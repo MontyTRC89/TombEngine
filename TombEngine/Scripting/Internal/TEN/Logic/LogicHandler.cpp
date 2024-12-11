@@ -323,7 +323,7 @@ Possible event type values:
 */
 void LogicHandler::HandleEvent(const std::string& name, EventType type, sol::optional<Moveable&> activator)
 {
-	TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? (Activator)activator.value().GetIndex() : (Activator)LaraItem->Index);
+	TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? (Activator)activator.value().GetIndex() : (Activator)short(LaraItem->Index));
 }
 
 /*** Attempt to find an event set and enable specified event in it.
@@ -485,9 +485,11 @@ void LogicHandler::FreeLevelScripts()
 }
 
 // Used when loading.
-void LogicHandler::SetVariables(const std::vector<SavedVar>& vars)
+void LogicHandler::SetVariables(const std::vector<SavedVar>& vars, bool onlyLevelVars)
 {
-	ResetGameTables();
+	if (!onlyLevelVars)
+		ResetGameTables();
+
 	ResetLevelTables();
 
 	std::unordered_map<unsigned int, sol::table> solTables;
@@ -564,6 +566,9 @@ void LogicHandler::SetVariables(const std::vector<SavedVar>& vars)
 	sol::table levelVars = rootTable[ScriptReserved_LevelVars];
 	for (auto& [first, second] : levelVars)
 		(*m_handler.GetState())[ScriptReserved_LevelVars][first] = second;
+
+	if (onlyLevelVars)
+		return;
 
 	sol::table gameVars = rootTable[ScriptReserved_GameVars];
 	for (auto& [first, second] : gameVars)

@@ -7,6 +7,8 @@
 #include "./Shadows.hlsli"
 #include "./ShaderLight.hlsli"
 
+#define ROOM_LIGHT_COEFF 0.7f
+
 cbuffer RoomBuffer : register(b5)
 {
 	int Water;
@@ -141,28 +143,31 @@ PixelShaderOutput PS(PixelShaderInput input)
 		occlusion = pow(SSAOTexture.Sample(SSAOSampler, samplePosition).x, AmbientOcclusionExponent);
 	}
 
-	if (CastShadows)
+	lighting = DoShadow(input.WorldPosition, normal, lighting, -2.5f);
+	lighting = DoBlobShadows(input.WorldPosition, lighting);
+
+	bool onlyPointLights = (NumRoomLights & ~LT_MASK) == LT_MASK_POINT;
+	int numLights = NumRoomLights & LT_MASK;
+
+	for (int i = 0; i < numLights; i++)
 	{
-		float isPointLight = step(0.5f, Light.Type == LT_POINT); // 1.0 if LT_POINT, 0.0 otherwise
-		float isSpotLight  = step(0.5f, Light.Type == LT_SPOT);  // 1.0 if LT_SPOT,  0.0 otherwise
-		float isOtherLight = 1.0 - (isPointLight + isSpotLight); // 1.0 if neither LT_POINT nor LT_SPOT
-		
-		float3 pointLightShadow = DoPointLightShadow(input.WorldPosition, lighting);
-		float3 spotLightShadow  = DoSpotLightShadow(input.WorldPosition, normal, lighting);
-		
-		// Blend the shadows based on the light type
-		lighting = pointLightShadow * isPointLight + spotLightShadow * isSpotLight + lighting * isOtherLight;
-	}
+		if (onlyPointLights)
+		{
+			lighting += DoPointLight(input.WorldPosition, normal, RoomLights[i]) * ROOM_LIGHT_COEFF;
+		}
+		else
+		{
+			// Room dynamic lights can only be spot or point, so we use simplified function for that.
 
-    lighting = DoBlobShadows(input.WorldPosition, lighting);
+			float isPoint = step(0.5f, RoomLights[i].Type == LT_POINT);
+			float isSpot  = step(0.5f, RoomLights[i].Type == LT_SPOT);
 
-	for (int i = 0; i < NumRoomLights; i++)
-	{
-		float isPointLightRoom = step(0.5f, RoomLights[i].Type == LT_POINT);
-		float isSpotLightRoom  = step(0.5f, RoomLights[i].Type == LT_SPOT);
-
-		lighting += DoPointLight(input.WorldPosition, normal, RoomLights[i]) * isPointLightRoom;
-		lighting += DoSpotLight(input.WorldPosition, normal, RoomLights[i]) * isSpotLightRoom;
+			float3 pointLight = float3(0.0f, 0.0f, 0.0f);
+			float3 spotLight  = float3(0.0f, 0.0f, 0.0f);
+			DoPointAndSpotLight(input.WorldPosition, normal, RoomLights[i], pointLight, spotLight);
+			
+			lighting += pointLight * isPoint * ROOM_LIGHT_COEFF + spotLight  * isSpot * ROOM_LIGHT_COEFF;
+		}
 	}
 
 	if (Caustics)

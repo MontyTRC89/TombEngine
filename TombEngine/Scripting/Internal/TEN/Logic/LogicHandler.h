@@ -145,7 +145,7 @@ public:
 	void ExecuteFunction(const std::string& name, short idOne, short idTwo) override;
 
 	void GetVariables(std::vector<SavedVar>& vars) override;
-	void SetVariables(const std::vector<SavedVar>& vars) override;
+	void SetVariables(const std::vector<SavedVar>& vars, bool onlyLevelVars) override;
 	void ResetVariables();
 
 	void SetCallbackStrings(const std::vector<std::string>& preStart,

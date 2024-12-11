@@ -34,13 +34,6 @@ enum class FreezeMode
 	Player
 };
 
-enum class LevelLoadType
-{
-	New,
-	Hub,
-	Load
-};
-
 enum CardinalDirection
 {
 	NORTH,
@@ -106,8 +99,8 @@ void UpdateShatters();
 void CleanUp();
 
 void InitializeOrLoadGame(bool loadGame);
-void InitializeScripting(int levelIndex, LevelLoadType type);
-void DeInitializeScripting(int levelIndex);
+void InitializeScripting(int levelIndex, bool loadGame);
+void DeInitializeScripting(int levelIndex, GameStatus reason);
 
 void SetupInterpolation();
 
