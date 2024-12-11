@@ -34,6 +34,10 @@ namespace TEN::Renderer
 
 		_meshes.clear();
 
+		_dynamicLightList = 0;
+		for (auto& dynamicLightList : _dynamicLights)
+			dynamicLightList.clear();
+
 		int allocatedItemSize = (int)g_Level.Items.size() + MAX_SPAWNED_ITEM_COUNT;
 
 		auto item = RendererItem();
@@ -272,7 +276,7 @@ namespace TEN::Renderer
 					staticInfo->AmbientLight = r->AmbientLight;
 					staticInfo->Pose = oldMesh->pos;
 					staticInfo->Scale = oldMesh->scale;
-					staticInfo->OriginalSphere = GetStaticObject(staticInfo->ObjectNumber).visibilityBox.ToLocalBoundingSphere();
+					staticInfo->OriginalSphere = Statics[staticInfo->ObjectNumber].visibilityBox.ToLocalBoundingSphere();
 					staticInfo->IndexInRoom = l;
 
 					staticInfo->Update();
@@ -877,7 +881,7 @@ namespace TEN::Renderer
 
 		totalVertices = 0;
 		totalIndices = 0;
-		for (const auto& staticObj : StaticObjects)
+		for (const auto& staticObj : Statics)
 		{
 			const auto& mesh = g_Level.Meshes[staticObj.meshNumber];
 			for (const auto& bucket : mesh.buckets)
@@ -892,7 +896,7 @@ namespace TEN::Renderer
 
 		lastVertex = 0;
 		lastIndex = 0;
-		for (const auto& staticObj : StaticObjects)
+		for (const auto& staticObj : Statics)
 		{
 			auto newStaticObj = RendererObject();
 			newStaticObj.Type = 1;

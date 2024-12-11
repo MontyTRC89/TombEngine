@@ -193,9 +193,9 @@ namespace TEN::Entities::Creatures::TR2
 				Random::GenerateFloat(0.8f, 0.9f),
 				Random::GenerateFloat(0.4f, 0.5f),
 				Random::GenerateFloat(0.2f, 0.3f));
-			float falloff = Random::GenerateFloat(0.1f, 0.4f);
+			float falloff = Random::GenerateFloat(BLOCK(6), BLOCK(20));
 
-			TriggerDynamicLight(pos, color, falloff);
+			TriggerDynamicPointLight(pos, color, falloff);
 		}
 		break;
 
@@ -205,9 +205,9 @@ namespace TEN::Entities::Creatures::TR2
 				Random::GenerateFloat(0.8f, 0.9f),
 				Random::GenerateFloat(0.2f, 0.3f),
 				Random::GenerateFloat(0.0f, 0.1f));
-			float falloff = Random::GenerateFloat(0.1f, 0.2f);
+			float falloff = Random::GenerateFloat(BLOCK(6), BLOCK(12));
 
-			TriggerDynamicLight(pos, color, falloff);
+			TriggerDynamicPointLight(pos, color, falloff);
 		}
 		break;
 		}

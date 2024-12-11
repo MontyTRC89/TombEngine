@@ -119,7 +119,10 @@ CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible,
 
 	// Override extents if specified.
 	if (customRadius > 0.0f)
+	{
 		collidingAabb = BoundingBox(collidingItem.Pose.Position.ToVector3(), Vector3(customRadius));
+		convertedBounds.Extents = Vector3(customRadius);
+	}
 
 	// Run through neighboring rooms.
 	const auto& room = g_Level.Rooms[collidingItem.RoomNumber];
@@ -1844,10 +1847,9 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 					if (linkItem.HitPoints <= 0 || linkItem.HitPoints == NOT_TARGETABLE)
 						continue;
 
-					if (isHarmless || abs(item->Animation.Velocity.z) < VEHICLE_COLLISION_TERMINAL_VELOCITY ||
-						object.damageType == DamageMode::None)
+					if (isHarmless || abs(item->Animation.Velocity.z) < VEHICLE_COLLISION_TERMINAL_VELOCITY)
 					{
-						// If vehicle is harmless, enemy is non-damageable, or speed is too low, push enemy.
+						// If vehicle is harmless or speed is too low, just push enemy.
 						ItemPushItem(&linkItem, item, coll, false, 0);
 						continue;
 					}
@@ -1891,7 +1893,7 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 			// HACK: Shatter statics only by harmful vehicles.
 			if (!isPlayer && 
 				!isHarmless && abs(item->Animation.Velocity.z) > VEHICLE_COLLISION_TERMINAL_VELOCITY &&
-				GetStaticObject(staticObject.staticNumber).shatterType != ShatterType::None)
+				Statics[staticObject.staticNumber].shatterType != ShatterType::None)
 			{
 				SoundEffect(GetShatterSound(staticObject.staticNumber), &staticObject.pos);
 				ShatterObject(nullptr, &staticObject, -128, item->RoomNumber, 0);

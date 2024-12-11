@@ -346,7 +346,7 @@ namespace TEN::Entities::TR4
 			if (item->TriggerFlags % 1000 > 100)
 			{
 				item->ItemFlags[0] = -80;
-				FindAITargetObject(*item, ID_AI_X1);
+				FindAITargetObject(creature, ID_AI_X1);
 			}
 
 			item->TriggerFlags = 1000 * (item->TriggerFlags / 1000);

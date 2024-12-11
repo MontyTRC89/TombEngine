@@ -94,6 +94,13 @@ struct LevelData
 	std::vector<MESH>	  Meshes   = {};
 	std::vector<int>	  Bones	   = {};
 
+	// Animation data
+	std::vector<AnimData>				Anims	 = {};
+	std::vector<AnimFrame>				Frames	 = {};
+	std::vector<StateDispatchData>		Changes	 = {};
+	std::vector<StateDispatchRangeData> Ranges	 = {};
+	std::vector<int>					Commands = {};
+
 	// Collision data
 	std::vector<ROOM_INFO> Rooms	 = {};
 	std::vector<short>	   FloorData = {};
@@ -130,8 +137,6 @@ struct LevelData
 extern const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS;
 
 extern std::vector<int> MoveablesIds;
-extern int* StaticObjectsLUT;
-extern int StaticObjectsLUTSize;
 extern std::vector<int> SpriteSequencesIds;
 extern LevelData g_Level;
 extern int SystemNameHash;

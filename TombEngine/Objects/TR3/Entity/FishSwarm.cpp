@@ -184,7 +184,7 @@ namespace TEN::Entities::Creatures::TR3
 		// Follow path.
 		if (item.AIBits && !item.ItemFlags[4])
 		{
-			FindAITargetObject(item, ID_AI_FOLLOW, item.ItemFlags[3] + item.ItemFlags[2], false);
+			FindAITargetObject(&creature, ID_AI_FOLLOW, item.ItemFlags[3] + item.ItemFlags[2], false);
 
 			if (creature.AITarget->TriggerFlags == (item.ItemFlags[3] + item.ItemFlags[2]) &&
 				creature.AITarget->ObjectNumber == ID_AI_FOLLOW)

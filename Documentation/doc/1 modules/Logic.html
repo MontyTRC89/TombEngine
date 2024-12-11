@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.6 (Developer Version) Lua API</title>
+    <title>TombEngine 1.6 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -77,6 +77,7 @@
 <ul class="nowrap">
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
+  <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
@@ -184,6 +185,9 @@ PRESAVE <span class="comment">-- will be called immediately before OnSave
 PRELOAD <span class="comment">-- will be called immediately before OnLoad
 </span>POSTLOAD <span class="comment">-- will be called immediately after OnLoad
 </span>
+PREFREEZE <span class="comment">-- will be called before entering freeze mode
+</span>POSTFREEZE <span class="comment">-- will be called immediately after exiting freeze mode
+</span>
 <span class="comment">-- These take a LevelEndReason arg, like OnEnd
 </span>PREEND <span class="comment">-- will be called immediately before OnEnd
 </span>POSTEND <span class="comment">-- will be called immediately after OnEnd
@@ -191,6 +195,10 @@ PRELOAD <span class="comment">-- will be called immediately before OnLoad
 <span class="comment">-- These take functions which accepts a deltaTime argument
 </span>PRELOOP <span class="comment">-- will be called in the beginning of game loop
 </span>POSTLOOP <span class="comment">-- will be called at the end of game loop
+</span>
+<span class="comment">-- These take functions which accepts an objectNumber argument, like OnUseItem
+</span>PREUSEITEM <span class="comment">-- will be called immediately before OnUseItem
+</span>POSTUSEITEM <span class="comment">-- will be called immediately after OnUseItem
 </span></pre>
 		<p>The order in which two functions with the same CallbackPoint are called is undefined.
 i.e. if you register <code>MyFunc</code> and <code>MyFunc2</code> with <code>PRELOOP</code>, both will be called in the beginning of game loop, but there is no guarantee that <code>MyFunc</code> will be called before <code>MyFunc2</code>, or vice-versa.</p>
@@ -267,7 +275,8 @@ SAVE
 START
 END
 LOOP
-USEITEM</pre>
+USEITEM
+MENU</pre>
 
 
     <h3>Parameters:</h3>

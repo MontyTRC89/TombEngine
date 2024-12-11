@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.1.0 Lua API</title>
+    <title>TombEngine 1.6 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -34,21 +34,27 @@
 <ul class="nowrap">
   <li>    <a href="../1 modules/Effects.html">Effects</a></li>
   <li>    <a href="../1 modules/Flow.html">Flow</a></li>
+  <li>    <a href="../1 modules/Input.html">Input</a></li>
   <li>    <a href="../1 modules/Inventory.html">Inventory</a></li>
   <li>    <a href="../1 modules/Logic.html">Logic</a></li>
-  <li>    <a href="../1 modules/Misc.html">Misc</a></li>
   <li>    <a href="../1 modules/Objects.html">Objects</a></li>
+  <li>    <a href="../1 modules/Sound.html">Sound</a></li>
   <li>    <a href="../1 modules/Strings.html">Strings</a></li>
+  <li>    <a href="../1 modules/Util.html">Util</a></li>
+  <li>    <a href="../1 modules/View.html">View</a></li>
 </ul>
 <h2>2 Classes</h2>
 <ul class="nowrap">
+  <li>    <a href="../2 classes/View.DisplaySprite.html">View.DisplaySprite</a></li>
   <li>    <a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
   <li>    <a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
   <li>    <a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
+  <li>    <a href="../2 classes/Flow.LensFlare.html">Flow.LensFlare</a></li>
   <li>    <a href="../2 classes/Flow.Level.html">Flow.Level</a></li>
   <li>    <a href="../2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
   <li>    <a href="../2 classes/Flow.Settings.html">Flow.Settings</a></li>
   <li>    <a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
+  <li>    <a href="../2 classes/Flow.Starfield.html">Flow.Starfield</a></li>
   <li>    <a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
   <li>    <a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
   <li>    <a href="../2 classes/Objects.LaraObject.html">Objects.LaraObject</a></li>
@@ -71,14 +77,21 @@
 <ul class="nowrap">
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
-  <li>    <a href="../4 enums/Misc.ActionID.html">Misc.ActionID</a></li>
-  <li>    <a href="../4 enums/Misc.CameraType.html">Misc.CameraType</a></li>
-  <li>    <a href="../4 enums/Misc.LogLevel.html">Misc.LogLevel</a></li>
-  <li>    <here>Misc.SoundTrackType</here></li>
+  <li>    <here>Flow.FreezeMode</here></li>
+  <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
+  <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
+  <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
   <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
+  <li>    <a href="../4 enums/Sound.SoundTrackType.html">Sound.SoundTrackType</a></li>
+  <li>    <a href="../4 enums/Strings.DisplayStringOption.html">Strings.DisplayStringOption</a></li>
+  <li>    <a href="../4 enums/Util.LogLevel.html">Util.LogLevel</a></li>
+  <li>    <a href="../4 enums/View.AlignMode.html">View.AlignMode</a></li>
+  <li>    <a href="../4 enums/View.CameraType.html">View.CameraType</a></li>
+  <li>    <a href="../4 enums/View.PostProcessMode.html">View.PostProcessMode</a></li>
+  <li>    <a href="../4 enums/View.ScaleMode.html">View.ScaleMode</a></li>
 </ul>
 <h2>5 Lua utility modules</h2>
 <ul class="nowrap">
@@ -90,18 +103,18 @@
 
 <div id="content">
 
-<h1>Enum <code>Misc.SoundTrackType</code></h1>
-<p>Constants for the type of the audio tracks.</p>
+<h1>Enum <code>Flow.FreezeMode</code></h1>
+<p>Constants for freeze modes.</p>
 <p>
 
 </p>
 
 
-<h2><a href="#Misc_SoundTrackType_constants">Misc.SoundTrackType constants </a></h2>
+<h2><a href="#Flow_FreezeMode_constants">Flow.FreezeMode constants </a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" ><a href="#CONSTANT_STRING_HERE">CONSTANT_STRING_HERE</a></td>
-	<td class="summary">Table of sound track type constants (for use with sound track functions).</td>
+	<td class="summary">Table of freeze modes.</td>
 	</tr>
 </table>
 
@@ -109,17 +122,18 @@
 <br/>
 
 
-    <h2 class="section-header has-description"><a name="Misc_SoundTrackType_constants"></a>Misc.SoundTrackType constants </h2>
+    <h2 class="section-header has-description"><a name="Flow_FreezeMode_constants"></a>Flow.FreezeMode constants </h2>
 
           <div class="section-description">
 
 
 
-<p>The following constants are inside SoundTrackType.</p>
+<p>The following constants are inside Flow.FreezeMode.</p>
 
-<pre><code>ONESHOT
-LOOPED
-VOICE
+<pre><code>NONE - Normal in-game operation.
+FULL - Game is completely frozen, as in pause or inventory menus.
+SPECTATOR - Game is completely frozen, but with ability to control camera.
+PLAYER - Game is completely frozen, but with ability to control player. Experimental.
 </code></pre>
 
 
@@ -130,7 +144,7 @@ VOICE
     <strong>CONSTANT_STRING_HERE</strong>
     </dt>
     <dd>
-    Table of sound track type constants (for use with sound track functions).
+    Table of freeze modes.
 
 
 
@@ -147,7 +161,6 @@ VOICE
 </div> <!-- id="main" -->
 <div id="about">
 <i>generated by <a href="https://github.com/hispidence/TEN-LDoc">TEN-LDoc</a> (a fork of <a href="http://github.com/stevedonovan/LDoc">LDoc 1.4.6</a>)</i>
-<i style="float:right;">Last updated 2023-09-30 13:48:57 </i>
 </div> <!-- id="about" -->
 </div> <!-- id="container" -->
 </body>

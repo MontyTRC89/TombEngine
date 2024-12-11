@@ -333,6 +333,8 @@ void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 
 void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass)
 {
+	bool forceValue = g_GameFlow->CurrentFreezeMode == FreezeMode::Player;
+
 	for (int i = 0; i < HairEffect.Units.size(); i++)
 	{
 		const auto& unit = HairEffect.Units[i];
@@ -353,9 +355,9 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 			const auto& segment = unit.Segments[i];
 			auto worldMatrix = 
 				Matrix::CreateFromQuaternion(
-					Quaternion::Lerp(segment.PrevOrientation, segment.Orientation, _interpolationFactor)) *
+					Quaternion::Lerp(segment.PrevOrientation, segment.Orientation, GetInterpolationFactor(forceValue))) *
 				Matrix::CreateTranslation(
-					Vector3::Lerp(segment.PrevPosition, segment.Position, _interpolationFactor));
+					Vector3::Lerp(segment.PrevPosition, segment.Position, GetInterpolationFactor(forceValue)));
 
 			_stItem.BonesMatrices[i + 1] = worldMatrix;
 			_stItem.BoneLightModes[i] = (int)LightMode::Dynamic;
