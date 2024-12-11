@@ -1715,7 +1715,7 @@ static void ParseStatistics(const Save::SaveGame* s, bool isHub)
 	SaveGame::Statistics.Game.TimeTaken = s->game()->timer();
 }
 
-static void ParseLua(const Save::SaveGame* s)
+static void ParseLua(const Save::SaveGame* s, bool hubMode)
 {
 	// Event sets
 
@@ -1819,7 +1819,7 @@ static void ParseLua(const Save::SaveGame* s)
 		}
 	}
 
-	g_GameScript->SetVariables(loadedVars);
+	g_GameScript->SetVariables(loadedVars, hubMode);
 
 	auto populateCallbackVecs = [&s](auto callbackFunc)
 	{
@@ -2683,7 +2683,7 @@ void SaveGame::Parse(const std::vector<byte>& buffer, bool hubMode)
 	const Save::SaveGame* s = Save::GetSaveGame(buffer.data());
 
 	ParseLevel(s, hubMode);
-	ParseLua(s);
+	ParseLua(s, hubMode);
 	ParseStatistics(s, hubMode);
 
 	// Effects and player data is ignored when loading hub.
