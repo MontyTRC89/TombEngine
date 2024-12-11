@@ -206,6 +206,19 @@ bool SaveGame::DoesSaveGameExist(int slot, bool silent)
 	return true;
 }
 
+bool SaveGame::IsSaveGameValid(int slot)
+{
+	SaveGameHeader header;
+	if (!LoadHeader(slot, &header))
+		return false;
+
+	// Hash mismatch between savegame and level file means that level version has changed.
+	if (header.LevelHash != LastLevelHash)
+		return false;
+
+	return true;
+}
+
 bool SaveGame::IsLoadGamePossible()
 {
 	for (int i = 0; i < SAVEGAME_MAX; i++)
@@ -1574,7 +1587,7 @@ bool SaveGame::Save(int slot)
 		return false;
 
 	g_GameScript->OnSave();
-	HandleAllGlobalEvents(EventType::Save, (Activator)LaraItem->Index);
+	HandleAllGlobalEvents(EventType::Save, (Activator)short(LaraItem->Index));
 
 	// Savegame infos need to be reloaded so that last savegame counter properly increases.
 	LoadHeaders();
@@ -1614,15 +1627,9 @@ bool SaveGame::Save(int slot)
 
 bool SaveGame::Load(int slot)
 {
-	if (!IsSaveGameSlotValid(slot))
+	if (!IsSaveGameValid(slot))
 	{
-		TENLog("Savegame slot " + std::to_string(slot) + " is invalid, load is impossible.", LogLevel::Error);
-		return false;
-	}
-
-	if (!DoesSaveGameExist(slot))
-	{
-		TENLog("Savegame in slot " + std::to_string(slot) + " does not exist.", LogLevel::Error);
+		TENLog("Loading from savegame in slot " + std::to_string(slot) + " is impossible, data is missing or level has changed.", LogLevel::Error);
 		return false;
 	}
 
@@ -1704,7 +1711,7 @@ static void ParseStatistics(const Save::SaveGame* s, bool isHub)
 	SaveGame::Statistics.Game.Timer = s->game()->timer();
 }
 
-static void ParseLua(const Save::SaveGame* s)
+static void ParseLua(const Save::SaveGame* s, bool hubMode)
 {
 	// Event sets
 
@@ -1808,7 +1815,7 @@ static void ParseLua(const Save::SaveGame* s)
 		}
 	}
 
-	g_GameScript->SetVariables(loadedVars);
+	g_GameScript->SetVariables(loadedVars, hubMode);
 
 	auto populateCallbackVecs = [&s](auto callbackFunc)
 	{
@@ -2672,7 +2679,7 @@ void SaveGame::Parse(const std::vector<byte>& buffer, bool hubMode)
 	const Save::SaveGame* s = Save::GetSaveGame(buffer.data());
 
 	ParseLevel(s, hubMode);
-	ParseLua(s);
+	ParseLua(s, hubMode);
 	ParseStatistics(s, hubMode);
 
 	// Effects and player data is ignored when loading hub.

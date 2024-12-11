@@ -157,7 +157,7 @@ GameStatus GamePhase(bool insideMenu)
 
 	// Pre-loop script and event handling.
 	g_GameScript->OnLoop(DELTA_TIME, false); // TODO: Don't use DELTA_TIME constant with high framerate.
-	HandleAllGlobalEvents(EventType::Loop, (Activator)LaraItem->Index);
+	HandleAllGlobalEvents(EventType::Loop, (Activator)short(LaraItem->Index));
 
 	// Queued input actions are read again after OnLoop, so that remaining control loop can immediately register
 	// emulated keypresses from the script.
@@ -244,7 +244,7 @@ GameStatus GamePhase(bool insideMenu)
 		// Call post-loop callbacks last time and end level.
 		g_GameScript->OnLoop(DELTA_TIME, true);
 		g_GameScript->OnEnd(gameStatus);
-		HandleAllGlobalEvents(EventType::End, (Activator)LaraItem->Index);
+		HandleAllGlobalEvents(EventType::End, (Activator)short(LaraItem->Index));
 	}
 	else
 	{
@@ -299,7 +299,7 @@ GameStatus FreezePhase()
 	// Poll controls and call scripting events.
 	HandleControls(false);
 	g_GameScript->OnFreeze();
-	HandleAllGlobalEvents(EventType::Freeze, (Activator)LaraItem->Index);
+	HandleAllGlobalEvents(EventType::Freeze, (Activator)short(LaraItem->Index));
 
 	// Partially update scene if not using full freeze mode.
 	if (g_GameFlow->LastFreezeMode != FreezeMode::Full)
@@ -376,7 +376,6 @@ unsigned CALLBACK GameMain(void *)
 GameStatus DoLevel(int levelIndex, bool loadGame)
 {
 	bool isTitle = !levelIndex;
-	auto loadType = loadGame ? LevelLoadType::Load : (SaveGame::IsOnHub(levelIndex) ? LevelLoadType::Hub : LevelLoadType::New);
 
 	TENLog(isTitle ? "DoTitle" : "DoLevel", LogLevel::Info);
 
@@ -392,7 +391,7 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 	InitializeItemBoxData();
 
 	// Initialize scripting.
-	InitializeScripting(levelIndex, loadType);
+	InitializeScripting(levelIndex, loadGame);
 	InitializeNodeScripts();
 
 	// Initialize menu and inventory state.
@@ -540,12 +539,12 @@ void CleanUp()
 	ClearObjCamera();
 }
 
-void InitializeScripting(int levelIndex, LevelLoadType type)
+void InitializeScripting(int levelIndex, bool loadGame)
 {
 	TENLog("Loading level script...", LogLevel::Info);
 
 	g_GameStringsHandler->ClearDisplayStrings();
-	g_GameScript->ResetScripts(!levelIndex || type != LevelLoadType::New);
+	g_GameScript->ResetScripts(!levelIndex || loadGame);
 
 	const auto& level = *g_GameFlow->GetLevel(levelIndex);
 
@@ -575,7 +574,7 @@ void InitializeScripting(int levelIndex, LevelLoadType type)
 	}
 
 	// Play default background music.
-	if (type != LevelLoadType::Load)
+	if (!loadGame)
 		PlaySoundTrack(level.GetAmbientTrack(), SoundTrackType::BGM, 0, SOUND_XFADETIME_LEVELJUMP);
 }
 
@@ -594,13 +593,19 @@ void InitializeOrLoadGame(bool loadGame)
 	g_Gui.SetEnterInventory(NO_VALUE);
 
 	// Restore game?
-	if (loadGame && SaveGame::Load(g_GameFlow->SelectedSaveGame))
+	if (loadGame)
 	{
+		if (!SaveGame::Load(g_GameFlow->SelectedSaveGame))
+		{
+			NextLevel = g_GameFlow->GetNumLevels();
+			return;
+		}
+
 		InitializeGame = false;
 
 		g_GameFlow->SelectedSaveGame = 0;
 		g_GameScript->OnLoad();
-		HandleAllGlobalEvents(EventType::Load, (Activator)LaraItem->Index);
+		HandleAllGlobalEvents(EventType::Load, (Activator)short(LaraItem->Index));
 	}
 	else
 	{
@@ -624,7 +629,7 @@ void InitializeOrLoadGame(bool loadGame)
 		}
 
 		g_GameScript->OnStart();
-		HandleAllGlobalEvents(EventType::Start, (Activator)LaraItem->Index);
+		HandleAllGlobalEvents(EventType::Start, (Activator)short(LaraItem->Index));
 	}
 }
 
