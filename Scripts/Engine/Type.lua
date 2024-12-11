@@ -15,6 +15,15 @@
 --      end
 --	end
 --
+--
+-- You can use the `not` keyword together with the functions of the Type module.
+--
+-- Example: checking if variable does not have a null value
+--	LevelFuncs.AddProp = function (prop)
+--      if not Type.IsNull(prop) then
+--          LevelVars.property = prop
+--      end
+--	end
 -- @luautil Type
 
 local Type = {}
@@ -54,11 +63,9 @@ end
     -- --example of use
     --  LevelFuncs.test = function (test)
     --      if Type.IsBoolean(test) then
-    --          if test then
-    --              TEN.Util.PrintLog("Correct!", Util.LogLevel.INFO)
-    --          else
-    --              TEN.Util.PrintLog("Error!", Util.LogLevel.ERROR)
-    --          end
+    --          LevelVars.test = test
+    --      else
+    --          TEN.Util.PrintLog("Error!", Util.LogLevel.ERROR)
     --      end
     --  end
 Type.IsBoolean = function (variable)
@@ -87,7 +94,9 @@ end
     -- @usage
     -- --example of use
     --  LevelFuncs.AddProp = function (prop)
-    --      if not Type.IsNull(prop) then
+    --      if Type.IsNull(prop) then
+    --          TEN.Util.PrintLog("Error!", Util.LogLevel.ERROR)
+    --      else
     --          LevelVars.property = prop
     --      end
     --  end
