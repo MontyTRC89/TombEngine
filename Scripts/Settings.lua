@@ -14,8 +14,8 @@ local settings = Flow.Settings.new()
 	settings.Animations.ledgeJumps = false
 	settings.Animations.poseTimeout = 0
 	
-	settings.Camera.binocularLight = true
-	settings.Camera.lasersightLight = true
+	settings.Camera.binocularLightColor = Color(192, 192, 96)
+	settings.Camera.lasersightLightColor = Color(64, 255, 0)
 	settings.Camera.objectCollision = true
 	
 	settings.Flare.color = Color(128, 60, 0)
