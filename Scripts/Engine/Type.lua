@@ -18,7 +18,6 @@
 -- @luautil Type
 
 local Type = {}
-Type.__index = Type
 
 
     --- Check if the variable is a number.
@@ -40,8 +39,8 @@ end
     -- @usage
     -- --example of use
     --  local str = "Hi"
-    --  if Type.IsString(num) then
-    --      str = str .. "everyone!"
+    --  if Type.IsString(str) then
+    --      TEN.Util.PrintLog(str .. "everyone!", Util.LogLevel.INFO)
     --  end
 Type.IsString = function (variable)
     return type(variable) == "string"
@@ -55,7 +54,11 @@ end
     -- --example of use
     --  LevelFuncs.test = function (test)
     --      if Type.IsBoolean(test) then
-    --          TEN.Util.PrintLog("Correct!", Util.LogLevel.INFO)
+    --          if test then
+    --              TEN.Util.PrintLog("Correct!", Util.LogLevel.INFO)
+    --          else
+    --              TEN.Util.PrintLog("Error!", Util.LogLevel.ERROR)
+    --          end
     --      end
     --  end
 Type.IsBoolean = function (variable)
@@ -83,7 +86,7 @@ end
     -- @treturn boolean true if the variable is a null, false if it isn't a null
     -- @usage
     -- --example of use
-    --  LevelFuncs.Obj = function (prop)
+    --  LevelFuncs.AddProp = function (prop)
     --      if not Type.IsNull(prop) then
     --          LevelVars.property = prop
     --      end
