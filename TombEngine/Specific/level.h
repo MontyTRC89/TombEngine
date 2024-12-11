@@ -90,6 +90,7 @@ struct MirrorInfo
 	short RealRoom;
 	short VirtualRoom;
 	Vector4 MirrorPlane;
+	Matrix ReflectionMatrix;
 };
 
 // LevelData

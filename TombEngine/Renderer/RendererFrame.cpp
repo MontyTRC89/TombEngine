@@ -36,17 +36,7 @@ namespace TEN::Renderer
 
 			rendererMirror.RealRoom = mirror.RealRoom;
 			rendererMirror.VirtualRoom = mirror.VirtualRoom;
-			rendererMirror.Plane = Plane(
-				Vector3(mirror.MirrorPlane.x,
-					mirror.MirrorPlane.y,
-					mirror.MirrorPlane.z),
-				mirror.MirrorPlane.w);
-
-			Plane p = Plane(Vector3(mirror.MirrorPlane.x,
-				mirror.MirrorPlane.y,
-				mirror.MirrorPlane.z), Vector3(0, 0, BLOCK(21)));
-
-			rendererMirror.ReflectionMatrix = Matrix::CreateReflection(rendererMirror.Plane);
+			rendererMirror.ReflectionMatrix = mirror.ReflectionMatrix;
 		}
 
 		constexpr auto VIEW_PORT = Vector4(-1.0f, -1.0f, 1.0f, 1.0f);

@@ -205,12 +205,12 @@ namespace TEN::Renderer
 	{
 		memcpy(&lights[index], &light, sizeof(ShaderLight));
 
-		if (light.Hash == 0)
-			return;
+		if (light.Hash != 0)
+		{
+			lights[index].Position = Vector3::Lerp(light.PrevPosition, light.Position, GetInterpolationFactor());
+			lights[index].Direction = Vector3::Lerp(light.PrevDirection, light.Direction, GetInterpolationFactor());
+		}
 
-		lights[index].Position = Vector3::Lerp(light.PrevPosition, light.Position, GetInterpolationFactor());
-		lights[index].Direction = Vector3::Lerp(light.PrevDirection, light.Direction, GetInterpolationFactor());
-	
 		if (mirror != nullptr)
 		{
 			lights[index].Position = Vector3::Transform(lights[index].Position, mirror->ReflectionMatrix);

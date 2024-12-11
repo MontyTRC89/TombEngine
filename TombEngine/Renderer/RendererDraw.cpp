@@ -1607,6 +1607,18 @@ namespace TEN::Renderer
 
 		StoreInterpolatedDynamicLightData(dynamicLight);
 		_dynamicLights[_dynamicLightList].push_back(dynamicLight);
+
+		for (auto& mirror : g_Level.Mirrors)
+		{
+			if (Camera.pos.RoomNumber == mirror.RealRoom && IsPointInRoom(pos, mirror.RealRoom))
+			{
+				dynamicLight.Position = Vector3::Transform(pos, mirror.ReflectionMatrix);
+				dynamicLight.Direction = Vector3::Transform(dynamicLight.Direction, mirror.ReflectionMatrix);
+				dynamicLight.Hash = 0;
+
+				_dynamicLights[_dynamicLightList].push_back(dynamicLight);
+			}
+		}
 	}
 
 	void Renderer::AddDynamicPointLight(const Vector3& pos, float radius, const Color& color, bool castShadows, int hash)
@@ -1633,6 +1645,17 @@ namespace TEN::Renderer
 
 		StoreInterpolatedDynamicLightData(dynamicLight);
 		_dynamicLights[_dynamicLightList].push_back(dynamicLight);
+
+		for (auto& mirror : g_Level.Mirrors)
+		{
+			if (Camera.pos.RoomNumber == mirror.RealRoom && IsPointInRoom(pos, mirror.RealRoom))
+			{
+				dynamicLight.Position = Vector3::Transform(pos, mirror.ReflectionMatrix);
+				dynamicLight.Hash = 0;
+
+				_dynamicLights[_dynamicLightList].push_back(dynamicLight);
+			}
+		}
 	}
 
 	void Renderer::StoreInterpolatedDynamicLightData(RendererLight& light)

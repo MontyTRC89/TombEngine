@@ -1535,6 +1535,14 @@ void LoadMirrors()
 		mirror.MirrorPlane.y = ReadFloat();
 		mirror.MirrorPlane.z = ReadFloat();
 		mirror.MirrorPlane.w = ReadFloat();
+
+		Plane plane = Plane(
+			Vector3(mirror.MirrorPlane.x,
+					mirror.MirrorPlane.y,
+					mirror.MirrorPlane.z),
+			mirror.MirrorPlane.w);
+
+		mirror.ReflectionMatrix = Matrix::CreateReflection(plane);
 	}
 }
 

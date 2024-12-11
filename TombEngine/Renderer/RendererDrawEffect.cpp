@@ -1495,7 +1495,7 @@ namespace TEN::Renderer
 
 			SetBlendMode(BlendMode::Opaque, true);
 			SetDepthState(DepthState::Write, true);
-			SetCullMode(CullMode::CounterClockwise, true);
+			SetCullMode(mirror != nullptr ? CullMode::Clockwise : CullMode::CounterClockwise, true);
 		}
 	}
 
