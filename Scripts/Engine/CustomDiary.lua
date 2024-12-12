@@ -173,24 +173,30 @@ end
 
 --- The function returns the number of pages in the diary.
 -- @treturn int total number of pages in the diary.
-function CustomDiary:getPageCount()
+function CustomDiary:getUnlockedPageCount()
     
 	if GameVars.Engine.Diaries[self.Name] then
-		return #GameVars.Engine.Diaries[self.Name].Pages
+		return GameVars.Engine.Diaries[self.Name].UnlockedPages
 	end
 end
 
 -- The function sets the value of a custom bar over a specified time period.
 -- @int value: The new target to which the bar's current value should transition. (Must be a non-negative number; between 0 and the bar's maxValue.
--- @number time: The time (in seconds) over which the bar's value should transition to the target value.
 function CustomDiary:unlockPages(index)
     if GameVars.Engine.Diaries[self.Name] then
+
+        if index > #GameVars.Engine.Diaries[self.Name].Pages or index <=0 then
+            print("Index provided is higher than the page count.")
+            return
+        end
+
         local diary = GameVars.Engine.Diaries[self.Name]
 		diary.UnlockedPages = index
-               
-        print("Page unlocked")
+        diary.currentPageIndex = index
+        diary.NextPageIndex = nil
+        print("UnlockPages: currentPageIndex = " .. tostring(diary.currentPageIndex))
 
-        if diary.Notification  then
+        if diary.Notification and next(diary.Notification) then
             PlaySound(diary.Notification.NotificationSound)
             diary.Notification.ElapsedTime = 0
             diary.TargetAlpha = 255
@@ -359,9 +365,10 @@ function CustomDiary:customizeNotification(notificationTime, objectID, spriteID,
     end
 end
 
-function CustomDiary:customizePageNumbers(type, separator, textX, textY, textAlignment, textEffects, textScale, textColor)
+function CustomDiary:customizePageNumbers(type, prefix, separator, textX, textY, textAlignment, textEffects, textScale, textColor)
     if GameVars.Engine.Diaries[self.Name] and type >0 and type <=2 then
         GameVars.Engine.Diaries[self.Name].PageNumbers.type             = type
+        GameVars.Engine.Diaries[self.Name].PageNumbers.prefix           = prefix 
         GameVars.Engine.Diaries[self.Name].PageNumbers.separator        = separator 
         GameVars.Engine.Diaries[self.Name].PageNumbers.textX            = textX
         GameVars.Engine.Diaries[self.Name].PageNumbers.textY            = textY
@@ -427,7 +434,7 @@ LevelFuncs.Engine.Diaries.ShowDiary = function()
 	local dataName = objectNumber .. "_diarydata"
 
     if GameVars.Engine.Diaries[dataName] then
-
+        
         local diary             = GameVars.Engine.Diaries[dataName]
         local currentIndex      = diary.currentPageIndex
         local maxPages          = diary.UnlockedPages
@@ -479,7 +486,7 @@ LevelFuncs.Engine.Diaries.ShowDiary = function()
                     StopAudioTrack(Sound.SoundTrackType.VOICE)
                     PlaySound(diary.PageSound)
                 end
-            elseif KeyIsHit(ActionID.RIGHT) and not (diary.EntryFadingOut or diary.EntryFadingIn) then
+        elseif KeyIsHit(ActionID.RIGHT) and not (diary.EntryFadingOut or diary.EntryFadingIn) then
                 -- Initiate fade-out to switch to the next page
                 if currentIndex < maxPages then
                     diary.EntryFadingOut = true
@@ -494,7 +501,6 @@ LevelFuncs.Engine.Diaries.ShowDiary = function()
 
        --Sets the currentindex so that the diary opens at the same page
         diary.currentPageIndex = currentIndex
-
         local textEntries = GameVars.Engine.Diaries[dataName].Pages[currentIndex].TextEntries
         local imageEntries = GameVars.Engine.Diaries[dataName].Pages[currentIndex].ImageEntries
 
@@ -511,13 +517,14 @@ LevelFuncs.Engine.Diaries.ShowDiary = function()
             TEN.Logic.RemoveCallback(TEN.Logic.CallbackPoint.PREFREEZE, LevelFuncs.Engine.Diaries.ShowDiary)
             return
         end
-
-        if diary.PageNumbers then
+        
+        --show page numbers code
+        if diary.PageNumbers and next(diary.PageNumbers) then
             
             local entry = diary.PageNumbers
             local pageNumbers = currentIndex
             if entry.type == 2 then
-                pageNumbers = currentIndex  .. entry.separator .. #diary.Pages
+                pageNumbers = entry.prefix .. currentIndex  .. entry.separator .. diary.UnlockedPages
             end
 
             local pageNumberText = LevelFuncs.Engine.Node.GenerateString(pageNumbers, entry.textX, entry.textY, entry.textScale, entry.textAlignment, entry.textEffects, entry.textColor, (diary.CurrentAlpha/255))
@@ -607,12 +614,14 @@ LevelFuncs.Engine.Diaries.ShowNotification = function(dt)
         GameVars.Engine.Diaries[dataName].Notification.ElapsedTime  = GameVars.Engine.Diaries[dataName].Notification.ElapsedTime + dt
         
         if GameVars.Engine.Diaries[dataName].Notification.ElapsedTime <= GameVars.Engine.Diaries[dataName].Notification.NotificationTime then
-            LevelFuncs.Engine.Diaries.PrepareNotification()
+            diary.TargetAlpha = 255
         else
             diary.TargetAlpha = 0
         end
         
-        if diary.CurrentAlpha == 0 then
+        if diary.CurrentAlpha > 0 then
+            LevelFuncs.Engine.Diaries.PrepareNotification()
+        elseif diary.CurrentAlpha == 0 then
             GameVars.Engine.Diaries[dataName].Notification.ElapsedTime = 0
             TEN.Logic.RemoveCallback(TEN.Logic.CallbackPoint.PRELOOP, LevelFuncs.Engine.Diaries.ShowNotification)
             return
