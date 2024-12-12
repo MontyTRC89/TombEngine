@@ -1361,6 +1361,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClCompile Include="Specific\RGBAColor8Byte.cpp" />
     <ClCompile Include="Specific\trutils.cpp" />
     <ClCompile Include="Specific\winmain.cpp" />
+    <ClCompile Include="Specific\Worker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Objects\Generic\Switches\rail_switch.h" />
