@@ -2658,7 +2658,7 @@ namespace TEN::Renderer
 				// Set shadow map data and bind shadow map texture.
 				if (_shadowLight != nullptr)
 				{
-					memcpy(&_stShadowMap.Light, _shadowLight, sizeof(ShaderLight));
+					BindLight(*_shadowLight, &_stShadowMap.Light, 0);
 					_stShadowMap.ShadowMapSize = g_Configuration.ShadowMapSize;
 					_stShadowMap.CastShadows = true;
 

@@ -39,6 +39,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### New Features
 * Added fast savegame reloading.
+* Added dynamic shadow casting on objects and static meshes.
 * Added ricochet sounds and make the effect more prominent.
 * Allow camera shake during flybys.
 * Allow to run the engine without title level.
@@ -58,6 +59,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Use load camera instead of load screen by playing fixed camera from OnEnd() event and removing loadScreenFile field from level's gameflow entry.
 * Fixed DisplayString class not supporting some Unicode characters and empty lines in multiline strings.
 * Fixed DisplayString not being deallocated after showing.
+* Fixed GameVars not transferring between levels in hub mode.
 * Fixed incorrect behaviour of Moveable:GetJointRotation() function.
 * Fixed incorrect behaviour of Logic.EnableEvent() and Logic.DisableEvent() functions.
 * Fixed Util.HasLineOfSight() not taking static meshes into consideration.

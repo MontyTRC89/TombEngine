@@ -129,19 +129,28 @@ float3 DoSpotLight(float3 pos, float3 normal, ShaderLight light)
     float3 lightVec = pos - light.Position.xyz;
     float  distance = length(lightVec);
     float3 lightDir = normalize(lightVec);
-    float  cosine   = dot(lightDir, light.Direction.xyz);
 
-    // Angle attenuation
-    float coneInCos = cos(light.InRange * (PI / 180.0f));
-    float coneOutCos = cos(light.OutRange * (PI / 180.0f));
-    float angleAttenuation = saturate((cosine - coneOutCos) / (coneInCos - coneOutCos));
-
-    // Distance attenuation
+    float cosine = dot(lightDir, light.Direction.xyz);
+    float angleAttenuation = saturate((cosine - light.OutRange) / (light.InRange - light.OutRange));
     float distanceAttenuation = saturate((light.Out - distance) / (light.Out - light.In));
 
-    // Surface lighting
     float d = saturate(dot(normal, -lightDir));
     return saturate(light.Color.xyz * light.Intensity * angleAttenuation * distanceAttenuation * d);
+}
+
+void DoPointAndSpotLight(float3 pos, float3 normal, ShaderLight light, out float3 pointOutput, out float3 spotOutput)
+{
+    float3 lightVec = light.Position.xyz - pos;
+    float  distance = length(lightVec);
+    float3 lightDir = normalize(lightVec);
+	
+    float cosine = dot(-lightDir, light.Direction.xyz);
+    float distanceAttenuation = saturate((light.Out - distance) / (light.Out - light.In));
+    float angleAttenuation = saturate((cosine - light.OutRange) / (light.InRange - light.OutRange));
+
+    float d = saturate(dot(normal, lightDir));
+    pointOutput = saturate(light.Color.xyz * light.Intensity * distanceAttenuation * d);
+    spotOutput  = saturate(light.Color.xyz * light.Intensity * angleAttenuation * distanceAttenuation * d);
 }
 
 float3 DoDirectionalLight(float3 pos, float3 normal, ShaderLight light)
@@ -364,23 +373,37 @@ float3 CombineLights(float3 ambient, float3 vertex, float3 tex, float3 pos, floa
 	float3 shadow  = 0;
 	float3 spec    = 0;
 
+	int lightTypeMask = (numLights & ~LT_MASK);
+	numLights = numLights & LT_MASK;
+	
 	for (int i = 0; i < numLights; i++)
 	{
-		float isPoint   = step(0.5f, float(lights[i].Type == LT_POINT));
-		float isSpot    = step(0.5f, float(lights[i].Type == LT_SPOT));
-		float isSun     = step(0.5f, float(lights[i].Type == LT_SUN));
-		float isShadow  = step(0.5f, float(lights[i].Type == LT_SHADOW));
+		if (lightTypeMask & LT_MASK_SUN)
+		{
+			float isSun = step(0.5f, float(lights[i].Type == LT_SUN));
+			diffuse += isSun * DoDirectionalLight(pos, normal, lights[i]);
+			spec    += isSun * DoSpecularSun(normal, lights[i], sheen);
+		}
 
-		diffuse += isPoint * DoPointLight(pos, normal, lights[i]);
-		spec    += isPoint * DoSpecularPoint(pos, normal, lights[i], sheen);
+		if (lightTypeMask & LT_MASK_POINT)
+		{
+			float isPoint = step(0.5f, float(lights[i].Type == LT_POINT));
+			diffuse += isPoint * DoPointLight(pos, normal, lights[i]);
+			spec    += isPoint * DoSpecularPoint(pos, normal, lights[i], sheen);
+		}
 
-		diffuse += isSpot * DoSpotLight(pos, normal, lights[i]);
-		spec    += isSpot * DoSpecularSpot(pos, normal, lights[i], sheen);
-
-		diffuse += isSun * DoDirectionalLight(pos, normal, lights[i]);
-		spec    += isSun * DoSpecularSun(normal, lights[i], sheen);
-
-		shadow  += isShadow * DoShadowLight(pos, normal, lights[i]);
+		if (lightTypeMask & LT_MASK_SPOT)
+		{
+			float isSpot = step(0.5f, float(lights[i].Type == LT_SPOT));
+			diffuse += isSpot * DoSpotLight(pos, normal, lights[i]);
+			spec    += isSpot * DoSpecularSpot(pos, normal, lights[i], sheen);
+		}
+		
+		if (lightTypeMask & LT_MASK_SHADOW)
+		{
+			float isShadow = step(0.5f, float(lights[i].Type == LT_SHADOW));
+			shadow += isShadow * DoShadowLight(pos, normal, lights[i]);
+		}
 	}
 
 	shadow = saturate(shadow);
