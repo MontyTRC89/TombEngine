@@ -7033,7 +7033,6 @@ struct SaveGameHeaderT : public flatbuffers::NativeTable {
   typedef SaveGameHeader TableType;
   std::string level_name{};
   int32_t level_hash = 0;
-  int32_t days = 0;
   int32_t hours = 0;
   int32_t minutes = 0;
   int32_t seconds = 0;
@@ -7049,22 +7048,18 @@ struct SaveGameHeader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_LEVEL_NAME = 4,
     VT_LEVEL_HASH = 6,
-    VT_DAYS = 8,
-    VT_HOURS = 10,
-    VT_MINUTES = 12,
-    VT_SECONDS = 14,
-    VT_LEVEL = 16,
-    VT_TIMER = 18,
-    VT_COUNT = 20
+    VT_HOURS = 8,
+    VT_MINUTES = 10,
+    VT_SECONDS = 12,
+    VT_LEVEL = 14,
+    VT_TIMER = 16,
+    VT_COUNT = 18
   };
   const flatbuffers::String *level_name() const {
     return GetPointer<const flatbuffers::String *>(VT_LEVEL_NAME);
   }
   int32_t level_hash() const {
     return GetField<int32_t>(VT_LEVEL_HASH, 0);
-  }
-  int32_t days() const {
-    return GetField<int32_t>(VT_DAYS, 0);
   }
   int32_t hours() const {
     return GetField<int32_t>(VT_HOURS, 0);
@@ -7089,7 +7084,6 @@ struct SaveGameHeader FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyOffset(verifier, VT_LEVEL_NAME) &&
            verifier.VerifyString(level_name()) &&
            VerifyField<int32_t>(verifier, VT_LEVEL_HASH) &&
-           VerifyField<int32_t>(verifier, VT_DAYS) &&
            VerifyField<int32_t>(verifier, VT_HOURS) &&
            VerifyField<int32_t>(verifier, VT_MINUTES) &&
            VerifyField<int32_t>(verifier, VT_SECONDS) &&
@@ -7112,9 +7106,6 @@ struct SaveGameHeaderBuilder {
   }
   void add_level_hash(int32_t level_hash) {
     fbb_.AddElement<int32_t>(SaveGameHeader::VT_LEVEL_HASH, level_hash, 0);
-  }
-  void add_days(int32_t days) {
-    fbb_.AddElement<int32_t>(SaveGameHeader::VT_DAYS, days, 0);
   }
   void add_hours(int32_t hours) {
     fbb_.AddElement<int32_t>(SaveGameHeader::VT_HOURS, hours, 0);
@@ -7149,7 +7140,6 @@ inline flatbuffers::Offset<SaveGameHeader> CreateSaveGameHeader(
     flatbuffers::FlatBufferBuilder &_fbb,
     flatbuffers::Offset<flatbuffers::String> level_name = 0,
     int32_t level_hash = 0,
-    int32_t days = 0,
     int32_t hours = 0,
     int32_t minutes = 0,
     int32_t seconds = 0,
@@ -7163,7 +7153,6 @@ inline flatbuffers::Offset<SaveGameHeader> CreateSaveGameHeader(
   builder_.add_seconds(seconds);
   builder_.add_minutes(minutes);
   builder_.add_hours(hours);
-  builder_.add_days(days);
   builder_.add_level_hash(level_hash);
   builder_.add_level_name(level_name);
   return builder_.Finish();
@@ -7178,7 +7167,6 @@ inline flatbuffers::Offset<SaveGameHeader> CreateSaveGameHeaderDirect(
     flatbuffers::FlatBufferBuilder &_fbb,
     const char *level_name = nullptr,
     int32_t level_hash = 0,
-    int32_t days = 0,
     int32_t hours = 0,
     int32_t minutes = 0,
     int32_t seconds = 0,
@@ -7190,7 +7178,6 @@ inline flatbuffers::Offset<SaveGameHeader> CreateSaveGameHeaderDirect(
       _fbb,
       level_name__,
       level_hash,
-      days,
       hours,
       minutes,
       seconds,
@@ -7206,6 +7193,7 @@ struct SaveGameStatisticsT : public flatbuffers::NativeTable {
   int32_t ammo_hits = 0;
   int32_t ammo_used = 0;
   int32_t medipacks_used = 0;
+  int32_t damage_taken = 0;
   int32_t distance = 0;
   int32_t kills = 0;
   int32_t secrets = 0;
@@ -7220,10 +7208,11 @@ struct SaveGameStatistics FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_AMMO_HITS = 4,
     VT_AMMO_USED = 6,
     VT_MEDIPACKS_USED = 8,
-    VT_DISTANCE = 10,
-    VT_KILLS = 12,
-    VT_SECRETS = 14,
-    VT_TIMER = 16
+    VT_DAMAGE_TAKEN = 10,
+    VT_DISTANCE = 12,
+    VT_KILLS = 14,
+    VT_SECRETS = 16,
+    VT_TIMER = 18
   };
   int32_t ammo_hits() const {
     return GetField<int32_t>(VT_AMMO_HITS, 0);
@@ -7233,6 +7222,9 @@ struct SaveGameStatistics FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   int32_t medipacks_used() const {
     return GetField<int32_t>(VT_MEDIPACKS_USED, 0);
+  }
+  int32_t damage_taken() const {
+    return GetField<int32_t>(VT_DAMAGE_TAKEN, 0);
   }
   int32_t distance() const {
     return GetField<int32_t>(VT_DISTANCE, 0);
@@ -7251,6 +7243,7 @@ struct SaveGameStatistics FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_AMMO_HITS) &&
            VerifyField<int32_t>(verifier, VT_AMMO_USED) &&
            VerifyField<int32_t>(verifier, VT_MEDIPACKS_USED) &&
+           VerifyField<int32_t>(verifier, VT_DAMAGE_TAKEN) &&
            VerifyField<int32_t>(verifier, VT_DISTANCE) &&
            VerifyField<int32_t>(verifier, VT_KILLS) &&
            VerifyField<int32_t>(verifier, VT_SECRETS) &&
@@ -7274,6 +7267,9 @@ struct SaveGameStatisticsBuilder {
   }
   void add_medipacks_used(int32_t medipacks_used) {
     fbb_.AddElement<int32_t>(SaveGameStatistics::VT_MEDIPACKS_USED, medipacks_used, 0);
+  }
+  void add_damage_taken(int32_t damage_taken) {
+    fbb_.AddElement<int32_t>(SaveGameStatistics::VT_DAMAGE_TAKEN, damage_taken, 0);
   }
   void add_distance(int32_t distance) {
     fbb_.AddElement<int32_t>(SaveGameStatistics::VT_DISTANCE, distance, 0);
@@ -7303,6 +7299,7 @@ inline flatbuffers::Offset<SaveGameStatistics> CreateSaveGameStatistics(
     int32_t ammo_hits = 0,
     int32_t ammo_used = 0,
     int32_t medipacks_used = 0,
+    int32_t damage_taken = 0,
     int32_t distance = 0,
     int32_t kills = 0,
     int32_t secrets = 0,
@@ -7312,6 +7309,7 @@ inline flatbuffers::Offset<SaveGameStatistics> CreateSaveGameStatistics(
   builder_.add_secrets(secrets);
   builder_.add_kills(kills);
   builder_.add_distance(distance);
+  builder_.add_damage_taken(damage_taken);
   builder_.add_medipacks_used(medipacks_used);
   builder_.add_ammo_used(ammo_used);
   builder_.add_ammo_hits(ammo_hits);
@@ -7330,6 +7328,7 @@ struct SaveGameT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::SaveGameHeaderT> header{};
   std::unique_ptr<TEN::Save::SaveGameStatisticsT> game{};
   std::unique_ptr<TEN::Save::SaveGameStatisticsT> level{};
+  int32_t secret_map = 0;
   std::unique_ptr<TEN::Save::CameraT> camera{};
   std::unique_ptr<TEN::Save::LaraT> lara{};
   std::vector<std::unique_ptr<TEN::Save::RoomT>> rooms{};
@@ -7394,60 +7393,61 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_HEADER = 4,
     VT_GAME = 6,
     VT_LEVEL = 8,
-    VT_CAMERA = 10,
-    VT_LARA = 12,
-    VT_ROOMS = 14,
-    VT_ITEMS = 16,
-    VT_NEXT_ITEM_FREE = 18,
-    VT_NEXT_ITEM_ACTIVE = 20,
-    VT_ROOM_ITEMS = 22,
-    VT_FISH_SWARM = 24,
-    VT_FXINFOS = 26,
-    VT_NEXT_FX_FREE = 28,
-    VT_NEXT_FX_ACTIVE = 30,
-    VT_FIXED_CAMERAS = 32,
-    VT_SINKS = 34,
-    VT_STATIC_MESHES = 36,
-    VT_FLYBY_CAMERAS = 38,
-    VT_PARTICLES = 40,
-    VT_RATS = 42,
-    VT_SPIDERS = 44,
-    VT_SCARABS = 46,
-    VT_BATS = 48,
-    VT_FLIP_MAPS = 50,
-    VT_FLIP_STATS = 52,
-    VT_FLIP_EFFECT = 54,
-    VT_FLIP_TIMER = 56,
-    VT_FLIP_STATUS = 58,
-    VT_CURRENT_FOV = 60,
-    VT_LAST_INV_ITEM = 62,
-    VT_ACTION_QUEUE = 64,
-    VT_SOUNDTRACKS = 66,
-    VT_CD_FLAGS = 68,
-    VT_POSTPROCESS_MODE = 70,
-    VT_POSTPROCESS_STRENGTH = 72,
-    VT_POSTPROCESS_TINT = 74,
-    VT_ROPE = 76,
-    VT_PENDULUM = 78,
-    VT_ALTERNATE_PENDULUM = 80,
-    VT_VOLUMES = 82,
-    VT_GLOBAL_EVENT_SETS = 84,
-    VT_VOLUME_EVENT_SETS = 86,
-    VT_SCRIPT_VARS = 88,
-    VT_CALLBACKS_PRE_START = 90,
-    VT_CALLBACKS_POST_START = 92,
-    VT_CALLBACKS_PRE_END = 94,
-    VT_CALLBACKS_POST_END = 96,
-    VT_CALLBACKS_PRE_SAVE = 98,
-    VT_CALLBACKS_POST_SAVE = 100,
-    VT_CALLBACKS_PRE_LOAD = 102,
-    VT_CALLBACKS_POST_LOAD = 104,
-    VT_CALLBACKS_PRE_LOOP = 106,
-    VT_CALLBACKS_POST_LOOP = 108,
-    VT_CALLBACKS_PRE_USEITEM = 110,
-    VT_CALLBACKS_POST_USEITEM = 112,
-    VT_CALLBACKS_PRE_FREEZE = 114,
-    VT_CALLBACKS_POST_FREEZE = 116
+    VT_SECRET_MAP = 10,
+    VT_CAMERA = 12,
+    VT_LARA = 14,
+    VT_ROOMS = 16,
+    VT_ITEMS = 18,
+    VT_NEXT_ITEM_FREE = 20,
+    VT_NEXT_ITEM_ACTIVE = 22,
+    VT_ROOM_ITEMS = 24,
+    VT_FISH_SWARM = 26,
+    VT_FXINFOS = 28,
+    VT_NEXT_FX_FREE = 30,
+    VT_NEXT_FX_ACTIVE = 32,
+    VT_FIXED_CAMERAS = 34,
+    VT_SINKS = 36,
+    VT_STATIC_MESHES = 38,
+    VT_FLYBY_CAMERAS = 40,
+    VT_PARTICLES = 42,
+    VT_RATS = 44,
+    VT_SPIDERS = 46,
+    VT_SCARABS = 48,
+    VT_BATS = 50,
+    VT_FLIP_MAPS = 52,
+    VT_FLIP_STATS = 54,
+    VT_FLIP_EFFECT = 56,
+    VT_FLIP_TIMER = 58,
+    VT_FLIP_STATUS = 60,
+    VT_CURRENT_FOV = 62,
+    VT_LAST_INV_ITEM = 64,
+    VT_ACTION_QUEUE = 66,
+    VT_SOUNDTRACKS = 68,
+    VT_CD_FLAGS = 70,
+    VT_POSTPROCESS_MODE = 72,
+    VT_POSTPROCESS_STRENGTH = 74,
+    VT_POSTPROCESS_TINT = 76,
+    VT_ROPE = 78,
+    VT_PENDULUM = 80,
+    VT_ALTERNATE_PENDULUM = 82,
+    VT_VOLUMES = 84,
+    VT_GLOBAL_EVENT_SETS = 86,
+    VT_VOLUME_EVENT_SETS = 88,
+    VT_SCRIPT_VARS = 90,
+    VT_CALLBACKS_PRE_START = 92,
+    VT_CALLBACKS_POST_START = 94,
+    VT_CALLBACKS_PRE_END = 96,
+    VT_CALLBACKS_POST_END = 98,
+    VT_CALLBACKS_PRE_SAVE = 100,
+    VT_CALLBACKS_POST_SAVE = 102,
+    VT_CALLBACKS_PRE_LOAD = 104,
+    VT_CALLBACKS_POST_LOAD = 106,
+    VT_CALLBACKS_PRE_LOOP = 108,
+    VT_CALLBACKS_POST_LOOP = 110,
+    VT_CALLBACKS_PRE_USEITEM = 112,
+    VT_CALLBACKS_POST_USEITEM = 114,
+    VT_CALLBACKS_PRE_FREEZE = 116,
+    VT_CALLBACKS_POST_FREEZE = 118
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -7457,6 +7457,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const TEN::Save::SaveGameStatistics *level() const {
     return GetPointer<const TEN::Save::SaveGameStatistics *>(VT_LEVEL);
+  }
+  int32_t secret_map() const {
+    return GetField<int32_t>(VT_SECRET_MAP, 0);
   }
   const TEN::Save::Camera *camera() const {
     return GetPointer<const TEN::Save::Camera *>(VT_CAMERA);
@@ -7628,6 +7631,7 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(game()) &&
            VerifyOffset(verifier, VT_LEVEL) &&
            verifier.VerifyTable(level()) &&
+           VerifyField<int32_t>(verifier, VT_SECRET_MAP) &&
            VerifyOffset(verifier, VT_CAMERA) &&
            verifier.VerifyTable(camera()) &&
            VerifyOffset(verifier, VT_LARA) &&
@@ -7774,6 +7778,9 @@ struct SaveGameBuilder {
   }
   void add_level(flatbuffers::Offset<TEN::Save::SaveGameStatistics> level) {
     fbb_.AddOffset(SaveGame::VT_LEVEL, level);
+  }
+  void add_secret_map(int32_t secret_map) {
+    fbb_.AddElement<int32_t>(SaveGame::VT_SECRET_MAP, secret_map, 0);
   }
   void add_camera(flatbuffers::Offset<TEN::Save::Camera> camera) {
     fbb_.AddOffset(SaveGame::VT_CAMERA, camera);
@@ -7953,6 +7960,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     flatbuffers::Offset<TEN::Save::SaveGameHeader> header = 0,
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> game = 0,
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> level = 0,
+    int32_t secret_map = 0,
     flatbuffers::Offset<TEN::Save::Camera> camera = 0,
     flatbuffers::Offset<TEN::Save::Lara> lara = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Room>>> rooms = 0,
@@ -8061,6 +8069,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
   builder_.add_rooms(rooms);
   builder_.add_lara(lara);
   builder_.add_camera(camera);
+  builder_.add_secret_map(secret_map);
   builder_.add_level(level);
   builder_.add_game(game);
   builder_.add_header(header);
@@ -8078,6 +8087,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     flatbuffers::Offset<TEN::Save::SaveGameHeader> header = 0,
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> game = 0,
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> level = 0,
+    int32_t secret_map = 0,
     flatbuffers::Offset<TEN::Save::Camera> camera = 0,
     flatbuffers::Offset<TEN::Save::Lara> lara = 0,
     const std::vector<flatbuffers::Offset<TEN::Save::Room>> *rooms = nullptr,
@@ -8173,6 +8183,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       header,
       game,
       level,
+      secret_map,
       camera,
       lara,
       rooms__,
@@ -10341,7 +10352,6 @@ inline void SaveGameHeader::UnPackTo(SaveGameHeaderT *_o, const flatbuffers::res
   (void)_resolver;
   { auto _e = level_name(); if (_e) _o->level_name = _e->str(); }
   { auto _e = level_hash(); _o->level_hash = _e; }
-  { auto _e = days(); _o->days = _e; }
   { auto _e = hours(); _o->hours = _e; }
   { auto _e = minutes(); _o->minutes = _e; }
   { auto _e = seconds(); _o->seconds = _e; }
@@ -10360,7 +10370,6 @@ inline flatbuffers::Offset<SaveGameHeader> CreateSaveGameHeader(flatbuffers::Fla
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const SaveGameHeaderT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _level_name = _o->level_name.empty() ? _fbb.CreateSharedString("") : _fbb.CreateString(_o->level_name);
   auto _level_hash = _o->level_hash;
-  auto _days = _o->days;
   auto _hours = _o->hours;
   auto _minutes = _o->minutes;
   auto _seconds = _o->seconds;
@@ -10371,7 +10380,6 @@ inline flatbuffers::Offset<SaveGameHeader> CreateSaveGameHeader(flatbuffers::Fla
       _fbb,
       _level_name,
       _level_hash,
-      _days,
       _hours,
       _minutes,
       _seconds,
@@ -10392,6 +10400,7 @@ inline void SaveGameStatistics::UnPackTo(SaveGameStatisticsT *_o, const flatbuff
   { auto _e = ammo_hits(); _o->ammo_hits = _e; }
   { auto _e = ammo_used(); _o->ammo_used = _e; }
   { auto _e = medipacks_used(); _o->medipacks_used = _e; }
+  { auto _e = damage_taken(); _o->damage_taken = _e; }
   { auto _e = distance(); _o->distance = _e; }
   { auto _e = kills(); _o->kills = _e; }
   { auto _e = secrets(); _o->secrets = _e; }
@@ -10409,6 +10418,7 @@ inline flatbuffers::Offset<SaveGameStatistics> CreateSaveGameStatistics(flatbuff
   auto _ammo_hits = _o->ammo_hits;
   auto _ammo_used = _o->ammo_used;
   auto _medipacks_used = _o->medipacks_used;
+  auto _damage_taken = _o->damage_taken;
   auto _distance = _o->distance;
   auto _kills = _o->kills;
   auto _secrets = _o->secrets;
@@ -10418,6 +10428,7 @@ inline flatbuffers::Offset<SaveGameStatistics> CreateSaveGameStatistics(flatbuff
       _ammo_hits,
       _ammo_used,
       _medipacks_used,
+      _damage_taken,
       _distance,
       _kills,
       _secrets,
@@ -10436,6 +10447,7 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = header(); if (_e) _o->header = std::unique_ptr<TEN::Save::SaveGameHeaderT>(_e->UnPack(_resolver)); }
   { auto _e = game(); if (_e) _o->game = std::unique_ptr<TEN::Save::SaveGameStatisticsT>(_e->UnPack(_resolver)); }
   { auto _e = level(); if (_e) _o->level = std::unique_ptr<TEN::Save::SaveGameStatisticsT>(_e->UnPack(_resolver)); }
+  { auto _e = secret_map(); _o->secret_map = _e; }
   { auto _e = camera(); if (_e) _o->camera = std::unique_ptr<TEN::Save::CameraT>(_e->UnPack(_resolver)); }
   { auto _e = lara(); if (_e) _o->lara = std::unique_ptr<TEN::Save::LaraT>(_e->UnPack(_resolver)); }
   { auto _e = rooms(); if (_e) { _o->rooms.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->rooms[_i] = std::unique_ptr<TEN::Save::RoomT>(_e->Get(_i)->UnPack(_resolver)); } } }
@@ -10503,6 +10515,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _header = _o->header ? CreateSaveGameHeader(_fbb, _o->header.get(), _rehasher) : 0;
   auto _game = _o->game ? CreateSaveGameStatistics(_fbb, _o->game.get(), _rehasher) : 0;
   auto _level = _o->level ? CreateSaveGameStatistics(_fbb, _o->level.get(), _rehasher) : 0;
+  auto _secret_map = _o->secret_map;
   auto _camera = _o->camera ? CreateCamera(_fbb, _o->camera.get(), _rehasher) : 0;
   auto _lara = _o->lara ? CreateLara(_fbb, _o->lara.get(), _rehasher) : 0;
   auto _rooms = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Room>> (_o->rooms.size(), [](size_t i, _VectorArgs *__va) { return CreateRoom(*__va->__fbb, __va->__o->rooms[i].get(), __va->__rehasher); }, &_va );
@@ -10562,6 +10575,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _header,
       _game,
       _level,
+      _secret_map,
       _camera,
       _lara,
       _rooms,

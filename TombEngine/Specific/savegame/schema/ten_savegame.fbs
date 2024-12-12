@@ -506,7 +506,6 @@ table UnionVec {
 table SaveGameHeader {
 	level_name: string;
 	level_hash: int32;
-	days: int32;
 	hours: int32;
 	minutes: int32;
 	seconds: int32;
@@ -519,6 +518,7 @@ table SaveGameStatistics {
 	ammo_hits: int32;
 	ammo_used: int32;
 	medipacks_used: int32;
+	damage_taken: int32;
 	distance: int32;
 	kills: int32;
 	secrets: int32;
@@ -529,6 +529,7 @@ table SaveGame {
 	header: SaveGameHeader;
 	game: SaveGameStatistics;
 	level: SaveGameStatistics;
+	secret_map: int32;
 	camera: Camera;
 	lara: Lara;
 	rooms: [Room];

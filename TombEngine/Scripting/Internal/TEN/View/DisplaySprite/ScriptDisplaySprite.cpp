@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Scripting/Internal/TEN/DisplaySprite/ScriptDisplaySprite.h"
+#include "Scripting/Internal/TEN/View/DisplaySprite/ScriptDisplaySprite.h"
 
 #include "Game/effects/DisplaySprite.h"
 #include "Game/Setup.h"
@@ -7,8 +7,8 @@
 #include "Renderer/Renderer.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
-#include "Scripting/Internal/TEN/Color/Color.h"
-#include "Scripting/Internal/TEN/Vec2/Vec2.h"
+#include "Scripting/Internal/TEN/Types/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 
 using TEN::Renderer::g_Renderer;
 

@@ -12,6 +12,7 @@
 #include "Game/items.h"
 #include "Game/effects/tomb4fx.h"
 #include "Math/Random.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Math::Random;
@@ -44,7 +45,7 @@ void ControlBodyPart(short fxNumber)
 		if (fx->speed)
 			fx->pos.Orientation.x += 4 * fx->fallspeed;
 
-		fx->fallspeed += 6;
+		fx->fallspeed += g_GameFlow->GetSettings()->Physics.Gravity;
 	}
 	else
 	{

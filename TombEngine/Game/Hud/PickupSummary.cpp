@@ -6,6 +6,7 @@
 #include "Game/pickup/pickup_consumable.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/clock.h"
 
 using namespace TEN::Math;
@@ -173,6 +174,9 @@ namespace TEN::Hud
 	void PickupSummaryController::Draw() const
 	{
 		//DrawDebug();
+
+		if (!g_GameFlow->GetSettings()->Hud.PickupNotifier)
+			return;
 
 		if (_displayPickups.empty())
 			return;

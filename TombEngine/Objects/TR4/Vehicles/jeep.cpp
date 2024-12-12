@@ -22,6 +22,7 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Input;
@@ -348,7 +349,7 @@ namespace TEN::Entities::Vehicles
 				if (flags)
 					verticalVelocity += flags + (flags / 2);
 				else
-					verticalVelocity += (int)((float)GRAVITY * 1.5f);
+					verticalVelocity += (int)(g_GameFlow->GetSettings()->Physics.Gravity * 1.5f);
 			}
 			else
 			{

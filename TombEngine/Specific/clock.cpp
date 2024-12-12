@@ -104,18 +104,6 @@ bool TimeInit()
 	return true;
 }
 
-GameTime GetGameTime(int ticks)
-{
-	auto gameTime = GameTime{};
-	int seconds = ticks / FPS;
-
-	gameTime.Days    = (seconds / (DAY_UNIT * SQUARE(TIME_UNIT)));
-	gameTime.Hours   = (seconds % (DAY_UNIT * SQUARE(TIME_UNIT))) / SQUARE(TIME_UNIT);
-	gameTime.Minutes = (seconds / TIME_UNIT) % TIME_UNIT;
-	gameTime.Seconds = seconds % TIME_UNIT;
-	return gameTime;
-}
-
 bool TestGlobalTimeInterval(float intervalSecs, float offsetSecs)
 {
 	int intervalGameFrames = (int)round(intervalSecs * FPS);

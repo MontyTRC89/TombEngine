@@ -7,7 +7,7 @@ As seen in TR4's Coastal Ruins and Sacred Lake levels.
 
 __Not currently implemented.__ 
 
-@tenclass Flow.Mirror
+@tenprimitive Flow.Mirror
 @pragma nostrip
 */
 

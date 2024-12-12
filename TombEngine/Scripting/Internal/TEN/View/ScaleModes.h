@@ -26,7 +26,7 @@ namespace TEN::Scripting::View
 	*/
 
 	/*** Table of display sprite scale modes.
-	@table CONSTANT_STRING_HERE
+	@table ScaleMode
 	*/
 
 	static const std::unordered_map<std::string, DisplaySpriteScaleMode> SCALE_MODES
