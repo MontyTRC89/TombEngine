@@ -122,10 +122,8 @@ float3 DoShadow(float3 worldPos, float3 normal, float3 lighting, float bias)
             float x, y;
 
             // Perform PCF filtering on a 4 x 4 texel neighborhood.
-            [unroll]
             for (y = -1.5; y <= 1.5; y += 1.0)
             {
-                [unroll]
                 for (x = -1.5; x <= 1.5; x += 1.0)
                 {
                     sum += ShadowMap.SampleCmpLevelZero(ShadowMapSampler, float3(lightClipSpace.xy + TexOffset(x, y), i), lightClipSpace.z);
