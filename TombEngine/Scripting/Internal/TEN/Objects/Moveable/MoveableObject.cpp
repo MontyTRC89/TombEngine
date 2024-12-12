@@ -640,7 +640,20 @@ Vec3 Moveable::GetJointPos(int jointIndex, sol::optional<Vec3> offset) const
 
 Rotation Moveable::GetJointRot(int jointIndex) const
 {
-	return GetBoneOrientation(*m_item, jointIndex);
+	auto point1 = GetJointPosition(m_item, jointIndex);
+	auto point2 = GetJointPosition(m_item, jointIndex, Vector3::Forward * BLOCK(1));
+
+	auto normal = (point1 - point2).ToVector3();
+	normal.Normalize();
+
+	auto eulers = EulerAngles(normal);
+
+	return
+	{
+		TO_DEGREES(eulers.x),
+		TO_DEGREES(eulers.y),
+		TO_DEGREES(eulers.z)
+	};
 }
 
 // This does not guarantee that the returned value will be identical

@@ -381,8 +381,8 @@ namespace TEN::Collision::Floordata
 		// Calculate and return tilt.
 		auto sign = isFloor ? 1 : -1;
 		return Vector2i(
-			round(scaledNormal.x * 4),
-			round(scaledNormal.z * 4)) * sign;
+			(round(scaledNormal.x) * 4),
+			(round(scaledNormal.z) * 4)) * sign;
 	}
 
 	Vector2i GetSectorPoint(int x, int z)

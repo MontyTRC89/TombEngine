@@ -33,7 +33,7 @@ static const std::unordered_map<std::string, RoomEnvFlags> ROOM_FLAG_IDS
 {
 	{ "WATER", RoomEnvFlags::ENV_FLAG_WATER },
 	{ "QUICKSAND", RoomEnvFlags::ENV_FLAG_SWAMP },
-	{ "SKYBOX", RoomEnvFlags::ENV_FLAG_OUTSIDE },
+	{ "SKYBOX", RoomEnvFlags::ENV_FLAG_SKYBOX },
 	{ "WIND", RoomEnvFlags::ENV_FLAG_WIND },
 	{ "COLD", RoomEnvFlags::ENV_FLAG_COLD },
 	{ "DAMAGE", RoomEnvFlags::ENV_FLAG_DAMAGE },

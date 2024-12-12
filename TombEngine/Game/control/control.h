@@ -26,11 +26,12 @@ enum class GameStatus
 	LevelComplete
 };
 
-enum class LevelLoadType
+enum class FreezeMode
 {
-	New,
-	Hub,
-	Load
+	None,
+	Full,
+	Spectator,
+	Player
 };
 
 enum CardinalDirection
@@ -98,8 +99,8 @@ void UpdateShatters();
 void CleanUp();
 
 void InitializeOrLoadGame(bool loadGame);
-void InitializeScripting(int levelIndex, LevelLoadType type);
-void DeInitializeScripting(int levelIndex);
+void InitializeScripting(int levelIndex, bool loadGame);
+void DeInitializeScripting(int levelIndex, GameStatus reason);
 
 void SetupInterpolation();
 

@@ -101,7 +101,7 @@ struct LEVEL
 	std::vector<AnimFrame>				Frames	 = {};
 	std::vector<StateDispatchData>		Changes	 = {};
 	std::vector<StateDispatchRangeData> Ranges	 = {};
-	std::vector<short>					Commands = {};
+	std::vector<int>					Commands = {};
 
 	// Collision
 
@@ -144,8 +144,6 @@ struct LEVEL
 extern const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS;
 
 extern std::vector<int> MoveablesIds;
-extern int* StaticObjectsLUT;
-extern int StaticObjectsLUTSize;
 extern std::vector<int> SpriteSequencesIds;
 extern LEVEL g_Level;
 extern int SystemNameHash;

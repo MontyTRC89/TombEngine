@@ -93,13 +93,13 @@ using namespace TEN::Entities::Effects;
 constexpr auto DEATH_NO_INPUT_TIMEOUT = 10 * FPS;
 constexpr auto DEATH_INPUT_TIMEOUT	  = 3 * FPS;
 
-int GameTimer       = 0;
-int GlobalCounter   = 0;
+int GameTimer	  = 0;
+int GlobalCounter = 0;
 
-bool InitializeGame;
-bool DoTheGame;
-bool JustLoaded;
-bool ThreadEnded;
+bool InitializeGame	= false;
+bool DoTheGame		= false;
+bool JustLoaded		= false;
+bool ThreadEnded	= false;
 
 int RequiredStartPos;
 int CurrentLevel;
@@ -121,15 +121,19 @@ void DrawPhase(bool isTitle, float interpolationFactor)
 	{
 		g_Renderer.RenderTitle(interpolationFactor);
 	}
-	else
+	else if (g_GameFlow->CurrentFreezeMode == FreezeMode::None)
 	{
 		g_Renderer.Render(interpolationFactor);
+	}
+	else
+	{
+		g_Renderer.RenderFreezeMode(interpolationFactor, g_GameFlow->CurrentFreezeMode == FreezeMode::Full);
 	}
 
 	g_Renderer.Lock();
 }
 
-GameStatus ControlPhase(bool insideMenu)
+GameStatus GamePhase(bool insideMenu)
 {
 	auto time1 = std::chrono::high_resolution_clock::now();
 	bool isTitle = (CurrentLevel == 0);
@@ -153,7 +157,7 @@ GameStatus ControlPhase(bool insideMenu)
 
 	// Pre-loop script and event handling.
 	g_GameScript->OnLoop(DELTA_TIME, false); // TODO: Don't use DELTA_TIME constant with high framerate.
-	HandleAllGlobalEvents(EventType::Loop, (Activator)LaraItem->Index);
+	HandleAllGlobalEvents(EventType::Loop, (Activator)short(LaraItem->Index));
 
 	// Queued input actions are read again after OnLoop, so that remaining control loop can immediately register
 	// emulated keypresses from the script.
@@ -240,7 +244,7 @@ GameStatus ControlPhase(bool insideMenu)
 		// Call post-loop callbacks last time and end level.
 		g_GameScript->OnLoop(DELTA_TIME, true);
 		g_GameScript->OnEnd(gameStatus);
-		HandleAllGlobalEvents(EventType::End, (Activator)LaraItem->Index);
+		HandleAllGlobalEvents(EventType::End, (Activator)short(LaraItem->Index));
 	}
 	else
 	{
@@ -261,6 +265,84 @@ GameStatus ControlPhase(bool insideMenu)
 	ControlPhaseTime = (std::chrono::duration_cast<std::chrono::nanoseconds>(time2 - time1)).count() / 1000000;
 
 	return gameStatus;
+}
+
+GameStatus FreezePhase()
+{
+	// If needed when first entering freeze mode, do initialization.
+	if (g_GameFlow->LastFreezeMode == FreezeMode::None)
+	{
+		// Capture the screen for drawing it as a background.
+		if (g_GameFlow->LastFreezeMode == FreezeMode::Full)
+			g_Renderer.DumpGameScene(SceneRenderMode::NoHud);
+
+		StopRumble();
+	}
+	
+	// Update last freeze mode here, so that items won't update inside freeze loop.
+	g_GameFlow->LastFreezeMode = g_GameFlow->CurrentFreezeMode;
+
+	g_Renderer.PrepareScene();
+	g_Renderer.SaveOldState();
+
+	ClearLensFlares();
+	ClearAllDisplaySprites();
+
+	SetupInterpolation();
+	PrepareCamera();
+
+	g_GameStringsHandler->ProcessDisplayStrings(DELTA_TIME);
+
+	// Track previous player animation to queue hair update if needed.
+	int lastAnimNumber = LaraItem->Animation.AnimNumber;
+
+	// Poll controls and call scripting events.
+	HandleControls(false);
+	g_GameScript->OnFreeze();
+	HandleAllGlobalEvents(EventType::Freeze, (Activator)short(LaraItem->Index));
+
+	// Partially update scene if not using full freeze mode.
+	if (g_GameFlow->LastFreezeMode != FreezeMode::Full)
+	{
+		if (g_GameFlow->LastFreezeMode == FreezeMode::Player)
+			UpdateLara(LaraItem, false);
+
+		UpdateAllItems();
+		UpdateGlobalLensFlare();
+
+		UpdateCamera();
+
+		PlaySoundSources();
+		Sound_UpdateScene();
+	}
+
+	// HACK: Update player hair if animation was switched in spectator mode.
+	// Needed for photo mode and other similar functionality.
+	if (g_GameFlow->LastFreezeMode == FreezeMode::Spectator &&
+		lastAnimNumber != LaraItem->Animation.AnimNumber)
+	{
+		lastAnimNumber = LaraItem->Animation.AnimNumber;
+		for (int i = 0; i < FPS; i++)
+			HairEffect.Update(*LaraItem);
+	}
+
+	// Update last freeze mode again, as it may have been changed in a script.
+	g_GameFlow->LastFreezeMode = g_GameFlow->CurrentFreezeMode;
+
+	return GameStatus::Normal;
+}
+
+GameStatus ControlPhase(bool insideMenu)
+{
+	// For safety, only allow to break game loop in non-title levels.
+	if (g_GameFlow->CurrentFreezeMode == FreezeMode::None || CurrentLevel == 0)
+	{
+		return GamePhase(insideMenu);
+	}
+	else
+	{
+		return FreezePhase();
+	}
 }
 
 unsigned CALLBACK GameMain(void *)
@@ -294,7 +376,6 @@ unsigned CALLBACK GameMain(void *)
 GameStatus DoLevel(int levelIndex, bool loadGame)
 {
 	bool isTitle = !levelIndex;
-	auto loadType = loadGame ? LevelLoadType::Load : (SaveGame::IsOnHub(levelIndex) ? LevelLoadType::Hub : LevelLoadType::New);
 
 	TENLog(isTitle ? "DoTitle" : "DoLevel", LogLevel::Info);
 
@@ -310,7 +391,7 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 	InitializeItemBoxData();
 
 	// Initialize scripting.
-	InitializeScripting(levelIndex, loadType);
+	InitializeScripting(levelIndex, loadGame);
 	InitializeNodeScripts();
 
 	// Initialize menu and inventory state.
@@ -458,12 +539,12 @@ void CleanUp()
 	ClearObjCamera();
 }
 
-void InitializeScripting(int levelIndex, LevelLoadType type)
+void InitializeScripting(int levelIndex, bool loadGame)
 {
 	TENLog("Loading level script...", LogLevel::Info);
 
 	g_GameStringsHandler->ClearDisplayStrings();
-	g_GameScript->ResetScripts(!levelIndex || type != LevelLoadType::New);
+	g_GameScript->ResetScripts(!levelIndex || loadGame);
 
 	const auto& level = *g_GameFlow->GetLevel(levelIndex);
 
@@ -493,7 +574,7 @@ void InitializeScripting(int levelIndex, LevelLoadType type)
 	}
 
 	// Play default background music.
-	if (type != LevelLoadType::Load)
+	if (!loadGame)
 		PlaySoundTrack(level.GetAmbientTrack(), SoundTrackType::BGM, 0, SOUND_XFADETIME_LEVELJUMP);
 }
 
@@ -512,13 +593,19 @@ void InitializeOrLoadGame(bool loadGame)
 	g_Gui.SetEnterInventory(NO_VALUE);
 
 	// Restore game?
-	if (loadGame && SaveGame::Load(g_GameFlow->SelectedSaveGame))
+	if (loadGame)
 	{
+		if (!SaveGame::Load(g_GameFlow->SelectedSaveGame))
+		{
+			NextLevel = g_GameFlow->GetNumLevels();
+			return;
+		}
+
 		InitializeGame = false;
 
 		g_GameFlow->SelectedSaveGame = 0;
 		g_GameScript->OnLoad();
-		HandleAllGlobalEvents(EventType::Load, (Activator)LaraItem->Index);
+		HandleAllGlobalEvents(EventType::Load, (Activator)short(LaraItem->Index));
 	}
 	else
 	{
@@ -542,7 +629,7 @@ void InitializeOrLoadGame(bool loadGame)
 		}
 
 		g_GameScript->OnStart();
-		HandleAllGlobalEvents(EventType::Start, (Activator)LaraItem->Index);
+		HandleAllGlobalEvents(EventType::Start, (Activator)short(LaraItem->Index));
 	}
 }
 
@@ -551,9 +638,9 @@ GameStatus DoGameLoop(int levelIndex)
 	int frameCount = LOOP_FRAME_COUNT;
 	auto& status = g_GameFlow->LastGameStatus;
 
-	// Before entering actual game loop, ControlPhase() must be
-	// called once to sort out various runtime shenanigangs (e.g. hair).
-	status = ControlPhase(false);
+	// Before entering actual game loop, GamePhase() must be called once to sort out
+	// various runtime shenanigangs (e.g. hair or freeze mode initialization).
+	status = GamePhase(false);
 
 	g_Synchronizer.Init();
 	bool legacy30FpsDoneDraw = false;
@@ -572,6 +659,9 @@ GameStatus DoGameLoop(int levelIndex)
 
 		if (status != GameStatus::Normal)
 			break;
+
+		if (g_GameFlow->LastFreezeMode != g_GameFlow->CurrentFreezeMode)
+			continue;
 
 		if (!g_Configuration.EnableHighFramerate)
 		{
@@ -671,7 +761,8 @@ GameStatus HandleMenuCalls(bool isTitle)
 	{
 		SaveGame::LoadHeaders();
 		g_Gui.SetInventoryMode(InventoryMode::Load);
-		g_Gui.CallInventory(LaraItem, false);
+		if (g_Gui.CallInventory(LaraItem, false))
+			gameStatus = GameStatus::LoadGame;
 	}
 	else if (doPause && g_Gui.GetInventoryMode() != InventoryMode::Pause)
 	{

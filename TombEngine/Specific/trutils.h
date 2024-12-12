@@ -12,6 +12,7 @@ namespace TEN::Utils
 	std::wstring ToWString(const std::string& string);
 	std::wstring ToWString(const char* cString);
 	std::vector<std::wstring> SplitString(const std::wstring& string);
+	int GetHash(const std::string& string);
 
 	// 2D space utilities
 	Vector2 GetAspectCorrect2DPosition(const Vector2& pos);

@@ -747,10 +747,10 @@ namespace TEN::Renderer
 		constexpr auto COUNT_STRING_INF	   = "Inf";
 		constexpr auto COUNT_STRING_OFFSET = Vector2(DISPLAY_SPACE_RES.x / 40, 0.0f);
 
-		auto pos = Vector2::Lerp(pickup.PrevPosition, pickup.Position, _interpolationFactor);
-		auto orient = EulerAngles::Lerp(pickup.PrevOrientation, pickup.Orientation, _interpolationFactor);
-		float scale = Lerp(pickup.PrevScale, pickup.Scale, _interpolationFactor);
-		float opacity = Lerp(pickup.PrevOpacity, pickup.Opacity, _interpolationFactor);
+		auto pos = Vector2::Lerp(pickup.PrevPosition, pickup.Position, GetInterpolationFactor());
+		auto orient = EulerAngles::Lerp(pickup.PrevOrientation, pickup.Orientation, GetInterpolationFactor());
+		float scale = Lerp(pickup.PrevScale, pickup.Scale, GetInterpolationFactor());
+		float opacity = Lerp(pickup.PrevOpacity, pickup.Opacity, GetInterpolationFactor());
 
 		// Draw display pickup.
 		DrawObjectIn2DSpace(pickup.ObjectID, pos, orient, scale);
@@ -886,7 +886,7 @@ namespace TEN::Renderer
 	void Renderer::RenderTitleImage()
 	{
 		Texture2D texture;
-		SetTextureOrDefault(texture, TEN::Utils::ToWString(g_GameFlow->IntroImagePath.c_str()));
+		SetTextureOrDefault(texture, TEN::Utils::ToWString(g_GameFlow->GetGameDir() + g_GameFlow->IntroImagePath.c_str()));
 
 		if (!texture.Texture)
 			return;
@@ -1107,6 +1107,46 @@ namespace TEN::Renderer
 		SetTextureOrDefault(_loadingScreenTexture, fileName);
 	}
 
+	void Renderer::RenderFreezeMode(float interpFactor, bool staticBackground)
+	{
+		if (staticBackground)
+		{	
+			// Set basic render states.
+			SetBlendMode(BlendMode::Opaque);
+			SetCullMode(CullMode::CounterClockwise);
+
+			// Clear screen
+			_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
+			_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+			// Bind back buffer.
+			_context->OMSetRenderTargets(1, _backBuffer.RenderTargetView.GetAddressOf(), _backBuffer.DepthStencilView.Get());
+			_context->RSSetViewports(1, &_viewport);
+			ResetScissor();
+
+			// Draw full screen background.
+			DrawFullScreenQuad(_dumpScreenRenderTarget.ShaderResourceView.Get(), Vector3::One);
+		}
+		else
+		{
+			InterpolateCamera(interpFactor);
+			RenderScene(&_backBuffer, _gameCamera, SceneRenderMode::NoHud);
+		}
+
+		// TODO: Put 3D object drawing management here (don't forget about interpolation!)
+		// Draw3DObjectsIn2DSpace(_gameCamera);
+
+		// Draw display sprites sorted by priority.
+		CollectDisplaySprites(_gameCamera);
+		DrawDisplaySprites(_gameCamera);
+		DrawAllStrings();
+
+		ClearScene();
+
+		_context->ClearState();
+		_swapChain->Present(1, 0);
+	}
+
 	void Renderer::RenderLoadingScreen(float percentage)
 	{
 		// Set basic render states.
@@ -1153,6 +1193,7 @@ namespace TEN::Renderer
 			UpdateCameraMatrices(&Camera, BLOCK(g_GameFlow->GetLevel(CurrentLevel)->GetFarView()));
 			Camera.DisableInterpolation = true;
 			DumpGameScene();
+			_graphicsSettingsChanged = false;
 		}
 
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);

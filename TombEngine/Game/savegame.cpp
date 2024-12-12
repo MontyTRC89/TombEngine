@@ -206,6 +206,19 @@ bool SaveGame::DoesSaveGameExist(int slot, bool silent)
 	return true;
 }
 
+bool SaveGame::IsSaveGameValid(int slot)
+{
+	SaveGameHeader header;
+	if (!LoadHeader(slot, &header))
+		return false;
+
+	// Hash mismatch between savegame and level file means that level version has changed.
+	if (header.LevelHash != LastLevelHash)
+		return false;
+
+	return true;
+}
+
 bool SaveGame::IsLoadGamePossible()
 {
 	for (int i = 0; i < SAVEGAME_MAX; i++)
@@ -1408,6 +1421,12 @@ const std::vector<byte> SaveGame::Build()
 	std::vector<std::string> callbackVecPreLoop;
 	std::vector<std::string> callbackVecPostLoop;
 
+	std::vector<std::string> callbackVecPreUseItem;
+	std::vector<std::string> callbackVecPostUseItem;
+
+	std::vector<std::string> callbackVecPreFreeze;
+	std::vector<std::string> callbackVecPostFreeze;
+
 	g_GameScript->GetCallbackStrings(
 		callbackVecPreStart,
 		callbackVecPostStart,
@@ -1418,7 +1437,11 @@ const std::vector<byte> SaveGame::Build()
 		callbackVecPreLoad,
 		callbackVecPostLoad,
 		callbackVecPreLoop,
-		callbackVecPostLoop);
+		callbackVecPostLoop,
+		callbackVecPreUseItem,
+		callbackVecPostUseItem,
+		callbackVecPreFreeze,
+		callbackVecPostFreeze);
 
 	auto stringsCallbackPreStart = fbb.CreateVectorOfStrings(callbackVecPreStart);
 	auto stringsCallbackPostStart = fbb.CreateVectorOfStrings(callbackVecPostStart);
@@ -1430,6 +1453,10 @@ const std::vector<byte> SaveGame::Build()
 	auto stringsCallbackPostLoad = fbb.CreateVectorOfStrings(callbackVecPostLoad);
 	auto stringsCallbackPreLoop = fbb.CreateVectorOfStrings(callbackVecPreLoop);
 	auto stringsCallbackPostLoop = fbb.CreateVectorOfStrings(callbackVecPostLoop);
+	auto stringsCallbackPreUseItem = fbb.CreateVectorOfStrings(callbackVecPreUseItem);
+	auto stringsCallbackPostUseItem = fbb.CreateVectorOfStrings(callbackVecPostUseItem);
+	auto stringsCallbackPreFreeze = fbb.CreateVectorOfStrings(callbackVecPreFreeze);
+	auto stringsCallbackPostFreeze = fbb.CreateVectorOfStrings(callbackVecPostFreeze);
 
 	Save::SaveGameBuilder sgb{ fbb };
 
@@ -1496,6 +1523,12 @@ const std::vector<byte> SaveGame::Build()
 	sgb.add_callbacks_pre_loop(stringsCallbackPreLoop);
 	sgb.add_callbacks_post_loop(stringsCallbackPostLoop);
 
+	sgb.add_callbacks_pre_useitem(stringsCallbackPreUseItem);
+	sgb.add_callbacks_post_useitem(stringsCallbackPostUseItem);
+
+	sgb.add_callbacks_pre_freeze(stringsCallbackPreFreeze);
+	sgb.add_callbacks_post_freeze(stringsCallbackPostFreeze);
+
 	auto sg = sgb.Finish();
 	fbb.Finish(sg);
 
@@ -1554,7 +1587,7 @@ bool SaveGame::Save(int slot)
 		return false;
 
 	g_GameScript->OnSave();
-	HandleAllGlobalEvents(EventType::Save, (Activator)LaraItem->Index);
+	HandleAllGlobalEvents(EventType::Save, (Activator)short(LaraItem->Index));
 
 	// Savegame infos need to be reloaded so that last savegame counter properly increases.
 	LoadHeaders();
@@ -1594,15 +1627,9 @@ bool SaveGame::Save(int slot)
 
 bool SaveGame::Load(int slot)
 {
-	if (!IsSaveGameSlotValid(slot))
+	if (!IsSaveGameValid(slot))
 	{
-		TENLog("Savegame slot " + std::to_string(slot) + " is invalid, load is impossible.", LogLevel::Error);
-		return false;
-	}
-
-	if (!DoesSaveGameExist(slot))
-	{
-		TENLog("Savegame in slot " + std::to_string(slot) + " does not exist.", LogLevel::Error);
+		TENLog("Loading from savegame in slot " + std::to_string(slot) + " is impossible, data is missing or level has changed.", LogLevel::Error);
 		return false;
 	}
 
@@ -1684,7 +1711,7 @@ static void ParseStatistics(const Save::SaveGame* s, bool isHub)
 	SaveGame::Statistics.Game.Timer = s->game()->timer();
 }
 
-static void ParseLua(const Save::SaveGame* s)
+static void ParseLua(const Save::SaveGame* s, bool hubMode)
 {
 	// Event sets
 
@@ -1788,7 +1815,7 @@ static void ParseLua(const Save::SaveGame* s)
 		}
 	}
 
-	g_GameScript->SetVariables(loadedVars);
+	g_GameScript->SetVariables(loadedVars, hubMode);
 
 	auto populateCallbackVecs = [&s](auto callbackFunc)
 	{
@@ -1816,6 +1843,12 @@ static void ParseLua(const Save::SaveGame* s)
 	auto callbacksPreLoopVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_loop);
 	auto callbacksPostLoopVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_loop);
 
+	auto callbacksPreUseItemVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_useitem);
+	auto callbacksPostUseItemVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_useitem);
+
+	auto callbacksPreFreezeVec = populateCallbackVecs(&Save::SaveGame::callbacks_pre_freeze);
+	auto callbacksPostFreezeVec = populateCallbackVecs(&Save::SaveGame::callbacks_post_freeze);
+
 	g_GameScript->SetCallbackStrings(
 		callbacksPreStartVec,
 		callbacksPostStartVec,
@@ -1826,7 +1859,11 @@ static void ParseLua(const Save::SaveGame* s)
 		callbacksPreLoadVec,
 		callbacksPostLoadVec,
 		callbacksPreLoopVec,
-		callbacksPostLoopVec);
+		callbacksPostLoopVec,
+		callbacksPreUseItemVec,
+		callbacksPostUseItemVec,
+		callbacksPreFreezeVec,
+		callbacksPostFreezeVec);
 }
 
 static void ParsePlayer(const Save::SaveGame* s)
@@ -2648,7 +2685,7 @@ void SaveGame::Parse(const std::vector<byte>& buffer, bool hubMode)
 	const Save::SaveGame* s = Save::GetSaveGame(buffer.data());
 
 	ParseLevel(s, hubMode);
-	ParseLua(s);
+	ParseLua(s, hubMode);
 	ParseStatistics(s, hubMode);
 
 	// Effects and player data is ignored when loading hub.

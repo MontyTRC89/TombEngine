@@ -49,8 +49,8 @@ struct OLD_CAMERA
 	Vector3i target;
 };
 
+bool ItemCameraOn;
 GameVector LastTarget;
-
 GameVector LastIdeal;
 GameVector Ideals[5];
 OLD_CAMERA OldCam;
@@ -60,7 +60,6 @@ GameVector LookCamPosition;
 GameVector LookCamTarget;
 Vector3i CamOldPos;
 CAMERA_INFO Camera;
-ObjectCameraInfo ItemCamera;
 GameVector ForcedFixedCamera;
 int UseForcedFixedCamera;
 
@@ -216,6 +215,38 @@ inline void RumbleFromBounce()
 	Rumble(std::clamp((float)abs(Camera.bounce) / 70.0f, 0.0f, 0.8f), 0.2f);
 }
 
+void CalculateBounce(bool binocularMode)
+{
+	if (Camera.bounce == 0)
+		return;
+
+	if (Camera.bounce <= 0)
+	{
+		if (binocularMode)
+		{
+			Camera.target.x += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
+			Camera.target.y += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
+			Camera.target.z += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
+		}
+		else
+		{
+			int bounce = -Camera.bounce;
+			int bounce2 = bounce / 2;
+			Camera.target.x += GetRandomControl() % bounce - bounce2;
+			Camera.target.y += GetRandomControl() % bounce - bounce2;
+			Camera.target.z += GetRandomControl() % bounce - bounce2;
+		}
+
+		Camera.bounce += 5;
+		RumbleFromBounce();
+	}
+	else
+	{
+		Camera.pos.y += Camera.bounce;
+		Camera.target.y += Camera.bounce;
+		Camera.bounce = 0;
+	}
+}
 
 void InitializeCamera()
 {
@@ -314,25 +345,7 @@ void MoveCamera(GameVector* ideal, int speed)
 	Camera.pos.z += (ideal->z - Camera.pos.z) / speed;
 	Camera.pos.RoomNumber = ideal->RoomNumber;
 
-	if (Camera.bounce)
-	{
-		if (Camera.bounce <= 0)
-		{
-			int bounce = -Camera.bounce;
-			int bounce2 = bounce / 2;
-			Camera.target.x += GetRandomControl() % bounce - bounce2;
-			Camera.target.y += GetRandomControl() % bounce - bounce2;
-			Camera.target.z += GetRandomControl() % bounce - bounce2;
-			Camera.bounce += 5;
-			RumbleFromBounce();
-		}
-		else
-		{
-			Camera.pos.y += Camera.bounce;
-			Camera.target.y += Camera.bounce;
-			Camera.bounce = 0;
-		}
-	}
+	CalculateBounce(false);
 
 	int y = Camera.pos.y;
 	if (TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.RoomNumber))
@@ -403,7 +416,7 @@ void ObjCamera(ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int tar
 {
 	//camSlotId and targetItem stay the same object until I know how to expand targetItem to another object.
 	//activates code below ->  void CalculateCamera().
-	ItemCamera.ItemCameraOn = cond;
+	ItemCameraOn = cond;
 
 	UpdateCameraElevation();
 
@@ -420,7 +433,7 @@ void ObjCamera(ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int tar
 
 void ClearObjCamera()
 {
-	ItemCamera.ItemCameraOn = false;
+	ItemCameraOn = false;
 }
 
 void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int targetMeshId)
@@ -483,17 +496,10 @@ void MoveObjCamera(GameVector* ideal, ItemInfo* camSlotId, int camMeshId, ItemIn
 		speed = 2;
 	}
 
-	//actual movement of the target.
+	// Actual movement of the target.
 	Camera.target.x += (pos2.x - Camera.target.x) / speed;
 	Camera.target.y += (pos2.y - Camera.target.y) / speed;
 	Camera.target.z += (pos2.z - Camera.target.z) / speed;
-
-	if (ItemCamera.LastAngle != position)
-	{
-		ItemCamera.LastAngle = Vector3i(ItemCamera.LastAngle.x = angle.x, 
-										ItemCamera.LastAngle.y = angle.y, 
-										ItemCamera.LastAngle.z = angle.z);
-	}
 }
 
 void RefreshFixedCamera(short camNumber)
@@ -1008,23 +1014,8 @@ void BinocularCamera(ItemInfo* item)
 		Camera.target.RoomNumber = item->RoomNumber;
 	}
 
-	if (Camera.bounce &&
-		Camera.type == Camera.oldType)
-	{
-		if (Camera.bounce <= 0)
-		{
-			Camera.target.x += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
-			Camera.target.y += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
-			Camera.target.z += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
-			Camera.bounce += 5;
-			RumbleFromBounce();
-		}
-		else
-		{
-			Camera.bounce = 0;
-			Camera.target.y += Camera.bounce;
-		}
-	}
+	if (Camera.type == Camera.oldType)
+		CalculateBounce(true);
 
 	Camera.target.RoomNumber = GetPointCollision(Camera.pos.ToVector3i(), Camera.target.RoomNumber).GetRoomNumber();
 	LookAt(&Camera, 0);
@@ -1080,8 +1071,7 @@ static bool CalculateDeathCamera(const ItemInfo& item)
 		return true;
 
 	// Special death animations.
-	if (item.Animation.AnimNumber == LA_SPIKE_DEATH || 
-		item.Animation.AnimNumber == LA_BOULDER_DEATH || 
+	if (item.Animation.AnimNumber == LA_SPIKE_DEATH ||
 		item.Animation.AnimNumber == LA_TRAIN_OVERBOARD_DEATH)
 	{
 		return true;
@@ -1102,10 +1092,8 @@ void CalculateCamera(const CollisionInfo& coll)
 		return;
 	}
 
-	if (ItemCamera.ItemCameraOn)
-	{
+	if (ItemCameraOn)
 		return;
-	}
 
 	if (UseForcedFixedCamera != 0)
 	{

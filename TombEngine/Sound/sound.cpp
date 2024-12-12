@@ -1084,14 +1084,11 @@ void PlaySecretTrack()
 
 int GetShatterSound(int shatterID)
 {
-	auto fxID = GetStaticObject(shatterID).shatterSound;
-	if (fxID != -1 && fxID < NUM_SFX)
+	auto fxID = Statics[shatterID].shatterSound;
+	if (fxID != NO_VALUE && fxID < NUM_SFX)
 		return fxID;
 
-	if (shatterID < 3)
-		return SFX_TR5_SMASH_WOOD;
-	else
-		return SFX_TR4_SMASH_ROCK;
+	return SFX_TR4_SMASH_ROCK;
 }
 
 void PlaySoundSources()

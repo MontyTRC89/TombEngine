@@ -39,7 +39,7 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 		return;
 
 	// Get command data pointer.
-	short* commandDataPtr = &g_Level.Commands[anim.CommandIndex];
+	int* commandDataPtr = &g_Level.Commands[anim.CommandIndex];
 
 	for (int i = anim.NumCommands; i > 0; i--)
 	{
@@ -118,45 +118,11 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 			int frameNumber = commandDataPtr[0];
 			if (isFrameBased && item.Animation.FrameNumber == frameNumber)
 			{
-				// Get sound ID and sound environment flag from packed data.
-				int soundID = commandDataPtr[1] & 0xFFF;	   // Exclude last 4 bits for sound ID.
-				int soundEnvFlag = commandDataPtr[1] & 0xF000; // Keep only last 4 bits for sound environment flag.
+				// Get sound ID and sound environment flag.
+				int soundID = commandDataPtr[1];
+				auto requiredSoundEnv = (SoundEnvironment)commandDataPtr[2];
 
-				// FAILSAFE.
-				if (item.RoomNumber == NO_VALUE)
-				{
-					SoundEffect(soundID, &item.Pose, SoundEnvironment::Always);
-					commandDataPtr += 2;
-					break;
-				}
-
-				// Get required sound environment from flag.
-				auto requiredSoundEnv = SoundEnvironment::Always;
-				switch (soundEnvFlag)
-				{
-				default:
-				case 0:
-					requiredSoundEnv = SoundEnvironment::Always;
-					break;
-
-				case (1 << 14):
-					requiredSoundEnv = SoundEnvironment::Land;
-					break;
-
-				case (1 << 15):
-					requiredSoundEnv = SoundEnvironment::ShallowWater;
-					break;
-
-				case (1 << 12):
-					requiredSoundEnv = SoundEnvironment::Swamp;
-					break;
-
-				case (1 << 13):
-					requiredSoundEnv = SoundEnvironment::Underwater;
-					break;
-				}
-
-				int roomNumberAtPos = GetPointCollision(item).GetRoomNumber();
+				int roomNumberAtPos = (item.RoomNumber == NO_VALUE) ? Camera.pos.RoomNumber : GetPointCollision(item).GetRoomNumber();
 				bool isWater = TestEnvironment(ENV_FLAG_WATER, roomNumberAtPos);
 				bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, roomNumberAtPos);
 
@@ -201,13 +167,13 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 					SoundEffect(soundID, &item.Pose, *soundEnv);
 			}
 
-			commandDataPtr += 2;
-		}
+			commandDataPtr += 3;
 			break;
+		}
 
 		case AnimCommandType::Flipeffect:
 			if (isFrameBased && item.Animation.FrameNumber == commandDataPtr[0])
-				DoFlipEffect((commandDataPtr[1] & 0x3FFF), &item);
+				DoFlipEffect(commandDataPtr[1], &item);
 
 			commandDataPtr += 2;
 			break;

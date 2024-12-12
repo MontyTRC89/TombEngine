@@ -886,7 +886,8 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClInclude Include="Scripting\Internal\TEN\Flow\Animations\Animations.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\FlowHandler.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Fog\Fog.h" />
-    <ClInclude Include="Scripting\Internal\TEN\Flow\GameStatuses.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\Enums\FreezeModes.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\Enums\GameStatuses.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\InventoryItem\InventoryItem.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\LensFlare\LensFlare.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Level\FlowLevel.h" />
@@ -1387,7 +1388,10 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
       <FileType>Text</FileType>
     </None>
-    <None Include="Shaders\Blending.hlsli" />
+    <None Include="Shaders\Blending.hlsli">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</DeploymentContent>
+      <FileType>Document</FileType>
+    </None>
     <None Include="Shaders\CBPostProcess.hlsli">
       <DeploymentContent>true</DeploymentContent>
     </None>
