@@ -1900,6 +1900,29 @@ namespace TEN::Renderer
 		DrawRats(view, RendererPass::GBuffer);
 		DrawLocusts(view, RendererPass::GBuffer);
 
+		if (view.Mirrors.size() > 0)
+		{
+			SetCullMode(CullMode::Clockwise);
+
+			for (auto& mirror : view.Mirrors)
+			{
+				_currentMirror = &mirror;
+
+				DrawItems(view, RendererPass::GBuffer);
+				DrawStatics(view, RendererPass::GBuffer);
+				DrawScarabs(view, RendererPass::GBuffer);
+				DrawGunShells(view, RendererPass::GBuffer);
+				DrawBats(view, RendererPass::GBuffer);
+				DrawEffects(view, RendererPass::GBuffer);
+				DrawRats(view, RendererPass::GBuffer);
+				DrawLocusts(view, RendererPass::GBuffer);
+
+				_currentMirror = nullptr;
+			}
+
+			SetCullMode(CullMode::CounterClockwise);
+		}
+
 		// Calculate ambient occlusion.
 		if (g_Configuration.EnableAmbientOcclusion)
 		{
