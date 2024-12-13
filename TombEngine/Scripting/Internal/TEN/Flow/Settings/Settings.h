@@ -24,8 +24,8 @@ struct AnimSettings
 
 struct CameraSettings
 {
-	ScriptColor BinocularLightColor  = ScriptColor(192, 192, 96);
-	ScriptColor LasersightLightColor = ScriptColor(64, 255, 0);
+	ScriptColor BinocularLightColor  = { 192, 192, 96 };
+	ScriptColor LasersightLightColor = { 64, 255, 0 };
 	bool ObjectCollision = true;
 
 	static void Register(sol::table& parent);
@@ -33,7 +33,8 @@ struct CameraSettings
 
 struct FlareSettings
 {
-	ScriptColor Color = ScriptColor(128, 64, 0);
+	ScriptColor Color = { 128, 64, 0 };
+	Vec3 MuzzleOffset = { 0, 0, 41 };
 	float LensflareBrightness = 0.5f;
 	bool Sparks = true;
 	bool Smoke = true;

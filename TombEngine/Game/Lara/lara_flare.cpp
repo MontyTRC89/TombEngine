@@ -87,7 +87,8 @@ void FlareControl(short itemNumber)
 		life++;
 	}
 
-	auto lightPos = GetJointPosition(flareItem, 0, Vector3i(0, 0, 48));
+	auto offset = g_GameFlow->GetSettings()->Flare.MuzzleOffset.ToVector3i() + Vector3i(-6, 6, 0);
+	auto lightPos = GetJointPosition(flareItem, 0, offset);
 	if (DoFlareLight(lightPos, flareItem, life))
 	{
 		TriggerChaffEffects(flareItem, life);
@@ -397,10 +398,11 @@ void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectID, bool isThrown)
 void DoFlareInHand(ItemInfo& laraItem, int flareLife)
 {
 	auto& lara = *GetLaraInfo(&laraItem);
+	
+	auto offset = g_GameFlow->GetSettings()->Flare.MuzzleOffset.ToVector3i() + Vector3i(11, 32, 0);
+	auto lightPos = GetJointPosition(&laraItem, LM_LHAND, offset);
 
-	auto pos = GetJointPosition(&laraItem, LM_LHAND, Vector3i(11, 32, 41));
-
-	if (DoFlareLight(pos, laraItem, flareLife))
+	if (DoFlareLight(lightPos, laraItem, flareLife))
 		TriggerChaffEffects(lara.Control.Look.IsUsingBinoculars ? 0 : flareLife);
 
 	if (lara.Flare.Life >= g_GameFlow->GetSettings()->Flare.Timeout * FPS - (FLARE_DEATH_DELAY / 2))

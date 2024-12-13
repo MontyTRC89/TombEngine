@@ -138,6 +138,10 @@ void FlareSettings::Register(sol::table& parent)
 	@tfield Color color flare color. Used for sparks and lensflare coloring as well. */
 	"color", &FlareSettings::Color,
 
+	/*** Muzzle offset.
+	@tfield Vec3 muzzleOffset a relative muzzle offset where light and particle effects originate from. */
+	"muzzleOffset", &FlareSettings::MuzzleOffset,
+
 	/*** Light range.
 	@tfield int range flare light radius or range. Represented in "clicks" equal to 256 world units. */
 	"range", &FlareSettings::Range,

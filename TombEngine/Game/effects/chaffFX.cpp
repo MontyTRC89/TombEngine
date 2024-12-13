@@ -24,18 +24,20 @@ constexpr auto MAX_TRIGGER_RANGE = BLOCK(16);
 
 void TriggerChaffEffects(int flareLife)
 {
-	auto pos = GetJointPosition(LaraItem, LM_LHAND, Vector3i(8, 36, 32));
-	auto vect = GetJointPosition(LaraItem, LM_LHAND, Vector3i(8, 36, 1024 + Random::GenerateInt(0, 256)));
+	auto offset = g_GameFlow->GetSettings()->Flare.MuzzleOffset.ToVector3i() + Vector3i(11, 32, -4);
+	auto pos = GetJointPosition(LaraItem, LM_LHAND,  offset);
+	auto vect = GetJointPosition(LaraItem, LM_LHAND, Vector3i(11, 32, BLOCK(1) + Random::GenerateInt(0, 256)));
 	auto vel = vect - pos;
 	TriggerChaffEffects(*LaraItem, pos, vel, LaraItem->Animation.Velocity.z, TestEnvironment(ENV_FLAG_WATER, LaraItem->RoomNumber), flareLife);
 }
 
 void TriggerChaffEffects(ItemInfo& item, int age)
 {
-	auto world = Matrix::CreateTranslation(-6, 6, 32) * item.Pose.Orientation.ToRotationMatrix();
+	auto offset = g_GameFlow->GetSettings()->Flare.MuzzleOffset.ToVector3() + Vector3(0, 0, -4);
+	auto world = Matrix::CreateTranslation(offset) * item.Pose.Orientation.ToRotationMatrix();
 	auto pos = item.Pose.Position + Vector3i(world.Translation());
 
-	world = Matrix::CreateTranslation(-6, 6, 32) *
+	world = Matrix::CreateTranslation(offset) *
 		Matrix::CreateTranslation((GetRandomDraw() & 127) - 64, (GetRandomDraw() & 127) - 64, (GetRandomDraw() & 511) + 512) *
 		item.Pose.Orientation.ToRotationMatrix();
 
