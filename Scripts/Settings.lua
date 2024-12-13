@@ -5,21 +5,19 @@ local Flow = TEN.Flow
 
 local settings = Flow.Settings.new()
 
-	settings.Animations.crawlExtended = true
 	settings.Animations.crouchRoll = true
 	settings.Animations.crawlspaceSwandive = true
-	settings.Animations.overhangClimb = false
-	settings.Animations.slideExtended = false
 	settings.Animations.sprintJump = false
 	settings.Animations.ledgeJumps = false
 	settings.Animations.poseTimeout = 0
 	
 	settings.Camera.binocularLightColor = Color(192, 192, 96)
-	settings.Camera.lasersightLightColor = Color(64, 255, 0)
+	settings.Camera.lasersightLightColor = Color(255, 0, 0)
 	settings.Camera.objectCollision = true
 	
-	settings.Flare.color = Color(128, 60, 0)
-	settings.Flare.range = 10
+	settings.Flare.color = Color(128, 64, 0)
+	settings.Flare.muzzleOffset = Vec3(0, 0, 41)
+	settings.Flare.range = 9
 	settings.Flare.timeout = 60
 	settings.Flare.lensflareBrightness = 0.5
 	settings.Flare.sparks = true
@@ -41,19 +39,110 @@ local settings = Flow.Settings.new()
 	settings.Hair[1].offset = Vec3(-4, -4, -48)
 	settings.Hair[1].indices = { 37, 39, 40, 38 }
 	
-	-- Example weapon setting entry. You can use other weapon types as well.
-	-- To know default parameters, you can fetch settings using Flow.GetSettings() method.
+	settings.Hair[2].offset = Vec3(-48, -48, -50)
+	settings.Hair[2].indices = { 79, 78, 76, 77 }
 	
-	settings.Weapons[WeaponType.REVOLVER].accuracy = 4
+	settings.Hair[3].offset = Vec3(48, -48, -50)
+	settings.Hair[3].indices = { 68, 69, 70, 71 }
+	
+	settings.Weapons[WeaponType.PISTOLS].accuracy = 8
+	settings.Weapons[WeaponType.PISTOLS].targetingDistance = 8192
+	settings.Weapons[WeaponType.PISTOLS].interval = 9
+	settings.Weapons[WeaponType.PISTOLS].waterLevel = 650
+	settings.Weapons[WeaponType.PISTOLS].flashDuration = 3
+	settings.Weapons[WeaponType.PISTOLS].damage = 1
+	settings.Weapons[WeaponType.PISTOLS].alternateDamage = 1
+	settings.Weapons[WeaponType.PISTOLS].smoke = true
+	settings.Weapons[WeaponType.PISTOLS].shell = true
+	settings.Weapons[WeaponType.PISTOLS].pickupCount = 30
+	
+	settings.Weapons[WeaponType.REVOLVER].accuracy = 8
 	settings.Weapons[WeaponType.REVOLVER].targetingDistance = 8192
 	settings.Weapons[WeaponType.REVOLVER].interval = 16
 	settings.Weapons[WeaponType.REVOLVER].waterLevel = 650
 	settings.Weapons[WeaponType.REVOLVER].flashDuration = 3
 	settings.Weapons[WeaponType.REVOLVER].damage = 21
 	settings.Weapons[WeaponType.REVOLVER].alternateDamage = 21
-	settings.Weapons[WeaponType.REVOLVER].pickupCount = 6
 	settings.Weapons[WeaponType.REVOLVER].smoke = true
 	settings.Weapons[WeaponType.REVOLVER].shell = false
+	settings.Weapons[WeaponType.REVOLVER].pickupCount = 6
+	
+	settings.Weapons[WeaponType.UZI].accuracy = 8
+	settings.Weapons[WeaponType.UZI].targetingDistance = 8192
+	settings.Weapons[WeaponType.UZI].interval = 3
+	settings.Weapons[WeaponType.UZI].waterLevel = 650
+	settings.Weapons[WeaponType.UZI].flashDuration = 3
+	settings.Weapons[WeaponType.UZI].damage = 1
+	settings.Weapons[WeaponType.UZI].alternateDamage = 1
+	settings.Weapons[WeaponType.UZI].smoke = true
+	settings.Weapons[WeaponType.UZI].shell = true
+	settings.Weapons[WeaponType.UZI].pickupCount = 30
+	
+	settings.Weapons[WeaponType.SHOTGUN].accuracy = 10
+	settings.Weapons[WeaponType.SHOTGUN].targetingDistance = 8192
+	settings.Weapons[WeaponType.SHOTGUN].interval = 9
+	settings.Weapons[WeaponType.SHOTGUN].waterLevel = 500
+	settings.Weapons[WeaponType.SHOTGUN].flashDuration = 3
+	settings.Weapons[WeaponType.SHOTGUN].damage = 3
+	settings.Weapons[WeaponType.SHOTGUN].alternateDamage = 3
+	settings.Weapons[WeaponType.SHOTGUN].smoke = true
+	settings.Weapons[WeaponType.SHOTGUN].shell = true
+	settings.Weapons[WeaponType.SHOTGUN].pickupCount = 6
+	
+	settings.Weapons[WeaponType.CROSSBOW].accuracy = 8
+	settings.Weapons[WeaponType.CROSSBOW].targetingDistance = 8192
+	settings.Weapons[WeaponType.CROSSBOW].interval = 0
+	settings.Weapons[WeaponType.CROSSBOW].waterLevel = 500
+	settings.Weapons[WeaponType.CROSSBOW].flashDuration = 2
+	settings.Weapons[WeaponType.CROSSBOW].damage = 5
+	settings.Weapons[WeaponType.CROSSBOW].alternateDamage = 20
+	settings.Weapons[WeaponType.CROSSBOW].smoke = false
+	settings.Weapons[WeaponType.CROSSBOW].shell = false
+	settings.Weapons[WeaponType.CROSSBOW].pickupCount = 10
+	
+	settings.Weapons[WeaponType.HK].accuracy = 4
+	settings.Weapons[WeaponType.HK].targetingDistance = 12288
+	settings.Weapons[WeaponType.HK].interval = 0
+	settings.Weapons[WeaponType.HK].waterLevel = 500
+	settings.Weapons[WeaponType.HK].flashDuration = 3
+	settings.Weapons[WeaponType.HK].damage = 4
+	settings.Weapons[WeaponType.HK].alternateDamage = 4
+	settings.Weapons[WeaponType.HK].smoke = true
+	settings.Weapons[WeaponType.HK].shell = true
+	settings.Weapons[WeaponType.HK].pickupCount = 30
+	
+	settings.Weapons[WeaponType.GRENADE_LAUNCHER].accuracy = 8
+	settings.Weapons[WeaponType.GRENADE_LAUNCHER].targetingDistance = 8192
+	settings.Weapons[WeaponType.GRENADE_LAUNCHER].interval = 0
+	settings.Weapons[WeaponType.GRENADE_LAUNCHER].waterLevel = 500
+	settings.Weapons[WeaponType.GRENADE_LAUNCHER].flashDuration = 2
+	settings.Weapons[WeaponType.GRENADE_LAUNCHER].damage = 20
+	settings.Weapons[WeaponType.GRENADE_LAUNCHER].alternateDamage = 30
+	settings.Weapons[WeaponType.GRENADE_LAUNCHER].smoke = true
+	settings.Weapons[WeaponType.GRENADE_LAUNCHER].shell = false
+	settings.Weapons[WeaponType.GRENADE_LAUNCHER].pickupCount = 10
+	
+	settings.Weapons[WeaponType.ROCKET_LAUNCHER].accuracy = 8
+	settings.Weapons[WeaponType.ROCKET_LAUNCHER].targetingDistance = 8192
+	settings.Weapons[WeaponType.ROCKET_LAUNCHER].interval = 0
+	settings.Weapons[WeaponType.ROCKET_LAUNCHER].waterLevel = 500
+	settings.Weapons[WeaponType.ROCKET_LAUNCHER].flashDuration = 2
+	settings.Weapons[WeaponType.ROCKET_LAUNCHER].damage = 30
+	settings.Weapons[WeaponType.ROCKET_LAUNCHER].alternateDamage = 30
+	settings.Weapons[WeaponType.ROCKET_LAUNCHER].smoke = true
+	settings.Weapons[WeaponType.ROCKET_LAUNCHER].shell = false
+	settings.Weapons[WeaponType.ROCKET_LAUNCHER].pickupCount = 1
+	
+	settings.Weapons[WeaponType.HARPOON_GUN].accuracy = 8
+	settings.Weapons[WeaponType.HARPOON_GUN].targetingDistance = 8192
+	settings.Weapons[WeaponType.HARPOON_GUN].interval = 0
+	settings.Weapons[WeaponType.HARPOON_GUN].waterLevel = 500
+	settings.Weapons[WeaponType.HARPOON_GUN].flashDuration = 2
+	settings.Weapons[WeaponType.HARPOON_GUN].damage = 6
+	settings.Weapons[WeaponType.HARPOON_GUN].alternateDamage = 6
+	settings.Weapons[WeaponType.HARPOON_GUN].smoke = false
+	settings.Weapons[WeaponType.HARPOON_GUN].shell = false
+	settings.Weapons[WeaponType.HARPOON_GUN].pickupCount = 10
 	
 	settings.System.errorMode = Flow.ErrorMode.WARN
 	settings.System.fastReload = true
