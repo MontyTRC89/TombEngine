@@ -25,7 +25,7 @@ struct AnimSettings
 struct CameraSettings
 {
 	ScriptColor BinocularLightColor  = { 192, 192, 96 };
-	ScriptColor LasersightLightColor = { 64, 255, 0 };
+	ScriptColor LasersightLightColor = { 255, 0, 0 };
 	bool ObjectCollision = true;
 
 	static void Register(sol::table& parent);
