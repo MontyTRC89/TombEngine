@@ -28,7 +28,7 @@ namespace TEN::Utils
 		return groupId;
 	}
 
-	unsigned int WorkerManager::GetWorkerCount() const
+	unsigned int WorkerManager::GetThreadCount() const
 	{
 		return _threads.size();
 	}

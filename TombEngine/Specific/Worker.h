@@ -29,7 +29,7 @@ namespace TEN::Utils
 		// Getters
 
 		unsigned long GetNewGroupId();
-		unsigned int  GetWorkerCount() const;
+		unsigned int  GetThreadCount() const;
 		unsigned int  GetCoreCount() const;
 
 		// Utilities
