@@ -556,7 +556,7 @@ void HandleWeapon(ItemInfo& laraItem)
 				player.Control.Weapon.RequestGunType = player.Control.Weapon.LastGunType;
 		}
 		// Draw flare.
-		else if (IsHeld(In::Flare) && (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() != LaraType::Young))
+		else if (IsHeld(In::Flare))
 		{
 			if (player.Control.Weapon.GunType == LaraWeaponType::Flare)
 			{
