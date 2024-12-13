@@ -2667,8 +2667,7 @@ namespace TEN::Renderer
 
 				while (baseStaticIndex < staticsCount)
 				{
-					int k = 0;
-					int instanceCount = std::min(bucketSize, staticsCount - baseStaticIndex);
+					int instancesCount = 0;
 					int max = std::min(baseStaticIndex + bucketSize, staticsCount);
 
 					for (int s = baseStaticIndex; s < max; s++)
@@ -2686,23 +2685,23 @@ namespace TEN::Renderer
 						{
 							world = world * _currentMirror->ReflectionMatrix;
 						}
-						_stInstancedStaticMeshBuffer.StaticMeshes[k].World = world;
+						_stInstancedStaticMeshBuffer.StaticMeshes[instancesCount].World = world;
 
-						_stInstancedStaticMeshBuffer.StaticMeshes[k].Color = current->Color;
-						_stInstancedStaticMeshBuffer.StaticMeshes[k].Ambient = room->AmbientLight;
-						_stInstancedStaticMeshBuffer.StaticMeshes[k].LightMode = (int)refMesh->LightMode;
+						_stInstancedStaticMeshBuffer.StaticMeshes[instancesCount].Color = current->Color;
+						_stInstancedStaticMeshBuffer.StaticMeshes[instancesCount].Ambient = room->AmbientLight;
+						_stInstancedStaticMeshBuffer.StaticMeshes[instancesCount].LightMode = (int)refMesh->LightMode;
 
 						if (rendererPass != RendererPass::GBuffer)
 						{
-							BindInstancedStaticLights(current->LightsToDraw, k);
+							BindInstancedStaticLights(current->LightsToDraw, instancesCount);
 						}
 
-						k++;
+						instancesCount++;
 					}
 
 					baseStaticIndex += bucketSize;
 
-					if (k > 0)
+					if (instancesCount > 0)
 					{
 						_cbInstancedStaticMeshBuffer.UpdateData(_stInstancedStaticMeshBuffer, _context.Get());
 
@@ -2728,7 +2727,7 @@ namespace TEN::Renderer
 								BindTexture(TextureRegister::NormalMap,
 									&std::get<1>(_staticTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
-								DrawIndexedInstancedTriangles(bucket.NumIndices, instanceCount, bucket.StartIndex, 0);
+								DrawIndexedInstancedTriangles(bucket.NumIndices, instancesCount, bucket.StartIndex, 0);
 
 								_numInstancedStaticsDrawCalls++;
 							}
