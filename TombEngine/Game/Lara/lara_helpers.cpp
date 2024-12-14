@@ -489,6 +489,7 @@ static void SetPlayerOptics(ItemInfo* item)
 			player.Control.Look.IsUsingLasersight = true;
 			player.Inventory.IsBusy = true;
 
+			Camera.DisableInterpolation = true;
 			BinocularOldCamera = Camera.oldType;
 			return;
 		}
@@ -506,6 +507,7 @@ static void SetPlayerOptics(ItemInfo* item)
 	player.Control.Look.IsUsingLasersight = false;
 	player.Inventory.IsBusy = false;
 
+	Camera.DisableInterpolation = true;
 	Camera.type = BinocularOldCamera;
 	Camera.bounce = 0;
 	AlterFOV(LastFOV);

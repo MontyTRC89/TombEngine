@@ -959,6 +959,7 @@ void BinocularCamera(ItemInfo* item)
 			player.Inventory.IsBusy = false;
 
 			Camera.type = BinocularOldCamera;
+			Camera.DisableInterpolation = true;
 			Camera.target = LastTarget;
 			AlterFOV(LastFOV);
 			return;

@@ -1388,6 +1388,8 @@ namespace TEN::Renderer
 
 			SetCullMode(CullMode::None);
 
+			_primitiveBatch->Begin();
+
 			for (auto& deb : DebrisFragments)
 			{
 				if (deb.active)
@@ -1404,40 +1406,42 @@ namespace TEN::Renderer
 						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[deb.mesh.tex]), SamplerStateRegister::LinearClamp);
 					}
 
-					_stStatic.World = Matrix::Lerp(deb.PrevTransform, deb.Transform, GetInterpolationFactor());
+					_stStatic.World = Matrix::Identity;
 					_stStatic.Color = deb.color;
 					_stStatic.AmbientLight = _rooms[deb.roomNumber].AmbientLight;
 					_stStatic.LightMode = (int)deb.lightMode;
 
 					_cbStatic.UpdateData(_stStatic, _context.Get());
 
+					auto matrix = Matrix::Lerp(deb.PrevTransform, deb.Transform, GetInterpolationFactor());
+
 					Vertex vtx0;
-					vtx0.Position = deb.mesh.Positions[0];
+					vtx0.Position = Vector3::Transform(deb.mesh.Positions[0], matrix);
 					vtx0.UV = deb.mesh.TextureCoordinates[0];
 					vtx0.Normal = deb.mesh.Normals[0];
 					vtx0.Color = deb.mesh.Colors[0];
 
 					Vertex vtx1;
-					vtx1.Position = deb.mesh.Positions[1];
+					vtx1.Position = Vector3::Transform(deb.mesh.Positions[1], matrix);
 					vtx1.UV = deb.mesh.TextureCoordinates[1];
 					vtx1.Normal = deb.mesh.Normals[1];
 					vtx1.Color = deb.mesh.Colors[1];
 
 					Vertex vtx2;
-					vtx2.Position = deb.mesh.Positions[2];
+					vtx2.Position = Vector3::Transform(deb.mesh.Positions[2], matrix);
 					vtx2.UV = deb.mesh.TextureCoordinates[2];
 					vtx2.Normal = deb.mesh.Normals[2];
 					vtx2.Color = deb.mesh.Colors[2];
 
-					_primitiveBatch->Begin();
 					_primitiveBatch->DrawTriangle(vtx0, vtx1, vtx2);
-					_primitiveBatch->End();
 
 					_numDebrisDrawCalls++;
 					_numDrawCalls++;
 					_numTriangles++;
 				}
 			}
+
+			_primitiveBatch->End();
 
 			// TODO: temporary fix, we need to remove every use of SpriteBatch and PrimitiveBatch because
 			// they mess up render states cache.

@@ -2176,6 +2176,7 @@ namespace TEN::Gui
 				(player.Control.IsLow && !IsHeld(In::Crouch))) &&
 				!UseSpotCam && !TrackCameraInit)
 			{
+				Camera.DisableInterpolation = true;
 				player.Control.Look.OpticRange = ANGLE(0.7f);
 				player.Control.Look.IsUsingBinoculars = true;
 				player.Inventory.OldBusy = true;
