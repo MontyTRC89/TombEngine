@@ -26,12 +26,16 @@ void Time::Register(sol::table& parent)
 
 		// Meta functions
 		sol::meta_function::to_string, &Time::ToString,
-		sol::meta_function::addition, &Time::operator+,
-		sol::meta_function::subtraction, &Time::operator-,
 		sol::meta_function::equal_to, &Time::operator==,
 		sol::meta_function::less_than, &Time::operator<,
 		sol::meta_function::less_than_or_equal_to, &Time::operator<=,
 
+		sol::meta_function::addition, sol::overload(
+			[](const Time& t1, const Time& t2) { return t1 + t2; },
+			[](const Time& t1, int frames) { return t1 + frames; }),
+		sol::meta_function::subtraction, sol::overload(
+			[](const Time& t1, const Time& t2) { return t1 - t2; },
+			[](const Time& t1, int frames) { return t1 - frames; }),
 
 		// Methods
 		"GetTimeUnits", &Time::GetTimeUnits,
@@ -53,7 +57,7 @@ void Time::Register(sol::table& parent)
 // @function Time
 // @tparam int frames Total game frame count.
 // @treturn Time A new Time object initialized with the given frame count.
-Time::Time(int frames) : frameCount(frames) {}
+Time::Time(int frames) : _frameCount(frames) {}
 
 /// Create a Time object from a formatted string.
 // @function Time
@@ -78,7 +82,7 @@ Time::Time(const sol::table& hmsTable)
 // @treturn int Total number of game frames.
 int Time::GetFrameCount() const
 {
-	return frameCount;
+	return _frameCount;
 }
 
 /// Get the time in hours, minutes, seconds, and centiseconds as a table.
@@ -168,14 +172,14 @@ void Time::SetCents(int value)
 
 Time::HMSC Time::GetHMSC() const
 {
-	int totalSeconds = frameCount / FPS;
+	int totalSeconds = _frameCount / FPS;
 
 	return
 	{
 		totalSeconds / SQUARE(TIME_UNIT),
 		(totalSeconds % SQUARE(TIME_UNIT)) / TIME_UNIT,
 		totalSeconds % TIME_UNIT,
-		(frameCount * 100 / FPS) % CENTISECOND
+		(_frameCount * 100 / FPS) % CENTISECOND
 	};
 }
 
@@ -201,8 +205,8 @@ Time::HMSC Time::ParseFormattedString(const std::string& formattedTime)
 
 void Time::SetFromHMSC(int hours, int minutes, int seconds, int cents)
 {
-	frameCount = (hours * SQUARE(TIME_UNIT) + minutes * TIME_UNIT + seconds) * FPS +
-				  round((float)cents / ((float)CENTISECOND / (float)FPS));
+	_frameCount = (hours * SQUARE(TIME_UNIT) + minutes * TIME_UNIT + seconds) * FPS +
+				   round((float)cents / ((float)CENTISECOND / (float)FPS));
 }
 
 void Time::SetFromFormattedString(const std::string& formattedTime)
@@ -229,30 +233,32 @@ void Time::SetFromTable(const sol::table& hmsTable)
 
 Time& Time::operator++()
 {
-	++frameCount;
+	_frameCount++;
 	return *this;
 }
 
 Time& Time::operator++(int)
 {
-	frameCount++;
+	_frameCount++;
 	return *this;
 }
 
 Time& Time::operator+=(const Time& other)
 {
-	frameCount += other.frameCount;
+	_frameCount += other._frameCount;
 	return *this;
 }
 
 Time& Time::operator-=(const Time& other)
 {
-	frameCount -= other.frameCount;
+	_frameCount -= other._frameCount;
 	return *this;
 }
 
-Time Time::operator+(const Time& other)  const { return Time(frameCount +  other.frameCount); }
-Time Time::operator-(const Time& other)  const { return Time(frameCount -  other.frameCount); }
-Time Time::operator<(const Time& other)  const { return Time(frameCount <  other.frameCount); }
-Time Time::operator<=(const Time& other) const { return Time(frameCount <= other.frameCount); }
-bool Time::operator==(const Time& other) const { return frameCount == other.frameCount; }
+Time Time::operator+(const int frameCount) const { return Time(frameCount + _frameCount); }
+Time Time::operator-(const int frameCount) const { return Time(frameCount - _frameCount); }
+Time Time::operator+(const Time& other)    const { return Time(_frameCount +  other._frameCount); }
+Time Time::operator-(const Time& other)    const { return Time(_frameCount -  other._frameCount); }
+Time Time::operator<(const Time& other)    const { return Time(_frameCount <  other._frameCount); }
+Time Time::operator<=(const Time& other)   const { return Time(_frameCount <= other._frameCount); }
+bool Time::operator==(const Time& other)   const { return _frameCount == other._frameCount; }

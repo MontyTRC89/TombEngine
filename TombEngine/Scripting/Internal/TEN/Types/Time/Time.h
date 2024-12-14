@@ -9,7 +9,7 @@ public:
 	static void Register(sol::table& parent);
 
 	// Members
-	int frameCount = 0;
+	int _frameCount = 0;
 
 	// Constructors
 	Time() = default;
@@ -36,6 +36,8 @@ public:
 	int Time::GetCents() const;
 
 	// Operators
+	Time  operator+(const int frameCount) const;
+	Time  operator-(const int frameCount) const;
 	Time  operator+(const Time& other) const;
 	Time  operator-(const Time& other) const;
 	Time  operator<(const Time& other) const;
@@ -45,7 +47,7 @@ public:
 	Time& operator-=(const Time& other);
 	Time& Time::operator++();
 	Time& Time::operator++(int);
-	operator int() const { return (int)frameCount; }
+	operator int() const { return (int)_frameCount; }
 
 private:
 	struct HMSC
