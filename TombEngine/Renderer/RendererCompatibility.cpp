@@ -728,7 +728,7 @@ namespace TEN::Renderer
 										auto* parentMesh = skinObj.ObjectMeshes[LM_HEAD];
 										auto* parentBone = skinObj.LinearizedBones[LM_HEAD];
 
-										// Link first 4 vertices.
+										// Link listed vertices.
 										if (currentVertex->OriginalIndex < vertices0.size() || currentVertex->OriginalIndex < vertices1.size())
 										{
 											for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
@@ -815,6 +815,7 @@ namespace TEN::Renderer
 										auto* parentMesh = skinObj.ObjectMeshes[LM_HEAD];
 										auto* parentBone = skinObj.LinearizedBones[LM_HEAD];
 
+										// Link listed vertices.
 										if (currentVertex->OriginalIndex < vertices.size())
 										{
 											for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
