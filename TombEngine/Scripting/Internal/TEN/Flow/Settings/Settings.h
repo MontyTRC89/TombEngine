@@ -48,6 +48,7 @@ struct FlareSettings
 
 struct HairSettings
 {
+	int RootMesh = LM_HEAD;
 	Vec3 Offset = {};
 	std::vector<int> Indices = {};
 

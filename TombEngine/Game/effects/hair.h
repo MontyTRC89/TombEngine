@@ -48,6 +48,7 @@ namespace TEN::Effects::Hair
 		// Utilities
 
 		void Update(const ItemInfo& item, int hairUnitID);
+		static int GetRootMesh(int hairUnitID);
 
 	private:
 		// Helpers

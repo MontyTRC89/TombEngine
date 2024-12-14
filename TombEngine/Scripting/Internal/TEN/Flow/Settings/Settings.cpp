@@ -16,9 +16,9 @@ Can be accessed using @{Flow.SetSettings} and @{Flow.GetSettings} functions.
 
 Settings::Settings()
 {
-	Hair[(int)LaraHairType::Normal]     = { {  -4.0f,  -4.0f, -48.0f }, { 37, 39, 40, 38 } };
-	Hair[(int)LaraHairType::YoungLeft]  = { { -48.0f, -48.0f, -50.0f }, { 79, 78, 76, 77 } };
-	Hair[(int)LaraHairType::YoungRight] = { {  48.0f, -48.0f, -50.0f }, { 68, 69, 70, 71 } };
+	Hair[(int)LaraHairType::Normal]     = { LM_HEAD, {  -4.0f,  -4.0f, -48.0f }, { 37, 39, 40, 38 } };
+	Hair[(int)LaraHairType::YoungLeft]  = { LM_HEAD, { -48.0f, -48.0f, -50.0f }, { 79, 78, 76, 77 } };
+	Hair[(int)LaraHairType::YoungRight] = { LM_HEAD, {  48.0f, -48.0f, -50.0f }, { 68, 69, 70, 71 } };
 	
 	// Since we directly bind Weapons array to Lua, and Lua accesses this array by native enum, where 0 is NONE, and 1 is
 	// PISTOLS, zero index is omitted due to Lua indexing arrays starting from 1. Therefore we subtract 1 from initializer index.
@@ -182,6 +182,10 @@ void HairSettings::Register(sol::table& parent)
 {
 	parent.create().new_usertype<HairSettings>(ScriptReserved_HairSettings, sol::constructors<HairSettings()>(),
 		sol::call_constructor, sol::constructors<HairSettings()>(),
+
+	/*** Root mesh to which hair object will attach to.
+	@tfield int mesh index of a root mesh to which hair will attach. Root mesh may be different for each hair object. */
+	"rootMesh", &HairSettings::RootMesh,
 
 	/*** Relative braid offset to a headmesh.
 	@tfield Vec3 offset specifies how braid is positioned in relation to a headmesh. */

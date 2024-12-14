@@ -36,12 +36,15 @@ local settings = Flow.Settings.new()
 	-- Example hair setting entry. You can use types [2] and [3] as well for young Lara hair.
 	-- To know default parameters, you can fetch settings using Flow.GetSettings() method.
 	
+	settings.Hair[1].rootMesh = 14
 	settings.Hair[1].offset = Vec3(-4, -4, -48)
 	settings.Hair[1].indices = { 37, 39, 40, 38 }
 	
+	settings.Hair[2].rootMesh = 14
 	settings.Hair[2].offset = Vec3(-48, -48, -50)
 	settings.Hair[2].indices = { 79, 78, 76, 77 }
 	
+	settings.Hair[3].rootMesh = 14
 	settings.Hair[3].offset = Vec3(48, -48, -50)
 	settings.Hair[3].indices = { 68, 69, 70, 71 }
 	

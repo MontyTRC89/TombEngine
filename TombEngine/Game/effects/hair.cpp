@@ -33,7 +33,7 @@ namespace TEN::Effects::Hair
 
 		// Get world matrix from head bone.
 		auto worldMatrix = Matrix::Identity;
-		g_Renderer.GetBoneMatrix(item.Index, LM_HEAD, &worldMatrix);
+		g_Renderer.GetBoneMatrix(item.Index, GetRootMesh(hairUnitID), &worldMatrix);
 
 		// Apply base offset to world matrix.
 		auto relOffset = GetRelBaseOffset(hairUnitID, isYoung);
@@ -129,10 +129,46 @@ namespace TEN::Effects::Hair
 		else
 		{
 			// Center braid offset.
-			relOffset = g_GameFlow->GetSettings()->Hair[(int)LaraHairType::Normal].Offset;;
+			relOffset = g_GameFlow->GetSettings()->Hair[(int)LaraHairType::Normal].Offset;
 		}
 
 		return relOffset;
+	}
+
+	int HairUnit::GetRootMesh(int hairUnitID)
+	{
+		int result = LARA_MESHES::LM_HEAD;
+		bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
+
+		if (isYoung)
+		{
+			switch (hairUnitID)
+			{
+			// Left pigtail.
+			default:
+			case 0:
+				result = g_GameFlow->GetSettings()->Hair[(int)LaraHairType::YoungLeft].RootMesh;
+				break;
+
+			// Right pigtail.
+			case 1:
+				result = g_GameFlow->GetSettings()->Hair[(int)LaraHairType::YoungRight].RootMesh;
+				break;
+			}
+		}
+		else
+		{
+			// Center braid.
+			result = g_GameFlow->GetSettings()->Hair[(int)LaraHairType::YoungRight].RootMesh;
+		}
+
+		if (result >= LARA_MESHES::NUM_LARA_MESHES)
+		{
+			TENLog("Incorrect root mesh index specified for hair object. Check settings file.", LogLevel::Warning);
+			return LARA_MESHES::LM_HEAD;
+		}
+
+		return result;
 	}
 
 	Vector3 HairUnit::GetWaterProbeOffset(const ItemInfo& item)

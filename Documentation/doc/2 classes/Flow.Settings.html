@@ -195,6 +195,10 @@
 <h2><a href="#Hair">Hair </a></h2>
 <table class="function_list">
 	<tr>
+	<td class="name" ><a href="#mesh">mesh</a></td>
+	<td class="summary">Root mesh to which hair object will attach to.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#offset">offset</a></td>
 	<td class="summary">Relative braid offset to a headmesh.</td>
 	</tr>
@@ -699,6 +703,27 @@ Table consists of three entries, with first one representing classic Lara braid,
 Therefore, if you want to access classic Lara braid settings, use <code>settings.Hair[1]</code>, and so on.
           </div>
     <dl class="function">
+    <dt>
+    <a name = "mesh"></a>
+    <strong>mesh</strong>
+    </dt>
+    <dd>
+    Root mesh to which hair object will attach to.
+
+
+
+    <ul>
+        <li><span class="parameter">mesh</span>
+            <span class="types"><span class="type">int</span></span>
+         index of a root mesh to which hair will attach. Root mesh may be different for each hair object.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
     <dt>
     <a name = "offset"></a>
     <strong>offset</strong>
