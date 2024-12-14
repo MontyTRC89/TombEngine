@@ -24,7 +24,7 @@ constexpr auto MAX_TRIGGER_RANGE = BLOCK(16);
 
 void TriggerChaffEffects(int flareLife)
 {
-	auto offset = g_GameFlow->GetSettings()->Flare.MuzzleOffset.ToVector3i() + Vector3i(11, 32, -4);
+	auto offset = g_GameFlow->GetSettings()->Flare.Offset.ToVector3i() + Vector3i(11, 32, -4);
 	auto pos = GetJointPosition(LaraItem, LM_LHAND,  offset);
 	auto vect = GetJointPosition(LaraItem, LM_LHAND, Vector3i(11, 32, BLOCK(1) + Random::GenerateInt(0, 256)));
 	auto vel = vect - pos;
@@ -33,7 +33,7 @@ void TriggerChaffEffects(int flareLife)
 
 void TriggerChaffEffects(ItemInfo& item, int age)
 {
-	auto offset = g_GameFlow->GetSettings()->Flare.MuzzleOffset.ToVector3() + Vector3(0, 0, -4);
+	auto offset = g_GameFlow->GetSettings()->Flare.Offset.ToVector3() + Vector3(0, 0, -4);
 	auto world = Matrix::CreateTranslation(offset) * item.Pose.Orientation.ToRotationMatrix();
 	auto pos = item.Pose.Position + Vector3i(world.Translation());
 

@@ -160,7 +160,7 @@
 	<td class="summary">Flare color.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#muzzleOffset">muzzleOffset</a></td>
+	<td class="name" ><a href="#offset">offset</a></td>
 	<td class="summary">Muzzle offset.</td>
 	</tr>
 	<tr>
@@ -527,8 +527,8 @@
 
 </dd>
     <dt>
-    <a name = "muzzleOffset"></a>
-    <strong>muzzleOffset</strong>
+    <a name = "offset"></a>
+    <strong>offset</strong>
     </dt>
     <dd>
     Muzzle offset.
@@ -536,7 +536,7 @@
 
 
     <ul>
-        <li><span class="parameter">muzzleOffset</span>
+        <li><span class="parameter">offset</span>
             <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
          a relative muzzle offset where light and particle effects originate from.
         </li>
@@ -926,7 +926,7 @@ Access particular weapon's settings by using <a href="../4 enums/Flow.WeaponType
     <ul>
         <li><span class="parameter">accuracy</span>
             <span class="types"><span class="type">float</span></span>
-         determines accuracy range in angles (smaller angles mean higher accuracy). Not applicable for projectile weapons.
+         determines accuracy range in angles (smaller angles mean higher accuracy). Applicable only for firearms.
         </li>
     </ul>
 
@@ -1073,7 +1073,7 @@ Access particular weapon's settings by using <a href="../4 enums/Flow.WeaponType
     <ul>
         <li><span class="parameter">shell</span>
             <span class="types"><span class="type">bool</span></span>
-         if set to true, indicates that weapon emits gun shell. Not applicable for projectile weapons.
+         if set to true, indicates that weapon emits gun shell. Applicable only for firearms.
         </li>
     </ul>
 
@@ -1094,7 +1094,7 @@ Access particular weapon's settings by using <a href="../4 enums/Flow.WeaponType
     <ul>
         <li><span class="parameter">flashDuration</span>
             <span class="types"><span class="type">int</span></span>
-         specifies the duration of a gunflash effect. Not applicable for weapons without gunflash.
+         specifies the duration of a gunflash effect. Applicable only for firearms.
         </li>
     </ul>
 

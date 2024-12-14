@@ -87,7 +87,7 @@ void FlareControl(short itemNumber)
 		life++;
 	}
 
-	auto offset = g_GameFlow->GetSettings()->Flare.MuzzleOffset.ToVector3i() + Vector3i(-6, 6, 0);
+	auto offset = g_GameFlow->GetSettings()->Flare.Offset.ToVector3i() + Vector3i(-6, 6, 0);
 	auto lightPos = GetJointPosition(flareItem, 0, offset);
 	if (DoFlareLight(lightPos, flareItem, life))
 	{
@@ -399,7 +399,7 @@ void DoFlareInHand(ItemInfo& laraItem, int flareLife)
 {
 	auto& lara = *GetLaraInfo(&laraItem);
 	
-	auto offset = g_GameFlow->GetSettings()->Flare.MuzzleOffset.ToVector3i() + Vector3i(11, 32, 0);
+	auto offset = g_GameFlow->GetSettings()->Flare.Offset.ToVector3i() + Vector3i(11, 32, 0);
 	auto lightPos = GetJointPosition(&laraItem, LM_LHAND, offset);
 
 	if (DoFlareLight(lightPos, laraItem, flareLife))

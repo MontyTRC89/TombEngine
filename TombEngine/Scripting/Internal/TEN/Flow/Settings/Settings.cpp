@@ -7,6 +7,11 @@
 
 using namespace TEN::Effects::Hair;
 
+void NewIndex(sol::table self, const std::string& key, sol::object value)
+{
+	throw TENScriptException("Attempt to set unknown property \"" + key + "\" in settings.");
+}
+
 /***
 Global engine settings, which don't fall into particular category or can't be assigned to a specific object.
 Can be accessed using @{Flow.SetSettings} and @{Flow.GetSettings} functions.
@@ -47,6 +52,7 @@ void Settings::Register(sol::table& parent)
 
 	parent.new_usertype<Settings>(ScriptReserved_Settings,
 		sol::constructors<Settings()>(),
+		sol::meta_function::new_index, &NewIndex,
 		ScriptReserved_AnimSettings, &Settings::Animations,
 		ScriptReserved_FlareSettings, &Settings::Flare,
 		ScriptReserved_CameraSettings, &Settings::Camera,
@@ -67,6 +73,7 @@ void AnimSettings::Register(sol::table& parent)
 {
 	parent.create().new_usertype<AnimSettings>(ScriptReserved_AnimSettings, sol::constructors<AnimSettings()>(),
 		sol::call_constructor, sol::constructors<AnimSettings()>(),
+		sol::meta_function::new_index, &NewIndex,
 
 	/*** Extended crawl moveset.
 	@tfield bool crawlExtended when enabled, player will be able to traverse across one-click steps in crawlspaces. */
@@ -110,6 +117,7 @@ void CameraSettings::Register(sol::table& parent)
 {
 	parent.create().new_usertype<CameraSettings>(ScriptReserved_AnimSettings, sol::constructors<CameraSettings()>(),
 		sol::call_constructor, sol::constructors<CameraSettings()>(),
+		sol::meta_function::new_index, &NewIndex,
 
 	/*** Determines highlight color in binocular mode.
 	@tfield Color binocularLightColor color of highlight, when player presses action. Zero color means there will be no highlight. */
@@ -133,14 +141,15 @@ void FlareSettings::Register(sol::table& parent)
 {
 	parent.create().new_usertype<FlareSettings>(ScriptReserved_FlareSettings, sol::constructors<FlareSettings()>(),
 		sol::call_constructor, sol::constructors<FlareSettings()>(),
+		sol::meta_function::new_index, &NewIndex,
 
 	/*** Flare color.
 	@tfield Color color flare color. Used for sparks and lensflare coloring as well. */
 	"color", &FlareSettings::Color,
 
 	/*** Muzzle offset.
-	@tfield Vec3 muzzleOffset a relative muzzle offset where light and particle effects originate from. */
-	"muzzleOffset", &FlareSettings::MuzzleOffset,
+	@tfield Vec3 offset a relative muzzle offset where light and particle effects originate from. */
+	"offset", &FlareSettings::Offset,
 
 	/*** Light range.
 	@tfield int range flare light radius or range. Represented in "clicks" equal to 256 world units. */
@@ -182,6 +191,7 @@ void HairSettings::Register(sol::table& parent)
 {
 	parent.create().new_usertype<HairSettings>(ScriptReserved_HairSettings, sol::constructors<HairSettings()>(),
 		sol::call_constructor, sol::constructors<HairSettings()>(),
+		sol::meta_function::new_index, &NewIndex,
 
 	/*** Root mesh to which hair object will attach to.
 	@tfield int mesh index of a root mesh to which hair will attach. Root mesh may be different for each hair object. */
@@ -205,6 +215,7 @@ void HudSettings::Register(sol::table& parent)
 {
 	parent.create().new_usertype<HudSettings>(ScriptReserved_HudSettings, sol::constructors<HudSettings()>(),
 		sol::call_constructor, sol::constructors<HudSettings()>(),
+		sol::meta_function::new_index, &NewIndex,
 
 	/*** Toggle in-game status bars visibility.
 	@tfield bool statusBars if disabled, all status bars (health, air, stamina) will be hidden.. */
@@ -232,6 +243,7 @@ void PhysicsSettings::Register(sol::table& parent)
 {
 	parent.create().new_usertype<PhysicsSettings>(ScriptReserved_PhysicsSettings, sol::constructors<PhysicsSettings()>(),
 		sol::call_constructor, sol::constructors<PhysicsSettings()>(),
+		sol::meta_function::new_index, &NewIndex,
 
 	/*** Global world gravity.
 	@tfield float gravity specifies global gravity. Mostly affects Lara and several other objects. */
@@ -252,9 +264,10 @@ void WeaponSettings::Register(sol::table& parent)
 {
 	parent.create().new_usertype<WeaponSettings>(ScriptReserved_WeaponSettings, sol::constructors<WeaponSettings()>(),
 		sol::call_constructor, sol::constructors<WeaponSettings()>(),
+		sol::meta_function::new_index, &NewIndex,
 
 	/*** Shooting accuracy.
-	@tfield float accuracy determines accuracy range in angles (smaller angles mean higher accuracy). Not applicable for projectile weapons. */
+	@tfield float accuracy determines accuracy range in angles (smaller angles mean higher accuracy). Applicable only for firearms. */
 	"accuracy", &WeaponSettings::Accuracy,
 
 	/*** Targeting distance.
@@ -282,11 +295,11 @@ void WeaponSettings::Register(sol::table& parent)
 	"smoke", &WeaponSettings::Smoke,
 
 	/*** Gun shell.
-	@tfield bool shell if set to true, indicates that weapon emits gun shell. Not applicable for projectile weapons. */
+	@tfield bool shell if set to true, indicates that weapon emits gun shell. Applicable only for firearms. */
 	"shell", &WeaponSettings::Shell,
 
 	/*** Gunflash duration.
-	@tfield int flashDuration specifies the duration of a gunflash effect. Not applicable for weapons without gunflash. */
+	@tfield int flashDuration specifies the duration of a gunflash effect. Applicable only for firearms. */
 	"flashDuration", &WeaponSettings::FlashDuration,
 
 	/*** Water level.
@@ -303,6 +316,7 @@ void SystemSettings::Register(sol::table& parent)
 {
 	parent.create().new_usertype<SystemSettings>(ScriptReserved_SystemSettings, sol::constructors<SystemSettings()>(),
 		sol::call_constructor, sol::constructors<SystemSettings()>(),
+		sol::meta_function::new_index, &NewIndex,
 
 	/*** How should the application respond to script errors?
 	@tfield Flow.ErrorMode errorMode error mode to use. */

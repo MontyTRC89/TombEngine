@@ -34,7 +34,7 @@ struct CameraSettings
 struct FlareSettings
 {
 	ScriptColor Color = { 128, 64, 0 };
-	Vec3 MuzzleOffset = { 0, 0, 41 };
+	Vec3 Offset = { 0, 0, 41 };
 	float LensflareBrightness = 0.5f;
 	bool Sparks = true;
 	bool Smoke = true;
