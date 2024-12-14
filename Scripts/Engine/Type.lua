@@ -129,7 +129,7 @@ end
     --      end
     --  end
 Type.IsColor = function (variable)
-    return variable ~= nil and type(variable) == "userdata" and tostring(variable.__name) == "sol.ScriptColor"
+    return variable ~= nil and type(variable) == "userdata" and variable.__type.name == "ScriptColor"
 end
 
     --- Check if the variable is a Rotation.
@@ -143,7 +143,7 @@ end
     --      end
     --  end
 Type.IsRotation = function (variable)
-    return variable ~= nil and type(variable) == "userdata" and (tostring(variable.__name) == "sol.Rotation")
+    return variable ~= nil and type(variable) == "userdata" and variable.__type.name == "Rotation"
 end
 
     --- Check if the variable is a Vec2.
@@ -157,7 +157,7 @@ end
     --      end
     --  end
 Type.IsVec2 = function (variable)
-    return variable ~= nil and type(variable) == "userdata" and (tostring(variable.__name) == "sol.Vec2")
+    return variable ~= nil and type(variable) == "userdata" and variable.__type.name == "Vec2"
 end
 
     --- Check if the variable is a Vec3.
@@ -171,7 +171,7 @@ end
     --      end
     --	end
 Type.IsVec3 = function (variable)
-    return variable ~= nil and type(variable) == "userdata" and (tostring(variable.__name) == "sol.Vec3")
+    return variable ~= nil and type(variable) == "userdata" and variable.__type.name == "Vec3"
 end
 
     --- Check if the variable is a LevelFunc.
@@ -185,7 +185,7 @@ end
     --      end
     --  end
 Type.IsLevelFunc = function (variable)
-    return variable ~= nil and type(variable) == "userdata" and (tostring(variable.__name) == "sol.LevelFunc")
+    return variable ~= nil and type(variable) == "userdata" and variable.__type.name == "LevelFunc"
 end
 
 return Type
