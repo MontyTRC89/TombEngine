@@ -29,11 +29,11 @@
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
-using namespace TEN::Animation;
+using TEN::Renderer::g_Renderer;
+
 using namespace TEN::Entities::Doors;
 using namespace TEN::Input;
 using namespace TEN::Utils;
-using TEN::Renderer::g_Renderer;
 
 const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS =
 {
@@ -129,9 +129,7 @@ float ReadFloat()
 
 Vector2 ReadVector2()
 {
-	// NOTE: Cannot use Vector2 constructor due to quirky C++ init ordering.
-
-	auto value = Vector2::Zero;
+	Vector2 value;
 	value.x = ReadFloat();
 	value.y = ReadFloat();
 	return value;
@@ -139,9 +137,7 @@ Vector2 ReadVector2()
 
 Vector3 ReadVector3()
 {
-	// NOTE: Cannot use Vector3 constructor due to quirky C++ init ordering.
-
-	auto value = Vector3::Zero;
+	Vector3 value;
 	value.x = ReadFloat();
 	value.y = ReadFloat();
 	value.z = ReadFloat();
@@ -150,9 +146,7 @@ Vector3 ReadVector3()
 
 Vector4 ReadVector4()
 {
-	// NOTE: Cannot use Vector4 constructor due to quirky C++ init ordering.
-
-	auto value = Vector4::Zero;
+	Vector4 value;
 	value.x = ReadFloat();
 	value.y = ReadFloat();
 	value.z = ReadFloat();
@@ -162,7 +156,7 @@ Vector4 ReadVector4()
 
 bool ReadBool()
 {
-	return (bool)ReadUInt8();
+	return bool(ReadUInt8());
 }
 
 int ReadCount(int maxValue = SQUARE(1024))
@@ -193,15 +187,13 @@ long long ReadLEB128(bool sign)
 
 		result |= (long long)(currentByte & 0x7F) << currentShift;
 		currentShift += 7;
-	}
-	while ((currentByte & 0x80) != 0);
+	} while ((currentByte & 0x80) != 0);
 
-	// Sign extend.
-	if (sign)
+	if (sign) // Sign extend
 	{
 		int shift = 64 - currentShift;
 		if (shift > 0)
-			result = long long(result << shift) >> shift;
+			result = (long long)(result << shift) >> shift;
 	}
 
 	return result;
@@ -372,87 +364,22 @@ void LoadObjects()
 		g_Level.Meshes.push_back(mesh);
 	}
 
-	int animCount = ReadCount();
-	TENLog("Animation count: " + std::to_string(animCount), LogLevel::Info);
-
-			auto start = ReadVector2();
-			auto startHandle = ReadVector2();
-			auto endHandle = ReadVector2();
-			auto end = ReadVector2();
-			//anim.BlendCurve = BezierCurve2D(start, startHandle, endHandle, end);
-
-			anim.VelocityStart = ReadVector3();
-			anim.VelocityEnd = ReadVector3();
-
-			// Load keyframes.
-			int frameCount = ReadInt32();
-			anim.Keyframes.resize(frameCount);
-			for (auto& keyframe : anim.Keyframes)
-			{
-				auto center = ReadVector3();
-				auto extents = ReadVector3();
-				keyframe.Aabb = BoundingBox(center, extents);
-				keyframe.BoundingBox = GameBoundingBox(keyframe.Aabb);
-
-				keyframe.RootOffset = ReadVector3();
-
-				int boneCount = ReadInt32();
-				keyframe.BoneOrientations.resize(boneCount);
-				for (auto& orient : keyframe.BoneOrientations)
-					orient = ReadVector4();
-			}
-
-	int changeCount = ReadCount();
-	g_Level.Changes.resize(changeCount);
-	ReadBytes(g_Level.Changes.data(), sizeof(StateDispatchData) * changeCount);
-
-	int rangeCount = ReadCount();
-	g_Level.Ranges.resize(rangeCount);
-	ReadBytes(g_Level.Ranges.data(), sizeof(StateDispatchRangeData) * rangeCount);
-
-	int commandCount = ReadCount();
-	g_Level.Commands.resize(commandCount);
-	ReadBytes(g_Level.Commands.data(), sizeof(int) * commandCount);
-
 	int boneCount = ReadCount();
 	g_Level.Bones.resize(boneCount);
 	ReadBytes(g_Level.Bones.data(), 4 * boneCount);
 
-	int frameCount = ReadCount();
-	g_Level.Frames.resize(frameCount);
-	for (int i = 0; i < frameCount; i++)
-	{
-		auto* frame = &g_Level.Frames[i];
-
-					case AnimCommandType::Deactivate:
-						command = std::make_unique<DeactivateCommand>();
-						break;
-
-					case AnimCommandType::SoundEffect:
-					{
-						int soundID = ReadInt32();
-						int frameNumber = ReadInt32();
-						auto envCond = (SoundEffectEnvCondition)ReadInt32();
-						command = std::make_unique<SoundEffectCommand>(soundID, frameNumber, envCond);
-					}
-						break;
-
-					case AnimCommandType::FlipEffect:
-					{
-						int flipEffectID = ReadInt32();
-						int frameNumber = ReadInt32();
-						command = std::make_unique<FlipEffectCommand>(flipEffectID, frameNumber);
-					}
-						break;
-					}
-
 	int modelCount = ReadCount();
 	TENLog("Model count: " + std::to_string(modelCount), LogLevel::Info);
 
-			anim.Flags = ReadInt32();
-		}
+	for (int i = 0; i < modelCount; i++)
+	{
+		int objNum = ReadInt32();
+		MoveablesIds.push_back(objNum);
 
-		Objects[objectID].loaded = true;
+		Objects[objNum].loaded = true;
+		Objects[objNum].nmeshes = ReadInt32();
+		Objects[objNum].meshIndex = ReadInt32();
+		Objects[objNum].boneIndex = ReadInt32();
 	}
 
 	TENLog("Initializing objects...", LogLevel::Info);
