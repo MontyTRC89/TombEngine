@@ -20,14 +20,14 @@ struct ConsumablePickupInfo
 static std::array<ConsumablePickupInfo, 4> Consumables =
 {
 	{
-		{ ID_SMALLMEDI_ITEM, &PlayerInventoryData::TotalSmallMedipacks, 1 },
-		{ ID_BIGMEDI_ITEM, &PlayerInventoryData::TotalLargeMedipacks, 1 },
-		{ ID_FLARE_INV_ITEM, &PlayerInventoryData::TotalFlares, 12 },
-		{ ID_FLARE_ITEM, &PlayerInventoryData::TotalFlares, 1 }
+		ConsumablePickupInfo{ ID_SMALLMEDI_ITEM, &PlayerInventoryData::TotalSmallMedipacks, 1 },
+		ConsumablePickupInfo{ ID_BIGMEDI_ITEM, &PlayerInventoryData::TotalLargeMedipacks, 1 },
+		ConsumablePickupInfo{ ID_FLARE_INV_ITEM, &PlayerInventoryData::TotalFlares, 12 },
+		ConsumablePickupInfo{ ID_FLARE_ITEM, &PlayerInventoryData::TotalFlares, 1 }
 	}
  };
 
-void InitializeConsumables(Settings const& settings)
+void InitializeConsumables(const Settings& settings)
 {
 	Consumables[GetArraySlot(Consumables, GAME_OBJECT_ID::ID_FLARE_INV_ITEM)].Amount = settings.Flare.PickupCount;
 }
@@ -38,20 +38,20 @@ bool TryModifyingConsumable(LaraInfo& lara, GAME_OBJECT_ID objectID, std::option
 	if (arrayPos == NO_VALUE)
 		return false;
 
-	ConsumablePickupInfo info = Consumables[arrayPos];
-	auto & currentAmt = lara.Inventory.*(info.Count);
+	const auto& consumable = Consumables[arrayPos];
+	auto& currentAmount = lara.Inventory.*(consumable.Count);
 	switch (modType)
 	{
 	case ModificationType::Set:
-		currentAmt = amount.value();
+		currentAmount = amount.value();
 		break;
 
 	default:
-		if (currentAmt != NO_VALUE)
+		if (currentAmount != NO_VALUE)
 		{
-			int defaultModify = ModificationType::Add == modType ? info.Amount : -info.Amount;
-			int newVal = currentAmt + (amount.has_value() ? amount.value() : defaultModify);
-			currentAmt = std::max(0, newVal);
+			int defaultModify = ModificationType::Add == modType ? consumable.Amount : -consumable.Amount;
+			int newVal = currentAmount + (amount.has_value() ? amount.value() : defaultModify);
+			currentAmount = std::max(0, newVal);
 		}
 		break;
 	}
@@ -67,9 +67,13 @@ bool TryAddingConsumable(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<
 bool TryRemovingConsumable(LaraInfo& lara, GAME_OBJECT_ID objectID, std::optional<int> amount)
 {
 	if (amount.has_value())
+	{
 		return TryModifyingConsumable(lara, objectID, -amount.value(), ModificationType::Remove);
+	}
 	else
+	{
 		return TryModifyingConsumable(lara, objectID, amount, ModificationType::Remove);
+	}
 }
 
 std::optional<int> GetConsumableCount(LaraInfo& lara, GAME_OBJECT_ID objectID)
@@ -78,9 +82,9 @@ std::optional<int> GetConsumableCount(LaraInfo& lara, GAME_OBJECT_ID objectID)
 	if (arrayPos == NO_VALUE)
 		return std::nullopt;
 
-	ConsumablePickupInfo info = Consumables[arrayPos];
+	const auto& consumable = Consumables[arrayPos];
 
-	return lara.Inventory.*(info.Count);
+	return lara.Inventory.*(consumable.Count);
 }
 
 int GetDefaultConsumableCount(GAME_OBJECT_ID objectID)

@@ -14,9 +14,9 @@
 #include "Objects/Effects/flame_emitters.h"
 #include "Renderer/RendererEnums.h"
 #include "Sound/sound.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Entities::Effects;
 using namespace TEN::Input;
@@ -301,7 +301,7 @@ namespace TEN::Entities::Generic
 		auto pos1 = GameVector(*origin, LaraItem->RoomNumber);
 		auto pos2 = GameVector(*target);
 
-		auto& color = g_GameFlow->GetSettings()->Camera.BinocularLightColor;
+		const auto& color = g_GameFlow->GetSettings()->Camera.BinocularLightColor;
 
 		TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 12, color.GetR(), color.GetG(), color.GetB());
 

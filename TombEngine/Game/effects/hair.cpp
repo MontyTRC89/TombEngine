@@ -22,6 +22,20 @@ namespace TEN::Effects::Hair
 {
 	HairEffectController HairEffect = {};
 
+	int HairUnit::GetRootMeshID(int hairUnitID)
+	{
+		bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
+		int meshID = g_GameFlow->GetSettings()->Hair[GetHairTypeIndex(hairUnitID, isYoung)].RootMesh;
+
+		if (meshID >= LARA_MESHES::NUM_LARA_MESHES)
+		{
+			TENLog("Incorrect root mesh index specified for hair object. Check settings file.", LogLevel::Warning);
+			return LARA_MESHES::LM_HEAD;
+		}
+
+		return meshID;
+	}
+
 	void HairUnit::Update(const ItemInfo& item, int hairUnitID)
 	{
 		for (auto& segment : Segments)
@@ -33,7 +47,7 @@ namespace TEN::Effects::Hair
 
 		// Get world matrix from head bone.
 		auto worldMatrix = Matrix::Identity;
-		g_Renderer.GetBoneMatrix(item.Index, GetRootMesh(hairUnitID), &worldMatrix);
+		g_Renderer.GetBoneMatrix(item.Index, GetRootMeshID(hairUnitID), &worldMatrix);
 
 		// Apply base offset to world matrix.
 		auto relOffset = GetRelBaseOffset(hairUnitID, isYoung);
@@ -110,27 +124,27 @@ namespace TEN::Effects::Hair
 
 	int HairUnit::GetHairTypeIndex(int hairUnitID, bool isYoung)
 	{
-		int hairType = (int)LaraHairType::Normal;
+		int hairType = (int)PlayerHairType::Normal;
 
 		if (isYoung)
 		{
 			switch (hairUnitID)
 			{
-				// Left pigtail offset.
+			// Left offset.
 			case 0:
-				hairType = (int)LaraHairType::YoungLeft;
+				hairType = (int)PlayerHairType::YoungLeft;
 				break;
 
-				// Right pigtail offset.
+			// Right offset.
 			case 1:
-				hairType = (int)LaraHairType::YoungRight;
+				hairType = (int)PlayerHairType::YoungRight;
 				break;
 			}
 		}
 		else
 		{
-			// Center braid offset.
-			hairType = (int)LaraHairType::Normal;
+			// Center offset.
+			hairType = (int)PlayerHairType::Normal;
 		}
 
 		return hairType;
@@ -139,20 +153,6 @@ namespace TEN::Effects::Hair
 	Vector3 HairUnit::GetRelBaseOffset(int hairUnitID, bool isYoung)
 	{
 		return g_GameFlow->GetSettings()->Hair[GetHairTypeIndex(hairUnitID, isYoung)].Offset;
-	}
-
-	int HairUnit::GetRootMesh(int hairUnitID)
-	{
-		bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
-		int result = g_GameFlow->GetSettings()->Hair[GetHairTypeIndex(hairUnitID, isYoung)].RootMesh;
-
-		if (result >= LARA_MESHES::NUM_LARA_MESHES)
-		{
-			TENLog("Incorrect root mesh index specified for hair object. Check settings file.", LogLevel::Warning);
-			return LARA_MESHES::LM_HEAD;
-		}
-
-		return result;
 	}
 
 	Vector3 HairUnit::GetWaterProbeOffset(const ItemInfo& item)
@@ -292,7 +292,7 @@ namespace TEN::Effects::Hair
 				segment.Position += Weather.Wind() * 2;
 
 			// Apply gravity.
-			segment.Position.y += g_GameFlow->GetSettings()->Physics.Gravity * HAIR_GRAVITY;
+			segment.Position.y += g_GameFlow->GetSettings()->Physics.Gravity * HAIR_GRAVITY_COEFF;
 
 			// Float on water surface.
 			if (waterHeight != NO_HEIGHT && segment.Position.y > waterHeight)

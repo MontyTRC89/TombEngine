@@ -5,9 +5,9 @@
 #include "Game/collision/Sphere.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Setup.h"
-#include "Specific/level.h"
 #include "Math/Math.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Specific/level.h"
 
 using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;

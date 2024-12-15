@@ -9,13 +9,15 @@
 #include "Scripting/Internal/TEN/Types/Time/Time.h"
 #include "Scripting/Internal/TEN/Flow/Statistics/Statistics.h"
 
+using namespace TEN::Scripting;
+
 constexpr auto SAVEGAME_MAX = 16;
 
 struct GameStats
 {
-	unsigned int SecretMap = 0;
+	unsigned int SecretBits = 0;
 
-	Statistics Game	= {};
+	Statistics Game	 = {};
 	Statistics Level = {};
 };
 

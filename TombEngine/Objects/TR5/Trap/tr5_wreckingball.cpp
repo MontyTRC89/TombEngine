@@ -12,10 +12,10 @@
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
 #include "Objects/TR5/Light/tr5_light.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Effects::Environment;
 

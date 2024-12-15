@@ -1,4 +1,3 @@
-#pragma once
 #include "framework.h"
 
 #include "Game/effects/debris.h"
@@ -9,6 +8,9 @@
 #include "Scripting/Internal/TEN/Types/Color/Color.h"
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
+
+using namespace TEN::Scripting;
+
 /***
 Statics
 
@@ -24,7 +26,8 @@ Static::Static(MESH_INFO & ref) : m_mesh{ref}
 
 void Static::Register(sol::table & parent)
 {
-	parent.new_usertype<Static>(ScriptReserved_Static,
+	parent.new_usertype<Static>(
+		ScriptReserved_Static,
 		sol::no_constructor, // ability to spawn new ones could be added later
 		sol::meta_function::index, IndexError,
 		sol::meta_function::new_index, NewIndexError,

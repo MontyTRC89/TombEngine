@@ -1536,24 +1536,38 @@ namespace TEN::Gui
 		Ammo.CurrentCrossBowAmmoType = 0;
 
 		if (player.Weapons[(int)LaraWeaponType::Pistol].Present)
+		{
 			InsertObjectIntoList(INV_OBJECT_PISTOLS);
+		}
 		else if (Ammo.AmountPistolsAmmo)
+		{
 			InsertObjectIntoList(INV_OBJECT_PISTOLS_AMMO);
+		}
 
 		if (player.Weapons[(int)LaraWeaponType::Uzi].Present)
+		{
 			InsertObjectIntoList(INV_OBJECT_UZIS);
+		}
 		else if (Ammo.AmountUziAmmo)
+		{
 			InsertObjectIntoList(INV_OBJECT_UZI_AMMO);
+		}
 
 		if (player.Weapons[(int)LaraWeaponType::Revolver].Present)
 		{
 			if (player.Weapons[(int)LaraWeaponType::Revolver].HasLasersight)
+			{
 				InsertObjectIntoList(INV_OBJECT_REVOLVER_LASER);
+			}
 			else
+			{
 				InsertObjectIntoList(INV_OBJECT_REVOLVER);
+			}
 		}
 		else if (Ammo.AmountRevolverAmmo)
+		{
 			InsertObjectIntoList(INV_OBJECT_REVOLVER_AMMO);
+		}
 
 		if (player.Weapons[(int)LaraWeaponType::Shotgun].Present)
 		{
@@ -1574,9 +1588,13 @@ namespace TEN::Gui
 		if (player.Weapons[(int)LaraWeaponType::HK].Present)
 		{
 			if (player.Weapons[(int)LaraWeaponType::HK].HasLasersight)
+			{
 				InsertObjectIntoList(INV_OBJECT_HK_LASERSIGHT);
+			}
 			else
+			{
 				InsertObjectIntoList(INV_OBJECT_HK);
+			}
 
 			if (player.Weapons[(int)LaraWeaponType::HK].WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_2)
 				Ammo.CurrentHKAmmoType = 1;
@@ -1585,14 +1603,20 @@ namespace TEN::Gui
 				Ammo.CurrentHKAmmoType = 2;
 		}
 		else if (Ammo.AmountHKAmmo1)
+		{
 			InsertObjectIntoList(INV_OBJECT_HK_AMMO);
+		}
 
 		if (player.Weapons[(int)LaraWeaponType::Crossbow].Present)
 		{
 			if (player.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)
+			{
 				InsertObjectIntoList(INV_OBJECT_CROSSBOW_LASER);
+			}
 			else
+			{
 				InsertObjectIntoList(INV_OBJECT_CROSSBOW);
+			}
 
 			if (player.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo2)
 				Ammo.CurrentCrossBowAmmoType = 1;
@@ -1635,14 +1659,22 @@ namespace TEN::Gui
 		}
 
 		if (player.Weapons[(int)LaraWeaponType::RocketLauncher].Present)
+		{
 			InsertObjectIntoList(INV_OBJECT_ROCKET_LAUNCHER);
+		}
 		else if (Ammo.AmountRocketsAmmo)
+		{
 			InsertObjectIntoList(INV_OBJECT_ROCKET_AMMO);
+		}
 
 		if (player.Weapons[(int)LaraWeaponType::HarpoonGun].Present)
+		{
 			InsertObjectIntoList(INV_OBJECT_HARPOON_GUN);
+		}
 		else if (Ammo.AmountHarpoonAmmo)
+		{
 			InsertObjectIntoList(INV_OBJECT_HARPOON_AMMO);
+		}
 
 		if (player.Inventory.HasLasersight)
 			InsertObjectIntoList(INV_OBJECT_LASERSIGHT);

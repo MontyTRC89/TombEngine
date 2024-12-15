@@ -19,8 +19,8 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Math/Math.h"
-#include "Sound/sound.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Sound/sound.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Input;
@@ -712,7 +712,9 @@ namespace TEN::Entities::Vehicles
 				verticalVelocity = 0;
 			}
 			else
+			{
 				verticalVelocity += g_GameFlow->GetSettings()->Physics.Gravity;
+			}
 		}
 		// Airborne.
 		else

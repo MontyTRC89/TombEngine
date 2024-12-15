@@ -17,9 +17,9 @@
 #include "Game/people.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Collision::Point;
 
@@ -367,7 +367,9 @@ namespace TEN::Entities::Creatures::TR5
 			item->Animation.Velocity.z += (5.0f - item->Animation.Velocity.z) / 2.0f;
 		}
 		else
+		{
 			item->Animation.Velocity.y += g_GameFlow->GetSettings()->Physics.Gravity;
+		}
 
 		item->Pose.Position.y += item->Animation.Velocity.y;
 

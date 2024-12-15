@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Game/Gui.h"
 #include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
 
@@ -7,14 +8,14 @@ using namespace TEN::Gui;
 
 enum GAME_OBJECT_ID : short;
 
-static const std::unordered_map<std::string, RotationFlags> ROTATION_AXES
+static const auto ROTATION_AXES = std::unordered_map<std::string, RotationFlags>
 {
 	{ "X", RotationFlags::INV_ROT_X },
 	{ "Y", RotationFlags::INV_ROT_Y },
 	{ "Z", RotationFlags::INV_ROT_Z }
 };
 
-static const std::unordered_map<std::string, ItemOptions> ITEM_MENU_ACTIONS
+static const auto ITEM_MENU_ACTIONS = std::unordered_map<std::string, ItemOptions>
 {
 	{ "USE", ItemOptions::OPT_USE },
 	{ "EQUIP", ItemOptions::OPT_EQUIP },

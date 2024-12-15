@@ -31,9 +31,9 @@
 #include "Objects/Utils/object_helper.h"
 #include "Renderer/Structures/RendererSprite2D.h"
 #include "Renderer/Structures/RendererSprite.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
 #include "Structures/RendererSpriteBucket.h"
-#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
@@ -1012,15 +1012,13 @@ namespace TEN::Renderer
 
 	bool Renderer::DrawGunFlashes(RenderView& view) 
 	{
-
 		if (!Lara.RightArm.GunFlash && !Lara.LeftArm.GunFlash)
 			return false;
 
 		if (Lara.Control.Look.OpticRange > 0)
 			return false;
 
-		auto& settings = g_GameFlow->GetSettings()->Weapons[(int)Lara.Control.Weapon.GunType - 1];
-
+		const auto& settings = g_GameFlow->GetSettings()->Weapons[(int)Lara.Control.Weapon.GunType - 1];
 		if (!settings.MuzzleFlash)
 			return false;
 
@@ -1037,9 +1035,8 @@ namespace TEN::Renderer
 		const auto& room = _rooms[LaraItem->RoomNumber];
 		auto* itemPtr = &_items[LaraItem->Index];
 
-		// Divide gunflash tint by 2, because tinting uses multiplication and additive color,
-		// which doesn't look good with overbright color values.
-		_stStatic.Color = settings.ColorizeMuzzleFlash ? (Vector4)settings.FlashColor / 2.0f : Vector4::One;
+		// Divide gunflash tint by 2 because tinting uses multiplication and additive color which doesn't look good with overbright color values.
+		_stStatic.Color = settings.ColorizeMuzzleFlash ? ((Vector4)settings.FlashColor / 2) : Vector4::One;
 		_stStatic.AmbientLight = room.AmbientLight;
 		_stStatic.LightMode = (int)LightMode::Static;
 		BindStaticLights(itemPtr->LightsToDraw);

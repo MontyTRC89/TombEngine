@@ -15,8 +15,8 @@
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Specific/level.h"
 
-using namespace TEN::Renderer::Graphics;
 using namespace TEN::Effects::Hair;
+using namespace TEN::Renderer::Graphics;
 
 namespace TEN::Renderer
 {
@@ -639,42 +639,42 @@ namespace TEN::Renderer
 						isSkinPresent = true;
 						int bonesToCheck[2] = { 0, 0 };
 
-						RendererObject& objSkin = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
+						const auto& objSkin = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
 
 						for (int j = 1; j < obj->nmeshes; j++)
 						{
-							RendererMesh *jointMesh = moveable.ObjectMeshes[j];
-							RendererBone *jointBone = moveable.LinearizedBones[j];
+							const auto* jointMesh = moveable.ObjectMeshes[j];
+							const auto* jointBone = moveable.LinearizedBones[j];
 
 							bonesToCheck[0] = jointBone->Parent->Index;
 							bonesToCheck[1] = j;
 
 							for (int b1 = 0; b1 < jointMesh->Buckets.size(); b1++)
 							{
-								RendererBucket *jointBucket = &jointMesh->Buckets[b1];
+								const auto* jointBucket = &jointMesh->Buckets[b1];
 
 								for (int v1 = 0; v1 < jointBucket->NumVertices; v1++)
 								{
-									Vertex *jointVertex = &_moveablesVertices[jointBucket->StartVertex + v1];
+									auto* jointVertex = &_moveablesVertices[jointBucket->StartVertex + v1];
 
 									bool isDone = false;
 
 									for (int k = 0; k < 2; k++)
 									{
-										RendererMesh *skinMesh = objSkin.ObjectMeshes[bonesToCheck[k]];
-										RendererBone *skinBone = objSkin.LinearizedBones[bonesToCheck[k]];
+										const auto* skinMesh = objSkin.ObjectMeshes[bonesToCheck[k]];
+										const auto* skinBone = objSkin.LinearizedBones[bonesToCheck[k]];
 
 										for (int b2 = 0; b2 < skinMesh->Buckets.size(); b2++)
 										{
-											RendererBucket *skinBucket = &skinMesh->Buckets[b2];
+											const auto* skinBucket = &skinMesh->Buckets[b2];
 											for (int v2 = 0; v2 < skinBucket->NumVertices; v2++)
 											{
-												Vertex *skinVertex = &_moveablesVertices[skinBucket->StartVertex + v2];
+												auto* skinVertex = &_moveablesVertices[skinBucket->StartVertex + v2];
 
-												auto vertex1 = _moveablesVertices[jointBucket->StartVertex + v1].Position + jointBone->GlobalTranslation;
-												auto vertex2 = _moveablesVertices[skinBucket->StartVertex + v2].Position + skinBone->GlobalTranslation;
+												auto vertex0 = _moveablesVertices[jointBucket->StartVertex + v1].Position + jointBone->GlobalTranslation;
+												auto vertex1 = _moveablesVertices[skinBucket->StartVertex + v2].Position + skinBone->GlobalTranslation;
 
-												if (Vector3::Distance(vertex1, vertex2) > 2)
+												if (Vector3::Distance(vertex0, vertex1) > 2)
 													continue;
 
 												jointVertex->Bone = bonesToCheck[k];
@@ -700,13 +700,13 @@ namespace TEN::Renderer
 					{
 						bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
 						bool isSecond = isYoung && MoveablesIds[i] == ID_HAIR_SECONDARY;
-						auto& skinObj = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
-						auto& settings = g_GameFlow->GetSettings()->Hair;
+						const auto& skinObj = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
+						const auto& settings = g_GameFlow->GetSettings()->Hair;
 
 						for (int j = 0; j < obj->nmeshes; j++)
 						{
-							auto* currentMesh = moveable.ObjectMeshes[j];
-							auto* currentBone = moveable.LinearizedBones[j];
+							const auto* currentMesh = moveable.ObjectMeshes[j];
+							const auto* currentBone = moveable.LinearizedBones[j];
 
 							for (const auto& currentBucket : currentMesh->Buckets)
 							{
@@ -718,28 +718,30 @@ namespace TEN::Renderer
 									// Link mesh 0 to root mesh.
 									if (j == 0)
 									{
-										auto& vertices0 = isYoung ? settings[(int)LaraHairType::YoungLeft].Indices :
-																	settings[(int)LaraHairType::Normal].Indices;
+										const auto& vertices0 = isYoung ? settings[(int)PlayerHairType::YoungLeft].Indices :
+																		  settings[(int)PlayerHairType::Normal].Indices;
 
-										auto& vertices1 = isYoung ? settings[(int)LaraHairType::YoungRight].Indices :
-																	settings[(int)LaraHairType::Normal].Indices;
+										const auto& vertices1 = isYoung ? settings[(int)PlayerHairType::YoungRight].Indices :
+																		  settings[(int)PlayerHairType::Normal].Indices;
 
-										int rootMesh = HairUnit::GetRootMesh(isSecond ? 1 : 0);
+										int rootMesh = HairUnit::GetRootMeshID(isSecond ? 1 : 0);
 
-										auto* parentMesh = skinObj.ObjectMeshes[rootMesh];
-										auto* parentBone = skinObj.LinearizedBones[rootMesh];
+										const auto* parentMesh = skinObj.ObjectMeshes[rootMesh];
+										const auto* parentBone = skinObj.LinearizedBones[rootMesh];
 
 										// Link listed vertices.
 										if ((!isSecond && currentVertex->OriginalIndex >= vertices0.size()) || 
 											 (isSecond && currentVertex->OriginalIndex >= vertices1.size()))
+										{
 											continue;
+										}
 
 										for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
 										{
-											auto* parentBucket = &parentMesh->Buckets[b2];
+											const auto* parentBucket = &parentMesh->Buckets[b2];
 											for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 											{
-												auto* parentVertex = &_moveablesVertices[parentBucket->StartVertex + v2];
+												const auto* parentVertex = &_moveablesVertices[parentBucket->StartVertex + v2];
 												if ((parentVertex->OriginalIndex == vertices1[currentVertex->OriginalIndex] &&  isSecond) ||
 													(parentVertex->OriginalIndex == vertices0[currentVertex->OriginalIndex] && !isSecond))
 												{
@@ -753,12 +755,12 @@ namespace TEN::Renderer
 									// Link meshes > 0 to parent meshes.
 									else
 									{
-										auto* parentMesh = moveable.ObjectMeshes[j - 1];
-										auto* parentBone = moveable.LinearizedBones[j - 1];
+										const auto* parentMesh = moveable.ObjectMeshes[j - 1];
+										const auto* parentBone = moveable.LinearizedBones[j - 1];
 
 										for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
 										{
-											auto* parentBucket = &parentMesh->Buckets[b2];
+											const auto* parentBucket = &parentMesh->Buckets[b2];
 											for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 											{
 												auto* parentVertex = &_moveablesVertices[parentBucket->StartVertex + v2];
@@ -766,7 +768,7 @@ namespace TEN::Renderer
 												auto vertex1 = _moveablesVertices[currentBucket.StartVertex + v1].Position + currentBone->GlobalTranslation;
 												auto vertex2 = _moveablesVertices[parentBucket->StartVertex + v2].Position + parentBone->GlobalTranslation;
 
-												// FIXME: If we introduce tolerance, a strange bug will occur where certain vertices will disconnect. -- Lwmte, 14.12.2024
+												// FIXME: If a tolerance is used, a strange bug occurs where certain vertices don't connect. -- Lwmte, 14.12.2024
 												if (vertex1 != vertex2)
 													continue;
 

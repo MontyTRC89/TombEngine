@@ -1,10 +1,10 @@
 #include "framework.h"
 
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
-#include "Scripting/Internal/TEN/Strings/DisplayString/DisplayString.h"
-#include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/TEN/Strings/DisplayString/DisplayString.h"
 #include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 
 /*** A string appearing on the screen.

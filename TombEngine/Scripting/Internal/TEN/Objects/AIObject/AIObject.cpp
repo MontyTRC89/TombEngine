@@ -1,11 +1,12 @@
 #pragma once
-#include "framework.h"
 
-#include "AIObject.h"
-#include "Scripting/Internal/ScriptAssert.h"
-#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
-#include "Scripting/Internal/ScriptUtil.h"
+#include "framework.h"
+#include "Scripting/Internal/TEN/Objects/AIObject/AIObject.h"
+
 #include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/ScriptAssert.h"
+#include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 /***
 AI object
 

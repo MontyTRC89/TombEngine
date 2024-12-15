@@ -20,9 +20,9 @@
 #include "Game/Setup.h"
 #include "Math/Random.h"
 #include "Objects/Utils/VehicleHelpers.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
-#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Input;
@@ -501,9 +501,13 @@ namespace TEN::Entities::Vehicles
 			else
 			{
 				if (flags)
+				{
 					verticalVelocity += flags;
+				}
 				else
+				{
 					verticalVelocity += g_GameFlow->GetSettings()->Physics.Gravity;
+				}
 			}
 		}
 

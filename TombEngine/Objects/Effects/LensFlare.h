@@ -4,7 +4,7 @@ class EulerAngles;
 
 namespace TEN::Entities::Effects
 {
-	constexpr float LENSFLARE_ITEMFLAG_BRIGHTNESS_SCALE = 100.0f;
+	constexpr auto LENSFLARE_ITEMFLAG_BRIGHTNESS_SCALE = 100.0f;
 
 	struct LensFlare
 	{

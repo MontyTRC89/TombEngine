@@ -9,8 +9,8 @@
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Specific/level.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Specific/level.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Math;

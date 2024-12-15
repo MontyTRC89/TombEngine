@@ -305,25 +305,30 @@ const WeaponInfo& GetWeaponInfo(LaraWeaponType weaponType)
 	return (Weapons[(int)weaponType]);
 }
 
-void InitializeWeaponInfo(Settings const& settings)
+void InitializeWeaponInfo(const Settings& settings)
 {
-	for (auto weaponType : WEAPON_TYPES)
+	for (const auto& [name, weaponType] : WEAPON_TYPES)
 	{
+<<<<<<< Updated upstream
 		int weaponIndex = (int)weaponType.second;
 
 		if (weaponIndex <= 0 || weaponIndex >= (int)LaraWeaponType::NumWeapons)
 			continue;
+=======
+		if ((int)weaponType <= 0 || (int)weaponType >= (int)LaraWeaponType::NumWeapons)
+			return;
+>>>>>>> Stashed changes
 
-		auto& weapon = Weapons[weaponIndex];
-		auto& setting = settings.Weapons[weaponIndex - 1]; // Lua counts from 1
+		auto& weapon = Weapons[(int)weaponType];
+		const auto& weaponSettings = settings.Weapons[(int)weaponType - 1]; // Lua counts from 1.
 
-		weapon.Damage = setting.Damage;
-		weapon.AlternateDamage = setting.AlternateDamage;
-		weapon.FlashTime = setting.FlashDuration;
-		weapon.GunHeight = setting.WaterLevel;
-		weapon.ShotAccuracy = ANGLE(setting.Accuracy);
-		weapon.TargetDist = setting.Distance;
-		weapon.RecoilFrame = setting.Interval;
+		weapon.Damage = weaponSettings.Damage;
+		weapon.AlternateDamage = weaponSettings.AlternateDamage;
+		weapon.FlashTime = weaponSettings.FlashDuration;
+		weapon.GunHeight = weaponSettings.WaterLevel;
+		weapon.ShotAccuracy = ANGLE(weaponSettings.Accuracy);
+		weapon.TargetDist = weaponSettings.Distance;
+		weapon.RecoilFrame = weaponSettings.Interval;
 	}
 }
 

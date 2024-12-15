@@ -1,264 +1,293 @@
 #include "framework.h"
-#include "Time.h"
-
-#include <regex>
+#include "Scripting/Internal/TEN/Types/Time/Time.h"
 
 #include "Math/Math.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Specific/clock.h"
 
-constexpr int TIME_UNIT = 60;
-constexpr int CENTISECOND = 100;
-
-/// Represents a time value with support for formatting to hours, minutes, seconds, and centiseconds (1/100th of a second).
-// @tenprimitive Time
-// @pragma nostrip
-
-void Time::Register(sol::table& parent)
+namespace TEN::Scripting
 {
-	using ctors = sol::constructors<
-		Time(), Time(int),
-		Time(const std::string&), Time(const sol::table&)>;
+	constexpr auto TIME_UNIT   = 60;
+	constexpr auto CENTISECOND = 100;
 
-	parent.new_usertype<Time>(
-		"Time", ctors(),
-		sol::call_constructor, ctors(),
+	/// Represents a time value with support for formatting to hours, minutes, seconds, and centiseconds (1/100th of a second).
+	// @tenprimitive Time
+	// @pragma nostrip
 
-		// Meta functions
-		sol::meta_function::to_string, &Time::ToString,
-		sol::meta_function::equal_to, &Time::operator==,
-		sol::meta_function::less_than, &Time::operator<,
-		sol::meta_function::less_than_or_equal_to, &Time::operator<=,
-
-		sol::meta_function::addition, sol::overload(
-			[](const Time& t1, const Time& t2) { return t1 + t2; },
-			[](const Time& t1, int frames) { return t1 + frames; }),
-		sol::meta_function::subtraction, sol::overload(
-			[](const Time& t1, const Time& t2) { return t1 - t2; },
-			[](const Time& t1, int frames) { return t1 - frames; }),
-
-		// Methods
-		"GetTimeUnits", &Time::GetTimeUnits,
-		"GetFrameCount", &Time::GetFrameCount,
-
-		// Readable and writable fields
-		"h", sol::property(&Time::GetHours,   &Time::SetHours),
-		"m", sol::property(&Time::GetMinutes, &Time::SetMinutes),
-		"s", sol::property(&Time::GetSeconds, &Time::SetSeconds),
-		"c", sol::property(&Time::GetCents,   &Time::SetCents)
-	);
-}
-
-/// Create a Time object.
-// @function Time
-// @treturn Time A new Time object initialized to zero time.
-
-/// Create a Time object from a total game frame count (1 second = 30 frames).
-// @function Time
-// @tparam int frames Total game frame count.
-// @treturn Time A new Time object initialized with the given frame count.
-Time::Time(int frames) : _frameCount(frames) {}
-
-/// Create a Time object from a formatted string.
-// @function Time
-// @tparam string formattedTime Time in the format "HH:MM:SS[.CC]", where [.CC] is centiseconds, and is optional.
-// @treturn Time A new Time object parsed from the given string.
-Time::Time(const std::string& formattedTime)
-{
-	SetFromFormattedString(formattedTime);
-}
-
-/// Create a Time object from a time unit table (hours, minutes, seconds, centiseconds).
-// @function Time
-// @tparam table timeUnits A time unit table in the format {HH, MM, SS, [CC]}, where [CC] is optional.
-// @treturn Time A new Time object initialized with the given values.
-Time::Time(const sol::table& hmsTable)
-{
-	SetFromTable(hmsTable);
-}
-
-/// Get the total game frame count.
-// @function Time:GetFrameCount
-// @treturn int Total number of game frames.
-int Time::GetFrameCount() const
-{
-	return _frameCount;
-}
-
-/// Get the time in hours, minutes, seconds, and centiseconds as a table.
-// @function Time:GetTimeUnits
-// @treturn table A table in the format {HH, MM, SS, CC}.
-sol::table Time::GetTimeUnits(sol::state_view lua) const
-{
-	HMSC hmsc = GetHMSC();
-	sol::table tbl = lua.create_table();
-	tbl.add(hmsc.Hours);
-	tbl.add(hmsc.Minutes);
-	tbl.add(hmsc.Seconds);
-	tbl.add(hmsc.Cents);
-	return tbl;
-}
-
-///  Convert this Time object to a formatted string.
-// @function tostring
-// @tparam Time this Time.
-// @treturn string A string showing time in "HH:MM:SS.CC" format.
-std::string Time::ToString() const
-{
-	HMSC hmsf = GetHMSC();
-	std::ostringstream str;
-	str << std::setw(2) << std::setfill('0') << hmsf.Hours   << ":"
-		<< std::setw(2) << std::setfill('0') << hmsf.Minutes << ":"
-		<< std::setw(2) << std::setfill('0') << hmsf.Seconds << "."
-		<< std::setw(2) << std::setfill('0') << hmsf.Cents;
-	return str.str();
-}
-
-/// (int) Hours component.
-// @mem h
-int Time::GetHours() const
-{
-	auto [h, m, s, f] = GetHMSC();
-	return h;
-}
-
-void Time::SetHours(int value)
-{
-	auto [h, m, s, f] = GetHMSC();
-	SetFromHMSC(value, m, s, f);
-}
-
-/// (int) Minutes component.
-// @mem m
-int Time::GetMinutes() const
-{
-	auto [h, m, s, f] = GetHMSC();
-	return m;
-}
-
-void Time::SetMinutes(int value)
-{
-	auto [h, m, s, f] = GetHMSC();
-	SetFromHMSC(h, value, s, f);
-}
-
-/// (int) Seconds component.
-// @mem s
-int Time::GetSeconds() const
-{
-	auto [h, m, s, c] = GetHMSC();
-	return s;
-}
-
-void Time::SetSeconds(int value)
-{
-	auto [h, m, s, c] = GetHMSC();
-	SetFromHMSC(h, m, value, c);
-}
-
-/// (int) Centiseconds component.
-// @mem c
-int Time::GetCents() const
-{
-	auto [h, m, s, c] = GetHMSC();
-	return c;
-}
-
-void Time::SetCents(int value)
-{
-	auto [h, m, s, c] = GetHMSC();
-	SetFromHMSC(h, m, s, value);
-}
-
-Time::HMSC Time::GetHMSC() const
-{
-	int totalSeconds = _frameCount / FPS;
-
-	return
+	void Time::Register(sol::table& parent)
 	{
-		totalSeconds / SQUARE(TIME_UNIT),
-		(totalSeconds % SQUARE(TIME_UNIT)) / TIME_UNIT,
-		totalSeconds % TIME_UNIT,
-		(_frameCount * 100 / FPS) % CENTISECOND
-	};
-}
+		using ctors = sol::constructors<
+			Time(), Time(int),
+			Time(const std::string&), Time(const sol::table&)>;
 
-Time::HMSC Time::ParseFormattedString(const std::string& formattedTime)
-{
-	std::regex timeFormat(R"((\d{2}):(\d{2}):(\d{2})\.(\d{2}))");
-	std::smatch match;
+		parent.new_usertype<Time>(
+			"Time", ctors(),
+			sol::call_constructor, ctors(),
 
-	if (!std::regex_match(formattedTime, match, timeFormat))
-	{
-		TENLog("Invalid time format. Expected HH:MM:SS or HH:MM:SS.CC", LogLevel::Warning);
-		return Time::HMSC();
+			// Meta functions
+			sol::meta_function::to_string, &Time::ToString,
+			sol::meta_function::equal_to, &Time::operator ==,
+			sol::meta_function::less_than, &Time::operator <,
+			sol::meta_function::less_than_or_equal_to, &Time::operator <=,
+
+			sol::meta_function::addition, sol::overload(
+				[](const Time& time0, const Time& time1) { return (time0 + time1); },
+				[](const Time& time, int gameFrames) { return (time + gameFrames); }),
+			sol::meta_function::subtraction, sol::overload(
+				[](const Time& time0, const Time& time1) { return (time0 - time1); },
+				[](const Time& time, int gameFrames) { return (time - gameFrames); }),
+
+			// Methods
+			"GetTimeUnits", &Time::GetTimeUnits,
+			"GetFrameCount", &Time::GetFrameCount,
+
+			// Readable and writable fields
+			"h", sol::property(&Time::GetHours,		   &Time::SetHours),
+			"m", sol::property(&Time::GetMinutes,	   &Time::SetMinutes),
+			"s", sol::property(&Time::GetSeconds,	   &Time::SetSeconds),
+			"c", sol::property(&Time::GetCentiseconds, &Time::SetCentiseconds));
 	}
 
-	return
+	/// Create a Time object.
+	// @function Time
+	// @treturn Time A new Time object initialized to zero time.
+
+	/// Create a Time object from a total game frame count (1 second = 30 frames).
+	// @function Time
+	// @tparam int gaemFrames Total game frame count.
+	// @treturn Time A new Time object initialized with the given frame count.
+	Time::Time(int gameFrames)
 	{
-		std::stoi(match[1].str()),
-		std::stoi(match[2].str()),
-		std::stoi(match[3].str()),
-		match[4].matched ? std::stoi(match[4].str()) : 0
-	};
-}
-
-void Time::SetFromHMSC(int hours, int minutes, int seconds, int cents)
-{
-	_frameCount = (hours * SQUARE(TIME_UNIT) + minutes * TIME_UNIT + seconds) * FPS +
-				   round((float)cents / ((float)CENTISECOND / (float)FPS));
-}
-
-void Time::SetFromFormattedString(const std::string& formattedTime)
-{
-	HMSC hmsf = ParseFormattedString(formattedTime);
-	SetFromHMSC(hmsf.Hours, hmsf.Minutes, hmsf.Seconds, hmsf.Cents);
-}
-
-void Time::SetFromTable(const sol::table& hmsTable)
-{
-	if (!hmsTable.valid() || hmsTable.size() < 1 || hmsTable.size() > 4)
-	{
-		throw std::invalid_argument("Invalid time unit table. Expected {HH, MM, SS, [CC]}");
+		_frameCount = gameFrames;
 	}
 
-	int hours   = hmsTable.get_or(1, 0);
-	int minutes = hmsTable.get_or(2, 0);
-	int seconds = hmsTable.get_or(3, 0);
-	int cents   = hmsTable.get_or(4, 0);
+	/// Create a Time object from a formatted string.
+	// @function Time
+	// @tparam string formattedTime Time in the format "HH:MM:SS[.CC]", where [.CC] is centiseconds and is optional.
+	// @treturn Time A new Time object parsed from the given string.
+	Time::Time(const std::string& formattedTime)
+	{
+		SetFromFormattedString(formattedTime);
+	}
 
-	SetFromHMSC(hours, minutes, seconds, cents);
+	/// Create a Time object from a time unit table (hours, minutes, seconds, centiseconds).
+	// @function Time
+	// @tparam table timeUnits A time unit table in the format {HH, MM, SS, [CC]}, where [CC] is optional.
+	// @treturn Time A new Time object initialized with the given values.
+	Time::Time(const sol::table& hmsTable)
+	{
+		SetFromTable(hmsTable);
+	}
+
+	/// Get the total game frame count.
+	// @function Time:GetFrameCount
+	// @treturn int Total number of game frames.
+	int Time::GetFrameCount() const
+	{
+		return _frameCount;
+	}
+
+	/// Get the time in hours, minutes, seconds, and centiseconds as a table.
+	// @function Time:GetTimeUnits
+	// @treturn table A table in the format {HH, MM, SS, CC}.
+	sol::table Time::GetTimeUnits(sol::state_view lua) const
+	{
+		auto hmsc = GetHmsc();
+		auto table = lua.create_table();
+
+		table.add(hmsc.Hours);
+		table.add(hmsc.Minutes);
+		table.add(hmsc.Seconds);
+		table.add(hmsc.Centiseconds);
+		return table;
+	}
+
+	/// (int) Hours component.
+	// @mem h
+	int Time::GetHours() const
+	{
+		auto [h, m, s, f] = GetHmsc();
+		return h;
+	}
+
+	/// (int) Minutes component.
+	// @mem m
+	int Time::GetMinutes() const
+	{
+		auto [h, m, s, f] = GetHmsc();
+		return m;
+	}
+
+	/// (int) Seconds component.
+	// @mem s
+	int Time::GetSeconds() const
+	{
+		auto [h, m, s, c] = GetHmsc();
+		return s;
+	}
+
+	/// (int) Centiseconds component.
+	// @mem c
+	int Time::GetCentiseconds() const
+	{
+		auto [h, m, s, c] = GetHmsc();
+		return c;
+	}
+
+	void Time::SetHours(int value)
+	{
+		auto [h, m, s, f] = GetHmsc();
+		SetFromHMSC(value, m, s, f);
+	}
+
+	void Time::SetMinutes(int value)
+	{
+		auto [h, m, s, f] = GetHmsc();
+		SetFromHMSC(h, value, s, f);
+	}
+
+	void Time::SetSeconds(int value)
+	{
+		auto [h, m, s, c] = GetHmsc();
+		SetFromHMSC(h, m, value, c);
+	}
+
+	void Time::SetCentiseconds(int value)
+	{
+		auto [h, m, s, c] = GetHmsc();
+		SetFromHMSC(h, m, s, value);
+	}
+
+	///  Convert this Time object to a formatted string.
+	// @function tostring
+	// @tparam Time this Time object.
+	// @treturn string A string showing time in "HH:MM:SS.CC" format.
+	std::string Time::ToString() const
+	{
+		auto hmsf = GetHmsc();
+
+		auto stream = std::ostringstream();
+		stream << std::setw(2) << std::setfill('0') << hmsf.Hours << ":"
+			<< std::setw(2) << std::setfill('0') << hmsf.Minutes << ":"
+			<< std::setw(2) << std::setfill('0') << hmsf.Seconds << "."
+			<< std::setw(2) << std::setfill('0') << hmsf.Centiseconds;
+		return stream.str();
+	}
+
+	Time& Time::operator ++()
+	{
+		_frameCount++;
+		return *this;
+	}
+
+	Time& Time::operator ++(int)
+	{
+		_frameCount++;
+		return *this;
+	}
+
+	Time& Time::operator +=(const Time& time)
+	{
+		_frameCount += time._frameCount;
+		return *this;
+	}
+
+	Time& Time::operator -=(const Time& time)
+	{
+		_frameCount -= time._frameCount;
+		return *this;
+	}
+
+	Time Time::operator +(int frameCount) const
+	{
+		return Time(frameCount + _frameCount);
+	}
+
+	Time Time::operator -(int frameCount) const
+	{
+		return Time(frameCount - _frameCount);
+	}
+
+	Time Time::operator +(const Time& time) const
+	{
+		return Time(_frameCount + time._frameCount);
+	}
+
+	Time Time::operator -(const Time& time) const
+	{
+		return Time(_frameCount - time._frameCount);
+	}
+
+	Time Time::operator <(const Time& time) const
+	{
+		return Time(_frameCount < time._frameCount);
+	}
+
+	Time Time::operator <=(const Time& time) const
+	{
+		return Time(_frameCount <= time._frameCount);
+	}
+
+	bool Time::operator ==(const Time& time) const
+	{
+		return _frameCount == time._frameCount;
+	}
+
+	Time::Hmsc Time::GetHmsc() const
+	{
+		int totalSeconds = _frameCount / FPS;
+
+		return Hmsc
+		{
+			totalSeconds / SQUARE(TIME_UNIT),
+			(totalSeconds % SQUARE(TIME_UNIT)) / TIME_UNIT,
+			totalSeconds % TIME_UNIT,
+			(_frameCount * 100 / FPS) % CENTISECOND
+		};
+	}
+
+	Time::Hmsc Time::ParseFormattedString(const std::string& formattedTime)
+	{
+		std::regex timeFormat(R"((\d{2}):(\d{2}):(\d{2})\.(\d{2}))");
+		std::smatch match;
+
+		if (!std::regex_match(formattedTime, match, timeFormat))
+		{
+			TENLog("Invalid time format. Expected HH:MM:SS or HH:MM:SS.CC", LogLevel::Warning);
+			return Time::Hmsc();
+		}
+
+		return
+		{
+			std::stoi(match[1].str()),
+			std::stoi(match[2].str()),
+			std::stoi(match[3].str()),
+			match[4].matched ? std::stoi(match[4].str()) : 0
+		};
+	}
+
+	void Time::SetFromHMSC(int hours, int minutes, int seconds, int cents)
+	{
+		_frameCount = (hours * SQUARE(TIME_UNIT) + minutes * TIME_UNIT + seconds) * FPS +
+			round((float)cents / ((float)CENTISECOND / (float)FPS));
+	}
+
+	void Time::SetFromFormattedString(const std::string& formattedTime)
+	{
+		auto hmsf = ParseFormattedString(formattedTime);
+		SetFromHMSC(hmsf.Hours, hmsf.Minutes, hmsf.Seconds, hmsf.Centiseconds);
+	}
+
+	void Time::SetFromTable(const sol::table& hmsTable)
+	{
+		if (!hmsTable.valid() || hmsTable.size() < 1 || hmsTable.size() > 4)
+			throw std::invalid_argument("Invalid time unit table. Expected {HH, MM, SS, [CC]}");
+
+		int hours	= hmsTable.get_or(1, 0);
+		int minutes = hmsTable.get_or(2, 0);
+		int seconds = hmsTable.get_or(3, 0);
+		int cents	= hmsTable.get_or(4, 0);
+
+		SetFromHMSC(hours, minutes, seconds, cents);
+	}
 }
-
-
-Time& Time::operator++()
-{
-	_frameCount++;
-	return *this;
-}
-
-Time& Time::operator++(int)
-{
-	_frameCount++;
-	return *this;
-}
-
-Time& Time::operator+=(const Time& other)
-{
-	_frameCount += other._frameCount;
-	return *this;
-}
-
-Time& Time::operator-=(const Time& other)
-{
-	_frameCount -= other._frameCount;
-	return *this;
-}
-
-Time Time::operator+(const int frameCount) const { return Time(frameCount + _frameCount); }
-Time Time::operator-(const int frameCount) const { return Time(frameCount - _frameCount); }
-Time Time::operator+(const Time& other)    const { return Time(_frameCount +  other._frameCount); }
-Time Time::operator-(const Time& other)    const { return Time(_frameCount -  other._frameCount); }
-Time Time::operator<(const Time& other)    const { return Time(_frameCount <  other._frameCount); }
-Time Time::operator<=(const Time& other)   const { return Time(_frameCount <= other._frameCount); }
-bool Time::operator==(const Time& other)   const { return _frameCount == other._frameCount; }

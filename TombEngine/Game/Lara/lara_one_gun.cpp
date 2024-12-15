@@ -63,7 +63,7 @@ constexpr auto HK_BURST_MODE_SHOT_COUNT				  = 5;
 constexpr auto HK_BURST_AND_SNIPER_MODE_SHOT_INTERVAL = 12.0f;
 constexpr auto HK_RAPID_MODE_SHOT_INTERVAL			  = 3.0f;
 
-constexpr auto SHOTGUN_PELLET_COUNT			   = 6;
+constexpr auto SHOTGUN_PELLET_COUNT = 6;
 
 static Vector3i GetWeaponSmokeRelOffset(LaraWeaponType weaponType)
 {
@@ -1110,7 +1110,7 @@ void CrossbowBoltControl(short itemNumber)
 	HandleProjectile(boltItem, *LaraItem, prevPos, (ProjectileType)boltItem.ItemFlags[0], damage);
 }
 
-void FireHK(ItemInfo& laraItem, bool mode)
+void FireHK(ItemInfo& laraItem, bool inaccurateMode)
 {
 	auto& player = *GetLaraInfo(&laraItem);
 	const auto& weapon = player.Weapons[(int)LaraWeaponType::HK];
@@ -1143,10 +1143,10 @@ void FireHK(ItemInfo& laraItem, bool mode)
 	}
 	
 	// HACK: Backup unmodified accuracy/damage values.
-	auto accuracy = Weapons[(int)LaraWeaponType::HK].ShotAccuracy;
-	auto damage = Weapons[(int)LaraWeaponType::HK].Damage;
+	short accuracy = Weapons[(int)LaraWeaponType::HK].ShotAccuracy;
+	int damage = Weapons[(int)LaraWeaponType::HK].Damage;
 
-	if (mode)
+	if (inaccurateMode)
 	{
 		Weapons[(int)LaraWeaponType::HK].ShotAccuracy = accuracy * 3;
 		Weapons[(int)LaraWeaponType::HK].Damage = damage / 3;
@@ -1299,18 +1299,18 @@ void RifleHandler(ItemInfo& laraItem, LaraWeaponType weaponType)
 	{
 		auto& settings = g_GameFlow->GetSettings()->Weapons[(int)weaponType - 1];
 		
-		Vector4 color = settings.FlashColor;
-		color += Vector4(Random::GenerateFloat(-0.2f, 0.2f));
+		auto color = Color(settings.FlashColor);
+		color += Color(Random::GenerateFloat(-0.2f, 0.2f));
 
 		if (weaponType == LaraWeaponType::Shotgun || weaponType == LaraWeaponType::HK)
 		{
 			auto pos = GetJointPosition(&laraItem, LM_RHAND, Vector3i(0, -64, 0));
-			TriggerDynamicPointLight(pos.ToVector3(), color, settings.FlashRange * CLICK(1));
+			TriggerDynamicPointLight(pos.ToVector3(), color, CLICK(settings.FlashRange));
 		}
 		else if (weaponType == LaraWeaponType::Revolver)
 		{
 			auto pos = GetJointPosition(&laraItem, LM_RHAND, Vector3i(0, -32, 0));
-			TriggerDynamicPointLight(pos.ToVector3(), color, settings.FlashRange * CLICK(1));
+			TriggerDynamicPointLight(pos.ToVector3(), color, CLICK(settings.FlashRange));
 		}
 	}
 }

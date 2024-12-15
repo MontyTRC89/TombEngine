@@ -262,7 +262,7 @@ const std::vector<byte> SaveGame::Build()
 	sghb.add_level_name(levelNameOffset);
 	sghb.add_level_hash(LastLevelHash);
 
-	auto& gameTime = SaveGame::Statistics.Game.TimeTaken;
+	const auto& gameTime = SaveGame::Statistics.Game.TimeTaken;
 	sghb.add_hours(gameTime.GetHours());
 	sghb.add_minutes(gameTime.GetMinutes());
 	sghb.add_seconds(gameTime.GetSeconds());
@@ -1464,7 +1464,7 @@ const std::vector<byte> SaveGame::Build()
 	sgb.add_header(headerOffset);
 	sgb.add_level(levelStatisticsOffset);
 	sgb.add_game(gameStatisticsOffset);
-	sgb.add_secret_map(SaveGame::Statistics.SecretMap);
+	sgb.add_secret_map(SaveGame::Statistics.SecretBits);
 	sgb.add_camera(cameraOffset);
 	sgb.add_lara(laraOffset);
 	sgb.add_rooms(roomOffset);
@@ -1690,7 +1690,7 @@ bool SaveGame::Load(int slot)
 
 static void ParseStatistics(const Save::SaveGame* s, bool isHub)
 {
-	SaveGame::Statistics.SecretMap = s->secret_map();
+	SaveGame::Statistics.SecretBits = s->secret_map();
 
 	SaveGame::Statistics.Level.AmmoHits = s->level()->ammo_hits();
 	SaveGame::Statistics.Level.AmmoUsed = s->level()->ammo_used();

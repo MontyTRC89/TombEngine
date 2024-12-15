@@ -914,7 +914,7 @@ bool TestPlayerWaterStepOut(ItemInfo* item, CollisionInfo* coll)
 bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
-	auto& settings = g_GameFlow->GetSettings()->Animations;
+	const auto& settings = g_GameFlow->GetSettings()->Animations;
 
 	if (coll->CollisionType != CollisionType::Front || !IsHeld(In::Action))
 		return false;

@@ -346,7 +346,7 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 		const auto& rendererObject = *_moveableObjects[unit.ObjectID];
 
 		_stItem.World = Matrix::Identity;
-		_stItem.BonesMatrices[0] = itemToDraw->InterpolatedAnimTransforms[HairUnit::GetRootMesh(i)] * itemToDraw->InterpolatedWorld;
+		_stItem.BonesMatrices[0] = itemToDraw->InterpolatedAnimTransforms[HairUnit::GetRootMeshID(i)] * itemToDraw->InterpolatedWorld;
 
 		for (int i = 0; i < unit.Segments.size(); i++)
 		{

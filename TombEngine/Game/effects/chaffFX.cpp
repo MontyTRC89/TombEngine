@@ -14,8 +14,8 @@
 #include "Math/Math.h"
 #include "Specific/level.h"
 #include "Renderer/RendererEnums.h"
-#include "Sound/sound.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Sound/sound.h"
 
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Math;
@@ -26,8 +26,8 @@ void TriggerChaffEffects(int flareLife)
 {
 	auto offset = g_GameFlow->GetSettings()->Flare.Offset.ToVector3i() + Vector3i(11, 32, -4);
 	auto pos = GetJointPosition(LaraItem, LM_LHAND,  offset);
-	auto vect = GetJointPosition(LaraItem, LM_LHAND, Vector3i(11, 32, BLOCK(1) + Random::GenerateInt(0, 256)));
-	auto vel = vect - pos;
+	auto vec = GetJointPosition(LaraItem, LM_LHAND, Vector3i(11, 32, BLOCK(1) + Random::GenerateInt(0, 256)));
+	auto vel = vec - pos;
 	TriggerChaffEffects(*LaraItem, pos, vel, LaraItem->Animation.Velocity.z, TestEnvironment(ENV_FLAG_WATER, LaraItem->RoomNumber), flareLife);
 }
 
@@ -73,7 +73,7 @@ void TriggerChaffEffects(ItemInfo& item, const Vector3i& pos, const Vector3i& ve
 		if (dx < -MAX_TRIGGER_RANGE || dx > MAX_TRIGGER_RANGE || dz < -MAX_TRIGGER_RANGE || dz > MAX_TRIGGER_RANGE)
 			return;
 
-		auto& settings = g_GameFlow->GetSettings()->Flare;
+		const auto& settings = g_GameFlow->GetSettings()->Flare;
 
 		if (settings.Sparks)
 			TriggerChaffSparkles(pos, vel, settings.Color, age, item);

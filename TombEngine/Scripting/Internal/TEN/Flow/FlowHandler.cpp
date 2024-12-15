@@ -24,6 +24,8 @@
 #include "Sound/sound.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Scripting;
+
 /***
 Functions that (mostly) don't directly impact in-game mechanics. Used for setup
 in gameflow.lua, settings.lua and strings.lua; some can be used in level
@@ -369,15 +371,19 @@ void FlowHandler::SetStrings(sol::nested<std::unordered_map<std::string, std::ve
 
 Statistics* FlowHandler::GetStatistics(std::optional<bool> game) const
 {
-	return game.value_or(false) ? &SaveGame::Statistics.Game : &SaveGame::Statistics.Level;
+	return (game.value_or(false) ? &SaveGame::Statistics.Game : &SaveGame::Statistics.Level);
 }
 
 void FlowHandler::SetStatistics(Statistics const& src, std::optional<bool> game)
 {
 	if (game.value_or(false))
+	{
 		SaveGame::Statistics.Game = src;
+	}
 	else
+	{
 		SaveGame::Statistics.Level = src;
+	}
 }
 
 void FlowHandler::SetSettings(Settings const& src)
@@ -412,7 +418,7 @@ void FlowHandler::SetTotalSecretCount(int secretsNumber)
 
 void FlowHandler::LoadFlowScript()
 {
-	TENLog("Loading gameflow script, strings and settings...", LogLevel::Info);
+	TENLog("Loading gameflow script, strings, and settings...", LogLevel::Info);
 
 	_handler.ExecuteScript(_gameDir + "Scripts/Gameflow.lua");
 	_handler.ExecuteScript(_gameDir + "Scripts/SystemStrings.lua", true);
@@ -617,7 +623,7 @@ void FlowHandler::AddSecret(int levelSecretIndex)
 		return;
 	}
 
-	if (SaveGame::Statistics.SecretMap & (1 << levelSecretIndex))
+	if (SaveGame::Statistics.SecretBits & (1 << levelSecretIndex))
 		return;
 
 	if (SaveGame::Statistics.Game.Secrets >= UINT_MAX)
@@ -627,7 +633,7 @@ void FlowHandler::AddSecret(int levelSecretIndex)
 	}
 
 	PlaySecretTrack();
-	SaveGame::Statistics.SecretMap |= (1 << levelSecretIndex);
+	SaveGame::Statistics.SecretBits |= 1 << levelSecretIndex;
 	SaveGame::Statistics.Level.Secrets++;
 	SaveGame::Statistics.Game.Secrets++;
 }

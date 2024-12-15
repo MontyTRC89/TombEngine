@@ -331,9 +331,9 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		break;
 	}
 
-	int deltaDistance = (int)round(Vector3i::Distance(prevPos, item->Pose.Position));
-	SaveGame::Statistics.Game.Distance  += deltaDistance;
-	SaveGame::Statistics.Level.Distance += deltaDistance;
+	int deltaDist = (int)round(Vector3i::Distance(prevPos, item->Pose.Position));
+	SaveGame::Statistics.Game.Distance  += deltaDist;
+	SaveGame::Statistics.Level.Distance += deltaDist;
 
 	if (DebugMode)
 	{

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Scripting/Internal/ScriptAssert.h"
 
 #define index_error_maker(CPP_TYPE, LUA_CLASS_NAME) [](CPP_TYPE& item, sol::object key) \

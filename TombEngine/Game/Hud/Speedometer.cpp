@@ -3,9 +3,9 @@
 
 #include "Game/effects/DisplaySprite.h"
 #include "Math/Math.h"
-#include "Specific/clock.h"
 #include "Renderer/Renderer.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Specific/clock.h"
 
 using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Math;
