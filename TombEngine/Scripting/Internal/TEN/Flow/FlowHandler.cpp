@@ -317,7 +317,6 @@ Specify which translations in the strings table correspond to which languages.
 	Vec3::Register(parent);
 	Level::Register(tableFlow);
 	SkyLayer::Register(tableFlow);
-	Mirror::Register(tableFlow);
 	InventoryItem::Register(tableFlow);
 	Settings::Register(tableFlow);
 	Fog::Register(tableFlow);

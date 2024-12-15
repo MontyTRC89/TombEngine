@@ -51,7 +51,6 @@ struct SMOKE_SPARKS
 	BlendMode blendMode;
 	byte fxObj;
 	byte nodeNumber;
-	byte mirror;
 
 	Vector3i oldPosition;
 	byte oldShade;

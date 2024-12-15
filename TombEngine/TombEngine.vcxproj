@@ -892,7 +892,6 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClInclude Include="Scripting\Internal\TEN\Flow\InventoryItem\InventoryItem.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\LensFlare\LensFlare.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Level\FlowLevel.h" />
-    <ClInclude Include="Scripting\Internal\TEN\Flow\Mirror\Mirror.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\SkyLayer\SkyLayer.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Starfield\Starfield.h" />
     <ClInclude Include="Scripting\Internal\TEN\Input\ActionIDs.h" />
@@ -1328,7 +1327,6 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClCompile Include="Scripting\Internal\TEN\Flow\InventoryItem\InventoryItem.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\LensFlare\LensFlare.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\Level\FlowLevel.cpp" />
-    <ClCompile Include="Scripting\Internal\TEN\Flow\Mirror\Mirror.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\SkyLayer\SkyLayer.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\Starfield\Starfield.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Input\InputHandler.cpp" />
