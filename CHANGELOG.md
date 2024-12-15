@@ -16,6 +16,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed incorrect slide directions for sub-click geometry.
 * Fixed stutter during jumps between cameras in a flyby sequence.
 * Fixed uzi targeting issues after using flycheat.
+* Fixed hair object vertices not always linking properly.
 * Fixed snow particles not always melting on the ground.
 * Fixed enemies not damaging Lara if she is staying on the sector where enemies were triggered.
 * Fixed enemy pickups dropping on death sectors.
