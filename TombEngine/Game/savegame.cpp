@@ -1391,11 +1391,11 @@ const std::vector<byte> SaveGame::Build()
 
 			case SavedVarType::Time:
 				{
-					Save::timeTableBuilder dtb{ fbb };
-					dtb.add_scalar(std::get<int>(s));
-					auto doubleOffset = dtb.Finish();
+					Save::timeTableBuilder ttb{ fbb };
+					ttb.add_scalar(std::get<int>(s));
+					auto timeOffset = ttb.Finish();
 
-					putDataInVec(Save::VarUnion::time, doubleOffset);
+					putDataInVec(Save::VarUnion::time, timeOffset);
 					break;
 				}
 
