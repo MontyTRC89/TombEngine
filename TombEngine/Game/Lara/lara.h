@@ -90,6 +90,7 @@ constexpr auto SHALLOW_WATER_DEPTH	= (int)CLICK(0.5f);
 constexpr auto WADE_WATER_DEPTH		= STEPUP_HEIGHT;
 constexpr auto SWIM_WATER_DEPTH		= CLICK(2.75f);
 constexpr auto SLOPE_DIFFERENCE		= 60;
+constexpr auto SWAMP_GRAVITY_COEFF	= 3.0f;
 
 extern LaraInfo		 Lara;
 extern ItemInfo*	 LaraItem;

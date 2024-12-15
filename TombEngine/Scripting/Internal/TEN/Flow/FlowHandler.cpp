@@ -39,8 +39,7 @@ ScriptInterfaceObjectsHandler* g_GameScriptEntities;
 ScriptInterfaceStringsHandler* g_GameStringsHandler;
 ScriptInterfaceFlowHandler* g_GameFlow;
 
-FlowHandler::FlowHandler(sol::state* lua, sol::table& parent) :
-	_handler(lua)
+FlowHandler::FlowHandler(sol::state* lua, sol::table& parent) : _handler(lua)
 {
 /*** gameflow.lua.
 These functions are called in gameflow.lua, a file loosely equivalent to winroomedit's SCRIPT.DAT.
