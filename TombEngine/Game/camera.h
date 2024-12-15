@@ -15,8 +15,8 @@ enum class CameraType
 	Fixed,
 	Look,
 	Combat,
-	Heavy,
-	Object
+	Heavy, // HACK: Fixed camera type, but activated with heavy trigger.
+	Flyby  // TODO: Replace UseSpotCam global flag with this type.
 };
 
 struct CAMERA_INFO

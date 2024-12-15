@@ -69,6 +69,12 @@ namespace TEN::Scripting::View
 
 	static CameraType GetCameraType()
 	{
+		if (UseSpotCam)
+			return CameraType::Flyby;
+
+		if (Camera.oldType == CameraType::Heavy)
+			return CameraType::Fixed;
+
 		return Camera.oldType;
 	}
 	

@@ -12,11 +12,10 @@ Constants for the type of the Camera.
 The following constants are inside CameraType.
 
 	CHASE
+	COMBAT
 	FIXED
 	LOOK
-	COMBAT
-	HEAVY
-	OBJECT
+	FLYBY
 
 @section View.CameraType
 */
@@ -28,9 +27,8 @@ The following constants are inside CameraType.
 static const std::unordered_map<std::string, CameraType> CAMERA_TYPE
 {
 	{ "CHASE", CameraType::Chase },
+	{ "COMBAT", CameraType::Combat },
 	{ "FIXED", CameraType::Fixed },
 	{ "LOOK", CameraType::Look },
-	{ "COMBAT", CameraType::Combat },
-	{ "HEAVY", CameraType::Heavy },
-	{ "OBJECT", CameraType::Object }
+	{ "FLYBY", CameraType::Flyby }
 };
