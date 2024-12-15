@@ -7,7 +7,7 @@
 /***
 A set of gameplay statistics. Can be accessed using @{Flow.GetStatistics} and @{Flow.SetStatistics} functions.
 
-@tenprimitive Flow.Statistics
+@tenclass Flow.Statistics
 @pragma nostrip
 */
 
