@@ -88,13 +88,18 @@ struct WeaponSettings
 	
 	int   Interval        = 0;
 	int	  WaterLevel      = 0;
-	int	  FlashDuration   = 0;
 	int	  Damage          = 0;
 	int	  AlternateDamage = 0;
 	int   PickupCount     = 0;
 
-	bool  Smoke = false;
-	bool  Shell = false;
+	ScriptColor FlashColor = { 192, 128, 0 };
+	int			FlashRange = 12;
+	int			FlashDuration = 0;
+
+	bool Smoke = false;
+	bool Shell = false;
+	bool Muzzle = true;
+	bool ColorizeMuzzle = false;
 
 	static void Register(sol::table& parent);
 };

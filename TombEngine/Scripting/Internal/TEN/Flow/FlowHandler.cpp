@@ -415,6 +415,8 @@ void FlowHandler::SetTotalSecretCount(int secretsNumber)
 
 void FlowHandler::LoadFlowScript()
 {
+	TENLog("Loading gameflow script, strings and settings...", LogLevel::Info);
+
 	_handler.ExecuteScript(_gameDir + "Scripts/Gameflow.lua");
 	_handler.ExecuteScript(_gameDir + "Scripts/SystemStrings.lua", true);
 	_handler.ExecuteScript(_gameDir + "Scripts/Strings.lua", true);

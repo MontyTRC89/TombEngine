@@ -1,5 +1,7 @@
 #include "framework.h"
 #include "Scripting/Internal/TEN/Flow/Statistics/Statistics.h"
+#include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/ScriptUtil.h"
 
 /***
 A set of different gameplay statistics. Can be accessed using @{Flow.GetStatistics} and @{Flow.SetStatistics} functions.
@@ -10,8 +12,9 @@ A set of different gameplay statistics. Can be accessed using @{Flow.GetStatisti
  
 void Statistics::Register(sol::table& parent)
 {
-	parent.new_usertype<Statistics>("Statistics", sol::constructors<Statistics()>(),
+	parent.new_usertype<Statistics>(ScriptReserved_Statistics, sol::constructors<Statistics()>(),
 		sol::call_constructor, sol::constructors<Statistics()>(),
+		sol::meta_function::new_index, newindex_error_maker(Statistics, ScriptReserved_Statistics),
 
 		/*** Ammo hits.
 		@tfield int ammoHits amount of successful enemy hits. */
@@ -43,6 +46,5 @@ void Statistics::Register(sol::table& parent)
 
 		/*** Time taken.
 		@tfield int timeTaken amount of time passed. */
-		"timeTaken", &Statistics::TimeTaken
-		);
+		"timeTaken", &Statistics::TimeTaken);
 }

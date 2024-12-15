@@ -311,14 +311,16 @@ void HandlePistols(ItemInfo& laraItem, LaraWeaponType weaponType)
 
 	if (lara.LeftArm.GunFlash || lara.RightArm.GunFlash)
 	{
+		auto& weaponSetting = g_GameFlow->GetSettings()->Weapons[(int)weaponType - 1];
+
+		Vector4 color = weaponSetting.FlashColor;
+		color += Vector4(Random::GenerateFloat(-0.2f, 0.2f));
+
 		auto basePos = GetJointPosition(&laraItem, (lara.LeftArm.GunFlash != 0) ? LM_LHAND : LM_RHAND).ToVector3();
 		auto sphere = BoundingSphere(basePos, BLOCK(1 / 8.0f));
 		auto lightPos = Random::GeneratePointInSphere(sphere);
 
-		TriggerDynamicLight(
-			lightPos.x, lightPos.y, lightPos.z,
-			Random::GenerateFloat(8.0f, 11.0f),
-			(GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, GetRandomControl() & 0x3F);
+		TriggerDynamicPointLight(lightPos, color, weaponSetting.FlashRange * CLICK(1));
 	}
 }
 

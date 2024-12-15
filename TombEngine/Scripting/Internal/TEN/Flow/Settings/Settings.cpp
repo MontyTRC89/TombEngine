@@ -4,13 +4,9 @@
 #include "Game/effects/Hair.h"
 #include "Scripting/Internal/TEN/Flow/Enums/WeaponTypes.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/ScriptUtil.h"
 
 using namespace TEN::Effects::Hair;
-
-void NewIndex(sol::table self, const std::string& key, sol::object value)
-{
-	throw TENScriptException("Attempt to set unknown property \"" + key + "\" in settings.");
-}
 
 /***
 Global engine settings, which don't fall into particular category or can't be assigned to a specific object.
@@ -28,15 +24,15 @@ Settings::Settings()
 	// Since we directly bind Weapons array to Lua, and Lua accesses this array by native enum, where 0 is NONE, and 1 is
 	// PISTOLS, zero index is omitted due to Lua indexing arrays starting from 1. Therefore we subtract 1 from initializer index.
 
-	Weapons[(int)LaraWeaponType::Pistol          - 1] = { 8.0f,  BLOCK(8),  9,  (int)BLOCK(0.65f), 3, 1,  1,  30, true,  true  };
-	Weapons[(int)LaraWeaponType::Revolver        - 1] = { 4.0f,  BLOCK(8),  16, (int)BLOCK(0.65f), 3, 21, 21, 6,  true,  false };
-	Weapons[(int)LaraWeaponType::Uzi             - 1] = { 8.0f,  BLOCK(8),  3,  (int)BLOCK(0.65f), 3, 1,  1,  30, true,  true  };
-	Weapons[(int)LaraWeaponType::Shotgun         - 1] = { 10.0f, BLOCK(8),  9,  (int)BLOCK(0.50f), 3, 3,  3,  6,  true,  true  };
-	Weapons[(int)LaraWeaponType::Crossbow        - 1] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 2, 5,  20, 10, false, false };
-	Weapons[(int)LaraWeaponType::HK              - 1] = { 4.0f,  BLOCK(12), 0,  (int)BLOCK(0.50f), 3, 4,  4,  30, true,  true  };
-	Weapons[(int)LaraWeaponType::GrenadeLauncher - 1] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 2, 30, 30, 10, true,  false };
-	Weapons[(int)LaraWeaponType::RocketLauncher  - 1] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 2, 30, 30, 1,  true,  false };
-	Weapons[(int)LaraWeaponType::HarpoonGun      - 1] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 2, 6,  6,  10, false, false };
+	Weapons[(int)LaraWeaponType::Pistol          - 1] = { 8.0f,  BLOCK(8),  9,  (int)BLOCK(0.65f), 1,  1,  30, { 192, 128, 0 }, 12, 3, true,  true,  true,  false };
+	Weapons[(int)LaraWeaponType::Revolver        - 1] = { 4.0f,  BLOCK(8),  16, (int)BLOCK(0.65f), 21, 21, 6,  { 192, 128, 0 }, 12, 3, true,  false, true,  false };
+	Weapons[(int)LaraWeaponType::Uzi             - 1] = { 8.0f,  BLOCK(8),  3,  (int)BLOCK(0.65f), 1,  1,  30, { 192, 128, 0 }, 12, 2, true,  true,  true,  false };
+	Weapons[(int)LaraWeaponType::Shotgun         - 1] = { 10.0f, BLOCK(8),  0,  (int)BLOCK(0.50f), 3,  3,  6,  { 192, 128, 0 }, 12, 3, true,  true,  false, false };
+	Weapons[(int)LaraWeaponType::HK              - 1] = { 4.0f,  BLOCK(12), 0,  (int)BLOCK(0.50f), 4,  4,  30, { 192, 128, 0 }, 12, 2, true,  true,  true,  false };
+	Weapons[(int)LaraWeaponType::Crossbow        - 1] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 5,  20, 10, { 192, 128, 0 }, 0,  0, false, false, false, false };
+	Weapons[(int)LaraWeaponType::GrenadeLauncher - 1] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 30, 30, 10, { 192, 128, 0 }, 0,  0, true,  false, false, false };
+	Weapons[(int)LaraWeaponType::RocketLauncher  - 1] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 30, 30, 1,  { 192, 128, 0 }, 0,  0, true,  false, false, false };
+	Weapons[(int)LaraWeaponType::HarpoonGun      - 1] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 6,  6,  10, { 192, 128, 0 }, 0,  0, false, false, false, false };
 }
 
 void Settings::Register(sol::table& parent)
@@ -52,7 +48,7 @@ void Settings::Register(sol::table& parent)
 
 	parent.new_usertype<Settings>(ScriptReserved_Settings,
 		sol::constructors<Settings()>(),
-		sol::meta_function::new_index, &NewIndex,
+		sol::meta_function::new_index, newindex_error_maker(Settings, ScriptReserved_Settings),
 		ScriptReserved_AnimSettings, &Settings::Animations,
 		ScriptReserved_FlareSettings, &Settings::Flare,
 		ScriptReserved_CameraSettings, &Settings::Camera,
@@ -73,7 +69,7 @@ void AnimSettings::Register(sol::table& parent)
 {
 	parent.create().new_usertype<AnimSettings>(ScriptReserved_AnimSettings, sol::constructors<AnimSettings()>(),
 		sol::call_constructor, sol::constructors<AnimSettings()>(),
-		sol::meta_function::new_index, &NewIndex,
+		sol::meta_function::new_index, newindex_error_maker(AnimSettings, ScriptReserved_AnimSettings),
 
 	/*** Extended crawl moveset.
 	@tfield bool crawlExtended when enabled, player will be able to traverse across one-click steps in crawlspaces. */
@@ -115,9 +111,9 @@ Parameters to customize camera and everything related to it.
 
 void CameraSettings::Register(sol::table& parent)
 {
-	parent.create().new_usertype<CameraSettings>(ScriptReserved_AnimSettings, sol::constructors<CameraSettings()>(),
+	parent.create().new_usertype<CameraSettings>(ScriptReserved_CameraSettings, sol::constructors<CameraSettings()>(),
 		sol::call_constructor, sol::constructors<CameraSettings()>(),
-		sol::meta_function::new_index, &NewIndex,
+		sol::meta_function::new_index, newindex_error_maker(CameraSettings, ScriptReserved_CameraSettings),
 
 	/*** Determines highlight color in binocular mode.
 	@tfield Color binocularLightColor color of highlight, when player presses action. Zero color means there will be no highlight. */
@@ -141,7 +137,7 @@ void FlareSettings::Register(sol::table& parent)
 {
 	parent.create().new_usertype<FlareSettings>(ScriptReserved_FlareSettings, sol::constructors<FlareSettings()>(),
 		sol::call_constructor, sol::constructors<FlareSettings()>(),
-		sol::meta_function::new_index, &NewIndex,
+		sol::meta_function::new_index, newindex_error_maker(FlareSettings, ScriptReserved_FlareSettings),
 
 	/*** Flare color.
 	@tfield Color color flare color. Used for sparks and lensflare coloring as well. */
@@ -191,7 +187,7 @@ void HairSettings::Register(sol::table& parent)
 {
 	parent.create().new_usertype<HairSettings>(ScriptReserved_HairSettings, sol::constructors<HairSettings()>(),
 		sol::call_constructor, sol::constructors<HairSettings()>(),
-		sol::meta_function::new_index, &NewIndex,
+		sol::meta_function::new_index, newindex_error_maker(HairSettings, ScriptReserved_HairSettings),
 
 	/*** Root mesh to which hair object will attach to.
 	@tfield int mesh index of a root mesh to which hair will attach. Root mesh may be different for each hair object. */
@@ -215,7 +211,7 @@ void HudSettings::Register(sol::table& parent)
 {
 	parent.create().new_usertype<HudSettings>(ScriptReserved_HudSettings, sol::constructors<HudSettings()>(),
 		sol::call_constructor, sol::constructors<HudSettings()>(),
-		sol::meta_function::new_index, &NewIndex,
+		sol::meta_function::new_index, newindex_error_maker(HudSettings, ScriptReserved_HudSettings),
 
 	/*** Toggle in-game status bars visibility.
 	@tfield bool statusBars if disabled, all status bars (health, air, stamina) will be hidden.. */
@@ -243,7 +239,7 @@ void PhysicsSettings::Register(sol::table& parent)
 {
 	parent.create().new_usertype<PhysicsSettings>(ScriptReserved_PhysicsSettings, sol::constructors<PhysicsSettings()>(),
 		sol::call_constructor, sol::constructors<PhysicsSettings()>(),
-		sol::meta_function::new_index, &NewIndex,
+		sol::meta_function::new_index, newindex_error_maker(PhysicsSettings, ScriptReserved_PhysicsSettings),
 
 	/*** Global world gravity.
 	@tfield float gravity specifies global gravity. Mostly affects Lara and several other objects. */
@@ -264,7 +260,7 @@ void WeaponSettings::Register(sol::table& parent)
 {
 	parent.create().new_usertype<WeaponSettings>(ScriptReserved_WeaponSettings, sol::constructors<WeaponSettings()>(),
 		sol::call_constructor, sol::constructors<WeaponSettings()>(),
-		sol::meta_function::new_index, &NewIndex,
+		sol::meta_function::new_index, newindex_error_maker(WeaponSettings, ScriptReserved_WeaponSettings),
 
 	/*** Shooting accuracy.
 	@tfield float accuracy determines accuracy range in angles (smaller angles mean higher accuracy). Applicable only for firearms. */
@@ -286,9 +282,25 @@ void WeaponSettings::Register(sol::table& parent)
 	@tfield int alternateDamage for Revolver and HK, specifies damage in lasersight mode. For crossbow, specifies damage for explosive ammo. */
 	"alternateDamage", &WeaponSettings::AlternateDamage,
 
+	/*** Water level.
+	@tfield int waterLevel specifies water depth, at which Lara will put weapons back into holsters, indicating it's not possible to use it in water. */
+	"waterLevel", &WeaponSettings::WaterLevel,
+
 	/*** Default ammo pickup count.
 	@tfield int pickupCount amount of ammo which is given with every ammo pickup for this weapon. */
 	"pickupCount", &WeaponSettings::PickupCount,
+
+	/*** Gunflash color.
+	@tfield Color flashColor specifies the color of the gunflash. Applicable only for firearms. */
+	"flashColor", &WeaponSettings::FlashColor,
+
+	/*** Gunflash range.
+	@tfield Color flashRange specifies the range of the gunflash. Applicable only for firearms. */
+	"flashRange", &WeaponSettings::FlashRange,
+
+	/*** Gunflash duration.
+	@tfield int flashDuration specifies the duration of a gunflash effect. Applicable only for firearms. */
+	"flashDuration", &WeaponSettings::FlashDuration,
 
 	/*** Gun smoke.
 	@tfield bool smoke if set to true, indicates that weapon emits gun smoke. Not applicable for crossbow and harpoon gun. */
@@ -298,13 +310,13 @@ void WeaponSettings::Register(sol::table& parent)
 	@tfield bool shell if set to true, indicates that weapon emits gun shell. Applicable only for firearms. */
 	"shell", &WeaponSettings::Shell,
 
-	/*** Gunflash duration.
-	@tfield int flashDuration specifies the duration of a gunflash effect. Applicable only for firearms. */
-	"flashDuration", &WeaponSettings::FlashDuration,
+	/*** Display muzzle.
+	@tfield bool muzzle specifies whether muzzle flash should be displayed or not. Applicable only for firearms. */
+	"muzzle", &WeaponSettings::Muzzle,
 
-	/*** Water level.
-	@tfield int waterLevel specifies water depth, at which Lara will put weapons back into holsters, indicating it's not possible to use it in water. */
-	"waterLevel", &WeaponSettings::WaterLevel);
+	/*** Colorize muzzle.
+	@tfield bool colorizeMuzzle specifies whether muzzle flash should be tinted with the same color as gunflash color. Applicable only for firearms. */
+	"colorizeMuzzle", &WeaponSettings::ColorizeMuzzle);
 }
 
 /*** System
@@ -316,7 +328,7 @@ void SystemSettings::Register(sol::table& parent)
 {
 	parent.create().new_usertype<SystemSettings>(ScriptReserved_SystemSettings, sol::constructors<SystemSettings()>(),
 		sol::call_constructor, sol::constructors<SystemSettings()>(),
-		sol::meta_function::new_index, &NewIndex,
+		sol::meta_function::new_index, newindex_error_maker(SystemSettings, ScriptReserved_SystemSettings),
 
 	/*** How should the application respond to script errors?
 	@tfield Flow.ErrorMode errorMode error mode to use. */

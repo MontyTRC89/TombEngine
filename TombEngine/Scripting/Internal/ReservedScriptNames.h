@@ -26,6 +26,7 @@ static constexpr char ScriptReserved_Color[]			= "Color";
 static constexpr char ScriptReserved_DisplayString[]	= "DisplayString";
 static constexpr char ScriptReserved_Rotation[]			= "Rotation";
 static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
+static constexpr char ScriptReserved_Statistics[]		= "Statistics";
 
 // Settings sections
 static constexpr char ScriptReserved_Settings[]			= "Settings";

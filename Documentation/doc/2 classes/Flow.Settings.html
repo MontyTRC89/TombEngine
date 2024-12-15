@@ -260,8 +260,24 @@
 	<td class="summary">Alternate damage.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#waterLevel">waterLevel</a></td>
+	<td class="summary">Water level.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#pickupCount">pickupCount</a></td>
 	<td class="summary">Default ammo pickup count.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#flashColor">flashColor</a></td>
+	<td class="summary">Gunflash color.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#flashRange">flashRange</a></td>
+	<td class="summary">Gunflash range.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#flashDuration">flashDuration</a></td>
+	<td class="summary">Gunflash duration.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#smoke">smoke</a></td>
@@ -272,12 +288,12 @@
 	<td class="summary">Gun shell.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#flashDuration">flashDuration</a></td>
-	<td class="summary">Gunflash duration.</td>
+	<td class="name" ><a href="#muzzle">muzzle</a></td>
+	<td class="summary">Display muzzle.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#waterLevel">waterLevel</a></td>
-	<td class="summary">Water level.</td>
+	<td class="name" ><a href="#colorizeMuzzle">colorizeMuzzle</a></td>
+	<td class="summary">Colorize muzzle.</td>
 	</tr>
 </table>
 <h2><a href="#System">System </a></h2>
@@ -1020,6 +1036,27 @@ Access particular weapon's settings by using <a href="../4 enums/Flow.WeaponType
 
 </dd>
     <dt>
+    <a name = "waterLevel"></a>
+    <strong>waterLevel</strong>
+    </dt>
+    <dd>
+    Water level.
+
+
+
+    <ul>
+        <li><span class="parameter">waterLevel</span>
+            <span class="types"><span class="type">int</span></span>
+         specifies water depth, at which Lara will put weapons back into holsters, indicating it's not possible to use it in water.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
     <a name = "pickupCount"></a>
     <strong>pickupCount</strong>
     </dt>
@@ -1032,6 +1069,69 @@ Access particular weapon's settings by using <a href="../4 enums/Flow.WeaponType
         <li><span class="parameter">pickupCount</span>
             <span class="types"><span class="type">int</span></span>
          amount of ammo which is given with every ammo pickup for this weapon.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "flashColor"></a>
+    <strong>flashColor</strong>
+    </dt>
+    <dd>
+    Gunflash color.
+
+
+
+    <ul>
+        <li><span class="parameter">flashColor</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
+         specifies the color of the gunflash. Applicable only for firearms.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "flashRange"></a>
+    <strong>flashRange</strong>
+    </dt>
+    <dd>
+    Gunflash range.
+
+
+
+    <ul>
+        <li><span class="parameter">flashRange</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
+         specifies the range of the gunflash. Applicable only for firearms.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "flashDuration"></a>
+    <strong>flashDuration</strong>
+    </dt>
+    <dd>
+    Gunflash duration.
+
+
+
+    <ul>
+        <li><span class="parameter">flashDuration</span>
+            <span class="types"><span class="type">int</span></span>
+         specifies the duration of a gunflash effect. Applicable only for firearms.
         </li>
     </ul>
 
@@ -1083,18 +1183,18 @@ Access particular weapon's settings by using <a href="../4 enums/Flow.WeaponType
 
 </dd>
     <dt>
-    <a name = "flashDuration"></a>
-    <strong>flashDuration</strong>
+    <a name = "muzzle"></a>
+    <strong>muzzle</strong>
     </dt>
     <dd>
-    Gunflash duration.
+    Display muzzle.
 
 
 
     <ul>
-        <li><span class="parameter">flashDuration</span>
-            <span class="types"><span class="type">int</span></span>
-         specifies the duration of a gunflash effect. Applicable only for firearms.
+        <li><span class="parameter">muzzle</span>
+            <span class="types"><span class="type">bool</span></span>
+         specifies whether muzzle flash should be displayed or not. Applicable only for firearms.
         </li>
     </ul>
 
@@ -1104,18 +1204,18 @@ Access particular weapon's settings by using <a href="../4 enums/Flow.WeaponType
 
 </dd>
     <dt>
-    <a name = "waterLevel"></a>
-    <strong>waterLevel</strong>
+    <a name = "colorizeMuzzle"></a>
+    <strong>colorizeMuzzle</strong>
     </dt>
     <dd>
-    Water level.
+    Colorize muzzle.
 
 
 
     <ul>
-        <li><span class="parameter">waterLevel</span>
-            <span class="types"><span class="type">int</span></span>
-         specifies water depth, at which Lara will put weapons back into holsters, indicating it's not possible to use it in water.
+        <li><span class="parameter">colorizeMuzzle</span>
+            <span class="types"><span class="type">bool</span></span>
+         specifies whether muzzle flash should be tinted with the same color as gunflash color. Applicable only for firearms.
         </li>
     </ul>
 

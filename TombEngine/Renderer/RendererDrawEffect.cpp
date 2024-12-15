@@ -33,6 +33,7 @@
 #include "Renderer/Structures/RendererSprite.h"
 #include "Specific/level.h"
 #include "Structures/RendererSpriteBucket.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
@@ -1011,6 +1012,18 @@ namespace TEN::Renderer
 
 	bool Renderer::DrawGunFlashes(RenderView& view) 
 	{
+
+		if (!Lara.RightArm.GunFlash && !Lara.LeftArm.GunFlash)
+			return false;
+
+		if (Lara.Control.Look.OpticRange > 0)
+			return false;
+
+		auto& weaponSetting = g_GameFlow->GetSettings()->Weapons[(int)Lara.Control.Weapon.GunType - 1];
+
+		if (!weaponSetting.Muzzle)
+			return false;
+
 		_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
 		_context->PSSetShader(_psStatics.Get(), nullptr, 0);
 
@@ -1021,16 +1034,12 @@ namespace TEN::Renderer
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		if (!Lara.RightArm.GunFlash && !Lara.LeftArm.GunFlash)
-			return true;
-
-		if (Lara.Control.Look.OpticRange > 0)
-			return true;
-
 		const auto& room = _rooms[LaraItem->RoomNumber];
 		auto* itemPtr = &_items[LaraItem->Index];
 
-		_stStatic.Color = Vector4::One;
+		// Divide gunflash tint by 2, because tinting uses multiplication and additive color,
+		// which doesn't look good with overbright color values.
+		_stStatic.Color = weaponSetting.ColorizeMuzzle ? (Vector4)weaponSetting.FlashColor / 2.0f : Vector4::One;
 		_stStatic.AmbientLight = room.AmbientLight;
 		_stStatic.LightMode = (int)LightMode::Static;
 		BindStaticLights(itemPtr->LightsToDraw);
@@ -1039,11 +1048,10 @@ namespace TEN::Renderer
 		short zOffset = 0;
 		short rotationX = 0;
 
-		SetBlendMode(BlendMode::Additive);
 		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+		SetBlendMode(BlendMode::Additive);
 
 		if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare &&
-			Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun &&
 			Lara.Control.Weapon.GunType != LaraWeaponType::Crossbow)
 		{
 			switch (Lara.Control.Weapon.GunType)
@@ -1061,6 +1069,7 @@ namespace TEN::Renderer
 				break;
 
 			case LaraWeaponType::HK:
+			case LaraWeaponType::Shotgun:
 				length = 300;
 				zOffset = 92;
 				rotationX = -14560;
