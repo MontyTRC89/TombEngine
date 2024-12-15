@@ -164,13 +164,13 @@ namespace TEN::Scripting
 	// @treturn string A string showing time in "HH:MM:SS.CC" format.
 	std::string Time::ToString() const
 	{
-		auto hmsf = GetHmsc();
+		auto hmsc = GetHmsc();
 
 		auto stream = std::ostringstream();
-		stream << std::setw(2) << std::setfill('0') << hmsf.Hours << ":"
-			<< std::setw(2) << std::setfill('0') << hmsf.Minutes << ":"
-			<< std::setw(2) << std::setfill('0') << hmsf.Seconds << "."
-			<< std::setw(2) << std::setfill('0') << hmsf.Centiseconds;
+		stream << std::setw(2) << std::setfill('0') << hmsc.Hours << ":"
+			<< std::setw(2) << std::setfill('0') << hmsc.Minutes << ":"
+			<< std::setw(2) << std::setfill('0') << hmsc.Seconds << "."
+			<< std::setw(2) << std::setfill('0') << hmsc.Centiseconds;
 		return stream.str();
 	}
 

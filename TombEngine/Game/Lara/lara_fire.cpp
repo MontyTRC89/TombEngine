@@ -309,15 +309,8 @@ void InitializeWeaponInfo(const Settings& settings)
 {
 	for (const auto& [name, weaponType] : WEAPON_TYPES)
 	{
-<<<<<<< Updated upstream
-		int weaponIndex = (int)weaponType.second;
-
-		if (weaponIndex <= 0 || weaponIndex >= (int)LaraWeaponType::NumWeapons)
-			continue;
-=======
 		if ((int)weaponType <= 0 || (int)weaponType >= (int)LaraWeaponType::NumWeapons)
 			return;
->>>>>>> Stashed changes
 
 		auto& weapon = Weapons[(int)weaponType];
 		const auto& weaponSettings = settings.Weapons[(int)weaponType - 1]; // Lua counts from 1.
