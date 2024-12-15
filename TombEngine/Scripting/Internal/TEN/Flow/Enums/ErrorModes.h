@@ -10,17 +10,17 @@ namespace TEN::Scripting
 	// @pragma nostrip
 
 
-	/// Flow.ErrorMode constants.
-	// 
+	/// Table of Flow.ErrorMode constants. To be used in @{Flow.Settings.System.errorMode} setting.
+	//
 	// The following constants are inside Flow.ErrorMode: <br>
 	// 
-	// `ErrorMode.TERMINATE` - print to the log file and return to the title level when any script error is hit.
+	// - `TERMINATE` - print to the log file and return to the title level when any script error is hit.
 	// This is the one you will want to go for if you want to know IMMEDIATELY if something has gone wrong.
 	// 
-	// `ErrorMode.WARN` - print to the log file and continue running the application when a recoverable script error is hit.
+	// - `WARN` - print to the log file and continue running the application when a recoverable script error is hit.
 	// Choose this one if booting to the title level is too much for you.
 	// 
-	// `ErrorMode.SILENT` - do nothing when a recoverable script error is hit.
+	// - `SILENT` - do nothing when a recoverable script error is hit.
 	// Think __very__ carefully before using this setting. These error modes are here to help you to keep your scripts
 	// working properly, but if you opt to ignore errors, you won't be alerted if you've misused a function or passed
 	// an invalid argument.
@@ -28,10 +28,7 @@ namespace TEN::Scripting
 	// In all of these modes, an *unrecoverable* error will boot you to the title level. If the title level itself
 	// has an unrecoverable error, the game will close.
 	// 
-	// @section Flow.ErrorMode
-
-	/// Table of error modes.
-	// @table ErrorMode
+	// @table Flow.ErrorMode
 
 	static const auto ERROR_MODES = std::unordered_map<std::string, ErrorMode>
 	{

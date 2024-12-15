@@ -10,20 +10,16 @@ Constants for moveable statuses.
 @pragma nostrip
 */
 
-/*** Objects.MoveableStatus constants.
+/*** Table of Objects.MoveableStatus constants.
 
-The following constants are inside Objects.MoveableStatus.
+To be used with @{Objects.Moveable.GetStatus} and @{Objects.Moveable.SetStatus} functions.
 
-	INACTIVE
-	ACTIVE
-	DEACTIVATED
-	INVISIBLE
+ - `INACTIVE` - object was never activated.
+ - `ACTIVE` - object is active.
+ - `DEACTIVATED` - object was active before and was deactivated.
+ - `INVISIBLE` - object is invisible.
 
-@section Objects.MoveableStatus
-*/
-
-/*** Table of moveable statuses.
-@table MoveableStatus
+@table Objects.MoveableStatus
 */
 
 static const std::unordered_map<std::string, ItemStatus> MOVEABLE_STATUSES

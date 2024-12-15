@@ -9,22 +9,17 @@ using namespace TEN::Effects::DisplaySprite;
 namespace TEN::Scripting::View
 {
 
-	/// Constants for scale modes.
+	/// Constants for display sprite scale modes.
 	// @enum View.ScaleMode
 	// @pragma nostrip
 
-	/// View.ScaleMode constants.
+	/// Table of View.ScaleMode constants. To be used with @{View.DisplaySprite} class.
 	// 
-	// The following constants are inside View.ScaleMode.
+	// - `FIT`
+	// - `FILL`
+	// - `STRETCH`
 	// 
-	//	FIT
-	//	FILL
-	//	STRETCH
-	// 
-	// @section View.ScaleMode
-
-	/// Table of display sprite scale modes.
-	// @table ScaleMode
+	// @table View.ScaleMode
 
 	static const std::unordered_map<std::string, DisplaySpriteScaleMode> SCALE_MODES
 	{

@@ -7,28 +7,25 @@ Constants for the type of the Camera.
 @pragma nostrip
 */
 
-/*** View.CameraType constants.
-
-The following constants are inside CameraType.
-
-	CHASE
-	COMBAT
-	FIXED
-	LOOK
-	FLYBY
-
-@section View.CameraType
-*/
-
-/*** Table of camera type constants (for use with GetCameraType() function).
+/*** Table of View.CameraType constants. To be used with @{View.GetCameraType} function.
 @table CameraType
+
+ - `NORMAL` - standard in-game camera when weapons are holstered.
+ - `COMBAT` - in-game camera when weapons are unholstered.
+ - `FIXED` - classic fixed camera.
+ - `LOOK` - look camera.
+ - `FLYBY` - flyby or tracking camera.
+ - `OPTICS` - binoculars or lasersight is active.
 */
 
 static const std::unordered_map<std::string, CameraType> CAMERA_TYPE
 {
-	{ "CHASE", CameraType::Chase },
+	{ "CHASE",  CameraType::Chase  }, // DEPRECATED
+	{ "NORMAL", CameraType::Chase  },
 	{ "COMBAT", CameraType::Combat },
-	{ "FIXED", CameraType::Fixed },
-	{ "LOOK", CameraType::Look },
-	{ "FLYBY", CameraType::Flyby }
+	{ "FIXED",  CameraType::Fixed  },
+	{ "HEAVY",  CameraType::Fixed  }, // DEPRECATED
+	{ "LOOK",   CameraType::Look   },
+	{ "FLYBY",  CameraType::Flyby  },
+	{ "OPTICS", CameraType::Optics }
 };

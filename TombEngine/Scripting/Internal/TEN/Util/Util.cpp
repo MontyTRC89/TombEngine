@@ -177,7 +177,7 @@ namespace TEN::Scripting::Util
 	//<a href="https://www.lua.org/manual/5.4/manual.html#pdf-debug.traceback">debug.traceback</a>
 	//@function PrintLog
 	//@tparam string message to be displayed within the Log
-	//@tparam Misc.LogLevel logLevel log level to be displayed
+	//@tparam Util.LogLevel logLevel log level to be displayed
 	//@tparam[opt] bool allowSpam true allows spamming of the message
 	// 
 	//@usage

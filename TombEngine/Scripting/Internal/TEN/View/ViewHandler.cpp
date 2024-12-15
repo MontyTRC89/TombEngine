@@ -72,6 +72,9 @@ namespace TEN::Scripting::View
 		if (UseSpotCam)
 			return CameraType::Flyby;
 
+		if (Lara.Control.Look.IsUsingBinoculars || Lara.Control.Look.IsUsingLasersight)
+			return CameraType::Optics;
+
 		if (Camera.oldType == CameraType::Heavy)
 			return CameraType::Fixed;
 
@@ -178,7 +181,7 @@ namespace TEN::Scripting::View
 		//@treturn View.CameraType value used by the Main Camera.
 		//@usage
 		//LevelFuncs.OnLoop = function() 
-		//	if (View.GetCameraType() == CameraType.Combat) then
+		//	if (View.GetCameraType() == CameraType.COMBAT) then
 		//		--Do your Actions here.
 		//	end
 		//end

@@ -81,9 +81,9 @@
   <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
   <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
-  <li>    <a href="../4 enums/Flow.WeaponType.html">Flow.WeaponType</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
+  <li>    <a href="../4 enums/Objects.WeaponType.html">Objects.WeaponType</a></li>
   <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
@@ -113,11 +113,11 @@
 </p>
 
 
-<h2><a href="#View_PostProcessMode_constants">View.PostProcessMode constants </a></h2>
+<h2><a href="#Tables">Tables</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#PostProcessMode">PostProcessMode</a></td>
-	<td class="summary">Table of post-process effect constants (for use with SetPostProcessMode() function).</td>
+	<td class="name" ><a href="#View.PostProcessMode">View.PostProcessMode</a></td>
+	<td class="summary">Table of View.PostProcessMode effect constants.</td>
 	</tr>
 </table>
 
@@ -125,29 +125,25 @@
 <br/>
 
 
-    <h2 class="section-header has-description"><a name="View_PostProcessMode_constants"></a>View.PostProcessMode constants </h2>
+    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
 
-          <div class="section-description">
-
-
-
-<p>The following constants are inside PostProcessMode.</p>
-
-<pre><code>NONE
-MONOCHROME
-NEGATIVE
-EXCLUSION
-</code></pre>
-
-
-          </div>
     <dl class="function">
     <dt>
-    <a name = "PostProcessMode"></a>
-    <strong>PostProcessMode</strong>
+    <a name = "View.PostProcessMode"></a>
+    <strong>View.PostProcessMode</strong>
     </dt>
     <dd>
-    Table of post-process effect constants (for use with SetPostProcessMode() function).
+
+<p>Table of View.PostProcessMode effect constants.  To be used with <a href="../1 modules/View.html#SetPostProcessMode">View.SetPostProcessMode</a> function.</p>
+
+<ul>
+    <li><code>NONE</code> - No postprocess effect.</li>
+    <li><code>MONOCHROME</code> - Black &amp; white effect.</li>
+    <li><code>NEGATIVE</code> - Negative image effect.</li>
+    <li><code>EXCLUSION</code> - Similar to negative effect, but with different color operation.</li>
+</ul>
+
+
 
 
 

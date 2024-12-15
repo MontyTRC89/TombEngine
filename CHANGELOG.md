@@ -60,7 +60,9 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added support for transparency value in DisplayString class.
 * Added extra argument for SetAmbientTrack() function to specify if new ambient track should play from the beginning.
 * Allow to use TR4-like load cameras by playing fixed camera from OnEnd() event and removing loadScreenFile field from level's gameflow entry.
-* Added CameraType.FLYBY enum entry and return it by View.GetCameraType(), when flyby camera is active.
+* Added CameraType.FLYBY and CameraType.OPTICS enum entries and return it by View.GetCameraType(), when flyby camera or binoculars/lasersight is active.
+* Renamed Flow.WeaponType enumeration to Objects.WeaponType, and removed similar Objects.LaraWeaponType enumeration for consistency.
+* Renamed Objects.PlayerAmmoType to Objects.AmmoType for consistency.
 * Fixed DisplayString class not supporting some Unicode characters and empty lines in multiline strings.
 * Fixed DisplayString not being deallocated after showing.
 * Fixed GameVars not transferring between levels in hub mode.

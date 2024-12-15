@@ -81,9 +81,9 @@
   <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
   <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
-  <li>    <a href="../4 enums/Flow.WeaponType.html">Flow.WeaponType</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
+  <li>    <a href="../4 enums/Objects.WeaponType.html">Objects.WeaponType</a></li>
   <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
@@ -532,7 +532,7 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><a class="type" href="../4 enums/Flow.WeaponType.html#">WeaponType</a></span>
+           <span class="types"><span class="type">Flow.WeaponType</span></span>
         current weapon type.
     </ol>
 
@@ -556,14 +556,14 @@
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">weaponType</span>
-            <span class="types"><a class="type" href="../4 enums/Flow.WeaponType.html#">WeaponType</a></span>
+            <span class="types"><span class="type">Flow.WeaponType</span></span>
 
 
 
         </li>
         <li><span class="parameter">activate</span>
             <span class="types"><span class="type">bool</span></span>
-         true = let her also draw the weapons, set torch lit. false = let Laras new weapons remain holstered until she draws them, set torch unlit.
+         if <code>true</code>, also draw the weapons or set torch lit. If <code>false</code>, keep weapons holstered or leave torch unlit.
         </li>
     </ul>
 
@@ -589,7 +589,7 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">int</span></span>
+           <span class="types"><span class="type">Flow.AmmoType</span></span>
         player weapon ammo type
     </ol>
 

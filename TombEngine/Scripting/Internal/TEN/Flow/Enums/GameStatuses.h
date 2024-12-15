@@ -9,22 +9,20 @@ namespace TEN::Scripting
 	// @pragma nostrip
 
 
-	/// Flow.GameStatus constants.
+	/// Table of Flow.GameStatus constants.
+	// To be used with @{Flow.GetGameStatus} function.
 	// 
 	// The following constants are inside Flow.GameStatus.
 	// 
-	//	NORMAL
-	//	NEW_GAME
-	//	LOAD_GAME
-	//	EXIT_TO_TITLE
-	//	EXIT_GAME
-	//	LARA_DEAD
-	//	LEVEL_COMPLETE
+	// - `NORMAL`
+	// - `NEW_GAME`
+	// - `LOAD_GAME`
+	// - `EXIT_TO_TITLE`
+	// - `EXIT_GAME`
+	// - `LARA_DEAD`
+	// - `LEVEL_COMPLETE`
 	// 
-	// @section Flow.GameStatus
-
-	/// Table of game statuses.
-	// @table GameStatus
+	// @table Flow.GameStatus
 
 	static const auto GAME_STATUSES = std::unordered_map<std::string, GameStatus>
 	{

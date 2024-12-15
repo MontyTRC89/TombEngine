@@ -81,9 +81,9 @@
   <li>    <here>Flow.ErrorMode</here></li>
   <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
-  <li>    <a href="../4 enums/Flow.WeaponType.html">Flow.WeaponType</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
+  <li>    <a href="../4 enums/Objects.WeaponType.html">Objects.WeaponType</a></li>
   <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
@@ -113,11 +113,11 @@
 </p>
 
 
-<h2><a href="#Flow_ErrorMode_constants">Flow.ErrorMode constants </a></h2>
+<h2><a href="#Tables">Tables</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#ErrorMode">ErrorMode</a></td>
-	<td class="summary">Table of error modes.</td>
+	<td class="name" ><a href="#Flow.ErrorMode">Flow.ErrorMode</a></td>
+	<td class="summary">Table of Flow.ErrorMode constants.</td>
 	</tr>
 </table>
 
@@ -125,33 +125,32 @@
 <br/>
 
 
-    <h2 class="section-header has-description"><a name="Flow_ErrorMode_constants"></a>Flow.ErrorMode constants </h2>
+    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
 
-          <div class="section-description">
-           The following constants are inside Flow.ErrorMode: <br></p>
+    <dl class="function">
+    <dt>
+    <a name = "Flow.ErrorMode"></a>
+    <strong>Flow.ErrorMode</strong>
+    </dt>
+    <dd>
+    Table of Flow.ErrorMode constants.  To be used in <a href="../2 classes/Flow.Settings.html#errorMode">errorMode</a> setting.</p>
 
-<p> <code>ErrorMode.TERMINATE</code> - print to the log file and return to the title level when any script error is hit.
- This is the one you will want to go for if you want to know IMMEDIATELY if something has gone wrong.</p>
+<p> The following constants are inside Flow.ErrorMode: <br></p>
 
-<p> <code>ErrorMode.WARN</code> - print to the log file and continue running the application when a recoverable script error is hit.
- Choose this one if booting to the title level is too much for you.</p>
-
-<p> <code>ErrorMode.SILENT</code> - do nothing when a recoverable script error is hit.
- Think <strong>very</strong> carefully before using this setting. These error modes are here to help you to keep your scripts
- working properly, but if you opt to ignore errors, you won't be alerted if you've misused a function or passed
- an invalid argument.</p>
+<ul>
+    <li><p><code>TERMINATE</code> - print to the log file and return to the title level when any script error is hit.
+    This is the one you will want to go for if you want to know IMMEDIATELY if something has gone wrong.</p></li>
+    <li><p><code>WARN</code> - print to the log file and continue running the application when a recoverable script error is hit.
+    Choose this one if booting to the title level is too much for you.</p></li>
+    <li><p><code>SILENT</code> - do nothing when a recoverable script error is hit.
+    Think <strong>very</strong> carefully before using this setting. These error modes are here to help you to keep your scripts
+    working properly, but if you opt to ignore errors, you won't be alerted if you've misused a function or passed
+    an invalid argument.</p></li>
+</ul>
 
 <p> In all of these modes, an <em>unrecoverable</em> error will boot you to the title level. If the title level itself
  has an unrecoverable error, the game will close.
 
-          </div>
-    <dl class="function">
-    <dt>
-    <a name = "ErrorMode"></a>
-    <strong>ErrorMode</strong>
-    </dt>
-    <dd>
-    Table of error modes.
 
 
 

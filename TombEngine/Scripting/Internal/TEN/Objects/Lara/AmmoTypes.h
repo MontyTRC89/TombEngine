@@ -7,33 +7,29 @@ Constants for player weapon ammo types.
 @pragma nostrip
 */
 
-/*** Objects.AmmoType constants.
+/*** Table of Objects.AmmoType constants.
+To be used with @{Objects.LaraObject.GetAmmoType} function.
 
-The following constants are inside AmmoType.
+ - `NONE`
+ - `PISTOLS`
+ - `REVOLVER`
+ - `UZI`
+ - `SHOTGUN_NORMAL`
+ - `SHOTGUN_WIDE`
+ - `HK`
+ - `CROSSBOW_BOLT_NORMAL`
+ - `CROSSBOW_BOLT_POISON`
+ - `CROSSBOW_BOLT_EXPLOSIVE`
+ - `GRENADE_NORMAL`
+ - `GRENADE_FRAG`
+ - `GRENADE_FLASH`
+ - `HARPOON`
+ - `ROCKET`
 
-	NONE
-	PISTOLS
-	REVOLVER
-	UZI
-	SHOTGUN_NORMAL
-	SHOTGUN_WIDE
-	HK
-	CROSSBOW_BOLT_NORMAL
-	CROSSBOW_BOLT_POISON
-	CROSSBOW_BOLT_EXPLOSIVE
-	GRENADE_NORMAL
-	GRENADE_FRAG
-	GRENADE_FLASH
-	HARPOON
-	ROCKET
-
-@section Objects.AmmoType
+@table Objects.AmmoType
 */
 
-/*** AmmoType constants table.
-@table AmmoType
-*/
-static const std::unordered_map<std::string, PlayerAmmoType> PLAYER_AMMO_TYPES
+static const std::unordered_map<std::string, PlayerAmmoType> AMMO_TYPES
 {
 	{ "PISTOLS", PlayerAmmoType::Pistol },
 	{ "REVOLVER", PlayerAmmoType::Revolver },

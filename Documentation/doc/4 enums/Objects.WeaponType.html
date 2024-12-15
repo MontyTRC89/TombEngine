@@ -81,9 +81,9 @@
   <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
   <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
-  <li>    <here>Flow.WeaponType</here></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
+  <li>    <here>Objects.WeaponType</here></li>
   <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
@@ -106,18 +106,18 @@
 
 <div id="content">
 
-<h1>Enum <code>Flow.WeaponType</code></h1>
+<h1>Enum <code>Objects.WeaponType</code></h1>
 <p>Constants for weapon types.</p>
 <p>
 
 </p>
 
 
-<h2><a href="#Flow_WeaponType_constants">Flow.WeaponType constants </a></h2>
+<h2><a href="#Tables">Tables</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#WeaponType">WeaponType</a></td>
-	<td class="summary">Table of weapon types.</td>
+	<td class="name" ><a href="#Objects.WeaponType">Objects.WeaponType</a></td>
+	<td class="summary">Objects.WeaponType constants.</td>
 	</tr>
 </table>
 
@@ -125,35 +125,36 @@
 <br/>
 
 
-    <h2 class="section-header has-description"><a name="Flow_WeaponType_constants"></a>Flow.WeaponType constants </h2>
+    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
 
-          <div class="section-description">
-           The following constants are inside Flow.WeaponType. <br>
- Note that this enumeration also contains flare and torch - these are counted as "weapon" internally by the engine, and indicate
- an object that is currently in Lara's hands, as seen in <a href="../2 classes/Objects.LaraObject.html#LaraObject:GetWeaponType">Objects.LaraObject.GetWeaponType</a>.</p>
-
-<pre><code>WeaponType.NONE
-WeaponType.PISTOLS
-WeaponType.UZI
-WeaponType.REVOLVER
-WeaponType.SHOTGUN
-WeaponType.HK
-WeaponType.CROSSBOW
-WeaponType.FLARE
-WeaponType.TORCH
-WeaponType.GRENADE_LAUNCHER
-WeaponType.HARPOON_GUN
-WeaponType.ROCKET_LAUNCHER
-</code></pre>
-<p>
-          </div>
     <dl class="function">
     <dt>
-    <a name = "WeaponType"></a>
-    <strong>WeaponType</strong>
+    <a name = "Objects.WeaponType"></a>
+    <strong>Objects.WeaponType</strong>
     </dt>
     <dd>
-    Table of weapon types.
+
+<p>Objects.WeaponType constants.  To be used with <a href="../2 classes/Objects.LaraObject.html#LaraObject:GetWeaponType">Objects.LaraObject.GetWeaponType</a> and <a href="../2 classes/Objects.LaraObject.html#LaraObject:SetWeaponType">Objects.LaraObject.SetWeaponType</a> functions.</p>
+
+<p> Note that this enumeration also contains flare and torch - these are counted as "weapon" internally by the engine, and indicate
+ an object that is currently in Lara's hands.</p>
+
+<ul>
+    <li><code>NONE</code></li>
+    <li><code>PISTOLS</code></li>
+    <li><code>UZI</code></li>
+    <li><code>REVOLVER</code></li>
+    <li><code>SHOTGUN</code></li>
+    <li><code>HK</code></li>
+    <li><code>CROSSBOW</code></li>
+    <li><code>FLARE</code></li>
+    <li><code>TORCH</code></li>
+    <li><code>GRENADE_LAUNCHER</code></li>
+    <li><code>HARPOON_GUN</code></li>
+    <li><code>ROCKET_LAUNCHER</code>
+    </li>
+</ul>
+
 
 
 

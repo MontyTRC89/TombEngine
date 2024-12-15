@@ -12,24 +12,21 @@ namespace TEN::Scripting::View
 	// @enum View.AlignMode
 	// @pragma nostrip
 
-	/// View.AlignMode constants.
+	/// Table of View.AlignMode constants.
 	// 
-	// The following constants are inside View.AlignMode.
+	// The following constants are inside View.AlignMode. To be used with @{Strings.DisplayString} class.
 	// 
-	//	CENTER
-	//	CENTER_TOP
-	//	CENTER_BOTTOM
-	//	CENTER_LEFT
-	//	CENTER_RIGHT
-	//	TOP_LEFT
-	//	TOP_RIGHT
-	//	BOTTOM_LEFT
-	//	BOTTOM_RIGHT
+	// - `CENTER`
+	// - `CENTER_TOP`
+	// - `CENTER_BOTTOM`
+	// - `CENTER_LEFT`
+	// - `CENTER_RIGHT`
+	// - `TOP_LEFT`
+	// - `TOP_RIGHT`
+	// - `BOTTOM_LEFT`
+	// - `BOTTOM_RIGHT`
 	// 
-	// @section View.AlignMode
-
-	/// Table of align modes.
-	// @table AlignMode
+	// @table View.AlignMode
 
 	static const std::unordered_map<std::string, DisplaySpriteAlignMode> ALIGN_MODES
 	{

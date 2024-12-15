@@ -81,9 +81,9 @@
   <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
   <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
-  <li>    <a href="../4 enums/Flow.WeaponType.html">Flow.WeaponType</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
+  <li>    <a href="../4 enums/Objects.WeaponType.html">Objects.WeaponType</a></li>
   <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
@@ -113,11 +113,11 @@
 </p>
 
 
-<h2><a href="#View_CameraType_constants">View.CameraType constants </a></h2>
+<h2><a href="#Tables">Tables</a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" ><a href="#CameraType">CameraType</a></td>
-	<td class="summary">Table of camera type constants (for use with GetCameraType() function).</td>
+	<td class="summary">Table of View.CameraType constants.</td>
 	</tr>
 </table>
 
@@ -125,30 +125,26 @@
 <br/>
 
 
-    <h2 class="section-header has-description"><a name="View_CameraType_constants"></a>View.CameraType constants </h2>
+    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
 
-          <div class="section-description">
-
-
-
-<p>The following constants are inside CameraType.</p>
-
-<pre><code>CHASE
-COMBAT
-FIXED
-LOOK
-FLYBY
-</code></pre>
-
-
-          </div>
     <dl class="function">
     <dt>
     <a name = "CameraType"></a>
     <strong>CameraType</strong>
     </dt>
     <dd>
-    Table of camera type constants (for use with GetCameraType() function).
+
+<p>Table of View.CameraType constants.  To be used with <a href="../1 modules/View.html#GetCameraType">View.GetCameraType</a> function.</p>
+
+<ul>
+    <li><code>NORMAL</code> - standard in-game camera when weapons are holstered.</li>
+    <li><code>COMBAT</code> - in-game camera when weapons are unholstered.</li>
+    <li><code>FIXED</code> - classic fixed camera.</li>
+    <li><code>LOOK</code> - look camera.</li>
+    <li><code>FLYBY</code> - flyby or tracking camera.</li>
+    <li><code>OPTICS</code> - binoculars or lasersight is active.</li>
+</ul>
+
 
 
 

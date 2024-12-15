@@ -81,9 +81,9 @@
   <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
   <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
-  <li>    <a href="../4 enums/Flow.WeaponType.html">Flow.WeaponType</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
+  <li>    <a href="../4 enums/Objects.WeaponType.html">Objects.WeaponType</a></li>
   <li>    <here>Objects.MoveableStatus</here></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
@@ -113,11 +113,11 @@
 </p>
 
 
-<h2><a href="#Objects_MoveableStatus_constants">Objects.MoveableStatus constants </a></h2>
+<h2><a href="#Tables">Tables</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#MoveableStatus">MoveableStatus</a></td>
-	<td class="summary">Table of moveable statuses.</td>
+	<td class="name" ><a href="#Objects.MoveableStatus">Objects.MoveableStatus</a></td>
+	<td class="summary">Table of Objects.MoveableStatus constants.</td>
 	</tr>
 </table>
 
@@ -125,29 +125,27 @@
 <br/>
 
 
-    <h2 class="section-header has-description"><a name="Objects_MoveableStatus_constants"></a>Objects.MoveableStatus constants </h2>
+    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
 
-          <div class="section-description">
-
-
-
-<p>The following constants are inside Objects.MoveableStatus.</p>
-
-<pre><code>INACTIVE
-ACTIVE
-DEACTIVATED
-INVISIBLE
-</code></pre>
-
-
-          </div>
     <dl class="function">
     <dt>
-    <a name = "MoveableStatus"></a>
-    <strong>MoveableStatus</strong>
+    <a name = "Objects.MoveableStatus"></a>
+    <strong>Objects.MoveableStatus</strong>
     </dt>
     <dd>
-    Table of moveable statuses.
+
+<p>Table of Objects.MoveableStatus constants. </p>
+
+<p>To be used with <a href="../2 classes/Objects.Moveable.html#Moveable:GetStatus">Objects.Moveable.GetStatus</a> and <a href="../2 classes/Objects.Moveable.html#Moveable:SetStatus">Objects.Moveable.SetStatus</a> functions.</p>
+
+<ul>
+    <li><code>INACTIVE</code> - object was never activated.</li>
+    <li><code>ACTIVE</code> - object is active.</li>
+    <li><code>DEACTIVATED</code> - object was active before and was deactivated.</li>
+    <li><code>INVISIBLE</code> - object is invisible.</li>
+</ul>
+
+
 
 
 

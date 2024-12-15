@@ -202,7 +202,7 @@ LaraWeaponType LaraObject::GetWeaponType() const
 // @usage
 // Lara:SetWeaponType(WeaponType.PISTOLS, false)
 // @tparam Flow.WeaponType weaponType 
-// @tparam bool activate true = let her also draw the weapons, set torch lit. false = let Laras new weapons remain holstered until she draws them, set torch unlit.
+// @tparam bool activate if `true`, also draw the weapons or set torch lit. If `false`, keep weapons holstered or leave torch unlit.
 void LaraObject::SetWeaponType(LaraWeaponType weaponType, bool activate)
 {
 	auto* lara = GetLaraInfo(m_item);
@@ -227,9 +227,10 @@ void LaraObject::SetWeaponType(LaraWeaponType weaponType, bool activate)
 	}
 }
 
+
 /// Get player weapon ammo type.
 // @function LaraObject:GetAmmoType
-// @treturn int player weapon ammo type
+// @treturn Flow.AmmoType player weapon ammo type
 // @usage
 // local CurrentAmmoType = Lara:GetAmmoType()
 int LaraObject::GetAmmoType() const
