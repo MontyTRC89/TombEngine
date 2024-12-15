@@ -56,7 +56,7 @@ namespace TEN::Scripting
 			"secrets", &Statistics::Secrets,
 
 			/*** Time taken.
-			@tfield int timeTaken amount of time passed.
+			@tfield Time timeTaken amount of time passed.
 			*/
 			"timeTaken", &Statistics::TimeTaken);
 	}
