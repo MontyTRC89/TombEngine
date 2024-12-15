@@ -6,37 +6,37 @@
 
 namespace TEN::Scripting
 {
-	/***
-	Constants for weapon types.
-	@enum Flow.WeaponType
-	@pragma nostrip
-	*/
+/***
+Constants for weapon types.
+@enum Flow.WeaponType
+@pragma nostrip
+*/
 
-	/*** Flow.WeaponType constants.
+/*** Flow.WeaponType constants.
 
-	The following constants are inside Flow.WeaponType. <br>
-	Note that this enumeration also contains flare and torch - these are counted as "weapon" internally by the engine, and indicate
-	an object that is currently in Lara's hands, as seen in @{Objects.LaraObject.GetWeaponType}.
+The following constants are inside Flow.WeaponType. <br>
+Note that this enumeration also contains flare and torch - these are counted as "weapon" internally by the engine, and indicate
+an object that is currently in Lara's hands, as seen in @{Objects.LaraObject.GetWeaponType}.
 
-		WeaponType.NONE
-		WeaponType.PISTOLS
-		WeaponType.UZI
-		WeaponType.REVOLVER
-		WeaponType.SHOTGUN
-		WeaponType.HK
-		WeaponType.CROSSBOW
-		WeaponType.FLARE
-		WeaponType.TORCH
-		WeaponType.GRENADE_LAUNCHER
-		WeaponType.HARPOON_GUN
-		WeaponType.ROCKET_LAUNCHER
+	WeaponType.NONE
+	WeaponType.PISTOLS
+	WeaponType.UZI
+	WeaponType.REVOLVER
+	WeaponType.SHOTGUN
+	WeaponType.HK
+	WeaponType.CROSSBOW
+	WeaponType.FLARE
+	WeaponType.TORCH
+	WeaponType.GRENADE_LAUNCHER
+	WeaponType.HARPOON_GUN
+	WeaponType.ROCKET_LAUNCHER
 
-	@section Flow.WeaponType
-	*/
+@section Flow.WeaponType
+*/
 
-	/*** Table of weapon types.
-	@table WeaponType
-	*/
+/*** Table of weapon types.
+@table WeaponType
+*/
 
 	static const auto WEAPON_TYPES = std::unordered_map<std::string, LaraWeaponType>
 	{

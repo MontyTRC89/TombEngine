@@ -108,14 +108,7 @@
 
 <h1>Class <code>Flow.Settings</code></h1>
 <p>Global engine settings which don't fall into particular category or can't be assigned to a specific object.</p>
-<p>
-
-
-<pre>
-Can be accessed using <a href="../1 modules/Flow.html#SetSettings">Flow.SetSettings</a> <span class="keyword">and</span> <a href="../1 modules/Flow.html#GetSettings">Flow.GetSettings</a> functions.
-</pre>
-
-</p>
+<p>Can be accessed using <a href="../1 modules/Flow.html#SetSettings">Flow.SetSettings</a> and <a href="../1 modules/Flow.html#GetSettings">Flow.GetSettings</a> functions.</p>
 
 
 <h2><a href="#Animations">Animations </a></h2>
@@ -322,11 +315,7 @@ Can be accessed using <a href="../1 modules/Flow.html#SetSettings">Flow.SetSetti
     <h2 class="section-header has-description"><a name="Animations"></a>Animations </h2>
 
           <div class="section-description">
-
-
-<pre><code>These settings determine whether a specific moveset is available in-game.
-</code></pre>
-
+          These settings determine whether a specific moveset is available in-game.
           </div>
     <dl class="function">
     <dt>
@@ -459,11 +448,7 @@ Can be accessed using <a href="../1 modules/Flow.html#SetSettings">Flow.SetSetti
     <h2 class="section-header has-description"><a name="Camera"></a>Camera </h2>
 
           <div class="section-description">
-
-
-<pre><code>Parameters to customize camera and everything related to it.
-</code></pre>
-
+          Parameters to customize camera and everything related to it.
           </div>
     <dl class="function">
     <dt>
@@ -533,11 +518,7 @@ Can be accessed using <a href="../1 modules/Flow.html#SetSettings">Flow.SetSetti
     <h2 class="section-header has-description"><a name="Flare"></a>Flare </h2>
 
           <div class="section-description">
-
-
-<pre><code>These settings change appearance and behaviour of a flare.
-</code></pre>
-
+          These settings change appearance and behaviour of a flare.
           </div>
     <dl class="function">
     <dt>
@@ -733,13 +714,9 @@ Can be accessed using <a href="../1 modules/Flow.html#SetSettings">Flow.SetSetti
     <h2 class="section-header has-description"><a name="Hair"></a>Hair </h2>
 
           <div class="section-description">
-
-
-<pre><code>This is a table of Lara's braid object settings.
+          This is a table of Lara's braid object settings.
 Table consists of three entries, with first one representing classic Lara braid, and 2 and 3 representing left and right young Lara braids respectively.
-Therefore, if you want to access classic Lara braid settings, use &lt;code&gt;settings.Hair[1]&lt;/code&gt;, and so on.
-</code></pre>
-
+Therefore, if you want to access classic Lara braid settings, use <code>settings.Hair[1]</code>, and so on.
           </div>
     <dl class="function">
     <dt>
@@ -809,11 +786,7 @@ Therefore, if you want to access classic Lara braid settings, use &lt;code&gt;se
     <h2 class="section-header has-description"><a name="Hud"></a>Hud </h2>
 
           <div class="section-description">
-
-
-<pre><code>These settings determine visibility of particular in-game HUD elements.
-</code></pre>
-
+          These settings determine visibility of particular in-game HUD elements.
           </div>
     <dl class="function">
     <dt>
@@ -904,11 +877,7 @@ Therefore, if you want to access classic Lara braid settings, use &lt;code&gt;se
     <h2 class="section-header has-description"><a name="Physics"></a>Physics </h2>
 
           <div class="section-description">
-
-
-<pre><code>Here you will find various settings for game world physics.
-</code></pre>
-
+          Here you will find various settings for game world physics.
           </div>
     <dl class="function">
     <dt>
@@ -957,12 +926,8 @@ Therefore, if you want to access classic Lara braid settings, use &lt;code&gt;se
     <h2 class="section-header has-description"><a name="Weapons"></a>Weapons </h2>
 
           <div class="section-description">
-
-
-<pre><code>This is a table of weapon settings, with several parameters available for every weapon.
-Access particular weapon's settings by using &lt;a href="../4 enums/Flow.WeaponType.html#"&gt;Flow.WeaponType&lt;/a&gt; as an index for this table, e.g. &lt;code&gt;settings.Weapons[Flow.WeaponType.PISTOLS]&lt;/code&gt;.
-</code></pre>
-
+          This is a table of weapon settings, with several parameters available for every weapon.
+Access particular weapon's settings by using <a href="../4 enums/Flow.WeaponType.html#">Flow.WeaponType</a> as an index for this table, e.g. <code>settings.Weapons[Flow.WeaponType.PISTOLS]</code>.
           </div>
     <dl class="function">
     <dt>
@@ -1263,11 +1228,7 @@ Access particular weapon's settings by using &lt;a href="../4 enums/Flow.WeaponT
     <h2 class="section-header has-description"><a name="System"></a>System </h2>
 
           <div class="section-description">
-
-
-<pre><code>Global system settings that is not directly related to gameplay.
-</code></pre>
-
+          Global system settings that is not directly related to gameplay.
           </div>
     <dl class="function">
     <dt>
@@ -1296,14 +1257,10 @@ Access particular weapon's settings by using &lt;a href="../4 enums/Flow.WeaponT
     <strong>fastReload</strong>
     </dt>
     <dd>
-
-<p>Can the game utilize the fast reload feature?  <br></p>
-<pre><code>When set to &lt;code&gt;true&lt;/code&gt;, the game will attempt to perform fast savegame reloading if current level is the same as
+    Can the game utilize the fast reload feature?  <br>
+When set to <code>true</code>, the game will attempt to perform fast savegame reloading if current level is the same as
 the level loaded from the savegame. It will not work if the level timestamp or checksum has changed
-(i.e. level was updated). If set to &lt;code&gt;false&lt;/code&gt;, this functionality is turned off.
-</code></pre>
-
-
+(i.e. level was updated). If set to <code>false</code>, this functionality is turned off.
 
 
 

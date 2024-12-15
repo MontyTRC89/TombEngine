@@ -8,32 +8,32 @@ using namespace TEN::Effects::DisplaySprite;
 
 namespace TEN::Scripting::View
 {
-	/***
-	Constants for sprite align modes.
-	@enum View.AlignMode
-	@pragma nostrip
-	*/
+/***
+Constants for sprite align modes.
+@enum View.AlignMode
+@pragma nostrip
+*/
 
-	/*** View.AlignMode constants.
+/*** View.AlignMode constants.
 
-	The following constants are inside View.AlignMode.
+The following constants are inside View.AlignMode.
 
-	CENTER
-	CENTER_TOP
-	CENTER_BOTTOM
-	CENTER_LEFT
-	CENTER_RIGHT
-	TOP_LEFT
-	TOP_RIGHT
-	BOTTOM_LEFT
-	BOTTOM_RIGHT
+CENTER
+CENTER_TOP
+CENTER_BOTTOM
+CENTER_LEFT
+CENTER_RIGHT
+TOP_LEFT
+TOP_RIGHT
+BOTTOM_LEFT
+BOTTOM_RIGHT
 
-	@section View.AlignMode
-	*/
+@section View.AlignMode
+*/
 
-	/*** Table of align modes.
-	@table AlignMode
-	*/
+/*** Table of align modes.
+@table AlignMode
+*/
 
 	static const std::unordered_map<std::string, DisplaySpriteAlignMode> ALIGN_MODES
 	{

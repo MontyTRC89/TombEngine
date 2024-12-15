@@ -128,27 +128,21 @@
     <h2 class="section-header has-description"><a name="Flow_ErrorMode_constants"></a>Flow.ErrorMode constants </h2>
 
           <div class="section-description">
+          The following constants are inside Flow.ErrorMode: <br></p>
 
+<p><code>ErrorMode.TERMINATE</code> - print to the log file and return to the title level when any script error is hit.
+This is the one you will want to go for if you want to know IMMEDIATELY if something has gone wrong.</p>
 
+<p><code>ErrorMode.WARN</code> - print to the log file and continue running the application when a recoverable script error is hit.
+Choose this one if booting to the title level is too much for you.</p>
 
-<pre><code>The following constants are inside Flow.ErrorMode: &lt;br&gt;
-
-&lt;code&gt;ErrorMode.TERMINATE&lt;/code&gt; - print to the log file and return to the title level when any script error is hit.
-This is the one you will want to go for if you want to know IMMEDIATELY if something has gone wrong.
-
-&lt;code&gt;ErrorMode.WARN&lt;/code&gt; - print to the log file and continue running the application when a recoverable script error is hit.
-Choose this one if booting to the title level is too much for you.
-
-&lt;code&gt;ErrorMode.SILENT&lt;/code&gt; - do nothing when a recoverable script error is hit.
-Think __very__ carefully before using this setting. These error modes are here to help you to keep your scripts
+<p><code>ErrorMode.SILENT</code> - do nothing when a recoverable script error is hit.
+Think <strong>very</strong> carefully before using this setting. These error modes are here to help you to keep your scripts
 working properly, but if you opt to ignore errors, you won't be alerted if you've misused a function or passed
-an invalid argument.
+an invalid argument.</p>
 
-In all of these modes, an *unrecoverable* error will boot you to the title level. If the title level itself
+<p>In all of these modes, an <em>unrecoverable</em> error will boot you to the title level. If the title level itself
 has an unrecoverable error, the game will close.
-</code></pre>
-
-
           </div>
     <dl class="function">
     <dt>

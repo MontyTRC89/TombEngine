@@ -10,12 +10,13 @@ using namespace TEN::Effects::Hair;
 
 namespace TEN::Scripting
 {
-	/***
-	Global engine settings which don't fall into particular category or can't be assigned to a specific object.
-	Can be accessed using @{Flow.SetSettings} and @{Flow.GetSettings} functions.
-	@tenclass Flow.Settings
-	@pragma nostrip
-	*/
+
+/***
+Global engine settings which don't fall into particular category or can't be assigned to a specific object.
+Can be accessed using @{Flow.SetSettings} and @{Flow.GetSettings} functions.
+@tenclass Flow.Settings
+@pragma nostrip
+*/
 
 	Settings::Settings()
 	{
@@ -60,10 +61,10 @@ namespace TEN::Scripting
 			ScriptReserved_WeaponSettings, &Settings::Weapons);
 	}
 
-	/*** Animations
-	@section Animations
-	These settings determine whether a specific moveset is available in-game.
-	*/
+/*** Animations
+@section Animations
+These settings determine whether a specific moveset is available in-game.
+*/
 
 	void AnimSettings::Register(sol::table& parent)
 	{
@@ -105,10 +106,10 @@ namespace TEN::Scripting
 		"poseTimeout", &AnimSettings::PoseTimeout);
 	}
 
-	/*** Camera
-	@section Camera
-	Parameters to customize camera and everything related to it.
-	*/
+/*** Camera
+@section Camera
+Parameters to customize camera and everything related to it.
+*/
 
 	void CameraSettings::Register(sol::table& parent)
 	{
@@ -129,10 +130,10 @@ namespace TEN::Scripting
 		"objectCollision", &CameraSettings::ObjectCollision);
 	}
 
-	/*** Flare
-	@section Flare
-	These settings change appearance and behaviour of a flare.
-	*/
+/*** Flare
+@section Flare
+These settings change appearance and behaviour of a flare.
+*/
 
 	void FlareSettings::Register(sol::table& parent)
 	{
@@ -177,12 +178,12 @@ namespace TEN::Scripting
 		"flicker", &FlareSettings::Flicker);
 	}
 
-	/*** Hair
-	@section Hair
-	This is a table of Lara's braid object settings.
-	Table consists of three entries, with first one representing classic Lara braid, and 2 and 3 representing left and right young Lara braids respectively.
-	Therefore, if you want to access classic Lara braid settings, use `settings.Hair[1]`, and so on.
-	*/
+/*** Hair
+@section Hair
+This is a table of Lara's braid object settings.
+Table consists of three entries, with first one representing classic Lara braid, and 2 and 3 representing left and right young Lara braids respectively.
+Therefore, if you want to access classic Lara braid settings, use `settings.Hair[1]`, and so on.
+*/
 
 	void HairSettings::Register(sol::table& parent)
 	{
@@ -203,10 +204,10 @@ namespace TEN::Scripting
 		"indices", &HairSettings::Indices);
 	}
 
-	/*** Hud
-	@section Hud
-	These settings determine visibility of particular in-game HUD elements.
-	*/
+/*** Hud
+@section Hud
+These settings determine visibility of particular in-game HUD elements.
+*/
 
 	void HudSettings::Register(sol::table& parent)
 	{
@@ -231,10 +232,10 @@ namespace TEN::Scripting
 		"pickupNotifier", &HudSettings::PickupNotifier);
 	}
 
-	/*** Physics
-	@section Physics
-	Here you will find various settings for game world physics.
-	*/
+/*** Physics
+@section Physics
+Here you will find various settings for game world physics.
+*/
 
 	void PhysicsSettings::Register(sol::table& parent)
 	{
@@ -251,11 +252,11 @@ namespace TEN::Scripting
 		"swimVelocity", &PhysicsSettings::SwimVelocity);
 	}
 
-	/*** Weapons
-	@section Weapons
-	This is a table of weapon settings, with several parameters available for every weapon.
-	Access particular weapon's settings by using @{Flow.WeaponType} as an index for this table, e.g. `settings.Weapons[Flow.WeaponType.PISTOLS]`.
-	*/
+/*** Weapons
+@section Weapons
+This is a table of weapon settings, with several parameters available for every weapon.
+Access particular weapon's settings by using @{Flow.WeaponType} as an index for this table, e.g. `settings.Weapons[Flow.WeaponType.PISTOLS]`.
+*/
 
 	void WeaponSettings::Register(sol::table& parent)
 	{
@@ -320,10 +321,10 @@ namespace TEN::Scripting
 		"colorizeMuzzleFlash", &WeaponSettings::ColorizeMuzzleFlash);
 	}
 
-	/*** System
-	@section System
-	Global system settings that is not directly related to gameplay.
-	*/
+/*** System
+@section System
+Global system settings that is not directly related to gameplay.
+*/
 
 	void SystemSettings::Register(sol::table& parent)
 	{
@@ -331,17 +332,17 @@ namespace TEN::Scripting
 			sol::call_constructor, sol::constructors<SystemSettings()>(),
 			sol::meta_function::new_index, newindex_error_maker(SystemSettings, ScriptReserved_SystemSettings),
 
-		/*** How should the application respond to script errors?
-		@tfield Flow.ErrorMode errorMode error mode to use. */
+/*** How should the application respond to script errors?
+@tfield Flow.ErrorMode errorMode error mode to use. */
 		"errorMode", &SystemSettings::ErrorMode,
 
-	/*** Can the game utilize the fast reload feature? <br>
-	When set to `true`, the game will attempt to perform fast savegame reloading if current level is the same as
-	the level loaded from the savegame. It will not work if the level timestamp or checksum has changed
-	(i.e. level was updated). If set to `false`, this functionality is turned off.
+/*** Can the game utilize the fast reload feature? <br>
+When set to `true`, the game will attempt to perform fast savegame reloading if current level is the same as
+the level loaded from the savegame. It will not work if the level timestamp or checksum has changed
+(i.e. level was updated). If set to `false`, this functionality is turned off.
 
-	@tfield bool fastReload toggle fast reload on or off.
-	*/
+@tfield bool fastReload toggle fast reload on or off.
+*/
 		"fastReload", &SystemSettings::FastReload);
 	}
 }
