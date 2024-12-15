@@ -274,8 +274,8 @@ namespace TEN::Scripting
 
 	void Time::SetFromFormattedString(const std::string& formattedTime)
 	{
-		auto hmsf = ParseFormattedString(formattedTime);
-		SetFromHMSC(hmsf.Hours, hmsf.Minutes, hmsf.Seconds, hmsf.Centiseconds);
+		auto hmsc = ParseFormattedString(formattedTime);
+		SetFromHMSC(hmsc.Hours, hmsc.Minutes, hmsc.Seconds, hmsc.Centiseconds);
 	}
 
 	void Time::SetFromTable(const sol::table& hmsTable)
