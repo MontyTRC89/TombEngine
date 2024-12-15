@@ -312,7 +312,7 @@ void InitializeWeaponInfo(Settings const& settings)
 		int weaponIndex = (int)weaponType.second;
 
 		if (weaponIndex <= 0 || weaponIndex >= (int)LaraWeaponType::NumWeapons)
-			return;
+			continue;
 
 		auto& weapon = Weapons[weaponIndex];
 		auto& setting = settings.Weapons[weaponIndex - 1]; // Lua counts from 1
