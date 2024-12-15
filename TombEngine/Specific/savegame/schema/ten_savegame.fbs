@@ -463,6 +463,10 @@ table boolTable {
 	scalar: bool;
 }
 
+table timeTable {
+	scalar: int32;
+}
+
 table vec2Table {
 	vec: Vector2;
 }
@@ -488,6 +492,7 @@ union VarUnion {
 	tab: ScriptTable,
 	num: doubleTable,
 	boolean: boolTable,
+	time: timeTable,
 	vec2: vec2Table,
 	vec3: vec3Table,
 	rotation: rotationTable,

@@ -1389,6 +1389,16 @@ const std::vector<byte> SaveGame::Build()
 					break;
 				}
 
+			case SavedVarType::Time:
+				{
+					Save::timeTableBuilder dtb{ fbb };
+					dtb.add_scalar(std::get<int>(s));
+					auto doubleOffset = dtb.Finish();
+
+					putDataInVec(Save::VarUnion::time, doubleOffset);
+					break;
+				}
+
 			case SavedVarType::Color:
 				{
 					Save::colorTableBuilder ctb{ fbb };
@@ -1801,6 +1811,15 @@ static void ParseLua(const Save::SaveGame* s, bool hubMode)
 				auto stored = var->u_as_rotation()->vec();
 				SavedVar var;
 				var.emplace<(int)SavedVarType::Rotation>(ToVector3(stored));
+				loadedVars.push_back(var);
+				break;
+			}
+
+			case Save::VarUnion::time:
+			{
+				auto stored = var->u_as_time()->scalar();
+				SavedVar var;
+				var.emplace<(int)SavedVarType::Time>(stored);
 				loadedVars.push_back(var);
 				break;
 			}

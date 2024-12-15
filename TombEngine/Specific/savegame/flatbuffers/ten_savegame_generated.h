@@ -183,6 +183,10 @@ struct boolTable;
 struct boolTableBuilder;
 struct boolTableT;
 
+struct timeTable;
+struct timeTableBuilder;
+struct timeTableT;
+
 struct vec2Table;
 struct vec2TableBuilder;
 struct vec2TableT;
@@ -265,22 +269,24 @@ enum class VarUnion : uint8_t {
   tab = 2,
   num = 3,
   boolean = 4,
-  vec2 = 5,
-  vec3 = 6,
-  rotation = 7,
-  color = 8,
-  funcName = 9,
+  time = 5,
+  vec2 = 6,
+  vec3 = 7,
+  rotation = 8,
+  color = 9,
+  funcName = 10,
   MIN = NONE,
   MAX = funcName
 };
 
-inline const VarUnion (&EnumValuesVarUnion())[10] {
+inline const VarUnion (&EnumValuesVarUnion())[11] {
   static const VarUnion values[] = {
     VarUnion::NONE,
     VarUnion::str,
     VarUnion::tab,
     VarUnion::num,
     VarUnion::boolean,
+    VarUnion::time,
     VarUnion::vec2,
     VarUnion::vec3,
     VarUnion::rotation,
@@ -291,12 +297,13 @@ inline const VarUnion (&EnumValuesVarUnion())[10] {
 }
 
 inline const char * const *EnumNamesVarUnion() {
-  static const char * const names[11] = {
+  static const char * const names[12] = {
     "NONE",
     "str",
     "tab",
     "num",
     "boolean",
+    "time",
     "vec2",
     "vec3",
     "rotation",
@@ -331,6 +338,10 @@ template<> struct VarUnionTraits<TEN::Save::doubleTable> {
 
 template<> struct VarUnionTraits<TEN::Save::boolTable> {
   static const VarUnion enum_value = VarUnion::boolean;
+};
+
+template<> struct VarUnionTraits<TEN::Save::timeTable> {
+  static const VarUnion enum_value = VarUnion::time;
 };
 
 template<> struct VarUnionTraits<TEN::Save::vec2Table> {
@@ -416,6 +427,14 @@ struct VarUnionUnion {
   const TEN::Save::boolTableT *Asboolean() const {
     return type == VarUnion::boolean ?
       reinterpret_cast<const TEN::Save::boolTableT *>(value) : nullptr;
+  }
+  TEN::Save::timeTableT *Astime() {
+    return type == VarUnion::time ?
+      reinterpret_cast<TEN::Save::timeTableT *>(value) : nullptr;
+  }
+  const TEN::Save::timeTableT *Astime() const {
+    return type == VarUnion::time ?
+      reinterpret_cast<const TEN::Save::timeTableT *>(value) : nullptr;
   }
   TEN::Save::vec2TableT *Asvec2() {
     return type == VarUnion::vec2 ?
@@ -6527,6 +6546,64 @@ struct boolTable::Traits {
 
 flatbuffers::Offset<boolTable> CreateboolTable(flatbuffers::FlatBufferBuilder &_fbb, const boolTableT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct timeTableT : public flatbuffers::NativeTable {
+  typedef timeTable TableType;
+  int32_t scalar = 0;
+};
+
+struct timeTable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef timeTableT NativeTableType;
+  typedef timeTableBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_SCALAR = 4
+  };
+  int32_t scalar() const {
+    return GetField<int32_t>(VT_SCALAR, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_SCALAR) &&
+           verifier.EndTable();
+  }
+  timeTableT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(timeTableT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<timeTable> Pack(flatbuffers::FlatBufferBuilder &_fbb, const timeTableT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct timeTableBuilder {
+  typedef timeTable Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_scalar(int32_t scalar) {
+    fbb_.AddElement<int32_t>(timeTable::VT_SCALAR, scalar, 0);
+  }
+  explicit timeTableBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<timeTable> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<timeTable>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<timeTable> CreatetimeTable(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t scalar = 0) {
+  timeTableBuilder builder_(_fbb);
+  builder_.add_scalar(scalar);
+  return builder_.Finish();
+}
+
+struct timeTable::Traits {
+  using type = timeTable;
+  static auto constexpr Create = CreatetimeTable;
+};
+
+flatbuffers::Offset<timeTable> CreatetimeTable(flatbuffers::FlatBufferBuilder &_fbb, const timeTableT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct vec2TableT : public flatbuffers::NativeTable {
   typedef vec2Table TableType;
   std::unique_ptr<TEN::Save::Vector2> vec{};
@@ -6859,6 +6936,9 @@ struct UnionTable FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::boolTable *u_as_boolean() const {
     return u_type() == TEN::Save::VarUnion::boolean ? static_cast<const TEN::Save::boolTable *>(u()) : nullptr;
   }
+  const TEN::Save::timeTable *u_as_time() const {
+    return u_type() == TEN::Save::VarUnion::time ? static_cast<const TEN::Save::timeTable *>(u()) : nullptr;
+  }
   const TEN::Save::vec2Table *u_as_vec2() const {
     return u_type() == TEN::Save::VarUnion::vec2 ? static_cast<const TEN::Save::vec2Table *>(u()) : nullptr;
   }
@@ -6900,6 +6980,10 @@ template<> inline const TEN::Save::doubleTable *UnionTable::u_as<TEN::Save::doub
 
 template<> inline const TEN::Save::boolTable *UnionTable::u_as<TEN::Save::boolTable>() const {
   return u_as_boolean();
+}
+
+template<> inline const TEN::Save::timeTable *UnionTable::u_as<TEN::Save::timeTable>() const {
+  return u_as_time();
 }
 
 template<> inline const TEN::Save::vec2Table *UnionTable::u_as<TEN::Save::vec2Table>() const {
@@ -10156,6 +10240,32 @@ inline flatbuffers::Offset<boolTable> CreateboolTable(flatbuffers::FlatBufferBui
       _scalar);
 }
 
+inline timeTableT *timeTable::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<timeTableT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void timeTable::UnPackTo(timeTableT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = scalar(); _o->scalar = _e; }
+}
+
+inline flatbuffers::Offset<timeTable> timeTable::Pack(flatbuffers::FlatBufferBuilder &_fbb, const timeTableT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreatetimeTable(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<timeTable> CreatetimeTable(flatbuffers::FlatBufferBuilder &_fbb, const timeTableT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const timeTableT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _scalar = _o->scalar;
+  return TEN::Save::CreatetimeTable(
+      _fbb,
+      _scalar);
+}
+
 inline vec2TableT *vec2Table::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<vec2TableT>();
   UnPackTo(_o.get(), _resolver);
@@ -10653,6 +10763,10 @@ inline bool VerifyVarUnion(flatbuffers::Verifier &verifier, const void *obj, Var
       auto ptr = reinterpret_cast<const TEN::Save::boolTable *>(obj);
       return verifier.VerifyTable(ptr);
     }
+    case VarUnion::time: {
+      auto ptr = reinterpret_cast<const TEN::Save::timeTable *>(obj);
+      return verifier.VerifyTable(ptr);
+    }
     case VarUnion::vec2: {
       auto ptr = reinterpret_cast<const TEN::Save::vec2Table *>(obj);
       return verifier.VerifyTable(ptr);
@@ -10707,6 +10821,10 @@ inline void *VarUnionUnion::UnPack(const void *obj, VarUnion type, const flatbuf
       auto ptr = reinterpret_cast<const TEN::Save::boolTable *>(obj);
       return ptr->UnPack(resolver);
     }
+    case VarUnion::time: {
+      auto ptr = reinterpret_cast<const TEN::Save::timeTable *>(obj);
+      return ptr->UnPack(resolver);
+    }
     case VarUnion::vec2: {
       auto ptr = reinterpret_cast<const TEN::Save::vec2Table *>(obj);
       return ptr->UnPack(resolver);
@@ -10749,6 +10867,10 @@ inline flatbuffers::Offset<void> VarUnionUnion::Pack(flatbuffers::FlatBufferBuil
       auto ptr = reinterpret_cast<const TEN::Save::boolTableT *>(value);
       return CreateboolTable(_fbb, ptr, _rehasher).Union();
     }
+    case VarUnion::time: {
+      auto ptr = reinterpret_cast<const TEN::Save::timeTableT *>(value);
+      return CreatetimeTable(_fbb, ptr, _rehasher).Union();
+    }
     case VarUnion::vec2: {
       auto ptr = reinterpret_cast<const TEN::Save::vec2TableT *>(value);
       return Createvec2Table(_fbb, ptr, _rehasher).Union();
@@ -10789,6 +10911,10 @@ inline VarUnionUnion::VarUnionUnion(const VarUnionUnion &u) : type(u.type), valu
     }
     case VarUnion::boolean: {
       value = new TEN::Save::boolTableT(*reinterpret_cast<TEN::Save::boolTableT *>(u.value));
+      break;
+    }
+    case VarUnion::time: {
+      value = new TEN::Save::timeTableT(*reinterpret_cast<TEN::Save::timeTableT *>(u.value));
       break;
     }
     case VarUnion::vec2: {
@@ -10835,6 +10961,11 @@ inline void VarUnionUnion::Reset() {
     }
     case VarUnion::boolean: {
       auto ptr = reinterpret_cast<TEN::Save::boolTableT *>(value);
+      delete ptr;
+      break;
+    }
+    case VarUnion::time: {
+      auto ptr = reinterpret_cast<TEN::Save::timeTableT *>(value);
       delete ptr;
       break;
     }

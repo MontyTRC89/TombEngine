@@ -12,6 +12,7 @@
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 #include "Scripting/Internal/TEN/Types/Color/Color.h"
 #include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Types/Time/Time.h"
 #include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 
@@ -147,6 +148,7 @@ void SetVariable(sol::table tab, sol::object key, sol::object value)
 		if (value.is<Vec2>() ||
 			value.is<Vec3>() ||
 			value.is<Rotation>() ||
+			value.is<Time>() ||
 			value.is<ScriptColor>())
 		{
 			PutVar(tab, key, value);
@@ -539,6 +541,11 @@ void LogicHandler::SetVariables(const std::vector<SavedVar>& vars, bool onlyLeve
 					auto vec3 = Rotation(std::get<int(SavedVarType::Rotation)>(vars[second]));
 					solTables[i][vars[first]] = vec3;
 				}
+				else if (vars[second].index() == int(SavedVarType::Time))
+				{
+					auto time = Time(std::get<int(SavedVarType::Time)>(vars[second]));
+					solTables[i][vars[first]] = time;
+				}
 				else if (vars[second].index() == int(SavedVarType::Color))
 				{
 					auto color = D3DCOLOR(std::get<int(SavedVarType::Color)>(vars[second]));
@@ -762,6 +769,10 @@ void LogicHandler::GetVariables(std::vector<SavedVar>& vars)
 					else if (second.is<Rotation>())
 					{
 						putInVars(Handle<SavedVarType::Rotation, Vector3>(second.as<Rotation>(), varsMap, numVars, vars));
+					}
+					else if (second.is<Time>())
+					{
+						putInVars(Handle<SavedVarType::Time, int>(second.as<Time>(), varsMap, numVars, vars));
 					}
 					else if (second.is<ScriptColor>())
 					{
