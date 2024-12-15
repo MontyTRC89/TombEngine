@@ -57,20 +57,20 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added Effects.GetWind() function to get current wind speed vector.
 * Added Moveable:GetCollidable() and Moveable:SetCollidable() functions.
 * Added Rotation:Direction() method to get directional vector.
-* Added support for transparency value in DisplayString class.
-* Added extra argument for SetAmbientTrack() function to specify if new ambient track should play from the beginning.
-* Allow to use TR4-like load cameras by playing fixed camera from OnEnd() event and removing loadScreenFile field from level's gameflow entry.
+* Added support for transparency value in Strings.DisplayString class.
+* Added extra argument for Sound.SetAmbientTrack() function to specify if new ambient track should play from the beginning.
 * Added CameraType.FLYBY and CameraType.OPTICS enum entries and return it by View.GetCameraType(), when flyby camera or binoculars/lasersight is active.
+* Allow to use TR4-like load cameras by playing fixed camera from OnEnd() event and removing loadScreenFile field from level's gameflow entry.
 * Renamed Flow.WeaponType enumeration to Objects.WeaponType, and removed similar Objects.LaraWeaponType enumeration for consistency.
 * Renamed Objects.PlayerAmmoType to Objects.AmmoType for consistency.
-* Fixed DisplayString class not supporting some Unicode characters and empty lines in multiline strings.
-* Fixed DisplayString not being deallocated after showing.
+* Fixed Strings.DisplayString class not supporting some Unicode characters and empty lines in multiline strings.
+* Fixed Strings.DisplayString not being deallocated after showing.
 * Fixed GameVars not transferring between levels in hub mode.
 * Fixed incorrect behaviour of Moveable:GetJointRotation() function.
 * Fixed incorrect behaviour of Logic.EnableEvent() and Logic.DisableEvent() functions.
 * Fixed Util.HasLineOfSight() not taking static meshes into consideration.
 * Fixed collision callbacks not properly clearing after leveljump.
-* Fixed SetIntroImagePath() not using the correct path
+* Fixed Flow.SetIntroImagePath() not using the correct path
 
 ## [Version 1.5](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.2) - 2024-11-03
 
