@@ -54,7 +54,7 @@ namespace TEN::Scripting
 
 	/// Create a Time object from a total game frame count (1 second = 30 frames).
 	// @function Time
-	// @tparam int gaemFrames Total game frame count.
+	// @tparam int gameFrames Total game frame count.
 	// @treturn Time A new Time object initialized with the given frame count.
 	Time::Time(int gameFrames)
 	{
