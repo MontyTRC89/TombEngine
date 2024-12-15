@@ -51,8 +51,8 @@ void SoundSource::Register(sol::table& parent)
 		// @treturn int the ID of the sound
 		ScriptReserved_GetSoundID, &SoundSource::GetSoundID,
 
+		// TODO this and getSoundID should use enums
 		/// Set the sound source's ID 
-		// __TODO__ this and getSoundID should use enums
 		// @function SoundSource:SetSoundID
 		// @tparam int name The sound source's new name
 		ScriptReserved_SetSoundID, &SoundSource::SetSoundID
