@@ -90,10 +90,10 @@ namespace TEN::Scripting
 	/// Get the time in hours, minutes, seconds, and centiseconds as a table.
 	// @function Time:GetTimeUnits
 	// @treturn table A table in the format {HH, MM, SS, CC}.
-	sol::table Time::GetTimeUnits(sol::state_view lua) const
+	sol::table Time::GetTimeUnits(sol::this_state state) const
 	{
 		auto hmsc = GetHmsc();
-		auto table = lua.create_table();
+		auto table = sol::state_view(state).create_table();
 
 		table.add(hmsc.Hours);
 		table.add(hmsc.Minutes);

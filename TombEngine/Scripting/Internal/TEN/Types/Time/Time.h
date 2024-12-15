@@ -22,7 +22,7 @@ namespace TEN::Scripting
 		// Getters
 
 		int		   GetFrameCount() const;
-		sol::table GetTimeUnits(sol::state_view lua) const;
+		sol::table GetTimeUnits(sol::this_state state) const;
 
 		int GetHours() const;
 		int GetMinutes() const;
