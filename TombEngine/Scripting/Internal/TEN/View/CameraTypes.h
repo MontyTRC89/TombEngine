@@ -22,7 +22,7 @@ The following constants are inside CameraType.
 */
 
 /*** Table of camera type constants (for use with GetCameraType() function).
-@table CONSTANT_STRING_HERE
+@table CameraType
 */
 
 static const std::unordered_map<std::string, CameraType> CAMERA_TYPE

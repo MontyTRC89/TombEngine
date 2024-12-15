@@ -26,7 +26,7 @@ The following constants are inside RoomFlagID.
 */
 
 /*** Table of room flag ID constants (for use with Room:SetFlag / Room:GetFlag command).
-@table CONSTANT_STRING_HERE
+@table RoomFlagID
 */
 
 static const std::unordered_map<std::string, RoomEnvFlags> ROOM_FLAG_IDS

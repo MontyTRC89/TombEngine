@@ -65,7 +65,7 @@ The following constants are inside ActionID.
 */
 
 /*** Table of action ID constants (for use with KeyIsHeld / KeyIsHit / etc commands).
-@table CONSTANT_STRING_HERE
+@table ActionID
 */
 
 static const std::unordered_map<std::string, ActionID> ACTION_IDS

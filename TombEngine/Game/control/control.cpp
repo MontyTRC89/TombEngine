@@ -93,7 +93,6 @@ using namespace TEN::Entities::Effects;
 constexpr auto DEATH_NO_INPUT_TIMEOUT = 10 * FPS;
 constexpr auto DEATH_INPUT_TIMEOUT	  = 3 * FPS;
 
-int GameTimer	  = 0;
 int GlobalCounter = 0;
 
 bool InitializeGame	= false;
@@ -258,7 +257,8 @@ GameStatus GamePhase(bool insideMenu)
 	JustLoaded = false;
 
 	// Update timers.
-	GameTimer++;
+	SaveGame::Statistics.Game.TimeTaken++;
+	SaveGame::Statistics.Level.TimeTaken++;
 	GlobalCounter++;
 
 	auto time2 = std::chrono::high_resolution_clock::now();
@@ -616,7 +616,6 @@ void InitializeOrLoadGame(bool loadGame)
 		{
 			// Clear all game info as well.
 			SaveGame::Statistics.Game = {};
-			GameTimer = 0;
 			InitializeGame = false;
 
 			SaveGame::ResetHub();

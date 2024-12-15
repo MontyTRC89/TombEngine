@@ -21,7 +21,7 @@ The following constants are inside PostProcessMode.
 */
 
 /*** Table of post-process effect constants (for use with SetPostProcessMode() function).
-@table CONSTANT_STRING_HERE
+@table PostProcessMode
 */
 
 static const std::unordered_map<std::string, PostProcessMode> POSTPROCESS_MODES

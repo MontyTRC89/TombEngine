@@ -36,15 +36,6 @@ public:
 	virtual bool IsLaraInTitleEnabled() const = 0;
 	virtual bool IsHomeLevelEnabled() const = 0;
 	virtual bool IsLoadSaveEnabled() const = 0;
-	virtual bool HasCrawlExtended() const = 0;
-	virtual bool HasCrouchRoll() const = 0;
-	virtual bool HasCrawlspaceDive() const = 0;
-	virtual bool HasAutoMonkeySwingJump() const = 0;
-	virtual bool HasSprintJump() const = 0;
-	virtual bool HasAFKPose() const = 0;
-	virtual bool HasOverhangClimb() const = 0;
-	virtual bool HasSlideExtended() const = 0;
-	virtual bool HasLedgeJumps() const = 0;
 
 	virtual ScriptInterfaceLevel * GetLevel(int level) = 0;
 	virtual int	GetLevelNumber(std::string const& fileName) = 0;
