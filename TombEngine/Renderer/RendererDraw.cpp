@@ -475,9 +475,10 @@ namespace TEN::Renderer
 	void Renderer::DrawRats(RenderView& view, RendererPass rendererPass)
 	{
 		if (!Objects[ID_RATS_EMITTER].loaded)
-		{
 			return;
-		}
+
+		if (_currentMirror != nullptr && !_currentMirror->ReflectMoveables)
+			return;
 
 		if (rendererPass == RendererPass::CollectTransparentFaces)
 		{
@@ -734,6 +735,9 @@ namespace TEN::Renderer
 		if (!Objects[ID_BATS_EMITTER].loaded)
 			return;
 
+		if (_currentMirror != nullptr && !_currentMirror->ReflectMoveables)
+			return;
+
 		auto& mesh = *GetMesh(Objects[ID_BATS_EMITTER].meshIndex + (GlobalCounter & 3));
 
 		if (rendererPass == RendererPass::CollectTransparentFaces)
@@ -856,6 +860,9 @@ namespace TEN::Renderer
 	void Renderer::DrawScarabs(RenderView& view, RendererPass rendererPass)
 	{
 		if (!Objects[ID_LITTLE_BEETLE].loaded)
+			return;
+
+		if (_currentMirror != nullptr && !_currentMirror->ReflectMoveables)
 			return;
 
 		auto& mesh = *GetMesh(Objects[ID_LITTLE_BEETLE].meshIndex + ((Wibble >> 2) % 2));
@@ -984,6 +991,9 @@ namespace TEN::Renderer
 	void Renderer::DrawLocusts(RenderView& view, RendererPass rendererPass)
 	{
 		if (!Objects[ID_LOCUSTS].loaded)
+			return;
+
+		if (_currentMirror != nullptr && !_currentMirror->ReflectMoveables)
 			return;
 
 		if (rendererPass == RendererPass::CollectTransparentFaces)
@@ -2423,8 +2433,15 @@ namespace TEN::Renderer
 
 		for (auto room : view.RoomsToDraw)
 		{
+			if (_currentMirror != nullptr && _currentMirror->RealRoom != room->RoomNumber)
+				continue;
+
 			for (auto itemToDraw : room->ItemsToDraw)
 			{
+				if (_currentMirror != nullptr &&
+					(g_Level.Items[itemToDraw->ItemNumber].Flags & IFLAG_CLEAR_BODY))
+					continue;
+
 				switch (itemToDraw->ObjectID)
 				{ 
 				case ID_LARA:
@@ -2439,10 +2456,14 @@ namespace TEN::Renderer
 				case ID_WATERFALL6:
 				case ID_WATERFALLSS1:
 				case ID_WATERFALLSS2:
+					if (_currentMirror != nullptr && !_currentMirror->ReflectMoveables)
+						continue;
 					DrawWaterfalls(itemToDraw, view, 10, rendererPass);
 					continue;
 
 				default:
+					if (_currentMirror != nullptr && !_currentMirror->ReflectMoveables)
+						continue;
 					DrawAnimatingItem(itemToDraw, view, rendererPass);
 					break;
 				}
@@ -2545,9 +2566,10 @@ namespace TEN::Renderer
 	void Renderer::DrawStatics(RenderView& view, RendererPass rendererPass)
 	{
 		if (_staticTextures.size() == 0 || view.SortedStaticsToDraw.size() == 0)
-		{
 			return;
-		}
+
+		if (_currentMirror != nullptr && !_currentMirror->ReflectStatics)
+			return;
 		 
 		if (rendererPass != RendererPass::CollectTransparentFaces)
 		{
@@ -2676,9 +2698,7 @@ namespace TEN::Renderer
 						RendererRoom* room = &_rooms[current->RoomNumber];
 
 						if (_currentMirror != nullptr && current->RoomNumber != _currentMirror->RealRoom)
-						{
 							continue;
-						}
 
 						Matrix world = current->World;
 						if (_currentMirror != nullptr)

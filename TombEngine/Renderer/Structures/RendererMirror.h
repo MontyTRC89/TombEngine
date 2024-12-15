@@ -12,5 +12,9 @@ namespace TEN::Renderer::Structures
 		short VirtualRoom;
 		Plane Plane;
 		Matrix ReflectionMatrix;
+		bool ReflectLara;
+		bool ReflectMoveables;
+		bool ReflectStatics;
+		bool ReflectLights;
 	};
 }

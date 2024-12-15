@@ -91,6 +91,11 @@ struct MirrorInfo
 	short VirtualRoom;
 	Vector4 MirrorPlane;
 	Matrix ReflectionMatrix;
+	bool ReflectLara;
+	bool ReflectMoveables;
+	bool ReflectStatics;
+	bool ReflectLights;
+	bool Enabled;
 };
 
 // LevelData

@@ -1536,6 +1536,13 @@ void LoadMirrors()
 		mirror.MirrorPlane.z = ReadFloat();
 		mirror.MirrorPlane.w = ReadFloat();
 
+		mirror.ReflectLara = ReadBool();
+		mirror.ReflectMoveables = ReadBool();
+		mirror.ReflectStatics = ReadBool();
+		mirror.ReflectLights = ReadBool();
+
+		mirror.Enabled = true;
+
 		Plane plane = Plane(
 			Vector3(mirror.MirrorPlane.x,
 					mirror.MirrorPlane.y,

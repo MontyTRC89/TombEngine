@@ -27,9 +27,13 @@ namespace TEN::Renderer
 
 	void Renderer::CollectRooms(RenderView& renderView, bool onlyRooms)
 	{
+		// Collect mirrors first, because they are needed while collecting items
 		for (auto& mirror : g_Level.Mirrors)
 		{
 			if (mirror.RealRoom != Camera.pos.RoomNumber)
+				continue;
+
+			if (!mirror.Enabled)
 				continue;
 
 			auto& rendererMirror = renderView.Mirrors.emplace_back();
@@ -37,6 +41,10 @@ namespace TEN::Renderer
 			rendererMirror.RealRoom = mirror.RealRoom;
 			rendererMirror.VirtualRoom = mirror.VirtualRoom;
 			rendererMirror.ReflectionMatrix = mirror.ReflectionMatrix;
+			rendererMirror.ReflectLara = mirror.ReflectLara;
+			rendererMirror.ReflectMoveables = mirror.ReflectMoveables;
+			rendererMirror.ReflectStatics = mirror.ReflectStatics;
+			rendererMirror.ReflectLights = mirror.ReflectLights;
 		}
 
 		constexpr auto VIEW_PORT = Vector4(-1.0f, -1.0f, 1.0f, 1.0f);
