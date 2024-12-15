@@ -270,12 +270,12 @@ These functions are called in settings.lua, a file which holds global settings, 
 */
 /*** Set provided settings table to an engine.
 @function SetSettings
-@tparam Flow.Settings settings a settings object 
+@tparam Flow.Settings settings a settings table 
 */
 	tableFlow.set_function(ScriptReserved_SetSettings, &FlowHandler::SetSettings, this);
 /*** Get settings table from an engine.
 @function GetSettings
-@treturn Flow.Settings settings a settings object 
+@treturn Flow.Settings current settings table 
 */
 	tableFlow.set_function(ScriptReserved_GetSettings, &FlowHandler::GetSettings, this);
 
