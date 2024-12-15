@@ -33,8 +33,10 @@ local settings = Flow.Settings.new()
 	settings.Physics.gravity = 6
 	settings.Physics.swimVelocity = 50
 	
-	-- Example hair setting entry. You can use types [2] and [3] as well for young Lara hair.
-	-- To know default parameters, you can fetch settings using Flow.GetSettings() method.
+	settings.System.errorMode = Flow.ErrorMode.WARN
+	settings.System.fastReload = true
+	
+	-- Hair[1] is normal Lara hair. Types [2] and [3] are for left and right young Lara hair.
 	
 	settings.Hair[1].rootMesh = 14
 	settings.Hair[1].offset = Vec3(-4, -4, -48)
@@ -47,6 +49,9 @@ local settings = Flow.Settings.new()
 	settings.Hair[3].rootMesh = 14
 	settings.Hair[3].offset = Vec3(48, -48, -50)
 	settings.Hair[3].indices = { 68, 69, 70, 71 }
+	
+	-- Not all weapon settings are applicable to every weapon. Those which are not applicable
+	-- for particular weapon type, are omitted. See documentation for more details.
 	
 	settings.Weapons[WeaponType.PISTOLS].accuracy = 8
 	settings.Weapons[WeaponType.PISTOLS].targetingDistance = 8192
@@ -139,8 +144,5 @@ local settings = Flow.Settings.new()
 	settings.Weapons[WeaponType.HARPOON_GUN].targetingDistance = 8192
 	settings.Weapons[WeaponType.HARPOON_GUN].damage = 6
 	settings.Weapons[WeaponType.HARPOON_GUN].pickupCount = 10
-	
-	settings.System.errorMode = Flow.ErrorMode.WARN
-	settings.System.fastReload = true
 	
 Flow.SetSettings(settings)
