@@ -273,7 +273,7 @@ These functions are called in settings.lua, a file which holds global settings, 
 	tableFlow.set_function(ScriptReserved_SetSettings, &FlowHandler::SetSettings, this);
 /*** Get settings table from an engine.
 @function GetSettings
-@tparam Flow.Settings settings a settings object 
+@treturn Flow.Settings settings a settings object 
 */
 	tableFlow.set_function(ScriptReserved_GetSettings, &FlowHandler::GetSettings, this);
 
@@ -384,11 +384,8 @@ void FlowHandler::SetSettings(Settings const& src)
 {
 	_settings = src;
 
-	// Copy weapon settings to native table. Subtract 1 because weapon enum starts from 1.
-	for (auto weapon : WEAPON_TYPES)
-		InitializeWeaponInfo(weapon.second, _settings);
-
-	// Also copy pickup counts.
+	// Copy weapon, ammo and consumable settings to in-game structs.
+	InitializeWeaponInfo(_settings);
 	InitializeAmmo(_settings);
 	InitializeConsumables(_settings);
 }

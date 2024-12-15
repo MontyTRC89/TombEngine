@@ -25,6 +25,7 @@
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
+#include "Scripting/Internal/TEN/Flow/Enums/WeaponTypes.h"
 #include "Sound/sound.h"
 #include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
@@ -304,21 +305,26 @@ const WeaponInfo& GetWeaponInfo(LaraWeaponType weaponType)
 	return (Weapons[(int)weaponType]);
 }
 
-void InitializeWeaponInfo(LaraWeaponType weaponType, Settings const& settings)
+void InitializeWeaponInfo(Settings const& settings)
 {
-	if ((int)weaponType <= 0 || (int)weaponType >= (int)LaraWeaponType::NumWeapons)
-		return;
+	for (auto weaponType : WEAPON_TYPES)
+	{
+		int weaponIndex = (int)weaponType.second;
 
-	auto& weapon = Weapons[(int)weaponType];
-	auto& setting = settings.Weapons[(int)weaponType - 1]; // Lua counts from 1
+		if (weaponIndex <= 0 || weaponIndex >= (int)LaraWeaponType::NumWeapons)
+			return;
 
-	weapon.Damage = setting.Damage;
-	weapon.AlternateDamage = setting.AlternateDamage;
-	weapon.FlashTime = setting.FlashDuration;
-	weapon.GunHeight = setting.WaterLevel;
-	weapon.ShotAccuracy = ANGLE(setting.Accuracy);
-	weapon.TargetDist = setting.Distance;
-	weapon.RecoilFrame = setting.Interval;
+		auto& weapon = Weapons[weaponIndex];
+		auto& setting = settings.Weapons[weaponIndex - 1]; // Lua counts from 1
+
+		weapon.Damage = setting.Damage;
+		weapon.AlternateDamage = setting.AlternateDamage;
+		weapon.FlashTime = setting.FlashDuration;
+		weapon.GunHeight = setting.WaterLevel;
+		weapon.ShotAccuracy = ANGLE(setting.Accuracy);
+		weapon.TargetDist = setting.Distance;
+		weapon.RecoilFrame = setting.Interval;
+	}
 }
 
 void InitializeNewWeapon(ItemInfo& laraItem)

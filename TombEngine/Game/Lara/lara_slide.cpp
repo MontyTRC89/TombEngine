@@ -12,6 +12,7 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Input;
 using namespace TEN::Entities::Player;
@@ -40,7 +41,7 @@ void lara_as_slide_forward(ItemInfo* item, CollisionInfo* coll)
 	{
 		/*short direction = GetPlayerSlideHeadingAngle(item, coll);
 
-		if (g_GameFlow->Animations.SlideExtended)
+		if (g_GameFlow->GetSettings()->Animations.SlideExtended)
 		{
 			ApproachLaraTargetOrientation(item, direction, 12);
 			ModulateLaraSlideVelocity(item, coll);
@@ -147,7 +148,7 @@ void lara_as_slide_back(ItemInfo* item, CollisionInfo* coll)
 	{
 		/*short direction = GetPlayerSlideHeadingAngle(item, coll) + ANGLE(180.0f);
 
-		if (g_GameFlow->Animations.SlideExtended)
+		if (g_GameFlow->GetSettings()->Animations.SlideExtended)
 		{
 			ApproachLaraTargetOrientation(item, direction, 12);
 			ModulateLaraSlideVelocity(item, coll);

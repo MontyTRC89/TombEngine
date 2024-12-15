@@ -1297,20 +1297,20 @@ void RifleHandler(ItemInfo& laraItem, LaraWeaponType weaponType)
 
 	if (player.RightArm.GunFlash)
 	{
-		auto& weaponSetting = g_GameFlow->GetSettings()->Weapons[(int)weaponType - 1];
+		auto& settings = g_GameFlow->GetSettings()->Weapons[(int)weaponType - 1];
 		
-		Vector4 color = weaponSetting.FlashColor;
+		Vector4 color = settings.FlashColor;
 		color += Vector4(Random::GenerateFloat(-0.2f, 0.2f));
 
 		if (weaponType == LaraWeaponType::Shotgun || weaponType == LaraWeaponType::HK)
 		{
 			auto pos = GetJointPosition(&laraItem, LM_RHAND, Vector3i(0, -64, 0));
-			TriggerDynamicPointLight(pos.ToVector3(), color, weaponSetting.FlashRange * CLICK(1));
+			TriggerDynamicPointLight(pos.ToVector3(), color, settings.FlashRange * CLICK(1));
 		}
 		else if (weaponType == LaraWeaponType::Revolver)
 		{
 			auto pos = GetJointPosition(&laraItem, LM_RHAND, Vector3i(0, -32, 0));
-			TriggerDynamicPointLight(pos.ToVector3(), color, weaponSetting.FlashRange * CLICK(1));
+			TriggerDynamicPointLight(pos.ToVector3(), color, settings.FlashRange * CLICK(1));
 		}
 	}
 }

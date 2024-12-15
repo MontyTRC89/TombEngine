@@ -1019,9 +1019,9 @@ namespace TEN::Renderer
 		if (Lara.Control.Look.OpticRange > 0)
 			return false;
 
-		auto& weaponSetting = g_GameFlow->GetSettings()->Weapons[(int)Lara.Control.Weapon.GunType - 1];
+		auto& settings = g_GameFlow->GetSettings()->Weapons[(int)Lara.Control.Weapon.GunType - 1];
 
-		if (!weaponSetting.Muzzle)
+		if (!settings.Muzzle)
 			return false;
 
 		_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
@@ -1039,7 +1039,7 @@ namespace TEN::Renderer
 
 		// Divide gunflash tint by 2, because tinting uses multiplication and additive color,
 		// which doesn't look good with overbright color values.
-		_stStatic.Color = weaponSetting.ColorizeMuzzle ? (Vector4)weaponSetting.FlashColor / 2.0f : Vector4::One;
+		_stStatic.Color = settings.ColorizeMuzzle ? (Vector4)settings.FlashColor / 2.0f : Vector4::One;
 		_stStatic.AmbientLight = room.AmbientLight;
 		_stStatic.LightMode = (int)LightMode::Static;
 		BindStaticLights(itemPtr->LightsToDraw);

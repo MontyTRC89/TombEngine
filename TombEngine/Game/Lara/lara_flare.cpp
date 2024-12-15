@@ -496,17 +496,16 @@ bool DoFlareLight(const Vector3i& pos, ItemInfo& item, int flareLife)
 	TriggerDynamicPointLight(lightPos, Color(color), falloff, false);
 
 	// Spawn lensflare, if brightness is not zero.
-	float lensflareBrightness = settings.LensflareBrightness;
-	if (lensflareBrightness > EPSILON)
+	if (settings.LensflareBrightness > EPSILON)
 	{
 		if (item.ObjectNumber == GAME_OBJECT_ID::ID_FLARE_ITEM)
 		{
 			float currentIntensity = (float)item.ItemFlags[0] / LENSFLARE_ITEMFLAG_BRIGHTNESS_SCALE;
-			SetupLensFlare(pos.ToVector3(), item.RoomNumber, Color(color) * lensflareBrightness, &currentIntensity, 0);
+			SetupLensFlare(pos.ToVector3(), item.RoomNumber, Color(color) * settings.LensflareBrightness, &currentIntensity, 0);
 			item.ItemFlags[0] = (short)(currentIntensity * LENSFLARE_ITEMFLAG_BRIGHTNESS_SCALE);
 		}
 		else
-			SetupLensFlare(pos.ToVector3(), item.RoomNumber, Color(color) * lensflareBrightness, nullptr, 0);
+			SetupLensFlare(pos.ToVector3(), item.RoomNumber, Color(color) * settings.LensflareBrightness, nullptr, 0);
 	}
 
 	// Return chaff spawn status.
