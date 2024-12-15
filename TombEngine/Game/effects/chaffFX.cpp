@@ -73,10 +73,12 @@ void TriggerChaffEffects(ItemInfo& item, const Vector3i& pos, const Vector3i& ve
 		if (dx < -MAX_TRIGGER_RANGE || dx > MAX_TRIGGER_RANGE || dz < -MAX_TRIGGER_RANGE || dz > MAX_TRIGGER_RANGE)
 			return;
 
-		if (g_GameFlow->GetSettings()->Flare.Sparks)
-			TriggerChaffSparkles(pos, vel, g_GameFlow->GetSettings()->Flare.Color, age, item);
+		auto& settings = g_GameFlow->GetSettings()->Flare;
 
-		if (!g_GameFlow->GetSettings()->Flare.Smoke)
+		if (settings.Sparks)
+			TriggerChaffSparkles(pos, vel, settings.Color, age, item);
+
+		if (!settings.Smoke)
 			continue;
 
 		if (isUnderwater)

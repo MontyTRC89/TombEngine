@@ -53,6 +53,7 @@ namespace TEN::Effects::Hair
 	private:
 		// Helpers
 
+		static int					GetHairTypeIndex(int hairUnitID, bool isYoung);
 		Vector3						GetRelBaseOffset(int hairUnitID, bool isYoung);
 		Vector3						GetWaterProbeOffset(const ItemInfo& item);
 		Quaternion					GetSegmentOrientation(const Vector3& origin, const Vector3& target, const Quaternion& baseOrient);

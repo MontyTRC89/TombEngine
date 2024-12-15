@@ -701,6 +701,7 @@ namespace TEN::Renderer
 						bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
 						bool isSecond = isYoung && MoveablesIds[i] == ID_HAIR_SECONDARY;
 						auto& skinObj = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
+						auto& settings = g_GameFlow->GetSettings()->Hair;
 
 						for (int j = 0; j < obj->nmeshes; j++)
 						{
@@ -717,12 +718,11 @@ namespace TEN::Renderer
 									// Link mesh 0 to root mesh.
 									if (j == 0)
 									{
+										auto& vertices0 = isYoung ? settings[(int)LaraHairType::YoungLeft].Indices :
+																	settings[(int)LaraHairType::Normal].Indices;
 
-										auto& vertices0 = isYoung ? g_GameFlow->GetSettings()->Hair[(int)LaraHairType::YoungLeft].Indices :
-																	g_GameFlow->GetSettings()->Hair[(int)LaraHairType::Normal].Indices;
-
-										auto& vertices1 = isYoung ? g_GameFlow->GetSettings()->Hair[(int)LaraHairType::YoungRight].Indices :
-																	g_GameFlow->GetSettings()->Hair[(int)LaraHairType::Normal].Indices;
+										auto& vertices1 = isYoung ? settings[(int)LaraHairType::YoungRight].Indices :
+																	settings[(int)LaraHairType::Normal].Indices;
 
 										int rootMesh = HairUnit::GetRootMesh(isSecond ? 1 : 0);
 
@@ -766,7 +766,7 @@ namespace TEN::Renderer
 												auto vertex1 = _moveablesVertices[currentBucket.StartVertex + v1].Position + currentBone->GlobalTranslation;
 												auto vertex2 = _moveablesVertices[parentBucket->StartVertex + v2].Position + parentBone->GlobalTranslation;
 
-												// If we introduce tolerance, a strange bug will occur where certain vertices will disconnect.
+												// FIXME: If we introduce tolerance, a strange bug will occur where certain vertices will disconnect. -- Lwmte, 14.12.2024
 												if (vertex1 != vertex2)
 													continue;
 

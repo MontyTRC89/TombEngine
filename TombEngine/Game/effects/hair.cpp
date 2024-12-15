@@ -108,59 +108,43 @@ namespace TEN::Effects::Hair
 		}
 	}
 
-	Vector3 HairUnit::GetRelBaseOffset(int hairUnitID, bool isYoung)
+	int HairUnit::GetHairTypeIndex(int hairUnitID, bool isYoung)
 	{
-		auto relOffset = Vector3::Zero;
+		int hairType = (int)LaraHairType::Normal;
+
 		if (isYoung)
 		{
 			switch (hairUnitID)
 			{
-			// Left pigtail offset.
+				// Left pigtail offset.
 			case 0:
-				relOffset = g_GameFlow->GetSettings()->Hair[(int)LaraHairType::YoungLeft].Offset;
+				hairType = (int)LaraHairType::YoungLeft;
 				break;
 
-			// Right pigtail offset.
+				// Right pigtail offset.
 			case 1:
-				relOffset = g_GameFlow->GetSettings()->Hair[(int)LaraHairType::YoungRight].Offset;
+				hairType = (int)LaraHairType::YoungRight;
 				break;
 			}
 		}
 		else
 		{
 			// Center braid offset.
-			relOffset = g_GameFlow->GetSettings()->Hair[(int)LaraHairType::Normal].Offset;
+			hairType = (int)LaraHairType::Normal;
 		}
 
-		return relOffset;
+		return hairType;
+	}
+
+	Vector3 HairUnit::GetRelBaseOffset(int hairUnitID, bool isYoung)
+	{
+		return g_GameFlow->GetSettings()->Hair[GetHairTypeIndex(hairUnitID, isYoung)].Offset;
 	}
 
 	int HairUnit::GetRootMesh(int hairUnitID)
 	{
-		int result = LARA_MESHES::LM_HEAD;
 		bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
-
-		if (isYoung)
-		{
-			switch (hairUnitID)
-			{
-			// Left pigtail.
-			default:
-			case 0:
-				result = g_GameFlow->GetSettings()->Hair[(int)LaraHairType::YoungLeft].RootMesh;
-				break;
-
-			// Right pigtail.
-			case 1:
-				result = g_GameFlow->GetSettings()->Hair[(int)LaraHairType::YoungRight].RootMesh;
-				break;
-			}
-		}
-		else
-		{
-			// Center braid.
-			result = g_GameFlow->GetSettings()->Hair[(int)LaraHairType::YoungRight].RootMesh;
-		}
+		int result = g_GameFlow->GetSettings()->Hair[GetHairTypeIndex(hairUnitID, isYoung)].RootMesh;
 
 		if (result >= LARA_MESHES::NUM_LARA_MESHES)
 		{

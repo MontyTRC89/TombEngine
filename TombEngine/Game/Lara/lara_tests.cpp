@@ -914,6 +914,7 @@ bool TestPlayerWaterStepOut(ItemInfo* item, CollisionInfo* coll)
 bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+	auto& settings = g_GameFlow->GetSettings()->Animations;
 
 	if (coll->CollisionType != CollisionType::Front || !IsHeld(In::Action))
 		return false;
@@ -964,7 +965,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (g_GameFlow->GetSettings()->Animations.CrawlExtended)
+			if (settings.CrawlExtended)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_1_STEP);
 			else
 				return false;
@@ -976,7 +977,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (g_GameFlow->GetSettings()->Animations.CrawlExtended)
+			if (settings.CrawlExtended)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_M1_STEP);
 			else
 				return false;
@@ -989,7 +990,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (g_GameFlow->GetSettings()->Animations.CrawlExtended)
+			if (settings.CrawlExtended)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_0_STEP);
 			else
 				return false;
@@ -1449,6 +1450,7 @@ std::optional<VaultTestResult> TestLaraAutoMonkeySwingJump(ItemInfo* item, Colli
 std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+	auto& settings = g_GameFlow->GetSettings()->Animations;
 
 	if (lara->Control.HandStatus != HandStatus::Free)
 		return std::nullopt;
@@ -1485,7 +1487,7 @@ std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll
 
 		// Vault to crouch up two steps.
 		vaultResult = TestLaraVault2StepsToCrouch(item, coll);
-		if (vaultResult.has_value() && g_GameFlow->GetSettings()->Animations.CrawlExtended)
+		if (vaultResult.has_value() && settings.CrawlExtended)
 		{
 			vaultResult->TargetState = LS_VAULT_2_STEPS_CROUCH;
 			if (!HasStateDispatch(item, vaultResult->TargetState))
@@ -1507,7 +1509,7 @@ std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll
 
 		// Vault to crouch up three steps.
 		vaultResult = TestLaraVault3StepsToCrouch(item, coll);
-		if (vaultResult.has_value() && g_GameFlow->GetSettings()->Animations.CrawlExtended)
+		if (vaultResult.has_value() && settings.CrawlExtended)
 		{
 			vaultResult->TargetState = LS_VAULT_3_STEPS_CROUCH;
 			if (!HasStateDispatch(item, vaultResult->TargetState))

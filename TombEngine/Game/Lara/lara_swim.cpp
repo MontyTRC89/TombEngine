@@ -143,11 +143,13 @@ void lara_as_underwater_inertia(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Jump))
 		item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
 
-	item->Animation.Velocity.y -= g_GameFlow->GetSettings()->Physics.SwimVelocity * LARA_SWIM_VELOCITY_DECEL;
+	auto& settings = g_GameFlow->GetSettings()->Physics;
+
+	item->Animation.Velocity.y -= settings.SwimVelocity * LARA_SWIM_VELOCITY_DECEL;
 	if (item->Animation.Velocity.y < 0.0f)
 		item->Animation.Velocity.y = 0.0f;
 
-	if (item->Animation.Velocity.y < g_GameFlow->GetSettings()->Physics.SwimVelocity * LARA_SWIM_INTERTIA_VELOCITY_MIN)
+	if (item->Animation.Velocity.y < settings.SwimVelocity * LARA_SWIM_INTERTIA_VELOCITY_MIN)
 		item->Animation.TargetState = LS_UNDERWATER_IDLE;
 }
 

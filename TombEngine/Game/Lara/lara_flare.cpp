@@ -71,9 +71,11 @@ void FlareControl(short itemNumber)
 	flareItem.Pose.Position.y += flareItem.Animation.Velocity.y;
 	DoProjectileDynamics(itemNumber, prevPos.x, prevPos.y, prevPos.z, vel.x, vel.y, vel.z);
 
+	auto& settings = g_GameFlow->GetSettings()->Flare;
+
 	int& life = flareItem.Data;
 	life &= 0x7FFF;
-	if (life >= g_GameFlow->GetSettings()->Flare.Timeout * FPS)
+	if (life >= settings.Timeout * FPS)
 	{
 		if (flareItem.Animation.Velocity.y == 0.0f &&
 			flareItem.Animation.Velocity.z == 0.0f)
@@ -87,7 +89,7 @@ void FlareControl(short itemNumber)
 		life++;
 	}
 
-	auto offset = g_GameFlow->GetSettings()->Flare.Offset.ToVector3i() + Vector3i(-6, 6, 0);
+	auto offset = settings.Offset.ToVector3i() + Vector3i(-6, 6, 0);
 	auto lightPos = GetJointPosition(flareItem, 0, offset);
 	if (DoFlareLight(lightPos, flareItem, life))
 	{
@@ -398,14 +400,15 @@ void CreateFlare(ItemInfo& laraItem, GAME_OBJECT_ID objectID, bool isThrown)
 void DoFlareInHand(ItemInfo& laraItem, int flareLife)
 {
 	auto& lara = *GetLaraInfo(&laraItem);
+	auto& settings = g_GameFlow->GetSettings()->Flare;
 	
-	auto offset = g_GameFlow->GetSettings()->Flare.Offset.ToVector3i() + Vector3i(11, 32, 0);
+	auto offset = settings.Offset.ToVector3i() + Vector3i(11, 32, 0);
 	auto lightPos = GetJointPosition(&laraItem, LM_LHAND, offset);
 
 	if (DoFlareLight(lightPos, laraItem, flareLife))
 		TriggerChaffEffects(lara.Control.Look.IsUsingBinoculars ? 0 : flareLife);
 
-	if (lara.Flare.Life >= g_GameFlow->GetSettings()->Flare.Timeout * FPS - (FLARE_DEATH_DELAY / 2))
+	if (lara.Flare.Life >= settings.Timeout * FPS - (FLARE_DEATH_DELAY / 2))
 	{
 		// Prevent player from intercepting reach/jump states with flare throws.
 		if (laraItem.Animation.IsAirborne ||
@@ -436,9 +439,11 @@ bool DoFlareLight(const Vector3i& pos, ItemInfo& item, int flareLife)
 	constexpr auto LIGHT_SPHERE_RADIUS		 = BLOCK(1 / 16.0f);
 	constexpr auto LIGHT_POS_OFFSET			 = Vector3(0.0f, -BLOCK(1 / 8.0f), 0.0f);
 
-	auto flareRange = g_GameFlow->GetSettings()->Flare.Range * BLOCK(0.25f);
-	auto flareColor = Vector3(g_GameFlow->GetSettings()->Flare.Color);
-	auto flareTimeout = g_GameFlow->GetSettings()->Flare.Timeout * FPS;
+	auto& settings = g_GameFlow->GetSettings()->Flare;
+
+	auto flareRange = settings.Range * BLOCK(0.25f);
+	auto flareColor = Vector3(settings.Color);
+	auto flareTimeout = settings.Timeout * FPS;
 
 	if (flareLife >= flareTimeout || flareLife == 0)
 		return false;
@@ -476,7 +481,7 @@ bool DoFlareLight(const Vector3i& pos, ItemInfo& item, int flareLife)
 	auto intensity = 1.0f;
 
 	// Flicker effect, if specified.
-	if (g_GameFlow->GetSettings()->Flare.Flicker)
+	if (settings.Flicker)
 	{
 		auto sphere = BoundingSphere(pos.ToVector3() + LIGHT_POS_OFFSET, LIGHT_SPHERE_RADIUS);
 		lightPos = Random::GeneratePointInSphere(sphere);
@@ -491,7 +496,7 @@ bool DoFlareLight(const Vector3i& pos, ItemInfo& item, int flareLife)
 	TriggerDynamicPointLight(lightPos, Color(color), falloff, false);
 
 	// Spawn lensflare, if brightness is not zero.
-	float lensflareBrightness = g_GameFlow->GetSettings()->Flare.LensflareBrightness;
+	float lensflareBrightness = settings.LensflareBrightness;
 	if (lensflareBrightness > EPSILON)
 	{
 		if (item.ObjectNumber == GAME_OBJECT_ID::ID_FLARE_ITEM)
