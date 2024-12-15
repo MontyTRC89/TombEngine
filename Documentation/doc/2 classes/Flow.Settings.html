@@ -108,7 +108,7 @@
 
 <h1>Class <code>Flow.Settings</code></h1>
 <p>Global engine settings which don't fall into particular category or can't be assigned to a specific object.</p>
-<p>Can be accessed using <a href="../1 modules/Flow.html#SetSettings">Flow.SetSettings</a> and <a href="../1 modules/Flow.html#GetSettings">Flow.GetSettings</a> functions.</p>
+<p> Can be accessed using <a href="../1 modules/Flow.html#SetSettings">Flow.SetSettings</a> and <a href="../1 modules/Flow.html#GetSettings">Flow.GetSettings</a> functions.</p>
 
 
 <h2><a href="#Animations">Animations </a></h2>
@@ -315,7 +315,7 @@
     <h2 class="section-header has-description"><a name="Animations"></a>Animations </h2>
 
           <div class="section-description">
-          These settings determine whether a specific moveset is available in-game.
+           These settings determine whether a specific moveset is available in-game.
           </div>
     <dl class="function">
     <dt>
@@ -448,7 +448,7 @@
     <h2 class="section-header has-description"><a name="Camera"></a>Camera </h2>
 
           <div class="section-description">
-          Parameters to customize camera and everything related to it.
+           Parameters to customize camera and everything related to it.
           </div>
     <dl class="function">
     <dt>
@@ -518,7 +518,7 @@
     <h2 class="section-header has-description"><a name="Flare"></a>Flare </h2>
 
           <div class="section-description">
-          These settings change appearance and behaviour of a flare.
+           These settings change appearance and behaviour of a flare.
           </div>
     <dl class="function">
     <dt>
@@ -714,9 +714,9 @@
     <h2 class="section-header has-description"><a name="Hair"></a>Hair </h2>
 
           <div class="section-description">
-          This is a table of Lara's braid object settings.
-Table consists of three entries, with first one representing classic Lara braid, and 2 and 3 representing left and right young Lara braids respectively.
-Therefore, if you want to access classic Lara braid settings, use <code>settings.Hair[1]</code>, and so on.
+           This is a table of braid object settings. <br>
+ Table consists of three entries, with first one representing classic Lara braid, and 2 and 3 representing left and right young Lara braids respectively.
+ Therefore, if you want to access classic Lara braid settings, use <code>settings.Hair[1]</code>, and so on.
           </div>
     <dl class="function">
     <dt>
@@ -786,7 +786,7 @@ Therefore, if you want to access classic Lara braid settings, use <code>settings
     <h2 class="section-header has-description"><a name="Hud"></a>Hud </h2>
 
           <div class="section-description">
-          These settings determine visibility of particular in-game HUD elements.
+           These settings determine visibility of particular in-game HUD elements.
           </div>
     <dl class="function">
     <dt>
@@ -801,7 +801,7 @@ Therefore, if you want to access classic Lara braid settings, use <code>settings
     <ul>
         <li><span class="parameter">statusBars</span>
             <span class="types"><span class="type">bool</span></span>
-         if disabled, all status bars (health, air, stamina) will be hidden..
+         if disabled, all status bars (health, air, stamina) will be hidden.
         </li>
     </ul>
 
@@ -877,7 +877,7 @@ Therefore, if you want to access classic Lara braid settings, use <code>settings
     <h2 class="section-header has-description"><a name="Physics"></a>Physics </h2>
 
           <div class="section-description">
-          Here you will find various settings for game world physics.
+           Here you will find various settings for game world physics.
           </div>
     <dl class="function">
     <dt>
@@ -926,8 +926,8 @@ Therefore, if you want to access classic Lara braid settings, use <code>settings
     <h2 class="section-header has-description"><a name="Weapons"></a>Weapons </h2>
 
           <div class="section-description">
-          This is a table of weapon settings, with several parameters available for every weapon.
-Access particular weapon's settings by using <a href="../4 enums/Flow.WeaponType.html#">Flow.WeaponType</a> as an index for this table, e.g. <code>settings.Weapons[Flow.WeaponType.PISTOLS]</code>.
+           This is a table of weapon settings, with several parameters available for every weapon.
+ Access particular weapon's settings by using <a href="../4 enums/Flow.WeaponType.html#">Flow.WeaponType</a> as an index for this table, e.g. <code>settings.Weapons[Flow.WeaponType.PISTOLS]</code>.
           </div>
     <dl class="function">
     <dt>
@@ -1228,7 +1228,7 @@ Access particular weapon's settings by using <a href="../4 enums/Flow.WeaponType
     <h2 class="section-header has-description"><a name="System"></a>System </h2>
 
           <div class="section-description">
-          Global system settings that is not directly related to gameplay.
+           Global system settings that is not directly related to gameplay.
           </div>
     <dl class="function">
     <dt>
@@ -1243,7 +1243,7 @@ Access particular weapon's settings by using <a href="../4 enums/Flow.WeaponType
     <ul>
         <li><span class="parameter">errorMode</span>
             <span class="types"><a class="type" href="../4 enums/Flow.ErrorMode.html#">ErrorMode</a></span>
-         error mode to use.
+         error mode to use. */
         </li>
     </ul>
 
@@ -1258,9 +1258,9 @@ Access particular weapon's settings by using <a href="../4 enums/Flow.WeaponType
     </dt>
     <dd>
     Can the game utilize the fast reload feature?  <br>
-When set to <code>true</code>, the game will attempt to perform fast savegame reloading if current level is the same as
-the level loaded from the savegame. It will not work if the level timestamp or checksum has changed
-(i.e. level was updated). If set to <code>false</code>, this functionality is turned off.
+ When set to <code>true</code>, the game will attempt to perform fast savegame reloading if current level is the same as
+ the level loaded from the savegame. It will not work if the level timestamp or checksum has changed
+ (i.e. level was updated). If set to <code>false</code>, this functionality is turned off.
 
 
 
