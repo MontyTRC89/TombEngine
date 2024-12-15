@@ -773,13 +773,11 @@ namespace TEN::Renderer
 												int y2 = _moveablesVertices[parentBucket->StartVertex + v2].Position.y + parentBone->GlobalTranslation.y;
 												int z2 = _moveablesVertices[parentBucket->StartVertex + v2].Position.z + parentBone->GlobalTranslation.z;
 
-												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
+												if (x1 == x2 && y1 == y2 && z1 == z2)
 												{
 													currentVertex->Bone = j;
 													currentVertex->Position = parentVertex->Position;
 													currentVertex->Normal = parentVertex->Normal;
-													currentVertex->AnimationFrameOffset = parentVertex->AnimationFrameOffset;
-													currentVertex->Tangent = parentVertex->Tangent;
 													break;
 												}
 											}
@@ -854,7 +852,7 @@ namespace TEN::Renderer
 												int y2 = _moveablesVertices[parentBucket->StartVertex + v2].Position.y + parentBone->GlobalTranslation.y;
 												int z2 = _moveablesVertices[parentBucket->StartVertex + v2].Position.z + parentBone->GlobalTranslation.z;
 
-												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
+												if (x1 == x2 && y1 == y2 && z1 == z2)
 												{
 													currentVertex->Bone = j;
 													currentVertex->Position = parentVertex->Position;
