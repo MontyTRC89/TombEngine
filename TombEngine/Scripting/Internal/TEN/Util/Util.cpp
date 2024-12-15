@@ -15,6 +15,7 @@
 #include "Scripting/Internal/TEN/Util/LevelLog.h"
 #include "Scripting/Internal/TEN/Vec2/Vec2.h"
 #include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Rotation/Rotation.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 
@@ -192,6 +193,11 @@ namespace TEN::Scripting::Util
 		TENLog(message, level, LogConfig::All, USE_IF_HAVE(bool, allowSpam, false));
 	}
 
+	static Rotation GetOrientToPoint(const Moveable& a, const Moveable& b)
+	{
+		return Rotation(TEN::Math::Geometry::GetOrientToPoint(a.GetPos().ToVector3(), b.GetPos().ToVector3()));
+	}
+
 	void Register(sol::state* state, sol::table& parent)
 	{
 		auto tableUtil = sol::table(state->lua_state(), sol::create);
@@ -206,6 +212,7 @@ namespace TEN::Scripting::Util
 		tableUtil.set_function(ScriptReserved_PercentToScreen, &PercentToScreen);
 		tableUtil.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
 		tableUtil.set_function(ScriptReserved_PrintLog, &PrintLog);
+		tableUtil.set_function(ScriptReserved_GetOrientToPoint, &GetOrientToPoint);
 
 		auto handler = LuaHandler(state);
 		handler.MakeReadOnlyTable(tableUtil, ScriptReserved_LogLevel, LOG_LEVEL);

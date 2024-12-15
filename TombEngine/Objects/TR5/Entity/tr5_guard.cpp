@@ -26,6 +26,7 @@ namespace TEN::Entities::Creatures::TR5
 	constexpr auto GUARD_ALERT_RANGE  = SQUARE(BLOCK(1));
 	constexpr auto GUARD_WALK_RANGE	  = SQUARE(BLOCK(3));
 	constexpr auto GUARD_ATTACK_RANGE = SQUARE(BLOCK(4));
+	constexpr auto GUARD_JUMP_RANGE   = BLOCK(0.85f);
 
 	constexpr auto GUARD_WALK_TURN_RATE_MAX	   = ANGLE(5.0f);
 	constexpr auto GUARD_RUN_TURN_RATE_MAX	   = ANGLE(10.0f);
@@ -326,8 +327,8 @@ namespace TEN::Entities::Creatures::TR5
 		short torsoY = 0;
 		short headY = 0;
 
-		bool canJump1block = CanCreatureJump(*item, JumpDistance::Block1);
-		bool canJump2blocks = !canJump1block && CanCreatureJump(*item, JumpDistance::Block2);
+		bool canJump1block  =                   CanCreatureJump(*item, GUARD_JUMP_RANGE, JumpDistance::Block1);
+		bool canJump2blocks = !canJump1block && CanCreatureJump(*item, GUARD_JUMP_RANGE, JumpDistance::Block2);
 
 		if (item->AIBits)
 			GetAITarget(creature);

@@ -1644,6 +1644,23 @@ void GetCarriedItems()
 	}
 }
 
+static short GetAIBits(int objectNumber)
+{
+	switch (objectNumber)
+	{
+	case ID_AI_GUARD: return GUARD;
+	case ID_AI_AMBUSH: return AMBUSH;
+	case ID_AI_PATROL1: return PATROL1;
+	case ID_AI_MODIFY: return MODIFY;
+	case ID_AI_FOLLOW: return FOLLOW;
+	case ID_AI_PATROL2: return PATROL2;
+	case ID_AI_X1: return X1;
+	case ID_AI_X2: return X2;
+	case ID_AI_PATH: return PATH;
+	}
+	return NO_AI;
+}
+
 void GetAIPickups()
 {
 	for (int i = 0; i < g_Level.NumItems; ++i)
@@ -1651,18 +1668,20 @@ void GetAIPickups()
 		auto* item = &g_Level.Items[i];
 		if (Objects[item->ObjectNumber].intelligent)
 		{
-			item->AIBits = 0;
+			item->AIBits = NO_AI;
 
 			for (int number = 0; number < g_Level.AIObjects.size(); ++number)
 			{
 				auto* object = &g_Level.AIObjects[number];
 
-				if (abs(object->pos.Position.x - item->Pose.Position.x) < CLICK(2) &&
-					abs(object->pos.Position.z - item->Pose.Position.z) < CLICK(2) &&
+				if (abs(object->pos.Position.x - item->Pose.Position.x) <= CLICK(2) &&
+					abs(object->pos.Position.y - item->Pose.Position.y) <= CLICK(2) &&
+					abs(object->pos.Position.z - item->Pose.Position.z) <= CLICK(2) &&
 					object->roomNumber == item->RoomNumber &&
-					object->objectNumber < ID_AI_PATROL2)
+					((object->objectNumber >= ID_AI_GUARD && object->objectNumber <= ID_AI_X2) ||
+					  object->objectNumber == ID_AI_PATH))
 				{
-					item->AIBits = (1 << (object->objectNumber - ID_AI_GUARD)) & 0x1F;
+					item->AIBits = GetAIBits(item->ObjectNumber);
 					item->ItemFlags[3] = object->triggerFlags;
 
 					if (object->objectNumber != ID_AI_GUARD)
@@ -1670,7 +1689,7 @@ void GetAIPickups()
 				}
 			}
 
-			if (item->Data.is<CreatureInfo>())
+			if (item->IsCreature())
 			{
 				auto* creature = GetCreatureInfo(item);
 				creature->Tosspad |= item->AIBits << 8 | (char)item->ItemFlags[3];
