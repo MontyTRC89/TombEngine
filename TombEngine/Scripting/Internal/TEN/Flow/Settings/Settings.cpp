@@ -310,13 +310,13 @@ void WeaponSettings::Register(sol::table& parent)
 	@tfield bool shell if set to true, indicates that weapon emits gun shell. Applicable only for firearms. */
 	"shell", &WeaponSettings::Shell,
 
-	/*** Display muzzle.
-	@tfield bool muzzle specifies whether muzzle flash should be displayed or not. Applicable only for firearms. */
-	"muzzle", &WeaponSettings::Muzzle,
+	/*** Display muzzle flash.
+	@tfield bool muzzleFlash specifies whether muzzle flash should be displayed or not. Applicable only for firearms. */
+	"muzzleFlash", &WeaponSettings::MuzzleFlash,
 
-	/*** Colorize muzzle.
-	@tfield bool colorizeMuzzle specifies whether muzzle flash should be tinted with the same color as gunflash color. Applicable only for firearms. */
-	"colorizeMuzzle", &WeaponSettings::ColorizeMuzzle);
+	/*** Colorize muzzle flash.
+	@tfield bool colorizeMuzzleFlash specifies whether muzzle flash should be tinted with the same color as gunflash color. Applicable only for firearms. */
+	"colorizeMuzzleFlash", &WeaponSettings::ColorizeMuzzleFlash);
 }
 
 /*** System

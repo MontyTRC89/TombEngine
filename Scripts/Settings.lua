@@ -63,8 +63,8 @@ local settings = Flow.Settings.new()
 	settings.Weapons[WeaponType.PISTOLS].damage = 1
 	settings.Weapons[WeaponType.PISTOLS].smoke = true
 	settings.Weapons[WeaponType.PISTOLS].shell = true
-	settings.Weapons[WeaponType.PISTOLS].muzzle = true
-	settings.Weapons[WeaponType.PISTOLS].colorizeMuzzle = false
+	settings.Weapons[WeaponType.PISTOLS].muzzleFlash = true
+	settings.Weapons[WeaponType.PISTOLS].colorizeMuzzleFlash = false
 	settings.Weapons[WeaponType.PISTOLS].pickupCount = 30
 	
 	settings.Weapons[WeaponType.REVOLVER].accuracy = 8
@@ -78,8 +78,8 @@ local settings = Flow.Settings.new()
 	settings.Weapons[WeaponType.REVOLVER].alternateDamage = 21
 	settings.Weapons[WeaponType.REVOLVER].smoke = true
 	settings.Weapons[WeaponType.REVOLVER].shell = false
-	settings.Weapons[WeaponType.REVOLVER].muzzle = true
-	settings.Weapons[WeaponType.REVOLVER].colorizeMuzzle = false
+	settings.Weapons[WeaponType.REVOLVER].muzzleFlash = true
+	settings.Weapons[WeaponType.REVOLVER].colorizeMuzzleFlash = false
 	settings.Weapons[WeaponType.REVOLVER].pickupCount = 6
 	
 	settings.Weapons[WeaponType.UZI].accuracy = 8
@@ -92,8 +92,8 @@ local settings = Flow.Settings.new()
 	settings.Weapons[WeaponType.UZI].damage = 1
 	settings.Weapons[WeaponType.UZI].smoke = true
 	settings.Weapons[WeaponType.UZI].shell = true
-	settings.Weapons[WeaponType.UZI].muzzle = true
-	settings.Weapons[WeaponType.UZI].colorizeMuzzle = false
+	settings.Weapons[WeaponType.UZI].muzzleFlash = true
+	settings.Weapons[WeaponType.UZI].colorizeMuzzleFlash = false
 	settings.Weapons[WeaponType.UZI].pickupCount = 30
 	
 	settings.Weapons[WeaponType.SHOTGUN].accuracy = 10
@@ -105,8 +105,8 @@ local settings = Flow.Settings.new()
 	settings.Weapons[WeaponType.SHOTGUN].damage = 3
 	settings.Weapons[WeaponType.SHOTGUN].smoke = true
 	settings.Weapons[WeaponType.SHOTGUN].shell = true
-	settings.Weapons[WeaponType.SHOTGUN].muzzle = false
-	settings.Weapons[WeaponType.SHOTGUN].colorizeMuzzle = false
+	settings.Weapons[WeaponType.SHOTGUN].muzzleFlash = false
+	settings.Weapons[WeaponType.SHOTGUN].colorizeMuzzleFlash = false
 	settings.Weapons[WeaponType.SHOTGUN].pickupCount = 6
 	
 	settings.Weapons[WeaponType.HK].accuracy = 4
@@ -119,8 +119,8 @@ local settings = Flow.Settings.new()
 	settings.Weapons[WeaponType.HK].alternateDamage = 4
 	settings.Weapons[WeaponType.HK].smoke = true
 	settings.Weapons[WeaponType.HK].shell = true
-	settings.Weapons[WeaponType.HK].muzzle = true
-	settings.Weapons[WeaponType.HK].colorizeMuzzle = false
+	settings.Weapons[WeaponType.HK].muzzleFlash = true
+	settings.Weapons[WeaponType.HK].colorizeMuzzleFlash = false
 	settings.Weapons[WeaponType.HK].pickupCount = 30
 	
 	settings.Weapons[WeaponType.CROSSBOW].targetingDistance = 8192

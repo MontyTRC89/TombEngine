@@ -98,8 +98,8 @@ struct WeaponSettings
 
 	bool Smoke = false;
 	bool Shell = false;
-	bool Muzzle = true;
-	bool ColorizeMuzzle = false;
+	bool MuzzleFlash = true;
+	bool ColorizeMuzzleFlash = false;
 
 	static void Register(sol::table& parent);
 };
