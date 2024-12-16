@@ -118,7 +118,7 @@ Type.IsFunction = function (variable)
     return type(variable) == "function"
 end
 
-    --- Check if the variable is a Color.
+    --- Check if the variable is a @{Color}.
     -- @tparam variable variable to be check
     -- @treturn boolean true if the variable is a color, false if it isn't a color
     -- @usage
@@ -132,7 +132,7 @@ Type.IsColor = function (variable)
     return variable ~= nil and type(variable) == "userdata" and variable.__type.name == "ScriptColor"
 end
 
-    --- Check if the variable is a Rotation.
+    --- Check if the variable is a @{Rotation}.
     -- @tparam variable variable to be check
     -- @treturn boolean true if the variable is a rotation, false if it isn't a rotation
     -- @usage
@@ -146,7 +146,7 @@ Type.IsRotation = function (variable)
     return variable ~= nil and type(variable) == "userdata" and variable.__type.name == "Rotation"
 end
 
-    --- Check if the variable is a Vec2.
+    --- Check if the variable is a @{Vec2}.
     -- @tparam variable variable to be check
     -- @treturn boolean true if the variable is a vec2, false if it isn't a vec2
     -- @usage
@@ -160,7 +160,7 @@ Type.IsVec2 = function (variable)
     return variable ~= nil and type(variable) == "userdata" and variable.__type.name == "Vec2"
 end
 
-    --- Check if the variable is a Vec3.
+    --- Check if the variable is a @{Vec3}.
     -- @tparam variable variable to be check
     -- @treturn boolean true if the variable is a vec3, false if it isn't a vec3
     -- @usage
@@ -174,7 +174,7 @@ Type.IsVec3 = function (variable)
     return variable ~= nil and type(variable) == "userdata" and variable.__type.name == "Vec3"
 end
 
-    --- Check if the variable is a Time object.
+    --- Check if the variable is a @{Time} object.
     -- @tparam variable variable to be check
     -- @treturn boolean true if the variable is a Time object, false if it isn't a Time object
     -- @usage
