@@ -106,7 +106,7 @@ namespace TEN::Scripting
 	// @mem h
 	int Time::GetHours() const
 	{
-		auto [h, m, s, f] = GetHmsc();
+		auto [h, m, s, c] = GetHmsc();
 		return h;
 	}
 
@@ -114,7 +114,7 @@ namespace TEN::Scripting
 	// @mem m
 	int Time::GetMinutes() const
 	{
-		auto [h, m, s, f] = GetHmsc();
+		auto [h, m, s, c] = GetHmsc();
 		return m;
 	}
 
