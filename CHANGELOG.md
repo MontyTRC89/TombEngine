@@ -59,7 +59,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added Rotation:Direction() method to get directional vector.
 * Added support for transparency value in Strings.DisplayString class.
 * Added extra argument for Sound.SetAmbientTrack() function to specify if new ambient track should play from the beginning.
-* Added CameraType.FLYBY and CameraType.OPTICS enum entries and return it by View.GetCameraType(), when flyby camera or binoculars/lasersight is active.
+* Added new View.CameraType enum entries and return it by View.GetCameraType(), when flyby camera or binoculars/lasersight is active.
 * Allow to use TR4-like load cameras by playing fixed camera from OnEnd() event and removing loadScreenFile field from level's gameflow entry.
 * Renamed Flow.WeaponType enumeration to Objects.WeaponType, and removed similar Objects.LaraWeaponType enumeration for consistency.
 * Renamed Objects.PlayerAmmoType to Objects.AmmoType for consistency.
