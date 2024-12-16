@@ -210,7 +210,7 @@ std::vector<int> FindAllItems(GAME_OBJECT_ID objectID);
 std::vector<int> FindCreatedItems(GAME_OBJECT_ID objectID);
 ItemInfo* FindItem(GAME_OBJECT_ID objectID);
 int FindItem(ItemInfo* item);
-void DoDamage(ItemInfo* item, int damage);
+void DoDamage(ItemInfo* item, int damage, bool silent = false);
 void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn = true);
 void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);
 short SpawnItem(const ItemInfo& item, GAME_OBJECT_ID objectID);

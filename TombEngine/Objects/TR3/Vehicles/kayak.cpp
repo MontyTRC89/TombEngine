@@ -16,6 +16,7 @@
 #include "Objects/Sink.h"
 #include "Objects/TR3/Vehicles/kayak_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
 
@@ -279,7 +280,7 @@ namespace TEN::Entities::Vehicles
 				verticalVelocity = 0;
 			}
 			else
-				verticalVelocity += GRAVITY;
+				verticalVelocity += g_GameFlow->GetSettings()->Physics.Gravity;
 		}
 		else
 		{
