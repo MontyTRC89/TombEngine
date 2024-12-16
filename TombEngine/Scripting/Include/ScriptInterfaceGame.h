@@ -25,6 +25,7 @@ enum class SavedVarType
 	Vec2,
 	Vec3,
 	Rotation,
+	Time,
 	Color,
 	FuncName,
 
@@ -39,6 +40,7 @@ using SavedVar = std::variant<
 	Vector2,  // Vec2
 	Vector3,  // Vec3
 	Vector3,  // Rotation
+	int,	  // Time
 	D3DCOLOR, // Color
 	FuncName>;
 

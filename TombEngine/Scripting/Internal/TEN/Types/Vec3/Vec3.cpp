@@ -1,9 +1,9 @@
 #include "framework.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 
 #include "Math/Math.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
-#include "Scripting/Internal/TEN/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
 
 using namespace TEN::Math;
 
@@ -53,7 +53,7 @@ void Vec3::Register(sol::table& parent)
 }
 
 /// Create a Vec3 object.
-// @function Vec3(x, y, z)
+// @function Vec3
 // @tparam float x X component.
 // @tparam float y Y component.
 // @tparam float z Z component.
@@ -66,7 +66,7 @@ Vec3::Vec3(float x, float y, float z)
 }
 
 /// Create a Vec3 object.
-// @function Vec3(value)
+// @function Vec3
 // @tparam float value X, Y, and Z component.
 // @treturn Vec3 A new Vec3 object.
 Vec3::Vec3(float value)
@@ -91,7 +91,7 @@ Vec3::Vec3(const Vector3i& vector)
 }
 
 /// Get a copy of this Vec3 normalized to length 1.
-// @function Vec3:Normalize()
+// @function Vec3:Normalize
 // @treturn Vec3 Normalized vector.
 Vec3 Vec3::Normalize() const
 {
@@ -102,7 +102,7 @@ Vec3 Vec3::Normalize() const
 }
 
 /// Get a copy of this Vec3 rotated by the input Rotation object.
-// @function Vec3:Rotate(rot)
+// @function Vec3:Rotate
 // @tparam Rotation rot Rotation object.
 // @treturn Vec3 Rotated Vec3.
 Vec3 Vec3::Rotate(const Rotation& rot) const
@@ -115,7 +115,7 @@ Vec3 Vec3::Rotate(const Rotation& rot) const
 }
 
 /// Get the linearly interpolated Vec3 between this Vec3 and the input Vec3 according to the input interpolation alpha.
-// @function Vec3:Lerp(vector)
+// @function Vec3:Lerp
 // @tparam Vec3 vector Target interpolation vector.
 // @tparam float alpha Interpolation alpha in the range [0, 1].
 // @treturn Vec3 Linearly interpolated vector
@@ -128,7 +128,7 @@ Vec3 Vec3::Lerp(const Vec3& vector, float alpha) const
 }
 
 /// Get the cross product of this Vec3 and the input Vec3.
-// @function Vec3:Cross(vector)
+// @function Vec3:Cross
 // @tparam Vec3 vector Input vector.
 // @treturn Vec3 Cross product.
 Vec3 Vec3::Cross(const Vec3& vector) const
@@ -140,7 +140,7 @@ Vec3 Vec3::Cross(const Vec3& vector) const
 }
 
 /// Get the dot product of this Vec3 and the input Vec3.
-// @function Vec3:Dot(vector)
+// @function Vec3:Dot
 // @tparam Vec3 vector Input vector.
 // @treturn float Dot product.
 float Vec3::Dot(const Vec3& vector) const
@@ -152,7 +152,7 @@ float Vec3::Dot(const Vec3& vector) const
 }
 
 /// Get the distance between this Vec3 and the input Vec3.
-// @function Vec3:Distance(vector)
+// @function Vec3:Distance
 // @tparam Vec3 vector Input vector.
 // @treturn float Distance.
 float Vec3::Distance(const Vec3& vector) const
@@ -164,7 +164,7 @@ float Vec3::Distance(const Vec3& vector) const
 }
 
 /// Get the length of this Vec3.
-// @function Vec3:Length()
+// @function Vec3:Length
 // @treturn float Length.
 float Vec3::Length() const
 {

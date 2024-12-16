@@ -7,7 +7,7 @@
 /***
 Represents the properties of an object as it appears in the inventory.
 
-@tenclass Flow.InventoryItem
+@tenprimitive Flow.InventoryItem
 @pragma nostrip
 */
 

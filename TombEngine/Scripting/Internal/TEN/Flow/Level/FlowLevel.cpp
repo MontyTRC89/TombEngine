@@ -58,12 +58,12 @@ void Level::Register(sol::table& parent)
 //@mem layer2
 		"layer2", &Level::Layer2,
 
-		/// (@{Flow.Starfield}) Starfield.
-		// @mem starfield
+/// (@{Flow.Starfield}) Starfield.
+// @mem starfield
 		"starfield", &Level::Starfield,
 
-		/// (@{Flow.LensFlare}) Global lens flare .
-		// @mem lensFlare
+/// (@{Flow.LensFlare}) Global lens flare .
+// @mem lensFlare
 		"lensFlare", &Level::LensFlare,
 
 /// (@{Flow.Fog}) omni fog RGB color and distance.
@@ -114,12 +114,6 @@ e.g. `myLevel.laraType = LaraType.Divesuit`
 // As seen in TRC's Sinking Submarine.
 //@mem rumble
 		"rumble", &Level::Rumble,
-
-/// (@{Flow.Mirror}) Location and size of the level's mirror, if present.
-//
-// __(not yet implemented)__
-//@mem mirror
-		"mirror", &Level::Mirror,
 
 		"farView", sol::property(&Level::SetLevelFarView),
 
@@ -246,16 +240,10 @@ WeatherType Level::GetWeatherType() const
 	return Weather;
 }
 
-short Level::GetMirrorRoom() const
-{
-	return Mirror.Room;
-}
-
 bool Level::GetFogEnabled() const
 {
 	return Fog.Enabled;
 }
-
 
 RGBAColor8Byte Level::GetFogColor() const
 {

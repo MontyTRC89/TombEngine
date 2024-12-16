@@ -4,6 +4,9 @@
 class EulerAngles;
 struct CollisionInfo;
 struct ItemInfo;
+namespace TEN::Scripting { struct Settings; };
+
+using namespace TEN::Scripting;
 
 enum class FireWeaponType
 {
@@ -40,13 +43,14 @@ struct WeaponInfo
 	int	  FlashTime		  = 0;
 	int	  DrawFrame		  = 0;
 	int	  SampleNum		  = 0;
-	int	  ExplosiveDamage = 0;
+	int	  AlternateDamage = 0;
 };
 
 extern int FlashGrenadeAftershockTimer;
 extern WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons];
 
 void InitializeNewWeapon(ItemInfo& laraItem);
+void InitializeWeaponInfo(const Settings& settings);
 
 const WeaponInfo& GetWeaponInfo(LaraWeaponType weaponType);
 Ammo&			  GetAmmo(LaraInfo& lara, LaraWeaponType weaponType);
