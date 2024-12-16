@@ -45,7 +45,7 @@ namespace TEN::Entities::Effects
 		}
 	}
 
-	static void SetupLensFlare(const Vector3& pos, int roomNumber, const Color& color, float& intensity, int spriteID)
+	void SetupLensFlare(const Vector3& pos, int roomNumber, const Color& color, float* intensity, int spriteID)
 	{
 		auto cameraPos = Camera.pos.ToVector3();
 		auto cameraTarget = Camera.target.ToVector3();
@@ -118,16 +118,19 @@ namespace TEN::Entities::Effects
 				isVisible = false;
 		}
 
+		float inputIntensity = (intensity != nullptr) ? *intensity : 1.0f;
+
 		// Fade in/out lensflares depending on their visibility.
-		UpdateLensFlareIntensity(isVisible, intensity);
+		if (intensity != nullptr)
+			UpdateLensFlareIntensity(isVisible, inputIntensity);
 
 		// Lensflare is completely invisible.
-		if (!isVisible && intensity == 0.0f)
+		if (!isVisible && inputIntensity == 0.0f)
 			return;
 
 		// Generate slight shimmer.
 		float shimmer = Random::GenerateFloat(-SHIMMER_STRENGTH, SHIMMER_STRENGTH);
-		float finalIntensity = std::clamp(Smoothstep(intensity) + shimmer * intensity, 0.0f, MAX_INTENSITY);
+		float finalIntensity = std::clamp(Smoothstep(inputIntensity) + shimmer * inputIntensity, 0.0f, MAX_INTENSITY);
 
 		auto lensFlare = LensFlare{};
 		lensFlare.Position = pos;
@@ -137,6 +140,9 @@ namespace TEN::Entities::Effects
 		lensFlare.SpriteID = spriteID;
 
 		LensFlares.push_back(lensFlare);
+
+		if (intensity != nullptr)
+			*intensity = inputIntensity;
 	}
 
 	void UpdateGlobalLensFlare()
@@ -154,7 +160,7 @@ namespace TEN::Entities::Effects
 		auto rotMatrix = orient.ToRotationMatrix();
 
 		pos += Vector3::Transform(BASE_POS, rotMatrix);
-		SetupLensFlare(pos, NO_VALUE, color, GlobalLensFlareIntensity, spriteID);
+		SetupLensFlare(pos, NO_VALUE, color, &GlobalLensFlareIntensity, spriteID);
 	}
 
 	void ControlLensFlare(int itemNumber)
@@ -182,9 +188,9 @@ namespace TEN::Entities::Effects
 		}
 
 		// Intensity value can be modified inside lensflare setup function.
-		float currentIntensity = (float)item.ItemFlags[0] / 100.0f;
-		SetupLensFlare(item.Pose.Position.ToVector3(), item.RoomNumber, color, currentIntensity, SPRITE_TYPES::SPR_LENS_FLARE_3);
-		item.ItemFlags[0] = (short)(currentIntensity * 100.0f);
+		float currentIntensity = (float)item.ItemFlags[0] / LENSFLARE_ITEMFLAG_BRIGHTNESS_SCALE;
+		SetupLensFlare(item.Pose.Position.ToVector3(), item.RoomNumber, color, &currentIntensity, SPRITE_TYPES::SPR_LENS_FLARE_3);
+		item.ItemFlags[0] = short(currentIntensity * LENSFLARE_ITEMFLAG_BRIGHTNESS_SCALE);
 	}
 
 	void ClearLensFlares()

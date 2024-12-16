@@ -129,7 +129,6 @@ namespace TEN::Entities::Creatures::TR5
 			spark->rotAdd = (GetRandomControl() & 0x1F) - 16;
 			spark->maxYvel = 0;
 			spark->gravity = (GetRandomControl() & 7) + 8;
-			spark->mirror = 0;
 			spark->sSize = spark->size = (GetRandomControl() & 7) + 8;
 			spark->dSize = spark->size * 2;
 		}
