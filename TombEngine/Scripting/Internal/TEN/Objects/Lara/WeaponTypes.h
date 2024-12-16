@@ -33,10 +33,11 @@ namespace TEN::Scripting
 	static const auto WEAPON_TYPES = std::unordered_map<std::string, LaraWeaponType>
 	{
 		{ "NONE", LaraWeaponType::None },
-		{ "PISTOL", LaraWeaponType::Pistol }, // Deprecated
+		{ "PISTOL", LaraWeaponType::Pistol },
 		{ "PISTOLS", LaraWeaponType::Pistol },
 		{ "REVOLVER", LaraWeaponType::Revolver },
 		{ "UZI", LaraWeaponType::Uzi },
+		{ "UZIS", LaraWeaponType::Uzi },
 		{ "SHOTGUN", LaraWeaponType::Shotgun },
 		{ "HK", LaraWeaponType::HK },
 		{ "CROSSBOW", LaraWeaponType::Crossbow },
