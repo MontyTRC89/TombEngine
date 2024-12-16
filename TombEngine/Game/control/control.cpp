@@ -611,6 +611,7 @@ void InitializeOrLoadGame(bool loadGame)
 	{
 		// If not loading savegame, clear all info.
 		SaveGame::Statistics.Level = {};
+		SaveGame::Statistics.SecretBits = 0;
 
 		if (InitializeGame)
 		{

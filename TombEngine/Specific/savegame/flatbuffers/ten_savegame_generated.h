@@ -7412,7 +7412,7 @@ struct SaveGameT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::SaveGameHeaderT> header{};
   std::unique_ptr<TEN::Save::SaveGameStatisticsT> game{};
   std::unique_ptr<TEN::Save::SaveGameStatisticsT> level{};
-  int32_t secret_map = 0;
+  int32_t secret_bits = 0;
   std::unique_ptr<TEN::Save::CameraT> camera{};
   std::unique_ptr<TEN::Save::LaraT> lara{};
   std::vector<std::unique_ptr<TEN::Save::RoomT>> rooms{};
@@ -7477,7 +7477,7 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_HEADER = 4,
     VT_GAME = 6,
     VT_LEVEL = 8,
-    VT_SECRET_MAP = 10,
+    VT_SECRET_BITS = 10,
     VT_CAMERA = 12,
     VT_LARA = 14,
     VT_ROOMS = 16,
@@ -7542,8 +7542,8 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::SaveGameStatistics *level() const {
     return GetPointer<const TEN::Save::SaveGameStatistics *>(VT_LEVEL);
   }
-  int32_t secret_map() const {
-    return GetField<int32_t>(VT_SECRET_MAP, 0);
+  int32_t secret_bits() const {
+    return GetField<int32_t>(VT_SECRET_BITS, 0);
   }
   const TEN::Save::Camera *camera() const {
     return GetPointer<const TEN::Save::Camera *>(VT_CAMERA);
@@ -7715,7 +7715,7 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(game()) &&
            VerifyOffset(verifier, VT_LEVEL) &&
            verifier.VerifyTable(level()) &&
-           VerifyField<int32_t>(verifier, VT_SECRET_MAP) &&
+           VerifyField<int32_t>(verifier, VT_SECRET_BITS) &&
            VerifyOffset(verifier, VT_CAMERA) &&
            verifier.VerifyTable(camera()) &&
            VerifyOffset(verifier, VT_LARA) &&
@@ -7863,8 +7863,8 @@ struct SaveGameBuilder {
   void add_level(flatbuffers::Offset<TEN::Save::SaveGameStatistics> level) {
     fbb_.AddOffset(SaveGame::VT_LEVEL, level);
   }
-  void add_secret_map(int32_t secret_map) {
-    fbb_.AddElement<int32_t>(SaveGame::VT_SECRET_MAP, secret_map, 0);
+  void add_secret_bits(int32_t secret_bits) {
+    fbb_.AddElement<int32_t>(SaveGame::VT_SECRET_BITS, secret_bits, 0);
   }
   void add_camera(flatbuffers::Offset<TEN::Save::Camera> camera) {
     fbb_.AddOffset(SaveGame::VT_CAMERA, camera);
@@ -8044,7 +8044,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     flatbuffers::Offset<TEN::Save::SaveGameHeader> header = 0,
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> game = 0,
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> level = 0,
-    int32_t secret_map = 0,
+    int32_t secret_bits = 0,
     flatbuffers::Offset<TEN::Save::Camera> camera = 0,
     flatbuffers::Offset<TEN::Save::Lara> lara = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::Room>>> rooms = 0,
@@ -8153,7 +8153,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
   builder_.add_rooms(rooms);
   builder_.add_lara(lara);
   builder_.add_camera(camera);
-  builder_.add_secret_map(secret_map);
+  builder_.add_secret_bits(secret_bits);
   builder_.add_level(level);
   builder_.add_game(game);
   builder_.add_header(header);
@@ -8171,7 +8171,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     flatbuffers::Offset<TEN::Save::SaveGameHeader> header = 0,
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> game = 0,
     flatbuffers::Offset<TEN::Save::SaveGameStatistics> level = 0,
-    int32_t secret_map = 0,
+    int32_t secret_bits = 0,
     flatbuffers::Offset<TEN::Save::Camera> camera = 0,
     flatbuffers::Offset<TEN::Save::Lara> lara = 0,
     const std::vector<flatbuffers::Offset<TEN::Save::Room>> *rooms = nullptr,
@@ -8267,7 +8267,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       header,
       game,
       level,
-      secret_map,
+      secret_bits,
       camera,
       lara,
       rooms__,
@@ -10557,7 +10557,7 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = header(); if (_e) _o->header = std::unique_ptr<TEN::Save::SaveGameHeaderT>(_e->UnPack(_resolver)); }
   { auto _e = game(); if (_e) _o->game = std::unique_ptr<TEN::Save::SaveGameStatisticsT>(_e->UnPack(_resolver)); }
   { auto _e = level(); if (_e) _o->level = std::unique_ptr<TEN::Save::SaveGameStatisticsT>(_e->UnPack(_resolver)); }
-  { auto _e = secret_map(); _o->secret_map = _e; }
+  { auto _e = secret_bits(); _o->secret_bits = _e; }
   { auto _e = camera(); if (_e) _o->camera = std::unique_ptr<TEN::Save::CameraT>(_e->UnPack(_resolver)); }
   { auto _e = lara(); if (_e) _o->lara = std::unique_ptr<TEN::Save::LaraT>(_e->UnPack(_resolver)); }
   { auto _e = rooms(); if (_e) { _o->rooms.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->rooms[_i] = std::unique_ptr<TEN::Save::RoomT>(_e->Get(_i)->UnPack(_resolver)); } } }
@@ -10625,7 +10625,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _header = _o->header ? CreateSaveGameHeader(_fbb, _o->header.get(), _rehasher) : 0;
   auto _game = _o->game ? CreateSaveGameStatistics(_fbb, _o->game.get(), _rehasher) : 0;
   auto _level = _o->level ? CreateSaveGameStatistics(_fbb, _o->level.get(), _rehasher) : 0;
-  auto _secret_map = _o->secret_map;
+  auto _secret_bits = _o->secret_bits;
   auto _camera = _o->camera ? CreateCamera(_fbb, _o->camera.get(), _rehasher) : 0;
   auto _lara = _o->lara ? CreateLara(_fbb, _o->lara.get(), _rehasher) : 0;
   auto _rooms = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Room>> (_o->rooms.size(), [](size_t i, _VectorArgs *__va) { return CreateRoom(*__va->__fbb, __va->__o->rooms[i].get(), __va->__rehasher); }, &_va );
@@ -10685,7 +10685,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _header,
       _game,
       _level,
-      _secret_map,
+      _secret_bits,
       _camera,
       _lara,
       _rooms,
