@@ -74,7 +74,6 @@ namespace TEN::Entities::Creatures::TR5
 		smoke.rotAdd = Random::GenerateInt(-32, 32);
 		smoke.maxYvel = 0;
 		smoke.gravity = Random::GenerateInt(-4, -8);
-		smoke.mirror = 0;
 		smoke.dSize = Random::GenerateInt(24, 40);
 		smoke.sSize = smoke.dSize / 4;
 		smoke.size = smoke.dSize / 4;

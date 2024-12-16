@@ -2,9 +2,9 @@
 #include "Fog.h"
 
 /***
-Fog
+Distance fog.
 
-@tenclass Flow.Fog
+@tenprimitive Flow.Fog
 @pragma nostrip
 */
  
@@ -16,21 +16,17 @@ void Fog::Register(sol::table& parent)
 		sol::call_constructor, ctors(), 
 
 		/// (@{Color}) RGB fog color
-		//@mem color
+		// @mem color
 		"color", sol::property(&Fog::GetColor, &Fog::SetColor),
 
-		/*** (int) min distance.
-
-		This is the distance at which the fog starts 
-
-		@mem minDistance*/
+		/// (int) min distance.
+		// This is the distance at which the fog starts.
+		// @mem minDistance*
 		"minDistance", &Fog::MinDistance,
 
-		/*** (int) max distance.
-
-		This is the distance at which the fog reaches the maximum strength
-
-		@mem maxDistance*/
+		/// (int) max distance.
+		// This is the distance at which the fog reaches the maximum strength.
+		// @mem maxDistance
 		"maxDistance", &Fog::MaxDistance
 		);
 }

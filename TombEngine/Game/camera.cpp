@@ -971,7 +971,7 @@ void BinocularCamera(ItemInfo* item)
 
 			auto origin = Camera.pos.ToVector3i();
 			auto target = Camera.target.ToVector3i();
-			LaraTorch(&origin, &target, player.ExtraHeadRot.y, 192);
+			LaraTorch(&origin, &target);
 		}
 	}
 
@@ -1490,6 +1490,9 @@ std::vector<MESH_INFO*> FillCollideableStaticsList()
 
 void ItemsCollideCamera()
 {
+	if (!g_GameFlow->GetSettings()->Camera.ObjectCollision)
+		return;
+
 	constexpr auto RADIUS = CLICK(0.5f);
 
 	auto itemList = FillCollideableItemList();

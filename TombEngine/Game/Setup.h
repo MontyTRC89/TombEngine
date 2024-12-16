@@ -11,8 +11,6 @@ struct CollisionInfo;
 struct ItemInfo;
 
 constexpr auto DEFAULT_RADIUS = 10;
-constexpr auto GRAVITY		  = 6.0f;
-constexpr auto SWAMP_GRAVITY  = GRAVITY / 3.0f;
 
 enum JointRotationFlags
 {

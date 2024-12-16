@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Game/control/control.h"
-#include "Scripting/Internal/TEN/Color/Color.h"
-#include "Scripting/Internal/TEN/Vec2/Vec2.h"
+#include "Scripting/Internal/TEN/Types/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 
 /***
 Constants for Display String Options.
@@ -10,16 +10,13 @@ Constants for Display String Options.
 @pragma nostrip
 */
 
-/*** Strings.DisplayStringOption constants.
-
+/*** Strings.DisplayStringOption constants. To be used with @{Strings.DisplayString} class.
 @table Strings.DisplayStringOption
-	CENTER	-- set the horizontal origin point to the center of the string.
-	RIGHT	-- set the horizontal origin point to right of the string.
-	SHADOW	-- gives the string a small drop shadow.
-	BLINK	-- blinks the string
-*/
-/***
 
+ - `CENTER` - set the horizontal origin point to the center of the string.
+ - `RIGHT` - set the horizontal origin point to right of the string.
+ - `SHADOW` - gives the string a small drop shadow.
+ - `BLINK` - blinks the string
 */
 
 enum class DisplayStringOptions

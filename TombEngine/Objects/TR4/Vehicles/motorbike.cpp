@@ -20,6 +20,7 @@
 #include "Game/Setup.h"
 #include "Math/Random.h"
 #include "Objects/Utils/VehicleHelpers.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
@@ -31,11 +32,11 @@ using std::vector;
 
 namespace TEN::Entities::Vehicles
 {
-	const vector<unsigned int> MotorbikeJoints = { 0, 1, 2, 4, 5, 6, 7, 8, 9 };
-	const vector<unsigned int> MotorbikeBrakeLightJoints = { 10 };
-	const vector<unsigned int> MotorbikeHeadLightJoints = { 3 };
+	const std::vector<unsigned int> MotorbikeJoints = { 0, 1, 2, 4, 5, 6, 7, 8, 9 };
+	const std::vector<unsigned int> MotorbikeBrakeLightJoints = { 10 };
+	const std::vector<unsigned int> MotorbikeHeadLightJoints = { 3 };
 
-	const vector<VehicleMountType> MotorbikeMountTypes =
+	const std::vector<VehicleMountType> MotorbikeMountTypes =
 	{
 		VehicleMountType::LevelStart,
 		VehicleMountType::Right
@@ -502,9 +503,13 @@ namespace TEN::Entities::Vehicles
 			else
 			{
 				if (flags)
+				{
 					verticalVelocity += flags;
+				}
 				else
-					verticalVelocity += GRAVITY;
+				{
+					verticalVelocity += g_GameFlow->GetSettings()->Physics.Gravity;
+				}
 			}
 		}
 

@@ -151,7 +151,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	static void KnockbackCollision(ItemInfo& item, short headingAngle)
 	{
-		item.HitPoints -= 200;
+		DoDamage(&item, 200);
 		item.HitStatus = true;
 
 		short diff = item.Pose.Orientation.y - headingAngle;

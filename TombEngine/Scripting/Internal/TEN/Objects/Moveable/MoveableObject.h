@@ -15,13 +15,15 @@ namespace sol
 enum ItemStatus;
 enum GAME_OBJECT_ID : short;
 enum class EffectType;
-class Rotation;
 class ScriptColor;
 class Vec3;
 struct ItemInfo;
+namespace TEN::Scripting { class Rotation; };
+
+using namespace TEN::Scripting;
 
 using aiBitsArray = std::array<int, 6>;
-using aiBitsType = sol::as_table_t<aiBitsArray>;
+using aiBitsType  = sol::as_table_t<aiBitsArray>;
 
 class Moveable : public NamedBase<Moveable, short>
 {

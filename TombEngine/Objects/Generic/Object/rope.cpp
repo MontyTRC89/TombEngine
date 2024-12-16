@@ -13,6 +13,7 @@
 #include "Objects/Generic/Object/rope.h"
 #include "Sound/sound.h"
 #include "Game/camera.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Input;
 
@@ -316,7 +317,7 @@ namespace TEN::Entities::Generic
 				&pendulumPointer->velocity,
 				rope->segmentLength * pendulumPointer->node);
 		
-			pendulumPointer->velocity.y += 6 << FP_SHIFT;
+			pendulumPointer->velocity.y += (int)g_GameFlow->GetSettings()->Physics.Gravity << FP_SHIFT;
 
 			pendulumPointer->position.x += pendulumPointer->velocity.x;
 			pendulumPointer->position.y += pendulumPointer->velocity.y;

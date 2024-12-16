@@ -12,6 +12,7 @@
 #include "Math/Math.h"
 #include "Objects/Generic/Object/rope.h"
 #include "Renderer/Renderer.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
@@ -327,7 +328,7 @@ namespace TEN::Animation
 
 	float GetEffectiveGravity(float verticalVel)
 	{
-		return ((verticalVel >= VERTICAL_VELOCITY_GRAVITY_THRESHOLD) ? 1.0f : GRAVITY);
+		return ((verticalVel >= VERTICAL_VELOCITY_GRAVITY_THRESHOLD) ? 1.0f : g_GameFlow->GetSettings()->Physics.Gravity);
 	}
 
 	Vector3i GetJointPosition(const ItemInfo& item, int boneID, const Vector3i& relOffset)

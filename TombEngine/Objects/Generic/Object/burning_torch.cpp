@@ -14,6 +14,7 @@
 #include "Objects/Effects/flame_emitters.h"
 #include "Renderer/RendererEnums.h"
 #include "Sound/sound.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
@@ -71,7 +72,7 @@ namespace TEN::Entities::Generic
 		spark->size = Random::GenerateFloat(64, 150);
 		spark->dSize = spark->size / 8;
 
-		int spriteOffset = GameTimer % Objects[ID_FIRE_SPRITES].nmeshes;
+		int spriteOffset = GlobalCounter % Objects[ID_FIRE_SPRITES].nmeshes;
 		spark->spriteIndex = Objects[ID_FIRE_SPRITES].meshIndex + spriteOffset;
 	}
 
@@ -252,7 +253,7 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			item->Animation.Velocity.y += 6;
+			item->Animation.Velocity.y += g_GameFlow->GetSettings()->Physics.Gravity;
 		}
 
 		item->Pose.Position.y += item->Animation.Velocity.y;
@@ -297,12 +298,14 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	void LaraTorch(Vector3i* origin, Vector3i* target, int rot, int color)
+	void LaraTorch(Vector3i* origin, Vector3i* target)
 	{
 		auto pos1 = GameVector(*origin, LaraItem->RoomNumber);
 		auto pos2 = GameVector(*target);
 
-		TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 12, color, color, color >> 1);
+		const auto& color = g_GameFlow->GetSettings()->Camera.BinocularLightColor;
+
+		TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 12, color.GetR(), color.GetG(), color.GetB());
 
 		if (!LOS(&pos1, &pos2))
 		{
@@ -311,8 +314,14 @@ namespace TEN::Entities::Generic
 			if (l + 8 > 31)
 				l = 31;
 
-			if (color - l >= 0)
-				TriggerDynamicLight(pos2.x, pos2.y, pos2.z, l + 8, color - l, color - l, (color - l) * 2);
+			auto dir = pos1.ToVector3() - pos2.ToVector3();
+			dir.Normalize();
+			dir *= BLOCK(1);
+
+			byte r = std::max(0, color.GetR() - l);
+			byte g = std::max(0, color.GetG() - l);
+			byte b = std::max(0, color.GetB() - l);
+			TriggerDynamicLight(pos2.x + dir.x, pos2.y + dir.y, pos2.z + dir.z, l + 12, r, g, b);
 		}
 	}
 

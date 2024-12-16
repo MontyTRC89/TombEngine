@@ -778,10 +778,11 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 			if (switchOff)
 				break;
 
-			if (!(SaveGame::Statistics.Level.Secrets & (1 << value)))
+			if (!(SaveGame::Statistics.SecretBits & (1 << value)))
 			{
 				PlaySecretTrack();
-				SaveGame::Statistics.Level.Secrets |= (1 << value);
+				SaveGame::Statistics.SecretBits |= (1 << value);
+				SaveGame::Statistics.Level.Secrets++;
 				SaveGame::Statistics.Game.Secrets++;
 			}
 			break;

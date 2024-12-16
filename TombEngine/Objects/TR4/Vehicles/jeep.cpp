@@ -19,6 +19,7 @@
 #include "Objects/TR4/Vehicles/jeep_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
 #include "Renderer/RendererEnums.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
@@ -347,9 +348,13 @@ namespace TEN::Entities::Vehicles
 			if (*yPos <= height - 32)
 			{
 				if (flags)
+				{
 					verticalVelocity += flags + (flags / 2);
+				}
 				else
-					verticalVelocity += (int)((float)GRAVITY * 1.5f);
+				{
+					verticalVelocity += (int)(g_GameFlow->GetSettings()->Physics.Gravity * 1.5f);
+				}
 			}
 			else
 			{

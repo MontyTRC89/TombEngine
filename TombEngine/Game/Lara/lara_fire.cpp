@@ -25,6 +25,7 @@
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
+#include "Scripting/Internal/TEN/Objects/Lara/WeaponTypes.h"
 #include "Sound/sound.h"
 #include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
@@ -148,7 +149,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		std::pair(EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0)),
 		std::pair(EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0)),
 		ANGLE(10.0f),
-		0,
+		ANGLE(10.0f),
 		500,
 		BLOCK(8),
 		3,
@@ -303,6 +304,26 @@ const WeaponInfo& GetWeaponInfo(LaraWeaponType weaponType)
 		return Weapons[0];
 
 	return (Weapons[(int)weaponType]);
+}
+
+void InitializeWeaponInfo(const Settings& settings)
+{
+	for (const auto& [name, weaponType] : WEAPON_TYPES)
+	{
+		if ((int)weaponType <= 0 || (int)weaponType >= (int)LaraWeaponType::NumWeapons)
+			continue;
+
+		auto& weapon = Weapons[(int)weaponType];
+		const auto& weaponSettings = settings.Weapons[(int)weaponType - 1]; // Lua counts from 1.
+
+		weapon.Damage = weaponSettings.Damage;
+		weapon.AlternateDamage = weaponSettings.AlternateDamage;
+		weapon.FlashTime = weaponSettings.FlashDuration;
+		weapon.GunHeight = weaponSettings.WaterLevel;
+		weapon.ShotAccuracy = ANGLE(weaponSettings.Accuracy);
+		weapon.TargetDist = weaponSettings.Distance;
+		weapon.RecoilFrame = weaponSettings.Interval;
+	}
 }
 
 void InitializeNewWeapon(ItemInfo& laraItem)
@@ -531,7 +552,7 @@ void HandleWeapon(ItemInfo& laraItem)
 				player.Control.Weapon.RequestGunType = player.Control.Weapon.LastGunType;
 		}
 		// Draw flare.
-		else if (IsHeld(In::Flare) && (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() != LaraType::Young))
+		else if (IsHeld(In::Flare))
 		{
 			if (player.Control.Weapon.GunType == LaraWeaponType::Flare)
 			{
@@ -868,7 +889,6 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 	}
 	else
 	{
-		SaveGame::Statistics.Game.AmmoHits++;
 		target = origin + (directionNorm * closestDist);
 		auto vTarget = GameVector(target);
 
