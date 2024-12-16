@@ -15,7 +15,7 @@
 // 
 // - `NONE`
 // - `PISTOLS`
-// - `UZI`
+// - `UZIS`
 // - `REVOLVER`
 // - `SHOTGUN`
 // - `HK`
