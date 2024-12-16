@@ -837,7 +837,7 @@ Vector3i GetRoomCenter(int roomNumber)
 std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchDepth)
 {
 	// Initialize stack.
-	auto stack = std::stack<std::pair<int, unsigned int>>{};
+	auto stack = std::stack<std::pair<int, unsigned int>>{}; // First = room number, second = depth.
 	stack.push({ roomNumber, searchDepth });
 
 	// Collect neighbor room numbers.

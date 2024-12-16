@@ -1006,6 +1006,8 @@ void LoadRooms()
 	int floordataCount = ReadInt32(); 
 	g_Level.FloorData.resize(floordataCount);
 	ReadBytes(g_Level.FloorData.data(), floordataCount * sizeof(short));
+
+	InitializeNeighborRoomList();
 }
 
 void FreeLevel(bool partial)
