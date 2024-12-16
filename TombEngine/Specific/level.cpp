@@ -385,7 +385,7 @@ void LoadObjects()
 		object.boneIndex = ReadInt32();
 
 		// Load animations.
-		int animCount = ReadInt32();
+		int animCount = ReadCount();
 		object.Animations.resize(animCount);
 		for (auto& anim : object.Animations)
 		{
@@ -394,7 +394,7 @@ void LoadObjects()
 			anim.EndFrameNumber = ReadInt32();
 			anim.NextAnimNumber = ReadInt32();
 			anim.NextFrameNumber = ReadInt32();
-			/*anim.BlendFrameCount =*/ ReadInt32();
+			/*anim.BlendFrameCount =*/ ReadCount();
 
 			auto start = ReadVector2();
 			auto startHandle = ReadVector2();
@@ -406,7 +406,7 @@ void LoadObjects()
 			anim.VelocityEnd = ReadVector3();
 
 			// Load keyframes.
-			int frameCount = ReadInt32();
+			int frameCount = ReadCount();
 			anim.Keyframes.resize(frameCount);
 			for (auto& keyframe : anim.Keyframes)
 			{
@@ -417,14 +417,14 @@ void LoadObjects()
 
 				keyframe.RootOffset = ReadVector3();
 
-				int boneCount = ReadInt32();
+				int boneCount = ReadCount();
 				keyframe.BoneOrientations.resize(boneCount);
 				for (auto& orient : keyframe.BoneOrientations)
 					orient = ReadVector4();
 			}
 
 			// Load state dispatches.
-			int dispatchCount = ReadInt32();
+			int dispatchCount = ReadCount();
 			anim.Dispatches.resize(dispatchCount);
 			for (auto& dispatch : anim.Dispatches)
 			{
@@ -446,7 +446,7 @@ void LoadObjects()
 			}
 
 			// Load animation commands.
-			int commandCount = ReadInt32();
+			int commandCount = ReadCount();
 			if (commandCount != 0)
 			{
 				anim.Commands.reserve(commandCount);
@@ -459,48 +459,55 @@ void LoadObjects()
 					auto command = AnimData::AnimCommandPtr{};
 					switch (type)
 					{
-					default:
-					case AnimCommandType::None:
-						continue;
+						default:
+						case AnimCommandType::None:
+							continue;
 
-					case AnimCommandType::MoveOrigin:
-					{
-						auto relOffset = ReadVector3();
-						command = std::make_unique<MoveOriginCommand>(relOffset);
-					}
-					break;
+						case AnimCommandType::MoveOrigin:
+						{
+							auto relOffset = ReadVector3();
+							command = std::make_unique<MoveOriginCommand>(relOffset);
+						}
+							break;
 
-					case AnimCommandType::JumpVelocity:
-					{
-						auto jumpVel = ReadVector3();
-						command = std::make_unique<JumpVelocityCommand>(jumpVel);
-					}
-					break;
+						case AnimCommandType::JumpVelocity:
+						{
+							auto jumpVel = ReadVector3();
+							command = std::make_unique<JumpVelocityCommand>(jumpVel);
+						}
+							break;
 
-					case AnimCommandType::AttackReady:
-						command = std::make_unique<AttackReadyCommand>();
-						break;
+						case AnimCommandType::AttackReady:
+							command = std::make_unique<AttackReadyCommand>();
+							break;
 
-					case AnimCommandType::Deactivate:
-						command = std::make_unique<DeactivateCommand>();
-						break;
+						case AnimCommandType::Deactivate:
+							command = std::make_unique<DeactivateCommand>();
+							break;
 
-					case AnimCommandType::SoundEffect:
-					{
-						int soundID = ReadInt32();
-						int frameNumber = ReadInt32();
-						auto envCond = (SoundEffectEnvCondition)ReadInt32();
-						command = std::make_unique<SoundEffectCommand>(soundID, frameNumber, envCond);
-					}
-					break;
+						case AnimCommandType::SoundEffect:
+						{
+							int soundID = ReadInt32();
+							int frameNumber = ReadInt32();
+							auto envCond = (SoundEffectEnvCondition)ReadInt32();
+							command = std::make_unique<SoundEffectCommand>(soundID, frameNumber, envCond);
+						}
+							break;
 
-					case AnimCommandType::FlipEffect:
-					{
-						int flipEffectID = ReadInt32();
-						int frameNumber = ReadInt32();
-						command = std::make_unique<FlipEffectCommand>(flipEffectID, frameNumber);
-					}
-					break;
+						case AnimCommandType::FlipEffect:
+						{
+							int flipEffectID = ReadInt32();
+							int frameNumber = ReadInt32();
+							command = std::make_unique<FlipEffectCommand>(flipEffectID, frameNumber);
+						}
+							break;
+
+						case AnimCommandType::DisableInterpolation:
+						{
+							int frameNumber = ReadInt32();
+							command = std::make_unique<DisableInterpolationCommand>(frameNumber);
+						}
+							break;
 					}
 
 					anim.Commands.push_back(std::move(command));

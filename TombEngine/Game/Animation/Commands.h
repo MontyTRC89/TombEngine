@@ -12,7 +12,8 @@ namespace TEN::Animation
 		AttackReady,
 		Deactivate,
 		SoundEffect,
-		FlipEffect
+		FlipEffect,
+		DisableInterpolation
 	};
 
 	// TODO: Not needed. SoundCondition enum class exists.
@@ -68,8 +69,8 @@ namespace TEN::Animation
 	class SoundEffectCommand : public AnimCommand
 	{
 	private:
-		const int _soundID	   = 0;
-		const int _frameNumber = 0;
+		const int					  _soundID		= 0;
+		const int					  _frameNumber	= 0;
 		const SoundEffectEnvCondition _envCondition = SoundEffectEnvCondition::Always;
 
 	public:
@@ -85,6 +86,16 @@ namespace TEN::Animation
 
 	public:
 		FlipEffectCommand(int flipEffectID, int frameNumber) : _flipEffectID(flipEffectID), _frameNumber(frameNumber) {};
+		void Execute(ItemInfo& item, bool isFrameBased) const override;
+	};
+
+	class DisableInterpolationCommand : public AnimCommand
+	{
+	private:
+		const int _frameNumber = 0;
+
+	public:
+		DisableInterpolationCommand(int frameNumber) : _frameNumber(frameNumber) {};
 		void Execute(ItemInfo& item, bool isFrameBased) const override;
 	};
 }

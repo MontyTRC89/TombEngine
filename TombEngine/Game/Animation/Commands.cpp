@@ -140,4 +140,12 @@ namespace TEN::Animation
 		int flipEffectID = _flipEffectID & 0x3FFF; // Bits 1-14.
 		DoFlipEffect(flipEffectID, &item);
 	}
+
+	void DisableInterpolationCommand::Execute(ItemInfo& item, bool isFrameBased) const
+	{
+		if (!isFrameBased || item.Animation.FrameNumber != _frameNumber)
+			return;
+
+		item.DisableInterpolation = true;
+	}
 }
