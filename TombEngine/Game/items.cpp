@@ -793,10 +793,10 @@ void UpdateAllItems()
 		if (item.AfterDeath <= ITEM_DEATH_TIMEOUT)
 		{
 			if (Objects[item.ObjectNumber].control)
-				Objects[item.ObjectNumber].control(item->Index);
+				Objects[item.ObjectNumber].control(item.Index);
 
-			TestVolumes(item->Index);
-			ProcessEffects(item);
+			TestVolumes(item.Index);
+			ProcessEffects(&item);
 
 			if (item.AfterDeath > 0 && item.AfterDeath < ITEM_DEATH_TIMEOUT && !(Wibble & 3))
 				item.AfterDeath++;

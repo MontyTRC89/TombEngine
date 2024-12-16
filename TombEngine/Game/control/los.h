@@ -6,6 +6,8 @@
 
 struct MESH_INFO;
 
+constexpr auto NO_LOS_ITEM = -1;
+
 // Legacy LOS functions
 
 bool LOS(const GameVector* origin, GameVector* target);
