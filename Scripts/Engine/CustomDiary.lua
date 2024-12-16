@@ -1,40 +1,9 @@
 -----
---- Custom Bars - Draws custom bars on screen.
---The module provides functions to create and manage Diaries. It maintains state through LevelVars.Engine.CustomBars, which stores bar definitions and configurations.
--- Each bar is controlled by its specific functions. 
+--- Diaries:
+--The module provides functions to create and manage Diaries. It maintains state through LevelVars.Engine.Diaries which stores diary definitions and configurations.
+-- Each diary is accessed by the object that was used to create it. 
 --
--- Example usage:
---	local Diary = require("Engine.CustomBar")
---
---	local ObjID = TEN.Objects.ObjID.CUSTOM_BAR_GRAPHIC
---	local colorBar = TEN.Color(255,255,255)
---	local posBar =  TEN.Vec2(21.6, 5.79)
---	local scaleBar = TEN.Vec2(19.05, 19.1)
---	local posBG = TEN.Vec2(posBar.x+0.15, posBar.y)
---	local scaleBG = TEN.Vec2(scaleBar.x-0.35, scaleBar.y-0.62)
---	local alignMode = TEN.View.AlignMode.CENTER
---	local scaleMode = TEN.View.ScaleMode.FIT
---	local blendMode = TEN.Effects.BlendID.ALPHATEST
---	local textPos = TEN.Vec2(posBar.x, posBar.y+10)
---
---	-- This function creates the bar and displays it
---	CustomBar.Create("Test", 50, 1000,
---		ObjID, 2, colorBar, posBar, 0, scaleBar, alignMode, scaleMode, blendMode,
---		ObjID, 4, colorBar, posBG, 0, scaleBG, alignMode, scaleMode, blendMode,
---		"Test 1", textPos, {}, 1, colorBar, false, 50, true, 0.25)
---
---		-- This method displays the bar
---		bar:SetVisibility(true)
---	end
---
--- @luautil CustomBar
-
-
---Action list
---add function for showing controls/icon for narration if exists
---decouple nodes from code
---fix the diary page numbers function with chatgpt
---change default color everywhere in nodes
+-- @luautil Diary
 local CustomDiary = {}
 CustomDiary.__index = CustomDiary
 
@@ -44,41 +13,29 @@ GameVars.Engine.LastUsedDiary=nil
 
 
 ---
--- Creates a custom progress bar with extensive configuration options.
+-- Creates a diary with extensive configuration options.
 -- Parameters:
--- @tparam string barName Unique name for the bar.
--- @tparam float startvalue Initial value of the bar.
--- @tparam float maxvalue Maximum value of the bar.
--- @tparam Objects.ObjID objectIDbg Object ID for the bar's background sprite.
--- @tparam number spriteIDbg SpriteID from the specified object for the bar's background.
--- @tparam Color colorbg Color of bar's background.
--- @tparam Vec2 posBG X,Y position of the bar's background in screen percent (0-100).
--- @tparam float rotBG rotation of the bar's background. sprite (0-360).
--- @tparam Vec2 scaleBG X,Y Scaling factor for the bar's background sprite.
--- @tparam View.AlignMode alignModebg Alignment for the bar's background.
--- @tparam View.ScaleMode scaleModebg Scaling for the bar's background.
--- @tparam Effects.BlendID blendModebg Blending modes for the bar's background.
--- @tparam Objects.ObjID objectIDbar Object ID for the bar sprite.
--- @tparam number spriteIDbar SpriteID from the specified object for the bar.
--- @tparam Color colorbar Color of the bar.
--- @tparam Vec2 posBar X,Y position of the bar in screen percent (0-100).
--- @tparam float rot rotation of the bar's sprite (0-360).
--- @tparam Vec2 scaleBar X,Y Scaling factor for the bar's sprite.
--- @tparam View.AlignMode alignMode Alignment for the bar.
--- @tparam View.ScaleMode scaleMode Scaling for the bar.
--- @tparam Effects.BlendID blendMode Blending modes for the bar.
--- @tparam string text Text to display on the bar.
--- @tparam Vec2 textPos X,Y position of the text.
--- @tparam Strings.DisplayStringOption textOptions alignment and effects for the text. Default: None. Please note text is automatically aligned to the LEFT
--- @tparam number textScale Scale factor for the text.
--- @tparam Color textColor Color of the text.
--- @tparam bool hideText Whether to hide the text.
--- @tparam number alphaBlendSpeed Speed of alpha blending for bar visibility (0-255).
--- @tparam bool blink Whether the bar blinks.
--- @tparam number blinkLimit % Limit below which bar starts blinking (0-1).
---
--- @treturn CustomBar The custombar in its hidden state
+-- @tparam Objects.ObjID object The pickup object that will be used to create the diary. Access the diary by selecting the item in the inventory. (596-611)
+-- @tparam Objects.ObjID objectIDbg Object ID for the diary's sprite.
+-- @tparam number spriteIDbg SpriteID from the specified object for the diary's sprite.
+-- @tparam Color colorbg Color of diary's sprite.
+-- @tparam number posY, X position of the diary's sprite in screen percent (0-100).
+-- @tparam number posX, Y position of the diary's sprite in screen percent (0-100).
+-- @tparam float rotBG rotation of the diary's sprite (0-360).
+-- @tparam number scaleX, X Scaling factor for the diary's sprite.
+-- @tparam number scaleY, Y Scaling factor for the diary's sprite.
+-- @tparam View.AlignMode alignModebg Alignment for the diary's sprite.
+-- @tparam View.ScaleMode scaleModebg Scaling for the diary's sprite.
+-- @tparam Effects.BlendID blendModebg Blending modes for the diary's sprite.
+-- @tparam Sound pageSound Sound to play with page turn.
+-- @tparam Sound exitSound Sound to play when existing the diary.
+-- @treturn the Diary table
 CustomDiary.Create = function(object, objectIDbg, spriteIDbg, colorbg, posX, posY, rot, scaleX, scaleY, alignMode, scaleMode, blendMode, pageSound, exitSound)
+
+    if object < 596 or object > 611 then
+        print("Error: Invalid object slot for diary creation. Please use a pickup object slot in the range 596 to 611.")
+        return
+    end
 
 	local dataName = object .. "_diarydata"
     local self = {Name = dataName}
@@ -117,6 +74,8 @@ CustomDiary.Create = function(object, objectIDbg, spriteIDbg, colorbg, posX, pos
     GameVars.Engine.Diaries[dataName].Visible               = false
     GameVars.Engine.Diaries[dataName].Notification          = {}
     GameVars.Engine.Diaries[dataName].PageNumbers           = {}
+    GameVars.Engine.Diaries[dataName].Controls              = {}
+    GameVars.Engine.Diaries[dataName].Background            = {}
     GameVars.Engine.Diaries[dataName].AlphaBlendSpeed       = 100
     GameVars.Engine.Diaries[dataName].EntryFadingIn         = true
 
@@ -125,8 +84,10 @@ CustomDiary.Create = function(object, objectIDbg, spriteIDbg, colorbg, posX, pos
     return setmetatable(self, CustomDiary)
 end
 
--- The function retrieves an existing bar instance by its unique identifier (barName). This function is useful when you need to access or manipulate a bar that has already been created.
--- 	@string barName: The unique identifier assigned to the bar when it was created using CustomBar.New
+---
+-- The function retrieves a diary by its unique object. This function is useful when you need to access or manipulate a diary that has already been created .
+-- @tparam Objects.ObjID object The pickup object that was used to create the diary (596-611).
+-- @treturn The diary
 CustomDiary.Get = function(object)
 	local dataName = object .. "_diarydata"
     if GameVars.Engine.Diaries[dataName] then
@@ -135,8 +96,9 @@ CustomDiary.Get = function(object)
     end
 end
 
--- The function removes a custom bar and its associated data from the system. It ensures that the bar is no longer tracked or accessible in the LevelVars.Engine.CustomBars.bars table.
--- 	@string barName: The name of the custom bar to be deleted.
+---
+-- The function removes a custom diary and its associated data from the system. It ensures that the diary is no longer tracked or accessible in the LevelVars.Engine.Diaries.
+-- @tparam Objects.ObjID object The pickup object that was used to create the diary (596-611).
 CustomDiary.Delete = function (object)
     local dataName = object .. "_diarydata"
 	if GameVars.Engine.Diaries[dataName] then
@@ -144,6 +106,8 @@ CustomDiary.Delete = function (object)
 	end
 end
 
+-- The function add the callback to enabl diaries in levels. This needs to be added to every level preferably in the startLevelFuncs.OnStart.
+-- 	@bool value True enables the diaries to be activated. False would disable the diaries.
 CustomDiary.Status = function(value)
 
 	if GameVars.Engine.Diaries then
@@ -158,8 +122,9 @@ CustomDiary.Status = function(value)
 
 end
 
---- The function checks whether the specified diary is currently visible.
--- @treturn bool true if the bar is visible and false if it is not.
+--- 
+-- The function checks whether the specified diary is currently visible.
+-- @treturn bool true if the diary is visible and false if it is not.
 function CustomDiary:IsVisible()
     
 	if GameVars.Engine.Diaries[self.Name] then
@@ -171,8 +136,9 @@ function CustomDiary:IsVisible()
 	end
 end
 
---- The function returns the number of pages in the diary.
--- @treturn int total number of pages in the diary.
+--- 
+-- The function returns the number of pages in the diary.
+-- @treturn int total number of unlocked pages in the diary.
 function CustomDiary:getUnlockedPageCount()
     
 	if GameVars.Engine.Diaries[self.Name] then
@@ -180,8 +146,9 @@ function CustomDiary:getUnlockedPageCount()
 	end
 end
 
+---
 -- The function sets the value of a custom bar over a specified time period.
--- @int value: The new target to which the bar's current value should transition. (Must be a non-negative number; between 0 and the bar's maxValue.
+-- @tparam int pageIndex The page number up to which the diary should be unlocked.
 function CustomDiary:unlockPages(index)
     if GameVars.Engine.Diaries[self.Name] then
 
@@ -206,39 +173,15 @@ function CustomDiary:unlockPages(index)
 end
 
 ---
--- Creates a custom progress bar for an enemy with extensive configuration options. Ensure this function is called before Lara aims at the enemy if using generic enemy HP bars.
--- @tparam string barName Unique name for the bar.
--- @tparam Objects.ObjID objectIDbg Object ID for the bar's background sprite.
--- @tparam number spriteIDbg SpriteID from the specified object for the bar's background.
--- @tparam Color colorbg Color of bar's background.
--- @tparam Vec2 posBG X,Y position of the bar's background in screen percent (0-100).
--- @tparam number rotBG rotation of the bar's background. sprite (0-360).
--- @tparam Vec2 scaleBG X,Y Scaling factor for the bar's background sprite.
--- @tparam View.AlignMode alignModebg Alignment for the bar's background.
--- @tparam View.ScaleMode scaleModebg Scaling for the bar's background.
--- @tparam Effects.BlendID blendModebg Blending modes for the bar's background.
--- @tparam Objects.ObjID objectIDbar Object ID for the bar sprite.
--- @tparam number spriteIDbar SpriteID from the specified object for the bar.
--- @tparam Color colorbar Color of the bar.
--- @tparam Vec2 posBar X,Y position of the bar in screen percent (0-100).
--- @tparam number rot rotation of the bar's sprite (0-360).
--- @tparam Vec2 scaleBar X,Y Scaling factor for the bar's sprite.
--- @tparam View.AlignMode alignMode Alignment for the bar.
--- @tparam View.ScaleMode scaleMode Scaling for the bar.
--- @tparam Effects.BlendID blendMode Blending modes for the bar.
--- @tparam string text Text to display for the enemy.
--- @tparam Vec2 textPos X,Y position of the text.
+-- Adds a text entry to the specified page for the diary.
+-- @tparam int pageIndex page number to add the text entry to.
+-- @tparam string text Text entry to be added to the page.
+-- @tparam number textPosX X position of the text.
+-- @tparam number textPosX Y position of the text.
 -- @tparam Strings.DisplayStringOption textOptions alignment and effects for the text. Default: None. Please note text is automatically aligned to the LEFT
+-- change the code here
 -- @tparam number textScale Scale factor for the text.
 -- @tparam Color textColor Color of the text.
--- @tparam bool hideText Whether to hide the text.
--- @tparam number alphaBlendSpeed Speed whether the enemy is current target or not. Useful for boss health bars.
--- @tparam bool blink Whether the bar blinks.
--- @tparam number blinkLimit %Limit below which bar starts blinking (0-1).of alpha blending for bar visibility (0-255).
--- @tparam string object Enemy name set in Editor for which to create HP for.
--- @tparam bool showBar Option to always show the bar 
---
--- @treturn CustomBar The custombar in its hidden state
 function CustomDiary:addTextEntry(pageIndex, text, textX, textY, textAlignment, textEffects, textScale, textColor)
     local textEntry = {
             text = text,
@@ -257,39 +200,19 @@ function CustomDiary:addTextEntry(pageIndex, text, textX, textY, textAlignment, 
 end
 
 ---
--- Creates a custom progress bar for an enemy with extensive configuration options. Ensure this function is called before Lara aims at the enemy if using generic enemy HP bars.
--- @tparam string barName Unique name for the bar.
--- @tparam Objects.ObjID objectIDbg Object ID for the bar's background sprite.
--- @tparam number spriteIDbg SpriteID from the specified object for the bar's background.
--- @tparam Color colorbg Color of bar's background.
--- @tparam Vec2 posBG X,Y position of the bar's background in screen percent (0-100).
--- @tparam number rotBG rotation of the bar's background. sprite (0-360).
--- @tparam Vec2 scaleBG X,Y Scaling factor for the bar's background sprite.
--- @tparam View.AlignMode alignModebg Alignment for the bar's background.
--- @tparam View.ScaleMode scaleModebg Scaling for the bar's background.
--- @tparam Effects.BlendID blendModebg Blending modes for the bar's background.
--- @tparam Objects.ObjID objectIDbar Object ID for the bar sprite.
--- @tparam number spriteIDbar SpriteID from the specified object for the bar.
--- @tparam Color colorbar Color of the bar.
--- @tparam Vec2 posBar X,Y position of the bar in screen percent (0-100).
--- @tparam number rot rotation of the bar's sprite (0-360).
--- @tparam Vec2 scaleBar X,Y Scaling factor for the bar's sprite.
--- @tparam View.AlignMode alignMode Alignment for the bar.
--- @tparam View.ScaleMode scaleMode Scaling for the bar.
--- @tparam Effects.BlendID blendMode Blending modes for the bar.
--- @tparam string text Text to display for the enemy.
--- @tparam Vec2 textPos X,Y position of the text.
--- @tparam Strings.DisplayStringOption textOptions alignment and effects for the text. Default: None. Please note text is automatically aligned to the LEFT
--- @tparam number textScale Scale factor for the text.
--- @tparam Color textColor Color of the text.
--- @tparam bool hideText Whether to hide the text.
--- @tparam number alphaBlendSpeed Speed whether the enemy is current target or not. Useful for boss health bars.
--- @tparam bool blink Whether the bar blinks.
--- @tparam number blinkLimit %Limit below which bar starts blinking (0-1).of alpha blending for bar visibility (0-255).
--- @tparam string object Enemy name set in Editor for which to create HP for.
--- @tparam bool showBar Option to always show the bar 
---
--- @treturn CustomBar The custombar in its hidden state
+-- Adds an image entry to the specified page for the diary.
+-- @tparam int pageIndex page number to add the image entry to.
+-- @tparam Objects.ObjID objectIDbg Object ID for the image entry sprite.
+-- @tparam number spriteID SpriteID from the specified object for the image entry.
+-- @tparam Color color Color of image entry.
+-- @tparam number posX,X position of the image entry in screen percent (0-100).
+-- @tparam number posY,Y position of the image entry in screen percent (0-100).
+-- @tparam number rot rotation of the image entry (0-360).
+-- @tparam number scaleX, X Scaling factor for the image entry.
+-- @tparam number scaleY, Y Scaling factor for the image entry.
+-- @tparam View.AlignMode alignMode Alignment for the image entry.
+-- @tparam View.ScaleMode scaleMode Scaling for the image entry.
+-- @tparam Effects.BlendID blendMode Blending modes for the image entry.
 function CustomDiary:addImageEntry(pageIndex, objectID, spriteID, color, posX, posY, rot, scaleX, scaleY, alignMode, scaleMode, blendMode)
    local imageEntry = {
             objectID = objectID,
@@ -315,35 +238,80 @@ end
 -- Add a narration track in the voice channel to the page. Track is played with the draw button.
 -- @tparam int pageIndex page number to add the narration track to.
 -- @tparam string trackName of track (without file extension) to play.
-
 function CustomDiary:addNarration(pageIndex, trackName)
     if not GameVars.Engine.Diaries[self.Name].Pages[pageIndex] then
         GameVars.Engine.Diaries[self.Name].Pages[pageIndex] = {NarrationTrack=nil, TextEntries = {}, ImageEntries = {}}
     end
     GameVars.Engine.Diaries[self.Name].Pages[pageIndex].NarrationTrack = trackName
     print("Narration added to page: ")
+end
+
+---
+-- Remove the narration track from the page of the specified diary.
+-- @tparam int pageIndex page number to add the narration track to.
+function CustomDiary:removeNarration(pageIndex)
+    if GameVars.Engine.Diaries[self.Name].Pages[pageIndex] then
+		GameVars.Engine.Diaries[self.Name].Pages[pageIndex].NarrationTrack = {}
+	end
+    print("Narration added to page: ".. pageIndex)
  end
 
 ---
--- Sets the postprocessing mode for diary background.
--- @tparam View.PostProcessMode postProcessMode effect type to set.
--- @tparam number power Postprocessing strength.
--- @tparam Color tintColor Set the tint color that overlays over the chosen color mode.
-
-function CustomDiary:addPostProcess(postProcessMode, power, tintColor)
+-- Add a background image for the diary.
+-- @tparam Objects.ObjID objectIDbg Object ID for the diary's background.
+-- @tparam number spriteIDbg SpriteID from the specified object for the diary's background.
+-- @tparam Color colorbg Color of diary's background.
+-- @tparam number posY, X position of the diary's background in screen percent (0-100).
+-- @tparam number posX, Y position of the diary's background in screen percent (0-100).
+-- @tparam float rotBG rotation of the diary's background sprite (0-360).
+-- @tparam number scaleX, X Scaling factor for the diary's background.
+-- @tparam number scaleY, Y Scaling factor for the diary's background.
+-- @tparam View.AlignMode alignModebg Alignment for the diary's background.
+-- @tparam View.ScaleMode scaleModebg Scaling for the diary's background.
+-- @tparam Effects.BlendID blendModebg Blending modes for the diary's background.
+function CustomDiary:addBackground(objectIDbg, spriteIDbg, colorbg, posX, posY, rot, scaleX, scaleY, alignMode, scaleMode, blendMode, alpha)
     if GameVars.Engine.Diaries[self.Name] then
-        GameVars.Engine.Diaries[self.Name].PostProcessMode    = postProcessMode
-        GameVars.Engine.Diaries[self.Name].PostProcessPower   = power
-        GameVars.Engine.Diaries[self.Name].PostProcessColor   = tintColor
-        print("Post Processing added to diary: ")
+        GameVars.Engine.Diaries[self.Name].Background.ObjectIDbg	    = objectIDbg
+	    GameVars.Engine.Diaries[self.Name].Background.SpriteIDbg	    = spriteIDbg
+	    GameVars.Engine.Diaries[self.Name].Background.ColorBG		    = colorbg
+	    GameVars.Engine.Diaries[self.Name].Background.PosX			    = posX
+	    GameVars.Engine.Diaries[self.Name].Background.PosY			    = posY
+	    GameVars.Engine.Diaries[self.Name].Background.Rot			    = rot
+	    GameVars.Engine.Diaries[self.Name].Background.ScaleX		    = scaleX
+	    GameVars.Engine.Diaries[self.Name].Background.ScaleY		    = scaleY
+	    GameVars.Engine.Diaries[self.Name].Background.AlignMode		    = alignMode
+	    GameVars.Engine.Diaries[self.Name].Background.ScaleMode		    = scaleMode
+	    GameVars.Engine.Diaries[self.Name].Background.BlendMode 	    = blendMode
+        GameVars.Engine.Diaries[self.Name].Background.Alpha		        = alpha
+        print("Background added to diary: ")
     end
 end
 
--- Sets the postprocessing mode for diary background.
--- @tparam View.PostProcessMode postProcessMode effect type to set.
--- @tparam number power Postprocessing strength.
--- @tparam Color tintColor Set the tint color that overlays over the chosen color mode.
+---
+-- Clears settings for the background for the specified diary.
+function CustomDiary:clearBackground()
+    if GameVars.Engine.Diaries[self.Name] then
+        GameVars.Engine.Diaries[self.Name].Background = {}
+        
+        print("Background cleared")
+    end
+end
 
+---
+-- Customizes the notification icon and sound for the diary.
+-- @tparam number notificationTime Time in seconds the notification icon will show on screen.
+-- @tparam Objects.ObjID objectIDbg Object ID for the notification icon.
+-- @tparam number spriteID SpriteID from the specified object for the notification icon.
+-- @tparam Color color Color of notification icon.
+-- @tparam number posX,X position of the notification icon in screen percent (0-100).
+-- @tparam number posY,Y position of the notification icon in screen percent (0-100).
+-- @tparam number rot rotation of the notification icon (0-360).
+-- @tparam number scaleX, X Scaling factor for the notification icon.
+-- @tparam number scaleY, Y Scaling factor for the notification icon.
+-- @tparam View.AlignMode alignMode Alignment for the notification icon.
+-- @tparam View.ScaleMode scaleMode Scaling for the notification icon.
+-- @tparam Effects.BlendID blendMode Blending modes for the notification icon.
+-- @tparam Sound notificationSound Sound to play with notification icon.
 function CustomDiary:customizeNotification(notificationTime, objectID, spriteID, color, posX, posY, rot, scaleX, scaleY, alignMode, scaleMode, blendMode, notificationSound)
     if GameVars.Engine.Diaries[self.Name] then
         GameVars.Engine.Diaries[self.Name].Notification.ObjectID            = objectID
@@ -365,6 +333,27 @@ function CustomDiary:customizeNotification(notificationTime, objectID, spriteID,
     end
 end
 
+---
+-- Clears settings for the notification system for the specified diary.
+function CustomDiary:clearNotification()
+    if GameVars.Engine.Diaries[self.Name] then
+        GameVars.Engine.Diaries[self.Name].Notification = {}
+        
+        print("Notifications cleared")
+    end
+end
+
+---
+-- Customizes the page numbers for the diary.
+-- @tparam int type Specifies the format for page numbers (1 or 2). 1: Displays only the current page number. 2: Formats the page number as: [Prefix][CurrentPage][Separator][UnlockedPages].
+-- @tparam string prefix Prefix to be added for type 2 of page numbers.
+-- @tparam string separator Separator to be added for type 2 of page numbers.
+-- @tparam number textPosX X position of the page numbers.
+-- @tparam number textPosX Y position of the page numbers.
+-- @tparam Strings.DisplayStringOption textOptions alignment and effects for the text. Default: None. Please note text is automatically aligned to the LEFT
+-- change the code here
+-- @tparam number textScale Scale factor for the page numbers.
+-- @tparam Color textColor Color of the page numbers.
 function CustomDiary:customizePageNumbers(type, prefix, separator, textX, textY, textAlignment, textEffects, textScale, textColor)
     if GameVars.Engine.Diaries[self.Name] and type >0 and type <=2 then
         GameVars.Engine.Diaries[self.Name].PageNumbers.type             = type
@@ -382,39 +371,68 @@ function CustomDiary:customizePageNumbers(type, prefix, separator, textX, textY,
 end
 
 ---
--- Creates a custom progress bar for an enemy with extensive configuration options. Ensure this function is called before Lara aims at the enemy if using generic enemy HP bars.
--- @tparam string barName Unique name for the bar.
--- @tparam Objects.ObjID objectIDbg Object ID for the bar's background sprite.
--- @tparam number spriteIDbg SpriteID from the specified object for the bar's background.
--- @tparam Color colorbg Color of bar's background.
--- @tparam Vec2 posBG X,Y position of the bar's background in screen percent (0-100).
--- @tparam number rotBG rotation of the bar's background. sprite (0-360).
--- @tparam Vec2 scaleBG X,Y Scaling factor for the bar's background sprite.
--- @tparam View.AlignMode alignModebg Alignment for the bar's background.
--- @tparam View.ScaleMode scaleModebg Scaling for the bar's background.
--- @tparam Effects.BlendID blendModebg Blending modes for the bar's background.
--- @tparam Objects.ObjID objectIDbar Object ID for the bar sprite.
--- @tparam number spriteIDbar SpriteID from the specified object for the bar.
--- @tparam Color colorbar Color of the bar.
--- @tparam Vec2 posBar X,Y position of the bar in screen percent (0-100).
--- @tparam number rot rotation of the bar's sprite (0-360).
--- @tparam Vec2 scaleBar X,Y Scaling factor for the bar's sprite.
--- @tparam View.AlignMode alignMode Alignment for the bar.
--- @tparam View.ScaleMode scaleMode Scaling for the bar.
--- @tparam Effects.BlendID blendMode Blending modes for the bar.
--- @tparam string text Text to display for the enemy.
--- @tparam Vec2 textPos X,Y position of the text.
+-- Clears settings for the page numbers for the specified diary.
+function CustomDiary:clearPageNumbers()
+    if GameVars.Engine.Diaries[self.Name] then
+        GameVars.Engine.Diaries[self.Name].PageNumbers = nil
+		print("Page Numbers cleared")
+    end
+end
+
+---
+-- Customizes the controls bar for the diary.
+-- @tparam number textPosX X position of the page numbers.
+-- @tparam number textPosX Y position of the page numbers.
 -- @tparam Strings.DisplayStringOption textOptions alignment and effects for the text. Default: None. Please note text is automatically aligned to the LEFT
--- @tparam number textScale Scale factor for the text.
--- @tparam Color textColor Color of the text.
--- @tparam bool hideText Whether to hide the text.
--- @tparam number alphaBlendSpeed Speed whether the enemy is current target or not. Useful for boss health bars.
--- @tparam bool blink Whether the bar blinks.
--- @tparam number blinkLimit %Limit below which bar starts blinking (0-1).of alpha blending for bar visibility (0-255).
--- @tparam string object Enemy name set in Editor for which to create HP for.
--- @tparam bool showBar Option to always show the bar 
---
--- @treturn CustomBar The custombar in its hidden state
+-- change the code here
+-- @tparam number textScale Scale factor for the page numbers.
+-- @tparam Color textColor Color of the page numbers.
+function CustomDiary:customizeControls(textX, textY, textAlignment, textEffects, textScale, textColor)
+    if GameVars.Engine.Diaries[self.Name] then
+        GameVars.Engine.Diaries[self.Name].Controls.text1           = "Space: Play Voice Note"
+        GameVars.Engine.Diaries[self.Name].Controls.text2           = "Left Key: Previous Page" 
+        GameVars.Engine.Diaries[self.Name].Controls.text3           = "Right Key: Next Page"
+        GameVars.Engine.Diaries[self.Name].Controls.text4           = "Esc: Back"
+        GameVars.Engine.Diaries[self.Name].Controls.textX           = textX
+        GameVars.Engine.Diaries[self.Name].Controls.textY           = textY
+        GameVars.Engine.Diaries[self.Name].Controls.textAlignment   = textAlignment
+        GameVars.Engine.Diaries[self.Name].Controls.textEffects	    = textEffects
+        GameVars.Engine.Diaries[self.Name].Controls.textScale		= textScale
+        GameVars.Engine.Diaries[self.Name].Controls.textColor		= textColor
+        
+        print("Controls updated")
+    end
+end
+
+---
+-- Customizes the display text for controls for specified diary for the diary.
+-- @tparam string1 prefix Prefix to be added for type 2 of page numbers.
+-- @tparam string2 separator Separator to be added for type 2 of page numbers.
+-- @tparam string3 separator Separator to be added for type 2 of page numbers.
+-- @tparam string4 separator Separator to be added for type 2 of page numbers.
+function CustomDiary:customizeControlsText(string1, string2, string3, string4)
+    if GameVars.Engine.Diaries[self.Name] then
+        GameVars.Engine.Diaries[self.Name].Controls.text1           = string1
+        GameVars.Engine.Diaries[self.Name].Controls.text2           = string2
+        GameVars.Engine.Diaries[self.Name].Controls.text3           = string3
+        GameVars.Engine.Diaries[self.Name].Controls.text4           = string4
+        print("Controls text updated")
+    end
+end
+
+
+---
+-- Clears settings for the control display system for the specified diary.
+function CustomDiary:clearControls()
+    if GameVars.Engine.Diaries[self.Name] then
+        GameVars.Engine.Diaries[self.Name].Controls ={}
+        
+        print("Controls cleared")
+    end
+end
+---
+-- Imports diary entries from an external file.
+-- @tparam string fileName Name of file without extension to import the diary entries from.
 function CustomDiary:importData(filename)
 
     local diaryData = require(filename)
@@ -475,8 +493,6 @@ LevelFuncs.Engine.Diaries.ShowDiary = function()
         if KeyIsHit(ActionID.DRAW) then
             if narrationTrack then
             PlayAudioTrack(narrationTrack, Sound.SoundTrackType.VOICE)
-
-            --add code for narration track icon to show
             end
         elseif KeyIsHit(ActionID.LEFT) and not (diary.EntryFadingOut or diary.EntryFadingIn) then
             -- Initiate fade-out to switch to the previous page
@@ -495,6 +511,7 @@ LevelFuncs.Engine.Diaries.ShowDiary = function()
                     PlaySound(diary.PageSound)
                 end            
         elseif KeyIsHit(ActionID.INVENTORY) then
+            PlaySound(diary.ExitSound)
             diary.TargetAlpha = 0
             diary.EntryFadingOut = true
         end
@@ -510,45 +527,83 @@ LevelFuncs.Engine.Diaries.ShowDiary = function()
             diary.Visible = false
             StopAudioTrack(Sound.SoundTrackType.VOICE)
             PlaySound(diary.ExitSound)
-            SetPostProcessMode(View.PostProcessMode.NONE)
-            SetPostProcessStrength(1)
-            SetPostProcessTint(Color(255,255,255))
             Flow.SetFreezeMode(Flow.FreezeMode.NONE)
             TEN.Logic.RemoveCallback(TEN.Logic.CallbackPoint.PREFREEZE, LevelFuncs.Engine.Diaries.ShowDiary)
             return
         end
-        
-        --show page numbers code
-        if diary.PageNumbers and next(diary.PageNumbers) then
-            
-            local entry = diary.PageNumbers
-            local pageNumbers = currentIndex
-            if entry.type == 2 then
-                pageNumbers = entry.prefix .. currentIndex  .. entry.separator .. diary.UnlockedPages
-            end
 
-            local pageNumberText = LevelFuncs.Engine.Node.GenerateString(pageNumbers, entry.textX, entry.textY, entry.textScale, entry.textAlignment, entry.textEffects, entry.textColor, (diary.CurrentAlpha/255))
-            ShowString(pageNumberText, 1 / 30)
-
-        end
+        local normalAlpha = (diary.CurrentAlpha/255)
+        local normalAlphaEntry = (diary.EntryCurrentAlpha/255)
 
         if textEntries or imageEntries then
-            -- Draw background sprite
-            local bgColor = TEN.Color(diary.ColorBG.r, diary.ColorBG.g,diary.ColorBG.b,diary.CurrentAlpha)
-            local bgPos = TEN.Vec2(diary.PosX, diary.PosY)
-            local bgScale = TEN.Vec2(diary.ScaleX, diary.ScaleY)
-            local bgSprite = TEN.DisplaySprite(diary.ObjectIDbg, diary.SpriteIDbg, bgPos, diary.Rot, bgScale, bgColor)
-            bgSprite:Draw(0, diary.AlignMode, diary.ScaleMode, diary.BlendMode)
-            --add code for controls
+            -- Draw Diary sprite
+            local dColor = TEN.Color(diary.ColorBG.r, diary.ColorBG.g, diary.ColorBG.b, diary.CurrentAlpha)
+            local dPos = TEN.Vec2(diary.PosX, diary.PosY)
+            local dScale = TEN.Vec2(diary.ScaleX, diary.ScaleY)
+            local dSprite = TEN.DisplaySprite(diary.ObjectIDbg, diary.SpriteIDbg, dPos, diary.Rot, dScale, dColor)
+            dSprite:Draw(1, diary.AlignMode, diary.ScaleMode, diary.BlendMode)
+
+            -- Draw Background Image
+            if diary.Background and next(diary.Background) then
+                local bgAlpha = diary.Background.Alpha*normalAlpha
+                local bgColor = TEN.Color(diary.Background.ColorBG.r, diary.Background.ColorBG.g, diary.Background.ColorBG.b, bgAlpha)
+                local bgPos = TEN.Vec2(diary.Background.PosX, diary.Background.PosY)
+                local bgScale = TEN.Vec2(diary.Background.ScaleX, diary.Background.ScaleY)
+                local bgSprite = TEN.DisplaySprite(diary.Background.ObjectIDbg, diary.Background.SpriteIDbg, bgPos, diary.Background.Rot, bgScale, bgColor)
+                bgSprite:Draw(0, diary.Background.AlignMode, diary.Background.ScaleMode, diary.Background.BlendMode)
+            end
+
+            if diary.Controls.textX then
+                --draw accent bars
+                -- local bgColorC = TEN.Color(diary.ColorBG.r, diary.ColorBG.g,diary.ColorBG.b,diary.CurrentAlpha)
+                -- local bgPosC = TEN.Vec2(diary.PosX, diary.PosY)
+                -- local bgScaleC = TEN.Vec2(diary.ScaleX, diary.ScaleY)
+                -- local bgSpriteC = TEN.DisplaySprite(diary.ObjectIDbg, diary.SpriteIDbg, bgPos, diary.Rot, bgScale, bgColor)
+                -- bgSprite:Draw(3, diary.AlignMode, diary.ScaleMode, diary.BlendMode)
+
+                --Controls
+                
+                local controlTexts = {}
+
+                if narrationTrack then
+                    table.insert(controlTexts, diary.Controls.text1)
+                end
+                if currentIndex > 1 then
+                    table.insert(controlTexts, diary.Controls.text2)
+                end
+                if currentIndex < maxPages then
+                    table.insert(controlTexts, diary.Controls.text3)
+                end
+            
+                -- Add the always-present back control
+                table.insert(controlTexts, diary.Controls.text4)
+                local alignedText = table.concat(controlTexts, " | ")
+
+                local controlsText = LevelFuncs.Engine.Node.GenerateString(alignedText, diary.Controls.textX, diary.Controls.textY, diary.Controls.textScale, diary.Controls.textAlignment, diary.Controls.textEffects, diary.Controls.textColor, normalAlpha)
+                ShowString(controlsText, 1 / 30)
+            end
+
+
+            
+            --Draw Page Numbers
+            if diary.PageNumbers and next(diary.PageNumbers) then
+                
+                local entry = diary.PageNumbers
+                local pageNumbers = currentIndex
+                if entry.type == 2 then
+                    pageNumbers = entry.prefix .. currentIndex  .. entry.separator .. diary.UnlockedPages
+                end
+
+                local pageNumberText = LevelFuncs.Engine.Node.GenerateString(pageNumbers, entry.textX, entry.textY, entry.textScale, entry.textAlignment, entry.textEffects, entry.textColor, normalAlpha)
+                ShowString(pageNumberText, 1 / 30)
+
+            end
 
             -- Draw entries based on type
-            
-            
-
             if textEntries then
                 for _, entry in ipairs(textEntries) do
                         
-                        local diaryText = LevelFuncs.Engine.Node.GenerateString(entry.text, entry.textX, entry.textY, entry.textScale, entry.textAlignment, entry.textEffects, entry.textColor, normalAlpha)
+                        local diaryText = LevelFuncs.Engine.Node.GenerateString(entry.text, entry.textX, entry.textY, entry.textScale, entry.textAlignment, entry.textEffects, entry.textColor, normalAlphaEntry)
                         ShowString(diaryText, 1 / 30)
                 end
             end
@@ -560,7 +615,7 @@ LevelFuncs.Engine.Diaries.ShowDiary = function()
                     local entryScale = TEN.Vec2(entry.scaleX, entry.scaleY)
                     local entrySprite = TEN.DisplaySprite(entry.objectID, entry.spriteID, entryPos, entry.rot, entryScale, entryColor)
                 
-                    entrySprite:Draw(1, entry.alignMode, entry.scaleMode, entry.blendMode)
+                    entrySprite:Draw(2, entry.alignMode, entry.scaleMode, entry.blendMode)
                 end
             end
         
@@ -582,12 +637,6 @@ LevelFuncs.Engine.Diaries.ActivateDiary = function(objectNumber)
         GameVars.Engine.Diaries[dataName].TargetAlpha = 255
         GameVars.Engine.Diaries[dataName].EntryTargetAlpha = 255
 		TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PREFREEZE, LevelFuncs.Engine.Diaries.ShowDiary)
-        if GameVars.Engine.Diaries[dataName].PostProcessMode then
-            TEN.View.SetPostProcessMode(GameVars.Engine.Diaries[dataName].PostProcessMode)
-            TEN.View.SetPostProcessStrength(GameVars.Engine.Diaries[dataName].PostProcessPower)
-            TEN.View.SetPostProcessTint(GameVars.Engine.Diaries[dataName].PostProcessColor)
-            --print("Post Process mode has been set: "..GameVars.Engine.Diaries[dataName].PostProcessMode)
-        end
         Flow.SetFreezeMode(Flow.FreezeMode.FULL)
 	end
 
@@ -630,6 +679,7 @@ LevelFuncs.Engine.Diaries.ShowNotification = function(dt)
 
 end
 
+-- !Ignore
 LevelFuncs.Engine.Diaries.PrepareNotification = function()
 	
 	local dataName = GameVars.Engine.LastUsedDiary .. "_diarydata"
