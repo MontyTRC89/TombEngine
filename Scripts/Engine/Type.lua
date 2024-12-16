@@ -174,6 +174,20 @@ Type.IsVec3 = function (variable)
     return variable ~= nil and type(variable) == "userdata" and variable.__type.name == "Vec3"
 end
 
+    --- Check if the variable is a Time object.
+    -- @tparam variable variable to be check
+    -- @treturn boolean true if the variable is a Time object, false if it isn't a Time object
+    -- @usage
+    -- --example of use
+    --	LevelFuncs.IncreaseTime = function (time)
+    --      if Type.IsTime(time) then
+    --          time + 1
+    --      end
+    --	end
+Type.IsTime = function (variable)
+    return variable ~= nil and type(variable) == "userdata" and variable.__type.name == "TEN::Scripting::Time"
+end
+
     --- Check if the variable is a LevelFunc.
     -- @tparam variable variable to be check
     -- @treturn boolean true if the variable is a LevelFunc, false if it isn't a IsLevelFunc
