@@ -319,8 +319,9 @@ void HandlePistols(ItemInfo& laraItem, LaraWeaponType weaponType)
 		auto basePos = GetJointPosition(&laraItem, (lara.LeftArm.GunFlash != 0) ? LM_LHAND : LM_RHAND).ToVector3();
 		auto sphere = BoundingSphere(basePos, BLOCK(1 / 8.0f));
 		auto lightPos = Random::GeneratePointInSphere(sphere);
-
-		TriggerDynamicPointLight(lightPos, color, CLICK(settings.FlashRange));
+		
+		int range = abs(Random::GenerateInt(settings.FlashRange - 2, settings.FlashRange + 2));
+		TriggerDynamicPointLight(lightPos, color, CLICK(range));
 	}
 }
 

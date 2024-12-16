@@ -17,7 +17,8 @@ enum class CameraType
 	Combat,
 	Heavy,		// HACK: Fixed camera type, but activated with heavy trigger.
 	Flyby,		// Used as script function return type only.
-	Optics		// Used as script function return type only.
+	Binoculars,	// Used as script function return type only.
+	Lasersight	// Used as script function return type only.
 };
 
 struct CAMERA_INFO

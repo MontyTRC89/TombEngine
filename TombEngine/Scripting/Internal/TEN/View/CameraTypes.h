@@ -15,17 +15,19 @@ Constants for the type of the Camera.
  - `FIXED` - classic fixed camera.
  - `LOOK` - look camera.
  - `FLYBY` - flyby or tracking camera.
- - `OPTICS` - binoculars or lasersight is active.
+ - `BINOCULARS` - binoculars is active.
+ - `LASERSIGHT` - lasersight is active.
 */
 
 static const std::unordered_map<std::string, CameraType> CAMERA_TYPE
 {
-	{ "CHASE",  CameraType::Chase  }, // DEPRECATED
-	{ "NORMAL", CameraType::Chase  },
-	{ "COMBAT", CameraType::Combat },
-	{ "FIXED",  CameraType::Fixed  },
-	{ "HEAVY",  CameraType::Fixed  }, // DEPRECATED
-	{ "LOOK",   CameraType::Look   },
-	{ "FLYBY",  CameraType::Flyby  },
-	{ "OPTICS", CameraType::Optics }
+	{ "CHASE",		CameraType::Chase		}, // DEPRECATED
+	{ "NORMAL",		CameraType::Chase		},
+	{ "COMBAT",		CameraType::Combat		},
+	{ "FIXED",		CameraType::Fixed		},
+	{ "HEAVY",		CameraType::Fixed		}, // DEPRECATED
+	{ "LOOK",		CameraType::Look		},
+	{ "FLYBY",		CameraType::Flyby		},
+	{ "BINOCULARS", CameraType::Binoculars	},
+	{ "LASERSIGHT", CameraType::Lasersight	}
 };

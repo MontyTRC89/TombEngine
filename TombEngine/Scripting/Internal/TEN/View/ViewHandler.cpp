@@ -72,8 +72,11 @@ namespace TEN::Scripting::View
 		if (UseSpotCam)
 			return CameraType::Flyby;
 
-		if (Lara.Control.Look.IsUsingBinoculars || Lara.Control.Look.IsUsingLasersight)
-			return CameraType::Optics;
+		if (Lara.Control.Look.IsUsingLasersight)
+			return CameraType::Lasersight;
+
+		if (Lara.Control.Look.IsUsingBinoculars)
+			return CameraType::Binoculars;
 
 		if (Camera.oldType == CameraType::Heavy)
 			return CameraType::Fixed;
@@ -187,6 +190,16 @@ namespace TEN::Scripting::View
 		//end
 		tableView.set_function(ScriptReserved_GetCameraType, &GetCameraType);
 
+		///Gets current camera position.
+		//@function GetCameraPosition
+		//@treturn Vec3 current camera position
+		tableView.set_function(ScriptReserved_GetCameraPosition, &GetCameraPosition);
+
+		///Gets current camera target.
+		//@function GetCameraTarget
+		//@treturn Vec3 current camera target
+		tableView.set_function(ScriptReserved_GetCameraTarget, &GetCameraTarget);
+
 		///Gets current room where camera is positioned.
 		//@function GetCameraRoom
 		//@treturn Objects.Room current room of the camera
@@ -206,16 +219,6 @@ namespace TEN::Scripting::View
 		//@function SetPostProcessTint
 		//@tparam Color tint value to use.
 		tableView.set_function(ScriptReserved_SetPostProcessTint, &SetPostProcessTint);
-
-		///Gets current camera position.
-		//@function GetCameraPosition
-		//@treturn Vec3 current camera position
-		tableView.set_function(ScriptReserved_GetCameraPosition, &GetCameraPosition);
-
-		///Gets current camera target.
-		//@function GetCameraTarget
-		//@treturn Vec3 current camera target
-		tableView.set_function(ScriptReserved_GetCameraTarget, &GetCameraTarget);
 
 		///Enable FlyBy with specific ID
 		//@function PlayFlyBy
