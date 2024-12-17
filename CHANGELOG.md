@@ -11,6 +11,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Improved engine performance if weather or bubble effects are active.
 * Fixed silent crashes if loaded level is corrupted or in incorrect format.
 * Fixed occasional crashes if there are static meshes placed within room border walls.
+* Fixed climbable pushables clipping Lara under the bridges when pulled.
 * Fixed incorrect clipping of scaled off-centered static meshes.
 * Fixed incorrect collision detection for off-centered moveables.
 * Fixed incorrect slide directions for sub-click geometry.
@@ -40,6 +41,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### New Features
 * Added fast savegame reloading.
+* Added ability to customize many hardcoded parameters, such as flare, weapon, and hair settings.
 * Added dynamic shadow casting on objects and static meshes.
 * Added ricochet sounds and make the effect more prominent.
 * Allow camera shake during flybys.
@@ -48,24 +50,29 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Allow more than 1000 static mesh slots in a level.
 
 ### Lua API changes
-* Added Moveable:GetCollidable() and Moveable:SetCollidable() functions.
+* Added Flow.Statistics class, Flow.GetStatistics() and Flow.SetStatistics() functions.
 * Added Flow.GetFreezeMode() and Flow.SetFreezeMode() functions.
 * Added Flow.GetNextLevel() function to get script entry for incoming level, if it's about to start.
 * Added Effects.EmitSpotLight() function for directional spotlights.
 * Added optional cast shadow and name parameters for Effects.EmitLight() function.
 * Added Effects.GetWind() function to get current wind speed vector.
+* Added Moveable:GetCollidable() and Moveable:SetCollidable() functions.
 * Added Rotation:Direction() method to get directional vector.
-* Added support for transparency value in DisplayString class.
-* Added extra argument for SetAmbientTrack() function to specify if new ambient track should play from the beginning.
-* Use load camera instead of load screen by playing fixed camera from OnEnd() event and removing loadScreenFile field from level's gameflow entry.
-* Fixed DisplayString class not supporting some Unicode characters and empty lines in multiline strings.
-* Fixed DisplayString not being deallocated after showing.
+* Added support for transparency value in Strings.DisplayString class.
+* Added extra argument for Sound.SetAmbientTrack() function to specify if new ambient track should play from the beginning.
+* Added new View.CameraType enum entries and return it by View.GetCameraType(), when flyby camera or binoculars/lasersight is active.
+* Added new primitive Time class, which allows to manipulate and format game time without precision loss.
+* Allow to use TR4-like load cameras by playing fixed camera from OnEnd() event and removing loadScreenFile field from level's gameflow entry.
+* Renamed Flow.WeaponType enumeration to Objects.WeaponType, and removed similar Objects.LaraWeaponType enumeration for consistency.
+* Renamed Objects.PlayerAmmoType to Objects.AmmoType for consistency.
+* Fixed Strings.DisplayString class not supporting some Unicode characters and empty lines in multiline strings.
+* Fixed Strings.DisplayString not being deallocated after showing.
 * Fixed GameVars not transferring between levels in hub mode.
 * Fixed incorrect behaviour of Moveable:GetJointRotation() function.
 * Fixed incorrect behaviour of Logic.EnableEvent() and Logic.DisableEvent() functions.
 * Fixed Util.HasLineOfSight() not taking static meshes into consideration.
 * Fixed collision callbacks not properly clearing after leveljump.
-* Fixed SetIntroImagePath() not using the correct path
+* Fixed Flow.SetIntroImagePath() not using the correct path.
 
 ## [Version 1.5](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.2) - 2024-11-03
 

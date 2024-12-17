@@ -1455,8 +1455,6 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
 
-	bool mirror = (roomNumber == g_GameFlow->GetLevel(CurrentLevel)->GetMirrorRoom());
-
 	bool water = false;
 	if (TestEnvironment(ENV_FLAG_WATER, room))
 	{
@@ -1505,7 +1503,6 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 	spark->gravity = 0;
 	spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 64;
 	spark->dSize = 2 * (spark->sSize + 4);
-	spark->mirror = mirror;
 }
 
 void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1, const Vector3& color2)

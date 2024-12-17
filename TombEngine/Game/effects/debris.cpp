@@ -5,8 +5,9 @@
 #include "Game/collision/Sphere.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Setup.h"
-#include "Specific/level.h"
 #include "Math/Math.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Specific/level.h"
 
 using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
@@ -172,7 +173,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 				fragment->isStatic = isStatic;
 				fragment->active = true;
 				fragment->terminalVelocity = 1024;
-				fragment->gravity = Vector3(0, 7, 0);
+				fragment->gravity = Vector3(0, g_GameFlow->GetSettings()->Physics.Gravity, 0);
 				fragment->restitution = 0.6f;
 				fragment->friction = 0.6f;
 				fragment->linearDrag = .99f;

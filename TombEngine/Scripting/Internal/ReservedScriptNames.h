@@ -26,6 +26,18 @@ static constexpr char ScriptReserved_Color[]			= "Color";
 static constexpr char ScriptReserved_DisplayString[]	= "DisplayString";
 static constexpr char ScriptReserved_Rotation[]			= "Rotation";
 static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
+static constexpr char ScriptReserved_Statistics[]		= "Statistics";
+
+// Settings sections
+static constexpr char ScriptReserved_Settings[]			= "Settings";
+static constexpr char ScriptReserved_SystemSettings[]	= "System";
+static constexpr char ScriptReserved_FlareSettings[]	= "Flare";
+static constexpr char ScriptReserved_CameraSettings[]	= "Camera";
+static constexpr char ScriptReserved_AnimSettings[]		= "Animations";
+static constexpr char ScriptReserved_HairSettings[]		= "Hair";
+static constexpr char ScriptReserved_HudSettings[]		= "Hud";
+static constexpr char ScriptReserved_PhysicsSettings[]	= "Physics";
+static constexpr char ScriptReserved_WeaponSettings[]	= "Weapons";
 
 // Moveable object
 static constexpr char ScriptReserved_Moveable[]			= "Moveable";
@@ -215,8 +227,11 @@ static constexpr char ScriptReserved_GetNextLevel[]				= "GetNextLevel";
 static constexpr char ScriptReserved_SetIntroImagePath[]		= "SetIntroImagePath";
 static constexpr char ScriptReserved_SetTitleScreenImagePath[]	= "SetTitleScreenImagePath";
 static constexpr char ScriptReserved_SetFarView[]				= "SetFarView";
-static constexpr char ScriptReserved_SetSettings[]				= "SetSettings";
 static constexpr char ScriptReserved_SetAnimations[]			= "SetAnimations";
+static constexpr char ScriptReserved_GetSettings[]				= "GetSettings";
+static constexpr char ScriptReserved_SetSettings[]				= "SetSettings";
+static constexpr char ScriptReserved_GetStatistics[]			= "GetStatistics";
+static constexpr char ScriptReserved_SetStatistics[]			= "SetStatistics";
 static constexpr char ScriptReserved_EndLevel[]					= "EndLevel";
 static constexpr char ScriptReserved_GetGameStatus[]			= "GetGameStatus";
 static constexpr char ScriptReserved_SetFreezeMode[]			= "SetFreezeMode";
@@ -246,13 +261,13 @@ static constexpr char ScriptReserved_SetLanguageNames[]		= "SetLanguageNames";
 // Flow Tables
 static constexpr char ScriptReserved_WeatherType[]	  = "WeatherType";
 static constexpr char ScriptReserved_LaraType[]		  = "LaraType";
+static constexpr char ScriptReserved_WeaponType[]	  = "WeaponType";
+static constexpr char ScriptReserved_AmmoType[]		  = "AmmoType";
 static constexpr char ScriptReserved_RotationAxis[]	  = "RotationAxis";
 static constexpr char ScriptReserved_ItemAction[]	  = "ItemAction";
 static constexpr char ScriptReserved_ErrorMode[]	  = "ErrorMode";
 static constexpr char ScriptReserved_FastReload[]	  = "FastReload";
 static constexpr char ScriptReserved_InventoryItem[]  = "InventoryItem";
-static constexpr char ScriptReserved_LaraWeaponType[] = "LaraWeaponType";
-static constexpr char ScriptReserved_PlayerAmmoType[] = "PlayerAmmoType";
 static constexpr char ScriptReserved_HandStatus[]	  = "HandStatus";
 static constexpr char ScriptReserved_GameStatus[]	  = "GameStatus";
 static constexpr char ScriptReserved_FreezeMode[]	  = "FreezeMode";

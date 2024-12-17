@@ -1,10 +1,12 @@
 #pragma once
 
-namespace sol { class state; }
 class GameVector;
 class Pose;
-class Rotation;
 class Vector3i;
+namespace sol { class state; }
+namespace TEN::Scripting { class Rotation; };
+
+using namespace TEN::Scripting;
 
 class Vec3
 {

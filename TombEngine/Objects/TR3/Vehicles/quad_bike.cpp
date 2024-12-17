@@ -19,6 +19,7 @@
 #include "Math/Math.h"
 #include "Objects/TR3/Vehicles/quad_bike_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
@@ -450,7 +451,9 @@ namespace TEN::Entities::Vehicles
 				verticalVelocity = 0;
 			}
 			else
-				verticalVelocity += 6;
+			{
+				verticalVelocity += g_GameFlow->GetSettings()->Physics.Gravity;
+			}
 		}
 		else
 		{

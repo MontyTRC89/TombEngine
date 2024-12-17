@@ -1,14 +1,16 @@
-#pragma once
 #include "framework.h"
 
 #include "Game/effects/debris.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/TEN/Objects/Static/StaticObject.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
-#include "Scripting/Internal/TEN/Rotation/Rotation.h"
-#include "Scripting/Internal/TEN/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Types/Color/Color.h"
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
+
+using namespace TEN::Scripting;
+
 /***
 Statics
 
@@ -24,8 +26,8 @@ Static::Static(MESH_INFO & ref) : m_mesh{ref}
 
 void Static::Register(sol::table & parent)
 {
-	parent.new_usertype<Static>(ScriptReserved_Static,
-		sol::no_constructor, // ability to spawn new ones could be added later
+	parent.new_usertype<Static>(
+		ScriptReserved_Static, sol::no_constructor, // Ability to spawn new ones could be added later.
 		sol::meta_function::index, IndexError,
 		sol::meta_function::new_index, NewIndexError,
 

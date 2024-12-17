@@ -12,9 +12,9 @@
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 #include "Scripting/Internal/TEN/Objects/Static/StaticObject.h"
+#include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/Util/LevelLog.h"
-#include "Scripting/Internal/TEN/Vec2/Vec2.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 
@@ -177,7 +177,7 @@ namespace TEN::Scripting::Util
 	//<a href="https://www.lua.org/manual/5.4/manual.html#pdf-debug.traceback">debug.traceback</a>
 	//@function PrintLog
 	//@tparam string message to be displayed within the Log
-	//@tparam Misc.LogLevel logLevel log level to be displayed
+	//@tparam Util.LogLevel logLevel log level to be displayed
 	//@tparam[opt] bool allowSpam true allows spamming of the message
 	// 
 	//@usage

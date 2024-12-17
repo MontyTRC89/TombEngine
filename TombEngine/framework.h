@@ -10,6 +10,7 @@
 #include <map>
 #include <memory>
 #include <optional>
+#include <regex>
 #include <set>
 #include <SimpleMath.h>
 #include <sol.hpp>
