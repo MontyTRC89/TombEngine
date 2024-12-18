@@ -1062,7 +1062,7 @@ void LoadAnimatedTextures()
 		auto sequence = ANIMATED_TEXTURES_SEQUENCE{};
 		sequence.atlas = ReadInt32();
 		sequence.Fps = ReadInt32();
-		sequence.numFrames = ReadInt32();
+		sequence.numFrames = ReadCount();
 
 		for (int j = 0; j < sequence.numFrames; j++)
 		{
