@@ -1654,8 +1654,8 @@ namespace TEN::Renderer
 		{
 			if (Camera.pos.RoomNumber == mirror.RealRoom && IsPointInRoom(light.Position, mirror.RealRoom))
 			{
-				light.Position = Vector3::Transform(light.Position, mirror.ReflectionMatrix);
-				light.Direction = Vector3::Transform(light.Direction, mirror.ReflectionMatrix);
+				ReflectVectorOptionally(light.Position);
+				ReflectVectorOptionally(light.Direction);
 				light.Hash = 0;
 
 				_dynamicLights[_dynamicLightList].push_back(light);
