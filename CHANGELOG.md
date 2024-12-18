@@ -40,6 +40,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed Skeleton and Mummy not reacting to shotgun hits.
 
 ### New Features
+* Added classic mirror effect with ability to reflect moveables and static meshes.
 * Added fast savegame reloading.
 * Added ability to customize many hardcoded parameters, such as flare, weapon, and hair settings.
 * Added dynamic shadow casting on objects and static meshes.
