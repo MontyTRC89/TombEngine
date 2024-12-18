@@ -30,7 +30,7 @@ GameVars.Engine.LastUsedDiary=nil
 -- @tparam Sound pageSound Sound to play with page turn.
 -- @tparam Sound exitSound Sound to play when existing the diary.
 -- @treturn the Diary table
-CustomDiary.Create = function(object, objectIDbg, spriteIDbg, colorbg, posX, posY, rot, scaleX, scaleY, alignMode, scaleMode, blendMode, pageSound, exitSound)
+CustomDiary.Create = function(object, objectIDbg, spriteIDbg, colorbg, posX, posY, rot, scaleX, scaleY, alignMode, scaleMode, blendMode, alpha, pageSound, exitSound)
 
     if object < 596 or object > 611 then
         print("Error: Invalid object slot for diary creation. Please use a pickup object slot in the range 596 to 611.")
@@ -62,6 +62,7 @@ CustomDiary.Create = function(object, objectIDbg, spriteIDbg, colorbg, posX, pos
 	GameVars.Engine.Diaries[dataName].AlignMode		        = alignMode
 	GameVars.Engine.Diaries[dataName].ScaleMode		        = scaleMode
 	GameVars.Engine.Diaries[dataName].BlendMode		        = blendMode
+    GameVars.Engine.Diaries[dataName].Alpha     	        = alpha
 	GameVars.Engine.Diaries[dataName].PageSound		        = pageSound
 	GameVars.Engine.Diaries[dataName].ExitSound		        = exitSound
     GameVars.Engine.Diaries[dataName].PostProcessMode       = View.PostProcessMode.NONE
@@ -537,7 +538,8 @@ LevelFuncs.Engine.Diaries.ShowDiary = function()
 
         if textEntries or imageEntries then
             -- Draw Diary sprite
-            local dColor = TEN.Color(diary.ColorBG.r, diary.ColorBG.g, diary.ColorBG.b, diary.CurrentAlpha)
+            local dAlpha = math.min(diary.CurrentAlpha, diary.Alpha)
+            local dColor = TEN.Color(diary.ColorBG.r, diary.ColorBG.g, diary.ColorBG.b, dAlpha)
             local dPos = TEN.Vec2(diary.PosX, diary.PosY)
             local dScale = TEN.Vec2(diary.ScaleX, diary.ScaleY)
             local dSprite = TEN.DisplaySprite(diary.ObjectIDbg, diary.SpriteIDbg, dPos, diary.Rot, dScale, dColor)
@@ -545,7 +547,7 @@ LevelFuncs.Engine.Diaries.ShowDiary = function()
 
             -- Draw Background Image
             if diary.Background and next(diary.Background) then
-                local bgAlpha = diary.Background.Alpha*normalAlpha
+                local bgAlpha = math.min(diary.CurrentAlpha, diary.Background.Alpha)
                 local bgColor = TEN.Color(diary.Background.ColorBG.r, diary.Background.ColorBG.g, diary.Background.ColorBG.b, bgAlpha)
                 local bgPos = TEN.Vec2(diary.Background.PosX, diary.Background.PosY)
                 local bgScale = TEN.Vec2(diary.Background.ScaleX, diary.Background.ScaleY)
@@ -589,7 +591,7 @@ LevelFuncs.Engine.Diaries.ShowDiary = function()
             if diary.PageNumbers and next(diary.PageNumbers) then
                 
                 local entry = diary.PageNumbers
-                local pageNumbers = currentIndex
+                local pageNumbers = tostring(currentIndex)
                 if entry.type == 2 then
                     pageNumbers = entry.prefix .. currentIndex  .. entry.separator .. diary.UnlockedPages
                 end
