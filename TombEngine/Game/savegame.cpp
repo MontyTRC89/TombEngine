@@ -1474,7 +1474,7 @@ const std::vector<byte> SaveGame::Build()
 	sgb.add_header(headerOffset);
 	sgb.add_level(levelStatisticsOffset);
 	sgb.add_game(gameStatisticsOffset);
-	sgb.add_secret_map(SaveGame::Statistics.SecretBits);
+	sgb.add_secret_bits(SaveGame::Statistics.SecretBits);
 	sgb.add_camera(cameraOffset);
 	sgb.add_lara(laraOffset);
 	sgb.add_rooms(roomOffset);
@@ -1700,7 +1700,7 @@ bool SaveGame::Load(int slot)
 
 static void ParseStatistics(const Save::SaveGame* s, bool isHub)
 {
-	SaveGame::Statistics.SecretBits = s->secret_map();
+	SaveGame::Statistics.SecretBits = s->secret_bits();
 
 	SaveGame::Statistics.Level.AmmoHits = s->level()->ammo_hits();
 	SaveGame::Statistics.Level.AmmoUsed = s->level()->ammo_used();
