@@ -472,6 +472,8 @@ namespace TEN::Renderer
 		void PrepareWeatherParticles(RenderView& view);
 		void PrepareDrips(RenderView& view);
 		void PrepareBubbles(RenderView& view);
+		void DoRenderPass(RendererPass pass, RenderView& view, bool drawMirrors);
+		void DrawObjects(RendererPass pass, RenderView& view, bool player, bool moveables, bool statics);
 		void DrawEffects(RenderView& view, RendererPass rendererPass);
 		void DrawEffect(RenderView& view, RendererEffect* effect, RendererPass rendererPass);
 		void PrepareSplashes(RenderView& view);

@@ -1866,79 +1866,8 @@ namespace TEN::Renderer
 		pRenderViewPtrs[1] = _depthRenderTarget.RenderTargetView.Get();
 		_context->OMSetRenderTargets(2, &pRenderViewPtrs[0], _renderTarget.DepthStencilView.Get());
 
-		// Lambda function to perform normal render pass and mirror passes, if needed.
-		auto doRenderPass = [&](RendererPass pass, bool drawMirrors)
-		{
-			// Draw room geometry first, if applicable for a given pass.
-			if (pass != RendererPass::Transparent && pass != RendererPass::GunFlashes)
-				DrawRooms(view, pass);
-
-			// Draw all objects, and additionally draw all reflections for them.
-			auto renderObjects = [&](bool player, bool moveables, bool statics)
-			{
-				switch (pass)
-				{
-					case RendererPass::Transparent:
-						DrawSortedFaces(view);
-						break;
-
-					case RendererPass::GunFlashes:
-						DrawGunFlashes(view);
-						DrawBaddyGunflashes(view);
-						break;
-
-					default:
-						if (statics)
-						{
-							DrawStatics(view, pass);
-							DrawDebris(view, pass);	 // Debris mostly originate from shatter statics.
-						}
-
-						if (moveables)
-						{
-							DrawItems(view, pass);
-							DrawEffects(view, pass);
-							DrawGunShells(view, pass);
-							DrawSpiders(view, pass);
-							DrawScarabs(view, pass);
-							DrawBats(view, pass);
-							DrawRats(view, pass);
-							DrawLocusts(view, pass);
-							DrawFishSwarm(view, pass);
-						}
-						else if (player)
-						{
-							DrawItems(view, pass, true);
-							DrawGunShells(view, pass);
-						}
-						
-						// Sorted sprites already collected at beginning of frame.
-						if (pass != RendererPass::CollectTransparentFaces)
-							DrawSprites(view, pass);
-
-						break;
-				}
-			};
-
-			// Draw original objects.
-			renderObjects(true, true, true);
-
-			// Draw mirrored objects for all visible mirrors.
-			if (drawMirrors && !view.Mirrors.empty())
-			{
-				SetCullMode(CullMode::Clockwise);
-				for (auto& mirror : view.Mirrors)
-				{
-					_currentMirror = &mirror;
-					renderObjects(mirror.ReflectLara, mirror.ReflectMoveables, mirror.ReflectStatics);
-					_currentMirror = nullptr;
-				}
-				SetCullMode(CullMode::CounterClockwise);
-			}
-		};
-
 		// Render G-Buffer pass.
-		doRenderPass(RendererPass::GBuffer, true);
+		DoRenderPass(RendererPass::GBuffer, view, true);
 
 		// Calculate ambient occlusion.
 		if (g_Configuration.EnableAmbientOcclusion)
@@ -1961,13 +1890,13 @@ namespace TEN::Renderer
 		// Bind main render target again. Main depth buffer is already filled and avoids overdraw in following steps.
 		_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), _renderTarget.DepthStencilView.Get());
 
-		doRenderPass(RendererPass::Opaque, true);
-		doRenderPass(RendererPass::Additive, true);
-		doRenderPass(RendererPass::CollectTransparentFaces, false);
+		DoRenderPass(RendererPass::Opaque, view, true);
+		DoRenderPass(RendererPass::Additive, view, true);
+		DoRenderPass(RendererPass::CollectTransparentFaces, view, false);
 		SortTransparentFaces(view);
 
-		doRenderPass(RendererPass::Transparent, true);
-		doRenderPass(RendererPass::GunFlashes, true); // HACK: Gunflashes are drawn after everything because they are near the camera.
+		DoRenderPass(RendererPass::Transparent, view, true);
+		DoRenderPass(RendererPass::GunFlashes, view, true); // HACK: Gunflashes are drawn after everything because they are near the camera.
 		
 		// Draw 3D debug lines and triangles.
 		DrawLines3D(view);
@@ -2289,6 +2218,75 @@ namespace TEN::Renderer
 	void Renderer::DumpGameScene(SceneRenderMode renderMode)
 	{
 		RenderScene(&_dumpScreenRenderTarget, _gameCamera, renderMode);
+	}
+
+	void Renderer::DoRenderPass(RendererPass pass, RenderView& view, bool drawMirrors)
+	{
+		// Draw room geometry first, if applicable for a given pass.
+		if (pass != RendererPass::Transparent && pass != RendererPass::GunFlashes)
+			DrawRooms(view, pass);
+
+		// Draw all objects.
+		DrawObjects(pass, view, true, true, true);
+
+		// If mirrors are in view, render mirrored objects for every mirror.
+		if (drawMirrors && !view.Mirrors.empty())
+		{
+			SetCullMode(CullMode::Clockwise);
+			for (auto& mirror : view.Mirrors)
+			{
+				_currentMirror = &mirror;
+				DrawObjects(pass, view, mirror.ReflectLara, mirror.ReflectMoveables, mirror.ReflectStatics);
+				_currentMirror = nullptr;
+			}
+			SetCullMode(CullMode::CounterClockwise);
+		}
+	}
+
+	void Renderer::DrawObjects(RendererPass pass, RenderView& view, bool player, bool moveables, bool statics)
+	{
+		switch (pass)
+		{
+		case RendererPass::Transparent:
+			DrawSortedFaces(view);
+			break;
+
+		case RendererPass::GunFlashes:
+			DrawGunFlashes(view);
+			DrawBaddyGunflashes(view);
+			break;
+
+		default:
+			if (statics)
+			{
+				DrawStatics(view, pass);
+				DrawDebris(view, pass); // Debris mostly originate from shatter statics.
+			}
+
+			if (moveables)
+			{
+				DrawItems(view, pass);
+				DrawEffects(view, pass);
+				DrawGunShells(view, pass);
+				DrawSpiders(view, pass);
+				DrawScarabs(view, pass);
+				DrawBats(view, pass);
+				DrawRats(view, pass);
+				DrawLocusts(view, pass);
+				DrawFishSwarm(view, pass);
+			}
+			else if (player)
+			{
+				DrawItems(view, pass, true);
+				DrawGunShells(view, pass);
+			}
+
+			// Sorted sprites are already collected at the beginning of frame.
+			if (pass != RendererPass::CollectTransparentFaces)
+				DrawSprites(view, pass);
+
+			break;
+		}
 	}
 
 	void Renderer::DrawItems(RenderView& view, RendererPass rendererPass, bool onlyPlayer)
