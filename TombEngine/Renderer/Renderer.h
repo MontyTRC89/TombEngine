@@ -379,7 +379,6 @@ namespace TEN::Renderer
 		ComPtr<ID3D11PixelShader> _psPostProcessExclusion;
 		ComPtr<ID3D11PixelShader> _psPostProcessFinalPass;
 		ComPtr<ID3D11PixelShader> _psPostProcessLensFlare;
-		ComPtr<ID3D11PixelShader> _psDownsampleDepthBuffer;
 
 		bool _doingFullscreenPass = false;
 
