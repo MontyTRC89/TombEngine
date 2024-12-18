@@ -1652,6 +1652,9 @@ namespace TEN::Renderer
 		// Check if light is spawned in a mirrored room, and create reflection.
 		for (auto& mirror : g_Level.Mirrors)
 		{
+			if (!mirror.ReflectLights)
+				continue;
+
 			if ((Camera.pos.RoomNumber == mirror.RoomNumber || LaraItem->RoomNumber == mirror.RoomNumber) && 
 				IsPointInRoom(light.Position, mirror.RoomNumber))
 			{
