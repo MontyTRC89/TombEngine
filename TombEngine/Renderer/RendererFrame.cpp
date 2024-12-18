@@ -528,7 +528,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::CollectLights(Vector3 position, float radius, int roomNumber, int prevRoomNumber, bool prioritizeShadowLight, bool useCachedRoomLights, std::vector<RendererLightNode>* roomsLights, std::vector<RendererLight*>* outputLights)
+	void Renderer::CollectLights(const Vector3& pos, float radius, int roomNumber, int prevRoomNumber, bool prioritizeShadowLight, bool useCachedRoomLights, std::vector<RendererLightNode>* roomsLights, std::vector<RendererLight*>* outputLights)
 	{
 		if (_rooms.size() <= roomNumber)
 			return;
@@ -573,7 +573,7 @@ namespace TEN::Renderer
 		// Dynamic lights have the priority
 		for (auto& light : _dynamicLights[_dynamicLightList])
 		{
-			float distSqr = Vector3::DistanceSquared(position, light.Position);
+			float distSqr = Vector3::DistanceSquared(pos, light.Position);
 			processLight(light, distSqr, 1);
 		}
 
@@ -604,7 +604,7 @@ namespace TEN::Renderer
 							 light.Type == LightType::Shadow ||
 							 light.Type == LightType::Spot)
 					{
-						float distSqr = Vector3::DistanceSquared(position, light.Position);
+						float distSqr = Vector3::DistanceSquared(pos, light.Position);
 						processLight(light, distSqr, 0);
 					}
 					else
@@ -655,7 +655,7 @@ namespace TEN::Renderer
 		std::vector<RendererLight*> lightsToDraw;
 		CollectLights(Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z), CAMERA_LIGHT_COLLECTION_RADIUS, Camera.pos.RoomNumber, NO_VALUE, true, false, nullptr, &lightsToDraw);
 
-		if (!lightsToDraw.empty() && lightsToDraw.front()->CastShadows)
+		if (g_Configuration.ShadowType != ShadowMode::None && !lightsToDraw.empty() && lightsToDraw.front()->CastShadows)
 		{
 			_shadowLight = lightsToDraw.front();
 		}

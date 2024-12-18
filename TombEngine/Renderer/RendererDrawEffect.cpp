@@ -31,6 +31,7 @@
 #include "Objects/Utils/object_helper.h"
 #include "Renderer/Structures/RendererSprite2D.h"
 #include "Renderer/Structures/RendererSprite.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
 #include "Structures/RendererSpriteBucket.h"
 
@@ -1011,6 +1012,16 @@ namespace TEN::Renderer
 
 	bool Renderer::DrawGunFlashes(RenderView& view) 
 	{
+		if (!Lara.RightArm.GunFlash && !Lara.LeftArm.GunFlash)
+			return false;
+
+		if (Lara.Control.Look.OpticRange > 0)
+			return false;
+
+		const auto& settings = g_GameFlow->GetSettings()->Weapons[(int)Lara.Control.Weapon.GunType - 1];
+		if (!settings.MuzzleFlash)
+			return false;
+
 		_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
 		_context->PSSetShader(_psStatics.Get(), nullptr, 0);
 
@@ -1021,16 +1032,11 @@ namespace TEN::Renderer
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		if (!Lara.RightArm.GunFlash && !Lara.LeftArm.GunFlash)
-			return true;
-
-		if (Lara.Control.Look.OpticRange > 0)
-			return true;
-
 		const auto& room = _rooms[LaraItem->RoomNumber];
 		auto* itemPtr = &_items[LaraItem->Index];
 
-		_stStatic.Color = Vector4::One;
+		// Divide gunflash tint by 2 because tinting uses multiplication and additive color which doesn't look good with overbright color values.
+		_stStatic.Color = settings.ColorizeMuzzleFlash ? ((Vector4)settings.FlashColor / 2) : Vector4::One;
 		_stStatic.AmbientLight = room.AmbientLight;
 		_stStatic.LightMode = (int)LightMode::Static;
 		BindStaticLights(itemPtr->LightsToDraw);
@@ -1039,11 +1045,10 @@ namespace TEN::Renderer
 		short zOffset = 0;
 		short rotationX = 0;
 
-		SetBlendMode(BlendMode::Additive);
 		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+		SetBlendMode(BlendMode::Additive);
 
 		if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare &&
-			Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun &&
 			Lara.Control.Weapon.GunType != LaraWeaponType::Crossbow)
 		{
 			switch (Lara.Control.Weapon.GunType)
@@ -1061,6 +1066,7 @@ namespace TEN::Renderer
 				break;
 
 			case LaraWeaponType::HK:
+			case LaraWeaponType::Shotgun:
 				length = 300;
 				zOffset = 92;
 				rotationX = -14560;
@@ -1387,6 +1393,8 @@ namespace TEN::Renderer
 
 			SetCullMode(CullMode::None);
 
+			_primitiveBatch->Begin();
+
 			for (auto& deb : DebrisFragments)
 			{
 				if (deb.active)
@@ -1403,40 +1411,42 @@ namespace TEN::Renderer
 						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[deb.mesh.tex]), SamplerStateRegister::LinearClamp);
 					}
 
-					_stStatic.World = Matrix::Lerp(deb.PrevTransform, deb.Transform, GetInterpolationFactor());
+					_stStatic.World = Matrix::Identity;
 					_stStatic.Color = deb.color;
 					_stStatic.AmbientLight = _rooms[deb.roomNumber].AmbientLight;
 					_stStatic.LightMode = (int)deb.lightMode;
 
 					_cbStatic.UpdateData(_stStatic, _context.Get());
 
+					auto matrix = Matrix::Lerp(deb.PrevTransform, deb.Transform, GetInterpolationFactor());
+
 					Vertex vtx0;
-					vtx0.Position = deb.mesh.Positions[0];
+					vtx0.Position = Vector3::Transform(deb.mesh.Positions[0], matrix);
 					vtx0.UV = deb.mesh.TextureCoordinates[0];
 					vtx0.Normal = deb.mesh.Normals[0];
 					vtx0.Color = deb.mesh.Colors[0];
 
 					Vertex vtx1;
-					vtx1.Position = deb.mesh.Positions[1];
+					vtx1.Position = Vector3::Transform(deb.mesh.Positions[1], matrix);
 					vtx1.UV = deb.mesh.TextureCoordinates[1];
 					vtx1.Normal = deb.mesh.Normals[1];
 					vtx1.Color = deb.mesh.Colors[1];
 
 					Vertex vtx2;
-					vtx2.Position = deb.mesh.Positions[2];
+					vtx2.Position = Vector3::Transform(deb.mesh.Positions[2], matrix);
 					vtx2.UV = deb.mesh.TextureCoordinates[2];
 					vtx2.Normal = deb.mesh.Normals[2];
 					vtx2.Color = deb.mesh.Colors[2];
 
-					_primitiveBatch->Begin();
 					_primitiveBatch->DrawTriangle(vtx0, vtx1, vtx2);
-					_primitiveBatch->End();
 
 					_numDebrisDrawCalls++;
 					_numDrawCalls++;
 					_numTriangles++;
 				}
 			}
+
+			_primitiveBatch->End();
 
 			// TODO: temporary fix, we need to remove every use of SpriteBatch and PrimitiveBatch because
 			// they mess up render states cache.

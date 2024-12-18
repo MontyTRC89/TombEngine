@@ -25,6 +25,7 @@ enum class SavedVarType
 	Vec2,
 	Vec3,
 	Rotation,
+	Time,
 	Color,
 	FuncName,
 
@@ -39,6 +40,7 @@ using SavedVar = std::variant<
 	Vector2,  // Vec2
 	Vector3,  // Vec3
 	Vector3,  // Rotation
+	int,	  // Time
 	D3DCOLOR, // Color
 	FuncName>;
 
@@ -69,7 +71,7 @@ public:
 	virtual void ExecuteFunction(const std::string& luaFuncName, short idOne, short idTwo = 0) = 0;
 
 	virtual void GetVariables(std::vector<SavedVar>& vars) = 0;
-	virtual void SetVariables(const std::vector<SavedVar>& vars) = 0;
+	virtual void SetVariables(const std::vector<SavedVar>& vars, bool onlyLevelVars) = 0;
 
 	virtual void GetCallbackStrings(
 		std::vector<std::string>& preStart,

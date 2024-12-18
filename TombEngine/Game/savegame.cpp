@@ -206,6 +206,19 @@ bool SaveGame::DoesSaveGameExist(int slot, bool silent)
 	return true;
 }
 
+bool SaveGame::IsSaveGameValid(int slot)
+{
+	SaveGameHeader header;
+	if (!LoadHeader(slot, &header))
+		return false;
+
+	// Hash mismatch between savegame and level file means that level version has changed.
+	if (header.LevelHash != LastLevelHash)
+		return false;
+
+	return true;
+}
+
 bool SaveGame::IsLoadGamePossible()
 {
 	for (int i = 0; i < SAVEGAME_MAX; i++)
@@ -249,14 +262,13 @@ const std::vector<byte> SaveGame::Build()
 	sghb.add_level_name(levelNameOffset);
 	sghb.add_level_hash(LastLevelHash);
 
-	auto gameTime = GetGameTime(GameTimer);
-	sghb.add_days(gameTime.Days);
-	sghb.add_hours(gameTime.Hours);
-	sghb.add_minutes(gameTime.Minutes);
-	sghb.add_seconds(gameTime.Seconds);
+	const auto& gameTime = SaveGame::Statistics.Game.TimeTaken;
+	sghb.add_hours(gameTime.GetHours());
+	sghb.add_minutes(gameTime.GetMinutes());
+	sghb.add_seconds(gameTime.GetSeconds());
 
 	sghb.add_level(CurrentLevel);
-	sghb.add_timer(GameTimer);
+	sghb.add_timer(GlobalCounter);
 	sghb.add_count(++LastSaveGame);
 	auto headerOffset = sghb.Finish();
 
@@ -265,9 +277,10 @@ const std::vector<byte> SaveGame::Build()
 	sgLevelStatisticsBuilder.add_ammo_used(Statistics.Level.AmmoUsed);
 	sgLevelStatisticsBuilder.add_kills(Statistics.Level.Kills);
 	sgLevelStatisticsBuilder.add_medipacks_used(Statistics.Level.HealthUsed);
+	sgLevelStatisticsBuilder.add_damage_taken(Statistics.Level.DamageTaken);
 	sgLevelStatisticsBuilder.add_distance(Statistics.Level.Distance);
 	sgLevelStatisticsBuilder.add_secrets(Statistics.Level.Secrets);
-	sgLevelStatisticsBuilder.add_timer(Statistics.Level.Timer);
+	sgLevelStatisticsBuilder.add_timer(SaveGame::Statistics.Level.TimeTaken);
 	auto levelStatisticsOffset = sgLevelStatisticsBuilder.Finish();
 
 	Save::SaveGameStatisticsBuilder sgGameStatisticsBuilder{ fbb };
@@ -275,9 +288,10 @@ const std::vector<byte> SaveGame::Build()
 	sgGameStatisticsBuilder.add_ammo_used(Statistics.Game.AmmoUsed);
 	sgGameStatisticsBuilder.add_kills(Statistics.Game.Kills);
 	sgGameStatisticsBuilder.add_medipacks_used(Statistics.Game.HealthUsed);
+	sgGameStatisticsBuilder.add_damage_taken(Statistics.Game.DamageTaken);
 	sgGameStatisticsBuilder.add_distance(Statistics.Game.Distance);
 	sgGameStatisticsBuilder.add_secrets(Statistics.Game.Secrets);
-	sgGameStatisticsBuilder.add_timer(Statistics.Game.Timer);
+	sgGameStatisticsBuilder.add_timer(SaveGame::Statistics.Game.TimeTaken);
 	auto gameStatisticsOffset = sgGameStatisticsBuilder.Finish();
 
 	// Lara
@@ -1375,6 +1389,16 @@ const std::vector<byte> SaveGame::Build()
 					break;
 				}
 
+			case SavedVarType::Time:
+				{
+					Save::timeTableBuilder ttb{ fbb };
+					ttb.add_scalar(std::get<int>(s));
+					auto timeOffset = ttb.Finish();
+
+					putDataInVec(Save::VarUnion::time, timeOffset);
+					break;
+				}
+
 			case SavedVarType::Color:
 				{
 					Save::colorTableBuilder ctb{ fbb };
@@ -1450,6 +1474,7 @@ const std::vector<byte> SaveGame::Build()
 	sgb.add_header(headerOffset);
 	sgb.add_level(levelStatisticsOffset);
 	sgb.add_game(gameStatisticsOffset);
+	sgb.add_secret_map(SaveGame::Statistics.SecretBits);
 	sgb.add_camera(cameraOffset);
 	sgb.add_lara(laraOffset);
 	sgb.add_rooms(roomOffset);
@@ -1574,7 +1599,7 @@ bool SaveGame::Save(int slot)
 		return false;
 
 	g_GameScript->OnSave();
-	HandleAllGlobalEvents(EventType::Save, (Activator)LaraItem->Index);
+	HandleAllGlobalEvents(EventType::Save, (Activator)short(LaraItem->Index));
 
 	// Savegame infos need to be reloaded so that last savegame counter properly increases.
 	LoadHeaders();
@@ -1614,15 +1639,9 @@ bool SaveGame::Save(int slot)
 
 bool SaveGame::Load(int slot)
 {
-	if (!IsSaveGameSlotValid(slot))
+	if (!IsSaveGameValid(slot))
 	{
-		TENLog("Savegame slot " + std::to_string(slot) + " is invalid, load is impossible.", LogLevel::Error);
-		return false;
-	}
-
-	if (!DoesSaveGameExist(slot))
-	{
-		TENLog("Savegame in slot " + std::to_string(slot) + " does not exist.", LogLevel::Error);
+		TENLog("Loading from savegame in slot " + std::to_string(slot) + " is impossible, data is missing or level has changed.", LogLevel::Error);
 		return false;
 	}
 
@@ -1681,30 +1700,32 @@ bool SaveGame::Load(int slot)
 
 static void ParseStatistics(const Save::SaveGame* s, bool isHub)
 {
+	SaveGame::Statistics.SecretBits = s->secret_map();
+
 	SaveGame::Statistics.Level.AmmoHits = s->level()->ammo_hits();
 	SaveGame::Statistics.Level.AmmoUsed = s->level()->ammo_used();
 	SaveGame::Statistics.Level.Distance = s->level()->distance();
 	SaveGame::Statistics.Level.HealthUsed = s->level()->medipacks_used();
+	SaveGame::Statistics.Level.DamageTaken = s->level()->damage_taken();
 	SaveGame::Statistics.Level.Kills = s->level()->kills();
 	SaveGame::Statistics.Level.Secrets = s->level()->secrets();
-	SaveGame::Statistics.Level.Timer = s->level()->timer();
+	SaveGame::Statistics.Level.TimeTaken = s->level()->timer();
 
 	// Don't touch game statistics if data is parsed in hub mode.
 	if (isHub)
 		return;
 
-	GameTimer = s->header()->timer();
-
 	SaveGame::Statistics.Game.AmmoHits = s->game()->ammo_hits();
 	SaveGame::Statistics.Game.AmmoUsed = s->game()->ammo_used();
 	SaveGame::Statistics.Game.Distance = s->game()->distance();
 	SaveGame::Statistics.Game.HealthUsed = s->game()->medipacks_used();
+	SaveGame::Statistics.Game.DamageTaken = s->game()->damage_taken();
 	SaveGame::Statistics.Game.Kills = s->game()->kills();
 	SaveGame::Statistics.Game.Secrets = s->game()->secrets();
-	SaveGame::Statistics.Game.Timer = s->game()->timer();
+	SaveGame::Statistics.Game.TimeTaken = s->game()->timer();
 }
 
-static void ParseLua(const Save::SaveGame* s)
+static void ParseLua(const Save::SaveGame* s, bool hubMode)
 {
 	// Event sets
 
@@ -1794,6 +1815,15 @@ static void ParseLua(const Save::SaveGame* s)
 				break;
 			}
 
+			case Save::VarUnion::time:
+			{
+				auto stored = var->u_as_time()->scalar();
+				SavedVar var;
+				var.emplace<(int)SavedVarType::Time>(stored);
+				loadedVars.push_back(var);
+				break;
+			}
+
 			case Save::VarUnion::color:
 				loadedVars.push_back((D3DCOLOR)var->u_as_color()->color());
 				break;
@@ -1808,7 +1838,7 @@ static void ParseLua(const Save::SaveGame* s)
 		}
 	}
 
-	g_GameScript->SetVariables(loadedVars);
+	g_GameScript->SetVariables(loadedVars, hubMode);
 
 	auto populateCallbackVecs = [&s](auto callbackFunc)
 	{
@@ -2672,7 +2702,7 @@ void SaveGame::Parse(const std::vector<byte>& buffer, bool hubMode)
 	const Save::SaveGame* s = Save::GetSaveGame(buffer.data());
 
 	ParseLevel(s, hubMode);
-	ParseLua(s);
+	ParseLua(s, hubMode);
 	ParseStatistics(s, hubMode);
 
 	// Effects and player data is ignored when loading hub.
@@ -2730,7 +2760,6 @@ bool SaveGame::LoadHeader(int slot, SaveGameHeader* header)
 		header->Level = s->header()->level();
 		header->LevelName = s->header()->level_name()->str();
 		header->LevelHash = s->header()->level_hash();
-		header->Days = s->header()->days();
 		header->Hours = s->header()->hours();
 		header->Minutes = s->header()->minutes();
 		header->Seconds = s->header()->seconds();

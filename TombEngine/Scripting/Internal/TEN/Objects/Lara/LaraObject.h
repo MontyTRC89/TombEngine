@@ -2,24 +2,6 @@
 #include "Game/Lara/lara_struct.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 
-static const std::unordered_map<std::string, LaraWeaponType> LaraWeaponTypeMap
-{
-	{ "NONE", LaraWeaponType::None },
-	{ "PISTOLS", LaraWeaponType::Pistol },
-	{ "REVOLVER", LaraWeaponType::Revolver },
-	{ "UZI", LaraWeaponType::Uzi },
-	{ "SHOTGUN", LaraWeaponType::Shotgun },
-	{ "HK", LaraWeaponType::HK },
-	{ "CROSSBOW", LaraWeaponType::Crossbow },
-	{ "FLARE", LaraWeaponType::Flare },
-	{ "TORCH", LaraWeaponType::Torch },
-	{ "GRENADELAUNCHER", LaraWeaponType::GrenadeLauncher },
-	{ "HARPOONGUN", LaraWeaponType::HarpoonGun },
-	{ "ROCKETLAUNCHER", LaraWeaponType::RocketLauncher },
-	{ "SNOWMOBILE", LaraWeaponType::Snowmobile },
-	{ "NUMWEAPONS", LaraWeaponType::NumWeapons}
-};
-
 static const std::unordered_map<std::string, HandStatus> HandStatusMap
 {
 	{ "FREE", HandStatus::Free },

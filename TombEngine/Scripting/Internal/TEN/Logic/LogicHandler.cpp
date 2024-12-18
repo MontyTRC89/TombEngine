@@ -1,8 +1,6 @@
 #include "framework.h"
 #include "LogicHandler.h"
 
-#include <filesystem>
-
 #include "Game/control/volume.h"
 #include "Game/effects/Electricity.h"
 #include "Game/Lara/lara.h"
@@ -10,12 +8,13 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
-#include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
-#include "Scripting/Internal/TEN/Rotation/Rotation.h"
-#include "Scripting/Internal/TEN/Vec2/Vec2.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Types/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Types/Time/Time.h"
+#include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 
 using namespace TEN::Effects::Electricity;
 
@@ -149,6 +148,7 @@ void SetVariable(sol::table tab, sol::object key, sol::object value)
 		if (value.is<Vec2>() ||
 			value.is<Vec3>() ||
 			value.is<Rotation>() ||
+			value.is<Time>() ||
 			value.is<ScriptColor>())
 		{
 			PutVar(tab, key, value);
@@ -323,7 +323,7 @@ Possible event type values:
 */
 void LogicHandler::HandleEvent(const std::string& name, EventType type, sol::optional<Moveable&> activator)
 {
-	TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? (Activator)activator.value().GetIndex() : (Activator)LaraItem->Index);
+	TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? (Activator)activator.value().GetIndex() : (Activator)short(LaraItem->Index));
 }
 
 /*** Attempt to find an event set and enable specified event in it.
@@ -485,9 +485,11 @@ void LogicHandler::FreeLevelScripts()
 }
 
 // Used when loading.
-void LogicHandler::SetVariables(const std::vector<SavedVar>& vars)
+void LogicHandler::SetVariables(const std::vector<SavedVar>& vars, bool onlyLevelVars)
 {
-	ResetGameTables();
+	if (!onlyLevelVars)
+		ResetGameTables();
+
 	ResetLevelTables();
 
 	std::unordered_map<unsigned int, sol::table> solTables;
@@ -539,6 +541,11 @@ void LogicHandler::SetVariables(const std::vector<SavedVar>& vars)
 					auto vec3 = Rotation(std::get<int(SavedVarType::Rotation)>(vars[second]));
 					solTables[i][vars[first]] = vec3;
 				}
+				else if (vars[second].index() == int(SavedVarType::Time))
+				{
+					auto time = Time(std::get<int(SavedVarType::Time)>(vars[second]));
+					solTables[i][vars[first]] = time;
+				}
 				else if (vars[second].index() == int(SavedVarType::Color))
 				{
 					auto color = D3DCOLOR(std::get<int(SavedVarType::Color)>(vars[second]));
@@ -564,6 +571,9 @@ void LogicHandler::SetVariables(const std::vector<SavedVar>& vars)
 	sol::table levelVars = rootTable[ScriptReserved_LevelVars];
 	for (auto& [first, second] : levelVars)
 		(*m_handler.GetState())[ScriptReserved_LevelVars][first] = second;
+
+	if (onlyLevelVars)
+		return;
 
 	sol::table gameVars = rootTable[ScriptReserved_GameVars];
 	for (auto& [first, second] : gameVars)
@@ -759,6 +769,10 @@ void LogicHandler::GetVariables(std::vector<SavedVar>& vars)
 					else if (second.is<Rotation>())
 					{
 						putInVars(Handle<SavedVarType::Rotation, Vector3>(second.as<Rotation>(), varsMap, numVars, vars));
+					}
+					else if (second.is<Time>())
+					{
+						putInVars(Handle<SavedVarType::Time, int>(second.as<Time>(), varsMap, numVars, vars));
 					}
 					else if (second.is<ScriptColor>())
 					{

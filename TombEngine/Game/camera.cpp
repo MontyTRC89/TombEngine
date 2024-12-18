@@ -215,6 +215,38 @@ inline void RumbleFromBounce()
 	Rumble(std::clamp((float)abs(Camera.bounce) / 70.0f, 0.0f, 0.8f), 0.2f);
 }
 
+void CalculateBounce(bool binocularMode)
+{
+	if (Camera.bounce == 0)
+		return;
+
+	if (Camera.bounce <= 0)
+	{
+		if (binocularMode)
+		{
+			Camera.target.x += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
+			Camera.target.y += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
+			Camera.target.z += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
+		}
+		else
+		{
+			int bounce = -Camera.bounce;
+			int bounce2 = bounce / 2;
+			Camera.target.x += GetRandomControl() % bounce - bounce2;
+			Camera.target.y += GetRandomControl() % bounce - bounce2;
+			Camera.target.z += GetRandomControl() % bounce - bounce2;
+		}
+
+		Camera.bounce += 5;
+		RumbleFromBounce();
+	}
+	else
+	{
+		Camera.pos.y += Camera.bounce;
+		Camera.target.y += Camera.bounce;
+		Camera.bounce = 0;
+	}
+}
 
 void InitializeCamera()
 {
@@ -313,25 +345,7 @@ void MoveCamera(GameVector* ideal, int speed)
 	Camera.pos.z += (ideal->z - Camera.pos.z) / speed;
 	Camera.pos.RoomNumber = ideal->RoomNumber;
 
-	if (Camera.bounce)
-	{
-		if (Camera.bounce <= 0)
-		{
-			int bounce = -Camera.bounce;
-			int bounce2 = bounce / 2;
-			Camera.target.x += GetRandomControl() % bounce - bounce2;
-			Camera.target.y += GetRandomControl() % bounce - bounce2;
-			Camera.target.z += GetRandomControl() % bounce - bounce2;
-			Camera.bounce += 5;
-			RumbleFromBounce();
-		}
-		else
-		{
-			Camera.pos.y += Camera.bounce;
-			Camera.target.y += Camera.bounce;
-			Camera.bounce = 0;
-		}
-	}
+	CalculateBounce(false);
 
 	int y = Camera.pos.y;
 	if (TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.RoomNumber))
@@ -944,6 +958,7 @@ void BinocularCamera(ItemInfo* item)
 			player.Inventory.IsBusy = false;
 
 			Camera.type = BinocularOldCamera;
+			Camera.DisableInterpolation = true;
 			Camera.target = LastTarget;
 			AlterFOV(LastFOV);
 			return;
@@ -955,7 +970,7 @@ void BinocularCamera(ItemInfo* item)
 
 			auto origin = Camera.pos.ToVector3i();
 			auto target = Camera.target.ToVector3i();
-			LaraTorch(&origin, &target, player.ExtraHeadRot.y, 192);
+			LaraTorch(&origin, &target);
 		}
 	}
 
@@ -1000,23 +1015,8 @@ void BinocularCamera(ItemInfo* item)
 		Camera.target.RoomNumber = item->RoomNumber;
 	}
 
-	if (Camera.bounce &&
-		Camera.type == Camera.oldType)
-	{
-		if (Camera.bounce <= 0)
-		{
-			Camera.target.x += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
-			Camera.target.y += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
-			Camera.target.z += (CLICK(0.25f) / 4) * (GetRandomControl() % (-Camera.bounce) - (-Camera.bounce / 2));
-			Camera.bounce += 5;
-			RumbleFromBounce();
-		}
-		else
-		{
-			Camera.bounce = 0;
-			Camera.target.y += Camera.bounce;
-		}
-	}
+	if (Camera.type == Camera.oldType)
+		CalculateBounce(true);
 
 	Camera.target.RoomNumber = GetPointCollision(Camera.pos.ToVector3i(), Camera.target.RoomNumber).GetRoomNumber();
 	LookAt(&Camera, 0);
@@ -1489,6 +1489,9 @@ std::vector<MESH_INFO*> FillCollideableStaticsList()
 
 void ItemsCollideCamera()
 {
+	if (!g_GameFlow->GetSettings()->Camera.ObjectCollision)
+		return;
+
 	constexpr auto RADIUS = CLICK(0.5f);
 
 	auto itemList = FillCollideableItemList();

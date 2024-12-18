@@ -34,13 +34,6 @@ enum class FreezeMode
 	Player
 };
 
-enum class LevelLoadType
-{
-	New,
-	Hub,
-	Load
-};
-
 enum CardinalDirection
 {
 	NORTH,
@@ -60,7 +53,6 @@ constexpr int MAX_ROOMS = 1024;
 
 constexpr auto LOOP_FRAME_COUNT = 2;
 
-extern int GameTimer;
 extern int RumbleTimer;
 extern int GlobalCounter;
 
@@ -106,8 +98,8 @@ void UpdateShatters();
 void CleanUp();
 
 void InitializeOrLoadGame(bool loadGame);
-void InitializeScripting(int levelIndex, LevelLoadType type);
-void DeInitializeScripting(int levelIndex);
+void InitializeScripting(int levelIndex, bool loadGame);
+void DeInitializeScripting(int levelIndex, GameStatus reason);
 
 void SetupInterpolation();
 

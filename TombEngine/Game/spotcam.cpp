@@ -494,6 +494,7 @@ void CalculateSpotCameras()
 			Camera.target.x = ctx;
 			Camera.target.y = cty;
 			Camera.target.z = ctz;
+			CalculateBounce(false);
 		}
 
 		int outsideRoom = IsRoomOutside(cpx, cpy, cpz);

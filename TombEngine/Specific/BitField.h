@@ -2,7 +2,6 @@
 
 namespace TEN::Utils
 {
-	// TODO: Switch to std::span container type as parameter whenever we update to C++20.
 	// TODO: When all conversions are complete, remove the size cap and use unsigned long long for packedBits input.
 
 	class BitField
@@ -11,24 +10,27 @@ namespace TEN::Utils
 		static constexpr auto SIZE_DEFAULT = 32;
 
 		std::vector<bool> _bits = {};
-		bool IndexIsCorrect(unsigned int index) const;
 
 	public:
 		// Presets
+
 		static const BitField Empty;
 		static const BitField Default;
 
 		// Constructors
+
 		BitField();
 		BitField(unsigned int size);
 		BitField(unsigned int size, unsigned int packedBits);
 		BitField(const std::string& bitString);
 		
 		// Getters
+
 		unsigned int GetSize() const;
 		unsigned int GetCount() const;
 
 		// Setters
+
 		void Set(const std::vector<unsigned int>& indices);
 		void Set(unsigned int index);
 		void SetAll();
@@ -40,12 +42,14 @@ namespace TEN::Utils
 		void FlipAll();
 
 		// Inquirers
+
 		bool Test(const std::vector<unsigned int>& indices, bool testAny = true) const;
 		bool Test(unsigned int index) const;
 		bool TestAny() const;
 		bool TestAll() const;
 
 		// Converters
+
 		unsigned int ToPackedBits() const;
 		std::string	 ToString() const;
 
@@ -64,5 +68,6 @@ namespace TEN::Utils
 		// Helpers
 
 		void Fill(bool value);
+		bool IsIndexCorrect(unsigned int index) const;
 	};
 }

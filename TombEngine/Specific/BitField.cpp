@@ -38,17 +38,6 @@ namespace TEN::Utils
 			_bits.push_back(bit == '1');
 	}
 
-	bool BitField::IndexIsCorrect(unsigned int index) const
-	{
-		if (index >= _bits.size())
-		{
-			TENLog(std::string("BitField attempted to access bit at invalid index."), LogLevel::Warning);
-			return false;
-		}
-
-		return true;
-	}
-
 	unsigned int BitField::GetSize() const
 	{
 		return (unsigned int)_bits.size();
@@ -70,7 +59,7 @@ namespace TEN::Utils
 	{
 		for (const unsigned int& index : indices)
 		{
-			if (!IndexIsCorrect(index))
+			if (!IsIndexCorrect(index))
 				continue;
 			
 			_bits[index] = true;
@@ -91,7 +80,7 @@ namespace TEN::Utils
 	{
 		for (const unsigned int& index : indices)
 		{
-			if (!IndexIsCorrect(index))
+			if (!IsIndexCorrect(index))
 				continue;
 
 			_bits[index] = false;
@@ -112,7 +101,7 @@ namespace TEN::Utils
 	{
 		for (const unsigned int& index : indices)
 		{
-			if (!IndexIsCorrect(index))
+			if (!IsIndexCorrect(index))
 				continue;
 
 			_bits[index].flip();
@@ -133,7 +122,7 @@ namespace TEN::Utils
 	{
 		for (const unsigned int& index : indices)
 		{
-			if (!IndexIsCorrect(index))
+			if (!IsIndexCorrect(index))
 				continue;
 
 			// Test if any bits at input indices are set.
@@ -155,7 +144,7 @@ namespace TEN::Utils
 
 	bool BitField::Test(unsigned int index) const
 	{
-		if (!IndexIsCorrect(index))
+		if (!IsIndexCorrect(index))
 			return false;
 
 		return _bits[index];
@@ -274,5 +263,16 @@ namespace TEN::Utils
 	void BitField::Fill(bool value)
 	{
 		std::fill(_bits.begin(), _bits.end(), value);
+	}
+
+	bool BitField::IsIndexCorrect(unsigned int index) const
+	{
+		if (index >= _bits.size())
+		{
+			TENLog(std::string("BitField attempted to access bit at invalid index."), LogLevel::Warning);
+			return false;
+		}
+
+		return true;
 	}
 }
