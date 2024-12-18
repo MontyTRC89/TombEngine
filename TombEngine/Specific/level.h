@@ -136,7 +136,7 @@ struct LEVEL
 	std::vector<int>			 LoopedEventSetIndices = {};
 	std::vector<AI_OBJECT>		 AIObjects = {};
 	std::vector<SPRITE>			 Sprites   = {};
-	std::vector<MirrorInfo>			 Mirrors = {};
+	std::vector<MirrorInfo>		 Mirrors = {};
 
 	// Texture data
 	TEXTURE				 SkyTexture		   = {};

@@ -980,7 +980,6 @@ void FreeLevel(bool partial)
 	g_Level.VolumeEventSets.resize(0);
 	g_Level.GlobalEventSets.resize(0);
 	g_Level.LoopedEventSetIndices.resize(0);
-	g_Level.Mirrors.resize(0);
 
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
@@ -1010,6 +1009,7 @@ void FreeLevel(bool partial)
 	g_Level.Commands.resize(0);
 	g_Level.Frames.resize(0);
 	g_Level.Sprites.resize(0);
+	g_Level.Mirrors.resize(0);
 	g_Level.SoundDetails.resize(0);
 	g_Level.SoundMap.resize(0);
 	g_Level.FloorData.resize(0);
@@ -1525,6 +1525,7 @@ void LoadMirrors()
 
 	TENLog("Mirror count: " + std::to_string(mirrorCount), LogLevel::Info);
 	g_Level.Mirrors.reserve(mirrorCount);
+
 	for (int i = 0; i < mirrorCount; i++)
 	{
 		auto& mirror = g_Level.Mirrors.emplace_back();
