@@ -1288,7 +1288,6 @@ namespace TEN::Renderer
 		auto scaleMatrix = Matrix::CreateScale(sprite->Width * sprite->Scale, sprite->Height * sprite->Scale, sprite->Scale);
 
 		Vector3 spritePosition = sprite->pos;
-		ReflectVectorOptionally(spritePosition);
 
 		switch (sprite->Type)
 		{
@@ -1325,6 +1324,7 @@ namespace TEN::Renderer
 			break;
 		}
 
+		ReflectMatrixOptionally(spriteMatrix);
 		return spriteMatrix;
 	}
 

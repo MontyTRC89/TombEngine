@@ -593,14 +593,6 @@ namespace TEN::Renderer
 			return (_currentMirror != nullptr && room != _currentMirror->RealRoom);
 		}
 
-		inline void ReflectVectorOptionally(Vector3& vector)
-		{
-			if (_currentMirror == nullptr)
-				return;
-
-			vector = Vector3::Transform(vector, _currentMirror->ReflectionMatrix);
-		}
-
 		inline void ReflectMatrixOptionally(Matrix& matrix)
 		{
 			if (_currentMirror == nullptr)

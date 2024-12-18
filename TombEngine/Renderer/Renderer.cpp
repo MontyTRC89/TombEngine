@@ -219,10 +219,6 @@ namespace TEN::Renderer
 			lights[index].Direction = Vector3::Lerp(light.PrevDirection, light.Direction, GetInterpolationFactor());
 		}
 
-		// If we are in mirror renderer pass, reflect light.
-		ReflectVectorOptionally(lights[index].Position);
-		ReflectVectorOptionally(lights[index].Direction);
-
 		// Bitmask light type to filter it in the shader later.
 		return (1 << (31 - (int)light.Type));
 	}
@@ -281,7 +277,6 @@ namespace TEN::Renderer
 				continue;
 
 			lightTypeMask = lightTypeMask | BindLight(*lights[i], _stItem.Lights, numLights);
-
 			_stItem.Lights[numLights].Intensity *= fadedCoeff;
 			numLights++;
 		}
