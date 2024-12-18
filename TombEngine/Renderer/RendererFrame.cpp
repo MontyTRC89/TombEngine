@@ -362,7 +362,7 @@ namespace TEN::Renderer
 		// Collect mirrors first, because they are needed while collecting items
 		for (auto& mirror : g_Level.Mirrors)
 		{
-			if (mirror.RealRoom != Camera.pos.RoomNumber && mirror.RealRoom != LaraItem->RoomNumber)
+			if (mirror.RoomNumber != Camera.pos.RoomNumber && mirror.RoomNumber != LaraItem->RoomNumber)
 				continue;
 
 			if (!mirror.Enabled)
@@ -370,7 +370,7 @@ namespace TEN::Renderer
 
 			auto& rendererMirror = renderView.Mirrors.emplace_back();
 
-			rendererMirror.RealRoom = mirror.RealRoom;
+			rendererMirror.RoomNumber = mirror.RoomNumber;
 			rendererMirror.ReflectionMatrix = mirror.ReflectionMatrix;
 			rendererMirror.ReflectLara = mirror.ReflectLara;
 			rendererMirror.ReflectMoveables = mirror.ReflectMoveables;

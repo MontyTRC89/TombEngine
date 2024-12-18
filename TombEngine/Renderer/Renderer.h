@@ -582,7 +582,7 @@ namespace TEN::Renderer
 
 		inline bool IgnoreReflectionPassForRoom(int room)
 		{
-			return (_currentMirror != nullptr && room != _currentMirror->RealRoom);
+			return (_currentMirror != nullptr && room != _currentMirror->RoomNumber);
 		}
 		
 		inline void ReflectVectorOptionally(Vector3& vector)

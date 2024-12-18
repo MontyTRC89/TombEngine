@@ -1652,7 +1652,7 @@ namespace TEN::Renderer
 		// Check if light is spawned in a mirrored room, and create reflection.
 		for (auto& mirror : g_Level.Mirrors)
 		{
-			if (Camera.pos.RoomNumber == mirror.RealRoom && IsPointInRoom(light.Position, mirror.RealRoom))
+			if (Camera.pos.RoomNumber == mirror.RoomNumber && IsPointInRoom(light.Position, mirror.RoomNumber))
 			{
 				RendererLight reflectedLight = light;
 				reflectedLight.Position = Vector3::Transform(light.Position, mirror.ReflectionMatrix);

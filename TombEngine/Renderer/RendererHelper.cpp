@@ -604,7 +604,7 @@ namespace TEN::Renderer
 	{
 		for (auto& mirror : renderView.Mirrors)
 		{
-			if (roomNumber == mirror.RealRoom && (Camera.pos.RoomNumber == mirror.RealRoom || LaraItem->RoomNumber == mirror.RealRoom))
+			if (roomNumber == mirror.RoomNumber && (Camera.pos.RoomNumber == mirror.RoomNumber || LaraItem->RoomNumber == mirror.RoomNumber))
 				return true;
 		}
 
