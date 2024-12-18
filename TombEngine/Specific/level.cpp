@@ -1530,10 +1530,10 @@ void LoadMirrors()
 		auto& mirror = g_Level.Mirrors.emplace_back();
 
 		mirror.RoomNumber = ReadInt16();
-		mirror.MirrorPlane.x = ReadFloat();
-		mirror.MirrorPlane.y = ReadFloat();
-		mirror.MirrorPlane.z = ReadFloat();
-		mirror.MirrorPlane.w = ReadFloat();
+		mirror.Plane.x = ReadFloat();
+		mirror.Plane.y = ReadFloat();
+		mirror.Plane.z = ReadFloat();
+		mirror.Plane.w = ReadFloat();
 
 		mirror.ReflectLara = ReadBool();
 		mirror.ReflectMoveables = ReadBool();
@@ -1543,10 +1543,10 @@ void LoadMirrors()
 		mirror.Enabled = true;
 
 		Plane plane = Plane(
-			Vector3(mirror.MirrorPlane.x,
-					mirror.MirrorPlane.y,
-					mirror.MirrorPlane.z),
-			mirror.MirrorPlane.w);
+			Vector3(mirror.Plane.x,
+					mirror.Plane.y,
+					mirror.Plane.z),
+			mirror.Plane.w);
 
 		mirror.ReflectionMatrix = Matrix::CreateReflection(plane);
 	}
