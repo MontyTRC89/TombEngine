@@ -1111,11 +1111,7 @@ namespace TEN::Renderer
 					worldMatrix = itemPtr->AnimTransforms[LM_LHAND] * itemPtr->World;
 					worldMatrix = tMatrix * worldMatrix;
 					worldMatrix = rotMatrix * worldMatrix;
-
-					if (_currentMirror != nullptr)
-					{
-						worldMatrix = worldMatrix * _currentMirror->ReflectionMatrix;
-					}
+					ReflectMatrixOptionally(worldMatrix);
 
 					_stStatic.World = worldMatrix;
 					_cbStatic.UpdateData(_stStatic, _context.Get());
@@ -1130,11 +1126,7 @@ namespace TEN::Renderer
 					worldMatrix = itemPtr->AnimTransforms[LM_RHAND] * itemPtr->World;
 					worldMatrix = tMatrix * worldMatrix;
 					worldMatrix = rotMatrix * worldMatrix;
-
-					if (_currentMirror != nullptr)
-					{
-						worldMatrix = worldMatrix * _currentMirror->ReflectionMatrix;
-					}
+					ReflectMatrixOptionally(worldMatrix);
 
 					_stStatic.World = worldMatrix;
 					_cbStatic.UpdateData(_stStatic, _context.Get());
@@ -1163,14 +1155,12 @@ namespace TEN::Renderer
 
 		for (auto* rRoomPtr : view.RoomsToDraw)
 		{
+			if (IgnoreMirrorPassForRoom(rRoomPtr->RoomNumber))
+				continue;
+
 			for (auto* rItemPtr : rRoomPtr->ItemsToDraw)
 			{
 				auto& nativeItem = g_Level.Items[rItemPtr->ItemNumber];
-
-				if (_currentMirror != nullptr && nativeItem.RoomNumber != _currentMirror->RealRoom)
-				{
-					continue;
-				}
 
 				if (!nativeItem.IsCreature())
 					continue;
@@ -1217,10 +1207,7 @@ namespace TEN::Renderer
 						if (creature.MuzzleFlash[0].ApplyZRotation)
 							worldMatrix = rotMatrixZ * worldMatrix;
 
-						if (_currentMirror != nullptr)
-						{
-							worldMatrix = worldMatrix * _currentMirror->ReflectionMatrix;
-						}
+						ReflectMatrixOptionally(worldMatrix);
 
 						_stStatic.World = worldMatrix;
 						_cbStatic.UpdateData(_stStatic, _context.Get());
@@ -1262,10 +1249,7 @@ namespace TEN::Renderer
 						if (creature.MuzzleFlash[1].ApplyZRotation)
 							worldMatrix = rotMatrixZ * worldMatrix;
 
-						if (_currentMirror != nullptr)
-						{
-							worldMatrix = worldMatrix * _currentMirror->ReflectionMatrix;
-						}
+						ReflectMatrixOptionally(worldMatrix);
 
 						_stStatic.World = worldMatrix;
 						_cbStatic.UpdateData(_stStatic, _context.Get());
@@ -1352,12 +1336,9 @@ namespace TEN::Renderer
 		const auto& room = _rooms[effect->RoomNumber];
 
 		Matrix world = effect->InterpolatedWorld;
-		if (_currentMirror != nullptr)
-		{
-			world = world * _currentMirror->ReflectionMatrix;
-		}
-		_stStatic.World = world;
+		ReflectMatrixOptionally(world);
 
+		_stStatic.World = world;
 		_stStatic.Color = effect->Color;
 		_stStatic.AmbientLight = effect->AmbientLight;
 		_stStatic.LightMode = (int)LightMode::Dynamic;
@@ -1400,11 +1381,11 @@ namespace TEN::Renderer
 
 		for (auto* roomPtr : view.RoomsToDraw)
 		{
+			if (IgnoreMirrorPassForRoom(roomPtr->RoomNumber))
+				continue;
+
 			for (auto* effectPtr : roomPtr->EffectsToDraw)
 			{
-				if (_currentMirror != nullptr && effectPtr->RoomNumber != _currentMirror->RealRoom)
-					continue;
-
 				const auto& room = _rooms[effectPtr->RoomNumber];
 				const auto& object = Objects[effectPtr->ObjectID];
 
@@ -1421,7 +1402,7 @@ namespace TEN::Renderer
 		{
 			if (deb.active)
 			{
-				if (_currentMirror != nullptr && deb.roomNumber != _currentMirror->RealRoom)
+				if (IgnoreMirrorPassForRoom(deb.roomNumber))
 					continue;
 
 				activeDebrisExist = true;
@@ -1442,7 +1423,7 @@ namespace TEN::Renderer
 			{
 				if (deb.active)
 				{
-					if (_currentMirror != nullptr && deb.roomNumber != _currentMirror->RealRoom)
+					if (IgnoreMirrorPassForRoom(deb.roomNumber))
 						continue;
 
 					if (!SetupBlendModeAndAlphaTest(deb.mesh.blendMode, rendererPass, 0))
@@ -1465,10 +1446,7 @@ namespace TEN::Renderer
 					_cbStatic.UpdateData(_stStatic, _context.Get());
 
 					auto matrix = Matrix::Lerp(deb.PrevTransform, deb.Transform, GetInterpolationFactor());
-					if (_currentMirror != nullptr)
-					{
-						matrix = matrix * _currentMirror->ReflectionMatrix;
-					}
+					ReflectMatrixOptionally(matrix);
 
 					Vertex vtx0;
 					vtx0.Position = Vector3::Transform(deb.mesh.Positions[0], matrix);
@@ -1503,7 +1481,6 @@ namespace TEN::Renderer
 
 			SetBlendMode(BlendMode::Opaque, true);
 			SetDepthState(DepthState::Write, true);
-			SetCullMode(_currentMirror != nullptr ? CullMode::Clockwise : CullMode::CounterClockwise, true);
 		}
 	}
 

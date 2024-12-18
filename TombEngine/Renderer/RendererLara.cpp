@@ -280,9 +280,6 @@ void Renderer::UpdateLaraAnimations(bool force)
 
 void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 {
-	if (_currentMirror != nullptr && LaraItem->RoomNumber != _currentMirror->RealRoom)
-		return;
-
 	// Don't draw player if using optics.
 	if (Lara.Control.Look.OpticRange != 0 || SpotcamDontDrawLara)
 		return;
@@ -309,10 +306,7 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 	RendererRoom* room = &_rooms[LaraItem->RoomNumber];
 
 	_stItem.World = item->InterpolatedWorld;
-	if (_currentMirror != nullptr)
-	{
-		_stItem.World = _stItem.World * _currentMirror->ReflectionMatrix;
-	}
+	ReflectMatrixOptionally(_stItem.World);
 
 	_stItem.Color = item->Color;
 	_stItem.AmbientLight = item->AmbientLight;
@@ -355,11 +349,7 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 
 		_stItem.World = Matrix::Identity;
 		_stItem.BonesMatrices[0] = itemToDraw->InterpolatedAnimTransforms[HairUnit::GetRootMeshID(i)] * itemToDraw->InterpolatedWorld;
-		
-		if (_currentMirror != nullptr)
-		{
-			_stItem.BonesMatrices[0] = _stItem.BonesMatrices[0] * _currentMirror->ReflectionMatrix;
-		}
+		ReflectMatrixOptionally(_stItem.BonesMatrices[0]);
 
 		for (int i = 0; i < unit.Segments.size(); i++)
 		{
@@ -370,10 +360,7 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 				Matrix::CreateTranslation(
 					Vector3::Lerp(segment.PrevPosition, segment.Position, GetInterpolationFactor(forceValue)));
 			
-			if (_currentMirror != nullptr)
-			{
-				worldMatrix = worldMatrix * _currentMirror->ReflectionMatrix;
-			}
+			ReflectMatrixOptionally(worldMatrix);
 
 			_stItem.BonesMatrices[i + 1] = worldMatrix;
 			_stItem.BoneLightModes[i] = (int)LightMode::Dynamic;

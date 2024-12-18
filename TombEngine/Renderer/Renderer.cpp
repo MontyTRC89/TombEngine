@@ -219,6 +219,7 @@ namespace TEN::Renderer
 			lights[index].Direction = Vector3::Lerp(light.PrevDirection, light.Direction, GetInterpolationFactor());
 		}
 
+		// If we are in mirror renderer pass, reflect light.
 		if (_currentMirror != nullptr)
 		{
 			lights[index].Position = Vector3::Transform(lights[index].Position, _currentMirror->ReflectionMatrix);

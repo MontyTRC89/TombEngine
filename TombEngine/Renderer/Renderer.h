@@ -456,7 +456,7 @@ namespace TEN::Renderer
 		void PrepareSingleLaserBeam(RenderView& view);
 		void DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
 		void DrawRooms(RenderView& view, RendererPass rendererPass);
-		void DrawItems(RenderView& view, RendererPass rendererPass);
+		void DrawItems(RenderView& view, RendererPass rendererPass, bool onlyPlayer = false);
 		void DrawAnimatingItem(RendererItem* item, RenderView& view, RendererPass rendererPass);
 		void DrawWaterfalls(RendererItem* item, RenderView& view, int fps, RendererPass rendererPass);
 		void DrawBaddyGunflashes(RenderView& view);
@@ -536,6 +536,7 @@ namespace TEN::Renderer
 		void SetScissor(RendererRectangle rectangle);
 		bool SetupBlendModeAndAlphaTest(BlendMode blendMode, RendererPass rendererPass, int drawPass);
 		void SortAndPrepareSprites(RenderView& view);
+		void SortTransparentFaces(RenderView& view);
 		void ResetItems();
 		void ResetScissor();
 		void ResetDebugVariables();
@@ -573,6 +574,19 @@ namespace TEN::Renderer
 		void InitializePostProcess();
 		void CreateSSAONoiseTexture();
 		void InitializeSMAA();
+
+		inline bool IgnoreMirrorPassForRoom(int room)
+		{
+			return (_currentMirror != nullptr && room != _currentMirror->RealRoom);
+		}
+
+		inline void ReflectMatrixOptionally(Matrix& matrix)
+		{
+			if (_currentMirror == nullptr)
+				return;
+
+			matrix = matrix * _currentMirror->ReflectionMatrix;
+		}
 
 		inline void DrawIndexedTriangles(int count, int baseIndex, int baseVertex)
 		{

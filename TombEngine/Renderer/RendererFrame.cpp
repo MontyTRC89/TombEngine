@@ -39,7 +39,6 @@ namespace TEN::Renderer
 			auto& rendererMirror = renderView.Mirrors.emplace_back();
 
 			rendererMirror.RealRoom = mirror.RealRoom;
-			rendererMirror.VirtualRoom = mirror.VirtualRoom;
 			rendererMirror.ReflectionMatrix = mirror.ReflectionMatrix;
 			rendererMirror.ReflectLara = mirror.ReflectLara;
 			rendererMirror.ReflectMoveables = mirror.ReflectMoveables;

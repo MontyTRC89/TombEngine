@@ -9,7 +9,6 @@ namespace TEN::Renderer::Structures
 	struct RendererMirror
 	{
 		short RealRoom;
-		short VirtualRoom;
 		Plane Plane;
 		Matrix ReflectionMatrix;
 		bool ReflectLara;

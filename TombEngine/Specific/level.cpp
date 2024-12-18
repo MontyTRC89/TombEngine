@@ -1530,7 +1530,6 @@ void LoadMirrors()
 		auto& mirror = g_Level.Mirrors.emplace_back();
 
 		mirror.RealRoom = ReadInt16();
-		mirror.VirtualRoom = ReadInt16();
 		mirror.MirrorPlane.x = ReadFloat();
 		mirror.MirrorPlane.y = ReadFloat();
 		mirror.MirrorPlane.z = ReadFloat();
