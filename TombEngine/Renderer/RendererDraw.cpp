@@ -1594,20 +1594,7 @@ namespace TEN::Renderer
 		dynamicLight.Luma = Luma(dynamicLight.Color);
 		dynamicLight.Hash = hash;
 
-		StoreInterpolatedDynamicLightData(dynamicLight);
-		_dynamicLights[_dynamicLightList].push_back(dynamicLight);
-
-		for (auto& mirror : g_Level.Mirrors)
-		{
-			if (Camera.pos.RoomNumber == mirror.RealRoom && IsPointInRoom(pos, mirror.RealRoom))
-			{
-				dynamicLight.Position = Vector3::Transform(pos, mirror.ReflectionMatrix);
-				dynamicLight.Direction = Vector3::Transform(dynamicLight.Direction, mirror.ReflectionMatrix);
-				dynamicLight.Hash = 0;
-
-				_dynamicLights[_dynamicLightList].push_back(dynamicLight);
-			}
-		}
+		PrepareDynamicLight(dynamicLight);
 	}
 
 	void Renderer::AddDynamicPointLight(const Vector3& pos, float radius, const Color& color, bool castShadows, int hash)
@@ -1632,44 +1619,48 @@ namespace TEN::Renderer
 		dynamicLight.Luma = Luma(dynamicLight.Color);
 		dynamicLight.Hash = hash;
 
-		StoreInterpolatedDynamicLightData(dynamicLight);
-		_dynamicLights[_dynamicLightList].push_back(dynamicLight);
-
-		for (auto& mirror : g_Level.Mirrors)
-		{
-			if (Camera.pos.RoomNumber == mirror.RealRoom && IsPointInRoom(pos, mirror.RealRoom))
-			{
-				dynamicLight.Position = Vector3::Transform(pos, mirror.ReflectionMatrix);
-				dynamicLight.Hash = 0;
-
-				_dynamicLights[_dynamicLightList].push_back(dynamicLight);
-			}
-		}
+		PrepareDynamicLight(dynamicLight);
 	}
 
-	void Renderer::StoreInterpolatedDynamicLightData(RendererLight& light)
+	void Renderer::PrepareDynamicLight(RendererLight& light)
 	{
-		// Hash is not provided, do not search for same light in old buffer.
-		if (light.Hash == 0)
-			return;
+		// If hash is provided, search for same light in old buffer.
+		if (light.Hash != 0)
+		{
+			// Determine the previous buffer index.
+			const auto& previousList = _dynamicLights[1 - _dynamicLightList];
 
-		// Determine the previous buffer index.
-		const auto& previousList = _dynamicLights[1 - _dynamicLightList];
+			// Find a light in the previous buffer with the same Hash.
+			auto it = std::find_if(previousList.begin(), previousList.end(),
+				[&light](const auto& prevLight)
+				{
+					return prevLight.Hash == light.Hash;
+				});
 
-		// Find a light in the previous buffer with the same Hash.
-		auto it = std::find_if(previousList.begin(), previousList.end(),
-			[&light](const auto& prevLight)
+			if (it == previousList.end())
+				return;
+
+			// If a matching light is found, copy its data.
+			const auto& prevLight = *it;
+			light.PrevPosition = prevLight.Position;
+			light.PrevDirection = prevLight.Direction;
+		}
+
+		// Queue dynamic light.
+		_dynamicLights[_dynamicLightList].push_back(light);
+
+		// Check if light is spawned in a mirrored room, and create reflection.
+		for (auto& mirror : g_Level.Mirrors)
+		{
+			if (Camera.pos.RoomNumber == mirror.RealRoom && IsPointInRoom(light.Position, mirror.RealRoom))
 			{
-				return prevLight.Hash == light.Hash;
-			});
+				light.Position = Vector3::Transform(light.Position, mirror.ReflectionMatrix);
+				light.Direction = Vector3::Transform(light.Direction, mirror.ReflectionMatrix);
+				light.Hash = 0;
 
-		if (it == previousList.end())
-			return;
-
-		// If a matching light is found, copy its data.
-		const auto& prevLight = *it;
-		light.PrevPosition = prevLight.Position;
-		light.PrevDirection = prevLight.Direction;
+				_dynamicLights[_dynamicLightList].push_back(light);
+			}
+		}
 	}
 
 	void Renderer::PrepareScene()
@@ -1728,6 +1719,7 @@ namespace TEN::Renderer
 
 		// Prepare scene to draw.
 		auto time1 = std::chrono::high_resolution_clock::now();
+		CollectMirrors(view);
 		CollectRooms(view, false);
 		auto time = std::chrono::high_resolution_clock::now();
 		_timeRoomsCollector = (std::chrono::duration_cast<ns>(time - time1)).count() / 1000000;

@@ -27,25 +27,6 @@ namespace TEN::Renderer
 
 	void Renderer::CollectRooms(RenderView& renderView, bool onlyRooms)
 	{
-		// Collect mirrors first, because they are needed while collecting items
-		for (auto& mirror : g_Level.Mirrors)
-		{
-			if (mirror.RealRoom != Camera.pos.RoomNumber)
-				continue;
-
-			if (!mirror.Enabled)
-				continue;
-
-			auto& rendererMirror = renderView.Mirrors.emplace_back();
-
-			rendererMirror.RealRoom = mirror.RealRoom;
-			rendererMirror.ReflectionMatrix = mirror.ReflectionMatrix;
-			rendererMirror.ReflectLara = mirror.ReflectLara;
-			rendererMirror.ReflectMoveables = mirror.ReflectMoveables;
-			rendererMirror.ReflectStatics = mirror.ReflectStatics;
-			rendererMirror.ReflectLights = mirror.ReflectLights;
-		}
-
 		constexpr auto VIEW_PORT = Vector4(-1.0f, -1.0f, 1.0f, 1.0f);
 
 		_visitedRoomsStack.clear();
@@ -376,6 +357,28 @@ namespace TEN::Renderer
 		_visitedRoomsStack.pop_back();
 	}
 
+	void Renderer::CollectMirrors(RenderView& renderView)
+	{
+		// Collect mirrors first, because they are needed while collecting items
+		for (auto& mirror : g_Level.Mirrors)
+		{
+			if (mirror.RealRoom != Camera.pos.RoomNumber)
+				continue;
+
+			if (!mirror.Enabled)
+				continue;
+
+			auto& rendererMirror = renderView.Mirrors.emplace_back();
+
+			rendererMirror.RealRoom = mirror.RealRoom;
+			rendererMirror.ReflectionMatrix = mirror.ReflectionMatrix;
+			rendererMirror.ReflectLara = mirror.ReflectLara;
+			rendererMirror.ReflectMoveables = mirror.ReflectMoveables;
+			rendererMirror.ReflectStatics = mirror.ReflectStatics;
+			rendererMirror.ReflectLights = mirror.ReflectLights;
+		}
+	}
+
 	void Renderer::CollectItems(short roomNumber, RenderView& renderView)
 	{
 		if (_rooms.size() < roomNumber)
@@ -383,6 +386,8 @@ namespace TEN::Renderer
 
 		auto& room = _rooms[roomNumber];
 		auto* r = &g_Level.Rooms[room.RoomNumber];
+
+		bool roomHasMirrors = RoomHasMirrors(renderView, roomNumber);
 
 		short itemNum = NO_VALUE;
 		for (itemNum = r->itemNumber; itemNum != NO_VALUE; itemNum = g_Level.Items[itemNum].NextItem)
@@ -409,20 +414,9 @@ namespace TEN::Renderer
 			if (obj.DoNotDraw)
 				continue;
 
-			// Clip object by frustum only if it doesn't cast shadows. Otherwise we may see
-			// disappearing shadows if object gets out of frustum.
-
-			bool isMirrorRoom = false;
-			for (auto& mirror : g_Level.Mirrors)
-			{
-				if (Camera.pos.RoomNumber == mirror.RealRoom)
-				{
-					isMirrorRoom = true;
-					break;
-				}
-			}
-
-			if (obj.ShadowType == ShadowMode::None && !isMirrorRoom)
+			// Clip object by frustum only if it doesn't cast shadows and is not in the mirror room.
+			// Otherwise we may see disappearing shadows or reflections if object gets out of frustum.
+			if (!roomHasMirrors &&  obj.ShadowType == ShadowMode::None)
 			{
 				// Get all spheres and check if frustum intersects any of them.
 				auto spheres = GetSpheres(itemNum);
@@ -496,6 +490,8 @@ namespace TEN::Renderer
 		if (r->mesh.empty())
 			return;
 
+		bool roomHasMirrors = RoomHasMirrors(renderView, roomNumber);
+
 		for (int i = 0; i < room.Statics.size(); i++)
 		{
 			auto* mesh = &room.Statics[i];
@@ -524,21 +520,8 @@ namespace TEN::Renderer
 			if (obj.ObjectMeshes.empty())
 				continue;
 
-			bool isMirrorRoom = false;
-			for (auto& mirror : g_Level.Mirrors)
-			{
-				if (Camera.pos.RoomNumber == mirror.RealRoom)
-				{
-					isMirrorRoom = true;
-					break;
-				}
-			}
-
-			if (!isMirrorRoom)
-			{
-				if (!renderView.Camera.Frustum.SphereInFrustum(mesh->Sphere.Center, mesh->Sphere.Radius))
-					continue;
-			}
+			if (!roomHasMirrors && !renderView.Camera.Frustum.SphereInFrustum(mesh->Sphere.Center, mesh->Sphere.Radius))
+				continue;
 
 			// Collect the lights
 			std::vector<RendererLight*> lights;
@@ -761,22 +744,10 @@ namespace TEN::Renderer
 	void Renderer::CollectLightsForRoom(short roomNumber, RenderView &renderView)
 	{
 		if (_rooms.size() < roomNumber)
-		{
 			return;
-		}
 
 		RendererRoom& room = _rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
-		
-		bool isMirrorRoom = false;
-		for (auto& mirror : renderView.Mirrors)
-		{
-			if (mirror.RealRoom == roomNumber)
-			{
-				isMirrorRoom = true;
-				break;
-			}
-		}
 
 		// Collect dynamic lights for rooms
 		for (int i = 0; i < _dynamicLights[_dynamicLightList].size(); i++)

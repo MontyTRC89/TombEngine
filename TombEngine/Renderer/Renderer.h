@@ -420,7 +420,7 @@ namespace TEN::Renderer
 		void ApplySMAA(RenderTarget2D* renderTarget, RenderView& view);
 		void ApplyFXAA(RenderTarget2D* renderTarget, RenderView& view);
 		void BindTexture(TextureRegister registerType, TextureBase* texture, SamplerStateRegister samplerType);
-		int BindLight(RendererLight& light, ShaderLight* lights, int index);
+		int  BindLight(RendererLight& light, ShaderLight* lights, int index);
 		void BindRoomLights(std::vector<RendererLight*>& lights);
 		void BindStaticLights(std::vector<RendererLight*>& lights);
 		void BindInstancedStaticLights(std::vector<RendererLight*>& lights, int instanceID);
@@ -433,6 +433,7 @@ namespace TEN::Renderer
 		void UpdateAnimation(RendererItem* item, RendererObject& obj, const AnimFrameInterpData& frameData, int mask, bool useObjectWorldRotation = false);
 		bool CheckPortal(short parentRoomNumber, RendererDoor* door, Vector4 viewPort, Vector4* clipPort, RenderView& renderView);
 		void GetVisibleRooms(short from, short to, Vector4 viewPort, bool water, int count, bool onlyRooms, RenderView& renderView);
+		void CollectMirrors(RenderView& renderView);
 		void CollectRooms(RenderView& renderView, bool onlyRooms);
 		void CollectItems(short roomNumber, RenderView& renderView);
 		void CollectStatics(short roomNumber, RenderView& renderView);
@@ -452,6 +453,7 @@ namespace TEN::Renderer
 		void InitializeMenuBars(int y);
 		void InitializeSky();
 		void DrawAllStrings();
+		void PrepareDynamicLight(RendererLight& light);
 		void PrepareLaserBarriers(RenderView& view);
 		void PrepareSingleLaserBeam(RenderView& view);
 		void DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
@@ -575,6 +577,17 @@ namespace TEN::Renderer
 		void CreateSSAONoiseTexture();
 		void InitializeSMAA();
 
+		inline bool RoomHasMirrors(RenderView& renderView, int roomNumber)
+		{
+			for (auto& mirror : renderView.Mirrors)
+			{
+				if (Camera.pos.RoomNumber == mirror.RealRoom && roomNumber == mirror.RealRoom)
+					return true;
+			}
+
+			return false;
+		}
+
 		inline bool IgnoreMirrorPassForRoom(int room)
 		{
 			return (_currentMirror != nullptr && room != _currentMirror->RealRoom);
@@ -663,7 +676,6 @@ namespace TEN::Renderer
 		void FreeRendererData();
 		void AddDynamicPointLight(const Vector3& pos, float radius, const Color& color, bool castShadows, int hash = 0);
 		void AddDynamicSpotLight(const Vector3& pos, const Vector3& dir, float radius, float falloff, float distance, const Color& color, bool castShadows, int hash = 0);
-		void StoreInterpolatedDynamicLightData(RendererLight& light);
 		void RenderLoadingScreen(float percentage);
 		void RenderFreezeMode(float interpFactor, bool staticBackground);
 		void UpdateProgress(float value);
