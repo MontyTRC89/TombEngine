@@ -129,11 +129,7 @@ end
 function CustomDiary:IsVisible()
     
 	if GameVars.Engine.Diaries[self.Name] then
-		if GameVars.Engine.Diaries[self.Name].Visible then
-			return true
-		else
-			return false
-		end
+		return GameVars.Engine.Diaries[self.Name].Visible
 	end
 end
 
@@ -439,11 +435,15 @@ function CustomDiary:importData(filename)
     local diaryData = require(filename)
 
     for pageIndex, page in ipairs(diaryData.Pages) do
-        self:addImageEntry(pageIndex, page.Image.objectIDbg, page.Image.spriteIDbg, page.Image.colorBG, page.Image.posX, page.Image.posY, page.Image.rot, page.Image.scaleX, page.Image.scaleY, page.Image.alignMode, page.Image.scaleMode, page.Image.blendMode)
+        for _, image in ipairs(page.Image) do
+            self:addImageEntry(pageIndex, image.objectIDbg, image.spriteIDbg, image.colorBG, image.posX, image.posY, image.rot, image.scaleX, image.scaleY, image.alignMode, image.scaleMode, image.blendMode)
+        end
+        
         for _, text in ipairs(page.Text) do
             self:addTextEntry(pageIndex, text.text, text.textX, text.textY, text.textAlignment, text.textEffects, text.textScale, text.textColor)
         end
     end
+    print("External file imported")
 end
 
 -- !Ignore
