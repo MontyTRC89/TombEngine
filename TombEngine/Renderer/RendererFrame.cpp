@@ -375,6 +375,7 @@ namespace TEN::Renderer
 			rendererMirror.ReflectLara = mirror.ReflectLara;
 			rendererMirror.ReflectMoveables = mirror.ReflectMoveables;
 			rendererMirror.ReflectStatics = mirror.ReflectStatics;
+			rendererMirror.ReflectSprites = mirror.ReflectSprites;
 			rendererMirror.ReflectLights = mirror.ReflectLights;
 		}
 	}

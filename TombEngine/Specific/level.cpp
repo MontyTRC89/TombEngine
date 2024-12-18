@@ -1538,6 +1538,7 @@ void LoadMirrors()
 		mirror.ReflectLara = ReadBool();
 		mirror.ReflectMoveables = ReadBool();
 		mirror.ReflectStatics = ReadBool();
+		mirror.ReflectSprites = ReadBool();
 		mirror.ReflectLights = ReadBool();
 
 		mirror.Enabled = true;

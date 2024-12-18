@@ -2200,7 +2200,7 @@ namespace TEN::Renderer
 			DrawRooms(view, pass);
 
 		// Draw all objects.
-		DrawObjects(pass, view, true, true, true);
+		DrawObjects(pass, view, true, true, true, true);
 
 		// If mirrors are in view, render mirrored objects for every mirror.
 		if (drawMirrors && !view.Mirrors.empty())
@@ -2209,14 +2209,14 @@ namespace TEN::Renderer
 			for (auto& mirror : view.Mirrors)
 			{
 				_currentMirror = &mirror;
-				DrawObjects(pass, view, mirror.ReflectLara, mirror.ReflectMoveables, mirror.ReflectStatics);
+				DrawObjects(pass, view, mirror.ReflectLara, mirror.ReflectMoveables, mirror.ReflectStatics, mirror.ReflectSprites);
 				_currentMirror = nullptr;
 			}
 			SetCullMode(CullMode::CounterClockwise);
 		}
 	}
 
-	void Renderer::DrawObjects(RendererPass pass, RenderView& view, bool player, bool moveables, bool statics)
+	void Renderer::DrawObjects(RendererPass pass, RenderView& view, bool player, bool moveables, bool statics, bool sprites)
 	{
 		switch (pass)
 		{
@@ -2255,7 +2255,7 @@ namespace TEN::Renderer
 			}
 
 			// Sorted sprites are already collected at the beginning of frame.
-			if (pass != RendererPass::CollectTransparentFaces)
+			if (sprites && pass != RendererPass::CollectTransparentFaces)
 				DrawSprites(view, pass);
 
 			break;

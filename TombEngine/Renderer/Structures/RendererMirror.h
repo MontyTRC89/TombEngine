@@ -14,6 +14,7 @@ namespace TEN::Renderer::Structures
 		bool ReflectLara;
 		bool ReflectMoveables;
 		bool ReflectStatics;
+		bool ReflectSprites;
 		bool ReflectLights;
 	};
 }

@@ -94,6 +94,7 @@ struct MirrorInfo
 	bool ReflectMoveables;
 	bool ReflectStatics;
 	bool ReflectLights;
+	bool ReflectSprites;
 	bool Enabled;
 };
 
