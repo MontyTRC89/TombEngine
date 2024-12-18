@@ -32,8 +32,8 @@ GameVars.Engine.LastUsedDiary=nil
 -- @treturn the Diary table
 CustomDiary.Create = function(object, objectIDbg, spriteIDbg, colorbg, posX, posY, rot, scaleX, scaleY, alignMode, scaleMode, blendMode, alpha, pageSound, exitSound)
 
-    if object < 596 or object > 611 then
-        print("Error: Invalid object slot for diary creation. Please use a pickup object slot in the range 596 to 611.")
+    if (object < 596 or object > 611) and object ~= 986 then
+        print("Error: Invalid object slot for diary creation. Please use a pickup object slot in the range 596 to 611 and 986.")
         return
     end
 
