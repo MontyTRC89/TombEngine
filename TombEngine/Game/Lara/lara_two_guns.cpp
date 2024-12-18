@@ -154,7 +154,7 @@ static void AnimateWeapon(ItemInfo& laraItem, LaraWeaponType weaponType, bool& h
 							arm.Orientation.y + laraItem.Pose.Orientation.y,
 							0);
 
-					if (FireWeapon(weaponType, *player.TargetEntity, laraItem, armOrient) != FireWeaponType::NoAmmo)
+					if (FireWeapon(weaponType, player.TargetEntity, laraItem, armOrient) != FireWeaponType::NoAmmo)
 					{
 						arm.GunSmoke = 28;
 						TriggerGunShell(isRightWeapon ? true : false, ID_GUNSHELL, weaponType);
