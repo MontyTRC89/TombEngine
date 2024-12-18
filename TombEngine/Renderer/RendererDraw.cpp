@@ -1714,8 +1714,6 @@ namespace TEN::Renderer
 
 		ResetDebugVariables();
 
-		_doingFullscreenPass = false;
-
 		auto& level = *g_GameFlow->GetLevel(CurrentLevel);
 
 		// Prepare scene to draw.
@@ -1871,11 +1869,7 @@ namespace TEN::Renderer
 
 		// Calculate ambient occlusion.
 		if (g_Configuration.EnableAmbientOcclusion)
-		{
-			_doingFullscreenPass = true;
 			CalculateSSAO(view);
-			_doingFullscreenPass = false;
-		}
 
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetInputLayout(_inputLayout.Get());
@@ -1913,33 +1907,8 @@ namespace TEN::Renderer
 		
 		if (renderMode != SceneRenderMode::NoPostprocess)
 		{
-			_doingFullscreenPass = true;
-
-			// Apply antialiasing.
-			switch (g_Configuration.AntialiasingMode)
-			{
-			case AntialiasingMode::None:
-				break;
-
-			case AntialiasingMode::Low:
-				ApplyFXAA(&_renderTarget, view);
-				break;
-
-			case AntialiasingMode::Medium:
-			case AntialiasingMode::High:
-				ApplySMAA(&_renderTarget, view);
-				break;
-			}
-
-			// Draw post-process effects (cinematic bars, fade, flash, HDR, tone mapping, etc.).
 			DrawPostprocess(renderTarget, view, renderMode);
-
-			_doingFullscreenPass = false;
-
-			// Draw binoculars or lasersight overlay.
 			DrawOverlays(view);
-
-			// Draw 2D debug lines.
 			DrawLines2D();
 		}
 
@@ -2477,6 +2446,9 @@ namespace TEN::Renderer
 				{
 					RendererStatic* current = statics[s];
 					RendererRoom* room = &_rooms[current->RoomNumber];
+
+					if (IgnoreReflectionPassForRoom(current->RoomNumber))
+						continue;
 
 					_stStatic.World = current->World;
 					_stStatic.Color = current->Color;
@@ -3752,6 +3724,8 @@ namespace TEN::Renderer
 
 	void Renderer::CalculateSSAO(RenderView& view)
 	{
+		_doingFullscreenPass = true;
+
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
 		SetDepthState(DepthState::Write);
@@ -3812,6 +3786,8 @@ namespace TEN::Renderer
 		BindRenderTargetAsTexture(TextureRegister::SSAO, &_SSAORenderTarget, SamplerStateRegister::PointWrap);
  
 		DrawTriangles(3, 0);
+
+		_doingFullscreenPass = false;
 	}
 
 	void Renderer::InterpolateCamera(float interpFactor)

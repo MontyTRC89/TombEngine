@@ -6,6 +6,24 @@ namespace TEN::Renderer
 {
 	void Renderer::DrawPostprocess(RenderTarget2D* renderTarget, RenderView& view, SceneRenderMode renderMode)
 	{
+		_doingFullscreenPass = true;
+
+		// Apply antialiasing.
+		switch (g_Configuration.AntialiasingMode)
+		{
+		case AntialiasingMode::None:
+			break;
+
+		case AntialiasingMode::Low:
+			ApplyFXAA(&_renderTarget, view);
+			break;
+
+		case AntialiasingMode::Medium:
+		case AntialiasingMode::High:
+			ApplySMAA(&_renderTarget, view);
+			break;
+		}
+
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
 		SetDepthState(DepthState::Write);
@@ -111,6 +129,9 @@ namespace TEN::Renderer
 		BindTexture(TextureRegister::ColorMap, &_postProcessRenderTarget[currentRenderTarget], SamplerStateRegister::PointWrap);
 
 		DrawTriangles(3, 0);
+
+
+		_doingFullscreenPass = false;
 	}
 
 	PostProcessMode Renderer::GetPostProcessMode()
