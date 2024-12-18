@@ -1155,7 +1155,7 @@ namespace TEN::Renderer
 
 		for (auto* rRoomPtr : view.RoomsToDraw)
 		{
-			if (IgnoreMirrorPassForRoom(rRoomPtr->RoomNumber))
+			if (IgnoreReflectionPassForRoom(rRoomPtr->RoomNumber))
 				continue;
 
 			for (auto* rItemPtr : rRoomPtr->ItemsToDraw)
@@ -1282,16 +1282,13 @@ namespace TEN::Renderer
 		}
 	}
 
-	Matrix Renderer::GetWorldMatrixForSprite(RendererSpriteToDraw* sprite, RendererMirror* mirror, RenderView& view)
+	Matrix Renderer::GetWorldMatrixForSprite(RendererSpriteToDraw* sprite, RenderView& view)
 	{
 		auto spriteMatrix = Matrix::Identity;
 		auto scaleMatrix = Matrix::CreateScale(sprite->Width * sprite->Scale, sprite->Height * sprite->Scale, sprite->Scale);
 
 		Vector3 spritePosition = sprite->pos;
-		if (mirror != nullptr)
-		{
-			spritePosition = Vector3::Transform(spritePosition, mirror->ReflectionMatrix); // Vector3::Reflect(spritePosition, mirror->Plane.Normal());
-		}
+		ReflectVectorOptionally(spritePosition);
 
 		switch (sprite->Type)
 		{
@@ -1381,7 +1378,7 @@ namespace TEN::Renderer
 
 		for (auto* roomPtr : view.RoomsToDraw)
 		{
-			if (IgnoreMirrorPassForRoom(roomPtr->RoomNumber))
+			if (IgnoreReflectionPassForRoom(roomPtr->RoomNumber))
 				continue;
 
 			for (auto* effectPtr : roomPtr->EffectsToDraw)
@@ -1402,7 +1399,7 @@ namespace TEN::Renderer
 		{
 			if (deb.active)
 			{
-				if (IgnoreMirrorPassForRoom(deb.roomNumber))
+				if (IgnoreReflectionPassForRoom(deb.roomNumber))
 					continue;
 
 				activeDebrisExist = true;
@@ -1423,7 +1420,7 @@ namespace TEN::Renderer
 			{
 				if (deb.active)
 				{
-					if (IgnoreMirrorPassForRoom(deb.roomNumber))
+					if (IgnoreReflectionPassForRoom(deb.roomNumber))
 						continue;
 
 					if (!SetupBlendModeAndAlphaTest(deb.mesh.blendMode, rendererPass, 0))

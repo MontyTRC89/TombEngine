@@ -220,11 +220,8 @@ namespace TEN::Renderer
 		}
 
 		// If we are in mirror renderer pass, reflect light.
-		if (_currentMirror != nullptr)
-		{
-			lights[index].Position = Vector3::Transform(lights[index].Position, _currentMirror->ReflectionMatrix);
-			lights[index].Direction = Vector3::Transform(lights[index].Direction, _currentMirror->ReflectionMatrix);
-		}
+		ReflectVectorOptionally(lights[index].Position);
+		ReflectVectorOptionally(lights[index].Direction);
 
 		// Bitmask light type to filter it in the shader later.
 		return (1 << (31 - (int)light.Type));

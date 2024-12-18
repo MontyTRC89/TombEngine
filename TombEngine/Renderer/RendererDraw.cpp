@@ -253,7 +253,7 @@ namespace TEN::Renderer
 			if (gunshell->counter <= 0)
 				continue;
 
-			if (IgnoreMirrorPassForRoom(gunshell->roomNumber))
+			if (IgnoreReflectionPassForRoom(gunshell->roomNumber))
 				continue;
 
 			objectID = gunshell->objectNumber;
@@ -477,7 +477,7 @@ namespace TEN::Renderer
 			{
 				auto* rat = &Rats[i];
 
-				if (IgnoreMirrorPassForRoom(rat->RoomNumber))
+				if (IgnoreReflectionPassForRoom(rat->RoomNumber))
 					continue;
 
 				if (rat->On)
@@ -520,7 +520,7 @@ namespace TEN::Renderer
 			{
 				auto* rat = &Rats[i];
 
-				if (IgnoreMirrorPassForRoom(rat->RoomNumber))
+				if (IgnoreReflectionPassForRoom(rat->RoomNumber))
 					continue;
 
 				if (rat->On)
@@ -733,7 +733,7 @@ namespace TEN::Renderer
 				if (!bat.On)
 					continue;
 
-				if (IgnoreMirrorPassForRoom(bat.RoomNumber))
+				if (IgnoreReflectionPassForRoom(bat.RoomNumber))
 					continue;
 
 				for (auto& bucket : mesh.Buckets)
@@ -769,7 +769,7 @@ namespace TEN::Renderer
 			{
 				const auto& bat = Bats[i];
 
-				if (IgnoreMirrorPassForRoom(bat.RoomNumber))
+				if (IgnoreReflectionPassForRoom(bat.RoomNumber))
 					continue;
 
 				if (bat.On)
@@ -854,7 +854,7 @@ namespace TEN::Renderer
 				if (!beetle.On)
 					continue;
 
-				if (IgnoreMirrorPassForRoom(beetle.RoomNumber))
+				if (IgnoreReflectionPassForRoom(beetle.RoomNumber))
 					continue;
 
 				auto transformMatrix = Matrix::Lerp(beetle.PrevTransform, beetle.Transform, GetInterpolationFactor());
@@ -894,7 +894,7 @@ namespace TEN::Renderer
 				if (!beetle.On)
 					continue;
 
-				if (IgnoreMirrorPassForRoom(beetle.RoomNumber))
+				if (IgnoreReflectionPassForRoom(beetle.RoomNumber))
 					continue;
 
 				auto& room = _rooms[beetle.RoomNumber];
@@ -983,7 +983,7 @@ namespace TEN::Renderer
 				if (!locust.on)
 					continue;
 
-				if (IgnoreMirrorPassForRoom(locust.roomNumber))
+				if (IgnoreReflectionPassForRoom(locust.roomNumber))
 					continue;
 
 				auto& mesh = *GetMesh(Objects[ID_LOCUSTS].meshIndex + (-locust.counter & 3));
@@ -1022,7 +1022,7 @@ namespace TEN::Renderer
 				if (!locust.on)
 					continue;
 
-				if (IgnoreMirrorPassForRoom(locust.roomNumber))
+				if (IgnoreReflectionPassForRoom(locust.roomNumber))
 					continue;
 
 				activeLocustsExist = true;
@@ -2314,7 +2314,7 @@ namespace TEN::Renderer
 
 		for (auto room : view.RoomsToDraw)
 		{
-			if (IgnoreMirrorPassForRoom(room->RoomNumber))
+			if (IgnoreReflectionPassForRoom(room->RoomNumber))
 				continue;
 
 			for (auto itemToDraw : room->ItemsToDraw)
@@ -2565,7 +2565,7 @@ namespace TEN::Renderer
 						RendererStatic* current = statics[s];
 						RendererRoom* room = &_rooms[current->RoomNumber];
 
-						if (IgnoreMirrorPassForRoom(current->RoomNumber))
+						if (IgnoreReflectionPassForRoom(current->RoomNumber))
 							continue;
 
 						Matrix world = current->World;
@@ -2968,7 +2968,7 @@ namespace TEN::Renderer
 					rDrawSprite.Width = STAR_SIZE * star.Scale;
 					rDrawSprite.Height = STAR_SIZE * star.Scale;
 
-					_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, nullptr, renderView);
+					_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
 					_stInstancedSpriteBuffer.Sprites[i].Color = Vector4(
 						star.Color.x,
 						star.Color.y,
@@ -3031,7 +3031,7 @@ namespace TEN::Renderer
 						rDrawSprite.Height = 192;
 						rDrawSprite.ConstrainAxis = meteor.Direction;
 
-						_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, nullptr, renderView);
+						_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
 						_stInstancedSpriteBuffer.Sprites[i].Color = Vector4(
 							meteor.Color.x,
 							meteor.Color.y,
@@ -3137,7 +3137,7 @@ namespace TEN::Renderer
 			rDrawSprite.Height = SUN_SIZE;
 			rDrawSprite.color = renderView.LensFlaresToDraw[0].Color;
 
-			_stInstancedSpriteBuffer.Sprites[0].World = GetWorldMatrixForSprite(&rDrawSprite, nullptr, renderView);
+			_stInstancedSpriteBuffer.Sprites[0].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
 			_stInstancedSpriteBuffer.Sprites[0].Color = renderView.LensFlaresToDraw[0].Color;
 			_stInstancedSpriteBuffer.Sprites[0].IsBillboard = 1;
 			_stInstancedSpriteBuffer.Sprites[0].IsSoftParticle = 0;
@@ -3348,9 +3348,7 @@ namespace TEN::Renderer
 			_sortedPolygonsIndices.clear();
 
 			if (_currentMirror != nullptr && object->ObjectType == RendererObjectType::Room)
-			{
 				continue;
-			}
 
 			if (object->ObjectType == RendererObjectType::Room)
 			{
@@ -3502,7 +3500,7 @@ namespace TEN::Renderer
 					uv2 = spr->Sprite->UV[2];
 					uv3 = spr->Sprite->UV[3];
 
-					Matrix world = GetWorldMatrixForSprite(currentObject->Sprite, _currentMirror, view);
+					Matrix world = GetWorldMatrixForSprite(currentObject->Sprite, view);
 					
 					Vertex v0;
 					v0.Position = Vector3::Transform(p0t, world);

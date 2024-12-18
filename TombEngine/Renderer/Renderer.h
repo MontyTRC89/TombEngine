@@ -566,7 +566,7 @@ namespace TEN::Renderer
 							const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3,
 							BlendMode blendMode, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);
 
-		Matrix GetWorldMatrixForSprite(RendererSpriteToDraw* spr, RendererMirror* mirror, RenderView& view);
+		Matrix GetWorldMatrixForSprite(RendererSpriteToDraw* spr, RenderView& view);
 		RendererObject& GetRendererObject(GAME_OBJECT_ID id);
 		RendererMesh* GetMesh(int meshIndex);
 		Texture2D CreateDefaultNormalTexture();
@@ -588,9 +588,17 @@ namespace TEN::Renderer
 			return false;
 		}
 
-		inline bool IgnoreMirrorPassForRoom(int room)
+		inline bool IgnoreReflectionPassForRoom(int room)
 		{
 			return (_currentMirror != nullptr && room != _currentMirror->RealRoom);
+		}
+
+		inline void ReflectVectorOptionally(Vector3& vector)
+		{
+			if (_currentMirror == nullptr)
+				return;
+
+			vector = Vector3::Transform(vector, _currentMirror->ReflectionMatrix);
 		}
 
 		inline void ReflectMatrixOptionally(Matrix& matrix)
