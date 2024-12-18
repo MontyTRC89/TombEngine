@@ -1654,7 +1654,7 @@ namespace TEN::Renderer
 		{
 			if (Camera.pos.RoomNumber == mirror.RealRoom && IsPointInRoom(light.Position, mirror.RealRoom))
 			{
-				auto reflectedLight = light;
+				RendererLight reflectedLight = light;
 				reflectedLight.Position = Vector3::Transform(light.Position, mirror.ReflectionMatrix);
 				reflectedLight.Direction = Vector3::Transform(light.Direction, mirror.ReflectionMatrix);
 				reflectedLight.Hash = 0;
