@@ -577,16 +577,7 @@ namespace TEN::Renderer
 		void CreateSSAONoiseTexture();
 		void InitializeSMAA();
 
-		inline bool RoomHasMirrors(RenderView& renderView, int roomNumber)
-		{
-			for (auto& mirror : renderView.Mirrors)
-			{
-				if (Camera.pos.RoomNumber == mirror.RealRoom && roomNumber == mirror.RealRoom)
-					return true;
-			}
-
-			return false;
-		}
+		bool RoomIsReflected(RenderView& renderView, int roomNumber);
 
 		inline bool IgnoreReflectionPassForRoom(int room)
 		{

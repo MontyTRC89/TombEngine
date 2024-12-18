@@ -362,7 +362,7 @@ namespace TEN::Renderer
 		// Collect mirrors first, because they are needed while collecting items
 		for (auto& mirror : g_Level.Mirrors)
 		{
-			if (mirror.RealRoom != Camera.pos.RoomNumber)
+			if (mirror.RealRoom != Camera.pos.RoomNumber && mirror.RealRoom != LaraItem->RoomNumber)
 				continue;
 
 			if (!mirror.Enabled)
@@ -387,7 +387,7 @@ namespace TEN::Renderer
 		auto& room = _rooms[roomNumber];
 		auto* r = &g_Level.Rooms[room.RoomNumber];
 
-		bool roomHasMirrors = RoomHasMirrors(renderView, roomNumber);
+		bool roomIsReflected = RoomIsReflected(renderView, roomNumber);
 
 		short itemNum = NO_VALUE;
 		for (itemNum = r->itemNumber; itemNum != NO_VALUE; itemNum = g_Level.Items[itemNum].NextItem)
@@ -416,7 +416,7 @@ namespace TEN::Renderer
 
 			// Clip object by frustum only if it doesn't cast shadows and is not in the mirror room.
 			// Otherwise we may see disappearing shadows or reflections if object gets out of frustum.
-			if (!roomHasMirrors &&  obj.ShadowType == ShadowMode::None)
+			if (!roomIsReflected && obj.ShadowType == ShadowMode::None)
 			{
 				// Get all spheres and check if frustum intersects any of them.
 				auto spheres = GetSpheres(itemNum);
@@ -490,7 +490,7 @@ namespace TEN::Renderer
 		if (r->mesh.empty())
 			return;
 
-		bool roomHasMirrors = RoomHasMirrors(renderView, roomNumber);
+		bool roomIsReflected = RoomIsReflected(renderView, roomNumber);
 
 		for (int i = 0; i < room.Statics.size(); i++)
 		{
@@ -520,7 +520,7 @@ namespace TEN::Renderer
 			if (obj.ObjectMeshes.empty())
 				continue;
 
-			if (!roomHasMirrors && !renderView.Camera.Frustum.SphereInFrustum(mesh->Sphere.Center, mesh->Sphere.Radius))
+			if (!roomIsReflected && !renderView.Camera.Frustum.SphereInFrustum(mesh->Sphere.Center, mesh->Sphere.Radius))
 				continue;
 
 			// Collect the lights
