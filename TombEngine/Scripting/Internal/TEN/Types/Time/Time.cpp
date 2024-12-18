@@ -248,22 +248,21 @@ namespace TEN::Scripting
 
 	Time::Hmsc Time::ParseFormattedString(const std::string& formattedTime)
 	{
-		std::regex timeFormat(R"((\d{2}):(\d{2}):(\d{2})\.(\d{2}))");
+		std::regex timeFormat(R"((?:(\d+):)?(\d+):(\d+)(?:\.(\d+))?)");
 		std::smatch match;
 
 		if (!std::regex_match(formattedTime, match, timeFormat))
 		{
-			TENLog("Invalid time format. Expected HH:MM:SS or HH:MM:SS.CC", LogLevel::Warning);
+			TENLog("Invalid time format. Supported formats: HH:MM:SS.CC, HH:MM:SS, MM:SS, or MM:SS.CC.", LogLevel::Warning);
 			return Time::Hmsc();
 		}
 
-		return
-		{
-			std::stoi(match[1].str()),
-			std::stoi(match[2].str()),
-			std::stoi(match[3].str()),
-			match[4].matched ? std::stoi(match[4].str()) : 0
-		};
+		int hours   = match[1].matched ? std::stoi(match[1].str()) : 0;
+		int minutes = match[2].matched ? std::stoi(match[2].str()) : 0;
+		int seconds = match[3].matched ? std::stoi(match[3].str()) : 0;
+		int cents   = match[4].matched ? std::stoi(match[4].str()) : 0;
+
+		return { hours, minutes, seconds, cents };
 	}
 
 	void Time::SetFromHMSC(int hours, int minutes, int seconds, int cents)
