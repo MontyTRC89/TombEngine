@@ -165,7 +165,7 @@ void SayNo();
 void PlaySoundSources();
 int  GetShatterSound(int shatterID);
 
-void PlaySoundTrack(const std::string& trackName, SoundTrackType mode, QWORD position = 0, int forceFadeInTime = 0);
+void PlaySoundTrack(const std::string& trackName, SoundTrackType mode, std::optional<QWORD> pos = std::nullopt, int forceFadeInTime = 0);
 void PlaySoundTrack(const std::string& trackName, short mask = 0);
 void PlaySoundTrack(int index, short mask = 0);
 void StopSoundTrack(SoundTrackType mode, int fadeoutTime);

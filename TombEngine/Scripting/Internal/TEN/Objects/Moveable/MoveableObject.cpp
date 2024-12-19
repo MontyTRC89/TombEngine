@@ -14,11 +14,11 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
-#include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
 #include "Scripting/Internal/TEN/Objects/ObjectsHandler.h"
-#include "Scripting/Internal/TEN/Rotation/Rotation.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Types/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
@@ -167,6 +167,9 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 	ScriptReserved_MakeInvisible, &Moveable::MakeInvisible,
 
 	ScriptReserved_SetVisible, &Moveable::SetVisible,
+
+	ScriptReserved_SetCollidable, & Moveable::SetCollidable,
+	ScriptReserved_GetCollidable, & Moveable::GetCollidable,
 
 /// Explode item. This also kills and disables item.
 // @function Moveable:Explode
@@ -634,7 +637,20 @@ Vec3 Moveable::GetJointPos(int jointIndex, sol::optional<Vec3> offset) const
 
 Rotation Moveable::GetJointRot(int jointIndex) const
 {
-	return GetBoneOrientation(*m_item, jointIndex);
+	auto point1 = GetJointPosition(m_item, jointIndex);
+	auto point2 = GetJointPosition(m_item, jointIndex, Vector3::Forward * BLOCK(1));
+
+	auto normal = (point1 - point2).ToVector3();
+	normal.Normalize();
+
+	auto eulers = EulerAngles(normal);
+
+	return
+	{
+		TO_DEGREES(eulers.x),
+		TO_DEGREES(eulers.y),
+		TO_DEGREES(eulers.z)
+	};
 }
 
 // This does not guarantee that the returned value will be identical
@@ -1166,6 +1182,22 @@ void Moveable::Shatter()
 	KillItem(m_num);
 }
 
+/// Get the item's collision state.
+// @treturn bool item's collision state
+// @function Moveable:GetCollidable
+bool Moveable::GetCollidable()
+{
+	return m_item->Collidable;
+}
+
+/// Set the item's collision.
+// @bool collidable true if the caller should be collidable, false if no collision should occur.
+// @function Moveable:SetCollidable
+void Moveable::SetCollidable(bool isCollidable)
+{
+	m_item->Collidable = isCollidable;
+}
+
 /// Make the item invisible. Alias for `Moveable:SetVisible(false)`.
 // @function Moveable:MakeInvisible
 void Moveable::MakeInvisible()
@@ -1231,7 +1263,7 @@ bool Moveable::GetValid() const
 
 void Moveable::Destroy()
 {
-	if (m_num > NO_VALUE) 
+	if (m_num > NO_VALUE)
 	{
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
 		s_callbackRemoveName(m_item->Name);

@@ -32,12 +32,10 @@ namespace TEN::Renderer
 
 	void Renderer::FreeRendererData()
 	{
-		_shadowLight = nullptr;
-
 		_items.resize(0);
 		_effects.resize(0);
 		_moveableObjects.resize(0);
-		_staticObjects.resize(0);
+		_staticObjects.clear();
 		_sprites.resize(0);
 		_rooms.resize(0);
 		_roomTextures.resize(0);
@@ -46,6 +44,12 @@ namespace TEN::Renderer
 		_spritesTextures.resize(0);
 		_animatedTextures.resize(0);
 		_animatedTextureSets.resize(0);
+
+		_shadowLight = nullptr;
+
+		_dynamicLightList = 0;
+		for (auto& dynamicLightList : _dynamicLights)
+			dynamicLightList.resize(0);
 
 		for (auto& mesh : _meshes)
 			delete mesh;
@@ -195,34 +199,64 @@ namespace TEN::Renderer
 		}
 
 		_context->PSSetSamplers((UINT)registerType, 1, &samplerState);
-	} 
+	}
+
+	int Renderer::BindLight(RendererLight& light, ShaderLight* lights, int index)
+	{
+		memcpy(&lights[index], &light, sizeof(ShaderLight));
+
+		// Precalculate ranges so that it's not recalculated in shader for every pixel.
+		if (light.Type == LightType::Spot)
+		{
+			lights[index].InRange  = cos(light.InRange * (PI / 180.0f));
+			lights[index].OutRange = cos(light.OutRange * (PI / 180.0f));
+		}
+
+		// If light has hash, interpolate its position with previous position.
+		if (light.Hash != 0)
+		{
+			lights[index].Position  = Vector3::Lerp(light.PrevPosition, light.Position, GetInterpolationFactor());
+			lights[index].Direction = Vector3::Lerp(light.PrevDirection, light.Direction, GetInterpolationFactor());
+		}
+
+		// Bitmask light type to filter it in the shader later.
+		return (1 << (31 - (int)light.Type));
+	}
 
 	void Renderer::BindRoomLights(std::vector<RendererLight*>& lights)
 	{
+		int lightTypeMask = 0;
+
 		for (int i = 0; i < lights.size(); i++)
-			memcpy(&_stRoom.RoomLights[i], lights[i], sizeof(ShaderLight));
+			lightTypeMask = lightTypeMask | BindLight(*lights[i], _stRoom.RoomLights, i);
 		
-		_stRoom.NumRoomLights = (int)lights.size();
+		_stRoom.NumRoomLights = (int)lights.size() | lightTypeMask;
 	}
 
 	void Renderer::BindStaticLights(std::vector<RendererLight*>& lights)
 	{
+		int lightTypeMask = 0;
+
 		for (int i = 0; i < lights.size(); i++)
-			memcpy(&_stStatic.Lights[i], lights[i], sizeof(ShaderLight));
+			lightTypeMask = lightTypeMask | BindLight(*lights[i], _stStatic.Lights, i);
 		
-		_stStatic.NumLights = (int)lights.size();
+		_stStatic.NumLights = (int)lights.size() | lightTypeMask;
 	}
 
 	void Renderer::BindInstancedStaticLights(std::vector<RendererLight*>& lights, int instanceID)
 	{
-		for (int i = 0; i < lights.size(); i++)
-			memcpy(&_stInstancedStaticMeshBuffer.StaticMeshes[instanceID].Lights[i], lights[i], sizeof(ShaderLight));
+		int lightTypeMask = 0;
 
-		_stInstancedStaticMeshBuffer.StaticMeshes[instanceID].NumLights = (int)lights.size();
+		for (int i = 0; i < lights.size(); i++)
+			lightTypeMask = lightTypeMask | BindLight(*lights[i], _stInstancedStaticMeshBuffer.StaticMeshes[instanceID].Lights, i);
+
+		_stInstancedStaticMeshBuffer.StaticMeshes[instanceID].NumLights = (int)lights.size() | lightTypeMask;
 	}
 
 	void Renderer::BindMoveableLights(std::vector<RendererLight*>& lights, int roomNumber, int prevRoomNumber, float fade)
 	{
+		int lightTypeMask = 0;
+
 		int numLights = 0;
 		for (int i = 0; i < lights.size(); i++)
 		{
@@ -242,12 +276,12 @@ namespace TEN::Renderer
 			if (fadedCoeff == 0.0f)
 				continue;
 
-			memcpy(&_stItem.Lights[numLights], lights[i], sizeof(ShaderLight));
+			lightTypeMask = lightTypeMask | BindLight(*lights[i], _stItem.Lights, numLights);
 			_stItem.Lights[numLights].Intensity *= fadedCoeff;
 			numLights++;
 		}
 
-		_stItem.NumLights = numLights;
+		_stItem.NumLights = numLights | lightTypeMask;
 	}
 
 	void Renderer::BindConstantBufferVS(ConstantBufferRegister constantBufferType, ID3D11Buffer** buffer)

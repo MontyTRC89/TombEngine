@@ -40,6 +40,7 @@ namespace TEN::Control::Volumes
 		Start,
 		End,
 		UseItem,
+		Freeze,
 
 		Count
 	};

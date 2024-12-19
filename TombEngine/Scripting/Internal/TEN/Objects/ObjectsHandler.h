@@ -143,5 +143,7 @@ private:
 	void FreeEntities() override
 	{
 		m_nameMap.clear();
+		m_collidingItemsToRemove.clear();
+		m_collidingItems.clear();
 	}
 };

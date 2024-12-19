@@ -12,8 +12,8 @@ new_type("luautil", "5 Lua utility modules", true)
 
 not_luadoc = true
 
-local version = "1.5"
-project = "TombEngine"
+local version = "1.6"
+project = "&nbsp;TombEngine"
 title = "TombEngine " .. version .. " Lua API"
 description = "TombEngine " .. version .. " scripting interface"
 full_description = [[Welcome to the TombEngine scripting API. This is a work in progress and some information might be wrong or outdated. Please also note that this is primarily a reference document, not a tutorial, so expect descriptions to be fairly sparse.
@@ -34,7 +34,7 @@ If this happens, check __logs/TENLog.txt__ and look for an error message with th
 
 Enjoy.
 
-\- _squidshire_
+\- _squidshire and the TombEngine development team._
 ]]
 
 convert_opt=true 

@@ -370,7 +370,6 @@ void Trigger(short const value, short const flags)
 	if (item->Flags & IFLAG_KILLED)
 		return;
 
-	item->TouchBits = NO_JOINT_BITS;
 	item->Flags |= TRIGGERED;
 
 	if (flags & ONESHOT)
@@ -408,12 +407,16 @@ void Trigger(short const value, short const flags)
 		}
 
 		item->Status = ITEM_ACTIVE;
+		item->TouchBits = NO_JOINT_BITS;
 		item->DisableInterpolation = true;
 	}
 }
 
 void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bool heavy, int heavyFlags)
 {
+	if (g_GameFlow->CurrentFreezeMode != FreezeMode::None)
+		return;
+
 	bool switchOff = false;
 	bool flipAvailable = false;
 	int flip = NO_VALUE;
@@ -775,10 +778,11 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 			if (switchOff)
 				break;
 
-			if (!(SaveGame::Statistics.Level.Secrets & (1 << value)))
+			if (!(SaveGame::Statistics.SecretBits & (1 << value)))
 			{
 				PlaySecretTrack();
-				SaveGame::Statistics.Level.Secrets |= (1 << value);
+				SaveGame::Statistics.SecretBits |= (1 << value);
+				SaveGame::Statistics.Level.Secrets++;
 				SaveGame::Statistics.Game.Secrets++;
 			}
 			break;
@@ -838,7 +842,7 @@ void TestTriggers(ItemInfo* item, bool isHeavy, int heavyFlags)
 	short roomNumber = item->RoomNumber;
 	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 
-	TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, floor, item->Index, isHeavy, heavyFlags);
+	TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, floor, (Activator)short(item->Index), isHeavy, heavyFlags);
 }
 
 void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFlags)
@@ -855,6 +859,9 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 
 void ProcessSectorFlags(ItemInfo* item)
 {
+	if (g_GameFlow->CurrentFreezeMode != FreezeMode::None)
+		return;
+
 	bool isPlayer = item->IsLara();
 
 	// HACK: because of L-shaped portal configurations, we need to fetch room number from Location struct for player.

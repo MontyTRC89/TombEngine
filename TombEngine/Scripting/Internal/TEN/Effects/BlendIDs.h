@@ -10,26 +10,18 @@ Constants for blend mode IDs.
 @pragma nostrip
 */
 
-/*** Effects.BlendID constants.
+/*** Table of Effects.BlendID constants (for use with particles).
 
-The following constants are inside BlendID.
+ - `OPAQUE`
+ - `ALPHATEST`
+ - `ADDITIVE`
+ - `SUBTRACTIVE`
+ - `EXCLUDE`
+ - `SCREEN`
+ - `LIGHTEN`
+ - `ALPHABLEND`
 
-	OPAQUE  
-	ALPHATEST  
-	ADDITIVE  
-	NOZTEST  
-	SUBTRACTIVE  
-	WIREFRAME  
-	EXCLUDE  
-	SCREEN  
-	LIGHTEN  
-	ALPHABLEND  
-
-@section Effects.BlendID
-*/
-
-/*** Table of blend mode constants (for use with particles).
-@table CONSTANT_STRING_HERE
+@table Effects.BlendID
 */
 
 static const std::unordered_map<std::string, BlendMode> BLEND_IDS

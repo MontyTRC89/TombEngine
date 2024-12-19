@@ -161,7 +161,7 @@ public:
 	const SectorSurfaceTriangleData& GetSurfaceTriangle(int x, int z, bool isFloor) const;
 	Vector3							 GetSurfaceNormal(int triID, bool isFloor) const;
 	Vector3							 GetSurfaceNormal(int x, int z, bool isFloor) const;
-	short							 GetSurfaceIllegalSlopeAngle(int x, int z, bool isFloor) const;
+	short							 GetSurfaceSteepSlopeAngle(int x, int z, bool isFloor) const;
 	MaterialType					 GetSurfaceMaterial(int x, int z, bool isFloor) const;
 
 	std::optional<int> GetNextRoomNumber(int x, int z, bool isBelow) const;

@@ -203,23 +203,6 @@ void RemoveObjectFromInventory(GAME_OBJECT_ID objectID, std::optional<int> count
 		}
 }
 
-void CollectCarriedItems(ItemInfo* item)
-{
-	short pickupNumber = item->CarriedItem;
-	while (pickupNumber != NO_VALUE)
-	{
-		auto& pickupItem = g_Level.Items[pickupNumber];
-
-		PickedUpObject(pickupItem);
-		g_Hud.PickupSummary.AddDisplayPickup(pickupItem);
-		KillItem(pickupNumber);
-
-		pickupNumber = pickupItem.CarriedItem;
-	}
-
-	item->CarriedItem = NO_VALUE;
-}
-
 static void HideOrDisablePickup(ItemInfo& pickupItem)
 {
 	if (pickupItem.TriggerFlags & 0xC0)
@@ -232,6 +215,23 @@ static void HideOrDisablePickup(ItemInfo& pickupItem)
 	{
 		KillItem(pickupItem.Index);
 	}
+}
+
+void CollectCarriedItems(ItemInfo* item)
+{
+	short pickupNumber = item->CarriedItem;
+	while (pickupNumber != NO_VALUE)
+	{
+		auto& pickupItem = g_Level.Items[pickupNumber];
+
+		PickedUpObject(pickupItem);
+		g_Hud.PickupSummary.AddDisplayPickup(pickupItem);
+		HideOrDisablePickup(pickupItem);
+
+		pickupNumber = pickupItem.CarriedItem;
+	}
+
+	item->CarriedItem = NO_VALUE;
 }
 
 void CollectMultiplePickups(int itemNumber)
@@ -903,7 +903,7 @@ void DropPickups(ItemInfo* item)
 
 		for (auto* staticPtr : collObjects.Statics)
 		{
-			auto& object = StaticObjects[staticPtr->staticNumber];
+			auto& object = Statics[staticPtr->staticNumber];
 
 			auto box = object.collisionBox.ToBoundingOrientedBox(staticPtr->pos);
 			if (box.Intersects(sphere))
@@ -963,7 +963,7 @@ void PickupControl(short itemNumber)
 	switch (triggerFlags)
 	{
 	case 5:
-		item->Animation.Velocity.y += 6.0f;
+		item->Animation.Velocity.y += g_GameFlow->GetSettings()->Physics.Gravity;
 		item->Pose.Position.y += item->Animation.Velocity.y;
 		
 		roomNumber = item->RoomNumber;
@@ -1270,7 +1270,7 @@ void SearchObjectControl(short itemNumber)
 				{
 					PickedUpObject(*item2);
 					g_Hud.PickupSummary.AddDisplayPickup(*item2);
-					KillItem(item->ItemFlags[1]);
+					HideOrDisablePickup(*item2);
 				}
 				else
 				{

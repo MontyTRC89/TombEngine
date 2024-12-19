@@ -30,7 +30,7 @@ Default: nil (i.e. infinite)
 @tparam bool autoDelete should be string automatically deleted after timeout is reached.
 If not given, the string will remain allocated even after timeout is reached, and can be
 shown again without re-initialization.
-Default: false
+Default: true
 */
 	table.set_function(ScriptReserved_ShowString, &StringsHandler::ShowString, this);
 
@@ -93,7 +93,7 @@ void StringsHandler::ShowString(const DisplayString& str, sol::optional<float> n
 	auto it = m_userDisplayStrings.find(str.GetID());
 	it->second._timeRemaining = numSeconds.value_or(0.0f);
 	it->second._isInfinite = !numSeconds.has_value();
-	it->second._deleteWhenZero = autoDelete.value_or(false);
+	it->second._deleteWhenZero = autoDelete.value_or(true);
 }
 
 bool StringsHandler::IsStringDisplaying(const DisplayString& displayString)
@@ -110,16 +110,16 @@ void StringsHandler::ProcessDisplayStrings(float deltaTime)
 	{
 		auto& str = it->second;
 		bool endOfLife = 0.0f >= str._timeRemaining;
-		if (str._deleteWhenZero && endOfLife)
+		if (!str._isInfinite && str._deleteWhenZero && endOfLife)
 		{
 			ScriptAssertF(!str._isInfinite, "The infinite string {} (key \"{}\") went out of scope without being hidden.", it->first, str._key);
 			it = m_userDisplayStrings.erase(it);
 		}
 		else
 		{
-			if (!endOfLife || str._isInfinite)
+			if ((!endOfLife || str._isInfinite) && str._owner == g_GameFlow->CurrentFreezeMode)
 			{
-				auto cstr = str._isTranslated ? g_GameFlow->GetString(str._key.c_str()) : str._key.c_str();
+				auto cstr = str._isTranslated ? g_GameFlow->GetString(str._key.c_str()) : str._key;
 				int flags = 0;
 
 				if (str._flags[(size_t)DisplayStringOptions::Center])

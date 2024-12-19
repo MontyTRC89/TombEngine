@@ -1,4 +1,7 @@
 #pragma once
+
+#include "Scripting/Internal/ScriptAssert.h"
+
 #define index_error_maker(CPP_TYPE, LUA_CLASS_NAME) [](CPP_TYPE& item, sol::object key) \
 { \
 	std::string err = "Attempted to read missing var \"" + key.as<std::string>() + "\" from " + LUA_CLASS_NAME; \

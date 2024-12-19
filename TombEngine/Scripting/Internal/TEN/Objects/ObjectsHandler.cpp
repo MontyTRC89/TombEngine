@@ -9,6 +9,7 @@
 #include "Scripting/Internal/TEN/Objects/Camera/CameraObject.h"
 #include "Scripting/Internal/TEN/Objects/Lara/AmmoTypes.h"
 #include "Scripting/Internal/TEN/Objects/Lara/LaraObject.h"
+#include "Scripting/Internal/TEN/Objects/Lara/WeaponTypes.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableStatuses.h"
 #include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
 #include "Scripting/Internal/TEN/Objects/Room/RoomFlags.h"
@@ -164,8 +165,8 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table& parent) :
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_ObjID, kObjIDs);
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_RoomFlagID, ROOM_FLAG_IDS);
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_RoomReverb, ROOM_REVERB_TYPES);
-	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_LaraWeaponType, LaraWeaponTypeMap);
-	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_PlayerAmmoType, PLAYER_AMMO_TYPES);
+	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_WeaponType, WEAPON_TYPES);
+	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_AmmoType, AMMO_TYPES);
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_HandStatus, HandStatusMap);
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_MoveableStatus, MOVEABLE_STATUSES);
 }
