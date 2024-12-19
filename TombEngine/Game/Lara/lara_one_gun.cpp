@@ -395,7 +395,7 @@ void FireShotgun(ItemInfo& laraItem)
 			armOrient.y + scatter * (GetRandomControl() - ANGLE(90.0f)) / 65536,
 			0);
 
-		if (FireWeapon(LaraWeaponType::Shotgun, *player.TargetEntity, laraItem, wobbledArmOrient) != FireWeaponType::NoAmmo)
+		if (FireWeapon(LaraWeaponType::Shotgun, player.TargetEntity, laraItem, wobbledArmOrient) != FireWeaponType::NoAmmo)
 			hasFired = true;
 
 		// HACK: Compensate for spending 6 units of shotgun ammo. -- Lwmte, 18.11.22
@@ -1152,7 +1152,7 @@ void FireHK(ItemInfo& laraItem, bool inaccurateMode)
 		Weapons[(int)LaraWeaponType::HK].Damage = damage / 3;
 	}
 
-	if (FireWeapon(LaraWeaponType::HK, *player.TargetEntity, laraItem, angles) != FireWeaponType::NoAmmo)
+	if (FireWeapon(LaraWeaponType::HK, player.TargetEntity, laraItem, angles) != FireWeaponType::NoAmmo)
 	{
 		player.LeftArm.GunSmoke = 12;
 
