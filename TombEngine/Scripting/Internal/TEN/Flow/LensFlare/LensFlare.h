@@ -12,7 +12,7 @@ namespace TEN::Scripting
 	{
 	private:
 		// Members
-		int	 _sunSpriteID = SPRITE_TYPES::SPR_LENS_FLARE_BLEND_3;
+		int	 _sunSpriteID = SPRITE_TYPES::SPR_LENS_FLARE_3;
 		bool _isEnabled	  = false;
 
 		Rotation	_rotation = {};

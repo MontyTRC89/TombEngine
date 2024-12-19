@@ -2847,7 +2847,7 @@ namespace TEN::Renderer
 			UINT offset = 0;
 			_context->IASetVertexBuffers(0, 1, _quadVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 
-			BindTexture(TextureRegister::ColorMap, _sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENS_FLARE_BLEND_3].Texture, SamplerStateRegister::LinearClamp);
+			BindTexture(TextureRegister::ColorMap, _sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENS_FLARE_3].Texture, SamplerStateRegister::LinearClamp);
 
 			int drawnStars = 0;
 			int starCount = (int)Weather.GetStars().size();
@@ -2865,7 +2865,7 @@ namespace TEN::Renderer
 					auto& star = Weather.GetStars()[drawnStars + i];
 
 					RendererSpriteToDraw rDrawSprite;
-					rDrawSprite.Sprite = &_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENS_FLARE_BLEND_3];
+					rDrawSprite.Sprite = &_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENS_FLARE_3];
 
 					rDrawSprite.Type = SpriteType::Billboard;
 					rDrawSprite.pos = renderView.Camera.WorldPosition + star.Direction * BLOCK(1);
@@ -2906,7 +2906,7 @@ namespace TEN::Renderer
 			if (Weather.GetMeteors().size() > 0)
 			{
 				RendererSpriteToDraw rDrawSprite;
-				rDrawSprite.Sprite = &_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENS_FLARE_BLEND_3];
+				rDrawSprite.Sprite = &_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENS_FLARE_3];
 				BindTexture(TextureRegister::ColorMap, rDrawSprite.Sprite->Texture, SamplerStateRegister::LinearClamp);
 
 				int drawnMeteors = 0;

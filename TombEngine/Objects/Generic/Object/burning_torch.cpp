@@ -72,7 +72,7 @@ namespace TEN::Entities::Generic
 		spark->dSize = spark->size / 8;
 
 		int spriteOffset = GlobalCounter % Objects[ID_FIRE_SPRITES].nmeshes;
-		spark->spriteIndex = Objects[ID_FIRE_SPRITES].meshIndex + spriteOffset;
+		spark->SpriteID = spriteOffset;
 	}
 
 	void DoFlameTorch()

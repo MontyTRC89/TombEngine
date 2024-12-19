@@ -224,18 +224,28 @@ void UpdateSparks()
 				continue;
 			}
 
-			if (spark.fxObj == ID_WATERFALL_EMITTER && 
+			if (spark.SpriteSeqID == ID_WATERFALL &&
 				spark.y >= spark.targetPos.y && 
 				spark.targetPos.w == spark.itemNumber)
 			{
-					spark.targetPos.y = spark.y;
+
+				spark.life = 0;
+				spark.on = false;
+				//if the coordinates of the waterfallsplas is outside a room or in a wall it appears anywhere on map. 
+				//To avoid this, check if coordinates are 0. This is set in the waterfall sprites.
+				if (spark.targetPos.x != 0 &&
+					spark.targetPos.z != 0)
+				{
+					spark.targetPos.y = spark.y - 80;
 					spark.targetPos.x = spark.x;
 					spark.targetPos.z = spark.z;
 
-					if (Random::TestProbability(1 / 2.0f))
-						SpawnWaterfallMist(spark.targetPos, spark.roomNumber, spark.scalar, 62, Color(spark.sR, spark.sG, spark.sB));
+					auto& item = g_Level.Items[spark.itemNumber];
 
-					spark.on = false;
+					if (Random::TestProbability(1 / 2.0f))
+						SpawnWaterfallMist(spark.targetPos, spark.roomNumber, item.ItemFlags[3], 62, Color(spark.sR, spark.sG, spark.sB));
+				}
+
 					continue;
 			}
 			

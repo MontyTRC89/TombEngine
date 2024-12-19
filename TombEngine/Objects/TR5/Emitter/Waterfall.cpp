@@ -29,104 +29,131 @@ namespace TEN::Effects::WaterfallEmitter
 
 	void InitializeWaterfall(short itemNumber)
 	{
-		// TODO
+        auto& item = g_Level.Items[itemNumber];
+
+        //Customize x and z vel:
+        item.ItemFlags[0] = 100;
+
+        //Customize Waterfall scale
+        item.ItemFlags[1] = 3;
+
+        //Customize density
+        item.ItemFlags[2] = 120;
+
+        //Customize Waterfallmist scale
+        item.ItemFlags[3] = 3;
+
 	}
 
-	void ControlWaterfall(short itemNumber)
-	{
-		constexpr auto SCALE		= 3.0f;
-		//constexpr auto SPAWN_RADIUS = BLOCK(1 / 16.0f);
+    void ControlWaterfall(short itemNumber)
+    {
+        auto& item = g_Level.Items[itemNumber];
+        if (!TriggerActive(&item))
+            return;
+
+        item.ItemFlags[3] = 5;
+        item.ItemFlags[2] = 126;
+
+        float customVel = item.ItemFlags[0] / 256.0f;
+
+        short scale = item.ItemFlags[1] ;
+        scale = Random::GenerateInt(scale, scale + 2);
+
+        float density = item.TriggerFlags < 5 ? std::clamp(int(item.ItemFlags[2]), 10, 256) : std::clamp(int(item.ItemFlags[2]), 80, 256);
+        density = density / 256.0f;
+
+        SoundEffect(SFX_TR4_WATERFALL_LOOP, &item.Pose);
+
+        float waterfallWidth = std::max(CLICK(float(item.TriggerFlags)), CLICK(0.1f));
+        auto vel = item.Pose.Orientation.ToDirection() * BLOCK(customVel);
+
+        auto startColor = (item.Model.Color / 4) * SCHAR_MAX;
+        auto endColor = (item.Model.Color / 8) * UCHAR_MAX;
+
+        // Spawn particles.
+        unsigned int partCount = (int)round(waterfallWidth / BLOCK(density));
+        for (int i = 0; i < partCount; i++)
+        {
+            auto& part = *GetFreeParticle();
+
+            auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
+            auto relOffset = Vector3(Random::GenerateFloat(-waterfallWidth / 2.0f, waterfallWidth / 2.0f), 0.0f, 0.0f);
+            auto offset = Vector3::Transform(relOffset, rotMatrix);
+            auto pos = item.Pose.Position.ToVector3() + offset;
+            auto orient2 = EulerAngles(item.Pose.Orientation.x, item.Pose.Orientation.y, item.Pose.Orientation.z);
+            auto origin2 = Geometry::TranslatePoint(Vector3(pos.x, pos.y, pos.z), orient2, BLOCK(customVel));
+
+            vel.y = Random::GenerateFloat(0.0f, 16.0f);
+
+            part.on = true;
+            part.SpriteSeqID = ID_WATERFALL;
+            part.SpriteID = Random::TestProbability(1 / 2.2f) ? WATERFALL_STREAM_2_SPRITE_ID : WATERFALL_SPLASH_SPRITE_ID;
+            part.x = pos.x;
+            part.y = pos.y;
+            part.z = pos.z;
+            part.roomNumber = item.RoomNumber;
+            part.xVel = vel.x;
+            part.yVel = vel.y;
+            part.zVel = vel.z;
+            part.friction = -2;
+            part.itemNumber = itemNumber;
+
+            auto pointColl = GetPointCollision(origin2, item.RoomNumber, item.Pose.Orientation.y, BLOCK(customVel));
+
+            int relFloorHeight = pointColl.GetFloorHeight() - part.y;
+            part.targetPos = Vector4(origin2.x, origin2.y + relFloorHeight, origin2.z, itemNumber);
+
+            // if targetpos is in a wall, calculate targetpos from the main item coordinates so the particles still spawn.
+            if (pointColl.GetSector().IsWall(part.targetPos.x, part.targetPos.z))
+            {
+                pointColl = GetPointCollision(origin2, item.RoomNumber, item.Pose.Orientation.y, BLOCK(0.0f));
+                relFloorHeight = pointColl.GetFloorHeight() - part.y;
+                origin2 = Geometry::TranslatePoint(Vector3(pos.x, pos.y, pos.z), orient2, BLOCK(0.0f));
+                //set the x and z values to 0 to prevent it from spawning a waterfallmist within the wall. Also sets the right height.
+                part.targetPos = Vector4(0, origin2.y + relFloorHeight, 0, itemNumber);
 
 
-		auto SPAWN_RADIUS = CLICK(1);
-		auto& item = g_Level.Items[itemNumber];
-		if (!TriggerActive(&item))
-			return;
+                //Stop spawning particles if there is a wall directly at the spawnpoint
+                if (pointColl.GetSector().IsWall(pos.x, pos.z))
+                {
+                    part.on = false;
+                    continue;
+                }
+            }
 
-		
+            if (TestEnvironment(ENV_FLAG_WATER, Vector3i(part.targetPos.x, part.targetPos.y, part.targetPos.z), part.roomNumber) ||
+                TestEnvironment(ENV_FLAG_SWAMP, Vector3i(part.targetPos.x, part.targetPos.y, part.targetPos.z), part.roomNumber))
+            {
+                part.targetPos.y = pointColl.GetWaterSurfaceHeight();
+            }
 
-		SoundEffect(SFX_TR4_WATERFALL_LOOP, &item.Pose);
+            //Debug
+            //g_Renderer.AddDebugLine(origin2, Vector3(part.targetPos.x, part.targetPos.y, part.targetPos.z) , Vector4(1, 0, 0, 1));
 
-		float waterfallWidth = std::max(CLICK(float(item.TriggerFlags)), CLICK(0.1f));
+            char colorOffset = Random::GenerateInt(-8, 8);
 
-		auto vel = item.Pose.Orientation.ToDirection() * BLOCK(0.2f);
+            part.sR = std::clamp((int)startColor.x + colorOffset, 0, UCHAR_MAX);
+            part.sG = std::clamp((int)startColor.y + colorOffset, 0, UCHAR_MAX);
+            part.sB = std::clamp((int)startColor.z + colorOffset, 0, UCHAR_MAX);
+            part.dR = std::clamp((int)endColor.x + colorOffset, 0, UCHAR_MAX);
+            part.dG = std::clamp((int)endColor.y + colorOffset, 0, UCHAR_MAX);
+            part.dB = std::clamp((int)endColor.z + colorOffset, 0, UCHAR_MAX);
+            part.roomNumber = pointColl.GetRoomNumber();
+            part.colFadeSpeed = 2;
+            part.blendMode = BlendMode::Additive;
+            part.gravity = 120;
+            part.life = part.sLife = WATERFALL_LIFE_MAX;
+            part.fadeToBlack = 0;
+            part.rotAng = Random::GenerateAngle();
+            part.rotAdd = Random::GenerateAngle(ANGLE(-0.1f), ANGLE(0.1f));
+            part.scalar = scale;// item.TriggerFlags < 10 ? Random::GenerateInt(2, 4) : Random::GenerateInt(3, 5);
+            part.maxYvel = 0;
+            part.sSize = part.size = (item.TriggerFlags < 10 ? Random::GenerateFloat(40.0f, 51.0f) : Random::GenerateFloat(49.0f, 87.0f)) / 2;
+            part.dSize = item.TriggerFlags < 10 ? Random::GenerateFloat(40.0f, 51.0f) : Random::GenerateFloat(98.0f, 174.0f);
+            part.flags = SP_SCALE | SP_DEF | SP_ROTATE;
+        }
+    }
 
-		auto startColor = (item.Model.Color / 4) * SCHAR_MAX;
-		auto endColor = (item.Model.Color / 8) * UCHAR_MAX;
-
-		// Spawn particles.
-			unsigned int partCount = (int)round(waterfallWidth / BLOCK(0.5f));
-			for (int i = 0; i < partCount; i++)
-			{
-					auto& part = *GetFreeParticle();
-
-					auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
-					auto relOffset = Vector3(Random::GenerateFloat(-waterfallWidth / 2, waterfallWidth / 2), 0.0f, 0.0f);
-					auto offset = Vector3::Transform(relOffset, rotMatrix);
-					auto sphere = BoundingSphere(offset, SPAWN_RADIUS);
-					offset = Random::GeneratePointInSphere(sphere);
-					auto pos = item.Pose.Position.ToVector3() + offset;
-					auto orient2 = EulerAngles(item.Pose.Orientation.x, item.Pose.Orientation.y, item.Pose.Orientation.z);
-					auto origin2 = Geometry::TranslatePoint(Vector3(pos.x, pos.y, pos.z), orient2, BLOCK(0.3));
-
-					vel.y = Random::GenerateFloat(0.0f, 16.0f);
-
-					part.on = true;
-					part.SpriteSeqID = ID_WATERFALL;
-					part.SpriteID = Random::TestProbability(1 / 2.2f) ? WATERFALL_STREAM_2_SPRITE_ID : WATERFALL_SPLASH_SPRITE_ID;
-					part.x = pos.x;
-					part.y = pos.y;
-					part.z = pos.z;
-					part.roomNumber = item.RoomNumber;
-					part.xVel = vel.x;
-					part.yVel = vel.y;
-					part.zVel = vel.z;
-					part.friction = -2;
-					part.itemNumber = itemNumber;
-
-					auto pointColl = GetPointCollision(origin2, item.RoomNumber, item.Pose.Orientation.y, BLOCK(0.3f));
-
-					if (pointColl.GetSector().IsWall(pos.x, pos.z))
-					{
-						part.on = false;
-						continue;
-					}
-
-					int relFloorHeight = pointColl.GetFloorHeight() - part.y;
-					part.targetPos = Vector4(origin2.x, origin2.y + relFloorHeight, origin2.z, itemNumber); // pointColl.GetRoomNumber());
-					if (TestEnvironment(ENV_FLAG_WATER, Vector3i(part.targetPos.x, part.targetPos.y, part.targetPos.z), part.roomNumber) ||
-						TestEnvironment(ENV_FLAG_SWAMP, Vector3i(part.targetPos.x, part.targetPos.y, part.targetPos.z), part.roomNumber))
-					{
-						part.targetPos.y =  pointColl.GetWaterSurfaceHeight();
-					}
-
-					// TODO: Offset colour earlier.
-					char colorOffset = Random::GenerateInt(-8, 8);
-
-					part.sR = std::clamp((int)startColor.x + colorOffset, 0, UCHAR_MAX);
-					part.sG = std::clamp((int)startColor.y + colorOffset, 0, UCHAR_MAX);
-					part.sB = std::clamp((int)startColor.z + colorOffset, 0, UCHAR_MAX);
-					part.dR = std::clamp((int)endColor.x + colorOffset, 0, UCHAR_MAX);
-					part.dG = std::clamp((int)endColor.y + colorOffset, 0, UCHAR_MAX);
-					part.dB = std::clamp((int)endColor.z + colorOffset, 0, UCHAR_MAX);
-					part.roomNumber = pointColl.GetRoomNumber();
-					part.colFadeSpeed = 2;
-					part.blendMode = BlendMode::Additive;
-					part.gravity = 120;
-					part.life =
-						part.sLife = WATERFALL_LIFE_MAX;
-					part.fxObj = ID_WATERFALL_EMITTER;
-					part.fadeToBlack = 0;
-					part.rotAng = Random::GenerateAngle();
-					part.rotAdd = Random::GenerateAngle(ANGLE(-0.1f), ANGLE(0.1f));
-					part.scalar = item.TriggerFlags < 10 ? Random::GenerateInt(2, 4) : Random::GenerateInt(3, 5);
-					part.maxYvel = 0;
-					part.sSize =
-						part.size = (item.TriggerFlags < 10 ? Random::GenerateFloat(40.0f, 51.0f) : Random::GenerateFloat(49.0f, 87.0f)) / 2;
-					part.dSize = item.TriggerFlags < 10 ? Random::GenerateFloat(40.0f, 51.0f) : Random::GenerateFloat(98.0f, 174.0f);
-					part.flags = SP_SCALE | SP_DEF | SP_ROTATE;
-			}
-	}
 
 	void SpawnWaterfallMist(const Vector4& pos, int roomNumber, float scalar, float size, const Color& color)
 	{
@@ -143,10 +170,10 @@ namespace TEN::Effects::WaterfallEmitter
 
 		part.on = true;
 
-		part.x = Random::GenerateInt(-12, 12) + pos.x;
-		part.y = Random::GenerateInt(0, 16) + pos.y - 8;
-		part.z = Random::GenerateInt(-12, 12) + pos.z;
-		part.roomNumber = roomNumber;
+		part.x = pos.x;
+		part.y = Random::GenerateInt(-16, 0) + pos.y;
+		part.z = pos.z;
+        part.roomNumber = roomNumber;
 
 		// TODO: Generate normal color representation, then convert to legacy.
 		char colorVariation = (Random::GenerateInt(-8, 8)); // TODO: Why char?
@@ -169,18 +196,16 @@ namespace TEN::Effects::WaterfallEmitter
 
 		part.friction = 3;
 		part.rotAng = Random::GenerateAngle();
-
-		auto scale = (scalar == 3.0f) ? (scalar - 1.0f) : (scalar + 3.0f);
-		scale = std::clamp(int(scale), 2, 9);
-		part.scalar = scale;
+        part.scalar = scalar;
+        part.targetPos = Vector4::Zero;
 
 		part.rotAdd = Random::GenerateInt(-16, 16);
-		part.gravity =
-		part.maxYvel = -64;
+		part.gravity = 0;
+		part.maxYvel = 0;
 
-		float size1 = (GetRandomControl() & 8) + size + scalar;
+		float size1 = (GetRandomControl() & 8) + size ;
 		part.size =
-		part.sSize = size1 / 4;
+		part.sSize = size1 / 4 ;
 		part.dSize = size1;
 
 		part.flags = SP_SCALE | SP_DEF | SP_ROTATE;
