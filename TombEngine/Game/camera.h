@@ -15,8 +15,7 @@ enum class CameraType
 	Fixed,
 	Look,
 	Combat,
-	Heavy,
-	Object
+	Heavy
 };
 
 struct CAMERA_INFO
@@ -52,12 +51,6 @@ struct CAMERA_INFO
 	float Fov  = 0.0f;
 
 	bool DisableInterpolation = false;
-};
-
-struct ObjectCameraInfo
-{
-	GameVector LastAngle;
-	bool ItemCameraOn;
 };
 
 enum CAMERA_FLAGS
@@ -105,6 +98,7 @@ void BounceCamera(ItemInfo* item, short bounce, short maxDistance);
 void BinocularCamera(ItemInfo* item);
 void ConfirmCameraTargetPos();
 void CalculateCamera(const CollisionInfo& coll);
+void CalculateBounce(bool binocularMode);
 void RumbleScreen();
 bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, short radius);
 void ItemPushCamera(GameBoundingBox* bounds, Pose* pos, short radius);

@@ -150,7 +150,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	static void KnockbackCollision(ItemInfo& item, short headingAngle)
 	{
-		item.HitPoints -= 200;
+		DoDamage(&item, 200);
 		item.HitStatus = true;
 
 		short diff = item.Pose.Orientation.y - headingAngle;
@@ -289,7 +289,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		// Check the previous and next position of AI object to
 		// allow Sophia to go up or down based on enemy's vertical position.
-		FindAITargetObject(item, ID_AI_X1, creature->LocationAI, false);
+		FindAITargetObject(creature, ID_AI_X1, creature->LocationAI, false);
 
 		if (Vector3i::Distance(item.Pose.Position, creature->Enemy->Pose.Position) < SOPHIALEIGH_REACHED_GOAL_RANGE)
 		{

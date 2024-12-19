@@ -7,10 +7,10 @@
 #include <codecvt>
 #include <filesystem>
 
-#include "resource.h"
 #include "Game/control/control.h"
 #include "Game/savegame.h"
 #include "Renderer/Renderer.h"
+#include "resource.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/configuration.h"
@@ -129,9 +129,9 @@ void DisableDpiAwareness()
 	FreeLibrary(lib);
 }
 
-bool GenerateTitleLevel(const std::string& levelPath)
+bool GenerateDummyLevel(const std::string& levelPath)
 {
-	// Try to load the embedded resource "data.bin"
+	// Try loading embedded resource "data.bin"
 	HRSRC hResource = FindResource(NULL, MAKEINTRESOURCE(IDR_TITLELEVEL), "BIN");
 	if (hResource == NULL)
 	{
@@ -139,7 +139,7 @@ bool GenerateTitleLevel(const std::string& levelPath)
 		return false;
 	}
 
-	// Load the resource into memory
+	// Load resource into memory.
 	HGLOBAL hGlobal = LoadResource(NULL, hResource);
 	if (hGlobal == NULL)
 	{
@@ -147,17 +147,18 @@ bool GenerateTitleLevel(const std::string& levelPath)
 		return false;
 	}
 
-	// Lock the resource to get a pointer to the data
+	// Lock resource to get data pointer.
 	void* pData = LockResource(hGlobal);
 	DWORD dwSize = SizeofResource(NULL, hResource);
 
-	// Write the resource data to the file
+	// Write resource data to file.
 	try
 	{
-		std::filesystem::path dir = std::filesystem::path(levelPath).parent_path();
-		std::filesystem::create_directories(dir);
+		auto dir = std::filesystem::path(levelPath).parent_path();
+		if (!dir.empty())
+			std::filesystem::create_directories(dir);
 
-		std::ofstream outFile(levelPath, std::ios::binary);
+		auto outFile = std::ofstream(levelPath, std::ios::binary);
 		if (!outFile)
 			throw std::ios_base::failure("Failed to create title level file.");
 
@@ -178,18 +179,18 @@ bool GenerateTitleLevel(const std::string& levelPath)
 
 void WinProcMsg()
 {
-	MSG Msg;
+	MSG msg;
 
 	do
 	{
-		GetMessage(&Msg, 0, 0, 0);
-		if (!TranslateAccelerator(WindowsHandle, hAccTable, &Msg))
+		GetMessage(&msg, 0, 0, 0);
+		if (!TranslateAccelerator(WindowsHandle, hAccTable, &msg))
 		{
-			TranslateMessage(&Msg);
-			DispatchMessage(&Msg);
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
 		}
 	}
-	while (!ThreadEnded && Msg.message != WM_QUIT);
+	while (!ThreadEnded && msg.message != WM_QUIT);
 }
 
 void CALLBACK HandleWmCommand(unsigned short wParam)
@@ -351,7 +352,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	auto windowName = (std::string("Starting TombEngine version ") +
 					   std::to_string(ver[0]) + "." +
 					   std::to_string(ver[1]) + "." +
-					   std::to_string(ver[2]) + " " +
+					   std::to_string(ver[2]) + "." +
 					   std::to_string(ver[3]) + " " +
 #ifdef _WIN64
 					   "(64-bit)"

@@ -46,7 +46,7 @@ const BASS_BFX_FREEVERB BASS_ReverbTypes[(int)ReverbType::Count] =    // Reverb 
   {  1.0f,     0.25f,     0.90f,    1.00f,    1.0f,     0,      -1     }	// 4 = Pipe
 };
 
-const  std::string TRACKS_EXTENSIONS[] = {".wav", ".mp3", ".ogg"};
+const  std::string TRACKS_EXTENSIONS[] = {".wav", ".ogg", ".mp3" };
 const  std::string TRACKS_PATH = "Audio/";
 static std::string FullAudioDirectory;
 
@@ -490,7 +490,7 @@ std::optional<std::string> GetCurrentSubtitle()
 	return std::nullopt;
 }
 
-void PlaySoundTrack(const std::string& track, SoundTrackType mode, QWORD position, int forceFadeInTime)
+void PlaySoundTrack(const std::string& track, SoundTrackType mode, std::optional<QWORD> pos, int forceFadeInTime)
 {
 	if (!g_Configuration.EnableSound)
 		return;
@@ -505,10 +505,11 @@ void PlaySoundTrack(const std::string& track, SoundTrackType mode, QWORD positio
 	bool channelActive = BASS_ChannelIsActive(SoundtrackSlot[(int)mode].Channel);
 	if (channelActive && SoundtrackSlot[(int)mode].Track.compare(track) == 0)
 	{
-		// Same track is incoming with different playhead, set it to a new position.
+		// Same track is incoming with different playhead; set it to new position.
 		auto stream = SoundtrackSlot[(int)mode].Channel;
-		if (position && (BASS_ChannelGetLength(stream, BASS_POS_BYTE) > position))
-			BASS_ChannelSetPosition(stream, position, BASS_POS_BYTE);
+		if (pos.has_value() && BASS_ChannelGetLength(stream, BASS_POS_BYTE) > pos.value())
+			BASS_ChannelSetPosition(stream, pos.value(), BASS_POS_BYTE);
+
 		return;
 	}
 
@@ -573,20 +574,22 @@ void PlaySoundTrack(const std::string& track, SoundTrackType mode, QWORD positio
 
 		// Shuffle...
 		// Only activates if no custom position is passed as argument.
-		if (!position)
+		if (!pos.has_value())
 		{
 			QWORD newPos = BASS_ChannelGetLength(stream, BASS_POS_BYTE) * (static_cast<float>(GetRandomControl()) / static_cast<float>(RAND_MAX));
 			BASS_ChannelSetPosition(stream, newPos, BASS_POS_BYTE);
 		}
 	}
 	else
+	{
 		BASS_ChannelSetAttribute(stream, BASS_ATTRIB_VOL, masterVolume);
+	}
 
 	BASS_ChannelPlay(stream, false);
 
 	// Try to restore position, if specified.
-	if (position && (BASS_ChannelGetLength(stream, BASS_POS_BYTE) > position))
-		BASS_ChannelSetPosition(stream, position, BASS_POS_BYTE);
+	if (pos.has_value() && BASS_ChannelGetLength(stream, BASS_POS_BYTE) > pos.value())
+		BASS_ChannelSetPosition(stream, pos.value(), BASS_POS_BYTE);
 
 	if (Sound_CheckBASSError("Playing soundtrack '%s'", true, fullTrackName.filename().string().c_str()))
 		return;
@@ -1081,14 +1084,11 @@ void PlaySecretTrack()
 
 int GetShatterSound(int shatterID)
 {
-	auto fxID = StaticObjects[shatterID].shatterSound;
-	if (fxID != -1 && fxID < NUM_SFX)
+	auto fxID = Statics[shatterID].shatterSound;
+	if (fxID != NO_VALUE && fxID < NUM_SFX)
 		return fxID;
 
-	if (shatterID < 3)
-		return SFX_TR5_SMASH_WOOD;
-	else
-		return SFX_TR4_SMASH_ROCK;
+	return SFX_TR4_SMASH_ROCK;
 }
 
 void PlaySoundSources()
