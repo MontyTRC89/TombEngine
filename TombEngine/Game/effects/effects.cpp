@@ -40,7 +40,7 @@ using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Effects::WaterfallEmitter;
 using namespace TEN::Math;
-using namespace TEN::Math::Random; // TODO: No.
+using namespace TEN::Math::Random;
 
 using TEN::Renderer::g_Renderer;
 

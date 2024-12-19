@@ -52,12 +52,13 @@ namespace TEN::Effects::WaterfallEmitter
         item.ItemFlags[WaterfallItemFlags::MistSpriteScale] = 3;
 
         //Customize Waterfallmist sprite scale
-        item.ItemFlags[WaterfallItemFlags::Sound] = 1;
+        item.ItemFlags[WaterfallItemFlags::Sound] = 0;
 	}
 
     void ControlWaterfall(short itemNumber)
     {
         auto& item = g_Level.Items[itemNumber];
+
         if (!TriggerActive(&item))
             return;
 
@@ -69,8 +70,8 @@ namespace TEN::Effects::WaterfallEmitter
         float density = item.TriggerFlags < 5 ? std::clamp(int(item.ItemFlags[WaterfallItemFlags::Density]), 10, 256) : std::clamp(int(item.ItemFlags[WaterfallItemFlags::Density]), 80, 256);
         density = density / 256.0f;
 
-        if  (item.ItemFlags[WaterfallItemFlags::Sound])
-        SoundEffect(SFX_TR4_WATERFALL_LOOP, &item.Pose);
+        if (!item.ItemFlags[WaterfallItemFlags::Sound])
+            SoundEffect(SFX_TR4_WATERFALL_LOOP, &item.Pose);
 
         float waterfallWidth = std::max(CLICK(float(item.TriggerFlags)), CLICK(0.1f));
         auto vel = item.Pose.Orientation.ToDirection() * BLOCK(customVel);
