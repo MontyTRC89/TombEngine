@@ -280,8 +280,12 @@ void Renderer::UpdateLaraAnimations(bool force)
 
 void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 {
-	// Don't draw player if using optics.
-	if (Lara.Control.Look.OpticRange != 0 || SpotcamDontDrawLara)
+	// Don't draw player if using optics (but still draw reflections).
+	if (Lara.Control.Look.OpticRange != 0 && _currentMirror == nullptr)
+		return;
+
+	// Don't draw player if spotcam is active.
+	if (SpotcamDontDrawLara)
 		return;
 
 	// Don't draw player if on title level and disabled.
