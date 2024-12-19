@@ -134,6 +134,20 @@ function CustomDiary:IsVisible()
 end
 
 --- 
+-- The function displays the specified diary.
+function CustomDiary:showDiary()
+    
+	if GameVars.Engine.Diaries[self.Name] then
+
+		local object = GameVars.Engine.Diaries[self.Name].Object
+
+        LevelFuncs.Engine.Diaries.ActivateDiary(object)
+
+	end
+
+end
+
+--- 
 -- The function returns the number of pages in the diary.
 -- @treturn int total number of unlocked pages in the diary.
 function CustomDiary:getUnlockedPageCount()
@@ -166,6 +180,16 @@ function CustomDiary:unlockPages(index)
             diary.TargetAlpha = 255
             TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRELOOP, LevelFuncs.Engine.Diaries.ShowNotification)
         end
+    end
+end
+
+---
+-- The function clears the page number for the diary.
+-- @tparam int pageIndex The page number to be cleared.
+function CustomDiary:clearPage(index)
+    if GameVars.Engine.Diaries[self.Name] then
+        GameVars.Engine.Diaries[self.Name].Pages[index]= {NarrationTrack=nil,TextEntries={},ImageEntries={}}
+        print("Page Cleared")
     end
 end
 
@@ -434,16 +458,21 @@ function CustomDiary:importData(filename)
 
     local diaryData = require(filename)
 
-    for pageIndex, page in ipairs(diaryData.Pages) do
-        for _, image in ipairs(page.Image) do
-            self:addImageEntry(pageIndex, image.objectIDbg, image.spriteIDbg, image.colorBG, image.posX, image.posY, image.rot, image.scaleX, image.scaleY, image.alignMode, image.scaleMode, image.blendMode)
+    for _, page in ipairs(diaryData.pages) do
+
+        local pageNumber = page.pageNumber or error("Page number is missing for one of the pages.")
+        local images =  page.images or {}
+        local texts = page.texts or {}
+
+        for _, image in ipairs(images) do
+            self:addImageEntry(pageNumber, image.objectID, image.spriteID, image.color, image.posX, image.posY, image.rot, image.scaleX, image.scaleY, image.alignMode, image.scaleMode, image.blendMode)
         end
         
-        for _, text in ipairs(page.Text) do
-            self:addTextEntry(pageIndex, text.text, text.textX, text.textY, text.textAlignment, text.textEffects, text.textScale, text.textColor)
+        for _, text in ipairs(texts) do
+            self:addTextEntry(pageNumber, text.text, text.textX, text.textY, text.textAlignment, text.textEffects, text.textScale, text.textColor)
         end
     end
-    print("External file imported")
+    print("External file: "..tostring(filename).." imported")
 end
 
 -- !Ignore
