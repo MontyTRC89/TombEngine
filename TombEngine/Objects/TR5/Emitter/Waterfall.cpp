@@ -20,9 +20,16 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Effects::WaterfallEmitter
 {
-	constexpr auto WATERFALL_LIFE_MAX			 = 100;
-	constexpr auto WATERFALL_MIST_COLOR_MODIFIER = Color(20.0f, 20.0f, 20.0f);
 
+    enum WaterfallItemFlags
+    {
+        Velocity,
+        WaterfallSpriteScale,
+        Density,
+        MistSpriteScale
+    };
+
+	constexpr auto WATERFALL_LIFE_MAX			= 100;
 	constexpr auto WATERFALL_SPLASH_SPRITE_ID	= 0;
 	constexpr auto WATERFALL_STREAM_1_SPRITE_ID = 1;
 	constexpr auto WATERFALL_STREAM_2_SPRITE_ID = 2;
@@ -32,17 +39,16 @@ namespace TEN::Effects::WaterfallEmitter
         auto& item = g_Level.Items[itemNumber];
 
         //Customize x and z vel:
-        item.ItemFlags[0] = 100;
+        item.ItemFlags[WaterfallItemFlags::Velocity] = 100;
 
-        //Customize Waterfall scale
-        item.ItemFlags[1] = 3;
+        //Customize Waterfall sprite scale
+        item.ItemFlags[WaterfallItemFlags::WaterfallSpriteScale] = 3;
 
         //Customize density
-        item.ItemFlags[2] = 120;
+        item.ItemFlags[WaterfallItemFlags::Density] = 120;
 
-        //Customize Waterfallmist scale
-        item.ItemFlags[3] = 3;
-
+        //Customize Waterfallmist sprite scale
+        item.ItemFlags[WaterfallItemFlags::MistSpriteScale] = 3;
 	}
 
     void ControlWaterfall(short itemNumber)
@@ -51,15 +57,12 @@ namespace TEN::Effects::WaterfallEmitter
         if (!TriggerActive(&item))
             return;
 
-        item.ItemFlags[3] = 5;
-        item.ItemFlags[2] = 126;
+        float customVel = item.ItemFlags[WaterfallItemFlags::Velocity] / 256.0f;
 
-        float customVel = item.ItemFlags[0] / 256.0f;
-
-        short scale = item.ItemFlags[1] ;
+        short scale = item.ItemFlags[WaterfallItemFlags::WaterfallSpriteScale] ;
         scale = Random::GenerateInt(scale, scale + 2);
 
-        float density = item.TriggerFlags < 5 ? std::clamp(int(item.ItemFlags[2]), 10, 256) : std::clamp(int(item.ItemFlags[2]), 80, 256);
+        float density = item.TriggerFlags < 5 ? std::clamp(int(item.ItemFlags[WaterfallItemFlags::Density]), 10, 256) : std::clamp(int(item.ItemFlags[WaterfallItemFlags::Density]), 80, 256);
         density = density / 256.0f;
 
         SoundEffect(SFX_TR4_WATERFALL_LOOP, &item.Pose);
@@ -110,8 +113,7 @@ namespace TEN::Effects::WaterfallEmitter
                 relFloorHeight = pointColl.GetFloorHeight() - part.y;
                 origin2 = Geometry::TranslatePoint(Vector3(pos.x, pos.y, pos.z), orient2, BLOCK(0.0f));
                 //set the x and z values to 0 to prevent it from spawning a waterfallmist within the wall. Also sets the right height.
-                part.targetPos = Vector4(0, origin2.y + relFloorHeight, 0, itemNumber);
-
+                part.targetPos = Vector4(origin2.x, origin2.y + relFloorHeight, origin2.z, itemNumber);
 
                 //Stop spawning particles if there is a wall directly at the spawnpoint
                 if (pointColl.GetSector().IsWall(pos.x, pos.z))
@@ -154,10 +156,8 @@ namespace TEN::Effects::WaterfallEmitter
         }
     }
 
-
 	void SpawnWaterfallMist(const Vector4& pos, int roomNumber, float scalar, float size, const Color& color)
 	{
-
 		auto& part = *GetFreeParticle();
 
 		auto colorOffset = Color(40.0f, 40.0f, 40.0f); // make constant. Color is Vector 4. 4th value should not be changed.
@@ -170,6 +170,9 @@ namespace TEN::Effects::WaterfallEmitter
 
 		part.on = true;
 
+        part.PrevX = pos.x;
+        part.PrevY = pos.y;
+        part.PrevZ = pos.z;
 		part.x = pos.x;
 		part.y = Random::GenerateInt(-16, 0) + pos.y;
 		part.z = pos.z;
