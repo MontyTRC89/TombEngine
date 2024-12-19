@@ -26,7 +26,8 @@ namespace TEN::Effects::WaterfallEmitter
         Velocity,
         WaterfallSpriteScale,
         Density,
-        MistSpriteScale
+        MistSpriteScale,
+        Sound
     };
 
 	constexpr auto WATERFALL_LIFE_MAX			= 100;
@@ -49,6 +50,9 @@ namespace TEN::Effects::WaterfallEmitter
 
         //Customize Waterfallmist sprite scale
         item.ItemFlags[WaterfallItemFlags::MistSpriteScale] = 3;
+
+        //Customize Waterfallmist sprite scale
+        item.ItemFlags[WaterfallItemFlags::Sound] = 1;
 	}
 
     void ControlWaterfall(short itemNumber)
@@ -65,6 +69,7 @@ namespace TEN::Effects::WaterfallEmitter
         float density = item.TriggerFlags < 5 ? std::clamp(int(item.ItemFlags[WaterfallItemFlags::Density]), 10, 256) : std::clamp(int(item.ItemFlags[WaterfallItemFlags::Density]), 80, 256);
         density = density / 256.0f;
 
+        if  (item.ItemFlags[WaterfallItemFlags::Sound])
         SoundEffect(SFX_TR4_WATERFALL_LOOP, &item.Pose);
 
         float waterfallWidth = std::max(CLICK(float(item.TriggerFlags)), CLICK(0.1f));
