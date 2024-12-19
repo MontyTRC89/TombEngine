@@ -228,14 +228,13 @@ void UpdateSparks()
 				spark.y >= spark.targetPos.y && 
 				spark.targetPos.w == spark.itemNumber)
 			{
-
 					spark.targetPos.y = spark.y - 80;
 					spark.targetPos.x = spark.x;
 					spark.targetPos.z = spark.z;
 
 					auto& item = g_Level.Items[spark.itemNumber];
 
-					if (Random::TestProbability(1 / 2.0f))
+					if (Random::TestProbability(1.0f / 2.0f))
 						SpawnWaterfallMist(spark.targetPos, spark.roomNumber, item.ItemFlags[3], 62, Color(spark.sR, spark.sG, spark.sB));
 
 				spark.life = 0;
