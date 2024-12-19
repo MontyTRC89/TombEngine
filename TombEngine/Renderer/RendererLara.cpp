@@ -284,14 +284,6 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 	if (Lara.Control.Look.OpticRange != 0 && _currentMirror == nullptr)
 		return;
 
-	// Don't draw player if spotcam is active.
-	if (SpotcamDontDrawLara)
-		return;
-
-	// Don't draw player if on title level and disabled.
-	if (CurrentLevel == 0 && !g_GameFlow->IsLaraInTitleEnabled())
-		return;
-
 	auto* item = &_items[LaraItem->Index];
 	auto* nativeItem = &g_Level.Items[item->ItemNumber];
 

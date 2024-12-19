@@ -401,7 +401,7 @@ namespace TEN::Renderer
 			if (item->Status == ITEM_INVISIBLE)
 				continue;
 
-			if (item->ObjectNumber == ID_LARA && (Lara.Control.Look.OpticRange || SpotcamOverlay || SpotcamDontDrawLara))
+			if (item->ObjectNumber == ID_LARA && (SpotcamOverlay || SpotcamDontDrawLara))
 				continue;
 
 			if (item->ObjectNumber == ID_LARA && CurrentLevel == 0 && !g_GameFlow->IsLaraInTitleEnabled())
