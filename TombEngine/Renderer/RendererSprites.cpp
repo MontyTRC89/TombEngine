@@ -243,7 +243,6 @@ namespace TEN::Renderer
 				object.Centre = rDrawSprite.pos;
 				object.Distance = distance;
 				object.Sprite = &rDrawSprite;
-				//object.World = GetWorldMatrixForSprite(&rDrawSprite, view);
 
 				view.TransparentObjectsToDraw.push_back(object);
 			}
@@ -363,20 +362,28 @@ namespace TEN::Renderer
 				vertex0.UV = rDrawSprite.Sprite->UV[0];
 				vertex0.Color = rDrawSprite.c1;
 
+				ReflectVectorOptionally(vertex0.Position);
+
 				auto vertex1 = Vertex{};
 				vertex1.Position = rDrawSprite.vtx2;
 				vertex1.UV = rDrawSprite.Sprite->UV[1];
 				vertex1.Color = rDrawSprite.c2;
+
+				ReflectVectorOptionally(vertex1.Position);
 
 				auto vertex2 = Vertex{};
 				vertex2.Position = rDrawSprite.vtx3;
 				vertex2.UV = rDrawSprite.Sprite->UV[2];
 				vertex2.Color = rDrawSprite.c3;
 
+				ReflectVectorOptionally(vertex2.Position);
+
 				auto vertex3 = Vertex{};
 				vertex3.Position = rDrawSprite.vtx4;
 				vertex3.UV = rDrawSprite.Sprite->UV[3];
 				vertex3.Color = rDrawSprite.c4;
+
+				ReflectVectorOptionally(vertex3.Position);
 
 				_primitiveBatch->DrawTriangle(vertex0, vertex1, vertex3);
 				_primitiveBatch->DrawTriangle(vertex1, vertex2, vertex3);
