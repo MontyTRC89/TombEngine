@@ -112,7 +112,7 @@ namespace TEN::Effects::WaterfallEmitter
             int relFloorHeight = pointColl.GetFloorHeight() - part.y;
             part.targetPos = Vector4(origin2.x, origin2.y + relFloorHeight, origin2.z, itemNumber);
 
-            // if targetpos is in a wall, calculate targetpos from the main item coordinates so the particles still spawn.
+            //If targetpos is in a wall, calculate targetpos from the main item coordinates so the particles still spawn.
             if (pointColl.GetSector().IsWall(part.targetPos.x, part.targetPos.z))
             {
                 pointColl = GetPointCollision(origin2, item.RoomNumber, item.Pose.Orientation.y, BLOCK(0.0f));
@@ -152,7 +152,7 @@ namespace TEN::Effects::WaterfallEmitter
             part.fadeToBlack = 0;
             part.rotAng = Random::GenerateAngle();
             part.rotAdd = Random::GenerateAngle(ANGLE(-0.1f), ANGLE(0.1f));
-            part.scalar = scale;// item.TriggerFlags < 10 ? Random::GenerateInt(2, 4) : Random::GenerateInt(3, 5);
+            part.scalar = scale;
             part.maxYvel = 0;
             part.sSize = part.size = (item.TriggerFlags < 10 ? Random::GenerateFloat(40.0f, 51.0f) : Random::GenerateFloat(49.0f, 87.0f)) / 2;
             part.dSize = item.TriggerFlags < 10 ? Random::GenerateFloat(40.0f, 51.0f) : Random::GenerateFloat(98.0f, 174.0f);
