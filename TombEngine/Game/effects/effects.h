@@ -167,6 +167,7 @@ struct Particle
 	unsigned char extras;
 	signed char dynamic;
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
+	Vector4 targetPos;
 
 	int PrevX;
 	int PrevY;
@@ -176,7 +177,6 @@ struct Particle
 	byte PrevG; 
 	byte PrevB;
 	byte PrevScalar;
-	Vector4 targetPos;
 
 	void StoreInterpolationData()
 	{
