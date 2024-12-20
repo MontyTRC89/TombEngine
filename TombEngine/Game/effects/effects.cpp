@@ -46,6 +46,7 @@ using TEN::Renderer::g_Renderer;
 
 constexpr int WIBBLE_SPEED = 4;
 constexpr int WIBBLE_MAX = UCHAR_MAX - WIBBLE_SPEED + 1;
+constexpr int WATERFALL_SPRITE_SIZE = 62;
 
 // New particle class
 Particle Particles[MAX_PARTICLES];
@@ -226,16 +227,16 @@ void UpdateSparks()
 
 			if (spark.SpriteSeqID == ID_WATERFALL &&
 				spark.y >= spark.targetPos.y && 
-				spark.targetPos.w == spark.itemNumber)
+				spark.targetPos.w == spark.fxObj)
 			{
 					spark.targetPos.y = spark.y - 80;
 					spark.targetPos.x = spark.x;
 					spark.targetPos.z = spark.z;
 
-					auto& item = g_Level.Items[spark.itemNumber];
+					auto& item = g_Level.Items[spark.fxObj];
 
 					if (Random::TestProbability(1.0f / 2.0f))
-						SpawnWaterfallMist(spark.targetPos, spark.roomNumber, item.ItemFlags[3], 62, Color(spark.sR, spark.sG, spark.sB));
+						SpawnWaterfallMist(spark.targetPos, spark.roomNumber, item.ItemFlags[3], WATERFALL_SPRITE_SIZE, Color(spark.sR, spark.sG, spark.sB));
 
 				spark.life = 0;
 				spark.on = false;

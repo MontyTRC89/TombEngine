@@ -39,19 +39,19 @@ namespace TEN::Effects::WaterfallEmitter
 	{
         auto& item = g_Level.Items[itemNumber];
 
-        //Customize x and z vel:
+        //Customize x and z vel.
         item.ItemFlags[WaterfallItemFlags::Velocity] = 100;
 
-        //Customize Waterfall sprite scale
+        //Customize waterfall sprite scale.
         item.ItemFlags[WaterfallItemFlags::WaterfallSpriteScale] = 3;
 
-        //Customize density
+        //Customize density.
         item.ItemFlags[WaterfallItemFlags::Density] = 120;
 
-        //Customize Waterfallmist sprite scale
+        //Customize waterfallmist sprite scale.
         item.ItemFlags[WaterfallItemFlags::MistSpriteScale] = 3;
 
-        //Customize Waterfallmist sprite scale
+        //Customize waterfall sound.   0 = ON, 1 = OFF.
         item.ItemFlags[WaterfallItemFlags::Sound] = 0;
 	}
 
@@ -64,7 +64,7 @@ namespace TEN::Effects::WaterfallEmitter
 
         float customVel = item.ItemFlags[WaterfallItemFlags::Velocity] / 256.0f;
 
-        short scale = item.ItemFlags[WaterfallItemFlags::WaterfallSpriteScale] ;
+        short scale = item.ItemFlags[WaterfallItemFlags::WaterfallSpriteScale];
         scale = Random::GenerateInt(scale, scale + 2);
 
         float density = item.TriggerFlags < 5 ? std::clamp(int(item.ItemFlags[WaterfallItemFlags::Density]), 10, 256) : std::clamp(int(item.ItemFlags[WaterfallItemFlags::Density]), 80, 256);
@@ -105,7 +105,7 @@ namespace TEN::Effects::WaterfallEmitter
             part.yVel = vel.y;
             part.zVel = vel.z;
             part.friction = -2;
-            part.itemNumber = itemNumber;
+            part.fxObj = itemNumber;
 
             auto pointColl = GetPointCollision(origin2, item.RoomNumber, item.Pose.Orientation.y, BLOCK(customVel));
 
@@ -118,7 +118,8 @@ namespace TEN::Effects::WaterfallEmitter
                 pointColl = GetPointCollision(origin2, item.RoomNumber, item.Pose.Orientation.y, BLOCK(0.0f));
                 relFloorHeight = pointColl.GetFloorHeight() - part.y;
                 origin2 = Geometry::TranslatePoint(Vector3(pos.x, pos.y, pos.z), orient2, BLOCK(0.0f));
-                //set the x and z values to 0 to prevent it from spawning a waterfallmist within the wall. Also sets the right height.
+
+                //Set the right height.
                 part.targetPos = Vector4(origin2.x, origin2.y + relFloorHeight, origin2.z, itemNumber);
 
                 //Stop spawning particles if there is a wall directly at the spawnpoint
@@ -134,9 +135,6 @@ namespace TEN::Effects::WaterfallEmitter
             {
                 part.targetPos.y = pointColl.GetWaterSurfaceHeight();
             }
-
-            //Debug
-            //g_Renderer.AddDebugLine(origin2, Vector3(part.targetPos.x, part.targetPos.y, part.targetPos.z) , Vector4(1, 0, 0, 1));
 
             char colorOffset = Random::GenerateInt(-8, 8);
 
@@ -185,7 +183,7 @@ namespace TEN::Effects::WaterfallEmitter
         part.roomNumber = roomNumber;
 
 		// TODO: Generate normal color representation, then convert to legacy.
-		char colorVariation = (Random::GenerateInt(-8, 8)); // TODO: Why char?
+		int colorVariation = (Random::GenerateInt(-8, 8)); 
 		part.sR = std::clamp((int)startColor.x + colorVariation, 0, SCHAR_MAX);
 		part.sG = std::clamp((int)startColor.y + colorVariation, 0, SCHAR_MAX);
 		part.sB = std::clamp((int)startColor.z + colorVariation, 0, SCHAR_MAX);
