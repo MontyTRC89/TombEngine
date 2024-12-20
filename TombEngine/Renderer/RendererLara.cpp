@@ -111,10 +111,19 @@ void Renderer::UpdateLaraAnimations(bool force)
 	auto frameData = GetFrameInterpData(*LaraItem);
 	UpdateAnimation(&rItem, playerObject, frameData, mask);
 
+	auto gunType	= Lara.Control.Weapon.GunType;
+	auto handStatus = Lara.Control.HandStatus;
+
+	// HACK: Treat binoculars as two-handed weapon.
+	if (Lara.Control.Look.IsUsingBinoculars)
+	{
+		gunType = LaraWeaponType::Shotgun;
+		handStatus = HandStatus::WeaponReady;
+	}
+
 	// Then the arms, based on current weapon status.
-	if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare &&
-		(Lara.Control.HandStatus == HandStatus::Free || Lara.Control.HandStatus == HandStatus::Busy) ||
-		Lara.Control.Weapon.GunType == LaraWeaponType::Flare && !Lara.Flare.ControlLeft)
+	if (gunType != LaraWeaponType::Flare && (handStatus == HandStatus::Free || handStatus == HandStatus::Busy) ||
+		gunType == LaraWeaponType::Flare && !Lara.Flare.ControlLeft)
 	{
 		// Both arms
 		mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND) | MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
@@ -124,15 +133,14 @@ void Renderer::UpdateLaraAnimations(bool force)
 	else
 	{
 		// While handling weapon, extra rotation may be applied to arms.
-		if (Lara.Control.Weapon.GunType == LaraWeaponType::Pistol ||
-			Lara.Control.Weapon.GunType == LaraWeaponType::Uzi)
-		{
-			playerObject.LinearizedBones[LM_LINARM]->ExtraRotation *= Lara.LeftArm.Orientation.ToQuaternion();
-			playerObject.LinearizedBones[LM_RINARM]->ExtraRotation *= Lara.RightArm.Orientation.ToQuaternion();
-		}
-		else
+		if (gunType == LaraWeaponType::Revolver)
 		{
 			playerObject.LinearizedBones[LM_LINARM]->ExtraRotation =
+			playerObject.LinearizedBones[LM_RINARM]->ExtraRotation *= Lara.RightArm.Orientation.ToQuaternion();
+		}
+		else 
+		{
+			playerObject.LinearizedBones[LM_LINARM]->ExtraRotation *= Lara.LeftArm.Orientation.ToQuaternion();
 			playerObject.LinearizedBones[LM_RINARM]->ExtraRotation *= Lara.RightArm.Orientation.ToQuaternion();
 		}
 
@@ -140,7 +148,7 @@ void Renderer::UpdateLaraAnimations(bool force)
 		ArmInfo* rightArm = &Lara.RightArm;
 
 		// HACK: Back guns are handled differently.
-		switch (Lara.Control.Weapon.GunType)
+		switch (gunType)
 		{
 		case LaraWeaponType::Shotgun:
 		case LaraWeaponType::HK:
@@ -152,7 +160,7 @@ void Renderer::UpdateLaraAnimations(bool force)
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
 
-			if (shouldAnimateUpperBody(Lara.Control.Weapon.GunType))
+			if (shouldAnimateUpperBody(gunType))
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
 			auto shotgunFrameData = AnimFrameInterpData

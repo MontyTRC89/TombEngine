@@ -1015,7 +1015,7 @@ namespace TEN::Renderer
 		if (!Lara.RightArm.GunFlash && !Lara.LeftArm.GunFlash)
 			return false;
 
-		if (Lara.Control.Look.OpticRange > 0)
+		if (Lara.Control.Look.OpticRange > 0 && _currentMirror == nullptr)
 			return false;
 
 		const auto& settings = g_GameFlow->GetSettings()->Weapons[(int)Lara.Control.Weapon.GunType - 1];

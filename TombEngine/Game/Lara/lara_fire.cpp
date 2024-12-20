@@ -572,7 +572,7 @@ void HandleWeapon(ItemInfo& laraItem)
 					player.Control.HandStatus = HandStatus::WeaponUndraw;
 				}
 			}
-			else if (player.Inventory.TotalFlares)
+			else if (player.Inventory.TotalFlares && !player.Control.Look.IsUsingBinoculars)
 			{
 				if (player.Inventory.TotalFlares != -1)
 					player.Inventory.TotalFlares--;

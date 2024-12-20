@@ -12,6 +12,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_optics.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/Lara/lara_two_guns.h"
 #include "Game/pickup/pickup.h"
@@ -2057,8 +2058,6 @@ namespace TEN::Gui
 
 		auto& player = GetLaraInfo(item);
 
-		short prevOpticRange = player.Control.Look.OpticRange;
-		player.Control.Look.OpticRange = 0;
 		player.Inventory.OldBusy = false;
 		item.MeshBits = ALL_JOINT_BITS;
 
@@ -2201,26 +2200,11 @@ namespace TEN::Gui
 				(player.Control.IsLow && !IsHeld(In::Crouch))) &&
 				!UseSpotCam && !TrackCameraInit)
 			{
-				Camera.DisableInterpolation = true;
-				player.Control.Look.OpticRange = ANGLE(0.7f);
+				SetScreenFadeIn(OPTICS_FADE_SPEED);
+				BinocularOldCamera = Camera.oldType;
+				player.Control.Look.OpticRange = OPTICS_RANGE_DEFAULT;
 				player.Control.Look.IsUsingBinoculars = true;
 				player.Inventory.OldBusy = true;
-
-				// TODO: To prevent Lara from crouching or performing other actions, the inherent state of
-				// LA_BINOCULARS_IDLE must be changed to LS_IDLE. @Sezz 2022.05.19
-				//SetAnimation(item, LA_BINOCULARS_IDLE);
-
-				if (player.Control.HandStatus != HandStatus::Free)
-					player.Control.HandStatus = HandStatus::WeaponUndraw;
-			}
-
-			if (prevOpticRange != ANGLE(0.0f))
-			{
-				player.Control.Look.OpticRange = prevOpticRange;
-			}
-			else
-			{
-				BinocularOldCamera = Camera.oldType;
 			}
 
 			InventoryItemChosen = NO_VALUE;

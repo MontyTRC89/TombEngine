@@ -12,6 +12,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/lara_optics.h"
 #include "Game/room.h"
 #include "Game/savegame.h"
 #include "Game/Setup.h"
@@ -945,50 +946,13 @@ void BinocularCamera(ItemInfo* item)
 {
 	auto& player = GetLaraInfo(*item);
 
-	if (!player.Control.Look.IsUsingLasersight)
-	{
-		if (IsClicked(In::Deselect) ||
-			IsClicked(In::Draw) ||
-			IsClicked(In::Look) ||
-			IsHeld(In::Flare))
-		{
-			ResetPlayerFlex(item);
-			player.Control.Look.OpticRange = 0;
-			player.Control.Look.IsUsingBinoculars = false;
-			player.Inventory.IsBusy = false;
-
-			Camera.type = BinocularOldCamera;
-			Camera.DisableInterpolation = true;
-			Camera.target = LastTarget;
-			AlterFOV(LastFOV);
-			return;
-		}
-
-		if (IsHeld(In::Action))
-		{
-			ClearAction(In::Action);
-
-			auto origin = Camera.pos.ToVector3i();
-			auto target = Camera.target.ToVector3i();
-			LaraTorch(&origin, &target);
-		}
-	}
-
 	AlterFOV(7 * (ANGLE(11.5f) - player.Control.Look.OpticRange), false);
 
 	int x = item->Pose.Position.x;
-	int y = item->Pose.Position.y - CLICK(2);
+	int y = item->Pose.Position.y + GameBoundingBox(item).Y1;
 	int z = item->Pose.Position.z;
 
 	auto pointColl = GetPointCollision(Vector3i(x, y, z), item->RoomNumber);
-	if (pointColl.GetCeilingHeight() <= (y - CLICK(1)))
-	{
-		y -= CLICK(1);
-	}
-	else
-	{
-		y = pointColl.GetCeilingHeight() + CLICK(0.25f);
-	}
 
 	Camera.pos.x = x;
 	Camera.pos.y = y;
@@ -1083,18 +1047,26 @@ static bool CalculateDeathCamera(const ItemInfo& item)
 
 void CalculateCamera(const CollisionInfo& coll)
 {
-	CamOldPos.x = Camera.pos.x;
-	CamOldPos.y = Camera.pos.y;
-	CamOldPos.z = Camera.pos.z;
+	if (ItemCameraOn)
+		return;
+
+	if (!HandlePlayerOptics(*LaraItem))
+	{
+		Camera.pos = CamOldPos;
+		Camera.target = LastTarget;
+	}
 
 	if (Lara.Control.Look.IsUsingBinoculars)
 	{
 		BinocularCamera(LaraItem);
 		return;
 	}
-
-	if (ItemCameraOn)
-		return;
+	else
+	{
+		CamOldPos.x = Camera.pos.x;
+		CamOldPos.y = Camera.pos.y;
+		CamOldPos.z = Camera.pos.z;
+	}
 
 	if (UseForcedFixedCamera != 0)
 	{
