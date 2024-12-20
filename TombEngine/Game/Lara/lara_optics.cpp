@@ -84,10 +84,6 @@ static void HandlePlayerOpticAnimations(ItemInfo& item)
 	}
 	else if (player.Control.Look.IsUsingBinoculars)
 	{
-		// If binoculars meshswap object is not available, don't perform animations.
-		if (!Objects[ID_LARA_BINOCULARS_MESH].loaded)
-			return;
-
 		// Silently holster any weapon or drop any item currently in hand.
 		if (player.Control.Weapon.GunType == LaraWeaponType::Flare ||
 			player.Control.Weapon.GunType == LaraWeaponType::Torch)
@@ -122,8 +118,10 @@ static void HandlePlayerOpticAnimations(ItemInfo& item)
 			player.TargetEntity = nullptr;
 		}
 
+		int objNumber = Objects[ID_LARA_BINOCULARS_MESH].loaded ? ID_LARA_BINOCULARS_MESH : ID_LARA_SKIN;
+		item.Model.MeshIndex[LM_RHAND] = Objects[objNumber].meshIndex + LM_RHAND;
+
 		player.Control.HandStatus = HandStatus::Free;
-		item.Model.MeshIndex[LM_RHAND] = Objects[ID_LARA_BINOCULARS_MESH].meshIndex + LM_RHAND;
 	}
 	
 	player.LeftArm.Locked = player.RightArm.Locked = false;
