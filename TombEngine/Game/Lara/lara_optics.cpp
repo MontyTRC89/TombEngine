@@ -63,7 +63,7 @@ static void HandlePlayerOpticAnimations(ItemInfo& item)
 	if (!player.Control.Look.IsUsingBinoculars && !player.Control.Look.IsUsingLasersight)
 		return;
 
-	int animNumber = LA_BINOCULARS_IDLE;
+	int animNumber = Objects[ID_LARA_BINOCULARS_MESH].loaded ? LA_BINOCULARS_IDLE : LA_STAND_IDLE;
 
 	if (player.Control.Look.IsUsingLasersight)
 	{
