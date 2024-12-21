@@ -171,7 +171,11 @@ pickups, and Lara herself (see also <a href="../2 classes/Objects.LaraObject.htm
 	<td class="summary">Retrieve the index of the current animation.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetAnim">Moveable:SetAnim(index)</a></td>
+	<td class="name" ><a href="#Moveable:GetAnimSlot">Moveable:GetAnimSlot()</a></td>
+	<td class="summary">Retrieve the slot ID of the animation.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetAnim">Moveable:SetAnim(index[, slot])</a></td>
 	<td class="summary">Set the object's animation to the one specified by the given index.</td>
 	</tr>
 	<tr>
@@ -776,8 +780,31 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 
 </dd>
     <dt>
+    <a name = "Moveable:GetAnimSlot"></a>
+    <strong>Moveable:GetAnimSlot()</strong>
+    </dt>
+    <dd>
+    Retrieve the slot ID of the animation.
+ In certain cases, moveable may play animations from another object slot. Use this
+ function when you need to identify such cases.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        animation slot ID
+    </ol>
+
+
+
+
+</dd>
+    <dt>
     <a name = "Moveable:SetAnim"></a>
-    <strong>Moveable:SetAnim(index)</strong>
+    <strong>Moveable:SetAnim(index[, slot])</strong>
     </dt>
     <dd>
     Set the object's animation to the one specified by the given index.
@@ -791,6 +818,11 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
         <li><span class="parameter">index</span>
             <span class="types"><span class="type">int</span></span>
          the index of the desired anim
+        </li>
+        <li><span class="parameter">slot</span>
+            <span class="types"><span class="type">int</span></span>
+         slot ID of the desired anim (if omitted, moveable's own slot ID is used)
+         (<em>optional</em>)
         </li>
     </ul>
 

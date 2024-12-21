@@ -166,6 +166,7 @@ static constexpr char ScriptReserved_SetVelocity[]			= "SetVelocity";
 static constexpr char ScriptReserved_GetFrameNumber[]		= "GetFrame";
 static constexpr char ScriptReserved_GetEndFrame[]			= "GetEndFrame";
 static constexpr char ScriptReserved_SetFrameNumber[]		= "SetFrame";
+static constexpr char ScriptReserved_GetAnimSlot[]			= "GetAnimSlot";
 static constexpr char ScriptReserved_GetAnimNumber[]		= "GetAnim";
 static constexpr char ScriptReserved_SetAnimNumber[]		= "SetAnim";
 static constexpr char ScriptReserved_GetStateNumber[]		= "GetState";

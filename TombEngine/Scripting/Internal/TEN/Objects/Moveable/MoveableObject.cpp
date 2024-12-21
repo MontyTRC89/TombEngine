@@ -130,7 +130,7 @@ static std::unique_ptr<Moveable> Create(
 
 		if (std::holds_alternative<int>(animNumber))
 		{
-			ptr->SetAnimNumber(std::get<int>(animNumber));
+			ptr->SetAnimNumber(std::get<int>(animNumber), objID);
 			ptr->SetFrameNumber(USE_IF_HAVE(int, frameNumber, 0));
 		}
 
@@ -245,11 +245,19 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 // @treturn int the index of the active animation
 	ScriptReserved_GetAnimNumber, &Moveable::GetAnimNumber,
 
+/// Retrieve the slot ID of the animation.
+// In certain cases, moveable may play animations from another object slot. Use this
+// function when you need to identify such cases.
+// @function Moveable:GetAnimSlot
+// @treturn int animation slot ID
+	ScriptReserved_GetAnimSlot, &Moveable::GetAnimSlot,
+
 /// Set the object's animation to the one specified by the given index.
 // Performs no bounds checking. *Ensure the number given is correct, else
 // object may end up in corrupted animation state.*
 // @function Moveable:SetAnim
 // @tparam int index the index of the desired anim 
+// @tparam[opt] int slot slot ID of the desired anim (if omitted, moveable's own slot ID is used)
 	ScriptReserved_SetAnimNumber, &Moveable::SetAnimNumber,
 
 /// Retrieve frame number.
@@ -878,14 +886,19 @@ void Moveable::SetStateNumber(int stateNumber)
 	m_item->Animation.TargetState = stateNumber;
 }
 
-int Moveable::GetAnimNumber() const
+int Moveable::GetAnimSlot() const
 {
-	return m_item->Animation.AnimNumber - Objects[m_item->ObjectNumber].animIndex;
+	return m_item->Animation.AnimObjectID;
 }
 
-void Moveable::SetAnimNumber(int animNumber)
+int Moveable::GetAnimNumber() const
 {
-	SetAnimation(m_item, animNumber);
+	return m_item->Animation.AnimNumber - Objects[m_item->Animation.AnimObjectID].animIndex;
+}
+
+void Moveable::SetAnimNumber(int animNumber, sol::optional<int> slotIndex)
+{
+	SetAnimation(*m_item, (GAME_OBJECT_ID)slotIndex.value_or(m_item->ObjectNumber), animNumber);
 }
 
 int Moveable::GetFrameNumber() const
