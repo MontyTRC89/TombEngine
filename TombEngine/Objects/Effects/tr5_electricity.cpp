@@ -222,7 +222,7 @@ void ElectricityWiresControl(short itemNumber)
 					isWaterNearby = true;
 			}
 
-			bool instantKill = BoundingSphere(Vector3(pos.x, pos.y, pos.z), CLICK(0.25f)).Intersects(npcBox);
+			bool instantKill = BoundingSphere(Vector3(pos.x, pos.y, pos.z), BLOCK(0.25f)).Intersects(npcBox);
 
 			if (isWaterNearby || instantKill)
 			{
