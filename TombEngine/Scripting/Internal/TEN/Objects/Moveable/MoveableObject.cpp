@@ -245,13 +245,6 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 // @treturn int the index of the active animation
 	ScriptReserved_GetAnimNumber, &Moveable::GetAnimNumber,
 
-/// Retrieve the slot ID of the animation.
-// In certain cases, moveable may play animations from another object slot. Use this
-// function when you need to identify such cases.
-// @function Moveable:GetAnimSlot
-// @treturn int animation slot ID
-	ScriptReserved_GetAnimSlot, &Moveable::GetAnimSlot,
-
 /// Set the object's animation to the one specified by the given index.
 // Performs no bounds checking. *Ensure the number given is correct, else
 // object may end up in corrupted animation state.*
@@ -260,12 +253,33 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 // @tparam[opt] int slot slot ID of the desired anim (if omitted, moveable's own slot ID is used)
 	ScriptReserved_SetAnimNumber, &Moveable::SetAnimNumber,
 
+/// Retrieve the slot ID of the animation.
+// In certain cases, moveable may play animations from another object slot. Use this
+// function when you need to identify such cases.
+// @function Moveable:GetAnimSlot
+// @treturn int animation slot ID
+	ScriptReserved_GetAnimSlot, &Moveable::GetAnimSlot,
+
 /// Retrieve frame number.
 // This is the current frame of the object's active animation.
 // @function Moveable:GetFrame
 // @treturn int the current frame of the active animation
 	ScriptReserved_GetFrameNumber, &Moveable::GetFrameNumber,
 
+/// Set frame number.
+// This will move the animation to the given frame.
+// The number of frames in an animation can be seen under the heading "End frame" in
+// the WadTool animation editor. If the animation has no frames, the only valid argument
+// is -1.
+// @function Moveable:SetFrame
+// @tparam int frame the new frame number
+	ScriptReserved_SetFrameNumber, &Moveable::SetFrameNumber,
+	
+
+/// Get the end frame number of the moveable's active animation.
+// This is the "End Frame" set in WADTool for the animation.
+// @function Moveable:GetEndFrame()
+// @treturn int End frame number of the active animation.
 	ScriptReserved_GetEndFrame, &Moveable::GetEndFrame,
 
 /// Set the object's velocity to specified value.
@@ -281,15 +295,6 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 // @function Moveable:GetVelocity
 // @treturn Vec3 current object velocity
 	ScriptReserved_GetVelocity, &Moveable::GetVelocity,
-
-/// Set frame number.
-// This will move the animation to the given frame.
-// The number of frames in an animation can be seen under the heading "End frame" in
-// the WadTool animation editor. If the animation has no frames, the only valid argument
-// is -1.
-// @function Moveable:SetFrame
-// @tparam int frame the new frame number
-	ScriptReserved_SetFrameNumber, &Moveable::SetFrameNumber,
 
 /// Get current HP (hit points/health points)
 // @function Moveable:GetHP
@@ -940,10 +945,6 @@ void Moveable::SetFrameNumber(int frameNumber)
 	}
 }
 
-/// Get the end frame number of the moveable's active animation.
-// This is the "End Frame" set in WADTool for the animation.
-// @function Moveable:GetEndFrame()
-// @treturn int End frame number of the active animation.	
 int Moveable::GetEndFrame() const
 {
 	const auto& anim = GetAnimData(*m_item);
