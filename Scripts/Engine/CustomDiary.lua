@@ -703,8 +703,6 @@ LevelFuncs.Engine.Diaries.ShowNotification = function(dt)
         else
             diary.TargetAlpha = 0
         end
-        
-        print(tostring(GameVars.Engine.Diaries[dataName].Notification.ElapsedTime))
 
         if diary.CurrentAlpha > 0 then
             LevelFuncs.Engine.Diaries.PrepareNotification()
