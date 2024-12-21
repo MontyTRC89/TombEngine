@@ -1881,10 +1881,6 @@ namespace TEN::Renderer
 		_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
 
-		SetBlendMode(BlendMode::Opaque);
-		SetCullMode(CullMode::CounterClockwise);
-		SetDepthState(DepthState::Write);
-
 		// Bind main render target again. Main depth buffer is already filled and avoids overdraw in following steps.
 		_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), _renderTarget.DepthStencilView.Get());
 
@@ -2195,6 +2191,11 @@ namespace TEN::Renderer
 
 	void Renderer::DoRenderPass(RendererPass pass, RenderView& view, bool drawMirrors)
 	{
+		// Reset GPU state.
+		SetBlendMode(BlendMode::Opaque);
+		SetCullMode(CullMode::CounterClockwise);
+		SetDepthState(DepthState::Write);
+
 		// Draw room geometry first, if applicable for a given pass.
 		if (pass != RendererPass::Transparent && pass != RendererPass::GunFlashes)
 			DrawRooms(view, pass);
@@ -2230,12 +2231,6 @@ namespace TEN::Renderer
 			break;
 
 		default:
-			if (statics)
-			{
-				DrawStatics(view, pass);
-				DrawDebris(view, pass); // Debris mostly originate from shatter statics.
-			}
-
 			if (moveables)
 			{
 				DrawItems(view, pass);
@@ -2252,6 +2247,12 @@ namespace TEN::Renderer
 			{
 				DrawItems(view, pass, true);
 				DrawGunShells(view, pass);
+			}
+
+			if (statics)
+			{
+				DrawStatics(view, pass);
+				DrawDebris(view, pass); // Debris mostly originate from shatter statics.
 			}
 
 			// Sorted sprites are already collected at the beginning of frame.
@@ -3139,11 +3140,6 @@ namespace TEN::Renderer
 
 		// Clear just the Z-buffer to start drawing on top of horizon.
 		_context->ClearDepthStencilView(depthTarget, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-		// Reset the GPU state
-		SetDepthState(DepthState::Write);
-		SetBlendMode(BlendMode::Opaque);
-		SetCullMode(CullMode::CounterClockwise);
 	}
 
 	void Renderer::Render(float interpFactor)
