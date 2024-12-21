@@ -58,6 +58,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added optional cast shadow and name parameters for Effects.EmitLight() function.
 * Added Effects.GetWind() function to get current wind speed vector.
 * Added Moveable:GetCollidable() and Moveable:SetCollidable() functions.
+* Added Moveable:GetAnimSlot() and optional second argument for Moveable:SetAnim() to access different animation slots.
 * Added Rotation:Direction() method to get directional vector.
 * Added support for transparency value in Strings.DisplayString class.
 * Added extra argument for Sound.SetAmbientTrack() function to specify if new ambient track should play from the beginning.
@@ -69,6 +70,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed Strings.DisplayString class not supporting some Unicode characters and empty lines in multiline strings.
 * Fixed Strings.DisplayString not being deallocated after showing.
 * Fixed GameVars not transferring between levels in hub mode.
+* Fixed incorrect return value of Moveable:GetAnim() function, if animation from another slot is currently playing.
 * Fixed incorrect behaviour of Moveable:GetJointRotation() function.
 * Fixed incorrect behaviour of Logic.EnableEvent() and Logic.DisableEvent() functions.
 * Fixed Util.HasLineOfSight() not taking static meshes into consideration.
