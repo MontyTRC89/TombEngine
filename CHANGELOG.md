@@ -35,6 +35,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed exploding TR3 bosses.
 * Fixed original issue with deactivation of Dart Emitter.
 * Fixed original issue with weapon hotkeys available in binoculars or lasersight mode.
+* Fixed Electricity Wires object not doing instant kill when Lara is in close proximity.
 * Fixed Lens Flare object not functioning properly.
 * Fixed lens flares not being occluded by static meshes and moveables.
 * Fixed spotlight shadows.
