@@ -11,6 +11,9 @@ LevelFuncs.Engine.Diaries = {}
 GameVars.Engine.Diaries = {}
 GameVars.Engine.LastUsedDiary=nil
 
+--update import function
+--update text draw
+
 
 ---
 -- Creates a diary with extensive configuration options.
@@ -160,7 +163,7 @@ end
 ---
 -- The function sets the value of a custom bar over a specified time period.
 -- @tparam int pageIndex The page number up to which the diary should be unlocked.
-function CustomDiary:unlockPages(index)
+function CustomDiary:unlockPages(index, notification)
     if GameVars.Engine.Diaries[self.Name] then
 
         if index > #GameVars.Engine.Diaries[self.Name].Pages or index <=0 then
@@ -174,10 +177,11 @@ function CustomDiary:unlockPages(index)
         diary.NextPageIndex = nil
         print("UnlockPages: currentPageIndex = " .. tostring(diary.currentPageIndex))
 
-        if diary.Notification and next(diary.Notification) then
+        if notification and diary.Notification and next(diary.Notification) then
             PlaySound(diary.Notification.NotificationSound)
             diary.Notification.ElapsedTime = 0
             diary.TargetAlpha = 255
+            diary.CurrentAlpha = 1
             TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRELOOP, LevelFuncs.Engine.Diaries.ShowNotification)
         end
     end
@@ -661,9 +665,10 @@ end
 -- !Ignore
 LevelFuncs.Engine.Diaries.ActivateDiary = function(objectNumber)
 	
-    GameVars.Engine.LastUsedDiary = objectNumber
-	local dataName = objectNumber .. "_diarydata"
+    local dataName = objectNumber .. "_diarydata"
+
 	if GameVars.Engine.Diaries[dataName] then
+        GameVars.Engine.LastUsedDiary = objectNumber
         TEN.Inventory.ClearUsedItem()
         GameVars.Engine.Diaries[dataName].TargetAlpha = 255
         GameVars.Engine.Diaries[dataName].EntryTargetAlpha = 255
@@ -675,12 +680,12 @@ end
 
 -- !Ignore
 LevelFuncs.Engine.Diaries.ShowNotification = function(dt)
-	
+
     local dataName = GameVars.Engine.LastUsedDiary .. "_diarydata"
-	
+  
     if GameVars.Engine.Diaries[dataName] then
         local diary = GameVars.Engine.Diaries[dataName]
-
+       
         if diary.CurrentAlpha ~= diary.TargetAlpha then
             
             if diary.CurrentAlpha < diary.TargetAlpha then
@@ -699,11 +704,14 @@ LevelFuncs.Engine.Diaries.ShowNotification = function(dt)
             diary.TargetAlpha = 0
         end
         
+        print(tostring(GameVars.Engine.Diaries[dataName].Notification.ElapsedTime))
+
         if diary.CurrentAlpha > 0 then
             LevelFuncs.Engine.Diaries.PrepareNotification()
         elseif diary.CurrentAlpha == 0 then
-            GameVars.Engine.Diaries[dataName].Notification.ElapsedTime = 0
+            diary.Notification.ElapsedTime = 0
             TEN.Logic.RemoveCallback(TEN.Logic.CallbackPoint.PRELOOP, LevelFuncs.Engine.Diaries.ShowNotification)
+            print("Notification Callback removed")
             return
         end
 	end
