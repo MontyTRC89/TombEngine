@@ -51,6 +51,7 @@ struct OLD_CAMERA
 };
 
 bool ItemCameraOn;
+GameVector LastPosition;
 GameVector LastTarget;
 GameVector LastIdeal;
 GameVector Ideals[5];
@@ -59,7 +60,6 @@ int CameraSnaps = 0;
 int TargetSnaps = 0;
 GameVector LookCamPosition;
 GameVector LookCamTarget;
-Vector3i CamOldPos;
 CAMERA_INFO Camera;
 GameVector ForcedFixedCamera;
 int UseForcedFixedCamera;
@@ -1052,7 +1052,7 @@ void CalculateCamera(const CollisionInfo& coll)
 
 	if (!HandlePlayerOptics(*LaraItem))
 	{
-		Camera.pos = CamOldPos;
+		Camera.pos = LastPosition;
 		Camera.target = LastTarget;
 	}
 
@@ -1063,9 +1063,7 @@ void CalculateCamera(const CollisionInfo& coll)
 	}
 	else
 	{
-		CamOldPos.x = Camera.pos.x;
-		CamOldPos.y = Camera.pos.y;
-		CamOldPos.z = Camera.pos.z;
+		LastPosition = Camera.pos;
 	}
 
 	if (UseForcedFixedCamera != 0)
@@ -1358,7 +1356,7 @@ void ItemPushCamera(GameBoundingBox* bounds, Pose* pos, short radius)
 
 	auto pointColl = GetPointCollision(Camera.pos.ToVector3i(), Camera.pos.RoomNumber);
 	if (pointColl.GetFloorHeight() == NO_HEIGHT || Camera.pos.y > pointColl.GetFloorHeight() || Camera.pos.y < pointColl.GetCeilingHeight())
-		Camera.pos = GameVector(CamOldPos, pointColl.GetRoomNumber());
+		Camera.pos = GameVector(LastPosition.ToVector3i(), pointColl.GetRoomNumber());
 }
 
 bool CheckItemCollideCamera(ItemInfo* item)
