@@ -174,7 +174,7 @@ namespace TEN::Hud
 		const auto& player = GetLaraInfo(playerItem);
 
 		// Check if target highlighter is enabled or lasersight is active.
-		if (!g_Configuration.EnableTargetHighlighter || player.Control.Look.IsUsingLasersight)
+		if (!g_Configuration.EnableTargetHighlighter || player.Control.Look.IsUsingBinoculars)
 		{
 			if (!_crosshairs.empty())
 				_crosshairs.clear();
