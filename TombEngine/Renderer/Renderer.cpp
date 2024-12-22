@@ -219,6 +219,9 @@ namespace TEN::Renderer
 			lights[index].Direction = Vector3::Lerp(light.PrevDirection, light.Direction, GetInterpolationFactor());
 		}
 
+		ReflectVectorOptionally(lights[index].Position);
+		ReflectVectorOptionally(lights[index].Direction);
+
 		// Bitmask light type to filter it in the shader later.
 		return (1 << (31 - (int)light.Type));
 	}
