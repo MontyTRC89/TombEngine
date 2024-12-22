@@ -65,6 +65,7 @@
 #include "Renderer/Structures/RendererRoomAmbientMap.h"
 #include "Renderer/Structures/RendererObject.h"
 #include "Renderer/Structures/RendererStar.h"
+#include "Structures/RendererShader.h"
 
 enum GAME_OBJECT_ID : short;
 enum class SphereSpaceType;
@@ -124,43 +125,31 @@ namespace TEN::Renderer
 
 		// Shaders
 
-		ComPtr<ID3D11VertexShader> _vsRooms;
-		ComPtr<ID3D11VertexShader> _vsRoomsAnimatedTextures;
-		ComPtr<ID3D11PixelShader> _psRooms;
-		ComPtr<ID3D11PixelShader> _psRoomsTransparent;
-		ComPtr<ID3D11VertexShader> _vsItems;
-		ComPtr<ID3D11PixelShader> _psItems;
-		ComPtr<ID3D11VertexShader> _vsStatics;
-		ComPtr<ID3D11PixelShader> _psStatics;
-		ComPtr<ID3D11VertexShader> _vsSky;
-		ComPtr<ID3D11PixelShader> _psSky;
-		ComPtr<ID3D11VertexShader> _vsSprites;
-		ComPtr<ID3D11PixelShader> _psSprites;
-		ComPtr<ID3D11VertexShader> _vsInstancedSprites;
-		ComPtr<ID3D11PixelShader> _psInstancedSprites;
-		ComPtr<ID3D11VertexShader> _vsInstancedStaticMeshes;
-		ComPtr<ID3D11PixelShader> _psInstancedStaticMeshes;
-		ComPtr<ID3D11VertexShader> _vsSolid;
-		ComPtr<ID3D11PixelShader> _psSolid;
-		ComPtr<ID3D11VertexShader> _vsInventory;
-		ComPtr<ID3D11PixelShader> _psInventory;
-		ComPtr<ID3D11VertexShader> _vsFullScreenQuad;
-		ComPtr<ID3D11PixelShader> _psFullScreenQuad;
-		ComPtr<ID3D11VertexShader> _vsShadowMap;
-		ComPtr<ID3D11PixelShader> _psShadowMap;
-		ComPtr<ID3D11VertexShader> _vsHUD;
-		ComPtr<ID3D11PixelShader> _psHUDColor;
-		ComPtr<ID3D11PixelShader> _psHUDTexture;
-		ComPtr<ID3D11PixelShader> _psHUDBarColor;
-		ComPtr<ID3D11VertexShader> _vsGBufferRooms;
-		ComPtr<ID3D11VertexShader> _vsGBufferRoomsAnimated;
-		ComPtr<ID3D11VertexShader> _vsGBufferItems;
-		ComPtr<ID3D11VertexShader> _vsGBufferStatics;
-		ComPtr<ID3D11VertexShader> _vsGBufferInstancedStatics;
-		ComPtr<ID3D11PixelShader> _psGBuffer;
-		ComPtr<ID3D11VertexShader> _vsRoomAmbient;
-		ComPtr<ID3D11VertexShader> _vsRoomAmbientSky;
-		ComPtr<ID3D11PixelShader> _psRoomAmbient;
+		RendererShader _sRooms;
+		RendererShader _sRoomsAnimated;
+		RendererShader _sRoomsTransparent;
+		RendererShader _sRoomAmbient;
+		RendererShader _sRoomAmbientSky;
+		RendererShader _sItems;
+		RendererShader _sStatics;
+		RendererShader _sInstancedStatics;
+		RendererShader _sSprites;
+		RendererShader _sInstancedSprites;
+		RendererShader _sSky;
+		RendererShader _sSolid;
+		RendererShader _sInventory;
+		RendererShader _sFullScreenQuad;
+		RendererShader _sShadowMap;
+		RendererShader _sHUD;
+		RendererShader _sHUDColor;
+		RendererShader _sHUDTexture;
+		RendererShader _sHUDBarColor;
+		RendererShader _sGBuffer;
+		RendererShader _sGBufferRooms;
+		RendererShader _sGBufferRoomsAnimated;
+		RendererShader _sGBufferItems;
+		RendererShader _sGBufferStatics;
+		RendererShader _sGBufferInstancedStatics;
 
 		// Constant buffers
 
@@ -352,17 +341,13 @@ namespace TEN::Renderer
 		RenderTarget2D _SMAAEdgesRenderTarget;
 		RenderTarget2D _SMAABlendRenderTarget;
 
-		ComPtr<ID3D11VertexShader> _SMAAEdgeDetectionVS;
-		ComPtr<ID3D11PixelShader> _SMAALumaEdgeDetectionPS;
-		ComPtr<ID3D11PixelShader> _SMAAColorEdgeDetectionPS;
-		ComPtr<ID3D11PixelShader> _SMAADepthEdgeDetectionPS;
-		ComPtr<ID3D11VertexShader> _SMAABlendingWeightCalculationVS;
-		ComPtr<ID3D11PixelShader> _SMAABlendingWeightCalculationPS;
-		ComPtr<ID3D11VertexShader> _SMAANeighborhoodBlendingVS;
-		ComPtr<ID3D11PixelShader> _SMAANeighborhoodBlendingPS;
-
-		ComPtr<ID3D11VertexShader> _vsFXAA;
-		ComPtr<ID3D11PixelShader> _psFXAA;
+		RendererShader _sSMAAEdgeDetection;
+		RendererShader _sSMAALumaEdgeDetection;
+		RendererShader _sSMAAColorEdgeDetection;
+		RendererShader _sSMAADepthEdgeDetection;
+		RendererShader _sSMAABlendingWeightCalculation;
+		RendererShader _sSMAANeighborhoodBlending;
+		RendererShader _sFXAA;
 
 		// Post-process
 
@@ -372,27 +357,27 @@ namespace TEN::Renderer
 
 		VertexBuffer<PostProcessVertex> _fullscreenTriangleVertexBuffer;
 		ComPtr<ID3D11InputLayout> _fullscreenTriangleInputLayout = nullptr;
-		ComPtr<ID3D11VertexShader> _vsPostProcess;
-		ComPtr<ID3D11PixelShader> _psPostProcessCopy;
-		ComPtr<ID3D11PixelShader> _psPostProcessMonochrome;
-		ComPtr<ID3D11PixelShader> _psPostProcessNegative;
-		ComPtr<ID3D11PixelShader> _psPostProcessExclusion;
-		ComPtr<ID3D11PixelShader> _psPostProcessFinalPass;
-		ComPtr<ID3D11PixelShader> _psPostProcessLensFlare;
+		RendererShader _sPostProcess;
+		RendererShader _sPostProcessMonochrome;
+		RendererShader _sPostProcessNegative;
+		RendererShader _sPostProcessExclusion;
+		RendererShader _sPostProcessFinalPass;
+		RendererShader _sPostProcessLensFlare;
 
 		bool _doingFullscreenPass = false;
 
 		// SSAO
 
-		ComPtr<ID3D11VertexShader> _vsSSAO;
-		ComPtr<ID3D11PixelShader> _psSSAO;
-		ComPtr<ID3D11PixelShader> _psSSAOBlur;
 		Texture2D _SSAONoiseTexture;
 		RenderTarget2D _SSAORenderTarget;
 		RenderTarget2D _SSAOBlurredRenderTarget;
 		std::vector<Vector4> _SSAOKernel;
 
+		RendererShader _sSSAO;
+		RendererShader _sSSAOBlur;
+
 		// New ambient light techinque
+
 		RenderTarget2D _roomAmbientMapFront;
 		RenderTarget2D _roomAmbientMapBack;
 
@@ -411,10 +396,12 @@ namespace TEN::Renderer
 		// High framerate.
 
 		float _interpolationFactor = 0.0f;
-
 		bool _graphicsSettingsChanged = false;
 
 		// Private functions
+
+		RendererShader CompileOrLoadShader(const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines = nullptr);
+		void BindShader(const RendererShader& shader);
 
 		void ApplySMAA(RenderTarget2D* renderTarget, RenderView& view);
 		void ApplyFXAA(RenderTarget2D* renderTarget, RenderView& view);

@@ -32,7 +32,7 @@ PixelShaderInput VS(VertexShaderInput input)
     return output;
 }
 
-float4 PSCopy(PixelShaderInput input) : SV_Target
+float4 PS(PixelShaderInput input) : SV_Target
 {
     return ColorTexture.Sample(ColorSampler, input.UV);
 }

@@ -9,6 +9,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Significantly improved renderer performance.
 * Improved engine performance around bridges.
 * Improved engine performance if weather or bubble effects are active.
+* Improved engine start-up time.
 * Fixed silent crashes if loaded level is corrupted or in incorrect format.
 * Fixed occasional crashes if there are static meshes placed within room border walls.
 * Fixed climbable pushables clipping Lara under the bridges when pulled.

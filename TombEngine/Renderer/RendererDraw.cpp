@@ -167,8 +167,7 @@ namespace TEN::Renderer
 			UINT offset = 0;
 
 			// Set shaders
-			_context->VSSetShader(_vsShadowMap.Get(), nullptr, 0);
-			_context->PSSetShader(_psShadowMap.Get(), nullptr, 0);
+			BindShader(_sShadowMap);
 
 			_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 			_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -285,8 +284,7 @@ namespace TEN::Renderer
 		{
 			auto& moveableObject = *_moveableObjects[objectID];
 
-			_context->VSSetShader(_vsInstancedStaticMeshes.Get(), nullptr, 0);
-			_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
+			BindShader(_sInstancedStatics);
 
 			unsigned int stride = sizeof(Vertex);
 			unsigned int offset = 0;
@@ -363,8 +361,7 @@ namespace TEN::Renderer
 		SetDepthState(DepthState::Read);
 		SetCullMode(CullMode::None);
 
-		_context->VSSetShader(_vsSolid.Get(), nullptr, 0);
-		_context->PSSetShader(_psSolid.Get(), nullptr, 0);
+		BindShader(_sSolid);
 		auto worldMatrix = Matrix::CreateOrthographicOffCenter(0, _screenWidth, _screenHeight, 0, _viewport.MinDepth, _viewport.MaxDepth);
 
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
@@ -534,13 +531,12 @@ namespace TEN::Renderer
 			{
 				if (rendererPass == RendererPass::GBuffer)
 				{
-					_context->VSSetShader(_vsGBufferStatics.Get(), nullptr, 0);
-					_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
+					BindShader(_sGBuffer);
+					BindShader(_sGBufferStatics);
 				}
 				else
 				{
-					_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
-					_context->PSSetShader(_psStatics.Get(), nullptr, 0);
+					BindShader(_sStatics);
 				}
 
 				UINT stride = sizeof(Vertex);
@@ -660,13 +656,12 @@ namespace TEN::Renderer
 			{
 				if (rendererPass == RendererPass::GBuffer)
 				{
-					_context->VSSetShader(_vsGBufferStatics.Get(), nullptr, 0);
-					_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
+					BindShader(_sGBuffer);
+					BindShader(_sGBufferStatics);
 				}
 				else
 				{
-					_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
-					_context->PSSetShader(_psStatics.Get(), nullptr, 0);
+					BindShader(_sStatics);
 				}
 
 				unsigned int stride = sizeof(Vertex);
@@ -797,13 +792,12 @@ namespace TEN::Renderer
 				{
 					if (rendererPass == RendererPass::GBuffer)
 					{
-						_context->VSSetShader(_vsGBufferInstancedStatics.Get(), nullptr, 0);
-						_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
+						BindShader(_sGBuffer);
+						BindShader(_sGBufferInstancedStatics);
 					}
 					else
 					{
-						_context->VSSetShader(_vsInstancedStaticMeshes.Get(), nullptr, 0);
-						_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
+						BindShader(_sInstancedStatics);
 					}
 
 					unsigned int stride = sizeof(Vertex);
@@ -925,13 +919,12 @@ namespace TEN::Renderer
 				{
 					if (rendererPass == RendererPass::GBuffer)
 					{
-						_context->VSSetShader(_vsGBufferInstancedStatics.Get(), nullptr, 0);
-						_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
+						BindShader(_sGBuffer);
+						BindShader(_sGBufferInstancedStatics);
 					}
 					else
 					{
-						_context->VSSetShader(_vsInstancedStaticMeshes.Get(), nullptr, 0);
-						_context->PSSetShader(_psInstancedStaticMeshes.Get(), nullptr, 0);
+						BindShader(_sInstancedStatics);
 					}
 
 					unsigned int stride = sizeof(Vertex);
@@ -1033,13 +1026,12 @@ namespace TEN::Renderer
 			{
 				if (rendererPass == RendererPass::GBuffer)
 				{
-					_context->VSSetShader(_vsGBufferStatics.Get(), nullptr, 0);
-					_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
+					BindShader(_sGBuffer);
+					BindShader(_sGBufferStatics);
 				}
 				else
 				{
-					_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
-					_context->PSSetShader(_psStatics.Get(), nullptr, 0);
+					BindShader(_sStatics);
 				}
 
 				unsigned int stride = sizeof(Vertex);
@@ -1097,8 +1089,7 @@ namespace TEN::Renderer
 		SetBlendMode(BlendMode::Additive);
 		SetCullMode(CullMode::None);
 
-		_context->VSSetShader(_vsSolid.Get(), nullptr, 0);
-		_context->PSSetShader(_psSolid.Get(), nullptr, 0);
+		BindShader(_sSolid);
 
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_LINELIST);
 
@@ -1131,8 +1122,7 @@ namespace TEN::Renderer
 		SetBlendMode(BlendMode::Additive);
 		SetCullMode(CullMode::None);
 
-		_context->VSSetShader(_vsSolid.Get(), nullptr, 0);
-		_context->PSSetShader(_psSolid.Get(), nullptr, 0);
+		BindShader(_sSolid);
 
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetInputLayout(_inputLayout.Get());
@@ -1936,7 +1926,7 @@ namespace TEN::Renderer
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
 
-		_context->PSSetShader(_psRoomAmbient.Get(), nullptr, 0);
+		BindShader(_sRoomAmbient);
 
 		// Bind and clear render target
 		_context->ClearRenderTargetView(renderTarget->RenderTargetView.Get(), Colors::Black);
@@ -1986,7 +1976,7 @@ namespace TEN::Renderer
 
 		if (levelPtr->Horizon)
 		{
-			_context->VSSetShader(_vsRoomAmbientSky.Get(), nullptr, 0);
+			BindShader(_sRoomAmbientSky);
 
 			if (Lara.Control.Look.OpticRange != 0)
 				AlterFOV(ANGLE(DEFAULT_FOV) - Lara.Control.Look.OpticRange, false);
@@ -2068,7 +2058,7 @@ namespace TEN::Renderer
 			_context->ClearDepthStencilView(renderTarget->DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		}
 
-		_context->VSSetShader(_vsRoomAmbient.Get(), nullptr, 0);
+		BindShader(_sRoomAmbient);
 
 		// Draw rooms
 		UINT stride = sizeof(Vertex);
@@ -2274,13 +2264,12 @@ namespace TEN::Renderer
 		// Set shaders.
 		if (rendererPass == RendererPass::GBuffer)
 		{
-			_context->VSSetShader(_vsGBufferItems.Get(), nullptr, 0);
-			_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
+			BindShader(_sGBuffer);
+			BindShader(_sGBufferItems);
 		}
 		else
 		{
-			_context->VSSetShader(_vsItems.Get(), nullptr, 0);
-			_context->PSSetShader(_psItems.Get(), nullptr, 0);
+			BindShader(_sItems);
 		}
 
 		BindRenderTargetAsTexture(TextureRegister::SSAO, &_SSAOBlurredRenderTarget, SamplerStateRegister::PointWrap);
@@ -2417,13 +2406,12 @@ namespace TEN::Renderer
 #ifdef DISABLE_INSTANCING
 			if (rendererPass == RendererPass::GBuffer)
 			{
-				_context->VSSetShader(_vsGBufferStatics.Get(), NULL, 0);
-				_context->PSSetShader(_psGBuffer.Get(), NULL, 0);
+				BindShader(_sGBuffer);
+				BindShader(_sGBufferStatics);
 			}
 			else
 			{
-				_context->VSSetShader(_vsStatics.Get(), NULL, 0);
-				_context->PSSetShader(_psStatics.Get(), NULL, 0);
+				BindShader(_sStatics);
 			}
 
 			// Bind vertex and index buffer
@@ -2499,13 +2487,12 @@ namespace TEN::Renderer
 #else
 			if (rendererPass == RendererPass::GBuffer)
 			{
-				_context->VSSetShader(_vsGBufferInstancedStatics.Get(), NULL, 0);
-				_context->PSSetShader(_psGBuffer.Get(), NULL, 0);
+				BindShader(_sGBuffer);
+				BindShader(_sGBufferInstancedStatics);
 			}
 			else
 			{
-				_context->VSSetShader(_vsInstancedStaticMeshes.Get(), NULL, 0);
-				_context->PSSetShader(_psInstancedStaticMeshes.Get(), NULL, 0);
+				BindShader(_sInstancedStatics);
 			}
 
 			// Bind vertex and index buffer
@@ -2695,11 +2682,11 @@ namespace TEN::Renderer
 		{
 			if (rendererPass == RendererPass::GBuffer)
 			{
-				_context->PSSetShader(_psGBuffer.Get(), nullptr, 0);
+				BindShader(_sGBuffer);
 			}
 			else
 			{
-				_context->PSSetShader(_psRooms.Get(), nullptr, 0);
+				BindShader(_sRooms);
 			}
 
 			UINT stride = sizeof(Vertex);
@@ -2763,11 +2750,11 @@ namespace TEN::Renderer
 				{
 					if (rendererPass != RendererPass::GBuffer)
 					{
-						_context->VSSetShader((animated == 0) ? _vsRooms.Get() : _vsRoomsAnimatedTextures.Get(), nullptr, 0);
+						if (animated == 0) BindShader(_sRooms); else BindShader(_sRoomsAnimated);
 					}
 					else
 					{
-						_context->VSSetShader((animated == 0) ? _vsGBufferRooms.Get() : _vsGBufferRoomsAnimated.Get(), nullptr, 0);
+						if (animated == 0) BindShader(_sGBufferRooms); else BindShader(_sGBufferRoomsAnimated);
 					}
 
 					for (const auto& bucket : room.Buckets)
@@ -2866,9 +2853,7 @@ namespace TEN::Renderer
 		// Draw sky.
 		auto rotation = Matrix::CreateRotationX(PI);
 
-		_context->VSSetShader(_vsSky.Get(), nullptr, 0);
-		_context->PSSetShader(_psSky.Get(), nullptr, 0);
-
+		BindShader(_sSky);
 		BindTexture(TextureRegister::ColorMap, &_skyTexture, SamplerStateRegister::AnisotropicClamp);
 
 		_context->IASetVertexBuffers(0, 1, _skyVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -2909,8 +2894,7 @@ namespace TEN::Renderer
 
 			_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-			_context->VSSetShader(_vsInstancedSprites.Get(), nullptr, 0);
-			_context->PSSetShader(_psInstancedSprites.Get(), nullptr, 0);
+			BindShader(_sInstancedSprites);
 
 			// Set up vertex buffer and parameters.
 			UINT stride = sizeof(Vertex);
@@ -3049,8 +3033,7 @@ namespace TEN::Renderer
 			_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 			_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-			_context->VSSetShader(_vsSky.Get(), nullptr, 0);
-			_context->PSSetShader(_psSky.Get(), nullptr, 0);
+			BindShader(_sSky);
 
 			auto& moveableObj = *_moveableObjects[ID_HORIZON];
 
@@ -3094,8 +3077,7 @@ namespace TEN::Renderer
 
 			_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
-			_context->VSSetShader(_vsInstancedSprites.Get(), nullptr, 0);
-			_context->PSSetShader(_psInstancedSprites.Get(), nullptr, 0);
+			BindShader(_sInstancedSprites);
 
 			// Set up vertex buffer and parameters.
 			unsigned int stride = sizeof(Vertex);
@@ -3522,7 +3504,7 @@ namespace TEN::Renderer
 
 		ROOM_INFO* nativeRoom = &g_Level.Rooms[objectInfo->Room->RoomNumber];
 
-		_context->PSSetShader(_psRooms.Get(), nullptr, 0);
+		BindShader(_sRooms);
 
 		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
@@ -3538,14 +3520,8 @@ namespace TEN::Renderer
 
 		SetScissor(objectInfo->Room->ClipBounds);
 
-		if (objectInfo->Bucket->Animated == 0)
-		{
-			_context->VSSetShader(_vsRooms.Get(), nullptr, 0);
-		}
-		else
-		{
-			_context->VSSetShader(_vsRoomsAnimatedTextures.Get(), nullptr, 0);
-		}
+		if (objectInfo->Bucket->Animated != 0)
+			BindShader(_sRoomsAnimated);
 
 		SetBlendMode(objectInfo->Bucket->BlendMode);
 		SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
@@ -3611,8 +3587,7 @@ namespace TEN::Renderer
 		SetBlendMode(objectInfo->Bucket->BlendMode);
 		SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
-		_context->VSSetShader(_vsItems.Get(), nullptr, 0);
-		_context->PSSetShader(_psItems.Get(), nullptr, 0);
+		BindShader(_sItems);
 
 		// Bind main item properties.
 		Matrix world = objectInfo->Item->InterpolatedWorld;
@@ -3652,8 +3627,7 @@ namespace TEN::Renderer
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetInputLayout(_inputLayout.Get());
 
-		_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
-		_context->PSSetShader(_psStatics.Get(), nullptr, 0);
+		BindShader(_sStatics);
 
 		Matrix world = objectInfo->Static->World;
 		_stStatic.World = world;
@@ -3691,8 +3665,7 @@ namespace TEN::Renderer
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetInputLayout(_inputLayout.Get());
 
-		_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
-		_context->PSSetShader(_psStatics.Get(), nullptr, 0);
+		BindShader(_sStatics);
 
 		Matrix world = objectInfo->World;
 		_stStatic.World = world;
@@ -3731,10 +3704,10 @@ namespace TEN::Renderer
 		SetDepthState(DepthState::Write);
 
 		// Common vertex shader to all full screen effects
-		_context->VSSetShader(_vsPostProcess.Get(), nullptr, 0);
+		BindShader(_sPostProcess);
 
 		// SSAO pixel shader
-		_context->PSSetShader(_psSSAO.Get(), nullptr, 0);
+		BindShader(_sSSAO);
 
 		_context->ClearRenderTargetView(_SSAORenderTarget.RenderTargetView.Get(), Colors::White);
 		_context->OMSetRenderTargets(1, _SSAORenderTarget.RenderTargetView.GetAddressOf(), nullptr);
@@ -3778,7 +3751,7 @@ namespace TEN::Renderer
 		DrawTriangles(3, 0);
 
 		// Blur step
-		_context->PSSetShader(_psSSAOBlur.Get(), nullptr, 0);
+		BindShader(_sSSAOBlur);
 
 		_context->ClearRenderTargetView(_SSAOBlurredRenderTarget.RenderTargetView.Get(), Colors::Black);
 		_context->OMSetRenderTargets(1, _SSAOBlurredRenderTarget.RenderTargetView.GetAddressOf(), nullptr);
