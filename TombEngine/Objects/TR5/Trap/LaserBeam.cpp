@@ -37,8 +37,6 @@ namespace TEN::Entities::Traps
 		Radius = (item.TriggerFlags == 0) ? RADIUS_STEP : (abs(item.TriggerFlags) * RADIUS_STEP);
 		IsLethal = (item.TriggerFlags > 0);
 		IsHeavyActivator = (item.TriggerFlags <= 0);
-
-		Update(item);
 	}
 
 	static void SpawnLaserSpark(const GameVector& pos, short angle, int count, const Vector4& colorStart)
