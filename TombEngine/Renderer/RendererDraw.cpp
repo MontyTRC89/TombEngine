@@ -1567,7 +1567,7 @@ namespace TEN::Renderer
 
 		RendererLight dynamicLight = {};
 
-		dynamicLight.Color = Vector3(color.x, color.y, color.z) * 2.0f;
+		dynamicLight.Color = Vector3(color.x, color.y, color.z);
 		if (falloff < 8)
 			dynamicLight.Color *= (falloff / 8.0f);
 
@@ -1604,7 +1604,7 @@ namespace TEN::Renderer
 
 		RendererLight dynamicLight = {};
 
-		dynamicLight.Color = Vector3(color.x, color.y, color.z) * 2.0f;
+		dynamicLight.Color = Vector3(color.x, color.y, color.z);
 		if (radius < BLOCK(2))
 			dynamicLight.Color *= (radius / BLOCK(2));
 
@@ -1637,13 +1637,13 @@ namespace TEN::Renderer
 					return prevLight.Hash == light.Hash;
 				});
 
-			if (it == previousList.end())
-				return;
-
-			// If a matching light is found, copy its data.
-			const auto& prevLight = *it;
-			light.PrevPosition = prevLight.Position;
-			light.PrevDirection = prevLight.Direction;
+			if (it != previousList.end())
+			{
+				// If a matching light is found, copy its data.
+				const auto& prevLight = *it;
+				light.PrevPosition = prevLight.Position;
+				light.PrevDirection = prevLight.Direction;
+			}
 		}
 
 		// Queue dynamic light.
