@@ -1022,7 +1022,7 @@ namespace TEN::Renderer
 		if (!settings.MuzzleFlash)
 			return false;
 
-		BindShader(_sStatics);
+		_shaderManager.Bind(Shader::Statics);
 
 		unsigned int stride = sizeof(Vertex);
 		unsigned int offset = 0;
@@ -1143,7 +1143,7 @@ namespace TEN::Renderer
 
 	void Renderer::DrawBaddyGunflashes(RenderView& view)
 	{
-		BindShader(_sStatics);
+		_shaderManager.Bind(Shader::Statics);
 
 		unsigned int stride = sizeof(Vertex);
 		unsigned int offset = 0;
@@ -1369,7 +1369,7 @@ namespace TEN::Renderer
 
 	void Renderer::DrawEffects(RenderView& view, RendererPass rendererPass)
 	{
-		BindShader(_sStatics);
+		_shaderManager.Bind(Shader::Statics);
 
 		unsigned int stride = sizeof(Vertex);
 		unsigned int offset = 0;
@@ -1410,7 +1410,7 @@ namespace TEN::Renderer
 
 		if (activeDebrisExist)
 		{
-			BindShader(_sStatics);
+			_shaderManager.Bind(Shader::Statics);
 
 			SetCullMode(CullMode::None);
 
