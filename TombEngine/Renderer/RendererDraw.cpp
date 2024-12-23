@@ -209,6 +209,12 @@ namespace TEN::Renderer
 
 			for (int k = 0; k < obj.ObjectMeshes.size(); k++)
 			{
+				if (item->MeshIds.size() <= k)
+				{
+					TENLog("Mesh structure was not properly initialized for object " + GetObjectName((GAME_OBJECT_ID)item->ObjectID));
+					break;
+				}
+
 				auto* mesh = GetMesh(item->MeshIds[k]);
 
 				for (auto& bucket : mesh->Buckets)
