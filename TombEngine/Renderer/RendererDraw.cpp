@@ -2390,7 +2390,8 @@ namespace TEN::Renderer
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			_stItem.BoneLightModes[k] = (int)moveableObj.ObjectMeshes[k]->LightMode;
 
-		BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade);
+		bool acceptsShadows = moveableObj.ShadowType == ShadowMode::None;
+		BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade, acceptsShadows);
 		_cbItem.UpdateData(_stItem, _context.Get());
 
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
@@ -3606,7 +3607,8 @@ namespace TEN::Renderer
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			_stItem.BoneLightModes[k] = (int)moveableObj.ObjectMeshes[k]->LightMode;
 
-		BindMoveableLights(objectInfo->Item->LightsToDraw, objectInfo->Item->RoomNumber, objectInfo->Item->PrevRoomNumber, objectInfo->Item->LightFade);
+		bool acceptsShadows = moveableObj.ShadowType == ShadowMode::None;
+		BindMoveableLights(objectInfo->Item->LightsToDraw, objectInfo->Item->RoomNumber, objectInfo->Item->PrevRoomNumber, objectInfo->Item->LightFade, acceptsShadows);
 		_cbItem.UpdateData(_stItem, _context.Get());
 
 		BindTexture(
