@@ -75,7 +75,7 @@ namespace TEN::Entities::Generic
 		if (pushablePtr->UseBridgeCollision)
 			addBridge ? AddBridge(pushableItem.Index) : RemoveBridge(pushableItem.Index);
 		
-		while (pushablePtr->Stack.ItemNumberAbove != NO_ITEM)
+		while (pushablePtr->Stack.ItemNumberAbove != NO_VALUE)
 		{
 			pushableItemPtr = &g_Level.Items[pushablePtr->Stack.ItemNumberAbove];
 			pushablePtr = &GetPushableInfo(*pushableItemPtr);

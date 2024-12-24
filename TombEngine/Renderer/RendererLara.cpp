@@ -9,7 +9,7 @@
 #include "Game/control/control.h"
 #include "Game/spotcam.h"
 #include "Game/camera.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
@@ -83,6 +83,9 @@ void Renderer::UpdateLaraAnimations(bool force)
 	rItem.ItemNumber = LaraItem->Index;
 
 	if (!force && rItem.DoneAnimations)
+		return;
+
+	if (_moveableObjects.empty())
 		return;
 
 	auto& playerObject = *_moveableObjects[ID_LARA];
@@ -268,10 +271,10 @@ void Renderer::UpdateLaraAnimations(bool force)
 
 	// Copy matrices in player object.
 	for (int m = 0; m < NUM_LARA_MESHES; m++)
-		playerObject.AnimationTransforms[m] = rItem.AnimationTransforms[m];
+		playerObject.AnimationTransforms[m] = rItem.AnimTransforms[m];
 
 	// Copy meshswap indices.
-	rItem.MeshIndex = LaraItem->Model.MeshIndex;
+	rItem.MeshIds = LaraItem->Model.MeshIndex;
 	rItem.DoneAnimations = true;
 }
 
@@ -302,10 +305,10 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 
 	RendererRoom* room = &_rooms[LaraItem->RoomNumber];
 
-	_stItem.World = _laraWorldMatrix;
+	_stItem.World = item->InterpolatedWorld; // _laraWorldMatrix;
 	_stItem.Color = item->Color;
 	_stItem.AmbientLight = item->AmbientLight;
-	memcpy(_stItem.BonesMatrices, laraObj.AnimationTransforms.data(), laraObj.AnimationTransforms.size() * sizeof(Matrix));
+	memcpy(_stItem.BonesMatrices, item->InterpolatedAnimTransforms, laraObj.AnimationTransforms.size() * sizeof(Matrix));
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
 		_stItem.BoneLightModes[k] = (int)GetMesh(nativeItem->Model.MeshIndex[k])->LightMode;
@@ -328,29 +331,31 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 
 void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass)
 {
-	if (!Objects[ID_HAIR].loaded)
-		return;
+	bool forceValue = g_GameFlow->CurrentFreezeMode == FreezeMode::Player;
 
-	const auto& hairObject = *_moveableObjects[ID_HAIR];
-
-	// TODO
-	bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
-
-	bool isHead = true;
-	for (const auto& unit : HairEffect.Units)
+	for (int i = 0; i < HairEffect.Units.size(); i++)
 	{
+		const auto& unit = HairEffect.Units[i];
 		if (!unit.IsEnabled)
 			continue;
 
-		// First matrix is Lara's head matrix, then all hair unit segment matrices.
-		// Bones are adjusted at load time to account for this.
+		const auto& object = Objects[unit.ObjectID];
+		if (!object.loaded)
+			continue;
+
+		const auto& rendererObject = *_moveableObjects[unit.ObjectID];
+
 		_stItem.World = Matrix::Identity;
-		_stItem.BonesMatrices[0] = itemToDraw->AnimationTransforms[LM_HEAD] * _laraWorldMatrix;
+		_stItem.BonesMatrices[0] = itemToDraw->InterpolatedAnimTransforms[HairUnit::GetRootMeshID(i)] * itemToDraw->InterpolatedWorld;
 
 		for (int i = 0; i < unit.Segments.size(); i++)
 		{
 			const auto& segment = unit.Segments[i];
-			auto worldMatrix = Matrix::CreateFromQuaternion(segment.Orientation) * Matrix::CreateTranslation(segment.Position);
+			auto worldMatrix = 
+				Matrix::CreateFromQuaternion(
+					Quaternion::Lerp(segment.PrevOrientation, segment.Orientation, GetInterpolationFactor(forceValue))) *
+				Matrix::CreateTranslation(
+					Vector3::Lerp(segment.PrevPosition, segment.Position, GetInterpolationFactor(forceValue)));
 
 			_stItem.BonesMatrices[i + 1] = worldMatrix;
 			_stItem.BoneLightModes[i] = (int)LightMode::Dynamic;
@@ -358,13 +363,11 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 
 		_cbItem.UpdateData(_stItem, _context.Get());
 
-		for (int i = 0; i < hairObject.ObjectMeshes.size(); i++)
+		for (int i = 0; i < rendererObject.ObjectMeshes.size(); i++)
 		{
-			auto& rMesh = *hairObject.ObjectMeshes[i];
-			DrawMoveableMesh(itemToDraw, &rMesh, room, i, view, rendererPass);
+			auto& rendererMesh = *rendererObject.ObjectMeshes[i];
+			DrawMoveableMesh(itemToDraw, &rendererMesh, room, i, view, rendererPass);
 		}
-
-		isHead = false;
 	}
 }
 

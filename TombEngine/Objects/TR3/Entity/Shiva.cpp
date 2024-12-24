@@ -4,6 +4,7 @@
 #include "Game/animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/itemdata/creature_info.h"
@@ -17,6 +18,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR3
@@ -252,7 +254,7 @@ namespace TEN::Entities::Creatures::TR3
 	void InitializeShiva(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-		item.Status &= ~ITEM_INVISIBLE; // Draw the statue from the start.
+		item.Status = ITEM_NOT_ACTIVE; // Draw the statue from the start.
 
 		InitializeCreature(itemNumber);
 		SetAnimation(&item, SHIVA_ANIM_INACTIVE);
@@ -339,9 +341,9 @@ namespace TEN::Entities::Creatures::TR3
 				{
 					int x = item->Pose.Position.x + BLOCK(1) * phd_sin(item->Pose.Orientation.y + ANGLE(180.0f));
 					int z = item->Pose.Position.z + BLOCK(1) * phd_cos(item->Pose.Orientation.y + ANGLE(180.0f));
-					auto box = GetCollision(x, item->Pose.Position.y, z, item->RoomNumber).BottomBlock->Box;
+					auto box = GetPointCollision(Vector3i(x, item->Pose.Position.y, z), item->RoomNumber).GetBottomSector().PathfindingBoxID;
 
-					if (box != NO_BOX && !(g_Level.Boxes[box].flags & BLOCKABLE) && !creature.Flags)
+					if (box != NO_VALUE && !(g_Level.PathfindingBoxes[box].flags & BLOCKABLE) && !creature.Flags)
 						item->Animation.TargetState = SHIVA_STATE_WALK_BACK;
 					else
 						item->Animation.TargetState = SHIVA_STATE_GUARD_IDLE;
@@ -535,7 +537,7 @@ namespace TEN::Entities::Creatures::TR3
 			if (target.ItemFlags[1] != 0)
 			{
 				SoundEffect(SFX_TR4_WEAPON_RICOCHET, &target.Pose);
-				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, false);
 				return;
 			}
 
@@ -544,7 +546,7 @@ namespace TEN::Entities::Creatures::TR3
 				target.Animation.ActiveState == SHIVA_STATE_GUARD_IDLE)
 			{
 				SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target.Pose);
-				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, false);
 				return;
 			}
 		}

@@ -20,6 +20,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Room;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Math;
@@ -81,7 +82,7 @@ namespace TEN::Entities::Creatures::TR5
 		if (!(GetRandomControl() & 0x1F))
 		{
 			int fxNumber = CreateNewEffect(item->RoomNumber);
-			if (fxNumber != NO_ITEM)
+			if (fxNumber != NO_VALUE)
 			{
 				auto* fx = &EffectList[fxNumber];
 
@@ -112,19 +113,22 @@ namespace TEN::Entities::Creatures::TR5
 			spark->dShade = (GetRandomControl() & 0xF) + 64;
 			spark->blendMode = BlendMode::Additive;
 			spark->life = spark->sLife = (GetRandomControl() & 3) + 64;
-			spark->x = (GetRandomControl() & 0x1F) + pos->x - 16;
-			spark->y = (GetRandomControl() & 0x1F) + pos->y - 16;
-			spark->z = (GetRandomControl() & 0x1F) + pos->z - 16;
-			spark->xVel = (GetRandomControl() & 0x7F) - 64;
-			spark->yVel = 0;
-			spark->zVel = (GetRandomControl() & 0x7F) - 64;
+			spark->position = Vector3i(
+				(GetRandomControl() & 0x1F) + pos->x - 16,
+				(GetRandomControl() & 0x1F) + pos->y - 16,
+				(GetRandomControl() & 0x1F) + pos->z - 16
+			);
+			spark->velocity = Vector3i(
+				(GetRandomControl() & 0x7F) - 64,
+				0,
+				(GetRandomControl() & 0x7F) - 64
+			);
 			spark->friction = 4;
 			spark->flags = SP_ROTATE;
 			spark->rotAng = GetRandomControl() & 0xFFF;
 			spark->rotAdd = (GetRandomControl() & 0x1F) - 16;
 			spark->maxYvel = 0;
 			spark->gravity = (GetRandomControl() & 7) + 8;
-			spark->mirror = 0;
 			spark->sSize = spark->size = (GetRandomControl() & 7) + 8;
 			spark->dSize = spark->size * 2;
 		}
@@ -155,7 +159,7 @@ namespace TEN::Entities::Creatures::TR5
 		spark->flags = SP_SCALE | SP_DEF;
 		spark->scalar = 3;
 		spark->maxYvel = 0;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENSFLARE_LIGHT;
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENS_FLARE_LIGHT;
 		spark->gravity = 0;
 		spark->dSize = spark->sSize = spark->size = size + (GetRandomControl() & 3);
 	}
@@ -205,7 +209,7 @@ namespace TEN::Entities::Creatures::TR5
 	static void RomanStatueAttack(Pose* pos, short roomNumber, short count)
 	{
 		int fxNumber = CreateNewEffect(roomNumber);
-		if (fxNumber == NO_ITEM)
+		if (fxNumber == NO_VALUE)
 			return;
 
 		auto* fx = &EffectList[fxNumber];
@@ -542,7 +546,7 @@ namespace TEN::Entities::Creatures::TR5
 					pos = GetJointPosition(item, 16);
 
 					auto* room = &g_Level.Rooms[item->RoomNumber];
-					FloorInfo* floor = GetSector(room, pos.x - room->x, pos.z - room->z);
+					FloorInfo* floor = GetSector(room, pos.x - room->Position.x, pos.z - room->Position.z);
 
 					// If floor is stopped, then try to find static meshes and shatter them, activating heavy triggers below
 					if (floor->Stopper)
@@ -553,7 +557,7 @@ namespace TEN::Entities::Creatures::TR5
 
 							if (!((mesh->pos.Position.z ^ pos.z) & 0xFFFFFC00) && !((mesh->pos.Position.x ^ pos.x) & 0xFFFFFC00))
 							{
-								if (StaticObjects[mesh->staticNumber].shatterType != ShatterType::None)
+								if (Statics[mesh->staticNumber].shatterType != ShatterType::None)
 								{
 									ShatterObject(0, mesh, -64, LaraItem->RoomNumber, 0);
 									SoundEffect(GetShatterSound(mesh->staticNumber), (Pose*)mesh);
@@ -595,7 +599,7 @@ namespace TEN::Entities::Creatures::TR5
 							TriggerShockwave(&Pose(pos1), 16, 160, 64, 0, color / 2, color, 48, EulerAngles::Identity, 1, true, false, true, (int)ShockwaveStyle::Normal);
 							
 							auto lightColor = Color(0.4f, 0.3f, 0.0f);
-							TriggerDynamicLight(pos.ToVector3(), lightColor, 0.04f);
+							TriggerDynamicPointLight(pos.ToVector3(), lightColor, BLOCK(2.5f));
 						}
 
 						deltaFrame = item->Animation.FrameNumber - GetAnimData(item).frameBase;
@@ -624,7 +628,7 @@ namespace TEN::Entities::Creatures::TR5
 							if (item->ItemFlags[3])
 							{
 								auto lightColor = Color(0.0f, 0.4f, 1.0f);
-								TriggerDynamicLight(pos.ToVector3(), lightColor, 0.06f);
+								TriggerDynamicPointLight(pos.ToVector3(), lightColor, BLOCK(4));
 							}
 						}
 					}
@@ -822,9 +826,9 @@ namespace TEN::Entities::Creatures::TR5
 					short floorHeight = item->ItemFlags[2] & 0xFF00;
 					auto* room = &g_Level.Rooms[roomNumber];
 
-					int x = room->x + (creature->Tosspad / 256 & 0xFF) * BLOCK(1) + 512;
-					int y = room->minfloor + floorHeight;
-					int z = room->z + (creature->Tosspad & 0xFF) * BLOCK(1) + 512;
+					int x = room->Position.x + (creature->Tosspad / 256 & 0xFF) * BLOCK(1) + 512;
+					int y = room->BottomHeight + floorHeight;
+					int z = room->Position.z + (creature->Tosspad & 0xFF) * BLOCK(1) + 512;
 
 					TestTriggers(x, y, z, roomNumber, true);
 				}
@@ -877,7 +881,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		if (object.hitEffect == HitEffect::Richochet && pos.has_value())
 		{
-			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+			TriggerRicochetSpark(*pos, source.Pose.Orientation.y, false);
 			SoundEffect(SFX_TR5_SWORD_GOD_HIT_METAL, &target.Pose);
 		}
 

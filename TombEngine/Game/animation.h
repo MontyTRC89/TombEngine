@@ -16,9 +16,6 @@ struct ObjectInfo;
 // animNumber: Relative animation number.
 // animIndex:  Index of animation in giant g_Level.Anims vector.
 
-constexpr auto NO_STATE = -1;
-constexpr auto NO_ANIM	= -1;
-
 enum class AnimCommandType
 {
 	None,
@@ -27,7 +24,8 @@ enum class AnimCommandType
 	AttackReady,
 	Deactivate,
 	SoundEffect,
-	Flipeffect
+	Flipeffect,
+	DisableInterpolation
 };
 
 struct AnimFrame
@@ -39,7 +37,7 @@ struct AnimFrame
 
 struct StateDispatchData
 {
-	int TargetState	 = NO_STATE;
+	int TargetState	 = NO_VALUE;
 	int NumberRanges = 0;
 	int RangeIndex	 = 0;
 };
@@ -48,8 +46,8 @@ struct StateDispatchRangeData
 {
 	int StartFrame	 = 0;		// g_Level.Frames base index.
 	int EndFrame	 = 0;		// g_Level.Frames end index.
-	int LinkAnimNum	 = NO_ANIM; // g_Level.Anims index.
-	int LinkFrameNum = NO_ANIM; // g_Level.Frames index.
+	int LinkAnimNum	 = NO_VALUE; // g_Level.Anims index.
+	int LinkFrameNum = NO_VALUE; // g_Level.Frames index.
 };
 
 struct AnimData
@@ -65,7 +63,7 @@ struct AnimData
 	int frameBase = 0; // g_Level.Frames base index.
 	int frameEnd  = 0; // g_Level.Frames end index.
 
-	int JumpAnimNum		   = NO_ANIM; // g_Level.Anims index.
+	int JumpAnimNum		   = NO_VALUE; // g_Level.Anims index.
 	int JumpFrameNum	   = 0;		  // g_Level.Frames index.
 	int NumStateDispatches = 0;
 	int StateDispatchIndex = 0;
@@ -98,9 +96,9 @@ struct BoneMutator
 void AnimateItem(ItemInfo* item);
 
 // Inquirers
-bool HasStateDispatch(const ItemInfo* item, int targetState = NO_STATE);
+bool HasStateDispatch(const ItemInfo* item, int targetState = NO_VALUE);
 bool TestAnimNumber(const ItemInfo& item, int animNumber);
-bool TestLastFrame(ItemInfo* item, int animNumber = NO_ANIM);
+bool TestLastFrame(ItemInfo* item, int animNumber = NO_VALUE);
 bool TestAnimFrame(const ItemInfo& item, int frameStart);
 bool TestAnimFrameRange(const ItemInfo& item, int frameStart, int frameEnd);
 
@@ -118,8 +116,8 @@ void SetAnimation(ItemInfo* item, int animNumber, int frameNumber = 0); // Depre
 const AnimData& GetAnimData(int animIndex); // Deprecated.
 const AnimData& GetAnimData(GAME_OBJECT_ID objectID, int animNumber);
 const AnimData& GetAnimData(const ObjectInfo& object, int animNumber);
-const AnimData& GetAnimData(const ItemInfo& item, int animNumber = NO_ANIM);
-const AnimData& GetAnimData(const ItemInfo* item, int animNumber = NO_ANIM); // Deprecated.
+const AnimData& GetAnimData(const ItemInfo& item, int animNumber = NO_VALUE);
+const AnimData& GetAnimData(const ItemInfo* item, int animNumber = NO_VALUE); // Deprecated.
 
 AnimFrameInterpData GetFrameInterpData(const ItemInfo& item);
 const AnimFrame&	GetAnimFrame(const ItemInfo& item, int animNumber, int frameNumber);

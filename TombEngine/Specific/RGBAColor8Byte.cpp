@@ -1,46 +1,57 @@
 #include "framework.h"
-#include "RGBAColor8Byte.h"
+#include "Specific/RGBAColor8Byte.h"
 
-static byte FloatComponentToByte(float v)
+static byte FloatComponentToByte(float value)
 {
-	//todo look into what these actually do AND TEST THEM
-	//todo like, see if these are actually not undefined or some shit
-	auto lval = std::lroundf((v / 2.0f) * 255.0f);
-	return static_cast<byte>(lval);
+	// TODO: Look into what these actually do and test them to see if they are actually not undefined.
+	long byteValue = std::lroundf((value / 2.0f) * 255.0f);
+	return (byte)byteValue;
 }
 
 static float ByteComponentToFloat(byte b)
 {
-	//todo look into what these actually do AND TEST THEM
-	//todo like, see if these are actually not undefined or some shit
-	float f = b;
-	f = (f / 255.0f) * 2.0f;
-	return f;
+	// TODO: Look into what these actually do and test them to see if they are actually not undefined.
+	float value = (b / 255.0f) * 2;
+	return value;
 }
 
-
-RGBAColor8Byte::RGBAColor8Byte(D3DCOLOR col)
+RGBAColor8Byte::RGBAColor8Byte(D3DCOLOR color)
 {
-	b = col & 0xFF;
-	col >>= 8;
-	g = col & 0xFF;
-	col >>= 8;
-	r = col & 0xFF;
-	col >>= 8;
-	a = col & 0xFF;
+	b = color & 0xFF;
+	color >>= 8;
+	g = color & 0xFF;
+	color >>= 8;
+	r = color & 0xFF;
+	color >>= 8;
+	a = color & 0xFF;
 }
 
-RGBAColor8Byte::operator D3DCOLOR() const
+RGBAColor8Byte::RGBAColor8Byte(byte r, byte g, byte b)
 {
-	D3DCOLOR col = a;
-	col <<= 8;
-	col += r;
-	col <<= 8;
-	col += g;
-	col <<= 8;
-	col += b;
+	SetR(r);
+	SetG(g);
+	SetB(b);
+}
 
-	return col;
+RGBAColor8Byte::RGBAColor8Byte(byte r, byte g, byte b, byte a) :
+	RGBAColor8Byte(r, g, b)
+{
+	SetA(a);
+}
+
+RGBAColor8Byte::RGBAColor8Byte(const Vector3& color)
+{
+	r = FloatComponentToByte(color.x);
+	g = FloatComponentToByte(color.y);
+	b = FloatComponentToByte(color.z);
+}
+
+RGBAColor8Byte::RGBAColor8Byte(const Vector4& color)
+{
+	r = FloatComponentToByte(color.x);
+	g = FloatComponentToByte(color.y);
+	b = FloatComponentToByte(color.z);
+	a = FloatComponentToByte(color.w);
 }
 
 byte RGBAColor8Byte::GetR() const
@@ -83,40 +94,30 @@ void RGBAColor8Byte::SetA(byte v)
 	a = std::clamp<byte>(v, 0, 255);
 }
 
-RGBAColor8Byte::RGBAColor8Byte(Vector3 const& col) :
-	r(FloatComponentToByte(col.x)),
-	g(FloatComponentToByte(col.y)),
-	b(FloatComponentToByte(col.z))
+RGBAColor8Byte::operator Color() const
 {
-}
-
-RGBAColor8Byte::RGBAColor8Byte(Vector4 const& col) :
-	r(FloatComponentToByte(col.x)),
-	g(FloatComponentToByte(col.y)),
-	b(FloatComponentToByte(col.z)),
-	a(FloatComponentToByte(col.w))
-{
+	return Color(ByteComponentToFloat(r), ByteComponentToFloat(g), ByteComponentToFloat(b));
 }
 
 RGBAColor8Byte::operator Vector3() const
 {
-	return Vector3{ ByteComponentToFloat(r), ByteComponentToFloat(g), ByteComponentToFloat(b) };
+	return Vector3(ByteComponentToFloat(r), ByteComponentToFloat(g), ByteComponentToFloat(b));
 }
 
 RGBAColor8Byte::operator Vector4() const
 {
-	return Vector4{ ByteComponentToFloat(r), ByteComponentToFloat(g), ByteComponentToFloat(b), ByteComponentToFloat(a) };
+	return Vector4(ByteComponentToFloat(r), ByteComponentToFloat(g), ByteComponentToFloat(b), ByteComponentToFloat(a));
 }
 
-RGBAColor8Byte::RGBAColor8Byte(byte r, byte g, byte b)
+RGBAColor8Byte::operator D3DCOLOR() const
 {
-	SetR(r);
-	SetG(g);
-	SetB(b);
-}
+	D3DCOLOR color = a;
+	color <<= 8;
+	color += r;
+	color <<= 8;
+	color += g;
+	color <<= 8;
+	color += b;
 
-RGBAColor8Byte::RGBAColor8Byte(byte r, byte g, byte b, byte a) : RGBAColor8Byte(r, g, b)
-{
-	SetA(a);
+	return color;
 }
-

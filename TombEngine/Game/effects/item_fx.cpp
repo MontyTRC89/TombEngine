@@ -3,16 +3,18 @@
 
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/smoke.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Scripting/Internal/TEN/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Color/Color.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Smoke;
 
 namespace TEN::Effects::Items
@@ -70,7 +72,7 @@ namespace TEN::Effects::Items
 		if (item->HitPoints < 0)
 			return;
 
-		auto height = GetCollision(item->Pose.Position.x, 32000, item->Pose.Position.z, item->RoomNumber).Position.Floor;
+		auto height = GetPointCollision(Vector3i(item->Pose.Position.x, 32000, item->Pose.Position.z), item->RoomNumber).GetFloorHeight();
 		if (item->Floor == height)
 		{
 			item->HitPoints = -1;

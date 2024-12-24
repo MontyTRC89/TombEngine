@@ -3,6 +3,7 @@
 
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/flipeffect.h"
 #include "Game/items.h"
@@ -12,9 +13,11 @@
 #include "Math/Math.h"
 #include "Objects/Generic/Object/rope.h"
 #include "Renderer/Renderer.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
@@ -37,7 +40,7 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 		return;
 
 	// Get command data pointer.
-	short* commandDataPtr = &g_Level.Commands[anim.CommandIndex];
+	int* commandDataPtr = &g_Level.Commands[anim.CommandIndex];
 
 	for (int i = anim.NumCommands; i > 0; i--)
 	{
@@ -60,6 +63,8 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 				{
 					UpdateItemRoom(item.Index);
 				}
+
+				item.DisableInterpolation = true;
 			}
 
 			commandDataPtr += 3;
@@ -110,56 +115,75 @@ static void PerformAnimCommands(ItemInfo& item, bool isFrameBased)
 			break;
 
 		case AnimCommandType::SoundEffect:
-			if (isFrameBased && item.Animation.FrameNumber == commandDataPtr[0])
+		{
+			int frameNumber = commandDataPtr[0];
+			if (isFrameBased && item.Animation.FrameNumber == frameNumber)
 			{
-				if (!Objects[item.ObjectNumber].waterCreature)
-				{
-					bool playInWater = (commandDataPtr[1] & 0x8000) != 0;
-					bool playOnLand	 = (commandDataPtr[1] & 0x4000) != 0;
-					bool playAlways	 = (playInWater && playOnLand) || (!playInWater && !playOnLand);
+				// Get sound ID and sound environment flag.
+				int soundID = commandDataPtr[1];
+				auto requiredSoundEnv = (SoundEnvironment)commandDataPtr[2];
 
-					if (item.IsLara())
-					{
-						auto& player = GetLaraInfo(item);
+				int roomNumberAtPos = (item.RoomNumber == NO_VALUE) ? Camera.pos.RoomNumber : GetPointCollision(item).GetRoomNumber();
+				bool isWater = TestEnvironment(ENV_FLAG_WATER, roomNumberAtPos);
+				bool isSwamp = TestEnvironment(ENV_FLAG_SWAMP, roomNumberAtPos);
 
-						if (playAlways ||
-							(playOnLand && (player.Context.WaterSurfaceDist >= -SHALLOW_WATER_DEPTH || player.Context.WaterSurfaceDist == NO_HEIGHT)) ||
-							(playInWater && player.Context.WaterSurfaceDist < -SHALLOW_WATER_DEPTH && player.Context.WaterSurfaceDist != NO_HEIGHT && !TestEnvironment(ENV_FLAG_SWAMP, &item)))
-						{
-							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
-						}
-					}
-					else
-					{
-						if (item.RoomNumber == NO_ROOM)
-						{
-							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
-						}
-						else if (TestEnvironment(ENV_FLAG_WATER, &item))
-						{
-							if (playAlways || (playInWater && TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber)))
-								SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
-						}
-						else if (playAlways || (playOnLand && !TestEnvironment(ENV_FLAG_WATER, Camera.pos.RoomNumber) && !TestEnvironment(ENV_FLAG_SWAMP, Camera.pos.RoomNumber)))
-						{
-							SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, SoundEnvironment::Always);
-						}
-					}
-				}
-				else
+				// Get sound environment for sound effect.
+				auto soundEnv = std::optional<SoundEnvironment>();
+				switch (requiredSoundEnv)
 				{
-					SoundEffect(commandDataPtr[1] & 0x3FFF, &item.Pose, TestEnvironment(ENV_FLAG_WATER, &item) ? SoundEnvironment::Water : SoundEnvironment::Land);
+				case SoundEnvironment::Always:
+					soundEnv = SoundEnvironment::Always;
+					break;
+
+				case SoundEnvironment::Land:
+					if (!isWater && !isSwamp)
+						soundEnv = SoundEnvironment::Land;
+
+					break;
+
+				case SoundEnvironment::ShallowWater:
+					if (isWater)
+					{
+						// HACK: Must update assets before removing this exception for water creatures.
+						const auto& object = Objects[item.ObjectNumber];
+						soundEnv = object.waterCreature ? SoundEnvironment::Underwater : SoundEnvironment::ShallowWater;
+					}
+
+					break;
+
+				case SoundEnvironment::Swamp:
+					if (isSwamp)
+						soundEnv = SoundEnvironment::Swamp;
+
+					break;
+
+				case SoundEnvironment::Underwater:
+					if (isWater || isSwamp)
+						soundEnv = SoundEnvironment::Underwater;
+
+					break;
 				}
+
+				if (soundEnv.has_value())
+					SoundEffect(soundID, &item.Pose, *soundEnv);
 			}
+
+			commandDataPtr += 3;
+			break;
+		}
+
+		case AnimCommandType::Flipeffect:
+			if (isFrameBased && item.Animation.FrameNumber == commandDataPtr[0])
+				DoFlipEffect(commandDataPtr[1], &item);
 
 			commandDataPtr += 2;
 			break;
 
-		case AnimCommandType::Flipeffect:
+		case AnimCommandType::DisableInterpolation:
 			if (isFrameBased && item.Animation.FrameNumber == commandDataPtr[0])
-				DoFlipEffect((commandDataPtr[1] & 0x3FFF), &item);
+				item.DisableInterpolation = true;
 
-			commandDataPtr += 2;
+			commandDataPtr += 1;
 			break;
 
 		default:
@@ -190,7 +214,7 @@ void AnimateItem(ItemInfo* item)
 		if (!item->IsLara())
 		{
 			if (item->Animation.RequiredState == item->Animation.ActiveState)
-				item->Animation.RequiredState = NO_STATE;
+				item->Animation.RequiredState = NO_VALUE;
 		}
 	}
 
@@ -212,7 +236,7 @@ void AnimateItem(ItemInfo* item)
 			}
 
 			if (item->Animation.RequiredState == item->Animation.ActiveState)
-				item->Animation.RequiredState = NO_STATE;
+				item->Animation.RequiredState = NO_VALUE;
 		}
 		else
 		{
@@ -229,7 +253,7 @@ void AnimateItem(ItemInfo* item)
 		if (!item->IsLara())
 		{
 			if (item->Animation.RequiredState == item->Animation.ActiveState)
-				item->Animation.RequiredState = NO_STATE;
+				item->Animation.RequiredState = NO_VALUE;
 		}*/
 	}
 
@@ -262,10 +286,13 @@ void AnimateItem(ItemInfo* item)
 			}
 			else
 			{
-				item->Animation.Velocity.y += GetEffectiveGravity(item->Animation.Velocity.y);
-				item->Animation.Velocity.z += animAccel.z;
+				if (item->Animation.ActiveState != LS_FLY_CHEAT)
+				{
+					item->Animation.Velocity.y += GetEffectiveGravity(item->Animation.Velocity.y);
+					item->Animation.Velocity.z += animAccel.z;
 
-				item->Pose.Position.y += item->Animation.Velocity.y;
+					item->Pose.Position.y += item->Animation.Velocity.y;
+				}
 			}
 		}
 		else
@@ -325,7 +352,7 @@ bool HasStateDispatch(const ItemInfo* item, int targetState)
 	if (anim.NumStateDispatches <= 0)
 		return false;
 
-	if (targetState == NO_STATE)
+	if (targetState == NO_VALUE)
 		targetState = item->Animation.TargetState;
 
 	// Iterate over animation's state dispatches.
@@ -363,7 +390,7 @@ bool TestLastFrame(ItemInfo* item, int animNumber)
 {
 	const auto& object = Objects[item->Animation.AnimObjectID];
 
-	if (animNumber == NO_ANIM)
+	if (animNumber == NO_VALUE)
 		animNumber = item->Animation.AnimNumber - object.animIndex;
 
 	// Animation to test doesn't match; return early.
@@ -466,7 +493,7 @@ const AnimData& GetAnimData(const ObjectInfo& object, int animNumber)
 
 const AnimData& GetAnimData(const ItemInfo& item, int animNumber)
 {
-	if (animNumber == NO_ANIM)
+	if (animNumber == NO_VALUE)
 		return GetAnimData(item.Animation.AnimNumber);
 
 	const auto& object = Objects[item.Animation.AnimObjectID];
@@ -509,7 +536,7 @@ const AnimFrame* GetFrame(GAME_OBJECT_ID objectID, int animNumber, int frameNumb
 	const auto& object = Objects[objectID];
 
 	int animIndex = object.animIndex + animNumber;
-	assertion(animIndex < g_Level.Anims.size(), "GetFrame() attempted to access missing animation.");
+	TENAssert(animIndex < g_Level.Anims.size(), "GetFrame() attempted to access missing animation.");
 
 	const auto& anim = GetAnimData(object, animNumber);
 
@@ -542,7 +569,7 @@ const AnimFrame& GetBestFrame(const ItemInfo& item)
 
 float GetEffectiveGravity(float verticalVel)
 {
-	return ((verticalVel >= VERTICAL_VELOCITY_GRAVITY_THRESHOLD) ? 1.0f : GRAVITY);
+	return ((verticalVel >= VERTICAL_VELOCITY_GRAVITY_THRESHOLD) ? 1.0f : g_GameFlow->GetSettings()->Physics.Gravity);
 }
 
 int GetAnimNumber(const ItemInfo& item)
@@ -666,7 +693,7 @@ void ClampRotation(Pose& outPose, short angle, short rotation)
 Vector3i GetJointPosition(const ItemInfo& item, int jointIndex, const Vector3i& relOffset)
 {
 	// Use matrices done in renderer to transform relative offset.
-	return Vector3i(g_Renderer.GetAbsEntityBonePosition(item.Index, jointIndex, relOffset.ToVector3()));
+	return Vector3i(g_Renderer.GetMoveableBonePosition(item.Index, jointIndex, relOffset.ToVector3()));
 }
 
 Vector3i GetJointPosition(ItemInfo* item, int jointIndex, const Vector3i& relOffset)
@@ -692,16 +719,9 @@ Vector3 GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex)
 	return Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));
 }
 
-Quaternion GetBoneOrientation(const ItemInfo& item, int boneIndex)
+Quaternion GetBoneOrientation(const ItemInfo& item, int boneID)
 {
-	static const auto REF_DIRECTION = Vector3::UnitZ;
-
-	auto origin = g_Renderer.GetAbsEntityBonePosition(item.Index, boneIndex);
-	auto target = g_Renderer.GetAbsEntityBonePosition(item.Index, boneIndex, REF_DIRECTION);
-
-	auto direction = target - origin;
-	direction.Normalize();
-	return Geometry::ConvertDirectionToQuat(direction);
+	return g_Renderer.GetMoveableBoneOrientation(item.Index, boneID);
 }
 
 // NOTE: Will not work for bones at ends of hierarchies.

@@ -5,7 +5,7 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 
 /***
 Sink
@@ -14,8 +14,8 @@ Sink
 @pragma nostrip
 */
 
-static auto index_error = index_error_maker(Sink, ScriptReserved_Sink);
-static auto newindex_error = newindex_error_maker(Sink, ScriptReserved_Sink);
+static auto IndexError = index_error_maker(Sink, ScriptReserved_Sink);
+static auto NewIndexError = newindex_error_maker(Sink, ScriptReserved_Sink);
 
 Sink::Sink(SinkInfo& ref) : m_sink{ref}
 {};
@@ -24,8 +24,8 @@ void Sink::Register(sol::table& parent)
 {
 	parent.new_usertype<Sink>(ScriptReserved_Sink,
 		sol::no_constructor, // ability to spawn new ones could be added later
-		sol::meta_function::index, index_error,
-		sol::meta_function::new_index, newindex_error,
+		sol::meta_function::index, IndexError,
+		sol::meta_function::new_index, NewIndexError,
 
 		/// Get the sink's position
 		// @function Sink:GetPosition

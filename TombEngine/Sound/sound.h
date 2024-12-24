@@ -25,6 +25,7 @@ constexpr auto SOUND_MILLISECONDS_IN_SECOND  = 1000.0f;
 constexpr auto SOUND_XFADETIME_BGM           = 5000;
 constexpr auto SOUND_XFADETIME_BGM_START     = 1500;
 constexpr auto SOUND_XFADETIME_ONESHOT       = 200;
+constexpr auto SOUND_XFADETIME_LEVELJUMP     = 400;
 constexpr auto SOUND_XFADETIME_CUTSOUND      = 100;
 constexpr auto SOUND_XFADETIME_HIJACKSOUND   = 50;
 constexpr auto SOUND_BGM_DAMP_COEFFICIENT    = 0.5f;
@@ -48,9 +49,11 @@ enum class SoundTrackType
 
 enum class SoundEnvironment
 {
+	Always,
 	Land,
-	Water,
-	Always
+	ShallowWater,
+	Swamp,
+	Underwater
 };
 
 enum class SoundPlayMode
@@ -121,9 +124,9 @@ struct SoundTrackInfo
 struct SoundSourceInfo
 {
 	Vector3i	Position = Vector3i::Zero;
-	int			SoundID = 0;
-	int			Flags = 0;
-	std::string	Name {};
+	int			SoundID	 = 0;
+	int			Flags	 = 0;
+	std::string	Name	 = {};
 
 	SoundSourceInfo()
 	{
@@ -131,27 +134,27 @@ struct SoundSourceInfo
 
 	SoundSourceInfo(int xPos, int yPos, int zPos)
 	{
-		this->Position = Vector3i(xPos, yPos, zPos);
+		Position = Vector3i(xPos, yPos, zPos);
 	}
 
 	SoundSourceInfo(int xPos, int yPos, int zPos, short soundID)
 	{
-		this->Position = Vector3i(xPos, yPos, zPos);
-		this->SoundID = soundID;
+		Position = Vector3i(xPos, yPos, zPos);
+		SoundID = soundID;
 	}
 
 	SoundSourceInfo(int xPos, int yPos, int zPos, short soundID, short newflags)
 	{
-		this->Position = Vector3i(xPos, yPos, zPos);
-		this->SoundID = soundID;
-		this->Flags = newflags;
+		Position = Vector3i(xPos, yPos, zPos);
+		SoundID = soundID;
+		Flags = newflags;
 	}
 };
 
 extern std::map<std::string, int> SoundTrackMap;
 extern std::unordered_map<int, SoundTrackInfo> SoundTracks;
 
-bool SoundEffect(int effectID, Pose* position, SoundEnvironment condition = SoundEnvironment::Land, float pitchMultiplier = 1.0f, float gainMultiplier = 1.0f);
+bool SoundEffect(int soundID, Pose* pose, SoundEnvironment soundEnv = SoundEnvironment::Land, float pitchMult = 1.0f, float gainMult = 1.0f);
 void StopSoundEffect(short effectID);
 bool LoadSample(char *buffer, int compSize, int uncompSize, int currentIndex);
 void FreeSamples();
@@ -162,11 +165,11 @@ void SayNo();
 void PlaySoundSources();
 int  GetShatterSound(int shatterID);
 
-void PlaySoundTrack(const std::string& trackName, SoundTrackType mode, QWORD position = 0);
+void PlaySoundTrack(const std::string& trackName, SoundTrackType mode, std::optional<QWORD> pos = std::nullopt, int forceFadeInTime = 0);
 void PlaySoundTrack(const std::string& trackName, short mask = 0);
 void PlaySoundTrack(int index, short mask = 0);
 void StopSoundTrack(SoundTrackType mode, int fadeoutTime);
-void StopSoundTracks(bool excludeAmbience = false);
+void StopSoundTracks(int fadeoutTime = SOUND_XFADETIME_LEVELJUMP, bool excludeAmbience = false);
 void ClearSoundTrackMasks();
 void PlaySecretTrack();
 void EnumerateLegacyTracks();

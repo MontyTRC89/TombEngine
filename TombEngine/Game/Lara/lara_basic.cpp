@@ -39,17 +39,7 @@ void lara_void_func(ItemInfo* item, CollisionInfo* coll)
 
 void lara_default_col(ItemInfo* item, CollisionInfo* coll)
 {
-	auto& player = GetLaraInfo(*item);
-
-	player.Control.MoveAngle = item->Pose.Orientation.y;
-	coll->Setup.LowerFloorBound = STEPUP_HEIGHT;
-	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
-	coll->Setup.LowerCeilingBound = 0;
-	coll->Setup.BlockFloorSlopeDown = true;
-	coll->Setup.BlockFloorSlopeUp = true;
-	coll->Setup.ForwardAngle = player.Control.MoveAngle;
-	GetCollisionInfo(coll, item);
-	LaraResetGravityStatus(item, coll);
+	LaraDefaultCollision(item, coll);
 }
 
 // Boulder death.
@@ -604,7 +594,7 @@ void lara_as_idle(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	// TODO: Without animation blending, the AFK state's movement lock interferes with responsiveness. -- Sezz 2021.10.31
-	if (CanStrikeAfkPose(*item, *coll) && player.Control.Count.Pose >= PLAYER_POSE_TIME)
+	if (CanStrikeAfkPose(*item, *coll) && player.Control.Count.Pose >= (g_GameFlow->GetSettings()->Animations.PoseTimeout * FPS))
 	{
 		item->Animation.TargetState = LS_POSE;
 		return;
@@ -1704,7 +1694,7 @@ void lara_as_sprint(ItemInfo* item, CollisionInfo* coll)
 	if (IsHeld(In::Jump) || player.Control.IsRunJumpQueued)
 	{
 		// TODO: CanSprintJumpForward() should handle HasSprintJump() check.
-		if (IsHeld(In::Walk) || !g_GameFlow->HasSprintJump())
+		if (IsHeld(In::Walk) || !g_GameFlow->GetSettings()->Animations.SprintJump)
 		{
 			item->Animation.TargetState = LS_SPRINT_DIVE;
 			return;

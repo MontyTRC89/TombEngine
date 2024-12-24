@@ -219,7 +219,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature.MaxTurn = WASP_AIR_TURN_RATE_MAX;
 				creature.Flags = 0;
 
-				if (item.Animation.RequiredState != NO_STATE)
+				if (item.Animation.RequiredState != NO_VALUE)
 				{
 					item.Animation.TargetState = item.Animation.RequiredState;
 				}
@@ -243,7 +243,7 @@ namespace TEN::Entities::Creatures::TR3
 				creature.MaxTurn = WASP_AIR_TURN_RATE_MAX;
 				creature.Flags = 0;
 
-				if (item.Animation.RequiredState != NO_STATE)
+				if (item.Animation.RequiredState != NO_VALUE)
 				{
 					item.Animation.TargetState = item.Animation.RequiredState;
 				}

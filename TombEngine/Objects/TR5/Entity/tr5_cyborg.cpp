@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
@@ -20,6 +21,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;
@@ -144,17 +146,17 @@ namespace TEN::Entities::Creatures::TR5
 
 		x += dx;
 		z += dz;
-		int height1 = GetCollision(x, item.Pose.Position.y, z, item.RoomNumber).Position.Floor;
+		int height1 = GetPointCollision(Vector3i(x, item.Pose.Position.y, z), item.RoomNumber).GetFloorHeight();
 
 		x += dx;
 		z += dz;
-		int height2 = GetCollision(x, item.Pose.Position.y, z, item.RoomNumber).Position.Floor;
+		int height2 = GetPointCollision(Vector3i(x, item.Pose.Position.y, z), item.RoomNumber).GetFloorHeight();
 
 		x += dx;
 		z += dz;
-		auto pointColl = GetCollision(x, item.Pose.Position.y, z, item.RoomNumber);
-		int roomNumber = pointColl.RoomNumber;
-		int height3 = pointColl.Position.Floor;
+		auto pointColl = GetPointCollision(Vector3i(x, item.Pose.Position.y, z), item.RoomNumber);
+		int roomNumber = pointColl.GetRoomNumber();
+		int height3 = pointColl.GetFloorHeight();
 
 		bool canJump1block = true;
 		if (item.BoxNumber == LaraItem->BoxNumber ||
@@ -220,7 +222,7 @@ namespace TEN::Entities::Creatures::TR5
 			if (randomIndex == 5 || randomIndex == 7 || randomIndex == 10)
 			{
 				auto pos2 = Vector3::Zero;
-				auto pointColl2 = GetCollision(pos2.x, pos2.y, pos2.z, item.RoomNumber);
+				auto pointColl2 = GetPointCollision(pos2, item.RoomNumber);
 				
 				switch (randomIndex)
 				{
@@ -230,9 +232,9 @@ namespace TEN::Entities::Creatures::TR5
 
 				case 7:
 					pos2 = GetJointPosition(&item, 6, Vector3i(0, 0, 50)).ToVector3();
-					pointColl2 = GetCollision(pos2.x, pos2.y, pos2.z, item.RoomNumber);
+					pointColl2 = GetPointCollision(pos2, item.RoomNumber);
 
-					if (TestEnvironment(ENV_FLAG_WATER, pointColl2.RoomNumber) && item.HitPoints > 0)
+					if (TestEnvironment(ENV_FLAG_WATER, pointColl2.GetRoomNumber()) && item.HitPoints > 0)
 					{
 						DropPickups(&item);
 						DoDamage(&item, INT_MAX);
@@ -317,7 +319,7 @@ namespace TEN::Entities::Creatures::TR5
 					joint1 = AI.xAngle;
 				}
 
-				if (item.Animation.RequiredState != NO_STATE)
+				if (item.Animation.RequiredState != NO_VALUE)
 				{
 					item.Animation.TargetState = item.Animation.RequiredState;
 				}
@@ -379,11 +381,11 @@ namespace TEN::Entities::Creatures::TR5
 							}
 							else
 							{
-								pointColl = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, roomNumber);
-								roomNumber = pointColl.RoomNumber;
-								height = pointColl.Position.Floor;
+								pointColl = GetPointCollision(item.Pose.Position, roomNumber);
+								roomNumber = pointColl.GetRoomNumber();
+								height = pointColl.GetFloorHeight();
 
-								if (pointColl.Position.Ceiling == (height - BLOCK(1.5f)))
+								if (pointColl.GetCeilingHeight() == (height - BLOCK(1.5f)))
 									item.Animation.TargetState = CYBORG_STATE_START_END_MONKEY;
 								else
 									item.Animation.TargetState = CYBORG_STATE_WALK;
@@ -481,11 +483,11 @@ namespace TEN::Entities::Creatures::TR5
 				if (item.BoxNumber == creature.LOT.TargetBox ||
 					!creature.MonkeySwingAhead)
 				{
-					pointColl = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, roomNumber);
-					roomNumber = pointColl.RoomNumber;
-					height = pointColl.Position.Floor;
+					pointColl = GetPointCollision(item.Pose.Position, roomNumber);
+					roomNumber = pointColl.GetRoomNumber();
+					height = pointColl.GetFloorHeight();
 
-					if (pointColl.Position.Ceiling == height - BLOCK(1.5f), 2)
+					if (pointColl.GetCeilingHeight() == height - BLOCK(1.5f), 2)
 						item.Animation.TargetState = CYBORG_STATE_IDLE;
 				}
 				else
@@ -503,11 +505,11 @@ namespace TEN::Entities::Creatures::TR5
 				if (item.BoxNumber == creature.LOT.TargetBox ||
 					!creature.MonkeySwingAhead)
 				{
-					pointColl = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, roomNumber);
-					roomNumber = pointColl.RoomNumber;
-					height = pointColl.Position.Floor;
+					pointColl = GetPointCollision(item.Pose.Position, roomNumber);
+					roomNumber = pointColl.GetRoomNumber();
+					height = pointColl.GetFloorHeight();
 
-					if (pointColl.Position.Ceiling == height - BLOCK(1.5f), 2)
+					if (pointColl.GetCeilingHeight() == height - BLOCK(1.5f), 2)
 						item.Animation.TargetState = CYBORG_STATE_START_END_MONKEY;
 				}
 
@@ -583,9 +585,9 @@ namespace TEN::Entities::Creatures::TR5
 		else if (item.Animation.ActiveState == CYBORG_STATE_DEATH && LaraItem->Effect.Type == EffectType::None)
 		{
 			auto pos = GetJointPosition(LaraItem, LM_RFOOT);
-			auto footProbeRight = GetCollision(pos.x, pos.y, pos.z, LaraItem->RoomNumber);
+			auto footProbeRight = GetPointCollision(pos, LaraItem->RoomNumber);
 			pos = GetJointPosition(LaraItem, LM_LFOOT);
-			auto footProbeLeft = GetCollision(pos.x, pos.y, pos.z, LaraItem->RoomNumber);
+			auto footProbeLeft = GetPointCollision(pos, LaraItem->RoomNumber);
 
 			short roomNumberLeft = LaraItem->RoomNumber;
 			GetFloor(pos.x, pos.y, pos.z, &roomNumberLeft);
@@ -599,8 +601,8 @@ namespace TEN::Entities::Creatures::TR5
 
 			short flipNumber = g_Level.Rooms[item.RoomNumber].flipNumber;
 
-			if (TestEnvironment(ENV_FLAG_WATER, footProbeLeft.RoomNumber) ||
-				TestEnvironment(ENV_FLAG_WATER, footProbeRight.RoomNumber))
+			if (TestEnvironment(ENV_FLAG_WATER, footProbeLeft.GetRoomNumber()) ||
+				TestEnvironment(ENV_FLAG_WATER, footProbeRight.GetRoomNumber()))
 			{
 				if (roomLeft->flipNumber == flipNumber || roomRight->flipNumber == flipNumber)
 				{

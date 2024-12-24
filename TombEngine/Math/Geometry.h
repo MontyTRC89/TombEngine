@@ -8,6 +8,7 @@ class Vector3i;
 namespace TEN::Math::Geometry
 {
 	// Integer-based point translation
+
 	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, float forward, float down = 0.0f, float right = 0.0f, const Vector3& axis = Vector3::UnitY);
 	Vector3i TranslatePoint(const Vector3i& point, short headingAngle, const Vector3i& relOffset, const Vector3& axis = Vector3::UnitY);
 	Vector3i TranslatePoint(const Vector3i& point, const EulerAngles& orient, const Vector3i& relOffset);
@@ -16,6 +17,7 @@ namespace TEN::Math::Geometry
 	Vector3i TranslatePoint(const Vector3i& point, const Vector3& dir, float dist);
 
 	// Float-based point translation
+
 	Vector3 TranslatePoint(const Vector3& point, short headingAngle, float forward, float down = 0.0f, float right = 0.0f, const Vector3& axis = Vector3::UnitY);
 	Vector3 TranslatePoint(const Vector3& point, short headingAngle, const Vector3& relOffset, const Vector3& axis = Vector3::UnitY);
 	Vector3 TranslatePoint(const Vector3& point, const EulerAngles& orient, const Vector3& relOffset);
@@ -24,15 +26,18 @@ namespace TEN::Math::Geometry
 	Vector3 TranslatePoint(const Vector3& point, const Vector3& dir, float dist);
 
 	// Rotation
+
 	Vector3 RotatePoint(const Vector3& point, const EulerAngles& rot);
 	Vector3 RotatePoint(const Vector3& point, const AxisAngle& rot);
 
 	// Angle getters
+
 	short GetShortestAngle(short fromAngle, short toAngle);
 	short GetSurfaceSlopeAngle(const Vector3& normal, const Vector3& axis = Vector3::UnitY);
 	short GetSurfaceAspectAngle(const Vector3& normal, const Vector3& axis = Vector3::UnitY);
 
 	// Misc. getters
+
 	float		GetDistanceToLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1);
 	Vector3		GetClosestPointOnLine(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1);
 	Vector3		GetClosestPointOnLinePerp(const Vector3& origin, const Vector3& linePoint0, const Vector3& linePoint1, const Vector3& axis = Vector3::UnitY);
@@ -43,10 +48,12 @@ namespace TEN::Math::Geometry
 	BoundingOrientedBox GetExpandedBoundingOrientedBox(const BoundingOrientedBox& box, const BoundingOrientedBox& expansionBox);
 
 	// Converters
+
 	Quaternion ConvertDirectionToQuat(const Vector3& dir);
 	Vector3	   ConvertQuatToDirection(const Quaternion& quat);
 
 	// Point relation inquirers
+
 	bool IsPointInFront(const Pose& pose, const Vector3& target);
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const EulerAngles& orient);
 	bool IsPointInFront(const Vector3& origin, const Vector3& target, const Vector3& refPoint);
@@ -56,4 +63,8 @@ namespace TEN::Math::Geometry
 	bool IsPointInBox(const Vector3& point, const BoundingBox& box);
 	bool IsPointInBox(const Vector3& point, const BoundingOrientedBox& box);
 	bool IsPointInSphere(const Vector3& point, const BoundingSphere& sphere);
+
+	// Intersection inquirers
+
+	bool CircleIntersects(const Vector3& circle0, const Vector3& circle1);
 }

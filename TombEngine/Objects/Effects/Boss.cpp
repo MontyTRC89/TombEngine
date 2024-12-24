@@ -21,7 +21,7 @@ namespace TEN::Effects::Boss
 			return;
 
 		int itemNumber = CreateItem();
-		if (itemNumber == NO_ITEM)
+		if (itemNumber == NO_VALUE)
 			return;
 
 		auto& shieldItem = g_Level.Items[itemNumber];
@@ -50,7 +50,7 @@ namespace TEN::Effects::Boss
 			return;
 
 		int itemNumber = CreateItem();
-		if (itemNumber == NO_ITEM)
+		if (itemNumber == NO_VALUE)
 			return;
 
 		auto& shockwaveItem = g_Level.Items[itemNumber];

@@ -49,10 +49,17 @@ enum class MaterialType
 
 enum class ClimbDirectionFlags
 {
-	North = (1 << 8),
-	East  = (1 << 9),
-	South = (1 << 10),
-	West  = (1 << 11)
+	North = 1 << 8,
+	East  = 1 << 9,
+	South = 1 << 10,
+	West  = 1 << 11
+};
+
+enum class BridgeUpdateType
+{
+	Normal,
+	Initialize,
+	Remove
 };
 
 // NOTE: Describes vertical room location.
@@ -74,10 +81,10 @@ public:
 
 struct SectorSurfaceTriangleData
 {
-	Plane		 Plane			   = {};
-	int			 PortalRoomNumber  = 0;
-	short		 IllegalSlopeAngle = 0;
-	MaterialType Material		   = MaterialType::Stone;
+	Plane		 Plane			  = {};
+	int			 PortalRoomNumber = 0;
+	short		 SteepSlopeAngle  = 0;
+	MaterialType Material		  = MaterialType::Stone;
 };
 
 struct SectorSurfaceData
@@ -135,24 +142,26 @@ struct SectorFlagData
 class FloorInfo
 {
 public:
-	// Components
-	int				  RoomNumber		   = 0;
-	int				  SidePortalRoomNumber = 0;
-	SectorSurfaceData FloorSurface		   = {};
-	SectorSurfaceData CeilingSurface	   = {};
-	std::set<int>	  BridgeItemNumbers	   = {};
-	SectorFlagData	  Flags				   = {};
+	// Members
+	Vector2i		  Position		 = Vector2i::Zero;
+	int				  RoomNumber	 = 0;
+	SectorSurfaceData FloorSurface	 = {};
+	SectorSurfaceData CeilingSurface = {};
+	SectorFlagData	  Flags			 = {};
 
-	int	 Box		  = 0;
-	int	 TriggerIndex = 0;
-	bool Stopper	  = true;
+	std::set<int> BridgeItemNumbers	   = {};
+	int			  SidePortalRoomNumber = 0;
+
+	int	 PathfindingBoxID = 0;
+	int	 TriggerIndex	  = 0;
+	bool Stopper		  = true;
 
 	// Getters
 	int								 GetSurfaceTriangleID(int x, int z, bool isFloor) const;
 	const SectorSurfaceTriangleData& GetSurfaceTriangle(int x, int z, bool isFloor) const;
 	Vector3							 GetSurfaceNormal(int triID, bool isFloor) const;
 	Vector3							 GetSurfaceNormal(int x, int z, bool isFloor) const;
-	short							 GetSurfaceIllegalSlopeAngle(int x, int z, bool isFloor) const;
+	short							 GetSurfaceSteepSlopeAngle(int x, int z, bool isFloor) const;
 	MaterialType					 GetSurfaceMaterial(int x, int z, bool isFloor) const;
 
 	std::optional<int> GetNextRoomNumber(int x, int z, bool isBelow) const;
@@ -184,7 +193,7 @@ namespace TEN::Collision::Floordata
 	Vector2i				GetSectorPoint(int x, int z);
 	Vector2i				GetRoomGridCoord(int roomNumber, int x, int z, bool clampToBounds = true);
 	std::vector<Vector2i>	GetNeighborRoomGridCoords(const Vector3i& pos, int roomNumber, unsigned int searchDepth);
-	std::vector<FloorInfo*> GetNeighborSectorPtrs(const Vector3i& pos, int roomNumber, unsigned int searchDepth);
+	std::vector<FloorInfo*> GetNeighborSectors(const Vector3i& pos, int roomNumber, unsigned int searchDepth);
 
 	FloorInfo& GetFloor(int roomNumber, const Vector2i& roomGridCoord);
 	FloorInfo& GetFloor(int roomNumber, int x, int z);
@@ -199,7 +208,7 @@ namespace TEN::Collision::Floordata
 
 	std::optional<int> GetBridgeItemIntersect(const ItemInfo& item, const Vector3i& pos, bool useBottomHeight);
 	int	 GetBridgeBorder(const ItemInfo& item, bool isBottom);
-	void UpdateBridgeItem(const ItemInfo& item, bool forceRemoval = false);
+	void UpdateBridgeItem(const ItemInfo& item, BridgeUpdateType updateType = BridgeUpdateType::Normal);
 
 	bool TestMaterial(MaterialType refMaterial, const std::vector<MaterialType>& materials);
 	

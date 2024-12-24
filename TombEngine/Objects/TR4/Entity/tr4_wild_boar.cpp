@@ -85,7 +85,7 @@ namespace TEN::Entities::TR4
 				for (auto& currentCreature : ActiveCreatures)
 				{
 					auto* currentItem = currentCreature;
-					if (currentItem->ItemNumber == NO_ITEM || currentItem->ItemNumber == itemNumber)
+					if (currentItem->ItemNumber == NO_VALUE || currentItem->ItemNumber == itemNumber)
 						continue;
 
 					auto* target = &g_Level.Items[currentItem->ItemNumber];

@@ -3,7 +3,6 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
-#include "Game/collision/sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
@@ -236,13 +235,31 @@ void InitializeAnimating(short itemNumber)
 
 void AnimatingControl(short itemNumber)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	auto& item = g_Level.Items[itemNumber];
 
-	if (!TriggerActive(item))
-		return;
+	if (TriggerActive(&item))
+	{
+		item.Status = ITEM_ACTIVE;
+		AnimateItem(&item);
 
-	item->Status = ITEM_ACTIVE;
-	AnimateItem(item);
+		if (item.TriggerFlags == 666) //OCB used for the helicopter animating in the Train level.
+		{
+			auto pos = GetJointPosition(item, 0);
+			SoundEffect(SFX_TR4_HELICOPTER_LOOP, (Pose*)&pos);
+
+			if (item.Animation.FrameNumber == GetAnimData(item).frameEnd)
+			{
+				item.Flags &= 0xC1;
+				RemoveActiveItem(itemNumber);
+				item.Status = ITEM_NOT_ACTIVE;
+			}
+		}
+	}
+	else if (item.TriggerFlags == 2) //Make the animating dissapear when anti-triggered.
+	{
+		RemoveActiveItem(itemNumber);
+		item.Status = ITEM_INVISIBLE;
+	}
 
 	// TODO: ID_SHOOT_SWITCH2 is probably the bell in Trajan Markets, use Lua for that.
 	/*if (item->frameNumber >= g_Level.Anims[item->animNumber].frameEnd)

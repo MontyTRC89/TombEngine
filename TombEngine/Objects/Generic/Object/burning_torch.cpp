@@ -14,6 +14,7 @@
 #include "Objects/Effects/flame_emitters.h"
 #include "Renderer/RendererEnums.h"
 #include "Sound/sound.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
@@ -70,7 +71,7 @@ namespace TEN::Entities::Generic
 		spark->size = Random::GenerateFloat(64, 150);
 		spark->dSize = spark->size / 8;
 
-		int spriteOffset = GameTimer % Objects[ID_FIRE_SPRITES].nmeshes;
+		int spriteOffset = GlobalCounter % Objects[ID_FIRE_SPRITES].nmeshes;
 		spark->spriteIndex = Objects[ID_FIRE_SPRITES].meshIndex + spriteOffset;
 	}
 
@@ -127,7 +128,6 @@ namespace TEN::Entities::Generic
 				lara->LeftArm.FrameNumber++;
 				if (lara->LeftArm.FrameNumber == 27)
 				{
-					lara->Torch.IsLit = false;
 					lara->Flare.ControlLeft = false;
 					lara->LeftArm.Locked = false;
 					lara->Torch.State = TorchState::Holding;
@@ -139,6 +139,7 @@ namespace TEN::Entities::Generic
 				{
 					laraItem->Model.MeshIndex[LM_LHAND] = laraItem->Model.BaseMesh + LM_LHAND;
 					CreateFlare(*laraItem, ID_BURNING_TORCH_ITEM, true);
+					lara->Torch.IsLit = false;
 				}
 			}
 		}
@@ -147,7 +148,6 @@ namespace TEN::Entities::Generic
 			lara->LeftArm.FrameNumber++;
 			if (lara->LeftArm.FrameNumber == 41)
 			{
-				lara->Torch.IsLit = false;
 				lara->Flare.ControlLeft = false;
 				lara->LeftArm.Locked = false;
 				lara->Torch.State = TorchState::Holding;
@@ -159,6 +159,7 @@ namespace TEN::Entities::Generic
 			{
 				laraItem->Model.MeshIndex[LM_LHAND] = laraItem->Model.BaseMesh + LM_LHAND;
 				CreateFlare(*laraItem, ID_BURNING_TORCH_ITEM, false);
+				lara->Torch.IsLit = false;
 			}
 		}
 		else if (lara->Torch.State == TorchState::JustLit)
@@ -231,14 +232,13 @@ namespace TEN::Entities::Generic
 			item->Pose.Orientation.z = 0;
 		}
 
-		auto velocity = Vector3i(
+		auto vel = Vector3i(
 			item->Animation.Velocity.z * phd_sin(item->Pose.Orientation.y),
 			item->Animation.Velocity.y,
-			item->Animation.Velocity.z * phd_cos(item->Pose.Orientation.y)
-		);
+			item->Animation.Velocity.z * phd_cos(item->Pose.Orientation.y));
 
 		auto prevPos = item->Pose.Position;
-		item->Pose.Position += Vector3i(velocity.x, 0, velocity.z);
+		item->Pose.Position += Vector3i(vel.x, 0, vel.z);
 
 		if (TestEnvironment(ENV_FLAG_WATER, item) ||
 			TestEnvironment(ENV_FLAG_SWAMP, item))
@@ -250,26 +250,31 @@ namespace TEN::Entities::Generic
 				item->ItemFlags[3] = 0;
 		}
 		else
-			item->Animation.Velocity.y += 6;
+		{
+			item->Animation.Velocity.y += g_GameFlow->GetSettings()->Physics.Gravity;
+		}
 
 		item->Pose.Position.y += item->Animation.Velocity.y;
-		DoProjectileDynamics(itemNumber, prevPos.x, prevPos.y, prevPos.z, velocity.x, velocity.y, velocity.z);
+		DoProjectileDynamics(itemNumber, prevPos.x, prevPos.y, prevPos.z, vel.x, vel.y, vel.z);
 
 		// Collide with entities.
-		if (GetCollidedObjects(item, 0, true, CollidedItems, CollidedMeshes, true))
+		auto collObjects = GetCollidedObjects(*item, true, true);
+		if (!collObjects.IsEmpty())
 		{
 			LaraCollision.Setup.EnableObjectPush = true;
-			if (CollidedItems[0])
+			if (!collObjects.Items.empty())
 			{
-				if (!Objects[CollidedItems[0]->ObjectNumber].intelligent &&
-					CollidedItems[0]->ObjectNumber != ID_LARA)
+				const auto& object = Objects[collObjects.Items.front()->ObjectNumber];
+
+				if (!object.intelligent &&
+					!collObjects.Items.front()->IsLara())
 				{
-					ObjectCollision(CollidedItems[0]->Index, item, &LaraCollision);
+					ObjectCollision(collObjects.Items.front()->Index, item, &LaraCollision);
 				}
 			}
-			else if (CollidedMeshes[0])
+			else if (!collObjects.Statics.empty())
 			{
-				ItemPushStatic(item, *CollidedMeshes[0], &LaraCollision);
+				ItemPushStatic(item, *collObjects.Statics.front(), &LaraCollision);
 			}
 			
 			item->Animation.Velocity.z = -int(item->Animation.Velocity.z / 1.5f);
@@ -291,12 +296,14 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	void LaraTorch(Vector3i* origin, Vector3i* target, int rot, int color)
+	void LaraTorch(Vector3i* origin, Vector3i* target)
 	{
 		auto pos1 = GameVector(*origin, LaraItem->RoomNumber);
 		auto pos2 = GameVector(*target);
 
-		TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 12, color, color, color >> 1);
+		const auto& color = g_GameFlow->GetSettings()->Camera.BinocularLightColor;
+
+		TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 12, color.GetR(), color.GetG(), color.GetB());
 
 		if (!LOS(&pos1, &pos2))
 		{
@@ -305,8 +312,14 @@ namespace TEN::Entities::Generic
 			if (l + 8 > 31)
 				l = 31;
 
-			if (color - l >= 0)
-				TriggerDynamicLight(pos2.x, pos2.y, pos2.z, l + 8, color - l, color - l, (color - l) * 2);
+			auto dir = pos1.ToVector3() - pos2.ToVector3();
+			dir.Normalize();
+			dir *= BLOCK(1);
+
+			byte r = std::max(0, color.GetR() - l);
+			byte g = std::max(0, color.GetG() - l);
+			byte b = std::max(0, color.GetB() - l);
+			TriggerDynamicLight(pos2.x + dir.x, pos2.y + dir.y, pos2.z + dir.z, l + 12, r, g, b);
 		}
 	}
 

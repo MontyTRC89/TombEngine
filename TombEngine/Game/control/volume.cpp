@@ -10,11 +10,7 @@
 #include "Game/room.h"
 #include "Game/savegame.h"
 #include "Game/Setup.h"
-#include "Renderer/Renderer.h"
-#include "Renderer/RendererEnums.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
-
-using TEN::Renderer::g_Renderer;
 
 namespace TEN::Control::Volumes
 {
@@ -30,7 +26,7 @@ namespace TEN::Control::Volumes
 		case VolumeType::Box:
 			if (roomNumber == Camera.pos.RoomNumber)
 			{
-				g_Renderer.AddDebugBox(volume.Box, 
+				DrawDebugBox(volume.Box, 
 					Vector4(color, 0.0f, color, 1.0f), RendererDebugPage::CollisionStats);
 			}
 			return volume.Box.Intersects(box);
@@ -38,7 +34,7 @@ namespace TEN::Control::Volumes
 		case VolumeType::Sphere:
 			if (roomNumber == Camera.pos.RoomNumber)
 			{
-				g_Renderer.AddDebugSphere(volume.Sphere.Center, volume.Sphere.Radius, 
+				DrawDebugSphere(volume.Sphere.Center, volume.Sphere.Radius, 
 					Vector4(color, 0.0f, color, 1.0f), RendererDebugPage::CollisionStats);
 			}
 			return volume.Sphere.Intersects(box);
@@ -49,7 +45,7 @@ namespace TEN::Control::Volumes
 		}
 	}
 
-	BoundingOrientedBox ConstructRoughBox(ItemInfo& item, const CollisionSetup& coll)
+	BoundingOrientedBox ConstructRoughBox(ItemInfo& item, const CollisionSetupData& coll)
 	{
 		auto pBounds = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 		auto pos = Vector3(item.Pose.Position.x, pBounds.Center.y, item.Pose.Position.z);
@@ -89,14 +85,16 @@ namespace TEN::Control::Volumes
 		return nullptr;
 	}
 
-	void HandleEvent(Event& event, Activator& activator)
+	bool HandleEvent(Event& event, Activator& activator)
 	{
-		if (event.Function.empty() || event.CallCounter == 0 || event.CallCounter < NO_CALL_COUNTER)
-			return;
+		if (!event.Enabled || event.CallCounter == 0 || event.Function.empty())
+			return false;
 
 		g_GameScript->ExecuteFunction(event.Function, activator, event.Data);
-		if (event.CallCounter != NO_CALL_COUNTER)
+		if (event.CallCounter != NO_VALUE)
 			event.CallCounter--;
+
+		return true;
 	}
 
 	bool HandleEvent(const std::string& name, EventType eventType, Activator activator)
@@ -126,29 +124,27 @@ namespace TEN::Control::Volumes
 		if (eventSet == nullptr)
 			return false;
 
-		auto& event = eventSet->Events[(int)eventType];
-		bool disabled = eventSet->Events[(int)eventType].CallCounter < NO_CALL_COUNTER;
-
-		// Flip the call counter to indicate that it is currently disabled.
-		if ((enabled && disabled) || (!enabled && !disabled))
-			eventSet->Events[(int)eventType].CallCounter += enabled ? EVENT_STATE_MASK : -EVENT_STATE_MASK;
+		eventSet->Events[(int)eventType].Enabled = enabled;
 
 		return true;
 	}
 
 	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, ActivatorFlags activatorFlag, Activator activator)
 	{
-		if (roomNumber == NO_ROOM)
+		if (g_GameFlow->CurrentFreezeMode != FreezeMode::None)
+			return;
+	
+		if (roomNumber == NO_VALUE)
 			return;
 
-		for (int currentRoomIndex : g_Level.Rooms[roomNumber].neighbors)
+		for (int currentRoomIndex : g_Level.Rooms[roomNumber].NeighborRoomNumbers)
 		{
 			auto& room = g_Level.Rooms[currentRoomIndex];
 
 			if (!room.Active())
 				continue;
 
-			for (auto& volume : room.triggerVolumes)
+			for (auto& volume : room.TriggerVolumes)
 			{
 				if (!volume.Enabled)
 					continue;
@@ -172,7 +168,7 @@ namespace TEN::Control::Volumes
 
 					if (candidate.Status == VolumeStateStatus::Leaving)
 					{
-						if ((GameTimer - candidate.Timestamp) > VOLUME_BUSY_TIMEOUT)
+						if ((SaveGame::Statistics.Level.TimeTaken - candidate.Timestamp) > VOLUME_BUSY_TIMEOUT)
 							candidate.Status = VolumeStateStatus::Outside;
 					}
 					else if (candidate.Status != VolumeStateStatus::Outside)
@@ -195,7 +191,7 @@ namespace TEN::Control::Volumes
 							{
 								VolumeStateStatus::Entering,
 								activator,
-								GameTimer
+								SaveGame::Statistics.Level.TimeTaken
 							});
 
 						HandleEvent(set.Events[(int)EventType::Enter], activator);
@@ -203,7 +199,7 @@ namespace TEN::Control::Volumes
 					else
 					{
 						entryPtr->Status = VolumeStateStatus::Inside;
-						entryPtr->Timestamp = GameTimer;
+						entryPtr->Timestamp = SaveGame::Statistics.Level.TimeTaken;
 
 						HandleEvent(set.Events[(int)EventType::Inside], activator);
 					}
@@ -213,10 +209,10 @@ namespace TEN::Control::Volumes
 					// Only fire leave event when a certain timeout has passed.
 					// This helps to filter out borderline cases when moving around volumes.
 
-					if ((GameTimer - entryPtr->Timestamp) > VOLUME_LEAVE_TIMEOUT)
+					if ((SaveGame::Statistics.Level.TimeTaken - entryPtr->Timestamp) > VOLUME_LEAVE_TIMEOUT)
 					{
 						entryPtr->Status = VolumeStateStatus::Leaving;
-						entryPtr->Timestamp = GameTimer;
+						entryPtr->Timestamp = SaveGame::Statistics.Level.TimeTaken;
 
 						HandleEvent(set.Events[(int)EventType::Leave], activator);
 					}
@@ -244,13 +240,13 @@ namespace TEN::Control::Volumes
 		TestVolumes(roomNumber, box, ActivatorFlags::Static, mesh);
 	}
 
-	void TestVolumes(short itemNumber, const CollisionSetup* coll)
+	void TestVolumes(short itemNumber, const CollisionSetupData* coll)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		auto box = (coll != nullptr) ?
 			ConstructRoughBox(item, *coll) : GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 
-		g_Renderer.AddDebugBox(box, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RendererDebugPage::CollisionStats);
+		DrawDebugBox(box, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RendererDebugPage::CollisionStats);
 
 		if (item.IsLara() || item.Index == Lara.Context.Vehicle)
 		{

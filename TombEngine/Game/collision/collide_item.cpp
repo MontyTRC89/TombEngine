@@ -4,7 +4,9 @@
 #include "Game/animation.h"
 #include "Game/control/los.h"
 #include "Game/collision/collide_room.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
+#include "Game/collision/Sphere.h"
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/simple_particle.h"
@@ -16,258 +18,211 @@
 #include "Game/room.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
-#include "Renderer/Renderer.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
 
+using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
-using namespace TEN::Renderer;
-
-GameBoundingBox GlobalCollisionBounds;
-ItemInfo* CollidedItems[MAX_COLLIDED_OBJECTS];
-MESH_INFO* CollidedMeshes[MAX_COLLIDED_OBJECTS];
 
 constexpr auto ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD = 6;
+constexpr auto COLLIDABLE_BOUNDS_THRESHOLD = 4;
 
-void GenericSphereBoxCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+// Globals
+
+GameBoundingBox GlobalCollisionBounds;
+
+void GenericSphereBoxCollision(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 {
-	auto* item = &g_Level.Items[itemNumber];
+	auto& item = g_Level.Items[itemNumber];
+	if (item.Status == ITEM_INVISIBLE)
+		return;
 
-	if (item->Status != ITEM_INVISIBLE)
+	if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
+		return;
+
+	HandleItemSphereCollision(item, *playerItem);
+	if (!item.TouchBits.TestAny())
+		return;
+
+	short prevYOrient = item.Pose.Orientation.y;
+	item.Pose.Orientation.y = 0;
+	auto spheres = item.GetSpheres();
+	item.Pose.Orientation.y = prevYOrient;
+
+	int harmBits = *(int*)&item.ItemFlags[0]; // NOTE: Value spread across ItemFlags[0] and ItemFlags[1].
+	
+	auto collidedBits = item.TouchBits;
+	if (item.ItemFlags[2] != 0)
+		collidedBits.Clear(0);
+
+	coll->Setup.EnableObjectPush = (item.ItemFlags[4] == 0);
+
+	// Handle push and damage.
+	for (int i = 0; i < spheres.size(); i++)
 	{
-		if (TestBoundsCollide(item, laraItem, coll->Setup.Radius))
+		if (collidedBits.Test(i))
 		{
-			int collidedBits = TestCollision(item, laraItem);
-			if (collidedBits)
+			const auto& sphere = spheres[i];
+
+			GlobalCollisionBounds.X1 = sphere.Center.x - sphere.Radius - item.Pose.Position.x;
+			GlobalCollisionBounds.X2 = sphere.Center.x + sphere.Radius - item.Pose.Position.x;
+			GlobalCollisionBounds.Y1 = sphere.Center.y - sphere.Radius - item.Pose.Position.y;
+			GlobalCollisionBounds.Y2 = sphere.Center.y + sphere.Radius - item.Pose.Position.y;
+			GlobalCollisionBounds.Z1 = sphere.Center.z - sphere.Radius - item.Pose.Position.z;
+			GlobalCollisionBounds.Z2 = sphere.Center.z + sphere.Radius - item.Pose.Position.z;
+
+			auto pos = playerItem->Pose.Position;
+			if (ItemPushItem(&item, playerItem, coll, harmBits & 1, 3) && (harmBits & 1))
 			{
-				short prevYOrient = item->Pose.Orientation.y;
+				DoDamage(playerItem, item.ItemFlags[3]);
 
-				item->Pose.Orientation.y = 0;
-				GetSpheres(item, CreatureSpheres, SPHERES_SPACE_WORLD, Matrix::Identity);
-				item->Pose.Orientation.y = prevYOrient;
-
-				int deadlyBits = *((int*)&item->ItemFlags[0]);
-				auto* sphere = &CreatureSpheres[0];
-
-				if (item->ItemFlags[2] != 0)
-					collidedBits &= ~1;
-				coll->Setup.EnableObjectPush = item->ItemFlags[4] == 0;
-
-				while (collidedBits)
+				auto deltaPos = pos - playerItem->Pose.Position;
+				if (deltaPos != Vector3i::Zero)
 				{
-					if (collidedBits & 1)
-					{
-						GlobalCollisionBounds.X1 = sphere->x - sphere->r - item->Pose.Position.x;
-						GlobalCollisionBounds.X2 = sphere->x + sphere->r - item->Pose.Position.x;
-						GlobalCollisionBounds.Y1 = sphere->y - sphere->r - item->Pose.Position.y;
-						GlobalCollisionBounds.Y2 = sphere->y + sphere->r - item->Pose.Position.y;
-						GlobalCollisionBounds.Z1 = sphere->z - sphere->r - item->Pose.Position.z;
-						GlobalCollisionBounds.Z2 = sphere->z + sphere->r - item->Pose.Position.z;
-
-						int x = laraItem->Pose.Position.x;
-						int y = laraItem->Pose.Position.y;
-						int z = laraItem->Pose.Position.z;
-
-						if (ItemPushItem(item, laraItem, coll, deadlyBits & 1, 3) && (deadlyBits & 1))
-						{
-							DoDamage(laraItem, item->ItemFlags[3]);
-
-							int dx = x - laraItem->Pose.Position.x;
-							int dy = y - laraItem->Pose.Position.y;
-							int dz = z - laraItem->Pose.Position.z;
-
-							if (dx || dy || dz)
-							{
-								if (TriggerActive(item))
-									TriggerLaraBlood();
-							}
-
-							if (!coll->Setup.EnableObjectPush)
-							{
-								laraItem->Pose.Position.x += dx;
-								laraItem->Pose.Position.y += dy;
-								laraItem->Pose.Position.z += dz;
-							}
-						}
-					}
-
-					collidedBits >>= 1;
-					deadlyBits >>= 1;
-					sphere++;
+					if (TriggerActive(&item))
+						TriggerLaraBlood();
 				}
+
+				if (!coll->Setup.EnableObjectPush)
+					playerItem->Pose.Position += deltaPos;
 			}
 		}
+
+		harmBits >>= 1;
 	}
 }
 
-bool GetCollidedObjects(ItemInfo* collidingItem, int radius, bool onlyVisible, ItemInfo** collidedItems, MESH_INFO** collidedMeshes, bool ignoreLara)
+CollidedObjectData GetCollidedObjects(ItemInfo& collidingItem, bool onlyVisible, bool ignorePlayer, float customRadius, ObjectCollectionMode mode)
 {
-	short numItems = 0;
-	short numMeshes = 0;
+	constexpr auto ROUGH_BOX_HEIGHT_MIN = BLOCK(1 / 8.0f);
 
-	// Collect all the rooms where to check
-	for (auto i : g_Level.Rooms[collidingItem->RoomNumber].neighbors)
+	auto collObjects = CollidedObjectData{};
+
+	int itemCount	= 0;
+	int staticCount = 0;
+
+	// Establish parameters of colliding item.
+	const auto& collidingBounds = GetBestFrame(collidingItem).BoundingBox;
+
+	// Quickly discard collision if colliding item bounds are below tolerance threshold.
+	if (!customRadius && collidingBounds.GetExtents().Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
+		return collObjects;
+
+	// Convert bounding box to DX bounds.
+	auto convertedBounds = collidingBounds.ToBoundingOrientedBox(collidingItem.Pose);
+
+	// Create conservative AABB for rough tests.
+	auto collidingAabb = collidingBounds.ToConservativeBoundingBox(collidingItem.Pose);
+
+	// Override extents if specified.
+	if (customRadius > 0.0f)
 	{
-		if (!g_Level.Rooms[i].Active())
+		collidingAabb = BoundingBox(collidingItem.Pose.Position.ToVector3(), Vector3(customRadius));
+		convertedBounds.Extents = Vector3(customRadius);
+	}
+
+	// Run through neighboring rooms.
+	const auto& room = g_Level.Rooms[collidingItem.RoomNumber];
+	for (int roomNumber : room.NeighborRoomNumbers)
+	{
+		auto& neighborRoom = g_Level.Rooms[roomNumber];
+		if (!neighborRoom.Active())
 			continue;
 
-		auto* room = &g_Level.Rooms[i];
-
-		if (collidedMeshes)
+		// Collect items.
+		if (mode == ObjectCollectionMode::All ||
+			mode == ObjectCollectionMode::Items)
 		{
-			for (int j = 0; j < room->mesh.size(); j++)
-			{
-				auto* mesh = &room->mesh[j];
-				const auto& bBox = GetBoundsAccurate(*mesh, false);
-
-				if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
-					continue;
-
-				if ((collidingItem->Pose.Position.y + radius + CLICK(0.5f)) < (mesh->pos.Position.y + bBox.Y1))
-					continue;
-
-				if (collidingItem->Pose.Position.y > (mesh->pos.Position.y + bBox.Y2))
-					continue;
-
-				float sinY = phd_sin(mesh->pos.Orientation.y);
-				float cosY = phd_cos(mesh->pos.Orientation.y);
-
-				float rx = ((collidingItem->Pose.Position.x - mesh->pos.Position.x) * cosY) - ((collidingItem->Pose.Position.z - mesh->pos.Position.z) * sinY);
-				float rz = ((collidingItem->Pose.Position.z - mesh->pos.Position.z) * cosY) + ((collidingItem->Pose.Position.x - mesh->pos.Position.x) * sinY);
-
-				if ((radius + rx + CLICK(0.5f) < bBox.X1) || (rx - radius - CLICK(0.5f) > bBox.X2))
-					continue;
-
-				if ((radius + rz + CLICK(0.5f) < bBox.Z1) || (rz - radius - CLICK(0.5f) > bBox.Z2))
-					continue;
-
-				collidedMeshes[numMeshes++] = mesh;
-
-				if (!radius)
-				{
-					collidedItems[0] = nullptr;
-					return true;
-				}
-			}
-
-			collidedMeshes[numMeshes] = nullptr;
-		}
-
-		if (collidedItems)
-		{
-			int itemNumber = room->itemNumber;
-			if (itemNumber != NO_ITEM)
+			int itemNumber = neighborRoom.itemNumber;
+			if (itemNumber != NO_VALUE)
 			{
 				do
 				{
-					auto* item = &g_Level.Items[itemNumber];
+					auto& item = g_Level.Items[itemNumber];
+					const auto& object = Objects[item.ObjectNumber];
 
-					if (item == collidingItem ||
-						(ignoreLara && item->ObjectNumber == ID_LARA) ||
-						(onlyVisible && item->Status == ITEM_INVISIBLE) ||
-						item->Flags & IFLAG_KILLED ||
-						item->MeshBits == NO_JOINT_BITS ||
-						(Objects[item->ObjectNumber].drawRoutine == nullptr && item->ObjectNumber != ID_LARA) ||
-						(Objects[item->ObjectNumber].collision == nullptr && item->ObjectNumber != ID_LARA))
-					{
-						itemNumber = item->NextItem;
+					itemNumber = item.NextItem;
+
+					// Ignore player (if applicable).
+					if (ignorePlayer && item.IsLara())
 						continue;
-					}
 
-					// TODO: This is awful and we need a better system.
-					if (item->ObjectNumber == ID_UPV && item->HitPoints == 1)
-					{
-						itemNumber = item->NextItem;
+					// Ignore invisible item (if applicable).
+					if (onlyVisible && item.Status == ITEM_INVISIBLE)
 						continue;
-					}
-					if (item->ObjectNumber == ID_BIGGUN && item->HitPoints == 1)
-					{
-						itemNumber = item->NextItem;
+
+					// Ignore items not feasible for collision.
+					if (item.Index == collidingItem.Index || item.Flags & IFLAG_KILLED || item.MeshBits == NO_JOINT_BITS)
 						continue;
-					}
 
-					int dx = collidingItem->Pose.Position.x - item->Pose.Position.x;
-					int dy = collidingItem->Pose.Position.y - item->Pose.Position.y;
-					int dz = collidingItem->Pose.Position.z - item->Pose.Position.z;
+					// Ignore non-collidable non-player.
+					if (!item.IsLara() && (!item.Collidable || object.drawRoutine == nullptr || object.collision == nullptr))
+						continue;
 
-					auto bounds = GetBestFrame(*item).BoundingBox;
+					// HACK: Ignore UPV and big gun.
+					if ((item.ObjectNumber == ID_UPV || item.ObjectNumber == ID_BIGGUN) && item.HitPoints == 1)
+						continue;
 
-					if (dx >= -BLOCK(2) && dx <= BLOCK(2) &&
-						dy >= -BLOCK(2) && dy <= BLOCK(2) &&
-						dz >= -BLOCK(2) && dz <= BLOCK(2) &&
-						(collidingItem->Pose.Position.y + radius + CLICK(0.5f)) >= (item->Pose.Position.y + bounds.Y1) &&
-						(collidingItem->Pose.Position.y - radius - CLICK(0.5f)) <= (item->Pose.Position.y + bounds.Y2))
-					{
-						float sinY = phd_sin(item->Pose.Orientation.y);
-						float cosY = phd_cos(item->Pose.Orientation.y);
+					// Test rough distance to discard objects more than 6 blocks away.
+					float dist = Vector3i::Distance(item.Pose.Position, collidingItem.Pose.Position);
+					if (dist > COLLISION_CHECK_DISTANCE)
+						continue;
 
-						int rx = (dx * cosY) - (dz * sinY);
-						int rz = (dz * cosY) + (dx * sinY);
+					// If item bounding box extents is below tolerance threshold, discard object.
+					const auto& bounds = GetBestFrame(item).BoundingBox;
+					if (bounds.GetExtents().Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
+						continue;
 
-						// TODO: Modify asset to avoid hardcoded bounds change. -- Sezz 2023.04.30
-						if (item->ObjectNumber == ID_TURN_SWITCH)
-						{
-							bounds.X1 = -CLICK(1);
-							bounds.X2 = CLICK(1);
-							bounds.Z1 = -CLICK(1);
-							bounds.Z1 = CLICK(1);
-						}
+					// Test conservative AABB intersection.
+					auto aabb = bounds.ToConservativeBoundingBox(item.Pose);
+					if (!aabb.Intersects(collidingAabb))
+						continue;
 
-						if ((radius + rx + CLICK(0.5f)) >= bounds.X1 &&
-							(rx - radius - CLICK(0.5f)) <= bounds.X2)
-						{
-							if ((radius + rz + CLICK(0.5f)) >= bounds.Z1 &&
-								(rz - radius - CLICK(0.5f)) <= bounds.Z2)
-							{
-								collidedItems[numItems++] = item;
-							}
-						}
-						else
-						{
-							if ((collidingItem->Pose.Position.y + radius + CLICK(0.5f)) >= (item->Pose.Position.y + bounds.Y1) &&
-								(collidingItem->Pose.Position.y - radius - CLICK(0.5f)) <= (item->Pose.Position.y + bounds.Y2))
-							{
-								float sinY = phd_sin(item->Pose.Orientation.y);
-								float cosY = phd_cos(item->Pose.Orientation.y);
-
-								int rx = (dx * cosY) - (dz * sinY);
-								int rz = (dz * cosY) + (dx * sinY);
-
-								// TODO: Modify asset to avoid hardcoded bounds change. -- Sezz 2023.04.30
-								if (item->ObjectNumber == ID_TURN_SWITCH)
-								{
-									bounds.X1 = -CLICK(1);
-									bounds.X2 = CLICK(1);
-									bounds.Z1 = -CLICK(1);
-									bounds.Z1 = CLICK(1);
-								}
-
-								if ((radius + rx + CLICK(0.5f)) >= bounds.X1 &&
-									(rx - radius - CLICK(0.5f)) <= bounds.X2)
-								{
-									if ((radius + rz + CLICK(0.5f)) >= bounds.Z1 &&
-										(rz - radius - CLICK(0.5f)) <= bounds.Z2)
-									{
-										collidedItems[numItems++] = item;
-
-										if (!radius)
-											return true;
-									}
-								}
-							}
-						}
-					}
-
-					itemNumber = item->NextItem;
+					// Test accurate OBB intersection.
+					auto obb = bounds.ToBoundingOrientedBox(item.Pose);
+					if (obb.Intersects(convertedBounds))
+						collObjects.Items.push_back(&item);
 				}
-				while (itemNumber != NO_ITEM);
+				while (itemNumber != NO_VALUE);
 			}
+		}
 
-			collidedItems[numItems] = nullptr;
+		// Collect statics.
+		if (mode == ObjectCollectionMode::All ||
+			mode == ObjectCollectionMode::Statics)
+		{
+			for (auto& staticObj : neighborRoom.mesh)
+			{
+				// Discard invisible statics.
+				if (!(staticObj.flags & StaticMeshFlags::SM_VISIBLE))
+					continue;
+
+				// Test rough distance to discard statics beyond collision check threshold.
+				float dist = Vector3i::Distance(staticObj.pos.Position, collidingItem.Pose.Position);
+				if (dist > COLLISION_CHECK_DISTANCE)
+					continue;
+
+				// Skip if either bounding box has any zero extent (not a collidable volume).
+				const auto& bounds = GetBoundsAccurate(staticObj, false);
+				if (bounds.GetExtents().Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
+					continue;
+
+				// Test conservative AABB intersection.
+				auto aabb = bounds.ToConservativeBoundingBox(staticObj.pos);
+				if (!aabb.Intersects(collidingAabb))
+					continue;
+
+				// Test accurate OBB intersection.
+				auto obb = bounds.ToBoundingOrientedBox(staticObj.pos.Position);
+				if (obb.Intersects(convertedBounds))
+					collObjects.Statics.push_back(&staticObj);
+			}
 		}
 	}
 
-	return (numItems || numMeshes);
+	return collObjects;
 }
 
 bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, CollisionInfo* coll)
@@ -302,7 +257,8 @@ bool TestWithGlobalCollisionBounds(ItemInfo* item, ItemInfo* laraItem, Collision
 
 void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 {
-	int height = GameBoundingBox(item).GetHeight();
+	auto bbox = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);
+	auto height = (bbox.Center - bbox.Extents).y - CLICK(1);
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -311,20 +267,21 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 
 		auto origin = Vector3(
 			item->Pose.Position.x + (sinHeading * (coll->Setup.Radius)),
-			item->Pose.Position.y - (height + CLICK(1)),
+			height,
 			item->Pose.Position.z + (cosHeading * (coll->Setup.Radius)));
+
 		auto mxR = Matrix::CreateFromYawPitchRoll(TO_RAD(coll->Setup.ForwardAngle), 0.0f, 0.0f);
 		auto direction = (Matrix::CreateTranslation(Vector3::UnitZ) * mxR).Translation();
 
-		// g_Renderer.AddDebugSphere(origin, 16, Vector4::One, RendererDebugPage::CollisionStats);
+		// DrawDebugSphere(origin, 16, Vector4::One, RendererDebugPage::CollisionStats);
 
-		for (auto i : g_Level.Rooms[item->RoomNumber].neighbors)
+		for (auto i : g_Level.Rooms[item->RoomNumber].NeighborRoomNumbers)
 		{
 			if (!g_Level.Rooms[i].Active())
 				continue;
 
 			int itemNumber = g_Level.Rooms[i].itemNumber;
-			while (itemNumber != NO_ITEM)
+			while (itemNumber != NO_VALUE)
 			{
 				auto* item2 = &g_Level.Items[itemNumber];
 				auto* object = &Objects[item2->ObjectNumber];
@@ -374,6 +331,8 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 // Deprecated.
 bool TestLaraPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, ItemInfo* laraItem)
 {
+	DrawDebugBox(bounds.BoundingBox.ToBoundingOrientedBox(item->Pose), Color(1.0f, 0.0f, 0.0f), RendererDebugPage::CollisionStats);
+
 	auto deltaOrient = laraItem->Pose.Orientation - item->Pose.Orientation;
 	if (deltaOrient.x < bounds.OrientConstraint.first.x || deltaOrient.x > bounds.OrientConstraint.second.x ||
 		deltaOrient.y < bounds.OrientConstraint.first.y || deltaOrient.y > bounds.OrientConstraint.second.y ||
@@ -411,7 +370,7 @@ bool AlignLaraPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraIte
 	auto pos = Vector3::Transform(offset.ToVector3(), rotMatrix);
 	auto target = item->Pose.Position.ToVector3() + pos;
 
-	int height = GetCollision(target.x, target.y, target.z, laraItem->RoomNumber).Position.Floor;
+	int height = GetPointCollision(target, laraItem->RoomNumber).GetFloorHeight();
 	if ((laraItem->Pose.Position.y - height) <= CLICK(2))
 	{
 		laraItem->Pose.Position = Vector3i(target);
@@ -442,7 +401,7 @@ bool MoveLaraPosition(const Vector3i& offset, ItemInfo* item, ItemInfo* laraItem
 
 	if (object.isPickup)
 	{
-		auto pointColl = GetCollision(target.Position.x, target.Position.y, target.Position.z, laraItem->RoomNumber);
+		auto pointColl = GetPointCollision(Vector31(target.Position), laraItem->RoomNumber);
 
 		// Prevent picking up items which can result in "flare pickup bug".
 		if (abs(pointColl.Position.Floor - laraItem->Pose.Position.y) <= STEPUP_HEIGHT)
@@ -614,6 +573,9 @@ bool TestBoundsCollide(ItemInfo* item, ItemInfo* laraItem, int radius)
 	const auto& bounds = GetBestFrame(*item).BoundingBox;
 	const auto& playerBounds = GetBestFrame(*laraItem).BoundingBox;
 
+	if (bounds.GetExtents() == Vector3::Zero || playerBounds.GetExtents() == Vector3::Zero)
+		return false;
+
 	if ((item->Pose.Position.y + bounds.Y2) <= (laraItem->Pose.Position.y + playerBounds.Y1))
 		return false;
 
@@ -744,7 +706,7 @@ bool ItemPushItem(ItemInfo* item0, ItemInfo* item1, CollisionInfo* coll, bool en
 		item1->Pose.Position.Lerp(item0->Pose.Position + newDeltaPos, SOFT_PUSH_LERP_ALPHA);
 	}
 	// Snap to new position.
-	else
+	else if (coll->Setup.EnableObjectPush)
 	{
 		item1->Pose.Position = item0->Pose.Position + newDeltaPos;
 	}
@@ -927,22 +889,19 @@ void ItemPushBridge(ItemInfo& item, CollisionInfo& coll)
 	ShiftItem(&item, &coll);
 }
 
-void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResult& collResult)
+void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, PointCollisionData& pointColl)
 {
-	// Store an offset for a bridge item into shifts, if exists.
-	if (coll.LastBridgeItemNumber == collResult.Position.Bridge && coll.LastBridgeItemNumber != NO_ITEM)
+	// Store offset for bridge item into shifts if it exists.
+	if (coll.LastBridgeItemNumber == pointColl.GetFloorBridgeItemNumber() && coll.LastBridgeItemNumber != NO_VALUE)
 	{
-		auto& bridgeItem = g_Level.Items[collResult.Position.Bridge];
+		auto& bridgeItem = g_Level.Items[pointColl.GetFloorBridgeItemNumber()];
 
 		auto deltaPos = bridgeItem.Pose.Position - coll.LastBridgeItemPose.Position;
 		auto deltaOrient = bridgeItem.Pose.Orientation - coll.LastBridgeItemPose.Orientation;
 		auto deltaPose = Pose(deltaPos, deltaOrient);
 
-		int absDeltaHeight = item.Pose.Position.y - collResult.Position.Floor;
-		int relDeltaHeight = absDeltaHeight + GameBoundingBox(&item).Y2;
-
-		if (deltaPose != Pose::Zero && 
-			(abs(absDeltaHeight) <= CLICK(1 / 8.0f) || abs(relDeltaHeight) <= CLICK(1 / 8.0f)))
+		// Item is grounded and bridge position changed; set shift.
+		if (deltaPose != Pose::Zero && !item.Animation.IsAirborne)
 		{
 			const auto& bridgePos = bridgeItem.Pose.Position;
 
@@ -952,15 +911,19 @@ void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResu
 			auto offset = bridgePos.ToVector3() + Vector3::Transform(relOffset, rotMatrix);
 
 			deltaPose.Position -= item.Pose.Position - Vector3i(offset);
-		   
-			// Don't update shifts if difference is too big (possibly bridge was teleported or just entered bridge).
-			if (deltaPose.Position.ToVector3().Length() <= coll.Setup.Radius * 2)
+
+			// Don't update shifts if difference is too big (bridge was possibly teleported or just entered).
+			if (Vector2(deltaPose.Position.x, deltaPose.Position.z).Length() <= (coll.Setup.Radius * 2))
+			{
+				deltaPose.Orientation = EulerAngles(0, deltaPose.Orientation.y, 0);
 				coll.Shift = deltaPose;
+			}
 		}
-		else if (deltaPos.ToVector3().Length() <= coll.Setup.Radius && relDeltaHeight > 0 &&
-				(deltaPos != Vector3i::Zero || deltaOrient != EulerAngles::Identity))
+		// Push item.
+		else if (TestBoundsCollide(&bridgeItem, &item, coll.Setup.Radius) &&
+			Vector2(deltaPose.Position.x, deltaPose.Position.z).Length() <= coll.Setup.Radius &&
+			(deltaPos != Vector3i::Zero || deltaOrient != EulerAngles::Identity))
 		{
-			// Push item away if not directly above bridge, and bridge position was changed.
 			ItemPushItem(&bridgeItem, &item);
 		}
 
@@ -969,25 +932,30 @@ void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, const CollisionResu
 	else
 	{
 		coll.LastBridgeItemPose = Pose::Zero;
-		coll.LastBridgeItemNumber = NO_ITEM;
+		coll.LastBridgeItemNumber = NO_VALUE;
 	}
 
-	coll.LastBridgeItemNumber = collResult.Position.Bridge;
+	coll.LastBridgeItemNumber = pointColl.GetFloorBridgeItemNumber();
 }
 
 void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 {
+	coll->HitStatic = false;
 	coll->HitTallObject = false;
 
-	for (auto i : g_Level.Rooms[item->RoomNumber].neighbors)
+	for (auto i : g_Level.Rooms[item->RoomNumber].NeighborRoomNumbers)
 	{
 		if (!g_Level.Rooms[i].Active())
 			continue;
 
 		for (auto& mesh : g_Level.Rooms[i].mesh)
 		{
-			// Only process meshes which are visible and solid.
-			if (!(mesh.flags & StaticMeshFlags::SM_VISIBLE) || !(mesh.flags & StaticMeshFlags::SM_SOLID))
+			// Only process meshes which are visible.
+			if (!(mesh.flags & StaticMeshFlags::SM_VISIBLE))
+				continue;
+
+			// Only process meshes which are solid, or if solid mode is set by the setup.
+			if (!coll->Setup.ForceSolidStatics && !(mesh.flags & StaticMeshFlags::SM_SOLID))
 				continue;
 
 			float distance = Vector3i::Distance(item->Pose.Position, mesh.pos.Position);
@@ -1003,6 +971,10 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& pose, CollisionInfo* coll)
 {
 	bool result = false;
+
+	// Ignore processing null bounds.
+	if (box.GetExtents().Length() <= COLLIDABLE_BOUNDS_THRESHOLD)
+		return false;
 
 	// Get DX static bounds in global coordinates.
 	auto staticBounds = box.ToBoundingOrientedBox(pose);
@@ -1022,7 +994,7 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	itemBounds.Extents = itemBounds.Extents - Vector3(BLOCK(1));
 
 	// Draw static bounds.
-	g_Renderer.AddDebugBox(staticBounds, Vector4(1, 0.3f, 0, 1), RendererDebugPage::CollisionStats);
+	DrawDebugBox(staticBounds, Vector4(1, 0.3f, 0, 1), RendererDebugPage::CollisionStats);
 
 	// Calculate horizontal item collision bounds according to radius.
 	GameBoundingBox collBox;
@@ -1048,12 +1020,8 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 	auto collBounds = collBox.ToBoundingOrientedBox(Pose(item->Pose.Position));
 	bool intersects = staticBounds.Intersects(collBounds);
 
-	// Check if previous item horizontal position intersects bounds.
-	auto prevCollBounds = collBox.ToBoundingOrientedBox(Pose(coll->Setup.PrevPosition));
-	bool prevHorIntersects = staticBounds.Intersects(prevCollBounds);
-
 	// Draw item coll bounds.
-	g_Renderer.AddDebugBox(collBounds, intersects ? Vector4(1, 0, 0, 1) : Vector4(0, 1, 0, 1), RendererDebugPage::CollisionStats);
+	DrawDebugBox(collBounds, intersects ? Vector4(1, 0, 0, 1) : Vector4(0, 1, 0, 1), RendererDebugPage::CollisionStats);
 
 	// Decompose static bounds into top/bottom plane vertices.
 	Vector3 corners[8];
@@ -1110,7 +1078,7 @@ bool CollideSolidBounds(ItemInfo* item, const GameBoundingBox& box, const Pose& 
 		auto distanceToVerticalPlane = height / 2 - yPoint;
 
 		// Correct position according to top/bottom bounds, if collided and plane is nearby.
-		if (intersects && prevHorIntersects && minDistance < height)
+		if (intersects && minDistance < height)
 		{
 			if (bottom)
 			{
@@ -1314,39 +1282,42 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	auto prevPointProbe = GetCollision(x, y, z, item->RoomNumber);
-	auto pointProbe = GetCollision(item);
+	auto prevPointColl = GetPointCollision(Vector3i(x, y, z), item->RoomNumber);
+	auto pointColl = GetPointCollision(*item);
+
+	// TODO: Use floor normal directly.
+	auto floorTilt = GetSurfaceTilt(pointColl.GetFloorNormal(), true);
 
 	auto bounds = GameBoundingBox(item);
 	int radius = bounds.GetHeight();
 
 	item->Pose.Position.y += radius;
 
-	if (item->Pose.Position.y >= pointProbe.Position.Floor)
+	if (item->Pose.Position.y >= pointColl.GetFloorHeight())
 	{
 		int bs = 0;
 
-		if (pointProbe.Position.FloorSlope && prevPointProbe.Position.Floor < pointProbe.Position.Floor)
+		if (pointColl.IsSteepFloor() && prevPointColl.GetFloorHeight() < pointColl.GetFloorHeight())
 		{
 			int yAngle = (long)((unsigned short)item->Pose.Orientation.y);
 
-			if (pointProbe.FloorTilt.x < 0)
+			if (floorTilt.x < 0)
 			{
 				if (yAngle >= ANGLE(180.0f))
 					bs = 1;
 			}
-			else if (pointProbe.FloorTilt.x > 0)
+			else if (floorTilt.x > 0)
 			{
 				if (yAngle <= ANGLE(180.0f))
 					bs = 1;
 			}
 
-			if (pointProbe.FloorTilt.y < 0)
+			if (floorTilt.y < 0)
 			{
 				if (yAngle >= ANGLE(90.0f) && yAngle <= ANGLE(270.0f))
 					bs = 1;
 			}
-			else if (pointProbe.FloorTilt.y > 0)
+			else if (floorTilt.y > 0)
 			{
 				if (yAngle <= ANGLE(90.0f) || yAngle >= ANGLE(270.0f))
 					bs = 1;
@@ -1355,7 +1326,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 
 		// If last position of item was also below this floor height, we've hit a wall, else we've hit a floor.
 
-		if (y > (pointProbe.Position.Floor + 32) && bs == 0 &&
+		if (y > (pointColl.GetFloorHeight() + 32) && bs == 0 &&
 			(((x / BLOCK(1)) != (item->Pose.Position.x / BLOCK(1))) ||
 				((z / BLOCK(1)) != (item->Pose.Position.z / BLOCK(1)))))
 		{
@@ -1395,14 +1366,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			item->Pose.Position.z = z;
 		}
 		// Hit a steep slope?
-		else if (pointProbe.Position.FloorSlope)
+		else if (pointColl.IsSteepFloor())
 		{
 			// Need to know which direction the slope is.
 
 			item->Animation.Velocity.z -= (item->Animation.Velocity.z / 4);
 
 			// Hit angle = ANGLE(90.0f)
-			if (pointProbe.FloorTilt.x < 0 && ((abs(pointProbe.FloorTilt.x)) - (abs(pointProbe.FloorTilt.y)) >= 2))
+			if (floorTilt.x < 0 && ((abs(floorTilt.x)) - (abs(floorTilt.y)) >= 2))
 			{
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(180.0f))
 				{
@@ -1414,7 +1385,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z -= pointProbe.FloorTilt.x * 2;
+						item->Animation.Velocity.z -= floorTilt.x * 2;
 						if ((unsigned short)item->Pose.Orientation.y > ANGLE(90.0f) && (unsigned short)item->Pose.Orientation.y < ANGLE(270.0f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1436,7 +1407,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 			// Hit angle = ANGLE(270.0f)
-			else if (pointProbe.FloorTilt.x > 0 && ((abs(pointProbe.FloorTilt.x)) - (abs(pointProbe.FloorTilt.y)) >= 2))
+			else if (floorTilt.x > 0 && ((abs(floorTilt.x)) - (abs(floorTilt.y)) >= 2))
 			{
 				if (((unsigned short)item->Pose.Orientation.y) < ANGLE(180.0f))
 				{
@@ -1448,7 +1419,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z += pointProbe.FloorTilt.x * 2;
+						item->Animation.Velocity.z += floorTilt.x * 2;
 						if ((unsigned short)item->Pose.Orientation.y > ANGLE(270.0f) || (unsigned short)item->Pose.Orientation.y < ANGLE(90.0f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1470,7 +1441,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 			// Hit angle = 0
-			else if (pointProbe.FloorTilt.y < 0 && ((abs(pointProbe.FloorTilt.y)) - (abs(pointProbe.FloorTilt.x)) >= 2))
+			else if (floorTilt.y < 0 && ((abs(floorTilt.y)) - (abs(floorTilt.x)) >= 2))
 			{
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(90.0f) && ((unsigned short)item->Pose.Orientation.y) < ANGLE(270.0f))
 				{
@@ -1482,7 +1453,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z -= pointProbe.FloorTilt.y * 2;
+						item->Animation.Velocity.z -= floorTilt.y * 2;
 
 						if ((unsigned short)item->Pose.Orientation.y < ANGLE(180.0f))
 						{
@@ -1505,7 +1476,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 			// Hit angle = ANGLE(180.0f)
-			else if (pointProbe.FloorTilt.y > 0 && ((abs(pointProbe.FloorTilt.y)) - (abs(pointProbe.FloorTilt.x)) >= 2))
+			else if (floorTilt.y > 0 && ((abs(floorTilt.y)) - (abs(floorTilt.x)) >= 2))
 			{
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(270.0f) || ((unsigned short)item->Pose.Orientation.y) < ANGLE(90.0f))
 				{
@@ -1517,7 +1488,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z += pointProbe.FloorTilt.y * 2;
+						item->Animation.Velocity.z += floorTilt.y * 2;
 
 						if ((unsigned short)item->Pose.Orientation.y > ANGLE(180.0f))
 						{
@@ -1539,7 +1510,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 						item->Animation.Velocity.y = 0;
 				}
 			}
-			else if (pointProbe.FloorTilt.x < 0 && pointProbe.FloorTilt.y < 0)	// Hit angle = 0x2000
+			else if (floorTilt.x < 0 && floorTilt.y < 0)	// Hit angle = 0x2000
 			{
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(135.0f) && ((unsigned short)item->Pose.Orientation.y) < ANGLE(315.0f))
 				{
@@ -1551,7 +1522,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z += -pointProbe.FloorTilt.x + -pointProbe.FloorTilt.y;
+						item->Animation.Velocity.z += -floorTilt.x + -floorTilt.y;
 						if ((unsigned short)item->Pose.Orientation.y > ANGLE(45.0f) && (unsigned short)item->Pose.Orientation.y < ANGLE(225.0f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1573,7 +1544,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 			// Hit angle = ANGLE(135.0f)
-			else if (pointProbe.FloorTilt.x < 0 && pointProbe.FloorTilt.y > 0)
+			else if (floorTilt.x < 0 && floorTilt.y > 0)
 			{
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(225.0f) || ((unsigned short)item->Pose.Orientation.y) < ANGLE(45.0f))
 				{
@@ -1585,7 +1556,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z += (-pointProbe.FloorTilt.x) + pointProbe.FloorTilt.y;
+						item->Animation.Velocity.z += (-floorTilt.x) + floorTilt.y;
 						if ((unsigned short)item->Pose.Orientation.y < ANGLE(315.0f) && (unsigned short)item->Pose.Orientation.y > ANGLE(135.0f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1607,7 +1578,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 			// Hit angle = ANGLE(225.5f)
-			else if (pointProbe.FloorTilt.x > 0 && pointProbe.FloorTilt.y > 0)
+			else if (floorTilt.x > 0 && floorTilt.y > 0)
 			{
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(315.0f) || ((unsigned short)item->Pose.Orientation.y) < ANGLE(135.0f))
 				{
@@ -1619,7 +1590,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z += pointProbe.FloorTilt.x + pointProbe.FloorTilt.y;
+						item->Animation.Velocity.z += floorTilt.x + floorTilt.y;
 						if ((unsigned short)item->Pose.Orientation.y < ANGLE(45.0f) || (unsigned short)item->Pose.Orientation.y > ANGLE(225.5f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1641,7 +1612,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 			// Hit angle = ANGLE(315.0f)
-			else if (pointProbe.FloorTilt.x > 0 && pointProbe.FloorTilt.y < 0)
+			else if (floorTilt.x > 0 && floorTilt.y < 0)
 			{
 				if (((unsigned short)item->Pose.Orientation.y) > ANGLE(45.0f) && ((unsigned short)item->Pose.Orientation.y) < ANGLE(225.5f))
 				{
@@ -1653,7 +1624,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				{
 					if (item->Animation.Velocity.z < 32)
 					{
-						item->Animation.Velocity.z += pointProbe.FloorTilt.x + (-pointProbe.FloorTilt.y);
+						item->Animation.Velocity.z += floorTilt.x + (-floorTilt.y);
 						if ((unsigned short)item->Pose.Orientation.y < ANGLE(135.0f) || (unsigned short)item->Pose.Orientation.y > ANGLE(315.0f))
 						{
 							item->Pose.Orientation.y -= ANGLE(22.5f);
@@ -1714,7 +1685,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 				}
 			}
 
-			item->Pose.Position.y = pointProbe.Position.Floor;
+			item->Pose.Position.y = pointColl.GetFloorHeight();
 		}
 	}
 	// Check for on top of object.
@@ -1722,8 +1693,8 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 	{
 		if (yv >= 0)
 		{
-			prevPointProbe = GetCollision(item->Pose.Position.x, y, item->Pose.Position.z, item->RoomNumber);
-			pointProbe = GetCollision(item);
+			prevPointColl = GetPointCollision(Vector3i(item->Pose.Position.x, y, item->Pose.Position.z), item->RoomNumber);
+			pointColl = GetPointCollision(*item);
 
 			// Bounce off floor.
 
@@ -1731,7 +1702,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 			// was always set to 0 by GetHeight() function which was called before the check.
 			// Possibly a mistake or unfinished feature by Core? -- Lwmte, 27.08.21
 
-			if (item->Pose.Position.y >= prevPointProbe.Position.Floor)
+			if (item->Pose.Position.y >= prevPointColl.GetFloorHeight())
 			{
 				// Hit the floor; bounce and slow down.
 				if (item->Animation.Velocity.y > 0)
@@ -1765,17 +1736,17 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					}
 				}
 
-				item->Pose.Position.y = prevPointProbe.Position.Floor;
+				item->Pose.Position.y = prevPointColl.GetFloorHeight();
 			}
 		}
 		// else
 		{
 			// Bounce off ceiling.
-			pointProbe = GetCollision(item);
+			pointColl = GetPointCollision(*item);
 
-			if (item->Pose.Position.y < pointProbe.Position.Ceiling)
+			if (item->Pose.Position.y < pointColl.GetCeilingHeight())
 			{
-				if (y < pointProbe.Position.Ceiling &&
+				if (y < pointColl.GetCeilingHeight() &&
 					(((x / BLOCK(1)) != (item->Pose.Position.x / BLOCK(1))) ||
 						((z / BLOCK(1)) != (item->Pose.Position.z / BLOCK(1)))))
 				{
@@ -1804,7 +1775,7 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 					item->Pose.Position.z = z;
 				}
 				else
-					item->Pose.Position.y = pointProbe.Position.Ceiling;
+					item->Pose.Position.y = pointColl.GetCeilingHeight();
 
 				if (item->Animation.Velocity.y < 0)
 					item->Animation.Velocity.y = -item->Animation.Velocity.y;
@@ -1812,14 +1783,14 @@ void DoProjectileDynamics(short itemNumber, int x, int y, int z, int xv, int yv,
 		}
 	}
 
-	pointProbe = GetCollision(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber);
+	pointColl = GetPointCollision(*item);
 
-	if (pointProbe.RoomNumber != item->RoomNumber)
+	if (pointColl.GetRoomNumber() != item->RoomNumber)
 	{
-		if (item->ObjectNumber == ID_GRENADE && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, pointProbe.RoomNumber))
+		if (item->ObjectNumber == ID_GRENADE && TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, pointColl.GetRoomNumber()))
 			Splash(item);
 
-		ItemNewRoom(itemNumber, pointProbe.RoomNumber);
+		ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 	}
 
 	item->Pose.Position.y -= radius;
@@ -1835,7 +1806,7 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 
 	if (isPlayer)
 	{
-		GetLaraInfo(*item).HitDirection = -1;
+		GetLaraInfo(*item).HitDirection = NO_VALUE;
 
 		if (item->HitPoints <= 0)
 			return;
@@ -1845,14 +1816,14 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 		return;
 
 	const auto& room = g_Level.Rooms[item->RoomNumber];
-	for (int neighborRoomNumber : room.neighbors)
+	for (int neighborRoomNumber : room.NeighborRoomNumbers)
 	{
 		auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
 		if (!neighborRoom.Active())
 			continue;
 
 		int nextItemNumber = neighborRoom.itemNumber;
-		while (nextItemNumber != NO_ITEM)
+		while (nextItemNumber != NO_VALUE)
 		{
 			auto& linkItem = g_Level.Items[nextItemNumber];
 			int itemNumber = nextItemNumber;
@@ -1950,7 +1921,7 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 			// HACK: Shatter statics only by harmful vehicles.
 			if (!isPlayer && 
 				!isHarmless && abs(item->Animation.Velocity.z) > VEHICLE_COLLISION_TERMINAL_VELOCITY &&
-				StaticObjects[staticObject.staticNumber].shatterType != ShatterType::None)
+				Statics[staticObject.staticNumber].shatterType != ShatterType::None)
 			{
 				SoundEffect(GetShatterSound(staticObject.staticNumber), &staticObject.pos);
 				ShatterObject(nullptr, &staticObject, -128, item->RoomNumber, 0);
@@ -1994,7 +1965,7 @@ void ObjectCollision(const short itemNumber, ItemInfo* laraItem, CollisionInfo* 
 
 	if (TestBoundsCollide(item, laraItem, coll->Setup.Radius))
 	{
-		if (TestCollision(item, laraItem))
+		if (HandleItemSphereCollision(*item, *laraItem))
 		{
 			if (coll->Setup.EnableObjectPush)
 				ItemPushItem(item, laraItem, coll, false, 1);
@@ -2009,7 +1980,7 @@ void CreatureCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll
 	if (!TestBoundsCollide(item, laraItem, coll->Setup.Radius))
 		return;
 
-	if (!TestCollision(item, laraItem))
+	if (!HandleItemSphereCollision(*item, *laraItem))
 		return;
 
 	bool doPlayerCollision = laraItem->IsLara();
@@ -2044,7 +2015,7 @@ void TrapCollision(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 			return;
 
-		TestCollision(&item, playerItem);
+		HandleItemSphereCollision(item, *playerItem);
 	}
 	else if (item.Status != ITEM_INVISIBLE)
 	{

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Math/Math.h"
 
 using namespace TEN::Math;
@@ -32,6 +33,7 @@ namespace TEN::Collision::Interaction
 
 		// Deprecated constructors.
 		// TODO: Adopt BoundingOrientedBox to remove.
+
 		InteractionBasis(const Vector3i& posOffset, const EulerAngles& orientOffset, const GameBoundingBox& box, const OrientConstraintPair& orientConstraint);
 		InteractionBasis(const Vector3i& posOffset, const GameBoundingBox& box, const OrientConstraintPair& orientConstraint);
 		InteractionBasis(const EulerAngles& orientOffset, const GameBoundingBox& box, const OrientConstraintPair& orientConstraint);

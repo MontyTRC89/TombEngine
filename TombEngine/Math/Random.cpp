@@ -4,6 +4,7 @@
 #include <random>
 
 #include "Math/Constants.h"
+#include "Math/Objects/EulerAngles.h"
 
 namespace TEN::Math::Random
 {
@@ -49,7 +50,8 @@ namespace TEN::Math::Random
 			relPoint = Vector2(
 				GenerateFloat(-1.0f, 1.0f),
 				GenerateFloat(-1.0f, 1.0f));
-		} while (relPoint.LengthSquared() > 1.0f);
+		}
+		while (relPoint.LengthSquared() > 1.0f);
 
 		return (pos + (relPoint * radius));
 	}
@@ -100,7 +102,8 @@ namespace TEN::Math::Random
 				GenerateFloat(-1.0f, 1.0f),
 				GenerateFloat(-1.0f, 1.0f),
 				GenerateFloat(-1.0f, 1.0f));
-		} while (relPoint.LengthSquared() > 1.0f);
+		}
+		while (relPoint.LengthSquared() > 1.0f);
 
 		return (sphere.Center + (relPoint * sphere.Radius));
 	}
@@ -118,6 +121,28 @@ namespace TEN::Math::Random
 			sin(phi) * sin(theta),
 			cos(phi));
 		return (sphere.Center + (relPoint * sphere.Radius));
+	}
+
+	Vector3 GeneratePointInSpheroid(const Vector3& center, const EulerAngles& orient, const Vector3& semiMajorAxis)
+	{
+		// Use rejection sampling method.
+		auto relPoint = Vector3::Zero;
+		do
+		{
+			relPoint = Vector3(
+				Random::GenerateFloat(-semiMajorAxis.x, semiMajorAxis.x),
+				Random::GenerateFloat(-semiMajorAxis.y, semiMajorAxis.y),
+				Random::GenerateFloat(-semiMajorAxis.z, semiMajorAxis.z));
+		}
+		while ((SQUARE(relPoint.x) / SQUARE(semiMajorAxis.x) +
+				SQUARE(relPoint.y) / SQUARE(semiMajorAxis.y) +
+				SQUARE(relPoint.z) / SQUARE(semiMajorAxis.z)) > 1.0f);
+
+		// Rotate relative point.
+		auto rotMatrix = orient.ToRotationMatrix();
+		relPoint = Vector3::Transform(relPoint, rotMatrix);
+
+		return (center + relPoint);
 	}
 
 	bool TestProbability(float prob)

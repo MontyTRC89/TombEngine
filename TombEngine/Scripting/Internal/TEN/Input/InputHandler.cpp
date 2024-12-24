@@ -6,7 +6,7 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Input/ActionIDs.h"
-#include "Scripting/Internal/TEN/Vec2/Vec2.h"
+#include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 #include "Specific/Input/Input.h"
 
 using namespace TEN::Input;
@@ -87,6 +87,14 @@ namespace TEN::Scripting::Input
 		ActionQueue[actionID] = QueueState::Clear;
 	}
 
+	/// Clear all action keys.
+	// @function KeyClearAll
+	static void KeyClearAll()
+	{
+		for (auto& queue : ActionQueue)
+			queue = QueueState::Clear;
+	}
+
 	/// Get the display position of the cursor in percent.
 	// @function GetMouseDisplayPosition()
 	// @treturn Vec2 Cursor display position in percent.
@@ -110,6 +118,7 @@ namespace TEN::Scripting::Input
 		table.set_function(ScriptReserved_KeyIsHit, &KeyIsHit);
 		table.set_function(ScriptReserved_KeyPush, &KeyPush);
 		table.set_function(ScriptReserved_KeyClear, &KeyClear);
+		table.set_function(ScriptReserved_KeyClearAll, &KeyClearAll);
 
 		table.set_function(ScriptReserved_GetMouseDisplayPosition, &GetMouseDisplayPosition);
 		table.set_function(ScriptReserved_GetCursorDisplayPosition, &GetMouseDisplayPosition);

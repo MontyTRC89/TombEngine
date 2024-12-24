@@ -1,9 +1,8 @@
 #pragma once
-#include "Game/collision/sphere.h"
-#include "Specific/newtypes.h"
-#include "Specific/level.h"
-#include "Renderer/Renderer.h"
 #include "Renderer/Graphics/Vertices/Vertex.h"
+#include "Renderer/Renderer.h"
+#include "Specific/level.h"
+#include "Specific/newtypes.h"
 
 constexpr int MAX_DEBRIS = 2048;
 
@@ -26,7 +25,7 @@ struct ITEM_LIGHT
 
 struct SHATTER_ITEM
 {
-	SPHERE sphere;
+	BoundingSphere sphere;
 	ITEM_LIGHT* il;
 	int meshIndex;
 	Vector4 color;
@@ -71,6 +70,20 @@ struct DebrisFragment
 	bool active;
 	bool isStatic;
 	Matrix Transform;
+
+	Matrix PrevTransform = Matrix::Identity;
+
+	void UpdateTransform()
+	{
+		auto translation = Matrix::CreateTranslation(worldPosition.x, worldPosition.y, worldPosition.z);
+		auto rot = Matrix::CreateFromQuaternion(rotation);
+		Transform = rot * translation;
+	}
+
+	void StoreInterpolationData()
+	{
+		PrevTransform = Transform;
+	}
 };
 
 extern SHATTER_ITEM ShatterItem;

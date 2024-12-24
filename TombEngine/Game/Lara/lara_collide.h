@@ -3,11 +3,6 @@
 struct ItemInfo;
 struct CollisionInfo;
 
-constexpr auto DEFLECT_STRAIGHT_ANGLE = 5.0f;
-constexpr auto DEFLECT_DIAGONAL_ANGLE = 12.0f;
-constexpr auto DEFLECT_STRAIGHT_ANGLE_CRAWL = 2.0f;
-constexpr auto DEFLECT_DIAGONAL_ANGLE_CRAWL = 5.0f;
-
 // -----------------------------
 // COLLISION TEST FUNCTIONS
 // For State Control & Collision
@@ -30,6 +25,7 @@ void GetLaraDeadlyBounds();
 void LaraJumpCollision(ItemInfo* item, CollisionInfo* coll, short moveAngle);
 void LaraSurfaceCollision(ItemInfo* item, CollisionInfo* coll);
 void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll);
+void LaraDefaultCollision(ItemInfo* item, CollisionInfo* coll);
 
 void LaraWaterCurrent(ItemInfo* item, CollisionInfo* coll);
 

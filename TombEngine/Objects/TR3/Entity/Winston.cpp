@@ -231,7 +231,7 @@ namespace TEN::Entities::Creatures::TR3
 			case WINSTON_STATE_GUARD_MID:
 				creature.MaxTurn = WINSTON_TURN_RATE_MAX;
 
-				if (item.Animation.RequiredState != NO_STATE)
+				if (item.Animation.RequiredState != NO_VALUE)
 					item.Animation.TargetState = item.Animation.RequiredState;
 
 				if (!item.TriggerFlags)
@@ -251,7 +251,7 @@ namespace TEN::Entities::Creatures::TR3
 			case WINSTON_STATE_GUARD_LOW:
 				creature.MaxTurn = WINSTON_TURN_RATE_MAX;
 
-				if (item.Animation.RequiredState != NO_STATE)
+				if (item.Animation.RequiredState != NO_VALUE)
 					item.Animation.TargetState = item.Animation.RequiredState;
 
 				if (item.HitStatus)
@@ -262,7 +262,7 @@ namespace TEN::Entities::Creatures::TR3
 			case WINSTON_STATE_GUARD_HIGH:
 				creature.MaxTurn = WINSTON_TURN_RATE_MAX;
 
-				if (item.Animation.RequiredState != NO_STATE)
+				if (item.Animation.RequiredState != NO_VALUE)
 					item.Animation.TargetState = item.Animation.RequiredState;
 
 				if (item.HitStatus)
@@ -315,7 +315,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			if (object.hitEffect == HitEffect::Richochet)
 			{
-				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, false);
 				SoundEffect(SFX_TR3_WINSTON_CUPS, &target.Pose);
 			}
 		}

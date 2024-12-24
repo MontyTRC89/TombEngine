@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
 #include "Game/control/trigger.h"
@@ -17,6 +18,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 namespace TEN::Entities::TR4
@@ -25,7 +27,7 @@ namespace TEN::Entities::TR4
 	{
 		short grenadeItemNumber = CreateItem();
 
-		if (grenadeItemNumber != NO_ITEM)
+		if (grenadeItemNumber != NO_VALUE)
 		{
 			auto* grenadeItem = &g_Level.Items[grenadeItemNumber];
 
@@ -53,7 +55,7 @@ namespace TEN::Entities::TR4
 
 			grenadeItem->Animation.ActiveState = grenadeItem->Pose.Orientation.x;
 			grenadeItem->Animation.TargetState = grenadeItem->Pose.Orientation.y;
-			grenadeItem->Animation.RequiredState = NO_STATE;
+			grenadeItem->Animation.RequiredState = NO_VALUE;
 			grenadeItem->Animation.Velocity.z = 32;
 			grenadeItem->Animation.Velocity.y = -32 * phd_sin(grenadeItem->Pose.Orientation.x);
 			grenadeItem->HitPoints = 120;
@@ -98,7 +100,7 @@ namespace TEN::Entities::TR4
 			int dx = 682 * phd_sin(item->Pose.Orientation.y);
 			int dz = 682 * phd_cos(item->Pose.Orientation.y);
 
-			int height1 = GetCollision(x - dz, y, z - dx, item->RoomNumber).Position.Floor;
+			int height1 = GetPointCollision(Vector3i(x - dz, y, z - dx), item->RoomNumber).GetFloorHeight();
 			if (abs(item->Pose.Position.y - height1) > CLICK(3))
 			{
 				item->Pose.Position.x += dz / 64;
@@ -107,7 +109,7 @@ namespace TEN::Entities::TR4
 				height1 = y;
 			}
 
-			int height2 = GetCollision(x + dz, y, z - dx, item->RoomNumber).Position.Floor;
+			int height2 = GetPointCollision(Vector3i(x + dz, y, z - dx), item->RoomNumber).GetFloorHeight();
 			if (abs(item->Pose.Position.y - height2) > CLICK(3))
 			{
 				item->Pose.Orientation.y -= ANGLE(2.0f);
@@ -118,11 +120,11 @@ namespace TEN::Entities::TR4
 
 			short zRot = phd_atan(1364, height2 - height1);
 
-			int height3 = GetCollision(x + dx, y, z + dz, item->RoomNumber).Position.Floor;
+			int height3 = GetPointCollision(Vector3i(x + dx, y, z + dz), item->RoomNumber).GetFloorHeight();
 			if (abs(y - height3) > CLICK(3))
 				height3 = y;
 
-			int height4 = GetCollision(x - dx, y, z - dz, item->RoomNumber).Position.Floor;
+			int height4 = GetPointCollision(Vector3i(x - dx, y, z - dz), item->RoomNumber).GetFloorHeight();
 			if (abs(y - height4) > CLICK(3))
 				height4 = y;
 
@@ -162,7 +164,7 @@ namespace TEN::Entities::TR4
 				if (item->ItemFlags[0] < 0)
 					item->ItemFlags[0] = 0;
 
-				if (item->Animation.RequiredState != NO_STATE)
+				if (item->Animation.RequiredState != NO_VALUE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (AI.distance > pow(BLOCK(1), 2) || Lara.Location >= item->ItemFlags[3])
 					item->Animation.TargetState = 1;
@@ -294,7 +296,7 @@ namespace TEN::Entities::TR4
 					{
 						aiObject = &g_Level.AIObjects[i];
 
-						if (g_Level.AIObjects[i].triggerFlags == item->ItemFlags[3] && g_Level.AIObjects[i].roomNumber != NO_ROOM)
+						if (g_Level.AIObjects[i].triggerFlags == item->ItemFlags[3] && g_Level.AIObjects[i].roomNumber != NO_VALUE)
 						{
 							aiObject = &g_Level.AIObjects[i];
 							break;
@@ -358,13 +360,15 @@ namespace TEN::Entities::TR4
 			creature->MaxTurn = 0;
 			AnimateItem(item);
 
-			auto probe = GetCollision(item);
-			item->Floor = probe.Position.Floor;
-			if (item->RoomNumber != probe.RoomNumber)
-				ItemNewRoom(itemNumber, probe.RoomNumber);
+			auto probe = GetPointCollision(*item);
+			item->Floor = probe.GetFloorHeight();
+			if (item->RoomNumber != probe.GetRoomNumber())
+				ItemNewRoom(itemNumber, probe.GetRoomNumber());
 
 			if (item->Pose.Position.y < item->Floor)
+			{
 				item->Animation.IsAirborne = true;
+			}
 			else
 			{
 				item->Pose.Position.y = item->Floor;

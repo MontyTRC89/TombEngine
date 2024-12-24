@@ -39,12 +39,13 @@ void HarpoonBoltControl(short itemNumber);
 void FireGrenade(ItemInfo& laraItem);
 void GrenadeControl(short itemNumber);
 void FireRocket(ItemInfo& laraItem);
+void FireRocket(ItemInfo& laraItem);
 void RocketControl(short itemNumber);
 void FireCrossbow(ItemInfo& laraItem, const std::optional<Pose>& pose = std::nullopt);
 void FireCrossBowFromLaserSight(ItemInfo& laraItem, GameVector* origin, GameVector* target);
 void CrossbowBoltControl(short itemNumber);
 
-void FireHK(ItemInfo& laraItem, int mode);
+void FireHK(ItemInfo& laraItem, bool inaccurateMode);
 void RifleHandler(ItemInfo& laraItem, LaraWeaponType weaponType);
 void LasersightWeaponHandler(ItemInfo& item, LaraWeaponType weaponType);
 

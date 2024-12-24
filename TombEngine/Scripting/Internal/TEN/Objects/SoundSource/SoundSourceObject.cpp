@@ -5,7 +5,8 @@
 #include "Sound/sound.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
+
 /***
 Sound source
 
@@ -13,8 +14,8 @@ Sound source
 @pragma nostrip
 */
 
-static auto index_error = index_error_maker(SoundSource, ScriptReserved_SoundSource);
-static auto newindex_error = newindex_error_maker(SoundSource, ScriptReserved_SoundSource);
+static auto IndexError = index_error_maker(SoundSource, ScriptReserved_SoundSource);
+static auto NewIndexError = newindex_error_maker(SoundSource, ScriptReserved_SoundSource);
 
 SoundSource::SoundSource(SoundSourceInfo& ref) : m_soundSource{ref}
 {};
@@ -23,8 +24,8 @@ void SoundSource::Register(sol::table& parent)
 {
 	parent.new_usertype<SoundSource>(ScriptReserved_SoundSource,
 		sol::no_constructor, // ability to spawn new ones could be added later
-		sol::meta_function::index, index_error,
-		sol::meta_function::new_index, newindex_error,
+		sol::meta_function::index, IndexError,
+		sol::meta_function::new_index, NewIndexError,
 		
 		/// Get the sound source's position
 		// @function SoundSource:GetPosition

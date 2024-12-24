@@ -127,7 +127,7 @@ namespace TEN::Entities::Creatures::TR3
 
 				for (auto& currentCreature : ActiveCreatures)
 				{
-					if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
+					if (currentCreature->ItemNumber == NO_VALUE || currentCreature->ItemNumber == itemNumber)
 						continue;
 
 					auto* target = &g_Level.Items[currentCreature->ItemNumber];
@@ -151,14 +151,14 @@ namespace TEN::Entities::Creatures::TR3
 
 			if (item->AIBits != MODIFY)
 			{
-				if (item->CarriedItem != NO_ITEM)
+				if (item->CarriedItem != NO_VALUE)
 					item->MeshBits = 0xFFFFFEFF;
 				else
 					item->MeshBits = ALL_JOINT_BITS;
 			}
 			else
 			{
-				if (item->CarriedItem != NO_ITEM)
+				if (item->CarriedItem != NO_VALUE)
 					item->MeshBits = 0xFFFF6E6F;
 				else
 					item->MeshBits = 0xFFFF6F6F;
@@ -190,7 +190,7 @@ namespace TEN::Entities::Creatures::TR3
 
 			GetCreatureMood(item, &AI, true);
 
-			if (Lara.Context.Vehicle != NO_ITEM)
+			if (Lara.Context.Vehicle != NO_VALUE)
 				creature->Mood = MoodType::Escape;
 
 			CreatureMood(item, &AI, true);
@@ -231,7 +231,7 @@ namespace TEN::Entities::Creatures::TR3
 					item->Animation.TargetState = MONKEY_STATE_IDLE;
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (item->Animation.RequiredState != NO_STATE)
+					if (item->Animation.RequiredState != NO_VALUE)
 						item->Animation.TargetState = item->Animation.RequiredState;
 					else if (Random::TestProbability(0.06f))
 						item->Animation.TargetState = MONKEY_STATE_WALK_FORWARD;
@@ -246,7 +246,7 @@ namespace TEN::Entities::Creatures::TR3
 				else if ((item->AIBits & FOLLOW) &&
 					(creature->ReachedGoal || laraAI.distance > pow(BLOCK(2), 2)))
 				{
-					if (item->Animation.RequiredState != NO_STATE)
+					if (item->Animation.RequiredState != NO_VALUE)
 						item->Animation.TargetState = item->Animation.RequiredState;
 					else if (AI.ahead)
 						item->Animation.TargetState = MONKEY_STATE_SIT;
@@ -292,7 +292,7 @@ namespace TEN::Entities::Creatures::TR3
 				}
 				else if (creature->Mood == MoodType::Bored)
 				{
-					if (item->Animation.RequiredState != NO_STATE)
+					if (item->Animation.RequiredState != NO_VALUE)
 						item->Animation.TargetState = item->Animation.RequiredState;
 					else if (Random::TestProbability(0.06f))
 						item->Animation.TargetState = MONKEY_STATE_WALK_FORWARD;
@@ -307,7 +307,7 @@ namespace TEN::Entities::Creatures::TR3
 				else if (item->AIBits & FOLLOW &&
 					(creature->ReachedGoal || laraAI.distance > pow(BLOCK(2), 2)))
 				{
-					if (item->Animation.RequiredState != NO_STATE)
+					if (item->Animation.RequiredState != NO_VALUE)
 						item->Animation.TargetState = item->Animation.RequiredState;
 					else if (AI.ahead)
 						item->Animation.TargetState = MONKEY_STATE_SIT;
@@ -349,7 +349,7 @@ namespace TEN::Entities::Creatures::TR3
 					creature->Enemy->ObjectNumber == ID_KEY_ITEM4) &&
 					item->Animation.FrameNumber == (GetAnimData(item).frameBase + 12))
 				{
-					if (creature->Enemy->RoomNumber == NO_ROOM ||
+					if (creature->Enemy->RoomNumber == NO_VALUE ||
 						creature->Enemy->Status == ITEM_INVISIBLE ||
 						creature->Enemy->Flags & -32768)
 					{
@@ -359,12 +359,12 @@ namespace TEN::Entities::Creatures::TR3
 					{
 						item->CarriedItem = creature->Enemy->Index;
 						RemoveDrawnItem(creature->Enemy->Index);
-						creature->Enemy->RoomNumber = NO_ROOM;
-						creature->Enemy->CarriedItem = NO_ITEM;
+						creature->Enemy->RoomNumber = NO_VALUE;
+						creature->Enemy->CarriedItem = NO_VALUE;
 
 						for (auto& currentCreature : ActiveCreatures)
 						{
-							if (currentCreature->ItemNumber == NO_ITEM || currentCreature->ItemNumber == itemNumber)
+							if (currentCreature->ItemNumber == NO_VALUE || currentCreature->ItemNumber == itemNumber)
 								continue;
 
 							auto* target = &g_Level.Items[currentCreature->ItemNumber];
@@ -391,7 +391,7 @@ namespace TEN::Entities::Creatures::TR3
 					carriedItem->Pose.Position = item->Pose.Position;
 
 					ItemNewRoom(item->CarriedItem, item->RoomNumber);
-					item->CarriedItem = NO_ITEM;
+					item->CarriedItem = NO_VALUE;
 
 					carriedItem->AIBits = GUARD;
 					creature->Enemy = nullptr;

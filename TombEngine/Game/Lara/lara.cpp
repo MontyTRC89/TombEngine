@@ -25,6 +25,7 @@
 #include "Game/collision/collide_item.h"
 #include "Game/collision/floordata.h"
 #include "Game/collision/Interaction.h"
+#include "Game/collision/Point.h"
 #include "Game/control/flipeffect.h"
 #include "Game/control/volume.h"
 #include "Game/effects/Hair.h"
@@ -49,6 +50,7 @@
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Interaction;
+using namespace TEN::Collision::Point;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Items;
@@ -59,8 +61,8 @@ using namespace TEN::Gui;
 
 using TEN::Renderer::g_Renderer;
 
-LaraInfo Lara = {};
-ItemInfo* LaraItem;
+LaraInfo	  Lara			= {};
+ItemInfo*	  LaraItem		= nullptr;
 CollisionInfo LaraCollision = {};
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
@@ -91,7 +93,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	}
 
 	if (!player.Control.IsLocked)
-		player.LocationPad = -1;
+		player.LocationPad = NO_VALUE;
 
 	// FAILSAFE: Force hand status reset.
 	if (item->Animation.AnimNumber == LA_STAND_IDLE &&
@@ -109,14 +111,14 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	auto water = GetPlayerWaterData(*item);
 	player.Context.WaterSurfaceDist = -water.HeightFromWater;
 
-	if (player.Context.Vehicle == NO_ITEM)
+	if (player.Context.Vehicle == NO_VALUE)
 		SpawnPlayerWaterSurfaceEffects(*item, water.WaterHeight, water.WaterDepth);
 
 	bool isWaterOnHeadspace = false;
 
 	// TODO: Move unrelated handling elsewhere.
 	// Handle environment state transition.
-	if (player.Context.Vehicle == NO_ITEM && player.ExtraAnim == NO_ITEM)
+	if (player.Context.Vehicle == NO_VALUE && player.ExtraAnim == NO_VALUE)
 	{
 		switch (player.Control.WaterStatus)
 		{
@@ -154,7 +156,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 					}
 					else if (item->Animation.ActiveState == LS_FREEFALL_DIVE)
 					{
-						SetAnimation(item, LA_SWANDIVE_DIVE);
+						SetAnimation(item, LA_SWANDIVE_FREEFALL_DIVE);
 						item->Animation.Velocity.y /= 2;
 						item->Pose.Orientation.x = ANGLE(-85.0f);
 						player.Control.HandStatus = HandStatus::Free;
@@ -209,7 +211,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			// pre-TR5 bug where player would keep submerged until root mesh was above water level.
 			isWaterOnHeadspace = TestEnvironment(
 				ENV_FLAG_WATER, item->Pose.Position.x, item->Pose.Position.y - CLICK(1), item->Pose.Position.z,
-				GetCollision(item->Pose.Position.x, item->Pose.Position.y - CLICK(1), item->Pose.Position.z, item->RoomNumber).RoomNumber);
+				GetPointCollision(*item, 0, 0, -CLICK(1)).GetRoomNumber());
 
 			if (water.WaterDepth == NO_HEIGHT || abs(water.HeightFromWater) >= CLICK(1) || isWaterOnHeadspace ||
 				item->Animation.AnimNumber == LA_UNDERWATER_RESURFACE || item->Animation.AnimNumber == LA_ONWATER_DIVE)
@@ -331,11 +333,13 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		break;
 	}
 
-	SaveGame::Statistics.Game.Distance += (int)round(Vector3i::Distance(prevPos, item->Pose.Position));
+	int deltaDist = (int)round(Vector3i::Distance(prevPos, item->Pose.Position));
+	SaveGame::Statistics.Game.Distance  += deltaDist;
+	SaveGame::Statistics.Level.Distance += deltaDist;
 
 	if (DebugMode)
 	{
-		DrawNearbyPathfinding(GetCollision(item).BottomBlock->Box);
+		DrawNearbyPathfinding(GetPointCollision(*item).GetBottomSector().PathfindingBoxID);
 		DrawNearbySectorFlags(*item);
 	}
 }
@@ -481,18 +485,17 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.BlockMonkeySwingEdge = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = true;
+	coll->Setup.ForceSolidStatics = false;
 	coll->Setup.PrevPosition = item->Pose.Position;
 	coll->Setup.PrevAnimObjectID = item->Animation.AnimObjectID;
 	coll->Setup.PrevAnimNumber = item->Animation.AnimNumber;
 	coll->Setup.PrevFrameNumber = item->Animation.FrameNumber;
 	coll->Setup.PrevState = item->Animation.ActiveState;
 
-	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
-
 	// Handle look-around.
 	if (((IsHeld(In::Look) && CanPlayerLookAround(*item)) ||
 			(player.Control.Look.IsUsingBinoculars || player.Control.Look.IsUsingLasersight)) &&
-		player.ExtraAnim == NO_ITEM)
+		player.ExtraAnim == NO_VALUE)
 	{
 		HandlePlayerLookAround(*item);
 	}
@@ -503,24 +506,24 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	}
 	player.Control.Look.Mode = LookMode::None;
 
+	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
+
 	// Process vehicles.
 	if (HandleLaraVehicle(item, coll))
 		return;
 
-	// Handle player behavior state control.
 	HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Control);
-
 	HandleLaraMovementParameters(item, coll);
 	AnimateItem(item);
 
-	if (player.ExtraAnim == NO_ITEM)
+	if (player.ExtraAnim == NO_VALUE)
 	{
 		// Check for collision with items.
 		DoObjectCollision(item, coll);
 		HandlePlayerWalkInteraction(*item);
 
 		// Handle player behavior state collision.
-		if (player.Context.Vehicle == NO_ITEM)
+		if (player.Context.Vehicle == NO_VALUE)
 			HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Collision);
 	}
 
@@ -554,6 +557,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.BlockMonkeySwingEdge = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
+	coll->Setup.ForceSolidStatics = false;
 	coll->Setup.PrevPosition = item->Pose.Position;
 
 	// Handle look-around.
@@ -595,7 +599,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	DoObjectCollision(item, coll);
 	HandlePlayerWalkInteraction(*item);
 
-	if (player.Context.Vehicle == NO_ITEM)
+	if (player.Context.Vehicle == NO_VALUE)
 		HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Collision);
 
 	UpdateLaraRoom(item, LARA_RADIUS);
@@ -627,6 +631,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.BlockMonkeySwingEdge = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
+	coll->Setup.ForceSolidStatics = false;
 	coll->Setup.PrevPosition = item->Pose.Position;
 
 	// Handle look-around.
@@ -699,7 +704,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	DoObjectCollision(item, coll);
 	HandlePlayerWalkInteraction(*item);
 
-	if (player.Context.Vehicle == NO_ITEM)
+	if (player.Context.Vehicle == NO_VALUE)
 		HandlePlayerBehaviorState(*item, *coll, PlayerBehaviorStateRoutineType::Collision);
 
 	UpdateLaraRoom(item, 0);
@@ -759,6 +764,7 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 
 	// Control player.
 	InItemControlLoop = true;
+
 	LaraControl(item, &LaraCollision);
 	HandlePlayerFlyCheat(*item);
 	InItemControlLoop = false;
@@ -767,17 +773,11 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 	if (isTitle)
 		ActionMap = actionMap;
 
-	if (g_Gui.GetInventoryItemChosen() != NO_ITEM)
-	{
-		g_Gui.SetInventoryItemChosen(NO_ITEM);
-		SayNo();
-	}
-
 	// Update player animations.
 	g_Renderer.UpdateLaraAnimations(true);
 
 	// Update player effects.
-	HairEffect.Update(*item, g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
+	HairEffect.Update(*item);
 	HandlePlayerWetnessDrips(*item);
 	HandlePlayerDiveBubbles(*item);
 	ProcessEffects(item);

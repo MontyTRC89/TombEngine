@@ -25,24 +25,41 @@ namespace TEN::Hud
 		float StringScale  = 0.0f;
 		float StringScalar = 0.0f;
 
+		Vector2		PrevPosition	= Vector2::Zero;
+		EulerAngles PrevOrientation = EulerAngles::Identity;
+		float		PrevScale		= 0.0f;
+		float		PrevOpacity		= 0.0f;
+
 		bool IsOffscreen() const;
 		void Update(bool isHead);
+
+		void StoreInterpolationData()
+		{
+			PrevPosition = Position;
+			PrevOrientation = Orientation;
+			PrevScale = Scale;
+			PrevOpacity = Opacity;
+		}
 	};
 
 	class PickupSummaryController
 	{
 	private:
 		// Constants
+
 		static constexpr auto DISPLAY_PICKUP_COUNT_MAX		   = 64;
 		static constexpr auto DISPLAY_PICKUP_COUNT_ARG_DEFAULT = 1;
 
 		// Members
+
 		std::vector<DisplayPickup> _displayPickups = {};
 
 	public:
 		// Utilities
+
 		void AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector2& origin, unsigned int count = DISPLAY_PICKUP_COUNT_ARG_DEFAULT);
 		void AddDisplayPickup(GAME_OBJECT_ID objectID, const Vector3& pos, unsigned int count = DISPLAY_PICKUP_COUNT_ARG_DEFAULT);
+		void AddDisplayPickup(const ItemInfo& item);
 
 		void Update();
 		void Draw() const;
@@ -50,6 +67,7 @@ namespace TEN::Hud
 
 	private:
 		// Helpers
+
 		std::vector<Vector2> GetStackPositions() const;
 		DisplayPickup&		 GetNewDisplayPickup();
 		void				 ClearInactiveDisplayPickups();

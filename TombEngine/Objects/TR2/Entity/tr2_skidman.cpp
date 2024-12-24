@@ -4,7 +4,7 @@
 #include "Game/animation.h"
 #include "Game/items.h"
 #include "Game/collision/collide_item.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Sphere.h"
 #include "Game/control/box.h"
 #include "Game/control/lot.h"
 #include "Game/effects/smoke.h"
@@ -19,6 +19,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Sphere;
 using namespace TEN::Effects::Smoke;
 
 namespace TEN::Entities::Creatures::TR2
@@ -54,7 +55,7 @@ namespace TEN::Entities::Creatures::TR2
 	static void CreateSkidooGun(ItemInfo& riderItem)
 	{
 		int skidooItemNumber = CreateItem();
-		if (skidooItemNumber == NO_ITEM)
+		if (skidooItemNumber == NO_VALUE)
 		{
 			TENLog("Failed to create ID_SNOWMOBILE_GUN from ID_SNOWMOBILE_DRIVER.", LogLevel::Warning);
 			return;
@@ -81,7 +82,7 @@ namespace TEN::Entities::Creatures::TR2
 
 		if (item.Flags & IFLAG_REVERSE)
 		{
-			item.Status &= ~ITEM_INVISIBLE;
+			item.Status = ITEM_NOT_ACTIVE;
 		}
 		else
 		{
@@ -96,7 +97,7 @@ namespace TEN::Entities::Creatures::TR2
 		if (!TestBoundsCollide(&item, laraItem, coll->Setup.Radius))
 			return;
 
-		if (!TestCollision(&item, laraItem))
+		if (!HandleItemSphereCollision(item, *laraItem))
 			return;
 
 		if (coll->Setup.EnableObjectPush)
@@ -111,7 +112,7 @@ namespace TEN::Entities::Creatures::TR2
 			}
 		}
 
-		if (Lara.Context.Vehicle == NO_ITEM && item.Animation.Velocity.z > 0.0f)
+		if (Lara.Context.Vehicle == NO_VALUE && item.Animation.Velocity.z > 0.0f)
 			DoDamage(laraItem, 100);
 	}
 
@@ -130,6 +131,9 @@ namespace TEN::Entities::Creatures::TR2
 
 		int skidooItemNumber = (short)riderItem.ItemFlags[0];
 		auto* skidooItem = &g_Level.Items[skidooItemNumber];
+
+		if (!CreatureActive(skidooItemNumber))
+			return;
 
 		if (!skidooItem->Data)
 		{
@@ -250,7 +254,7 @@ namespace TEN::Entities::Creatures::TR2
 		{
 			if (creature->Flags == 0 && abs(ai.angle) < SKIDOO_MAN_TARGET_ANGLE && creature->Enemy->HitPoints > 0)
 			{
-				int damage = (creature->Enemy->IsLara() && GetLaraInfo(creature->Enemy)->Context.Vehicle != NO_ITEM) ? 10 : 50;
+				int damage = (creature->Enemy->IsLara() && GetLaraInfo(creature->Enemy)->Context.Vehicle != NO_VALUE) ? 10 : 50;
 				
 				ShotLara(skidooItem, &ai, SkidooBiteLeft, 0, damage);
 

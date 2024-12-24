@@ -3,6 +3,7 @@
 
 #include "Game/collision/floordata.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
 #include "Game/effects/effects.h"
@@ -26,16 +27,18 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Room;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Generic;
-using namespace TEN::Collision::Floordata;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
 
-constexpr int ITEM_DEATH_TIMEOUT = 4 * FPS;
+constexpr auto ITEM_DEATH_TIMEOUT = 4 * FPS;
 
 void OffsetBlendData::SetLinear(const Vector3& posOffset, const EulerAngles& orientOffset, float vel, short turnRate, float delayInSec)
 {
@@ -185,7 +188,7 @@ void ItemInfo::SetFlagField(int id, short flags)
 	if (id < 0 || id > 7)
 		return;
 
-	this->ItemFlags[id] = flags;
+	ItemFlags[id] = flags;
 }
 
 void ItemInfo::ClearFlags(int id, short flags)
@@ -193,7 +196,7 @@ void ItemInfo::ClearFlags(int id, short flags)
 	if (id < 0 || id > 7)
 		return;
 
-	this->ItemFlags[id] &= ~flags;
+	ItemFlags[id] &= ~flags;
 }
 
 bool ItemInfo::TestMeshSwapFlags(unsigned int flags)
@@ -212,7 +215,7 @@ bool ItemInfo::TestMeshSwapFlags(unsigned int flags)
 
 bool ItemInfo::TestMeshSwapFlags(const std::vector<unsigned int>& flags)
 {
-	auto bits = BitField();
+	auto bits = BitField::Default;
 	bits.Set(flags);
 	return TestMeshSwapFlags(bits.ToPackedBits());
 }
@@ -249,21 +252,6 @@ void ItemInfo::SetMeshSwapFlags(const std::vector<unsigned int>& flags, bool cle
 	SetMeshSwapFlags(bits.ToPackedBits(), clear);
 }
 
-bool ItemInfo::IsLara() const
-{
-	return Data.is<LaraInfo*>();
-}
-
-bool ItemInfo::IsCreature() const
-{
-	return Data.is<CreatureInfo>();
-}
-
-bool ItemInfo::IsBridge() const
-{
-	return Contains(BRIDGE_OBJECT_IDS, ObjectNumber);
-}
-
 void ItemInfo::ResetModelToDefault()
 {
 	if (Objects[ObjectNumber].nmeshes > 0)
@@ -283,6 +271,26 @@ void ItemInfo::ResetModelToDefault()
 		Model.Mutators.clear();
 		Model.MeshIndex.clear();
 	}
+}
+
+bool ItemInfo::IsLara() const
+{
+	return Data.is<LaraInfo*>();
+}
+
+bool ItemInfo::IsCreature() const
+{
+	return Data.is<CreatureInfo>();
+}
+
+bool ItemInfo::IsBridge() const
+{
+	return Contains(BRIDGE_OBJECT_IDS, ObjectNumber);
+}
+
+std::vector<BoundingSphere> ItemInfo::GetSpheres() const
+{
+	return g_Renderer.GetSpheres(Index);
 }
 
 bool TestState(int refState, const std::vector<int>& stateList)
@@ -322,7 +330,7 @@ void KillItem(short const itemNumber)
 		ItemNewRooms[2 * ItemNewRoomNo] = itemNumber | 0x8000;
 		ItemNewRoomNo++;
 	}
-	else// if (NextItemActive != NO_ITEM)
+	else// if (NextItemActive != NO_VALUE)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
@@ -336,7 +344,7 @@ void KillItem(short const itemNumber)
 		else
 		{
 			short linkNumber;
-			for (linkNumber = NextItemActive; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextActive)
+			for (linkNumber = NextItemActive; linkNumber != NO_VALUE; linkNumber = g_Level.Items[linkNumber].NextActive)
 			{
 				if (g_Level.Items[linkNumber].NextActive == itemNumber)
 				{
@@ -346,7 +354,7 @@ void KillItem(short const itemNumber)
 			}
 		}
 
-		if (item->RoomNumber != NO_ROOM)
+		if (item->RoomNumber != NO_VALUE)
 		{
 			if (g_Level.Rooms[item->RoomNumber].itemNumber == itemNumber)
 			{
@@ -355,7 +363,7 @@ void KillItem(short const itemNumber)
 			else
 			{
 				short linkNumber;
-				for (linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
+				for (linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber; linkNumber != NO_VALUE; linkNumber = g_Level.Items[linkNumber].NextItem)
 				{
 					if (g_Level.Items[linkNumber].NextItem == itemNumber)
 					{
@@ -372,7 +380,7 @@ void KillItem(short const itemNumber)
 		// AI target generation uses a hack with making a dummy item without ObjectNumber.
 		// Therefore, a check should be done here to prevent access violation.
 		if (item->ObjectNumber != GAME_OBJECT_ID::ID_NO_OBJECT && item->IsBridge())
-			UpdateBridgeItem(*item, true);
+			UpdateBridgeItem(*item, BridgeUpdateType::Remove);
 
 		GameScriptHandleKilled(itemNumber, true);
 
@@ -393,7 +401,7 @@ void RemoveAllItemsInRoom(short roomNumber, short objectNumber)
 	auto* room = &g_Level.Rooms[roomNumber];
 
 	short currentItemNumber = room->itemNumber;
-	while (currentItemNumber != NO_ITEM)
+	while (currentItemNumber != NO_VALUE)
 	{
 		auto* item = &g_Level.Items[currentItemNumber];
 
@@ -439,7 +447,7 @@ void ItemNewRoom(short itemNumber, short roomNumber)
 	{
 		auto* item = &g_Level.Items[itemNumber];
 
-		if (item->RoomNumber != NO_ROOM)
+		if (item->RoomNumber != NO_VALUE)
 		{
 			auto* room = &g_Level.Rooms[item->RoomNumber];
 
@@ -513,7 +521,7 @@ void KillEffect(short fxNumber)
 			NextFxActive = fx->nextActive;
 		else
 		{
-			for (short linkNumber = NextFxActive; linkNumber != NO_ITEM; linkNumber = EffectList[linkNumber].nextActive)
+			for (short linkNumber = NextFxActive; linkNumber != NO_VALUE; linkNumber = EffectList[linkNumber].nextActive)
 			{
 				if (EffectList[linkNumber].nextActive == fxNumber)
 				{
@@ -527,7 +535,7 @@ void KillEffect(short fxNumber)
 			g_Level.Rooms[fx->roomNumber].fxNumber = fx->nextFx;
 		else
 		{
-			for (short linkNumber = g_Level.Rooms[fx->roomNumber].fxNumber; linkNumber != NO_ITEM; linkNumber = EffectList[linkNumber].nextFx)
+			for (short linkNumber = g_Level.Rooms[fx->roomNumber].fxNumber; linkNumber != NO_VALUE; linkNumber = EffectList[linkNumber].nextFx)
 			{
 				if (EffectList[linkNumber].nextFx == fxNumber)
 				{
@@ -544,7 +552,7 @@ void KillEffect(short fxNumber)
 	// HACK: Garbage collect nextFx if no active effects were detected.
 	// This fixes random crashes after spawining multiple FXs (like body part).
 
-	if (NextFxActive == NO_ITEM)
+	if (NextFxActive == NO_VALUE)
 		InitializeFXArray();
 }
 
@@ -552,7 +560,7 @@ short CreateNewEffect(short roomNumber)
 {
 	short fxNumber = NextFxFree;
 
-	if (NextFxFree != NO_ITEM)
+	if (NextFxFree != NO_VALUE)
 	{
 		auto* fx = &EffectList[NextFxFree];
 		NextFxFree = fx->nextFx;
@@ -572,16 +580,16 @@ short CreateNewEffect(short roomNumber)
 
 void InitializeFXArray()
 {
-	NextFxActive = NO_ITEM;
+	NextFxActive = NO_VALUE;
 	NextFxFree = 0;
 
-	for (int i = 0; i < NUM_EFFECTS; i++)
+	for (int i = 0; i < MAX_SPAWNED_ITEM_COUNT; i++)
 	{
 		auto* fx = &EffectList[i];
 		fx->nextFx = i + 1;
 	}
 
-	EffectList[NUM_EFFECTS - 1].nextFx = NO_ITEM;
+	EffectList[MAX_SPAWNED_ITEM_COUNT - 1].nextFx = NO_VALUE;
 }
 
 void RemoveDrawnItem(short itemNumber) 
@@ -592,7 +600,7 @@ void RemoveDrawnItem(short itemNumber)
 		g_Level.Rooms[item->RoomNumber].itemNumber = item->NextItem;
 	else
 	{
-		for (short linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextItem)
+		for (short linkNumber = g_Level.Rooms[item->RoomNumber].itemNumber; linkNumber != NO_VALUE; linkNumber = g_Level.Items[linkNumber].NextItem)
 		{
 			if (g_Level.Items[linkNumber].NextItem == itemNumber)
 			{
@@ -615,7 +623,7 @@ void RemoveActiveItem(short itemNumber, bool killed)
 		}
 		else
 		{
-			for (short linkNumber = NextItemActive; linkNumber != NO_ITEM; linkNumber = g_Level.Items[linkNumber].NextActive)
+			for (short linkNumber = NextItemActive; linkNumber != NO_VALUE; linkNumber = g_Level.Items[linkNumber].NextActive)
 			{
 				if (g_Level.Items[linkNumber].NextActive == itemNumber)
 				{
@@ -635,10 +643,10 @@ void InitializeItem(short itemNumber)
 	auto* item = &g_Level.Items[itemNumber];
 
 	SetAnimation(item, 0);
-	item->Animation.RequiredState = NO_STATE;
+	item->Animation.RequiredState = NO_VALUE;
 	item->Animation.Velocity = Vector3::Zero;
 
-	for (int i = 0; i < NUM_ITEM_FLAGS; i++)
+	for (int i = 0; i < ITEM_FLAG_COUNT; i++)
 		item->ItemFlags[i] = 0;
 
 	item->Active = false;
@@ -687,9 +695,9 @@ void InitializeItem(short itemNumber)
 	item->NextItem = room->itemNumber;
 	room->itemNumber = itemNumber;
 
-	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
+	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->Position.x, item->Pose.Position.z - room->Position.z);
 	item->Floor = floor->GetSurfaceHeight(item->Pose.Position.x, item->Pose.Position.z, true);
-	item->BoxNumber = floor->Box;
+	item->BoxNumber = floor->PathfindingBoxID;
 
 	item->ResetModelToDefault();
 
@@ -699,12 +707,14 @@ void InitializeItem(short itemNumber)
 
 short CreateItem()
 {
-	if (NextItemFree == NO_ITEM)
-		return NO_ITEM;
+	if (NextItemFree == NO_VALUE)
+		return NO_VALUE;
 
 	short itemNumber = NextItemFree;
 	g_Level.Items[NextItemFree].Flags = 0;
 	NextItemFree = g_Level.Items[NextItemFree].NextItem;
+
+	g_Level.Items[itemNumber].DisableInterpolation = true;
 
 	return itemNumber;
 }
@@ -729,15 +739,15 @@ void InitializeItemArray(int totalItem)
 		}
 	}
 
-	item->NextItem = NO_ITEM;
-	NextItemActive = NO_ITEM;
+	item->NextItem = NO_VALUE;
+	NextItemActive = NO_VALUE;
 	NextItemFree = g_Level.NumItems;
 }
 
 short SpawnItem(const ItemInfo& item, GAME_OBJECT_ID objectID)
 {
 	int itemNumber = CreateItem();
-	if (itemNumber != NO_ITEM)
+	if (itemNumber != NO_VALUE)
 	{
 		auto& newItem = g_Level.Items[itemNumber];
 
@@ -753,7 +763,7 @@ short SpawnItem(const ItemInfo& item, GAME_OBJECT_ID objectID)
 	else
 	{
 		TENLog("Failed to create new item.", LogLevel::Warning);
-		itemNumber = NO_ITEM;
+		itemNumber = NO_VALUE;
 	}
 
 	return itemNumber;
@@ -766,7 +776,7 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 	{
 		auto* room = &g_Level.Rooms[i];
 
-		for (short itemNumber = room->itemNumber; itemNumber != NO_ITEM; itemNumber = g_Level.Items[itemNumber].NextItem)
+		for (short itemNumber = room->itemNumber; itemNumber != NO_VALUE; itemNumber = g_Level.Items[itemNumber].NextItem)
 		{
 			if (g_Level.Items[itemNumber].ObjectNumber == search)
 			{
@@ -808,12 +818,12 @@ std::vector<int> FindCreatedItems(GAME_OBJECT_ID objectID)
 {
 	auto itemNumbers = std::vector<int>{};
 
-	if (NextItemActive == NO_ITEM)
+	if (NextItemActive == NO_VALUE)
 		return itemNumbers;
 
 	const auto* itemPtr = &g_Level.Items[NextItemActive];
 
-	for (int nextActive = NextItemActive; nextActive != NO_ITEM; nextActive = itemPtr->NextActive)
+	for (int nextActive = NextItemActive; nextActive != NO_VALUE; nextActive = itemPtr->NextActive)
 	{
 		itemPtr = &g_Level.Items[nextActive];
 
@@ -854,31 +864,33 @@ void UpdateAllItems()
 	InItemControlLoop = true;
 
 	short itemNumber = NextItemActive;
-	while (itemNumber != NO_ITEM)
+	while (itemNumber != NO_VALUE)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		short nextItem = item->NextActive;
+		itemNumber = item->NextActive;
 
 		if (!Objects.CheckID(item->ObjectNumber))
+			continue;
+
+		if (g_GameFlow->LastFreezeMode != FreezeMode::None && !Objects[item->ObjectNumber].AlwaysActive)
 			continue;
 
 		if (item->AfterDeath <= ITEM_DEATH_TIMEOUT)
 		{
 			if (Objects[item->ObjectNumber].control)
-				Objects[item->ObjectNumber].control(itemNumber);
+				Objects[item->ObjectNumber].control(item->Index);
 
-			TestVolumes(itemNumber);
+			TestVolumes(item->Index);
 			ProcessEffects(item);
 
 			if (item->AfterDeath > 0 && item->AfterDeath < ITEM_DEATH_TIMEOUT && !(Wibble & 3))
 				item->AfterDeath++;
 			if (item->AfterDeath == ITEM_DEATH_TIMEOUT)
-				KillItem(itemNumber);
+				KillItem(item->Index);
 		}
 		else
-			KillItem(itemNumber);
+			KillItem(item->Index);
 
-		itemNumber = nextItem;
 	}
 
 	InItemControlLoop = false;
@@ -890,7 +902,7 @@ void UpdateAllEffects()
 	InItemControlLoop = true;
 
 	short fxNumber = NextFxActive;
-	while (fxNumber != NO_ITEM)
+	while (fxNumber != NO_VALUE)
 	{
 		short nextFx = EffectList[fxNumber].nextActive;
 		auto* fx = &EffectList[fxNumber];
@@ -908,10 +920,9 @@ bool UpdateItemRoom(short itemNumber)
 {
 	auto* item = &g_Level.Items[itemNumber];
 
-	auto roomNumber = GetCollision(item->Pose.Position.x,
-		item->Pose.Position.y - CLICK(2),
-		item->Pose.Position.z,
-		item->RoomNumber).RoomNumber;
+	auto roomNumber = GetPointCollision(
+		Vector3i(item->Pose.Position.x, item->Pose.Position.y - CLICK(2), item->Pose.Position.z),
+		item->RoomNumber).GetRoomNumber();
 
 	if (roomNumber != item->RoomNumber)
 	{
@@ -922,7 +933,7 @@ bool UpdateItemRoom(short itemNumber)
 	return false;
 }
 
-void DoDamage(ItemInfo* item, int damage)
+void DoDamage(ItemInfo* item, int damage, bool silent)
 {
 	static int lastHurtTime = 0;
 
@@ -930,20 +941,34 @@ void DoDamage(ItemInfo* item, int damage)
 		return;
 
 	item->HitStatus = true;
-
 	item->HitPoints -= damage;
-	if (item->HitPoints < 0)
+
+	if (item->HitPoints <= 0)
+	{
 		item->HitPoints = 0;
+
+		if (!item->IsLara())
+		{
+			SaveGame::Statistics.Level.Kills++;
+			SaveGame::Statistics.Game.Kills++;
+		}
+	}
 
 	if (item->IsLara())
 	{
 		if (damage > 0)
 		{
-			float power = item->HitPoints ? Random::GenerateFloat(0.1f, 0.4f) : 0.5f;
-			Rumble(power, 0.15f);
+			if (!silent)
+			{
+				float power = item->HitPoints ? Random::GenerateFloat(0.1f, 0.4f) : 0.5f;
+				Rumble(power, 0.15f);
+			}
+
+			SaveGame::Statistics.Game.DamageTaken += damage;
+			SaveGame::Statistics.Level.DamageTaken += damage;
 		}
 
-		if ((GlobalCounter - lastHurtTime) > (FPS * 2 + Random::GenerateInt(0, FPS)))
+		if (!silent && (GlobalCounter - lastHurtTime) > (FPS * 2 + Random::GenerateInt(0, FPS)))
 		{
 			SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Pose);
 			lastHurtTime = GlobalCounter;
@@ -960,6 +985,7 @@ void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn)
 	{
 		if (target->HitPoints > 0)
 		{
+			SaveGame::Statistics.Game.AmmoHits++;
 			SaveGame::Statistics.Level.AmmoHits++;
 			DoDamage(target, damage);
 		}
@@ -988,7 +1014,7 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 			break;
 
 		case HitEffect::Richochet:
-			TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y, 3, 0);
+			TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y);
 			break;
 
 		case HitEffect::Smoke:

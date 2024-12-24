@@ -6,19 +6,28 @@
 // which assumes 30 iterations per second.
 constexpr auto FPS		  = 30;
 constexpr auto DELTA_TIME = 1.0f / FPS;
-constexpr auto TIME_UNIT  = 60;
-constexpr auto DAY_UNIT   = 24;
 
-struct GameTime
+class HighFramerateSynchronizer
 {
-	int Days;
-	int Hours;
-	int Minutes;
-	int Seconds;
+private:
+	LARGE_INTEGER _lastTime;
+	LARGE_INTEGER _currentTime;
+	LARGE_INTEGER _frequency;
+	double _controlDelay = 0.0;
+	double _frameTime    = 0.0;
+
+public:
+	void Init();
+	void Sync();
+	void Step();
+	bool Synced();
+	float GetInterpolationFactor();
 };
 
-int Sync();
+int	 TimeSync();
 bool TimeInit();
 bool TimeReset();
 
-GameTime GetGameTime(int frameCount);
+bool TestGlobalTimeInterval(float intervalSecs, float offsetSecs = 0.0f);
+
+extern HighFramerateSynchronizer g_Synchronizer;

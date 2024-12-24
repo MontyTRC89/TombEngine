@@ -123,7 +123,7 @@ void ObeliskControl(short itemNumber)
 					abs(pos2.y - LaraItem->Pose.Position.y) < BLOCK(20) &&
 					abs(pos2.z - LaraItem->Pose.Position.z) < BLOCK(20))
 				{
-					if (item->ItemFlags[2] != NO_ITEM)
+					if (item->ItemFlags[2] != NO_VALUE)
 					{
 						auto* item2 = &g_Level.Items[item->ItemFlags[2]];
 						ExplodeItemNode(item2, 0, 0, 128);
@@ -132,7 +132,7 @@ void ObeliskControl(short itemNumber)
 						TriggerExplosionSparks(pos.x, pos.y, pos.z, 3, -2, 0, item2->RoomNumber);
 						TriggerExplosionSparks(pos.x, pos.y, pos.z, 3, -1, 0, item2->RoomNumber);
 
-						item->ItemFlags[2] = NO_ITEM;
+						item->ItemFlags[2] = NO_VALUE;
 						item2 = FindItem(ID_PUZZLE_ITEM1_COMBO1);
 						item2->Status = ITEM_NOT_ACTIVE;
 

@@ -4,15 +4,18 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
-namespace TEN::Entities::Traps::TR1
+namespace TEN::Entities::Traps
 {
 	// NOTES:
 	// ItemFlags[0] = random turn rate when active.
@@ -52,17 +55,17 @@ namespace TEN::Entities::Traps::TR1
 			item.Pose.Orientation.y += item.ItemFlags[0];
 
 			// Calculate vertical velocity.
-			item.Animation.Velocity.y += (item.Animation.Velocity.y < DAMOCLES_SWORD_VELOCITY_MAX) ? GRAVITY : 1.0f;
+			item.Animation.Velocity.y += (item.Animation.Velocity.y < DAMOCLES_SWORD_VELOCITY_MAX) ? g_GameFlow->GetSettings()->Physics.Gravity : 1.0f;
 
 			// Translate sword.
 			short headingAngle = Geometry::GetOrientToPoint(item.Pose.Position.ToVector3(), laraItem.Pose.Position.ToVector3()).y;
 			TranslateItem(&item, headingAngle, item.ItemFlags[1], item.Animation.Velocity.y);
 
 			int vPos = item.Pose.Position.y;
-			auto pointColl = GetCollision(&item);
+			auto pointColl = GetPointCollision(item);
 
 			// Impale floor.
-			if ((pointColl.Position.Floor - vPos) <= DAMOCLES_SWORD_IMPALE_DEPTH)
+			if ((pointColl.GetFloorHeight() - vPos) <= DAMOCLES_SWORD_IMPALE_DEPTH)
 			{
 				SoundEffect(SFX_TR1_DAMOCLES_ROOM_SWORD, &item.Pose);
 				float distance = Vector3::Distance(item.Pose.Position.ToVector3(), Camera.pos.ToVector3());
@@ -79,7 +82,7 @@ namespace TEN::Entities::Traps::TR1
 		}
 		
 		// Scan for player.
-		if (item.Pose.Position.y < GetCollision(&item).Position.Floor)
+		if (item.Pose.Position.y < GetPointCollision(item).GetFloorHeight())
 		{
 			item.Pose.Orientation.y += item.ItemFlags[0];
 

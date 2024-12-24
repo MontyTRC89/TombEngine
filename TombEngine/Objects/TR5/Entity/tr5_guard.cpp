@@ -3,6 +3,7 @@
 
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/los.h"
 #include "Game/effects/effects.h"
@@ -17,6 +18,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 namespace TEN::Entities::Creatures::TR5
@@ -227,7 +229,7 @@ namespace TEN::Entities::Creatures::TR5
 			item->SetMeshSwapFlags(9216);
 
 			roomItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
-			if (roomItemNumber != NO_ITEM)
+			if (roomItemNumber != NO_VALUE)
 			{
 				ItemInfo* item2 = nullptr;
 				while (true)
@@ -242,7 +244,7 @@ namespace TEN::Entities::Creatures::TR5
 					}
 
 					roomItemNumber = item2->NextItem;
-					if (roomItemNumber == NO_ITEM)
+					if (roomItemNumber == NO_VALUE)
 					{
 						item->Animation.FrameNumber = GetAnimData(item).frameBase;
 						item->Animation.ActiveState = item->Animation.TargetState;
@@ -262,7 +264,7 @@ namespace TEN::Entities::Creatures::TR5
 
 		case GuardOcb::RopeDownFast:
 			SetAnimation(item, GUARD_ANIM_ROPE_DOWN_FAST);
-			item->Pose.Position.y = GetCollision(*item).Position.Ceiling - BLOCK(2);
+			item->Pose.Position.y = GetPointCollision(*item).GetCeilingHeight() - BLOCK(2);
 			break;
 
 		case GuardOcb::WaitOnWall:
@@ -465,7 +467,7 @@ namespace TEN::Entities::Creatures::TR5
 
 				if (item->ObjectNumber == ID_SCIENTIST && item == Lara.TargetEntity)
 					item->Animation.TargetState = GUARD_STATE_SURRENDER;
-				else if (item->Animation.RequiredState != NO_STATE)
+				else if (item->Animation.RequiredState != NO_VALUE)
 					item->Animation.TargetState = item->Animation.RequiredState;
 				else if (item->AIBits & GUARD)
 				{
@@ -765,7 +767,7 @@ namespace TEN::Entities::Creatures::TR5
 					item->SetMeshSwapFlags(NO_JOINT_BITS);
 
 					short currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber;
-					if (currentItemNumber == NO_ITEM)
+					if (currentItemNumber == NO_VALUE)
 						break;
 
 					while (true)
@@ -781,11 +783,11 @@ namespace TEN::Entities::Creatures::TR5
 						}
 
 						currentItemNumber = currentItem->NextItem;
-						if (currentItemNumber == NO_ITEM)
+						if (currentItemNumber == NO_VALUE)
 							break;
 					}
 
-					if (currentItemNumber == NO_ITEM)
+					if (currentItemNumber == NO_VALUE)
 						break;
 
 					currentItem->MeshBits = -3;
@@ -847,7 +849,7 @@ namespace TEN::Entities::Creatures::TR5
 				creature->MaxTurn = 0;
 				currentItem = nullptr;
 
-				for (currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber; currentItemNumber != NO_ITEM; currentItemNumber = currentItem->NextItem)
+				for (currentItemNumber = g_Level.Rooms[item->RoomNumber].itemNumber; currentItemNumber != NO_VALUE; currentItemNumber = currentItem->NextItem)
 				{
 					currentItem = &g_Level.Items[currentItemNumber];
 					if (item->ObjectNumber == ID_PUZZLE_HOLE8) // TODO: Avoid hardcoded object number. -- TokyoSU 24/12/2022
@@ -1147,15 +1149,15 @@ namespace TEN::Entities::Creatures::TR5
 
 		x += dx;
 		z += dz;
-		int height1 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height1 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 
 		x += dx;
 		z += dz;
-		int height2 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height2 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 	
 		x += dx;
 		z += dz;
-		int height3 = GetCollision(x, y, z, item->RoomNumber).Position.Floor;
+		int height3 = GetPointCollision(Vector3i(x, y, z), item->RoomNumber).GetFloorHeight();
 	
 		int height = 0;
 		bool canJump1Sector = true;

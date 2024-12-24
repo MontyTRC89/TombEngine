@@ -3,7 +3,7 @@
 
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
-#include "Game/collision/sphere.h"
+#include "Game/collision/Point.h"
 #include "Game/control/lot.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
@@ -16,6 +16,7 @@
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Input;
 using namespace TEN::Math;
 
@@ -116,7 +117,7 @@ namespace TEN::Entities::Creatures::TR2
 		int frontBoneItemNumber = SpawnItem(item, ID_DRAGON_BONE_FRONT);
 		int backBoneItemNumber = SpawnItem(item, ID_DRAGON_BONE_BACK);
 
-		if (backBoneItemNumber == NO_ITEM || frontBoneItemNumber == NO_ITEM)
+		if (backBoneItemNumber == NO_VALUE || frontBoneItemNumber == NO_VALUE)
 		{
 			TENLog("Failed to create dragon skeleton objects.", LogLevel::Warning);
 			return;
@@ -127,7 +128,7 @@ namespace TEN::Entities::Creatures::TR2
 	{
 		int backItemNumber = SpawnItem(frontItem, ID_DRAGON_BACK);
 
-		if (backItemNumber == NO_ITEM)
+		if (backItemNumber == NO_VALUE)
 		{
 			TENLog("Failed to create dragon back body segment.", LogLevel::Warning);
 			return;
@@ -141,7 +142,7 @@ namespace TEN::Entities::Creatures::TR2
 
 		// Store back body segment item number.
 		frontItem.ItemFlags[0] = backItemNumber;
-		backItem.ItemFlags[0] = NO_ITEM;
+		backItem.ItemFlags[0] = NO_VALUE;
 	}
 
 	void InitializeDragon(short itemNumber)
@@ -166,7 +167,7 @@ namespace TEN::Entities::Creatures::TR2
 		if (backItem.Status == ITEM_DEACTIVATED)
 		{
 			KillItem(backItem.Index);
-			backItemNumber = NO_ITEM;
+			backItemNumber = NO_VALUE;
 			return;
 		}
 
@@ -192,9 +193,9 @@ namespace TEN::Entities::Creatures::TR2
 				Random::GenerateFloat(0.8f, 0.9f),
 				Random::GenerateFloat(0.4f, 0.5f),
 				Random::GenerateFloat(0.2f, 0.3f));
-			float falloff = Random::GenerateFloat(0.1f, 0.4f);
+			float falloff = Random::GenerateFloat(BLOCK(6), BLOCK(20));
 
-			TriggerDynamicLight(pos, color, falloff);
+			TriggerDynamicPointLight(pos, color, falloff);
 		}
 		break;
 
@@ -204,9 +205,9 @@ namespace TEN::Entities::Creatures::TR2
 				Random::GenerateFloat(0.8f, 0.9f),
 				Random::GenerateFloat(0.2f, 0.3f),
 				Random::GenerateFloat(0.0f, 0.1f));
-			float falloff = Random::GenerateFloat(0.1f, 0.2f);
+			float falloff = Random::GenerateFloat(BLOCK(6), BLOCK(12));
 
-			TriggerDynamicLight(pos, color, falloff);
+			TriggerDynamicPointLight(pos, color, falloff);
 		}
 		break;
 		}
@@ -333,15 +334,15 @@ namespace TEN::Entities::Creatures::TR2
 		{
 			if (GetFrameNumber(item) == GetFrameCount(item.Animation.AnimNumber))
 			{
-				auto pointColl = GetCollision(pos, item.RoomNumber);
+				auto pointColl = GetPointCollision(pos, item.RoomNumber);
 
-				if (pointColl.Position.Floor == NO_HEIGHT)
+				if (pointColl.GetFloorHeight() == NO_HEIGHT)
 				{
 					pos.y -= CLICK(0.5f);
 				}
 				else
 				{
-					pos.y = pointColl.Position.Floor - CLICK(0.5f);
+					pos.y = pointColl.GetFloorHeight() - CLICK(0.5f);
 				}
 
 				auto pose = Pose(pos, EulerAngles::Identity);

@@ -12,7 +12,9 @@
 #include "Specific/level.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Point.h"
 
+using namespace TEN::Collision::Point;
 using namespace TEN::Input;
 
 int SenetPiecesNumber[6];
@@ -123,7 +125,7 @@ void GameSticksControl(short itemNumber)
 		else
 			item2->Pose.Position.z -= 128;
 
-		probedRoomNumber = GetCollision(item2->Pose.Position.x, item2->Pose.Position.y - 32, item2->Pose.Position.z, item2->RoomNumber).RoomNumber;
+		probedRoomNumber = GetPointCollision(Vector3i(item2->Pose.Position.x, item2->Pose.Position.y - 32, item2->Pose.Position.z), item2->RoomNumber).GetRoomNumber();
 		if (item2->RoomNumber != probedRoomNumber)
 			ItemNewRoom(SenetPiecesNumber[ActivePiece], probedRoomNumber);
 		
@@ -179,7 +181,7 @@ void GameSticksControl(short itemNumber)
 							item2->Pose.Position.x = SenetTargetX - BLOCK(4 * number) + BLOCK(7);
 							item2->Pose.Position.z = SenetTargetZ + BLOCK(i % 3);
 							
-							probedRoomNumber = GetCollision(item2->Pose.Position.x, item2->Pose.Position.y - 32, item2->Pose.Position.z, item2->RoomNumber).RoomNumber;
+							probedRoomNumber = GetPointCollision(Vector3i(item2->Pose.Position.x, item2->Pose.Position.y - 32, item2->Pose.Position.z), item2->RoomNumber).GetRoomNumber();
 							if (item2->RoomNumber != probedRoomNumber)
 								ItemNewRoom(SenetPiecesNumber[i], probedRoomNumber);
 							
@@ -329,7 +331,7 @@ void SenetPieceExplosionEffect(ItemInfo* item, int color, int speed)
 void TriggerItemInRoom(short room_number, int object)//originally this is in deltapak
 {
 	short num = g_Level.Rooms[room_number].itemNumber;
-	while (num != NO_ITEM)
+	while (num != NO_VALUE)
 	{
 		auto* item = &g_Level.Items[num];
 		short nex = item->NextItem;

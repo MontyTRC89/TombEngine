@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.3 Lua API</title>
+    <title>TombEngine 1.6 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -24,7 +24,7 @@
 
 <div id="navigation">
 <br/>
-<h1>TombEngine</h1>
+<h1>&nbsp;TombEngine</h1>
 
 <ul>
   <li><a href="../index.html">Index</a></li>
@@ -45,14 +45,9 @@
 </ul>
 <h2>2 Classes</h2>
 <ul class="nowrap">
-  <li>    <a href="../2 classes/View.DisplaySprite.html">View.DisplaySprite</a></li>
-  <li>    <a href="../2 classes/Flow.Animations.html">Flow.Animations</a></li>
-  <li>    <a href="../2 classes/Flow.Fog.html">Flow.Fog</a></li>
-  <li>    <a href="../2 classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
   <li>    <a href="../2 classes/Flow.Level.html">Flow.Level</a></li>
-  <li>    <a href="../2 classes/Flow.Mirror.html">Flow.Mirror</a></li>
   <li>    <a href="../2 classes/Flow.Settings.html">Flow.Settings</a></li>
-  <li>    <a href="../2 classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
+  <li>    <a href="../2 classes/Flow.Statistics.html">Flow.Statistics</a></li>
   <li>    <a href="../2 classes/Objects.AIObject.html">Objects.AIObject</a></li>
   <li>    <a href="../2 classes/Objects.Camera.html">Objects.Camera</a></li>
   <li>    <a href="../2 classes/Objects.LaraObject.html">Objects.LaraObject</a></li>
@@ -63,11 +58,18 @@
   <li>    <a href="../2 classes/Objects.Static.html">Objects.Static</a></li>
   <li>    <a href="../2 classes/Objects.Volume.html">Objects.Volume</a></li>
   <li>    <a href="../2 classes/Strings.DisplayString.html">Strings.DisplayString</a></li>
+  <li>    <a href="../2 classes/View.DisplaySprite.html">View.DisplaySprite</a></li>
 </ul>
 <h2>3 Primitive Classes</h2>
 <ul class="nowrap">
+  <li>    <a href="../3 primitive classes/Flow.Fog.html">Flow.Fog</a></li>
+  <li>    <a href="../3 primitive classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
+  <li>    <a href="../3 primitive classes/Flow.LensFlare.html">Flow.LensFlare</a></li>
+  <li>    <a href="../3 primitive classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
+  <li>    <a href="../3 primitive classes/Flow.Starfield.html">Flow.Starfield</a></li>
   <li>    <a href="../3 primitive classes/Color.html">Color</a></li>
   <li>    <a href="../3 primitive classes/Rotation.html">Rotation</a></li>
+  <li>    <a href="../3 primitive classes/Time.html">Time</a></li>
   <li>    <a href="../3 primitive classes/Vec2.html">Vec2</a></li>
   <li>    <a href="../3 primitive classes/Vec3.html">Vec3</a></li>
 </ul>
@@ -75,14 +77,18 @@
 <ul class="nowrap">
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
+  <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
+  <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
+  <li>    <a href="../4 enums/Objects.WeaponType.html">Objects.WeaponType</a></li>
   <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
   <li>    <a href="../4 enums/Objects.RoomFlagID.html">Objects.RoomFlagID</a></li>
   <li>    <a href="../4 enums/Objects.RoomReverb.html">Objects.RoomReverb</a></li>
   <li>    <a href="../4 enums/Sound.SoundTrackType.html">Sound.SoundTrackType</a></li>
+  <li>    <a href="../4 enums/Strings.DisplayStringOption.html">Strings.DisplayStringOption</a></li>
   <li>    <a href="../4 enums/Util.LogLevel.html">Util.LogLevel</a></li>
   <li>    <a href="../4 enums/View.AlignMode.html">View.AlignMode</a></li>
   <li>    <a href="../4 enums/View.CameraType.html">View.CameraType</a></li>
@@ -93,6 +99,7 @@
 <ul class="nowrap">
   <li>    <a href="../5 lua utility modules/EventSequence.html">EventSequence</a></li>
   <li>    <a href="../5 lua utility modules/Timer.html">Timer</a></li>
+  <li>    <a href="../5 lua utility modules/Type.html">Type</a></li>
 </ul>
 
 </div>
@@ -108,9 +115,8 @@ pickups, and Lara herself (see also <a href="../2 classes/Objects.LaraObject.htm
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#Moveable">Moveable(object, name, position[, rotation][, roomID][, animNumber=0][, frameNumber=0][, hp=10][, OCB=0][, AIBits])</a></td>
-	<td class="summary">For more information on each parameter, see the
-associated getters and setters.</td>
+	<td class="name" ><a href="#Moveable">Moveable(object, name, position, rotation, roomNumber, animNumber, frameNumber, hp, OCB, AIBits)</a></td>
+	<td class="summary">Used to generate a new moveable dynamically at runtime.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:Explode">Moveable:Explode()</a></td>
@@ -121,11 +127,11 @@ associated getters and setters.</td>
 	<td class="summary">Shatter item.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetEffect">Moveable:SetEffect(effect, timeout)</a></td>
+	<td class="name" ><a href="#Moveable:SetEffect">Moveable:SetEffect(effect[, timeout])</a></td>
 	<td class="summary">Set effect to moveable</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetCustomEffect">Moveable:SetCustomEffect(Color1, Color2, timeout)</a></td>
+	<td class="name" ><a href="#Moveable:SetCustomEffect">Moveable:SetCustomEffect(Color1, Color2[, timeout])</a></td>
 	<td class="summary">Set custom colored burn effect to moveable</td>
 	</tr>
 	<tr>
@@ -141,16 +147,6 @@ associated getters and setters.</td>
 	<td class="summary">Set the moveable's status.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetOnHit">Moveable:SetOnHit(callback)</a></td>
-	<td class="summary">Set the name of the function to be called when the moveable is shot by Lara.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SetOnKilled">Moveable:SetOnKilled(callback)</a></td>
-	<td class="summary">Set the name of the function to be called when the moveable is destroyed/killed
- Note that enemy death often occurs at the end of an animation, and not at the exact moment
- the enemy's HP becomes zero.</td>
-	</tr>
-	<tr>
 	<td class="name" ><a href="#Moveable:GetObjectID">Moveable:GetObjectID()</a></td>
 	<td class="summary">Retrieve the object ID</td>
 	</tr>
@@ -163,6 +159,10 @@ associated getters and setters.</td>
 	<td class="summary">Retrieve the index of the current state.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#Moveable:GetTargetState">Moveable:GetTargetState()</a></td>
+	<td class="summary">Retrieve the index of the target state.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#Moveable:SetState">Moveable:SetState(index)</a></td>
 	<td class="summary">Set the object's state to the one specified by the given index.</td>
 	</tr>
@@ -171,12 +171,24 @@ associated getters and setters.</td>
 	<td class="summary">Retrieve the index of the current animation.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetAnim">Moveable:SetAnim(index)</a></td>
+	<td class="name" ><a href="#Moveable:SetAnim">Moveable:SetAnim(index[, slot])</a></td>
 	<td class="summary">Set the object's animation to the one specified by the given index.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetAnimSlot">Moveable:GetAnimSlot()</a></td>
+	<td class="summary">Retrieve the slot ID of the animation.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetFrame">Moveable:GetFrame()</a></td>
 	<td class="summary">Retrieve frame number.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetFrame">Moveable:SetFrame(frame)</a></td>
+	<td class="summary">Set frame number.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetEndFrame">Moveable:GetEndFrame()</a></td>
+	<td class="summary">Get the end frame number of the moveable's active animation.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:SetVelocity">Moveable:SetVelocity(velocity)</a></td>
@@ -185,10 +197,6 @@ associated getters and setters.</td>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetVelocity">Moveable:GetVelocity()</a></td>
 	<td class="summary">Get the object's velocity.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SetFrame">Moveable:SetFrame(frame)</a></td>
-	<td class="summary">Set frame number.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetHP">Moveable:GetHP()</a></td>
@@ -236,8 +244,12 @@ associated getters and setters.</td>
 	<td class="summary">Determine whether the moveable is active or not</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:GetJointPosition">Moveable:GetJointPosition(index)</a></td>
+	<td class="name" ><a href="#Moveable:GetJointPosition">Moveable:GetJointPosition(index[, offset])</a></td>
 	<td class="summary">Get the object's joint position</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetJointRotation">Moveable:GetJointRotation(index)</a></td>
+	<td class="summary">Get the object's joint rotation</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetRotation">Moveable:GetRotation()</a></td>
@@ -274,12 +286,22 @@ associated getters and setters.</td>
 	<td class="summary">Borrow animation from an object</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#Moveable:SetOnHit">Moveable:SetOnHit(callback)</a></td>
+	<td class="summary">Set the name of the function to be called when the moveable is shot by Lara.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#Moveable:SetOnCollidedWithObject">Moveable:SetOnCollidedWithObject(func)</a></td>
 	<td class="summary">Set the function to be called when this moveable collides with another moveable</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:SetOnCollidedWithRoom">Moveable:SetOnCollidedWithRoom(func)</a></td>
 	<td class="summary">Set the function called when this moveable collides with room geometry (e.g.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetOnKilled">Moveable:SetOnKilled(callback)</a></td>
+	<td class="summary">Set the name of the function to be called when the moveable is destroyed/killed
+ Note that enemy death often occurs at the end of an animation, and not at the exact moment
+ the enemy's HP becomes zero.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetPosition">Moveable:GetPosition()</a></td>
@@ -310,10 +332,6 @@ associated getters and setters.</td>
 	<td class="summary">Set AIBits of object
  Use this to force a moveable into a certain AI mode or modes, as if a certain nullmesh
  (or more than one) had suddenly spawned beneath their feet.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:GetEndFrame">Moveable:GetEndFrame()</a></td>
-	<td class="summary">Get the end frame number of the moveable's active animation.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetRoom">Moveable:GetRoom()</a></td>
@@ -365,12 +383,20 @@ associated getters and setters.</td>
  Use this to bring back original unswapped mesh</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:Enable">Moveable:Enable()</a></td>
+	<td class="name" ><a href="#Moveable:Enable">Moveable:Enable(timeout)</a></td>
 	<td class="summary">Enable the item, as if a trigger for it had been stepped on.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:Disable">Moveable:Disable()</a></td>
 	<td class="summary">Disable the item, as if an antitrigger for it had been stepped on (i.e.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetCollidable">Moveable:GetCollidable()</a></td>
+	<td class="summary">Get the item's collision state.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetCollidable">Moveable:SetCollidable(collidable)</a></td>
+	<td class="summary">Set the item's collision.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:MakeInvisible">Moveable:MakeInvisible()</a></td>
@@ -391,11 +417,12 @@ associated getters and setters.</td>
     <dl class="function">
     <dt>
     <a name = "Moveable"></a>
-    <strong>Moveable(object, name, position[, rotation][, roomID][, animNumber=0][, frameNumber=0][, hp=10][, OCB=0][, AIBits])</strong>
+    <strong>Moveable(object, name, position, rotation, roomNumber, animNumber, frameNumber, hp, OCB, AIBits)</strong>
     </dt>
     <dd>
-    For more information on each parameter, see the
-associated getters and setters.  If you do not know what to set for these,
+    Used to generate a new moveable dynamically at runtime. <br/>
+For more information on each parameter, see the
+associated getters and setters. If you do not know what to set for these,
 most can just be ignored (see usage).
 
 
@@ -416,38 +443,31 @@ most can just be ignored (see usage).
         </li>
         <li><span class="parameter">rotation</span>
             <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
-         rotation about x, y, and z axes (default Rotation(0, 0, 0))
-         (<em>optional</em>)
+         rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))
         </li>
-        <li><span class="parameter">roomID</span>
+        <li><span class="parameter">roomNumber</span>
             <span class="types"><span class="type">int</span></span>
-         room ID item is in (default: calculated automatically)
-         (<em>optional</em>)
+         the room number the moveable is in (default: calculated automatically).
         </li>
         <li><span class="parameter">animNumber</span>
             <span class="types"><span class="type">int</span></span>
-         anim number
-         (<em>default</em> 0)
+         animation number
         </li>
         <li><span class="parameter">frameNumber</span>
             <span class="types"><span class="type">int</span></span>
          frame number
-         (<em>default</em> 0)
         </li>
         <li><span class="parameter">hp</span>
             <span class="types"><span class="type">int</span></span>
          HP of item
-         (<em>default</em> 10)
         </li>
         <li><span class="parameter">OCB</span>
             <span class="types"><span class="type">int</span></span>
          ocb of item
-         (<em>default</em> 0)
         </li>
         <li><span class="parameter">AIBits</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.6">table</a></span>
          table with AI bits (default { 0, 0, 0, 0, 0, 0 })
-         (<em>optional</em>)
         </li>
     </ul>
 
@@ -465,7 +485,7 @@ most can just be ignored (see usage).
         <pre class="example"><span class="keyword">local</span> item = Moveable(
 	TEN.Objects.ObjID.PISTOLS_ITEM, <span class="comment">-- object id
 </span>	<span class="string">"test"</span>, <span class="comment">-- name
-</span>	Vec3(<span class="number">18907</span>, <span class="number">0</span>, <span class="number">21201</span>))</pre>
+</span>	Vec3(<span class="number">18907</span>, <span class="number">0</span>, <span class="number">21201</span>)) <span class="comment">-- position</span></pre>
     </ul>
 
 </dd>
@@ -501,7 +521,7 @@ most can just be ignored (see usage).
 </dd>
     <dt>
     <a name = "Moveable:SetEffect"></a>
-    <strong>Moveable:SetEffect(effect, timeout)</strong>
+    <strong>Moveable:SetEffect(effect[, timeout])</strong>
     </dt>
     <dd>
     Set effect to moveable
@@ -516,7 +536,8 @@ most can just be ignored (see usage).
         </li>
         <li><span class="parameter">timeout</span>
             <span class="types"><span class="type">float</span></span>
-         time (in seconds) after which effect turns off (optional).
+         time (in seconds) after which effect turns off.
+         (<em>optional</em>)
         </li>
     </ul>
 
@@ -527,7 +548,7 @@ most can just be ignored (see usage).
 </dd>
     <dt>
     <a name = "Moveable:SetCustomEffect"></a>
-    <strong>Moveable:SetCustomEffect(Color1, Color2, timeout)</strong>
+    <strong>Moveable:SetCustomEffect(Color1, Color2[, timeout])</strong>
     </dt>
     <dd>
     Set custom colored burn effect to moveable
@@ -546,7 +567,8 @@ most can just be ignored (see usage).
         </li>
         <li><span class="parameter">timeout</span>
             <span class="types"><span class="type">float</span></span>
-         time (in seconds) after which effect turns off (optional).
+         time (in seconds) after which effect turns off.
+         (<em>optional</em>)
         </li>
     </ul>
 
@@ -620,58 +642,6 @@ most can just be ignored (see usage).
 
 </dd>
     <dt>
-    <a name = "Moveable:SetOnHit"></a>
-    <strong>Moveable:SetOnHit(callback)</strong>
-    </dt>
-    <dd>
-    Set the name of the function to be called when the moveable is shot by Lara.
- Note that this will be triggered twice when shot with both pistols at once.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">callback</span>
-            <span class="types"><span class="type">function</span></span>
-         function in LevelFuncs hierarchy to call when moveable is shot
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:SetOnKilled"></a>
-    <strong>Moveable:SetOnKilled(callback)</strong>
-    </dt>
-    <dd>
-    Set the name of the function to be called when the moveable is destroyed/killed
- Note that enemy death often occurs at the end of an animation, and not at the exact moment
- the enemy's HP becomes zero.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">callback</span>
-            <span class="types"><span class="type">function</span></span>
-         function in LevelFuncs hierarchy to call when enemy is killed
-        </li>
-    </ul>
-
-
-
-
-    <h3>Usage:</h3>
-    <ul>
-        <pre class="example">LevelFuncs.baddyKilled = <span class="keyword">function</span>(theBaddy) <span class="global">print</span>(<span class="string">"You killed a baddy!"</span>) <span class="keyword">end</span>
-baddy:SetOnKilled(LevelFuncs.baddyKilled)</pre>
-    </ul>
-
-</dd>
-    <dt>
     <a name = "Moveable:GetObjectID"></a>
     <strong>Moveable:GetObjectID()</strong>
     </dt>
@@ -742,6 +712,28 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 
 </dd>
     <dt>
+    <a name = "Moveable:GetTargetState"></a>
+    <strong>Moveable:GetTargetState()</strong>
+    </dt>
+    <dd>
+    Retrieve the index of the target state.
+ This corresponds to the state the object is trying to get into, which is sometimes different from the active state.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        the index of the target state
+    </ol>
+
+
+
+
+</dd>
+    <dt>
     <a name = "Moveable:SetState"></a>
     <strong>Moveable:SetState(index)</strong>
     </dt>
@@ -789,7 +781,7 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 </dd>
     <dt>
     <a name = "Moveable:SetAnim"></a>
-    <strong>Moveable:SetAnim(index)</strong>
+    <strong>Moveable:SetAnim(index[, slot])</strong>
     </dt>
     <dd>
     Set the object's animation to the one specified by the given index.
@@ -804,8 +796,36 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
             <span class="types"><span class="type">int</span></span>
          the index of the desired anim
         </li>
+        <li><span class="parameter">slot</span>
+            <span class="types"><span class="type">int</span></span>
+         slot ID of the desired anim (if omitted, moveable's own slot ID is used)
+         (<em>optional</em>)
+        </li>
     </ul>
 
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetAnimSlot"></a>
+    <strong>Moveable:GetAnimSlot()</strong>
+    </dt>
+    <dd>
+    Retrieve the slot ID of the animation.
+ In certain cases, moveable may play animations from another object slot. Use this
+ function when you need to identify such cases.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        animation slot ID
+    </ol>
 
 
 
@@ -827,6 +847,54 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 
            <span class="types"><span class="type">int</span></span>
         the current frame of the active animation
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetFrame"></a>
+    <strong>Moveable:SetFrame(frame)</strong>
+    </dt>
+    <dd>
+    Set frame number.
+ This will move the animation to the given frame.
+ The number of frames in an animation can be seen under the heading "End frame" in
+ the WadTool animation editor. If the animation has no frames, the only valid argument
+ is -1.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">frame</span>
+            <span class="types"><span class="type">int</span></span>
+         the new frame number
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetEndFrame"></a>
+    <strong>Moveable:GetEndFrame()</strong>
+    </dt>
+    <dd>
+    Get the end frame number of the moveable's active animation.
+ This is the "End Frame" set in WADTool for the animation.()
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        End frame number of the active animation.
     </ol>
 
 
@@ -875,32 +943,6 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
         current object velocity
     </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:SetFrame"></a>
-    <strong>Moveable:SetFrame(frame)</strong>
-    </dt>
-    <dd>
-    Set frame number.
- This will move the animation to the given frame.
- The number of frames in an animation can be seen under the heading "End frame" in
- the WadTool animation editor. If the animation has no frames, the only valid argument
- is -1.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">frame</span>
-            <span class="types"><span class="type">int</span></span>
-         the new frame number
-        </li>
-    </ul>
-
 
 
 
@@ -1155,7 +1197,7 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 </dd>
     <dt>
     <a name = "Moveable:GetJointPosition"></a>
-    <strong>Moveable:GetJointPosition(index)</strong>
+    <strong>Moveable:GetJointPosition(index[, offset])</strong>
     </dt>
     <dd>
     Get the object's joint position
@@ -1168,13 +1210,46 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
             <span class="types"><span class="type">int</span></span>
          of a joint to get position
         </li>
+        <li><span class="parameter">offset</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         a pre-rotation offset to the joint
+         (<em>optional</em>)
+        </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-        a copy of the moveable's position
+        a copy of the moveable's joint position
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetJointRotation"></a>
+    <strong>Moveable:GetJointRotation(index)</strong>
+    </dt>
+    <dd>
+    Get the object's joint rotation
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">index</span>
+            <span class="types"><span class="type">int</span></span>
+         of a joint to get rotation
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
+        a calculated copy of the moveable's joint rotation
     </ol>
 
 
@@ -1374,6 +1449,29 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 
 </dd>
     <dt>
+    <a name = "Moveable:SetOnHit"></a>
+    <strong>Moveable:SetOnHit(callback)</strong>
+    </dt>
+    <dd>
+    Set the name of the function to be called when the moveable is shot by Lara.
+ Note that this will be triggered twice when shot with both pistols at once.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><span class="type">function</span></span>
+         function in LevelFuncs hierarchy to call when moveable is shot
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
     <a name = "Moveable:SetOnCollidedWithObject"></a>
     <strong>Moveable:SetOnCollidedWithObject(func)</strong>
     </dt>
@@ -1395,7 +1493,10 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 
     <h3>Usage:</h3>
     <ul>
-        <pre class="example">LevelFuncs.objCollided = <span class="keyword">function</span>(obj1, obj2)
+        <pre class="example"><span class="comment">-- obj1 is the collision moveable
+</span><span class="comment">-- obj2 is the collider moveable
+</span>
+LevelFuncs.objCollided = <span class="keyword">function</span>(obj1, obj2)
     <span class="global">print</span>(obj1:GetName() .. <span class="string">" collided with "</span> .. obj2:GetName())
 <span class="keyword">end</span>
 baddy:SetOnCollidedWithObject(LevelFuncs.objCollided)</pre>
@@ -1428,6 +1529,35 @@ baddy:SetOnCollidedWithObject(LevelFuncs.objCollided)</pre>
     <span class="global">print</span>(obj:GetName() .. <span class="string">" collided with room geometry"</span>)
 <span class="keyword">end</span>
 baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
+    </ul>
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetOnKilled"></a>
+    <strong>Moveable:SetOnKilled(callback)</strong>
+    </dt>
+    <dd>
+    Set the name of the function to be called when the moveable is destroyed/killed
+ Note that enemy death often occurs at the end of an animation, and not at the exact moment
+ the enemy's HP becomes zero.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">callback</span>
+            <span class="types"><span class="type">function</span></span>
+         function in LevelFuncs hierarchy to call when enemy is killed
+        </li>
+    </ul>
+
+
+
+
+    <h3>Usage:</h3>
+    <ul>
+        <pre class="example">LevelFuncs.baddyKilled = <span class="keyword">function</span>(theBaddy) <span class="global">print</span>(<span class="string">"You killed a baddy!"</span>) <span class="keyword">end</span>
+baddy:SetOnKilled(LevelFuncs.baddyKilled)</pre>
     </ul>
 
 </dd>
@@ -1584,28 +1714,6 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
         <pre class="example"><span class="keyword">local</span> sas = TEN.Objects.GetMoveableByName(<span class="string">"sas_enemy"</span>)
 sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>})</pre>
     </ul>
-
-</dd>
-    <dt>
-    <a name = "Moveable:GetEndFrame"></a>
-    <strong>Moveable:GetEndFrame()</strong>
-    </dt>
-    <dd>
-    Get the end frame number of the moveable's active animation.
- This is the "End Frame" set in WADTool for the animation.()
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">int</span></span>
-        End frame number of the active animation.
-    </ol>
-
-
-
 
 </dd>
     <dt>
@@ -1868,13 +1976,20 @@ sas:SetPosition(newPos, <span class="keyword">false</span>)</pre>
 </dd>
     <dt>
     <a name = "Moveable:Enable"></a>
-    <strong>Moveable:Enable()</strong>
+    <strong>Moveable:Enable(timeout)</strong>
     </dt>
     <dd>
     Enable the item, as if a trigger for it had been stepped on.
 
 
 
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">timeout</span>
+            <span class="types"><span class="type">float</span></span>
+         time (in seconds) after which moveable automatically disables (optional).
+        </li>
+    </ul>
 
 
 
@@ -1891,6 +2006,49 @@ sas:SetPosition(newPos, <span class="keyword">false</span>)</pre>
 
 
 
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetCollidable"></a>
+    <strong>Moveable:GetCollidable()</strong>
+    </dt>
+    <dd>
+    Get the item's collision state.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        item's collision state
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetCollidable"></a>
+    <strong>Moveable:SetCollidable(collidable)</strong>
+    </dt>
+    <dd>
+    Set the item's collision.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">collidable</span>
+            <span class="types"><span class="type">bool</span></span>
+         true if the caller should be collidable, false if no collision should occur.
+        </li>
+    </ul>
 
 
 

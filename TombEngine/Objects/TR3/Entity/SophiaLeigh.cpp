@@ -150,7 +150,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	static void KnockbackCollision(ItemInfo& item, short headingAngle)
 	{
-		item.HitPoints -= 200;
+		DoDamage(&item, 200);
 		item.HitStatus = true;
 
 		short diff = item.Pose.Orientation.y - headingAngle;
@@ -246,7 +246,7 @@ namespace TEN::Entities::Creatures::TR3
 	static void SpawnSophiaLeighProjectileBolt(ItemInfo& item, ItemInfo* enemy, const CreatureBiteInfo& bite, SophiaData* data, bool isBoltLarge, short angleAdd)
 	{
 		int fxNumber = CreateNewEffect(item.RoomNumber);
-		if (fxNumber == NO_ITEM)
+		if (fxNumber == NO_VALUE)
 			return;
 
 		auto& fx = EffectList[fxNumber];

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Objects/NamedBase.h"
 #include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
@@ -14,13 +15,15 @@ namespace sol
 enum ItemStatus;
 enum GAME_OBJECT_ID : short;
 enum class EffectType;
-class Rotation;
 class ScriptColor;
 class Vec3;
 struct ItemInfo;
+namespace TEN::Scripting { class Rotation; };
+
+using namespace TEN::Scripting;
 
 using aiBitsArray = std::array<int, 6>;
-using aiBitsType = sol::as_table_t<aiBitsArray>;
+using aiBitsType  = sol::as_table_t<aiBitsArray>;
 
 class Moveable : public NamedBase<Moveable, short>
 {
@@ -47,17 +50,20 @@ public:
 	void Destroy();
 
 	[[nodiscard]] Vec3 GetPos() const;
-	[[nodiscard]] Vec3 GetJointPos(int index) const;
+	[[nodiscard]] Vec3 GetJointPos(int index, sol::optional<Vec3> offset) const;
 	void SetPos(const Vec3& pos, sol::optional<bool> updateRoom);
 
+	[[nodiscard]] Rotation GetJointRot(int index) const;
 	[[nodiscard]] Rotation GetRot() const;
 	void SetRot(const Rotation& rot);
 
 	[[nodiscard]] int GetStateNumber() const;
+	[[nodiscard]] int GetTargetStateNumber() const;
 	void SetStateNumber(int stateNumber);
 
 	[[nodiscard]] int GetAnimNumber() const;
-	void SetAnimNumber(int animNumber);
+	[[nodiscard]] int GetAnimSlot() const;
+	void SetAnimNumber(int animNumber, sol::optional<int> slotIndex);
 
 	[[nodiscard]] int GetFrameNumber() const;
 	[[nodiscard]] int GetEndFrame() const;
@@ -111,10 +117,12 @@ public:
 	void AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId);
 	void AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID);
 
-	void EnableItem();
+	void EnableItem(sol::optional<float> timer);
 	void DisableItem();
 	void MakeInvisible();
 	void SetVisible(bool isVisible);
+	[[nodiscard]] bool GetCollidable();
+	void SetCollidable(bool isCollidable);
 	void Explode();
 	void Shatter();
 

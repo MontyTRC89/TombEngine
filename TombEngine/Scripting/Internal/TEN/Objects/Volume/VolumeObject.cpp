@@ -5,185 +5,178 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
-#include "Scripting/Internal/TEN/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Specific/level.h"
 
 /***
-Volumes
+Activator volume.
 
 @tenclass Objects.Volume
 @pragma nostrip
 */
 
-static auto index_error = index_error_maker(Volume, ScriptReserved_Volume);
-static auto newindex_error = newindex_error_maker(Volume, ScriptReserved_Volume);
+static auto IndexError = index_error_maker(Volume, ScriptReserved_Volume);
+static auto NewIndexError = newindex_error_maker(Volume, ScriptReserved_Volume);
 
-Volume::Volume(TriggerVolume& volume) : m_volume{ volume }
+Volume::Volume(TriggerVolume& volume) :
+	_volume(volume)
 {};
 
 void Volume::Register(sol::table& parent)
 {
 	parent.new_usertype<Volume>(ScriptReserved_Volume,
-		sol::no_constructor, // TODO: Ability to spawn new ones could be added later.
-		sol::meta_function::index, index_error,
-		sol::meta_function::new_index, newindex_error,
+		sol::no_constructor, // TODO: Ability to spawn new volumes could be added later.
+		sol::meta_function::index, IndexError,
+		sol::meta_function::new_index, NewIndexError,
 
-		/// Enable the volume.
-		// @function Volume:Enable
-		ScriptReserved_Enable, &Volume::Enable,
-
-		/// Disable the volume.
-		// @function Volume:Disable
-		ScriptReserved_Disable, &Volume::Disable,
-
-		/// Determine whether the volume is active or not 
-		// @function Volume:GetActive
-		// @treturn bool true if the volume is active
-		ScriptReserved_GetName, &Volume::GetActive,
-
-		/// Get the volume's position.
-		// @function Volume:GetPosition
-		// @treturn Vec3 a copy of the volume's position
+		ScriptReserved_GetName, &Volume::GetName,
 		ScriptReserved_GetPosition, &Volume::GetPos,
-
-		/// Set the volume's position.
-		// @function Volume:SetPosition
-		// @tparam Vec3 position the new position of the volume 
-		ScriptReserved_SetPosition, &Volume::SetPos,
-
-		/// Get the volume's rotation.
-		// @function Volume:GetRotation
-		// @treturn Rotation a copy of the volume's rotation
 		ScriptReserved_GetRotation, &Volume::GetRot,
-
-		/// Set the volume's rotation.
-		// @function Volume:SetRotation
-		// @tparam Rotation rotation the volume's new rotation
-		ScriptReserved_SetRotation, &Volume::SetRot,
-
-		/// Get the volume's scale (separately on all 3 axes).
-		// @function Volume:GetScale
-		// @treturn Vec3 current volume scale
 		ScriptReserved_GetScale, &Volume::GetScale,
 
-		/// Set the volume's scale (separately on all 3 axes).
-		// @function Volume:SetScale
-		// @tparam Vec3 scale the volume's new scale
+		ScriptReserved_SetName, &Volume::SetName,
+		ScriptReserved_SetPosition, &Volume::SetPos,
+		ScriptReserved_SetRotation, &Volume::SetRot,
 		ScriptReserved_SetScale, &Volume::SetScale,
 
-		/// Get the volume's unique string identifier.
-		// @function Volume:GetName
-		// @treturn string the volume's name
-		ScriptReserved_GetName, &Volume::GetName,
-
-		/// Set the volume's name (its unique string identifier).
-		// @function Volume:SetName
-		// @tparam string name The volume's new name
-		ScriptReserved_SetName, &Volume::SetName,
-
-		/// Clear activator list for volumes (makes volume trigger everything again)
-		// @function Volume:ClearActivators
+		ScriptReserved_Enable, &Volume::Enable,
+		ScriptReserved_Disable, &Volume::Disable,
 		ScriptReserved_ClearActivators, &Volume::ClearActivators,
 
-		/// Check if specified moveable is inside the volume
-		// @function Volume:IsMoveableInside
-		// @tparam Objects.Moveable Moveable which should be checked for containment
-		// @treturn bool state of the moveable, true if contained, false if not
+		ScriptReserved_GetActive, &Volume::GetActive,
 		ScriptReserved_IsMoveableInside, &Volume::IsMoveableInside);
 }
 
-void Volume::Enable()
+/// Get the unique string identifier of this volume.
+// @function Volume:GetName()
+// @treturn string Name.
+std::string Volume::GetName() const
 {
-	m_volume.Enabled = true;
+	return _volume.Name;
 }
 
-void Volume::Disable()
-{
-	ClearActivators();
-	m_volume.Enabled = false;
-}
-
-bool Volume::GetActive() const
-{
-	return m_volume.Enabled;
-}
-
+/// Get the position of this volume.
+// @function Volume:GetPosition()
+// @treturn Vec3 Position.
 Vec3 Volume::GetPos() const
 {
-	return Vec3(m_volume.Box.Center.x, m_volume.Box.Center.y, m_volume.Box.Center.z);
+	return Vec3(_volume.Box.Center.x, _volume.Box.Center.y, _volume.Box.Center.z);
 }
 
-void Volume::SetPos(const Vec3& pos)
-{
-	m_volume.Box.Center =
-	m_volume.Sphere.Center = Vector3i(pos).ToVector3();
-}
-
+/// Get the rotation of this volume.
+// @function Volume:GetRotation()
+// @treturn Rotation Rotation.
 Rotation Volume::GetRot() const
 {
-	auto eulers = EulerAngles(m_volume.Box.Orientation);
+	auto eulers = EulerAngles(_volume.Box.Orientation);
 	return Rotation(TO_DEGREES(eulers.x), TO_DEGREES(eulers.y), TO_DEGREES(eulers.z));
 }
 
-void Volume::SetRot(const Rotation& rot)
-{
-	auto eulers = EulerAngles(ANGLE(rot.x), ANGLE(rot.y), ANGLE(rot.z));
-	m_volume.Box.Orientation = eulers.ToQuaternion();
-}
-
+/// Get this scale of this volume.
+// @function Volume:GetScale()
+// @treturn Vec3 Scale.
 Vec3 Volume::GetScale() const
 {
-	return Vec3((Vector3)m_volume.Box.Extents);
+	return Vec3((Vector3)_volume.Box.Extents);
 }
 
-void Volume::SetScale(const Vec3& scale)
-{
-	m_volume.Box.Extents = Vector3(scale.x, scale.y, scale.z);
-	m_volume.Sphere.Radius = m_volume.Box.Extents.x;
-}
-
-std::string Volume::GetName() const
-{
-	return m_volume.Name;
-}
-
+/// Set the unique string identifier of this volume.
+// @function Volume:SetName()
+// @tparam string name New name.
 void Volume::SetName(const std::string& name)
 {
-	if (!ScriptAssert(!name.empty(), "Name cannot be blank. Not setting name."))
+	if (!ScriptAssert(!name.empty(), "Attempted to set name to blank string."))
 		return;
 
-	if (s_callbackSetName(name, m_volume))
+	// Remove previous name if it exists.
+	if (s_callbackSetName(name, _volume))
 	{
-		// Remove the old name if we have one.
-		s_callbackRemoveName(m_volume.Name);
-		m_volume.Name = name;
+		s_callbackRemoveName(_volume.Name);
+		_volume.Name = name;
 	}
 	else
 	{
-		ScriptAssertF(false, "Could not add name {} - does an object with this name already exist?", name);
-		TENLog("Name will not be set", LogLevel::Warning, LogConfig::All);
+		ScriptAssertF(false, "Could not add name {}. Object with this name may already exist.", name);
+		TENLog("Name not set.", LogLevel::Warning, LogConfig::All);
 	}
 }
 
-void Volume::ClearActivators()
+/// Set the position of this volume.
+// @function Volume:SetPosition()
+// @tparam Vec3 pos New position.
+void Volume::SetPos(const Vec3& pos)
 {
-	m_volume.StateQueue.clear();
+	_volume.Box.Center =
+	_volume.Sphere.Center = pos.ToVector3();
 }
 
-bool Volume::IsMoveableInside(const Moveable& moveable)
+/// Set the rotation of this volume.
+// @function Volume:SetRotation()
+// @tparam Rotation rot New rotation.
+void Volume::SetRot(const Rotation& rot)
 {
-	for (auto& entry : m_volume.StateQueue)
+	auto eulers = EulerAngles(ANGLE(rot.x), ANGLE(rot.y), ANGLE(rot.z));
+	_volume.Box.Orientation = eulers.ToQuaternion();
+}
+
+/// Set the scale of the volume.
+// @function Volume:SetScale()
+// @tparam Vec3 scale New scale.
+void Volume::SetScale(const Vec3& scale)
+{
+	_volume.Box.Extents = scale.ToVector3();
+	_volume.Sphere.Radius = _volume.Box.Extents.x;
+}
+
+/// Determine if this volume is active.
+// @function Volume:GetActive()
+// @treturn bool Boolean representing active status.
+bool Volume::GetActive() const
+{
+	return _volume.Enabled;
+}
+
+/// Determine if a moveable is inside this volume.
+// @function Volume:IsMoveableInside()
+// @tparam Objects.Moveable Moveable to be checked for containment.
+// @treturn bool Boolean representing containment status.
+bool Volume::IsMoveableInside(const Moveable& mov)
+{
+	for (const auto& entry : _volume.StateQueue)
 	{
+		// TODO: Use int, not short.
 		if (std::holds_alternative<short>(entry.Activator))
 		{
-			short id = std::get<short>(entry.Activator);
-			auto& mov = std::make_unique<Moveable>(id);
+			int id = std::get<short>(entry.Activator);
+			auto& mov2 = std::make_unique<Moveable>(id);
 
-			if (mov.get()->GetName() == moveable.GetName())
+			if (mov2.get()->GetName() == mov.GetName())
 				return true;
 		}
 	}
 
 	return false;
+}
+
+/// Enable this volume.
+// @function Volume:Enable()
+void Volume::Enable()
+{
+	_volume.Enabled = true;
+}
+
+/// Disable this volume.
+// @function Volume:Disable()
+void Volume::Disable()
+{
+	ClearActivators();
+	_volume.Enabled = false;
+}
+
+/// Clear the activators for this volume, allowing it to trigger again.
+// @function Volume:ClearActivators()
+void Volume::ClearActivators()
+{
+	_volume.StateQueue.clear();
 }

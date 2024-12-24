@@ -2,13 +2,18 @@
 #include "Objects/TR3/Trap/ElectricCleaner.h"
 
 #include "Game/collision/collide_item.h"
+#include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/misc.h"
 #include "Game/Setup.h"
 
+using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Floordata;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;
 
@@ -69,99 +74,15 @@ namespace TEN::Entities::Traps
 		}
 	}
 
-	static bool IsNextSectorValid(const ItemInfo& item, const Vector3& dir)
-	{
-		auto projectedPos = Geometry::TranslatePoint(item.Pose.Position, dir, BLOCK(1));
-		auto pointColl = GetCollision(item.Pose.Position, item.RoomNumber, dir, BLOCK(1));
-
-		// Test for wall.
-		if (pointColl.Block->IsWall(projectedPos.x, projectedPos.z))
-			return false;
-
-		// Test for slippery slope.
-		if (pointColl.Position.FloorSlope)
-			return false;
-
-		// Flat floor.
-		if (abs(pointColl.FloorTilt.x) == 0 && abs(pointColl.FloorTilt.y) == 0)
-		{
-			// Test for step.
-			int relFloorHeight = abs(pointColl.Position.Floor - item.Pose.Position.y);
-			if (relFloorHeight >= CLICK(1))
-				return false;
-		}
-		// Sloped floor.
-		else
-		{
-			// Half block.
-			int relFloorHeight = abs(pointColl.Position.Floor - item.Pose.Position.y);
-			if (relFloorHeight > CLICK(2))
-				return false;
-
-			short slopeAngle = ANGLE(0.0f);
-			if (pointColl.FloorTilt.x > 0)
-			{
-				slopeAngle = ANGLE(-90.0f);
-			}
-			else if (pointColl.FloorTilt.x < 0)
-			{
-				slopeAngle = ANGLE(90.0f);
-			}
-
-			if (pointColl.FloorTilt.y > 0 && pointColl.FloorTilt.y > abs(pointColl.FloorTilt.x))
-			{
-				slopeAngle = ANGLE(180.0f);
-			}
-			else if (pointColl.FloorTilt.y < 0 && -pointColl.FloorTilt.y > abs(pointColl.FloorTilt.x))
-			{
-				slopeAngle = ANGLE(0.0f);
-			}
-
-			short dirAngle = phd_atan(dir.z, dir.x);
-			short alignAngle = Geometry::GetShortestAngle(slopeAngle, dirAngle);
-
-			// Test if slope aspect is aligned with direction.
-			if (alignAngle != 0 && alignAngle != ANGLE(180.0f))
-				return false;
-		}
-
-		// Check for diagonal split.
-		if (pointColl.Position.DiagonalStep)
-			return false;
-
-		// Test ceiling height.
-		int relCeilHeight = abs(pointColl.Position.Ceiling - pointColl.Position.Floor);
-		int cleanerHeight = BLOCK(1);
-		if (relCeilHeight < cleanerHeight)
-			return false;
-
-		// Check for inaccessible sector.
-		if (pointColl.Block->Box == NO_BOX)
-			return false;
-
-		// Check for blocked grey box.
-		if (g_Level.Boxes[pointColl.Block->Box].flags & BLOCKABLE)
-		{
-			if (g_Level.Boxes[pointColl.Block->Box].flags& BLOCKED)
-				return false;
-		}
-
-		// Check for stopper flag.
-		if (pointColl.Block->Stopper)
-			return false;
-
-		return true;
-	}
-
 	static Vector3 GetElectricCleanerMovementDirection(const ItemInfo& item, const Vector3& dir0, const Vector3& dir1, const Vector3& dir2)
 	{
-		if (IsNextSectorValid(item, dir0))
+		if (IsNextSectorValid(item, dir0, BLOCK(1), false))
 			return dir0;
 
-		if (IsNextSectorValid(item, dir1))
+		if (IsNextSectorValid(item, dir1, BLOCK(1), false))
 			return dir1;
 
-		if (IsNextSectorValid(item, dir2))
+		if (IsNextSectorValid(item, dir2, BLOCK(1), false))
 			return dir2;
 
 		return Vector3::Zero;
@@ -190,18 +111,18 @@ namespace TEN::Entities::Traps
 			break;
 		}
 
-		if (GetCollidedObjects(&item, CLICK(1), true, CollidedItems, CollidedMeshes, true))
+		auto collObjects = GetCollidedObjects(item, true, true);
+		if (!collObjects.IsEmpty())
 		{
-			int lp = 0;
-			while (CollidedItems[lp] != nullptr)
+			for (auto* itemPtr : collObjects.Items)
 			{
-				if (Objects[CollidedItems[lp]->ObjectNumber].intelligent)
-				{
-					CollidedItems[lp]->HitPoints = 0;
-					ItemElectricBurn(CollidedItems[lp], 120);
-				}
+				const auto& object = Objects[itemPtr->ObjectNumber];
 
-				lp++;
+				if (object.intelligent)
+				{
+					itemPtr->HitPoints = 0;
+					ItemElectricBurn(itemPtr, 120);
+				}
 			}
 		}
 
@@ -309,8 +230,8 @@ namespace TEN::Entities::Traps
 
 		case ElectricCleanerState::MOVE:
 			{
-				auto pointColl = GetCollision(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, item.RoomNumber);
-				item.Pose.Position.y = pointColl.Position.Floor;
+				auto pointColl = GetPointCollision(item);
+				item.Pose.Position.y = pointColl.GetFloorHeight();
 
 				auto forwardDir = EulerAngles(0, item.Pose.Orientation.y, 0).ToDirection();
 
@@ -321,7 +242,7 @@ namespace TEN::Entities::Traps
 					(item.Pose.Position.z & WALL_MASK) == BLOCK(0.5f))
 				{
 					// Only turn on flat floor.
-					if (abs(pointColl.FloorTilt.x) == 0 && abs(pointColl.FloorTilt.y) == 0)
+					if (pointColl.GetFloorNormal() == -Vector3::UnitY)
 						activeState = ElectricCleanerState::CHOOSE_PATH;
 				}
 			}
@@ -406,7 +327,7 @@ namespace TEN::Entities::Traps
 
 		AnimateItem(&item);
 
-		int probedRoomNumber = GetCollision(&item).RoomNumber;
+		int probedRoomNumber = GetPointCollision(item).GetRoomNumber();
 		if (item.RoomNumber != probedRoomNumber)
 			ItemNewRoom(itemNumber, probedRoomNumber);
 

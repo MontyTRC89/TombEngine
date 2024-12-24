@@ -21,16 +21,19 @@ namespace TEN::Effects::EmberEmitter
 		unsigned char b = 0;
 
 		float brightnessShift = Random::GenerateFloat(-0.1f, 0.1f);
-		r = std::clamp(item.Model.Color.x + brightnessShift, 0.0f, 1.0f) * UCHAR_MAX;
-		g = std::clamp(item.Model.Color.y + brightnessShift, 0.0f, 1.0f) * UCHAR_MAX;
-		b = std::clamp(item.Model.Color.z + brightnessShift, 0.0f, 1.0f) * UCHAR_MAX;
+		r = std::clamp(item.Model.Color.x / 2.0f + brightnessShift, 0.0f, 1.0f) * UCHAR_MAX;
+		g = std::clamp(item.Model.Color.y / 2.0f + brightnessShift, 0.0f, 1.0f) * UCHAR_MAX;
+		b = std::clamp(item.Model.Color.z / 2.0f + brightnessShift, 0.0f, 1.0f) * UCHAR_MAX;
 		
 		if (item.TriggerFlags < 0)
 		{
+			if (item.TriggerFlags > -11)
+				item.TriggerFlags = -11;
+
 			if (!item.ItemFlags[2])
 			{
-				int div = abs(item.TriggerFlags) % 10 << 10;
-				int mod = abs(item.TriggerFlags) / 10 << 10;
+				int div = (abs(item.TriggerFlags) % 10) << 10;
+				int mod = (abs(item.TriggerFlags) / 10) << 10;
 
 				// TODO: Use Random::GenerateInt()
 				item.ItemFlags[0] = GetRandomControl() % div;

@@ -12,7 +12,6 @@
 #include "Renderer/Renderer.h"
 
 using namespace TEN::Math;
-using TEN::Renderer::g_Renderer;
 
 namespace TEN::Collision::Interaction
 {
@@ -219,7 +218,7 @@ namespace TEN::Collision::Interaction
 
 		// Draw collision box.
 		auto collBox = GameBoundingBox(&interactable).ToBoundingOrientedBox(interactable.Pose);
-		g_Renderer.AddDebugBox(collBox, COLL_BOX_COLOR);
+		DrawDebugBox(collBox, COLL_BOX_COLOR);
 
 		auto rotMatrix = interactable.Pose.Orientation.ToRotationMatrix();
 		auto relCenter = Vector3::Transform(basis.Box.Center, rotMatrix);
@@ -227,6 +226,6 @@ namespace TEN::Collision::Interaction
 
 		// Draw interaction box.
 		auto interactBox = BoundingOrientedBox(interactable.Pose.Position.ToVector3() + relCenter, basis.Box.Extents, orient);
-		g_Renderer.AddDebugBox(interactBox, INTERACT_BOX_COLOR);
+		DrawDebugBox(interactBox, INTERACT_BOX_COLOR);
 	}
 }
