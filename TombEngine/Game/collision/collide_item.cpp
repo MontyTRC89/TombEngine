@@ -20,6 +20,7 @@
 #include "Math/Math.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
+#include "Specific/winmain.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
@@ -330,7 +331,10 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, ItemInfo* laraItem)
 {
-	DrawDebugBox(bounds.BoundingBox.ToBoundingOrientedBox(item->Pose), Color(1.0f, 0.0f, 0.0f), RendererDebugPage::CollisionStats);
+	if (DebugMode)
+	{
+		DrawDebugBox(bounds.BoundingBox.ToBoundingOrientedBox(item->Pose), Color(1.0f, 0.0f, 0.0f), RendererDebugPage::CollisionStats);
+	}
 
 	auto deltaOrient = laraItem->Pose.Orientation - item->Pose.Orientation;
 	if (deltaOrient.x < bounds.OrientConstraint.first.x || deltaOrient.x > bounds.OrientConstraint.second.x ||
