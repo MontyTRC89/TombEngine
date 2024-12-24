@@ -34,6 +34,7 @@ namespace TEN::Renderer
 
 	constexpr auto MenuLoadNumberLeftSide = 80;
 	constexpr auto MenuLoadNameLeftSide   = 150;
+	constexpr auto MenuLoadTimestampRightSide = 600;
 
 	// Vertical spacing templates
 	constexpr auto MenuVerticalLineSpacing = 30;
@@ -657,7 +658,7 @@ namespace TEN::Renderer
 
 				// Timestamp
 				sprintf(stringBuffer, g_GameFlow->GetString(STRING_SAVEGAME_TIMESTAMP), save.Hours, save.Minutes, save.Seconds);
-				AddString(MenuRightSideEntry, y, stringBuffer, PRINTSTRING_COLOR_WHITE, SF(selection == n));
+				AddString(MenuLoadTimestampRightSide, y, stringBuffer, PRINTSTRING_COLOR_WHITE, SF(selection == n));
 			}
 
 			GetNextLinePosition(&y);
@@ -1227,7 +1228,7 @@ namespace TEN::Renderer
 
 	void Renderer::DrawDebugInfo(RenderView& view)
 	{
-#ifdef TEST_BUILD
+#if TEST_BUILD
 		if (CurrentLevel == 0)
 		{
 			AddString("TombEngine " + std::string(TEN_VERSION_STRING) + " test build - not for distribution",
