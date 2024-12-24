@@ -26,9 +26,9 @@ short PuzzleItem;
 
 enum class PuzzleType
 {
-	Normal, 
-	Specfic, 
-	Cutscene, 
+	Normal,
+	Specfic,
+	Cutscene,
 	AnimAfter
 };
 
@@ -53,6 +53,20 @@ const ObjectCollisionBounds KeyHoleBounds =
 	std::pair(
 		EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
 		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f)))
+};
+
+const auto WaterKeyHolePosition = Vector3i(0, -571, 0);
+const ObjectCollisionBounds WaterKeyHoleBounds =
+{
+	GameBoundingBox(
+			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
+			-BLOCK(1.0f), 0,
+			-BLOCK(3 / 4.0f), BLOCK(3 / 4.0f)
+		),
+	std::pair(
+		EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
+		EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f))
+	)
 };
 
 // Puzzles
@@ -108,13 +122,26 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		puzzleType = PuzzleType::Specfic;
 	}
 
-	if (((IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() != NO_VALUE) &&
+	bool isUnderwater = (player.Control.WaterStatus == WaterStatus::Underwater);
+
+	bool actionActive = player.Control.IsMoving && player.Context.InteractedItem == itemNumber;
+
+	bool isActionReady = (IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() != NO_VALUE);
+
+	bool isPlayerAvailable = (!isUnderwater &&
+		player.Control.Look.OpticRange == 0 &&
 		laraItem->Animation.ActiveState == LS_IDLE &&
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
-		player.Control.HandStatus == HandStatus::Free &&
-		player.Control.Look.OpticRange == 0) ||
-		(player.Control.IsMoving &&
-			player.Context.InteractedItem == itemNumber))
+		player.Control.HandStatus == HandStatus::Free) ||
+		(isUnderwater &&
+			player.Control.Look.OpticRange == 0 &&
+			laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE &&
+			laraItem->Animation.AnimNumber == LA_UNDERWATER_IDLE &&
+			player.Control.HandStatus == HandStatus::Free);
+
+	const auto& boundSelect = isUnderwater ? WaterKeyHoleBounds : PuzzleBounds;
+
+	if (actionActive || (isActionReady && isPlayerAvailable))
 	{
 		short prevYOrient = receptacleItem.Pose.Orientation.y;
 
@@ -124,7 +151,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		PuzzleBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.25f);
 		PuzzleBounds.BoundingBox.Z2 = bounds.Z2 + BLOCK(0.25f);
 
-		if (TestLaraPosition(PuzzleBounds, &receptacleItem, laraItem))
+		if (TestLaraPosition(boundSelect, &receptacleItem, laraItem))
 		{
 			if (!player.Control.IsMoving)
 			{
@@ -146,8 +173,11 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 
 			if (puzzleType != PuzzleType::Cutscene)
 			{
+
 				auto pos = Vector3i(0, 0, bounds.Z1 - 100);
-				if (!MoveLaraPosition(pos, &receptacleItem, laraItem))
+				const auto& position = isUnderwater ? WaterKeyHolePosition : pos;
+
+				if (!MoveLaraPosition(position, &receptacleItem, laraItem))
 				{
 					player.Context.InteractedItem = itemNumber;
 					g_Gui.SetInventoryItemChosen(NO_VALUE);
@@ -168,7 +198,7 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 			}
 			else
 			{
-				laraItem->Animation.AnimNumber = LA_USE_PUZZLE;
+				laraItem->Animation.AnimNumber = isUnderwater ? LA_UNDERWATER_USE_PUZZLE : LA_USE_PUZZLE;
 				laraItem->Animation.ActiveState = LS_INSERT_PUZZLE;
 				receptacleItem.ItemFlags[0] = 1;
 			}
@@ -259,13 +289,26 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 
 	auto puzzleType = PuzzleType::Normal;
 
-	if ((IsHeld(In::Action) &&
+	bool isUnderwater = (player.Control.WaterStatus == WaterStatus::Underwater);
+
+	bool actionActive = player.Control.IsMoving && player.Context.InteractedItem == itemNumber;
+
+	bool isActionReady = IsHeld(In::Action);
+
+	bool isPlayerAvailable = (!isUnderwater &&
+		player.Control.Look.OpticRange == 0 &&
 		laraItem->Animation.ActiveState == LS_IDLE &&
 		laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
-		player.Control.HandStatus == HandStatus::Free &&
-		player.Control.Look.OpticRange == 0) ||
-		(player.Control.IsMoving &&
-			player.Context.InteractedItem == itemNumber))
+		player.Control.HandStatus == HandStatus::Free) ||
+		(isUnderwater &&
+			player.Control.Look.OpticRange == 0 &&
+			laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE &&
+			laraItem->Animation.AnimNumber == LA_UNDERWATER_IDLE &&
+			player.Control.HandStatus == HandStatus::Free);
+
+	const auto& boundSelect = isUnderwater ? WaterKeyHoleBounds : PuzzleBounds;
+
+	if (actionActive || (isActionReady && isPlayerAvailable))
 	{
 		short prevYOrient = receptacleItem.Pose.Orientation.y;
 
@@ -275,10 +318,12 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 		PuzzleBounds.BoundingBox.Z1 = bounds.Z1 - BLOCK(0.25f);
 		PuzzleBounds.BoundingBox.Z2 = bounds.Z2 + BLOCK(0.25f);
 
-		if (TestLaraPosition(PuzzleBounds, &receptacleItem, laraItem))
+		if (TestLaraPosition(boundSelect, &receptacleItem, laraItem))
 		{
 			auto pos = Vector3i(0, 0, bounds.Z1 - 100);
-			if (!MoveLaraPosition(pos, &receptacleItem, laraItem))
+			const auto& position = isUnderwater ? WaterKeyHolePosition : pos;
+
+			if (!MoveLaraPosition(position, &receptacleItem, laraItem))
 			{
 				player.Context.InteractedItem = itemNumber;
 				g_Gui.SetInventoryItemChosen(NO_VALUE);
@@ -286,7 +331,7 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 				return;
 			}
 
-			laraItem->Animation.AnimNumber = LA_REMOVE_PUZZLE;
+			laraItem->Animation.AnimNumber = isUnderwater ? LA_UNDERWATER_USE_PUZZLE : LA_REMOVE_PUZZLE;
 			laraItem->Animation.ActiveState = LS_REMOVE_PUZZLE;
 			receptacleItem.ItemFlags[0] = 1;
 
@@ -340,7 +385,7 @@ void PuzzleDone(ItemInfo* item, short itemNumber)
 		item->ItemFlags[5] = (int)ReusableReceptacleState::Done;
 		SetAnimation(item, 0);
 		item->DisableInterpolation = true;
-		item->ResetModelToDefault();	
+		item->ResetModelToDefault();
 	}
 	else
 	{
@@ -449,17 +494,28 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 	short triggerType = (*(triggerIndexPtr++) >> 8) & TRIGGER_BITS;
 
+	bool isUnderwater = (player->Control.WaterStatus == WaterStatus::Underwater);
+
 	bool isActionReady = (IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() != NO_VALUE);
 
-	bool isPlayerAvailable = (player->Control.Look.OpticRange == 0 &&
-							 laraItem->Animation.ActiveState == LS_IDLE &&
-							 laraItem->Animation.AnimNumber == LA_STAND_IDLE);
+	bool isPlayerAvailable = (!isUnderwater &&
+		player->Control.Look.OpticRange == 0 &&
+		laraItem->Animation.ActiveState == LS_IDLE &&
+		laraItem->Animation.AnimNumber == LA_STAND_IDLE) ||
+		(isUnderwater &&
+			player->Control.Look.OpticRange == 0 &&
+			laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE &&
+			laraItem->Animation.AnimNumber == LA_UNDERWATER_IDLE);
+
 
 	bool actionActive = player->Control.IsMoving && player->Context.InteractedItem == itemNumber;
 
+	const auto& bounds = isUnderwater ? WaterKeyHoleBounds : KeyHoleBounds;
+	const auto& position = isUnderwater ? WaterKeyHolePosition : KeyHolePosition;
+
 	if (actionActive || (isActionReady && isPlayerAvailable))
 	{
-		if (TestLaraPosition(KeyHoleBounds, keyHoleItem, laraItem))
+		if (TestLaraPosition(bounds, keyHoleItem, laraItem))
 		{
 			if (!player->Control.IsMoving)
 			{
@@ -483,7 +539,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 			if (player->Context.InteractedItem != itemNumber)
 				return;
 
-			if (MoveLaraPosition(KeyHolePosition, keyHoleItem, laraItem))
+			if (MoveLaraPosition(position, keyHoleItem, laraItem))
 			{
 				if (triggerType = TRIGGER_TYPES::SWITCH)
 					keyHoleItem->ItemFlags[1] = true;
@@ -497,13 +553,13 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 
 				if (keyHoleItem->TriggerFlags == 0)
 				{
-					laraItem->Animation.AnimNumber = LA_USE_KEY;
+					laraItem->Animation.AnimNumber = isUnderwater ? LA_UNDERWATER_USE_KEY : LA_USE_KEY;
 				}
 				else
 				{
 					laraItem->Animation.AnimNumber = animNumber;
 				}
-				
+
 				laraItem->Animation.ActiveState = LS_INSERT_KEY;
 				laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
 				player->Control.IsMoving = false;
