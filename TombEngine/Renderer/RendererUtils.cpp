@@ -68,7 +68,7 @@ namespace TEN::Renderer::Utils
 		ComPtr<ID3D11VertexShader> shader;
 		throwIfFailed(device->CreateVertexShader(bytecode->GetBufferPointer(), bytecode->GetBufferSize(), nullptr, shader.GetAddressOf()));
 		
-		if constexpr (DebugBuild)
+		if constexpr (DEBUG_BUILD)
 		{
 			char buffer[100];
 			unsigned int size = (unsigned int)std::wcstombs(buffer, fileName.c_str(), 100);
@@ -101,7 +101,7 @@ namespace TEN::Renderer::Utils
 		ComPtr<ID3D11PixelShader> shader;
 		throwIfFailed(device->CreatePixelShader(bytecode->GetBufferPointer(), bytecode->GetBufferSize(), nullptr, shader.GetAddressOf()));
 
-		if constexpr (DebugBuild)
+		if constexpr (DEBUG_BUILD)
 		{
 			char buffer[100];
 			unsigned int size = (unsigned int)std::wcstombs(buffer, fileName.c_str(), 100);
@@ -134,7 +134,7 @@ namespace TEN::Renderer::Utils
 		auto shader = ComPtr<ID3D11ComputeShader>{};
 		throwIfFailed(device->CreateComputeShader(bytecode->GetBufferPointer(), bytecode->GetBufferSize(), nullptr, shader.GetAddressOf()));
 
-		if constexpr (DebugBuild)
+		if constexpr (DEBUG_BUILD)
 		{
 			char buffer[100];
 			unsigned int size = (unsigned int)std::wcstombs(buffer, fileName.c_str(), 100);
@@ -148,7 +148,7 @@ namespace TEN::Renderer::Utils
 	{
 		unsigned int flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
 
-		if constexpr (DebugBuild)
+		if constexpr (DEBUG_BUILD)
 		{
 			flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 		}

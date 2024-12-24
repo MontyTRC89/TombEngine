@@ -44,7 +44,7 @@ namespace TEN::Debug
 		if (prevString == msg && !allowSpam)
 			return;
 
-		if constexpr (!DebugBuild)
+		if constexpr (!DEBUG_BUILD)
 		{
 			if (config == LogConfig::Debug)
 				return;
