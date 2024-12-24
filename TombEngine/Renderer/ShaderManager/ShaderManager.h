@@ -78,7 +78,7 @@ namespace TEN::Renderer::Utils
 			void Initialize(ComPtr<ID3D11Device>& device, ComPtr<ID3D11DeviceContext>& context);
 			void LoadAllShaders(int width, int height);
 
-			void Bind(Shader shader);
+			void Bind(Shader shader, bool forceNull = false);
 			const RendererShader& Get(Shader shader);
 	};
 }

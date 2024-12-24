@@ -16,7 +16,7 @@ namespace TEN::Renderer::Utils
 		TENLog("Loading shaders...", LogLevel::Info);
 
 		// Unbind any currently bound shader.
-		Bind(Shader::None);
+		Bind(Shader::None, true);
 
 		// Reset compile counter.
 		_compileCounter = 0;
@@ -27,7 +27,7 @@ namespace TEN::Renderer::Utils
 		const D3D_SHADER_MACRO roomDefinesShadowMap[] = { "SHADOW_MAP", "", nullptr, nullptr };
 
 		Load(Shader::Rooms, "Rooms", "", ShaderType::PixelAndVertex);
-		Load(Shader::RoomsAnimated, "Rooms", "", ShaderType::Vertex, &roomDefinesAnimated[0]);
+		Load(Shader::RoomsAnimated, "Rooms", "", ShaderType::Vertex, roomDefinesAnimated);
 		Load(Shader::Items, "Items", "", ShaderType::PixelAndVertex);
 		Load(Shader::Statics, "Statics", "", ShaderType::PixelAndVertex);
 		Load(Shader::Sky, "Sky", "", ShaderType::PixelAndVertex);
@@ -290,13 +290,13 @@ namespace TEN::Renderer::Utils
 		_shaders[(int)shader] = LoadOrCompile(fileName, funcName, type, defines);
 	}
 
-	void ShaderManager::Bind(Shader shader)
+	void ShaderManager::Bind(Shader shader, bool forceNull)
 	{
 		auto& shaderObj = _shaders[(int)shader];
 
-		if (shaderObj.Vertex.Shader  != nullptr) _context->VSSetShader(shaderObj.Vertex.Shader.Get(),  nullptr, 0);
-		if (shaderObj.Pixel.Shader   != nullptr) _context->PSSetShader(shaderObj.Pixel.Shader.Get(),   nullptr, 0);
-		if (shaderObj.Compute.Shader != nullptr) _context->CSSetShader(shaderObj.Compute.Shader.Get(), nullptr, 0);
+		if (shaderObj.Vertex.Shader  != nullptr || forceNull) _context->VSSetShader(shaderObj.Vertex.Shader.Get(),  nullptr, 0);
+		if (shaderObj.Pixel.Shader   != nullptr || forceNull) _context->PSSetShader(shaderObj.Pixel.Shader.Get(),   nullptr, 0);
+		if (shaderObj.Compute.Shader != nullptr || forceNull) _context->CSSetShader(shaderObj.Compute.Shader.Get(), nullptr, 0);
 	}
 
 	const RendererShader& ShaderManager::Get(Shader shader)
