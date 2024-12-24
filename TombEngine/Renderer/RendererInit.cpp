@@ -295,7 +295,7 @@ namespace TEN::Renderer
 		};
 
 		Utils::throwIfFailed(_device->CreateInputLayout(postProcessInputLayoutItems, 3, 
-							 _sPostProcess.Vertex.Blob->GetBufferPointer(), _sPostProcess.Vertex.Blob->GetBufferSize(), &_fullscreenTriangleInputLayout));
+			_sPostProcess.Vertex.Blob->GetBufferPointer(), _sPostProcess.Vertex.Blob->GetBufferSize(), &_fullscreenTriangleInputLayout));
 
 		_sPostProcessMonochrome = CompileOrLoadShader("PostProcess", "Monochrome", ShaderType::Pixel);
 		_sPostProcessNegative   = CompileOrLoadShader("PostProcess", "Negative",   ShaderType::Pixel);
