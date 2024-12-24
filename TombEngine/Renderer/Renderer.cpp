@@ -268,11 +268,13 @@ namespace TEN::Renderer
 		_stInstancedStaticMeshBuffer.StaticMeshes[instanceID].NumLights = (int)lights.size() | lightTypeMask;
 	}
 
-	void Renderer::BindMoveableLights(std::vector<RendererLight*>& lights, int roomNumber, int prevRoomNumber, float fade)
+	void Renderer::BindMoveableLights(std::vector<RendererLight*>& lights, int roomNumber, int prevRoomNumber, float fade, bool shadow)
 	{
-		int lightTypeMask = 0;
+		constexpr int SHADOWABLE_MASK = (1 << 16);
 
+		int lightTypeMask = 0;
 		int numLights = 0;
+
 		for (int i = 0; i < lights.size(); i++)
 		{
 			float fadedCoeff = 1.0f;
@@ -296,7 +298,7 @@ namespace TEN::Renderer
 			numLights++;
 		}
 
-		_stItem.NumLights = numLights | lightTypeMask;
+		_stItem.NumLights = numLights | lightTypeMask | (shadow ? SHADOWABLE_MASK : 0);
 	}
 
 	void Renderer::BindConstantBufferVS(ConstantBufferRegister constantBufferType, ID3D11Buffer** buffer)

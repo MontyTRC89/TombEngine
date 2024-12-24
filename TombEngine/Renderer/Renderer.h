@@ -365,7 +365,7 @@ namespace TEN::Renderer
 		void BindRoomLights(std::vector<RendererLight*>& lights);
 		void BindStaticLights(std::vector<RendererLight*>& lights);
 		void BindInstancedStaticLights(std::vector<RendererLight*>& lights, int instanceID);
-		void BindMoveableLights(std::vector<RendererLight*>& lights, int roomNumber, int prevRoomNumber, float fade);
+		void BindMoveableLights(std::vector<RendererLight*>& lights, int roomNumber, int prevRoomNumber, float fade, bool shadow);
 		void BindRenderTargetAsTexture(TextureRegister registerType, RenderTarget2D* target, SamplerStateRegister samplerType);
 		void BindConstantBufferVS(ConstantBufferRegister constantBufferType, ID3D11Buffer** buffer);
 		void BindConstantBufferPS(ConstantBufferRegister constantBufferType, ID3D11Buffer** buffer);

@@ -319,7 +319,9 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 	{
 		_stItem.BoneLightModes[k] = (int)GetMesh(nativeItem->Model.MeshIndex[k])->LightMode;
 	}
-	BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade);
+
+	bool acceptsShadows = laraObj.ShadowType == ShadowMode::None;
+	BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade, acceptsShadows);
 	_cbItem.UpdateData(_stItem, _context.Get());
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)

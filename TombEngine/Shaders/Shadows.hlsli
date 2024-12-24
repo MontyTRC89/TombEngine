@@ -2,7 +2,7 @@
 #include "./Math.hlsli"
 #include "./ShaderLight.hlsli"
 
-#define SHADOW_INTENSITY (0.5f)
+#define SHADOW_INTENSITY (0.6f)
 #define SHADOW_BLUR_MIN  (2.0f)
 #define SHADOW_BLUR_MAX  (8.0f)
 
