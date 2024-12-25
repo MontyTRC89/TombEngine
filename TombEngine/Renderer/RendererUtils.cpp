@@ -11,6 +11,7 @@
 #include "Renderer/Structures/RendererShader.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/trutils.h"
+#include "Structures/RendererShader.h"
 
 namespace TEN::Renderer::Utils
 {

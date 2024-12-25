@@ -3507,7 +3507,7 @@ namespace TEN::Renderer
 		SetScissor(objectInfo->Room->ClipBounds);
 
 		if (objectInfo->Bucket->Animated != 0)
-			_shaderManager.Bind(Shader::RoomsAnimated);
+			_shaderManager.Bind(Shader::RoomsAnimated
 
 		SetBlendMode(objectInfo->Bucket->BlendMode);
 		SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
