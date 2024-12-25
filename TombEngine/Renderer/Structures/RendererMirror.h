@@ -1,20 +1,17 @@
 #pragma once
-#include <SimpleMath.h>
 
 namespace TEN::Renderer::Structures
 {
-	using namespace DirectX;
-	using namespace DirectX::SimpleMath;
-
 	struct RendererMirror
 	{
-		short RoomNumber;
-		Plane Plane;
-		Matrix ReflectionMatrix;
-		bool ReflectLara;
-		bool ReflectMoveables;
-		bool ReflectStatics;
-		bool ReflectSprites;
-		bool ReflectLights;
+		int	   RoomNumber		= 0;
+		Plane  Plane			= SimpleMath::Plane();
+		Matrix ReflectionMatrix = Matrix::Identity;
+
+		bool ReflectPlayer	  = false;
+		bool ReflectMoveables = false;
+		bool ReflectStatics	  = false;
+		bool ReflectSprites	  = false;
+		bool ReflectLights	  = false;
 	};
 }

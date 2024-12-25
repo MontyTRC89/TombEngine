@@ -4,20 +4,25 @@
 #include "Game/camera.h"
 #include "Game/control/los.h"
 #include "Game/effects/effects.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_flare.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara_one_gun.h"
+#include "Game/Lara/lara_struct.h"
 #include "Game/Lara/lara_two_guns.h"
-#include "Specific/Input/Input.h"
 #include "Game/Setup.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Specific/Input/Input.h"
 
 using namespace TEN::Input;
 
 static void HandlePlayerOpticZoom(ItemInfo& item)
 {
+	constexpr auto OPTICS_RANGE_MAX	 = ANGLE(8.5f);
+	constexpr auto OPTICS_RANGE_MIN	 = ANGLE(0.7f);
+	constexpr auto OPTICS_RANGE_RATE = ANGLE(0.35f);
+
 	auto& player = GetLaraInfo(item);
 	bool isSlow = IsHeld(In::Walk);
 
@@ -64,7 +69,6 @@ static void HandlePlayerOpticAnimations(ItemInfo& item)
 		return;
 
 	int animNumber = Objects[ID_LARA_BINOCULARS_MESH].loaded ? LA_BINOCULARS_IDLE : LA_STAND_IDLE;
-
 	if (player.Control.Look.IsUsingLasersight)
 	{
 		switch (player.Control.Weapon.GunType)
@@ -95,7 +99,8 @@ static void HandlePlayerOpticAnimations(ItemInfo& item)
 			player.Torch.IsLit = false;
 			player.Flare.ControlLeft = false;
 			player.Flare.Life = 0;
-			player.Control.Weapon.GunType = player.Control.Weapon.RequestGunType = player.Control.Weapon.LastGunType;
+			player.Control.Weapon.GunType =
+			player.Control.Weapon.RequestGunType = player.Control.Weapon.LastGunType;
 		}
 		else if (player.Control.Weapon.GunType != LaraWeaponType::None &&
 				 player.Control.HandStatus != HandStatus::Free)
@@ -124,10 +129,14 @@ static void HandlePlayerOpticAnimations(ItemInfo& item)
 		player.Control.HandStatus = HandStatus::Free;
 	}
 	
-	player.LeftArm.Locked = player.RightArm.Locked = false;
-	player.LeftArm.FrameNumber = player.RightArm.FrameNumber = 0;
-	player.LeftArm.AnimNumber = player.RightArm.AnimNumber = animNumber;
-	player.LeftArm.FrameBase = player.RightArm.FrameBase = GetAnimData(animNumber).FramePtr;
+	player.LeftArm.Locked =
+	player.RightArm.Locked = false;
+	player.LeftArm.FrameNumber =
+	player.RightArm.FrameNumber = 0;
+	player.LeftArm.AnimNumber =
+	player.RightArm.AnimNumber = animNumber;
+	player.LeftArm.FrameBase =
+	player.RightArm.FrameBase = GetAnimData(animNumber).FramePtr;
 }
 
 static void ResetPlayerOpticAnimations(ItemInfo& item)
@@ -136,10 +145,14 @@ static void ResetPlayerOpticAnimations(ItemInfo& item)
 
 	ResetPlayerFlex(&item);
 
-	player.LeftArm.Locked = player.RightArm.Locked = false;
-	player.LeftArm.AnimNumber = player.RightArm.AnimNumber = 0;
-	player.LeftArm.FrameNumber = player.RightArm.FrameNumber = 0;
-	player.RightArm.FrameBase = player.LeftArm.FrameBase = GetAnimData(item).FramePtr;
+	player.LeftArm.Locked =
+	player.RightArm.Locked = false;
+	player.LeftArm.AnimNumber =
+	player.RightArm.AnimNumber = 0;
+	player.LeftArm.FrameNumber =
+	player.RightArm.FrameNumber = 0;
+	player.RightArm.FrameBase =
+	player.LeftArm.FrameBase = GetAnimData(item).FramePtr;
 	player.Control.HandStatus = player.Control.Look.IsUsingLasersight ? HandStatus::WeaponReady : HandStatus::Free;
 
 	if (!player.Control.Look.IsUsingLasersight)
@@ -156,32 +169,31 @@ static void ResetPlayerOpticAnimations(ItemInfo& item)
 	SetScreenFadeIn(OPTICS_FADE_SPEED);
 }
 
-static void DoOpticsHighlight(const ItemInfo& item, Vector3i* origin, Vector3i* target)
+static void DoOpticsHighlight(const ItemInfo& item, const Vector3i& origin, const Vector3i& target)
 {
-	auto pos1 = GameVector(*origin, item.RoomNumber);
-	auto pos2 = GameVector(*target);
+	auto origin2 = GameVector(origin, item.RoomNumber);
+	auto target2 = GameVector(target);
 
-	const auto& binocularColor  = g_GameFlow->GetSettings()->Camera.BinocularLightColor;
+	const auto& binocularsColor = g_GameFlow->GetSettings()->Camera.BinocularLightColor;
 	const auto& lasersightColor = g_GameFlow->GetSettings()->Camera.LasersightLightColor;
-	const auto& color = GetLaraInfo(item).Control.Look.IsUsingLasersight ? lasersightColor : binocularColor;
+	const auto& color = GetLaraInfo(item).Control.Look.IsUsingLasersight ? lasersightColor : binocularsColor;
 
-	TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 12, color.GetR(), color.GetG(), color.GetB());
+	TriggerDynamicLight(origin2.x, origin2.y, origin2.z, 12, color.GetR(), color.GetG(), color.GetB());
 
-	if (!LOS(&pos1, &pos2))
+	if (!LOS(&origin2, &target2))
 	{
-		int l = sqrt(pow(pos1.x - pos2.x, 2) + pow(pos1.y - pos2.y, 2) + pow(pos1.z - pos2.z, 2)) * CLICK(1);
+		int luma = sqrt(SQUARE(origin2.x - target2.x) + SQUARE(origin2.y - target2.y) + SQUARE(origin2.z - target2.z)) * CLICK(1);
+		if ((luma + 8) > 31)
+			luma = 31;
 
-		if (l + 8 > 31)
-			l = 31;
-
-		auto dir = pos1.ToVector3() - pos2.ToVector3();
+		auto dir = origin2.ToVector3() - target2.ToVector3();
 		dir.Normalize();
 		dir *= BLOCK(1);
 
-		byte r = std::max(0, color.GetR() - l);
-		byte g = std::max(0, color.GetG() - l);
-		byte b = std::max(0, color.GetB() - l);
-		TriggerDynamicLight(pos2.x + dir.x, pos2.y + dir.y, pos2.z + dir.z, l + 12, r, g, b);
+		byte r = std::max(0, color.GetR() - luma);
+		byte g = std::max(0, color.GetG() - luma);
+		byte b = std::max(0, color.GetB() - luma);
+		TriggerDynamicLight(target2.x + dir.x, target2.y + dir.y, target2.z + dir.z, luma + 12, r, g, b);
 	}
 }
 
@@ -257,7 +269,7 @@ bool HandlePlayerOptics(ItemInfo& item)
 
 		auto origin = Camera.pos.ToVector3i();
 		auto target = Camera.target.ToVector3i();
-		DoOpticsHighlight(item, &origin, &target);
+		DoOpticsHighlight(item, origin, target);
 	}
 
 	if (!breakOptics)

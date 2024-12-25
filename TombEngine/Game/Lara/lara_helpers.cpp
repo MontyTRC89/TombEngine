@@ -461,8 +461,8 @@ static short NormalizeLookAroundTurnRate(short turnRate, short opticRange)
 
 void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 {
-	constexpr auto TURN_RATE_MAX	= ANGLE(4.0f);
-	constexpr auto TURN_RATE_ACCEL	= ANGLE(0.75f);
+	constexpr auto TURN_RATE_MAX   = ANGLE(4.0f);
+	constexpr auto TURN_RATE_ACCEL = ANGLE(0.75f);
 
 	auto& player = GetLaraInfo(item);
 
