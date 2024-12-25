@@ -85,17 +85,18 @@ struct MESH
 	std::vector<BUCKET> buckets;
 };
 
-struct MirrorInfo
+struct MirrorData
 {
-	short RoomNumber;
-	Vector4 Plane;
-	Matrix ReflectionMatrix;
-	bool ReflectLara;
-	bool ReflectMoveables;
-	bool ReflectStatics;
-	bool ReflectLights;
-	bool ReflectSprites;
-	bool Enabled;
+	int	   RoomNumber		= 0;
+	Plane  Plane			= SimpleMath::Plane();
+	Matrix ReflectionMatrix = Matrix::Identity;
+	
+	bool Enabled		  = false;
+	bool ReflectPlayer	  = false;
+	bool ReflectMoveables = false;
+	bool ReflectStatics	  = false;
+	bool ReflectLights	  = false;
+	bool ReflectSprites	  = false;
 };
 
 // LevelData
@@ -136,7 +137,7 @@ struct LEVEL
 	std::vector<int>			 LoopedEventSetIndices = {};
 	std::vector<AI_OBJECT>		 AIObjects = {};
 	std::vector<SPRITE>			 Sprites   = {};
-	std::vector<MirrorInfo>		 Mirrors = {};
+	std::vector<MirrorData>		 Mirrors = {};
 
 	// Texture data
 	TEXTURE				 SkyTexture		   = {};

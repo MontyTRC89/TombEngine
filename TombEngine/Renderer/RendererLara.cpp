@@ -111,7 +111,7 @@ void Renderer::UpdateLaraAnimations(bool force)
 	auto frameData = GetFrameInterpData(*LaraItem);
 	UpdateAnimation(&rItem, playerObject, frameData, mask);
 
-	auto gunType	= Lara.Control.Weapon.GunType;
+	auto gunType = Lara.Control.Weapon.GunType;
 	auto handStatus = Lara.Control.HandStatus;
 
 	// HACK: Treat binoculars as two-handed weapon.
@@ -138,7 +138,7 @@ void Renderer::UpdateLaraAnimations(bool force)
 			playerObject.LinearizedBones[LM_LINARM]->ExtraRotation =
 			playerObject.LinearizedBones[LM_RINARM]->ExtraRotation *= Lara.RightArm.Orientation.ToQuaternion();
 		}
-		else 
+		else
 		{
 			playerObject.LinearizedBones[LM_LINARM]->ExtraRotation *= Lara.LeftArm.Orientation.ToQuaternion();
 			playerObject.LinearizedBones[LM_RINARM]->ExtraRotation *= Lara.RightArm.Orientation.ToQuaternion();
@@ -288,6 +288,7 @@ void Renderer::UpdateLaraAnimations(bool force)
 
 void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 {
+	// TODO: Avoid Lara global.
 	// Don't draw player if using optics (but still draw reflections).
 	if (Lara.Control.Look.OpticRange != 0 && _currentMirror == nullptr)
 		return;

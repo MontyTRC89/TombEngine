@@ -565,11 +565,11 @@ namespace TEN::Renderer
 		void CreateSSAONoiseTexture();
 		void InitializeSMAA();
 
-		bool RoomIsReflected(RenderView& renderView, int roomNumber);
+		bool IsRoomReflected(RenderView& renderView, int roomNumber);
 
-		inline bool IgnoreReflectionPassForRoom(int room)
+		inline bool IgnoreReflectionPassForRoom(int roomNumber)
 		{
-			return (_currentMirror != nullptr && room != _currentMirror->RoomNumber);
+			return (_currentMirror != nullptr && roomNumber != _currentMirror->RoomNumber);
 		}
 		
 		inline void ReflectVectorOptionally(Vector3& vector)

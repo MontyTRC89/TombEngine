@@ -129,7 +129,6 @@ namespace TEN::Renderer
 
 		DrawTriangles(3, 0);
 
-
 		_doingFullscreenPass = false;
 	}
 

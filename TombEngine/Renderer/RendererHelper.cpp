@@ -600,10 +600,11 @@ namespace TEN::Renderer
 		return rendererItem->BoneOrientations[boneID];
 	}
 
-	bool Renderer::RoomIsReflected(RenderView& renderView, int roomNumber)
+	bool Renderer::IsRoomReflected(RenderView& renderView, int roomNumber)
 	{
-		for (auto& mirror : renderView.Mirrors)
+		for (const auto& mirror : renderView.Mirrors)
 		{
+			// TODO: Avoid LaraItem global.
 			if (roomNumber == mirror.RoomNumber && (Camera.pos.RoomNumber == mirror.RoomNumber || LaraItem->RoomNumber == mirror.RoomNumber))
 				return true;
 		}
