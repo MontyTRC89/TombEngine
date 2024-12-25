@@ -53,6 +53,7 @@
 #include "Renderer/Graphics/Texture2DArray.h"
 #include "Renderer/Graphics/VertexBuffer.h"
 #include "Renderer/Graphics/Vertices/PostProcessVertex.h"
+#include "Renderer/ShaderManager/ShaderManager.h"
 #include "Renderer/Structures/RendererItem.h"
 #include "Renderer/Structures/RendererEffect.h"
 #include "Renderer/Structures/RendererLine3D.h"
@@ -81,6 +82,7 @@ namespace TEN::Renderer
 	using namespace TEN::Renderer::ConstantBuffers;
 	using namespace TEN::Renderer::Graphics;
 	using namespace TEN::Renderer::Structures;
+	using namespace TEN::Renderer::Utils;
 	using namespace DirectX::SimpleMath;
 
 	using TexturePair = std::tuple<Texture2D, Texture2D>;
@@ -122,34 +124,6 @@ namespace TEN::Renderer
 		RenderTarget2D _tempRoomAmbientRenderTarget3;
 		RenderTarget2D _tempRoomAmbientRenderTarget4;
 		Texture2DArray _shadowMap;
-
-		// Shaders
-
-		RendererShader _sRooms;
-		RendererShader _sRoomsAnimated;
-		RendererShader _sRoomsTransparent;
-		RendererShader _sRoomAmbient;
-		RendererShader _sRoomAmbientSky;
-		RendererShader _sItems;
-		RendererShader _sStatics;
-		RendererShader _sInstancedStatics;
-		RendererShader _sSprites;
-		RendererShader _sInstancedSprites;
-		RendererShader _sSky;
-		RendererShader _sSolid;
-		RendererShader _sInventory;
-		RendererShader _sFullScreenQuad;
-		RendererShader _sShadowMap;
-		RendererShader _sHUD;
-		RendererShader _sHUDColor;
-		RendererShader _sHUDTexture;
-		RendererShader _sHUDBarColor;
-		RendererShader _sGBuffer;
-		RendererShader _sGBufferRooms;
-		RendererShader _sGBufferRoomsAnimated;
-		RendererShader _sGBufferItems;
-		RendererShader _sGBufferStatics;
-		RendererShader _sGBufferInstancedStatics;
 
 		// Constant buffers
 
@@ -341,14 +315,6 @@ namespace TEN::Renderer
 		RenderTarget2D _SMAAEdgesRenderTarget;
 		RenderTarget2D _SMAABlendRenderTarget;
 
-		RendererShader _sSMAAEdgeDetection;
-		RendererShader _sSMAALumaEdgeDetection;
-		RendererShader _sSMAAColorEdgeDetection;
-		RendererShader _sSMAADepthEdgeDetection;
-		RendererShader _sSMAABlendingWeightCalculation;
-		RendererShader _sSMAANeighborhoodBlending;
-		RendererShader _sFXAA;
-
 		// Post-process
 
 		PostProcessMode _postProcessMode = PostProcessMode::None;
@@ -357,12 +323,6 @@ namespace TEN::Renderer
 
 		VertexBuffer<PostProcessVertex> _fullscreenTriangleVertexBuffer;
 		ComPtr<ID3D11InputLayout> _fullscreenTriangleInputLayout = nullptr;
-		RendererShader _sPostProcess;
-		RendererShader _sPostProcessMonochrome;
-		RendererShader _sPostProcessNegative;
-		RendererShader _sPostProcessExclusion;
-		RendererShader _sPostProcessFinalPass;
-		RendererShader _sPostProcessLensFlare;
 
 		bool _doingFullscreenPass = false;
 
@@ -372,9 +332,6 @@ namespace TEN::Renderer
 		RenderTarget2D _SSAORenderTarget;
 		RenderTarget2D _SSAOBlurredRenderTarget;
 		std::vector<Vector4> _SSAOKernel;
-
-		RendererShader _sSSAO;
-		RendererShader _sSSAOBlur;
 
 		// New ambient light techinque
 
@@ -398,10 +355,9 @@ namespace TEN::Renderer
 		float _interpolationFactor = 0.0f;
 		bool _graphicsSettingsChanged = false;
 
-		// Private functions
+		// Shader manager.
 
-		RendererShader CompileOrLoadShader(const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines = nullptr);
-		void BindShader(const RendererShader& shader);
+		ShaderManager _shaderManager;
 
 		void ApplySMAA(RenderTarget2D* renderTarget, RenderView& view);
 		void ApplyFXAA(RenderTarget2D* renderTarget, RenderView& view);
@@ -643,6 +599,7 @@ namespace TEN::Renderer
 		void DrawBar(float percent, const RendererHudBar& bar, GAME_OBJECT_ID textureSlot, int frame, bool poison);
 		void Create();
 		void Initialize(int w, int h, bool windowed, HWND handle);
+		void ReloadShaders();
 		void Render(float interpFactor);
 		void RenderTitle(float interpFactor);
 		void Lock();

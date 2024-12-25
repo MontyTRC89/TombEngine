@@ -279,7 +279,7 @@ namespace TEN::Renderer
 				SetDepthState(DepthState::Read);
 				SetCullMode(CullMode::None);
 
-				BindShader(_sInstancedSprites);
+				_shaderManager.Bind(Shader::InstancedSprites);
 
 				// Set up vertex buffer and parameters.
 				unsigned int stride = sizeof(Vertex);
@@ -340,7 +340,7 @@ namespace TEN::Renderer
 				SetDepthState(DepthState::Read);
 				SetCullMode(CullMode::None);
 
-				BindShader(_sSprites);
+				_shaderManager.Bind(Shader::Sprites);
 
 				wasGPUSet = true;
 			}
@@ -411,7 +411,7 @@ namespace TEN::Renderer
 			SetBlendMode(object->Sprite->BlendMode);
 			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
-			BindShader(_sInstancedSprites);
+			_shaderManager.Bind(Shader::InstancedSprites);
 
 			// Set up vertex buffer and parameters.
 			UINT stride = sizeof(Vertex);
@@ -456,7 +456,7 @@ namespace TEN::Renderer
 			SetBlendMode(object->Sprite->BlendMode);
 			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
-			BindShader(_sSprites);
+			_shaderManager.Bind(Shader::Sprites);
 
 			_stSprite.IsSoftParticle = object->Sprite->SoftParticle ? 1 : 0;
 			_stSprite.RenderType = (int)object->Sprite->renderType;
@@ -501,7 +501,7 @@ namespace TEN::Renderer
 		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 
-		BindShader(_sSprites);
+		_shaderManager.Bind(Shader::Sprites);
 
 		_sortedPolygonsVertexBuffer.Update(_context.Get(), _sortedPolygonsVertices.data(), 0, (int)_sortedPolygonsVertices.size());
 

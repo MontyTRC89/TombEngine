@@ -61,6 +61,18 @@ namespace TEN::Renderer
 		_isLocked = true;
 	}
 
+	void Renderer::ReloadShaders()
+	{
+		try
+		{
+			_shaderManager.LoadAllShaders(_screenWidth, _screenHeight);
+		}
+		catch (const std::exception& e)
+		{
+			TENLog("An exception occured during shader reload: " + std::string(e.what()), LogLevel::Error);
+		}
+	}
+
 	int Renderer::Synchronize()
 	{
 		// Sync the renderer

@@ -817,7 +817,7 @@ namespace TEN::Renderer
 		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// Set shaders.
-		BindShader(_sInventory);
+		_shaderManager.Bind(Shader::Inventory);
 
 		// Set matrices.
 		CCameraMatrixBuffer hudCamera;
@@ -1010,7 +1010,7 @@ namespace TEN::Renderer
 		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// Set shaders
-		BindShader(_sInventory);
+		_shaderManager.Bind(Shader::Inventory);
 
 		if (CurrentLevel == 0)
 		{

@@ -42,7 +42,7 @@ namespace TEN::Renderer
 		_cbPostProcessBuffer.UpdateData(_stPostProcessBuffer, _context.Get());
 
 		// Common vertex shader to all fullscreen effects.
-		BindShader(_sPostProcess);
+		_shaderManager.Bind(Shader::PostProcess);
 
 		// Draw fullscreen triangle.
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -71,7 +71,7 @@ namespace TEN::Renderer
 			_context->ClearRenderTargetView(_postProcessRenderTarget[destRenderTarget].RenderTargetView.Get(), clearColor);
 			_context->OMSetRenderTargets(1, _postProcessRenderTarget[destRenderTarget].RenderTargetView.GetAddressOf(), nullptr);
 
-			BindShader(_sPostProcessLensFlare);
+			_shaderManager.Bind(Shader::PostProcessLensFlare);
 
 			for (int i = 0; i < view.LensFlaresToDraw.size(); i++)
 			{
@@ -97,15 +97,15 @@ namespace TEN::Renderer
 			switch (_postProcessMode)
 			{
 			case PostProcessMode::Monochrome:
-				BindShader(_sPostProcessMonochrome);
+				_shaderManager.Bind(Shader::PostProcessMonochrome);
 				break;
 
 			case PostProcessMode::Negative:
-				BindShader(_sPostProcessNegative);
+				_shaderManager.Bind(Shader::PostProcessNegative);
 				break;
 
 			case PostProcessMode::Exclusion:
-				BindShader(_sPostProcessExclusion);
+				_shaderManager.Bind(Shader::PostProcessExclusion);
 				break;
 
 			default:
@@ -120,7 +120,7 @@ namespace TEN::Renderer
 		}
 
 		// Do final pass.
-		BindShader(_sPostProcessFinalPass);
+		_shaderManager.Bind(Shader::PostProcessFinalPass);
 
 		_context->ClearRenderTargetView(renderTarget->RenderTargetView.Get(), Colors::Black);
 		_context->OMSetRenderTargets(1, renderTarget->RenderTargetView.GetAddressOf(), nullptr);
@@ -171,7 +171,7 @@ namespace TEN::Renderer
 		ResetScissor();
 
 		// Common vertex shader to all fullscreen effects
-		BindShader(_sPostProcess);
+		_shaderManager.Bind(Shader::PostProcess);
 
 		// We draw a fullscreen triangle
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
