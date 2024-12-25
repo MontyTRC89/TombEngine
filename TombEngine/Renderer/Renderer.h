@@ -333,9 +333,6 @@ namespace TEN::Renderer
 		RenderTarget2D _SSAOBlurredRenderTarget;
 		std::vector<Vector4> _SSAOKernel;
 
-		RendererShader _sSSAO;
-		RendererShader _sSSAOBlur;
-
 		// New ambient light techinque
 
 		RenderTarget2D _roomAmbientMapFront;
@@ -361,9 +358,6 @@ namespace TEN::Renderer
 		// Shader manager.
 
 		ShaderManager _shaderManager;
-
-		RendererShader CompileOrLoadShader(const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines = nullptr);
-		void BindShader(const RendererShader& shader);
 
 		void ApplySMAA(RenderTarget2D* renderTarget, RenderView& view);
 		void ApplyFXAA(RenderTarget2D* renderTarget, RenderView& view);
