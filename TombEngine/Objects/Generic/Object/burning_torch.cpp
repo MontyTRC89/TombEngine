@@ -14,6 +14,7 @@
 #include "Objects/Effects/flame_emitters.h"
 #include "Renderer/RendererEnums.h"
 #include "Sound/sound.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
@@ -70,7 +71,7 @@ namespace TEN::Entities::Generic
 		spark->size = Random::GenerateFloat(64, 150);
 		spark->dSize = spark->size / 8;
 
-		int spriteOffset = GameTimer % Objects[ID_FIRE_SPRITES].nmeshes;
+		int spriteOffset = GlobalCounter % Objects[ID_FIRE_SPRITES].nmeshes;
 		spark->spriteIndex = Objects[ID_FIRE_SPRITES].meshIndex + spriteOffset;
 	}
 
@@ -250,7 +251,7 @@ namespace TEN::Entities::Generic
 		}
 		else
 		{
-			item->Animation.Velocity.y += 6;
+			item->Animation.Velocity.y += g_GameFlow->GetSettings()->Physics.Gravity;
 		}
 
 		item->Pose.Position.y += item->Animation.Velocity.y;
@@ -292,25 +293,6 @@ namespace TEN::Entities::Generic
 				TriggerTorchFlame(itemNumber, 1);
 
 			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
-		}
-	}
-
-	void LaraTorch(Vector3i* origin, Vector3i* target, int rot, int color)
-	{
-		auto pos1 = GameVector(*origin, LaraItem->RoomNumber);
-		auto pos2 = GameVector(*target);
-
-		TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 12, color, color, color >> 1);
-
-		if (!LOS(&pos1, &pos2))
-		{
-			int l = sqrt(pow(pos1.x - pos2.x, 2) + pow(pos1.y - pos2.y, 2) + pow(pos1.z - pos2.z, 2)) * CLICK(1);
-
-			if (l + 8 > 31)
-				l = 31;
-
-			if (color - l >= 0)
-				TriggerDynamicLight(pos2.x, pos2.y, pos2.z, l + 8, color - l, color - l, (color - l) * 2);
 		}
 	}
 

@@ -69,7 +69,6 @@ float HighFramerateSynchronizer::GetInterpolationFactor()
 	return std::min((float)_controlDelay / (float)CONTROL_FRAME_TIME, 1.0f);
 }
 
-
 int TimeSync()
 {
 	auto ct = LARGE_INTEGER{};
@@ -103,18 +102,6 @@ bool TimeInit()
 	LdFreq /= 60.0;
 	TimeReset();
 	return true;
-}
-
-GameTime GetGameTime(int ticks)
-{
-	auto gameTime = GameTime{};
-	int seconds = ticks / FPS;
-
-	gameTime.Days    = (seconds / (DAY_UNIT * SQUARE(TIME_UNIT)));
-	gameTime.Hours   = (seconds % (DAY_UNIT * SQUARE(TIME_UNIT))) / SQUARE(TIME_UNIT);
-	gameTime.Minutes = (seconds / TIME_UNIT) % TIME_UNIT;
-	gameTime.Seconds = seconds % TIME_UNIT;
-	return gameTime;
 }
 
 bool TestGlobalTimeInterval(float intervalSecs, float offsetSecs)

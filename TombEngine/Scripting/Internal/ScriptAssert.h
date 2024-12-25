@@ -14,7 +14,6 @@ void SetScriptErrorMode(ErrorMode mode);
 ErrorMode GetScriptErrorMode();
 
 void ScriptWarn(const std::string& msg);
-
 bool ScriptAssert(bool cond, const std::string& msg, std::optional<ErrorMode> forceMode = std::nullopt);
 
 template <typename ... Ts> bool ScriptAssertF(bool cond, std::string_view str, Ts...args)

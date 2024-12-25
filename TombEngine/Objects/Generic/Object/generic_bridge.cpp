@@ -104,6 +104,6 @@ namespace TEN::Entities::Generic
 			break;
 		}
 
-		UpdateBridgeItem(bridgeItem);
+		UpdateBridgeItem(bridgeItem, BridgeUpdateType::Initialize);
 	}
 }

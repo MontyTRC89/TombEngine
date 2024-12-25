@@ -4,11 +4,13 @@
 #include <array>
 #include <d3d11.h>
 #include <deque>
+#include <filesystem>
 #include <functional>
 #include <future>
 #include <map>
 #include <memory>
 #include <optional>
+#include <regex>
 #include <set>
 #include <SimpleMath.h>
 #include <sol.hpp>

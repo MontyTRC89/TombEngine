@@ -37,8 +37,6 @@ namespace TEN::Entities::Traps
 		Radius = (item.TriggerFlags == 0) ? RADIUS_STEP : (abs(item.TriggerFlags) * RADIUS_STEP);
 		IsLethal = (item.TriggerFlags > 0);
 		IsHeavyActivator = (item.TriggerFlags <= 0);
-
-		Update(item);
 	}
 
 	static void SpawnLaserSpark(const GameVector& pos, short angle, int count, const Vector4& colorStart)
@@ -74,10 +72,10 @@ namespace TEN::Entities::Traps
 
 	static void SpawnLaserBeamLight(const Vector3& pos, int roomNumber, const Color& color, float intensity, float amplitudeMax)
 	{
-		constexpr auto FALLOFF = 0.03f;
+		constexpr auto LASER_BEAM_FALLOFF = BLOCK(1.5f);
 
 		float intensityNorm = intensity - Random::GenerateFloat(0.0f, amplitudeMax);
-		TriggerDynamicLight(pos, color * intensityNorm, FALLOFF);
+		TriggerDynamicPointLight(pos, color * intensityNorm, LASER_BEAM_FALLOFF);
 	}
 
 	void LaserBeamEffect::StoreInterpolationData()
