@@ -128,9 +128,9 @@ float3 DoShadow(float3 worldPos, float3 normal, float3 lighting, float bias)
             float samples = 0;
 
             // Perform basic PCF filtering with distance-based kernel size
-            for (float y = -kernelSize; y <= kernelSize; y += 1.0)
+            for (float y = -SHADOW_BLUR_MIN; y <= SHADOW_BLUR_MIN; y += 1.0)
             {
-                for (float x = -kernelSize; x <= kernelSize; x += 1.0)
+                for (float x = -SHADOW_BLUR_MIN; x <= SHADOW_BLUR_MIN; x += 1.0)
                 {
                     sum += ShadowMap.SampleCmpLevelZero(ShadowMapSampler, float3(lightClipSpace.xy + TexOffset(x, y), i), lightClipSpace.z);
                     samples += 1.0;
