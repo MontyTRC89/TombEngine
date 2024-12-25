@@ -11,18 +11,13 @@ Constants for LogLevel IDs.
 @pragma nostrip
 */
 
-/*** Util.LogLevel constants.
-The following constants are inside LogLevel.
+/*** Table of Util.LogLevel constants. To be used with @{Util.PrintLog} function.
 
-	INFO
-	WARNING
-	ERROR
+ - `INFO`
+ - `WARNING`
+ - `ERROR`
 
-@section Util.LogLevel
-*/
-
-/*** Table of LogLevel ID constants (for use with PrintLog() command).
-@table CONSTANT_STRING_HERE
+@table Util.LogLevel
 */
 
 static const std::unordered_map<std::string, LogLevel> LOG_LEVEL

@@ -9,12 +9,12 @@
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptUtil.h"
-#include "Scripting/Internal/TEN/Color/Color.h"
-#include "Scripting/Internal/TEN/DisplaySprite/ScriptDisplaySprite.h"
 #include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Types/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/View/AlignModes.h"
 #include "Scripting/Internal/TEN/View/CameraTypes.h"
+#include "Scripting/Internal/TEN/View/DisplaySprite/ScriptDisplaySprite.h"
 #include "Scripting/Internal/TEN/View/ScaleModes.h"
 #include "Scripting/Internal/TEN/View/PostProcessEffects.h"
 #include "Specific/clock.h"
@@ -67,9 +67,21 @@ namespace TEN::Scripting::View
 		return TO_DEGREES(GetCurrentFOV());
 	}
 
-	static CameraType GetCameraType()
+	static ScriptCameraType GetCameraType()
 	{
-		return Camera.oldType;
+		if (UseSpotCam)
+			return ScriptCameraType::Flyby;
+
+		if (Lara.Control.Look.IsUsingLasersight)
+			return ScriptCameraType::Lasersight;
+
+		if (Lara.Control.Look.IsUsingBinoculars)
+			return ScriptCameraType::Binoculars;
+
+		if (Camera.oldType == CameraType::Heavy)
+			return ScriptCameraType::Fixed;
+
+		return (ScriptCameraType)Camera.oldType;
 	}
 	
 	static Vec3 GetCameraPosition()
@@ -172,11 +184,21 @@ namespace TEN::Scripting::View
 		//@treturn View.CameraType value used by the Main Camera.
 		//@usage
 		//LevelFuncs.OnLoop = function() 
-		//	if (View.GetCameraType() == CameraType.Combat) then
+		//	if (View.GetCameraType() == CameraType.COMBAT) then
 		//		--Do your Actions here.
 		//	end
 		//end
 		tableView.set_function(ScriptReserved_GetCameraType, &GetCameraType);
+
+		///Gets current camera position.
+		//@function GetCameraPosition
+		//@treturn Vec3 current camera position
+		tableView.set_function(ScriptReserved_GetCameraPosition, &GetCameraPosition);
+
+		///Gets current camera target.
+		//@function GetCameraTarget
+		//@treturn Vec3 current camera target
+		tableView.set_function(ScriptReserved_GetCameraTarget, &GetCameraTarget);
 
 		///Gets current room where camera is positioned.
 		//@function GetCameraRoom
@@ -197,16 +219,6 @@ namespace TEN::Scripting::View
 		//@function SetPostProcessTint
 		//@tparam Color tint value to use.
 		tableView.set_function(ScriptReserved_SetPostProcessTint, &SetPostProcessTint);
-
-		///Gets current camera position.
-		//@function GetCameraPosition
-		//@treturn Vec3 current camera position
-		tableView.set_function(ScriptReserved_GetCameraPosition, &GetCameraPosition);
-
-		///Gets current camera target.
-		//@function GetCameraTarget
-		//@treturn Vec3 current camera target
-		tableView.set_function(ScriptReserved_GetCameraTarget, &GetCameraTarget);
 
 		///Enable FlyBy with specific ID
 		//@function PlayFlyBy

@@ -47,7 +47,7 @@ constexpr int WIBBLE_MAX = UCHAR_MAX - WIBBLE_SPEED + 1;
 Particle Particles[MAX_PARTICLES];
 ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
 
-FX_INFO EffectList[NUM_EFFECTS];
+FX_INFO EffectList[MAX_SPAWNED_ITEM_COUNT];
 
 GameBoundingBox DeadlyBounds;
 SPLASH_SETUP SplashSetup;
@@ -450,9 +450,11 @@ void UpdateSparks()
 	}
 }
 
-void TriggerRicochetSpark(const GameVector& pos, short angle, int count, int unk)
+void TriggerRicochetSpark(const GameVector& pos, short angle, bool sound)
 {
+	int count = Random::GenerateInt(3, 8);
 	TriggerRicochetSpark(pos, angle, count);
+	SoundEffect(SFX_TR4_WEAPON_RICOCHET, &Pose(pos.ToVector3i()));
 }
 
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv)
@@ -1135,8 +1137,7 @@ void Ricochet(Pose& pose)
 {
 	short angle = Geometry::GetOrientToPoint(pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3()).y;
 	auto target = GameVector(pose.Position);
-	TriggerRicochetSpark(target, angle / 16, 3, 0);
-	SoundEffect(SFX_TR4_WEAPON_RICOCHET, &pose);
+	TriggerRicochetSpark(target, angle / 16);
 }
 
 void ControlWaterfallMist(short itemNumber)
@@ -1246,19 +1247,20 @@ void KillAllCurrentItems(short itemNumber)
 	// TODO: Reimplement this functionality.
 }
 
-// TODO: Rename to SpawnDynamicLight().
-void TriggerDynamicLight(const Vector3& pos, const Color& color, float falloff)
+void TriggerDynamicPointLight(const Vector3& pos, const Color& color, float falloff, bool castShadows, int hash)
 {
-	g_Renderer.AddDynamicLight(
-		pos.x, pos.y, pos.z,
-		falloff * UCHAR_MAX,
-		color.x * UCHAR_MAX, color.y * UCHAR_MAX, color.z * UCHAR_MAX);
+	g_Renderer.AddDynamicPointLight(pos, falloff , color, castShadows, hash);
+}
+
+void TriggerDynamicSpotLight(const Vector3& pos, const Vector3& dir, const Color& color, float radius, float falloff, float distance, bool castShadows, int hash)
+{
+	g_Renderer.AddDynamicSpotLight(pos, dir, radius, falloff, distance, color, castShadows, hash);
 }
 
 // Deprecated. Use above version instead.
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 {
-	g_Renderer.AddDynamicLight(x, y, z, falloff, r, g, b);
+	g_Renderer.AddDynamicPointLight(Vector3(x, y, z), (float)(falloff * UCHAR_MAX), Color(r / (float)CHAR_MAX, g / (float)CHAR_MAX, b / (float)CHAR_MAX), false);
 }
 
 void SpawnPlayerWaterSurfaceEffects(const ItemInfo& item, int waterHeight, int waterDepth)
@@ -1453,8 +1455,6 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 {
 	auto* room = &g_Level.Rooms[roomNumber];
 
-	bool mirror = (roomNumber == g_GameFlow->GetLevel(CurrentLevel)->GetMirrorRoom());
-
 	bool water = false;
 	if (TestEnvironment(ENV_FLAG_WATER, room))
 	{
@@ -1503,7 +1503,6 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber)
 	spark->gravity = 0;
 	spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 64;
 	spark->dSize = 2 * (spark->sSize + 4);
-	spark->mirror = mirror;
 }
 
 void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1, const Vector3& color2)

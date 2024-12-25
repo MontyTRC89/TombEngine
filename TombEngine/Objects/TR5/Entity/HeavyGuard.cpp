@@ -532,7 +532,7 @@ namespace TEN::Entities::Creatures::TR5
 			else
 			{
 				SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target.Pose);
-				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, false);
 			}
 		}
 	}

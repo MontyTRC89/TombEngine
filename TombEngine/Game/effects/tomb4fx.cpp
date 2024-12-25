@@ -35,13 +35,7 @@ using TEN::Renderer::g_Renderer;
 // NOTE: This fixes body part exploding instantly if entity is on ground.
 constexpr auto BODY_PART_SPAWN_VERTICAL_OFFSET = CLICK(1);
 
-char LaserSightActive = 0;
-char LaserSightCol = 0;
 int NextGunshell = 0;
-
-int LaserSightX;
-int LaserSightY;
-int LaserSightZ;
 
 int NextFireSpark = 1;
 int NextSmokeSpark = 0;
@@ -898,52 +892,55 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 			pos = GetJointPosition(LaraItem, LM_LHAND, Vector3i(-16, 35, 48));
 	}
 
-	auto* gshell = &Gunshells[GetFreeGunshell()];
-
-	gshell->pos.Position = pos;
-	gshell->pos.Orientation.x = 0;
-	gshell->pos.Orientation.y = 0;
-	gshell->pos.Orientation.z = GetRandomControl();
-	gshell->roomNumber = LaraItem->RoomNumber;
-	gshell->speed = (GetRandomControl() & 0x1F) + 16;
-	gshell->fallspeed = -48 - (GetRandomControl() & 7);
-	gshell->objectNumber = objNum;
-	gshell->counter = (GetRandomControl() & 0x1F) + 60;
-
-	if (hand)
+	if (g_GameFlow->GetSettings()->Weapons[(int)weaponType - 1].Shell)
 	{
-		if (weaponType == LaraWeaponType::Shotgun)
-		{
-			gshell->dirXrot =
-				Lara.LeftArm.Orientation.y +
-				Lara.ExtraTorsoRot.y +
-				LaraItem->Pose.Orientation.y -
-				(GetRandomControl() & 0xFFF) +
-				10240;
-			gshell->pos.Orientation.y +=
-				Lara.LeftArm.Orientation.y +
-				Lara.ExtraTorsoRot.y +
-				LaraItem->Pose.Orientation.y;
+		auto& gunshell = Gunshells[GetFreeGunshell()];
 
-			if (gshell->speed < 24)
-				gshell->speed += 24;
+		gunshell.pos.Position = pos;
+		gunshell.pos.Orientation.x = 0;
+		gunshell.pos.Orientation.y = 0;
+		gunshell.pos.Orientation.z = GetRandomControl();
+		gunshell.roomNumber = LaraItem->RoomNumber;
+		gunshell.speed = (GetRandomControl() & 0x1F) + 16;
+		gunshell.fallspeed = -48 - (GetRandomControl() & 7);
+		gunshell.objectNumber = objNum;
+		gunshell.counter = (GetRandomControl() & 0x1F) + 60;
+
+		if (hand)
+		{
+			if (weaponType == LaraWeaponType::Shotgun)
+			{
+				gunshell.dirXrot =
+					Lara.LeftArm.Orientation.y +
+					Lara.ExtraTorsoRot.y +
+					LaraItem->Pose.Orientation.y -
+					(GetRandomControl() & 0xFFF) +
+					10240;
+				gunshell.pos.Orientation.y +=
+					Lara.LeftArm.Orientation.y +
+					Lara.ExtraTorsoRot.y +
+					LaraItem->Pose.Orientation.y;
+
+				if (gunshell.speed < 24)
+					gunshell.speed += 24;
+			}
+			else
+			{
+				gunshell.dirXrot =
+					Lara.LeftArm.Orientation.y +
+					LaraItem->Pose.Orientation.y -
+					(GetRandomControl() & 0xFFF) +
+					18432;
+			}
 		}
 		else
 		{
-			gshell->dirXrot =
+			gunshell.dirXrot =
 				Lara.LeftArm.Orientation.y +
-				LaraItem->Pose.Orientation.y -
-				(GetRandomControl() & 0xFFF) +
+				LaraItem->Pose.Orientation.y +
+				(GetRandomControl() & 0xFFF) -
 				18432;
 		}
-	}
-	else
-	{
-		gshell->dirXrot =
-			Lara.LeftArm.Orientation.y +
-			LaraItem->Pose.Orientation.y +
-			(GetRandomControl() & 0xFFF) -
-			18432;
 	}
 
 	if (LaraItem->MeshBits.TestAny())
@@ -986,7 +983,7 @@ void UpdateGunShells()
 				gunshell->speed -= gunshell->speed >> 1;
 			}
 			else
-				gunshell->fallspeed += 6;
+				gunshell->fallspeed += g_GameFlow->GetSettings()->Physics.Gravity;
 
 			gunshell->pos.Orientation.x += ((gunshell->speed / 2) + 7) * ANGLE(1.0f);
 			gunshell->pos.Orientation.y += gunshell->speed * ANGLE(1.0f);
@@ -1383,7 +1380,7 @@ void UpdateShockwaves()
 		{
 			auto lightColor = Color(shockwave.r / (float)UCHAR_MAX, shockwave.g / (float)UCHAR_MAX, shockwave.b / (float)UCHAR_MAX);
 			auto pos = Vector3(shockwave.x, shockwave.y, shockwave.z);
-			TriggerDynamicLight(pos, lightColor, shockwave.life / (float)UCHAR_MAX);
+			TriggerDynamicPointLight(pos, lightColor, shockwave.life / 4.0f);
 		}
 
 		if (shockwave.style != (int)ShockwaveStyle::Knockback)
@@ -1473,93 +1470,6 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 		SpawnBubble(pos, roomNumber, (int)BubbleFlags::LargeScale | (int)BubbleFlags::HighAmplitude);
 	}
 }
-
-/*void TriggerExplosionSmokeEnd(int x, int y, int z, int unk)
-{
-	auto* spark = GetFreeParticle();
-	
-	spark->on = 1;
-	if (unk)
-	{
-		spark->sR = 0;
-		spark->sG = 0;
-		spark->sB = 0;
-		spark->dR = 192;
-		spark->dG = 192;
-		spark->dB = 208;
-	}
-	else
-	{
-		spark->dR = 64;
-		spark->sR = 144;
-		spark->sG = 144;
-		spark->sB = 144;
-		spark->dG = 64;
-		spark->dB = 64;
-	}
-
-	spark->colFadeSpeed = 8;
-	spark->fadeToBlack = 64;
-	spark->life = spark->sLife = (GetRandomControl() & 0x1F) + 96;
-
-	if (unk)
-		spark->blendMode = BlendMode::Additive;
-	else
-		spark->blendMode = 3;
-
-	spark->x = (GetRandomControl() & 0x1F) + x - 16;
-	spark->y = (GetRandomControl() & 0x1F) + y - 16;
-	spark->z = (GetRandomControl() & 0x1F) + z - 16;
-	spark->xVel = ((GetRandomControl() & 0xFFF) - 2048) >> 2;
-	spark->yVel = (GetRandomControl() & 0xFF) - 128;
-	spark->zVel = ((GetRandomControl() & 0xFFF) - 2048) >> 2;
-
-	if (unk)
-	{
-		spark->friction = 20;
-		spark->yVel >>= 4;
-		spark->y += 32;
-	}
-	else
-		spark->friction = 6;
-	
-	spark->flags = 538;
-	spark->rotAng = GetRandomControl() & 0xFFF;
-
-	if (GetRandomControl() & 1)
-		spark->rotAdd = -((GetRandomControl() & 0xF) + 16);
-	else
-		spark->rotAdd = (GetRandomControl() & 0xF) + 16;
-	spark->scalar = 3;
-
-	if (unk)
-	{
-		spark->maxYvel = 0;
-		spark->gravity = 0;
-	}
-	else
-	{
-		spark->gravity = -3 - (GetRandomControl() & 3);
-		spark->maxYvel = -4 - (GetRandomControl() & 3);
-	}
-
-	int size = (GetRandomControl() & 0x1F) + 128;
-	spark->dSize = size;
-	spark->sSize = size >> 2;
-	spark->size = size >> 2;
-}
-*/
-/*void DrawLensFlares(ItemInfo* item)
-{
-	GameVector pos;
-
-	pos.x = item->pos.Position.x;
-	pos.y = item->pos.Position.y;
-	pos.z = item->pos.Position.z;
-	pos.roomNumber = item->roomNumber;
-
-	SetUpLensFlare(0, 0, 0, &pos);
-}*/
 
 void TriggerFenceSparks(int x, int y, int z, int kill, int crane)
 {

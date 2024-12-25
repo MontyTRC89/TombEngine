@@ -406,6 +406,7 @@ table Pendulum {
 
 table EventSet {
 	index: int32;
+	statuses: [bool];
 	call_counters: [int32];
 }
 
@@ -462,6 +463,10 @@ table boolTable {
 	scalar: bool;
 }
 
+table timeTable {
+	scalar: int32;
+}
+
 table vec2Table {
 	vec: Vector2;
 }
@@ -487,6 +492,7 @@ union VarUnion {
 	tab: ScriptTable,
 	num: doubleTable,
 	boolean: boolTable,
+	time: timeTable,
 	vec2: vec2Table,
 	vec3: vec3Table,
 	rotation: rotationTable,
@@ -504,7 +510,7 @@ table UnionVec {
 
 table SaveGameHeader {
 	level_name: string;
-	days: int32;
+	level_hash: int32;
 	hours: int32;
 	minutes: int32;
 	seconds: int32;
@@ -517,6 +523,7 @@ table SaveGameStatistics {
 	ammo_hits: int32;
 	ammo_used: int32;
 	medipacks_used: int32;
+	damage_taken: int32;
 	distance: int32;
 	kills: int32;
 	secrets: int32;
@@ -527,6 +534,7 @@ table SaveGame {
 	header: SaveGameHeader;
 	game: SaveGameStatistics;
 	level: SaveGameStatistics;
+	secret_bits: int32;
 	camera: Camera;
 	lara: Lara;
 	rooms: [Room];
@@ -582,6 +590,10 @@ table SaveGame {
 	callbacks_post_load: [string];
 	callbacks_pre_loop: [string];
 	callbacks_post_loop: [string];
+	callbacks_pre_useitem: [string];
+	callbacks_post_useitem: [string];
+	callbacks_pre_freeze: [string];
+	callbacks_post_freeze: [string];
 }
 
 root_type TEN.Save.SaveGame;

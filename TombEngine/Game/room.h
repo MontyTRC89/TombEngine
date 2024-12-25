@@ -21,18 +21,18 @@ extern int  FlipMap[MAX_FLIPMAP];
 
 enum RoomEnvFlags
 {
-	ENV_FLAG_WATER			  = (1 << 0),
-	ENV_FLAG_SWAMP			  = (1 << 2),
-	ENV_FLAG_OUTSIDE		  = (1 << 3),
-	ENV_FLAG_DYNAMIC_LIT	  = (1 << 4),
-	ENV_FLAG_WIND			  = (1 << 5),
-	ENV_FLAG_NOT_NEAR_OUTSIDE = (1 << 6),
-	ENV_FLAG_NO_LENSFLARE	  = (1 << 7),
-	ENV_FLAG_MIST			  = (1 << 8),
-	ENV_FLAG_CAUSTICS		  = (1 << 9),
-	ENV_FLAG_UNKNOWN3		  = (1 << 10),
-	ENV_FLAG_DAMAGE			  = (1 << 11),
-	ENV_FLAG_COLD			  = (1 << 12)
+	ENV_FLAG_WATER			 = (1 << 0),
+	ENV_FLAG_SWAMP			 = (1 << 2),
+	ENV_FLAG_SKYBOX			 = (1 << 3),
+	ENV_FLAG_DYNAMIC_LIT	 = (1 << 4),
+	ENV_FLAG_WIND			 = (1 << 5),
+	ENV_FLAG_NOT_NEAR_SKYBOX = (1 << 6),
+	ENV_FLAG_NO_LENSFLARE	 = (1 << 7),
+	ENV_FLAG_MIST			 = (1 << 8),
+	ENV_FLAG_CAUSTICS		 = (1 << 9),
+	ENV_FLAG_UNKNOWN3		 = (1 << 10),
+	ENV_FLAG_DAMAGE			 = (1 << 11),
+	ENV_FLAG_COLD			 = (1 << 12)
 };
 
 enum StaticMeshFlags : short
@@ -125,9 +125,10 @@ struct ROOM_INFO
 };
 
 void DoFlipMap(int group);
+void ResetRoomData();
 bool IsObjectInRoom(int roomNumber, GAME_OBJECT_ID objectID);
 bool IsPointInRoom(const Vector3i& pos, int roomNumber);
-int FindRoomNumber(const Vector3i& pos, int startRoomNumber = NO_VALUE);
+int FindRoomNumber(const Vector3i& pos, int startRoomNumber = NO_VALUE, bool onlyNeighbors = false);
 Vector3i GetRoomCenter(int roomNumber);
 int IsRoomOutside(int x, int y, int z);
 void InitializeNeighborRoomList();

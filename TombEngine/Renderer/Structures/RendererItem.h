@@ -8,8 +8,8 @@ namespace TEN::Renderer::Structures
 {
 	struct RendererItem
 	{
-		int ItemNumber = 0;
-		int ObjectID   = 0;
+		int ItemNumber = NO_VALUE;
+		int ObjectID   = NO_VALUE;
 
 		Vector3 Position	= Vector3::Zero;
 		int		RoomNumber	= NO_VALUE;
