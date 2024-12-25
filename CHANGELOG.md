@@ -9,6 +9,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Significantly improved renderer performance.
 * Improved engine performance around bridges.
 * Improved engine performance if weather or bubble effects are active.
+* Improved engine start-up time.
 * Fixed silent crashes if loaded level is corrupted or in incorrect format.
 * Fixed occasional crashes if there are static meshes placed within room border walls.
 * Fixed climbable pushables clipping Lara under the bridges when pulled.
@@ -30,6 +31,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed incorrect object camera position.
 * Fixed incorrect camera movement near walls after leaving look mode.
 * Fixed binocular or lasersight camera not switching off correctly after flyby.
+* Fixed binocular or lasersight camera transitions.
+* Fixed target highlighter still being active in binocular or lasersight mode.
 * Fixed Lara's Home entry not working.
 * Fixed exploding TR3 bosses.
 * Fixed original issue with deactivation of Dart Emitter.
@@ -41,9 +44,10 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed Skeleton and Mummy not reacting to shotgun hits.
 
 ### New Features
-* Added fast savegame reloading.
+* Added classic mirror effect with ability to reflect moveables and static meshes.
 * Added ability to customize many hardcoded parameters, such as flare, weapon, and hair settings.
 * Added dynamic shadow casting on objects and static meshes.
+* Added fast savegame reloading.
 * Added ricochet sounds and make the effect more prominent.
 * Allow camera shake during flybys.
 * Allow to run the engine without title level.

@@ -817,8 +817,7 @@ namespace TEN::Renderer
 		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// Set shaders.
-		_context->VSSetShader(_vsInventory.Get(), nullptr, 0);
-		_context->PSSetShader(_psInventory.Get(), nullptr, 0);
+		BindShader(_sInventory);
 
 		// Set matrices.
 		CCameraMatrixBuffer hudCamera;
@@ -890,7 +889,7 @@ namespace TEN::Renderer
 		if (!texture.Texture)
 			return;
 
-		int timeout = 20;
+		int timeout = 10;
 		float currentFade = FADE_FACTOR;
 
 		while (timeout || currentFade > 0.0f)
@@ -1011,8 +1010,7 @@ namespace TEN::Renderer
 		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// Set shaders
-		_context->VSSetShader(_vsInventory.Get(), nullptr, 0);
-		_context->PSSetShader(_psInventory.Get(), nullptr, 0);
+		BindShader(_sInventory);
 
 		if (CurrentLevel == 0)
 		{

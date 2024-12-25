@@ -296,33 +296,6 @@ namespace TEN::Entities::Generic
 		}
 	}
 
-	void LaraTorch(Vector3i* origin, Vector3i* target)
-	{
-		auto pos1 = GameVector(*origin, LaraItem->RoomNumber);
-		auto pos2 = GameVector(*target);
-
-		const auto& color = g_GameFlow->GetSettings()->Camera.BinocularLightColor;
-
-		TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 12, color.GetR(), color.GetG(), color.GetB());
-
-		if (!LOS(&pos1, &pos2))
-		{
-			int l = sqrt(pow(pos1.x - pos2.x, 2) + pow(pos1.y - pos2.y, 2) + pow(pos1.z - pos2.z, 2)) * CLICK(1);
-
-			if (l + 8 > 31)
-				l = 31;
-
-			auto dir = pos1.ToVector3() - pos2.ToVector3();
-			dir.Normalize();
-			dir *= BLOCK(1);
-
-			byte r = std::max(0, color.GetR() - l);
-			byte g = std::max(0, color.GetG() - l);
-			byte b = std::max(0, color.GetB() - l);
-			TriggerDynamicLight(pos2.x + dir.x, pos2.y + dir.y, pos2.z + dir.z, l + 12, r, g, b);
-		}
-	}
-
 	void FireCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* torchItem = &g_Level.Items[itemNumber];

@@ -1260,7 +1260,7 @@ void TriggerDynamicSpotLight(const Vector3& pos, const Vector3& dir, const Color
 // Deprecated. Use above version instead.
 void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
 {
-	g_Renderer.AddDynamicPointLight(Vector3(x, y, z), (float)(falloff * UCHAR_MAX), Color(r / (float)UCHAR_MAX, g / (float)UCHAR_MAX, b / (float)UCHAR_MAX), false);
+	g_Renderer.AddDynamicPointLight(Vector3(x, y, z), (float)(falloff * UCHAR_MAX), Color(r / (float)CHAR_MAX, g / (float)CHAR_MAX, b / (float)CHAR_MAX), false);
 }
 
 void SpawnPlayerWaterSurfaceEffects(const ItemInfo& item, int waterHeight, int waterDepth)

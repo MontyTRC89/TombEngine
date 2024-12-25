@@ -2,8 +2,9 @@
 #include "./Math.hlsli"
 #include "./ShaderLight.hlsli"
 
-#define SHADOW_INTENSITY (0.55f)
-#define INV_SHADOW_INTENSITY (1.0f - SHADOW_INTENSITY)
+#define SHADOW_INTENSITY (0.6f)
+#define SHADOW_BLUR_MIN  (2.0f)
+#define SHADOW_BLUR_MAX  (8.0f)
 
 struct Sphere
 {
@@ -102,6 +103,11 @@ float3 DoShadow(float3 worldPos, float3 normal, float3 lighting, float bias)
     float ndot = dot(normal, dir);
     float facingFactor = saturate((ndot - bias) / (1.0f - bias + EPSILON));
 
+    // Calculate distance-based blur factor with non-linear progression
+    float distanceToLight = length(Light.Position - worldPos);
+    float blurFactor = pow(saturate(distanceToLight / Light.Out), 2.0f);
+    float kernelSize = lerp(SHADOW_BLUR_MIN, SHADOW_BLUR_MAX, blurFactor);
+
     [unroll]
     for (int i = 0; i < 6; i++)
     {
@@ -119,18 +125,19 @@ float3 DoShadow(float3 worldPos, float3 normal, float3 lighting, float bias)
             lightClipSpace.y = lightClipSpace.y / -2 + 0.5;
 
             float sum = 0;
-            float x, y;
+            float samples = 0;
 
-            // Perform PCF filtering on a 4 x 4 texel neighborhood.
-            for (y = -1.5; y <= 1.5; y += 1.0)
+            // Perform basic PCF filtering with distance-based kernel size
+            for (float y = -kernelSize; y <= kernelSize; y += 1.0)
             {
-                for (x = -1.5; x <= 1.5; x += 1.0)
+                for (float x = -kernelSize; x <= kernelSize; x += 1.0)
                 {
                     sum += ShadowMap.SampleCmpLevelZero(ShadowMapSampler, float3(lightClipSpace.xy + TexOffset(x, y), i), lightClipSpace.z);
+                    samples += 1.0;
                 }
             }
 
-            shadowFactor = lerp(shadowFactor, sum / 16.0, facingFactor * insideLightBounds);
+            shadowFactor = lerp(shadowFactor, sum / samples, facingFactor * insideLightBounds);
         }
     }
 
@@ -138,11 +145,11 @@ float3 DoShadow(float3 worldPos, float3 normal, float3 lighting, float bias)
     float isSpot  = step(0.5f, Light.Type == LT_SPOT);  // 1.0 if LT_SPOT,  0.0 otherwise
     float isOther = 1.0 - (isPoint + isSpot); // 1.0 if neither LT_POINT nor LT_SPOT
 
-    float pointFactor = 1.0f - Luma(DoPointLight(worldPos, normal, Light));
-    float spotFactor  = 1.0f - Luma(DoSpotLight(worldPos, normal, Light));
+    float pointFactor = Luma(DoPointLight(worldPos, normal, Light));
+    float spotFactor  = Luma(DoSpotLight(worldPos, normal, Light));
 
-    float3 pointShadow = lighting * saturate((shadowFactor + SHADOW_INTENSITY) + (pow(pointFactor, 4) * INV_SHADOW_INTENSITY));
-    float3 spotShadow  = lighting * saturate((shadowFactor + SHADOW_INTENSITY) + (pow(spotFactor,  4) * INV_SHADOW_INTENSITY));
+    float3 pointShadow = lighting * (1.0f - (1.0f - shadowFactor) * SHADOW_INTENSITY * pointFactor);
+    float3 spotShadow  = lighting * (1.0f - (1.0f - shadowFactor) * SHADOW_INTENSITY * spotFactor );
 
     return pointShadow * isPoint + spotShadow * isSpot + lighting * isOther;
 }

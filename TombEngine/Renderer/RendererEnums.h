@@ -226,6 +226,7 @@ enum class RendererPass
 	CollectTransparentFaces,
 	Additive,
 	GBuffer,
+	GunFlashes,
 	RoomAmbient
 };
 
