@@ -434,7 +434,7 @@ namespace TEN::Renderer
 					continue;
 			}
 
-			auto newItem = _items[itemNumber];
+			auto& newItem = _items[itemNumber];
 
 			newItem.ItemNumber = itemNumber;
 			newItem.ObjectID = item.ObjectNumber;
