@@ -286,7 +286,7 @@ void Renderer::UpdateLaraAnimations(bool force)
 	rItem.DoneAnimations = true;
 }
 
-void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
+void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 {
 	// TODO: Avoid Lara global.
 	// Don't draw player if using optics (but still draw reflections).

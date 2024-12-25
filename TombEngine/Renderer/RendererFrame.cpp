@@ -493,7 +493,7 @@ namespace TEN::Renderer
 		if (r->mesh.empty())
 			return;
 
-		bool roomIsReflected = IsRoomReflected(renderView, roomNumber);
+		bool isRoomReflected = IsRoomReflected(renderView, roomNumber);
 
 		for (int i = 0; i < room.Statics.size(); i++)
 		{
@@ -523,7 +523,7 @@ namespace TEN::Renderer
 			if (obj.ObjectMeshes.empty())
 				continue;
 
-			if (!roomIsReflected && !renderView.Camera.Frustum.SphereInFrustum(mesh->Sphere.Center, mesh->Sphere.Radius))
+			if (!isRoomReflected && !renderView.Camera.Frustum.SphereInFrustum(mesh->Sphere.Center, mesh->Sphere.Radius))
 				continue;
 
 			// Collect the lights

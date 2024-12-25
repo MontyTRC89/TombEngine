@@ -561,7 +561,7 @@ namespace TEN::Renderer
 
 					if (rat->On)
 					{
-						auto* mesh = GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
+						const auto& mesh = *GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
 
 						auto world = rat->Transform;
 						ReflectMatrixOptionally(world);
@@ -575,21 +575,17 @@ namespace TEN::Renderer
 
 						_cbStatic.UpdateData(_stStatic, _context.Get());
 
-						for (auto& bucket : mesh->Buckets)
+						for (const auto& bucket : mesh.Buckets)
 						{
 							if (bucket.NumVertices == 0)
-							{
 								continue;
-							}
 
 							int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
 
 							for (int p = 0; p < passes; p++)
 							{
 								if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
-								{
 									continue;
-								}
 
 								BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 								BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
