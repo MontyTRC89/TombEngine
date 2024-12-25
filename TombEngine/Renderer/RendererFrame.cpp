@@ -359,9 +359,10 @@ namespace TEN::Renderer
 
 	void Renderer::CollectMirrors(RenderView& renderView)
 	{
-		// Collect mirrors first, because they are needed while collecting items
-		for (auto& mirror : g_Level.Mirrors)
+		// Collect mirrors first because they are needed while collecting moveables.
+		for (const auto& mirror : g_Level.Mirrors)
 		{
+			// TODO: Avoid LaraItem global.
 			if (mirror.RoomNumber != Camera.pos.RoomNumber && mirror.RoomNumber != LaraItem->RoomNumber)
 				continue;
 
@@ -369,10 +370,9 @@ namespace TEN::Renderer
 				continue;
 
 			auto& rendererMirror = renderView.Mirrors.emplace_back();
-
 			rendererMirror.RoomNumber = mirror.RoomNumber;
 			rendererMirror.ReflectionMatrix = mirror.ReflectionMatrix;
-			rendererMirror.ReflectLara = mirror.ReflectLara;
+			rendererMirror.ReflectPlayer = mirror.ReflectPlayer;
 			rendererMirror.ReflectMoveables = mirror.ReflectMoveables;
 			rendererMirror.ReflectStatics = mirror.ReflectStatics;
 			rendererMirror.ReflectSprites = mirror.ReflectSprites;
@@ -385,98 +385,100 @@ namespace TEN::Renderer
 		if (_rooms.size() < roomNumber)
 			return;
 
-		auto& room = _rooms[roomNumber];
-		auto* r = &g_Level.Rooms[room.RoomNumber];
+		auto& rendererRoom = _rooms[roomNumber];
+		const auto& room = g_Level.Rooms[rendererRoom.RoomNumber];
 
-		bool roomIsReflected = RoomIsReflected(renderView, roomNumber);
+		bool isRoomReflected = IsRoomReflected(renderView, roomNumber);
 
-		short itemNum = NO_VALUE;
-		for (itemNum = r->itemNumber; itemNum != NO_VALUE; itemNum = g_Level.Items[itemNum].NextItem)
+		short itemNumber = NO_VALUE;
+		for (itemNumber = room.itemNumber; itemNumber != NO_VALUE; itemNumber = g_Level.Items[itemNumber].NextItem)
 		{
-			auto* item = &g_Level.Items[itemNum];
+			const auto& item = g_Level.Items[itemNumber];
 
-			if (item->ObjectNumber == ID_LARA && itemNum == g_Level.Items[itemNum].NextItem)
+			if (item.ObjectNumber == ID_LARA && itemNumber == g_Level.Items[itemNumber].NextItem)
 				break;
 
-			if (item->Status == ITEM_INVISIBLE)
+			if (item.Status == ITEM_INVISIBLE)
 				continue;
 
-			if (item->ObjectNumber == ID_LARA && (SpotcamOverlay || SpotcamDontDrawLara))
+			if (item.ObjectNumber == ID_LARA && (SpotcamOverlay || SpotcamDontDrawLara))
 				continue;
 
-			if (item->ObjectNumber == ID_LARA && CurrentLevel == 0 && !g_GameFlow->IsLaraInTitleEnabled())
+			if (item.ObjectNumber == ID_LARA && CurrentLevel == 0 && !g_GameFlow->IsLaraInTitleEnabled())
 				continue;
 
-			if (!_moveableObjects[item->ObjectNumber].has_value())
+			if (!_moveableObjects[item.ObjectNumber].has_value())
 				continue;
 
-			auto& obj = _moveableObjects[item->ObjectNumber].value();
+			auto& obj = _moveableObjects[item.ObjectNumber].value();
 
 			if (obj.DoNotDraw)
 				continue;
 
-			// Clip object by frustum only if it doesn't cast shadows and is not in the mirror room.
-			// Otherwise we may see disappearing shadows or reflections if object gets out of frustum.
-			if (!roomIsReflected && obj.ShadowType == ShadowMode::None)
+			// Clip object by frustum only if it doesn't cast shadows and is not in mirror room,
+			// otherwise disappearing shadows or reflections may be seen if object gets out of frustum.
+			if (!isRoomReflected && obj.ShadowType == ShadowMode::None)
 			{
 				// Get all spheres and check if frustum intersects any of them.
-				auto spheres = GetSpheres(itemNum);
+				auto spheres = GetSpheres(itemNumber);
 
 				bool inFrustum = false;
 				for (int i = 0; !inFrustum, i < spheres.size(); i++)
+				{
 					// Blow up sphere radius by half for cases of too small calculated spheres.
 					if (renderView.Camera.Frustum.SphereInFrustum(spheres[i].Center, spheres[i].Radius * 1.5f))
 						inFrustum = true;
+				}
 
 				if (!inFrustum)
 					continue;
 			}
 
-			auto newItem = &_items[itemNum];
+			auto& newItem = _items[itemNumber];
 
-			newItem->ItemNumber = itemNum;
-			newItem->ObjectID = item->ObjectNumber;
-			newItem->Color = item->Model.Color;
-			newItem->Position = item->Pose.Position.ToVector3();
-			newItem->Translation = Matrix::CreateTranslation(newItem->Position.x, newItem->Position.y, newItem->Position.z);
-			newItem->Rotation = item->Pose.Orientation.ToRotationMatrix();
-			newItem->Scale = Matrix::CreateScale(1.0f);
-			newItem->World = newItem->Rotation * newItem->Translation;
+			newItem.ItemNumber = itemNumber;
+			newItem.ObjectID = item.ObjectNumber;
+			newItem.Color = item.Model.Color;
+			newItem.Position = item.Pose.Position.ToVector3();
+			newItem.Translation = Matrix::CreateTranslation(newItem.Position.x, newItem.Position.y, newItem.Position.z);
+			newItem.Rotation = item.Pose.Orientation.ToRotationMatrix();
+			newItem.Scale = Matrix::CreateScale(1.0f);
+			newItem.World = newItem.Rotation * newItem.Translation;
 
 			// Disable interpolation either when renderer slot or item slot has flag. 
-			// Renderer slot has no interpolation flag set in case it is fetched for the first time (e.g. item first time in frustum).
-			newItem->DisableInterpolation = item->DisableInterpolation || newItem->DisableInterpolation;
+			// Renderer slot has no interpolation flag set in case it is fetched for first time (e.g. item first time in frustum).
+			newItem.DisableInterpolation = item.DisableInterpolation || newItem.DisableInterpolation;
 
-			if (newItem->DisableInterpolation)
+			if (newItem.DisableInterpolation)
 			{
-				// NOTE: Interpolation alwasy returns same result.
-				newItem->PrevPosition = newItem->Position;
-				newItem->PrevTranslation = newItem->Translation;
-				newItem->PrevRotation = newItem->Rotation;
-				newItem->PrevWorld = newItem->World;
+				// NOTE: Interpolation always returns same result.
+				newItem.PrevPosition = newItem.Position;
+				newItem.PrevTranslation = newItem.Translation;
+				newItem.PrevRotation = newItem.Rotation;
+				newItem.PrevWorld = newItem.World;
 
-				// Otherwise all frames until the next ControlPhase will not be interpolated.
-				newItem->DisableInterpolation = false;
+				// Otherwise all frames until next ControlPhase will not be interpolated.
+				newItem.DisableInterpolation = false;
 				
 				for (int j = 0; j < MAX_BONES; j++)
-					newItem->PrevAnimTransforms[j] = newItem->AnimTransforms[j];
+					newItem.PrevAnimTransforms[j] = newItem.AnimTransforms[j];
 			}
 
-			// Force interpolation only for Lara in player freeze mode.
-			bool forceValue = g_GameFlow->CurrentFreezeMode == FreezeMode::Player && item->ObjectNumber == ID_LARA;
+			// Force interpolation only for player in player freeze mode.
+			bool forceValue = g_GameFlow->CurrentFreezeMode == FreezeMode::Player && item.ObjectNumber == ID_LARA;
 
-			newItem->InterpolatedPosition = Vector3::Lerp(newItem->PrevPosition, newItem->Position, GetInterpolationFactor(forceValue));
-			newItem->InterpolatedTranslation = Matrix::Lerp(newItem->PrevTranslation, newItem->Translation, GetInterpolationFactor(forceValue));
-			newItem->InterpolatedRotation = Matrix::Lerp(newItem->InterpolatedRotation, newItem->Rotation, GetInterpolationFactor(forceValue));
-			newItem->InterpolatedWorld = Matrix::Lerp(newItem->PrevWorld, newItem->World, GetInterpolationFactor(forceValue));
+			newItem.InterpolatedPosition = Vector3::Lerp(newItem.PrevPosition, newItem.Position, GetInterpolationFactor(forceValue));
+			newItem.InterpolatedTranslation = Matrix::Lerp(newItem.PrevTranslation, newItem.Translation, GetInterpolationFactor(forceValue));
+			newItem.InterpolatedRotation = Matrix::Lerp(newItem.InterpolatedRotation, newItem.Rotation, GetInterpolationFactor(forceValue));
+			newItem.InterpolatedWorld = Matrix::Lerp(newItem.PrevWorld, newItem.World, GetInterpolationFactor(forceValue));
 			
 			for (int j = 0; j < MAX_BONES; j++)
-				newItem->InterpolatedAnimTransforms[j] = Matrix::Lerp(newItem->PrevAnimTransforms[j], newItem->AnimTransforms[j], GetInterpolationFactor(forceValue));
+				newItem.InterpolatedAnimTransforms[j] = Matrix::Lerp(newItem.PrevAnimTransforms[j], newItem.AnimTransforms[j], GetInterpolationFactor(forceValue));
 
-			CalculateLightFades(newItem);
-			CollectLightsForItem(newItem);
+			CalculateLightFades(&newItem);
+			CollectLightsForItem(&newItem);
 
-			room.ItemsToDraw.push_back(newItem);
+			rendererRoom.ItemsToDraw.push_back(&newItem);
 		}
 	}
 
@@ -491,7 +493,7 @@ namespace TEN::Renderer
 		if (r->mesh.empty())
 			return;
 
-		bool roomIsReflected = RoomIsReflected(renderView, roomNumber);
+		bool isRoomReflected = IsRoomReflected(renderView, roomNumber);
 
 		for (int i = 0; i < room.Statics.size(); i++)
 		{
@@ -521,7 +523,7 @@ namespace TEN::Renderer
 			if (obj.ObjectMeshes.empty())
 				continue;
 
-			if (!roomIsReflected && !renderView.Camera.Frustum.SphereInFrustum(mesh->Sphere.Center, mesh->Sphere.Radius))
+			if (!isRoomReflected && !renderView.Camera.Frustum.SphereInFrustum(mesh->Sphere.Center, mesh->Sphere.Radius))
 				continue;
 
 			// Collect the lights

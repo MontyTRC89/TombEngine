@@ -561,9 +561,9 @@ namespace TEN::Renderer
 
 					if (rat->On)
 					{
-						RendererMesh* mesh = GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
+						const auto& mesh = *GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
 
-						Matrix world = rat->Transform;
+						auto world = rat->Transform;
 						ReflectMatrixOptionally(world);
 
 						_stStatic.World = world;
@@ -571,27 +571,21 @@ namespace TEN::Renderer
 						_stStatic.AmbientLight = _rooms[rat->RoomNumber].AmbientLight;
 
 						if (rendererPass != RendererPass::GBuffer)
-						{
 							BindStaticLights(_rooms[rat->RoomNumber].LightsToDraw);
-						}
 
 						_cbStatic.UpdateData(_stStatic, _context.Get());
 
-						for (auto& bucket : mesh->Buckets)
+						for (const auto& bucket : mesh.Buckets)
 						{
 							if (bucket.NumVertices == 0)
-							{
 								continue;
-							}
 
 							int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
 
 							for (int p = 0; p < passes; p++)
 							{
 								if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
-								{
 									continue;
-								}
 
 								BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 								BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
@@ -779,7 +773,7 @@ namespace TEN::Renderer
 
 					auto transformMatrix = Matrix::Lerp(bat.PrevTransform, bat.Transform, GetInterpolationFactor());
 
-					Matrix world = transformMatrix;
+					auto world = transformMatrix;
 					ReflectMatrixOptionally(world);
 
 					_stInstancedStaticMeshBuffer.StaticMeshes[batCount].World = world;
@@ -901,7 +895,7 @@ namespace TEN::Renderer
 
 				auto transformMatrix = Matrix::Lerp(beetle.PrevTransform, beetle.Transform, GetInterpolationFactor());
 
-				Matrix world = transformMatrix;
+				auto world = transformMatrix;
 				ReflectMatrixOptionally(world);
 
 				_stInstancedStaticMeshBuffer.StaticMeshes[beetleCount].World = world;
@@ -1058,7 +1052,7 @@ namespace TEN::Renderer
 
 					auto& mesh = *GetMesh(Objects[ID_LOCUSTS].meshIndex + (-locust.counter & 3));
 
-					Matrix world = Matrix::Lerp(locust.PrevTransform, locust.Transform, GetInterpolationFactor());
+					auto world = Matrix::Lerp(locust.PrevTransform, locust.Transform, GetInterpolationFactor());
 					ReflectMatrixOptionally(world);
 
 					_stStatic.World = world;
@@ -1598,7 +1592,7 @@ namespace TEN::Renderer
 		if (_isLocked || g_GameFlow->LastFreezeMode != FreezeMode::None)
 			return;
 
-		RendererLight dynamicLight = {};
+		auto dynamicLight = RendererLight{};
 
 		dynamicLight.Color = Vector3(color.x, color.y, color.z);
 		if (radius < BLOCK(2))
@@ -1620,22 +1614,23 @@ namespace TEN::Renderer
 
 	void Renderer::PrepareDynamicLight(RendererLight& light)
 	{
-		// If hash is provided, search for same light in old buffer.
+		// If hash is provided, search for same light in previous buffer.
 		if (light.Hash != 0)
 		{
-			// Determine the previous buffer index.
-			const auto& previousList = _dynamicLights[1 - _dynamicLightList];
+			// Determine previous buffer index.
+			const auto& prevList = _dynamicLights[1 - _dynamicLightList];
 
-			// Find a light in the previous buffer with the same Hash.
-			auto it = std::find_if(previousList.begin(), previousList.end(),
+			// Find light in previous buffer with same hash.
+			auto it = std::find_if(
+				prevList.begin(), prevList.end(),
 				[&light](const auto& prevLight)
 				{
-					return prevLight.Hash == light.Hash;
+					return (prevLight.Hash == light.Hash);
 				});
 
-			if (it != previousList.end())
+			if (it != prevList.end())
 			{
-				// If a matching light is found, copy its data.
+				// If matching light is found, copy it.
 				const auto& prevLight = *it;
 				light.PrevPosition = prevLight.Position;
 				light.PrevDirection = prevLight.Direction;
@@ -1645,16 +1640,17 @@ namespace TEN::Renderer
 		// Queue dynamic light.
 		_dynamicLights[_dynamicLightList].push_back(light);
 
-		// Check if light is spawned in a mirrored room, and create reflection.
-		for (auto& mirror : g_Level.Mirrors)
+		// Check if light is spawned in mirrored room and create reflection.
+		for (const auto& mirror : g_Level.Mirrors)
 		{
 			if (!mirror.ReflectLights)
 				continue;
 
+			// TODO: Avoid LaraItem global.
 			if ((Camera.pos.RoomNumber == mirror.RoomNumber || LaraItem->RoomNumber == mirror.RoomNumber) && 
 				IsPointInRoom(light.Position, mirror.RoomNumber))
 			{
-				RendererLight reflectedLight = light;
+				auto reflectedLight = light;
 				reflectedLight.Position = Vector3::Transform(light.Position, mirror.ReflectionMatrix);
 				reflectedLight.Direction = Vector3::Transform(light.Direction, mirror.ReflectionMatrix);
 				reflectedLight.Hash = 0;
@@ -1886,7 +1882,7 @@ namespace TEN::Renderer
 		SortTransparentFaces(view);
 
 		DoRenderPass(RendererPass::Transparent, view, true);
-		DoRenderPass(RendererPass::GunFlashes, view, true); // HACK: Gunflashes are drawn after everything because they are near the camera.
+		DoRenderPass(RendererPass::GunFlashes, view, true); // HACK: Gunflashes are drawn after everything because they are near camera.
 		
 		// Draw 3D debug lines and triangles.
 		DrawLines3D(view);
@@ -2192,7 +2188,7 @@ namespace TEN::Renderer
 		SetCullMode(CullMode::CounterClockwise);
 		SetDepthState(DepthState::Write);
 
-		// Draw room geometry first, if applicable for a given pass.
+		// Draw room geometry first if applicable for a given pass.
 		if (pass != RendererPass::Transparent && pass != RendererPass::GunFlashes)
 			DrawRooms(view, pass);
 
@@ -2206,9 +2202,10 @@ namespace TEN::Renderer
 			for (auto& mirror : view.Mirrors)
 			{
 				_currentMirror = &mirror;
-				DrawObjects(pass, view, mirror.ReflectLara, mirror.ReflectMoveables, mirror.ReflectStatics, mirror.ReflectSprites);
+				DrawObjects(pass, view, mirror.ReflectPlayer, mirror.ReflectMoveables, mirror.ReflectStatics, mirror.ReflectSprites);
 				_currentMirror = nullptr;
 			}
+
 			SetCullMode(CullMode::CounterClockwise);
 		}
 	}
@@ -2251,7 +2248,7 @@ namespace TEN::Renderer
 				DrawDebris(view, pass); // Debris mostly originate from shatter statics.
 			}
 
-			// Sorted sprites are already collected at the beginning of frame.
+			// Sorted sprites already collected at beginning of frame.
 			if (sprites && pass != RendererPass::CollectTransparentFaces)
 				DrawSprites(view, pass);
 
@@ -2512,14 +2509,14 @@ namespace TEN::Renderer
 
 			for (auto it = view.SortedStaticsToDraw.begin(); it != view.SortedStaticsToDraw.end(); it++)
 			{
-				std::vector<RendererStatic*> statics = it->second;
+				auto statics = it->second;
 
-				RendererStatic* refStatic = statics[0];
-				RendererObject& refStaticObj = GetStaticRendererObject(refStatic->ObjectNumber);
+				auto* refStatic = statics[0];
+				auto& refStaticObj = GetStaticRendererObject(refStatic->ObjectNumber);
 				if (refStaticObj.ObjectMeshes.size() == 0)
 					continue;
 
-				RendererMesh* refMesh = refStaticObj.ObjectMeshes[0];
+				auto* refMesh = refStaticObj.ObjectMeshes[0];
 
 				int staticsCount = (int)statics.size();
 				int bucketSize = INSTANCED_STATIC_MESH_BUCKET_SIZE;
@@ -2532,13 +2529,13 @@ namespace TEN::Renderer
 
 					for (int s = baseStaticIndex; s < max; s++)
 					{
-						RendererStatic* current = statics[s];
-						RendererRoom* room = &_rooms[current->RoomNumber];
+						auto* current = statics[s];
+						auto* room = &_rooms[current->RoomNumber];
 
 						if (IgnoreReflectionPassForRoom(current->RoomNumber))
 							continue;
 
-						Matrix world = current->World;
+						auto world = current->World;
 						ReflectMatrixOptionally(world);
 
 						_stInstancedStaticMeshBuffer.StaticMeshes[instancesCount].World = world;
@@ -2547,9 +2544,7 @@ namespace TEN::Renderer
 						_stInstancedStaticMeshBuffer.StaticMeshes[instancesCount].LightMode = (int)refMesh->LightMode;
 
 						if (rendererPass != RendererPass::GBuffer)
-						{
 							BindInstancedStaticLights(current->LightsToDraw, instancesCount);
-						}
 
 						instancesCount++;
 					}
@@ -2560,21 +2555,16 @@ namespace TEN::Renderer
 					{
 						_cbInstancedStaticMeshBuffer.UpdateData(_stInstancedStaticMeshBuffer, _context.Get());
 
-						for (auto& bucket : refMesh->Buckets)
+						for (const auto& bucket : refMesh->Buckets)
 						{
 							if (bucket.NumVertices == 0)
-							{
 								continue;
-							}
 
 							int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
-
 							for (int p = 0; p < passes; p++)
 							{
 								if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
-								{
 									continue;
-								}
 
 								BindTexture(TextureRegister::ColorMap,
 									&std::get<0>(_staticTextures[bucket.Texture]),
@@ -2594,18 +2584,17 @@ namespace TEN::Renderer
 		}
 		else
 		{
-			// Collect sorted blend modes faces ordered by room, if transparent pass
-
+			// Collect sorted blend modes faces ordered by room if doing transparent pass.
 			for (auto it = view.SortedStaticsToDraw.begin(); it != view.SortedStaticsToDraw.end(); it++)
 			{
-				std::vector<RendererStatic*> statics = it->second;
+				auto statics = it->second;
 
-				RendererStatic* refStatic = statics[0];
-				RendererObject& refStaticObj = GetStaticRendererObject(refStatic->ObjectNumber);
+				auto* refStatic = statics[0];
+				auto& refStaticObj = GetStaticRendererObject(refStatic->ObjectNumber);
 				if (refStaticObj.ObjectMeshes.size() == 0)
 					continue;
 
-				RendererMesh* refMesh = refStaticObj.ObjectMeshes[0];
+				auto* refMesh = refStaticObj.ObjectMeshes[0];
 
 				for (int i = 0; i < statics.size(); i++)
 				{
@@ -2614,15 +2603,13 @@ namespace TEN::Renderer
 						auto& bucket = refMesh->Buckets[j];
 
 						if (bucket.NumVertices == 0)
-						{
 							continue;
-						}
 
 						if (IsSortedBlendMode(bucket.BlendMode))
 						{
 							for (int p = 0; p < bucket.Polygons.size(); p++)
 							{
-								RendererSortableObject object;
+								auto object = RendererSortableObject{};
 
 								object.ObjectType = RendererObjectType::Static;
 								object.Bucket = &bucket;
@@ -3301,8 +3288,8 @@ namespace TEN::Renderer
 	{
 		for (int i = 0; i < view.TransparentObjectsToDraw.size(); i++)
 		{
-			RendererSortableObject* object = &view.TransparentObjectsToDraw[i];
-			RendererObjectType lastObjectType = (i > 0 ? view.TransparentObjectsToDraw[i - 1].ObjectType : RendererObjectType::Unknown);
+			auto* object = &view.TransparentObjectsToDraw[i];
+			auto lastObjectType = (i > 0 ? view.TransparentObjectsToDraw[i - 1].ObjectType : RendererObjectType::Unknown);
 
 			_sortedPolygonsVertices.clear();
 			_sortedPolygonsIndices.clear();
@@ -3319,7 +3306,7 @@ namespace TEN::Renderer
 					view.TransparentObjectsToDraw[i].Bucket->BlendMode == object->Bucket->BlendMode &&
 					_sortedPolygonsIndices.size() + (view.TransparentObjectsToDraw[i].Polygon->Shape == 0 ? 6 : 3) < MAX_TRANSPARENT_VERTICES)
 				{
-					RendererSortableObject* currentObject = &view.TransparentObjectsToDraw[i];
+					auto* currentObject = &view.TransparentObjectsToDraw[i];
 					_sortedPolygonsIndices.bulk_push_back(
 						_roomsIndices.data(),
 						currentObject->Polygon->BaseIndex,
@@ -3330,9 +3317,7 @@ namespace TEN::Renderer
 				DrawRoomSorted(object, lastObjectType, view);
 
 				if (i == view.TransparentObjectsToDraw.size())
-				{
 					return;
-				}
 
 				i--;
 			}
@@ -3345,7 +3330,7 @@ namespace TEN::Renderer
 					view.TransparentObjectsToDraw[i].Bucket->BlendMode == object->Bucket->BlendMode &&
 					_sortedPolygonsIndices.size() + (view.TransparentObjectsToDraw[i].Polygon->Shape == 0 ? 6 : 3) < MAX_TRANSPARENT_VERTICES)
 				{
-					RendererSortableObject* currentObject = &view.TransparentObjectsToDraw[i];
+					auto* currentObject = &view.TransparentObjectsToDraw[i];
 					_sortedPolygonsIndices.bulk_push_back(
 						_moveablesIndices.data(),
 						currentObject->Polygon->BaseIndex,
@@ -3356,9 +3341,7 @@ namespace TEN::Renderer
 				DrawItemSorted(object, lastObjectType, view);
 
 				if (i == view.TransparentObjectsToDraw.size())
-				{
 					return;
-				}
 
 				i--;
 			}
@@ -3372,7 +3355,7 @@ namespace TEN::Renderer
 					view.TransparentObjectsToDraw[i].Bucket->BlendMode == object->Bucket->BlendMode &&
 					_sortedPolygonsIndices.size() + (view.TransparentObjectsToDraw[i].Polygon->Shape == 0 ? 6 : 3) < MAX_TRANSPARENT_VERTICES)
 				{
-					RendererSortableObject* currentObject = &view.TransparentObjectsToDraw[i];
+					auto* currentObject = &view.TransparentObjectsToDraw[i];
 					_sortedPolygonsIndices.bulk_push_back(
 						_staticsIndices.data(),
 						currentObject->Polygon->BaseIndex,
@@ -3383,9 +3366,7 @@ namespace TEN::Renderer
 				DrawStaticSorted(object, lastObjectType, view);
 
 				if (i == view.TransparentObjectsToDraw.size())
-				{
 					return;
-				}
 
 				i--;
 			}
@@ -3398,7 +3379,7 @@ namespace TEN::Renderer
 					view.TransparentObjectsToDraw[i].Bucket->BlendMode == object->Bucket->BlendMode &&
 					_sortedPolygonsIndices.size() + (view.TransparentObjectsToDraw[i].Polygon->Shape == 0 ? 6 : 3) < MAX_TRANSPARENT_VERTICES)
 				{
-					RendererSortableObject* currentObject = &view.TransparentObjectsToDraw[i];
+					auto* currentObject = &view.TransparentObjectsToDraw[i];
 					_sortedPolygonsIndices.bulk_push_back(
 						_staticsIndices.data(),
 						currentObject->Polygon->BaseIndex,
@@ -3409,9 +3390,7 @@ namespace TEN::Renderer
 				DrawMoveableAsStaticSorted(object, lastObjectType, view);
 
 				if (i == view.TransparentObjectsToDraw.size())
-				{
 					return;
-				}
 
 				i--;
 			}
@@ -3460,7 +3439,7 @@ namespace TEN::Renderer
 					uv2 = spr->Sprite->UV[2];
 					uv3 = spr->Sprite->UV[3];
 
-					Matrix world = GetWorldMatrixForSprite(currentObject->Sprite, view);
+					auto world = GetWorldMatrixForSprite(currentObject->Sprite, view);
 					
 					Vertex v0;
 					v0.Position = Vector3::Transform(p0t, world);
@@ -3637,7 +3616,7 @@ namespace TEN::Renderer
 
 		_shaderManager.Bind(Shader::Statics);
 
-		Matrix world = objectInfo->Static->World;
+		auto world = objectInfo->Static->World;
 		_stStatic.World = world;
 
 		_stStatic.Color = objectInfo->Static->Color;
@@ -3675,7 +3654,7 @@ namespace TEN::Renderer
 
 		_shaderManager.Bind(Shader::Statics);
 
-		Matrix world = objectInfo->World;
+		auto world = objectInfo->World;
 		_stStatic.World = world;
 
 		_stStatic.Color = Vector4::One;
