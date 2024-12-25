@@ -3,7 +3,15 @@
 The dates are in European standard format where date is presented as **YYYY-MM-DD**.
 TombEngine releases are located in this repository (alongside with Tomb Editor): https://github.com/TombEngine/TombEditorReleases
 
-## Version 1.7 - 2024-12-25
+## Version 1.8 - xxxx-xx-xx
+
+### Bug fixes
+
+### New Features
+
+### Lua API changes
+
+## [Version 1.7](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.3) - 2024-12-25
 
 ### Bug fixes
 * Significantly improved renderer performance.
