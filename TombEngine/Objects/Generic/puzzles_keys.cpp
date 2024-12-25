@@ -331,7 +331,7 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 				return;
 			}
 
-			laraItem->Animation.AnimNumber = isUnderwater ? LA_UNDERWATER_USE_PUZZLE : LA_REMOVE_PUZZLE;
+			laraItem->Animation.AnimNumber = isUnderwater ?  LA_REMOVE_PUZZLE_UNDERWATER : LA_REMOVE_PUZZLE;
 			laraItem->Animation.ActiveState = LS_REMOVE_PUZZLE;
 			receptacleItem.ItemFlags[0] = 1;
 
