@@ -3,7 +3,7 @@
 The dates are in European standard format where date is presented as **YYYY-MM-DD**.
 TombEngine releases are located in this repository (alongside with Tomb Editor): https://github.com/TombEngine/TombEditorReleases
 
-## Version 1.7 - xxxx-xx-xx
+## Version 1.7 - 2024-12-25
 
 ### Bug fixes
 * Significantly improved renderer performance.
@@ -57,7 +57,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### Lua API changes
 * Added Flow.Statistics class, Flow.GetStatistics() and Flow.SetStatistics() functions.
 * Added Flow.GetFreezeMode() and Flow.SetFreezeMode() functions.
-* Added Flow.GetNextLevel() function to get script entry for incoming level, if it's about to start.
 * Added Effects.EmitSpotLight() function for directional spotlights.
 * Added optional cast shadow and name parameters for Effects.EmitLight() function.
 * Added Effects.GetWind() function to get current wind speed vector.
@@ -68,7 +67,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added extra argument for Sound.SetAmbientTrack() function to specify if new ambient track should play from the beginning.
 * Added new View.CameraType enum entries and return it by View.GetCameraType(), when flyby camera or binoculars/lasersight is active.
 * Added new primitive Time class, which allows to manipulate and format game time without precision loss.
-* Allow to use TR4-like load cameras by playing fixed camera from OnEnd() event and removing loadScreenFile field from level's gameflow entry.
 * Renamed Flow.WeaponType enumeration to Objects.WeaponType, and removed similar Objects.LaraWeaponType enumeration for consistency.
 * Renamed Objects.PlayerAmmoType to Objects.AmmoType for consistency.
 * Fixed Strings.DisplayString class not supporting some Unicode characters and empty lines in multiline strings.
