@@ -1285,23 +1285,19 @@ namespace TEN::Renderer
 		auto spriteMatrix = Matrix::Identity;
 		auto scaleMatrix = Matrix::CreateScale(sprite->Width * sprite->Scale, sprite->Height * sprite->Scale, sprite->Scale);
 
-		auto spritePos = sprite->pos;
+		Vector3 spritePosition = sprite->pos;
 
 		if (sprite->Type == SpriteType::ThreeD)
-		{
 			ReflectMatrixOptionally(spriteMatrix);
-		}
 		else
-		{
-			ReflectVectorOptionally(spritePos);
-		}
+			ReflectVectorOptionally(spritePosition);
 
 		switch (sprite->Type)
 		{
 		case SpriteType::Billboard:
 		{
 			auto cameraUp = Vector3(view.Camera.View._12, view.Camera.View._22, view.Camera.View._32);
-			spriteMatrix = scaleMatrix * Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateBillboard(spritePos, Camera.pos.ToVector3(), cameraUp);
+			spriteMatrix = scaleMatrix * Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateBillboard(spritePosition, Camera.pos.ToVector3(), cameraUp);
 		}
 		break;
 
@@ -1310,7 +1306,7 @@ namespace TEN::Renderer
 			auto rotMatrix = Matrix::CreateRotationY(sprite->Rotation);
 			auto quadForward = Vector3(0.0f, 0.0f, 1.0f);
 			spriteMatrix = scaleMatrix * Matrix::CreateConstrainedBillboard(
-				spritePos,
+				spritePosition,
 				Camera.pos.ToVector3(),
 				sprite->ConstrainAxis,
 				nullptr,
@@ -1320,9 +1316,9 @@ namespace TEN::Renderer
 
 		case SpriteType::LookAtBillboard:
 		{
-			auto translationMatrix = Matrix::CreateTranslation(spritePos);
+			auto tMatrix = Matrix::CreateTranslation(spritePosition);
 			auto rotMatrix = Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateLookAt(Vector3::Zero, sprite->LookAtAxis, Vector3::UnitZ);
-			spriteMatrix = scaleMatrix * rotMatrix * translationMatrix;
+			spriteMatrix = scaleMatrix * rotMatrix * tMatrix;
 		}
 		break;
 
@@ -1338,7 +1334,7 @@ namespace TEN::Renderer
 	{
 		const auto& room = _rooms[effect->RoomNumber];
 
-		auto world = effect->InterpolatedWorld;
+		Matrix world = effect->InterpolatedWorld;
 		ReflectMatrixOptionally(world);
 
 		_stStatic.World = world;

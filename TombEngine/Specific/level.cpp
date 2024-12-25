@@ -1522,6 +1522,7 @@ void LoadBoxes()
 void LoadMirrors()
 {
 	int mirrorCount = ReadCount();
+
 	TENLog("Mirror count: " + std::to_string(mirrorCount), LogLevel::Info);
 	g_Level.Mirrors.reserve(mirrorCount);
 
@@ -1529,20 +1530,27 @@ void LoadMirrors()
 	{
 		auto& mirror = g_Level.Mirrors.emplace_back();
 
-		mirror.RoomNumber = ReadInt16(); // TODO: Write Int32 to level instead. Short isn't used for room numbers anymore.
+		mirror.RoomNumber = ReadInt16();
 		mirror.Plane.x = ReadFloat();
 		mirror.Plane.y = ReadFloat();
 		mirror.Plane.z = ReadFloat();
 		mirror.Plane.w = ReadFloat();
 
-		mirror.ReflectPlayer = ReadBool();
+		mirror.ReflectLara = ReadBool();
 		mirror.ReflectMoveables = ReadBool();
 		mirror.ReflectStatics = ReadBool();
 		mirror.ReflectSprites = ReadBool();
 		mirror.ReflectLights = ReadBool();
+
 		mirror.Enabled = true;
 
-		mirror.ReflectionMatrix = Matrix::CreateReflection(mirror.Plane);
+		Plane plane = Plane(
+			Vector3(mirror.Plane.x,
+					mirror.Plane.y,
+					mirror.Plane.z),
+			mirror.Plane.w);
+
+		mirror.ReflectionMatrix = Matrix::CreateReflection(plane);
 	}
 }
 
