@@ -14,6 +14,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added realtime shader reloading in debug mode by pressing F9 key.
 
 ### Lua API changes
+* Added Effects.EmitAirBubble() function to spawn air bubbles.
 
 ## [Version 1.7](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.3) - 2024-12-25
 
