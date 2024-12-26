@@ -13,6 +13,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added realtime shader reloading in debug mode by pressing F9 key.
 
 ### Lua API changes
+* Add more example scripts to some of the TombEngine Lua functions.
 
 ## [Version 1.7](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.3) - 2024-12-25
 
@@ -89,8 +90,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed Util.HasLineOfSight() not taking static meshes into consideration.
 * Fixed collision callbacks not properly clearing after leveljump.
 * Fixed Flow.SetIntroImagePath() not using the correct path.
-
-* Add more example scripts to some of the TombEngine Lua functions.
 
 ## [Version 1.5](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.2) - 2024-11-03
 
