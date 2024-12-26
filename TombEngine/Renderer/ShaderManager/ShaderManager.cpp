@@ -131,9 +131,9 @@ namespace TEN::Renderer::Utils
 		// Reset compile counter.
 		_compileCounter = 0;
 
+		LoadAAShaders(width, height, recompileAAShaders); // Should always be the first to have same ID
 		LoadCommonShaders();
 		LoadPostprocessShaders();
-		LoadAAShaders(width, height, recompileAAShaders);
 	}
 
 	void ShaderManager::Bind(Shader shader, bool forceNull)
