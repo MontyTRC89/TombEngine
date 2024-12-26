@@ -131,7 +131,10 @@ namespace TEN::Renderer::Utils
 		// Reset compile counter.
 		_compileCounter = 0;
 
-		LoadAAShaders(width, height, recompileAAShaders); // Should always be the first to have same ID
+		// LoadAAShaders should always be the first in the list, so that when AA settings are changed,
+		// they recompile with the same index as before.
+
+		LoadAAShaders(width, height, recompileAAShaders); 
 		LoadCommonShaders();
 		LoadPostprocessShaders();
 	}
