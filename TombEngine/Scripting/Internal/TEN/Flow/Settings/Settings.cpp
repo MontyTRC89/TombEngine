@@ -328,7 +328,7 @@ namespace TEN::Scripting
 
 		/// Use multithreading in certain calculations. <br>
 		// When set to `true`, some performance-critical calculations will be performed in parallel, which can give
-		// significant performance boost. Don't disable unless you have problems with launching or using TEN.
+		// a significant performance boost. Don't disable unless you have problems with launching or using TombEngine.
 		// @tfield bool multiThreaded determines whether to use multithreading or not. */
 		"multiThreaded", & SystemSettings::MultiThreaded,
 

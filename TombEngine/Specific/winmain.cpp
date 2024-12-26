@@ -562,7 +562,5 @@ void WinClose()
 
 	ShutdownTENLog();
 
-	g_Worker.Deinitialize();
-
 	CoUninitialize();
 }

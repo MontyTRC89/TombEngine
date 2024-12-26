@@ -22,9 +22,10 @@ namespace TEN::Utils
 		std::condition_variable					   _groupCond		= {};
 
 	public:
-		// Constructors
+		// Constructors and destructors
 
 		WorkerManager();
+		~WorkerManager();
 
 		// Getters
 
@@ -36,7 +37,6 @@ namespace TEN::Utils
 
 		void AddTask(const WorkerTask& task, uint64_t groupId = (uint64_t)NO_VALUE);
 		void WaitForGroup(uint64_t groupId);
-		void Deinitialize();
 		
 		// Template for batching parallel operations on vector.
 		template <typename T>

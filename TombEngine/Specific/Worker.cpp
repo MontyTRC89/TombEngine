@@ -18,6 +18,26 @@ namespace TEN::Utils
 		_deinitialize = false;
 	}
 
+	WorkerManager::~WorkerManager()
+	{
+		// LOCK: Restrict shutdown flag access.
+		{
+			auto taskLock = std::lock_guard(_taskMutex);
+
+			_deinitialize = true;
+		}
+
+		// Notify all threads they should stop.
+		_taskCond.notify_all();
+
+		// Join all threads.
+		for (auto& thread : _threads)
+		{
+			if (thread.joinable())
+				thread.join();
+		}
+	}
+
 	uint64_t WorkerManager::GetNewGroupId()
 	{
 		// Increment group ID counter, skipping NO_VALUE on wrap.
@@ -69,26 +89,6 @@ namespace TEN::Utils
 		{
 			auto groupLock = std::unique_lock(_groupMutex);
 			_groupCond.wait(groupLock, [this, groupId]() { return (_groupTaskCounts.find(groupId) == _groupTaskCounts.end()); });
-		}
-	}
-
-	void WorkerManager::Deinitialize()
-	{
-		// LOCK: Restrict shutdown flag access.
-		{
-			auto taskLock = std::lock_guard(_taskMutex);
-
-			_deinitialize = true;
-		}
-
-		// Notify all threads they should stop.
-		_taskCond.notify_all();
-
-		// Join all threads.
-		for (auto& thread : _threads)
-		{
-			if (thread.joinable())
-				thread.join();
 		}
 	}
 
