@@ -1,7 +1,5 @@
 #include "Sound/sound.h"
 
-#include <srtparser.h>
-
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/gui.h"

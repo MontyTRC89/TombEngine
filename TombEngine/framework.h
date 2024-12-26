@@ -47,6 +47,7 @@
 #include <algorithm>
 #include <array>
 #include <chrono>
+#include <CommCtrl.h>
 #include <ctime>
 #include <deque>
 #include <execution>
@@ -63,6 +64,7 @@
 #include <random>
 #include <regex>
 #include <set>
+#include <srtparser.h>
 #include <stack>
 #include <stdarg.h>
 #include <stdexcept>
@@ -87,6 +89,7 @@
 #include <d3d11.h>
 #include <d3d9types.h>
 #include <d3dcompiler.h>
+#include <DirectXCollision.h>
 
 // DirectX Tool Kit
 #include <directxtk/CommonStates.h>
@@ -106,6 +109,12 @@ using namespace DirectX::SimpleMath;
 
 // OIS
 #include <ois/OIS.h>
+
+// spdlog
+#include <spdlog/fmt/fmt.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/spdlog.h>
 
 // WRL
 #include <wrl/client.h>

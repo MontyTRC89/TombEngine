@@ -1,7 +1,5 @@
 #include "Specific/configuration.h"
 
-#include <CommCtrl.h>
-
 #include "Renderer/Renderer.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Internal/LanguageScript.h"

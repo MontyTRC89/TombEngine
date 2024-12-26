@@ -1,7 +1,5 @@
 #pragma once
 
-#include <DirectXCollision.h>
-
 #include "Renderer/RendererEnums.h"
 #include "Renderer/Structures/RendererBucket.h"
 

@@ -1,7 +1,5 @@
 #include "Specific/winmain.h"
 
-#include <CommCtrl.h>
-
 #include "Game/control/control.h"
 #include "Game/savegame.h"
 #include "Renderer/Renderer.h"

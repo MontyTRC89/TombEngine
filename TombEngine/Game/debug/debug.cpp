@@ -1,9 +1,5 @@
 #include "Game/Debug/Debug.h"
 
-#include <spdlog/spdlog.h>
-#include <spdlog/sinks/basic_file_sink.h>
-#include <spdlog/sinks/stdout_color_sinks.h>
-
 #include "Renderer/Renderer.h"
 
 using TEN::Renderer::g_Renderer;

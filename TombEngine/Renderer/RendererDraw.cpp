@@ -1,5 +1,3 @@
-#include <chrono>
-
 #include "ConstantBuffers/CameraMatrixBuffer.h"
 #include "Game/animation.h"
 #include "Game/camera.h"
