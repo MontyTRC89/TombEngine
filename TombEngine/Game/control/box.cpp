@@ -798,7 +798,7 @@ void CreatureHealth(ItemInfo* item)
 	}
 }
 
-void CreatureDie(int itemNumber, bool doExplosion)
+void CreatureDie(int itemNumber, bool doExplosion, bool forceExplosion)
 {
 	int flags = 0;
 	if (doExplosion)
@@ -817,6 +817,11 @@ void CreatureDie(int itemNumber, bool doExplosion)
 			break;
 
 		case HitEffect::NonExplosive:
+			if (forceExplosion)
+			{
+				flags |= BODY_DO_EXPLOSION;
+				break;
+			}
 			return;
 
 		default:
