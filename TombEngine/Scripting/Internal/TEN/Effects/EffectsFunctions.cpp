@@ -4,6 +4,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/los.h"
+#include "Game/effects/Bubble.h"
 #include "Game/effects/DisplaySprite.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
@@ -11,7 +12,6 @@
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
-#include "Game/effects/Bubble.h"
 #include "Game/Setup.h"
 #include "Objects/Utils/object_helper.h"
 #include "Scripting/Internal/LuaHandler.h"
@@ -32,12 +32,12 @@ Functions to generate effects.
 @pragma nostrip
 */
 
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
-using namespace TEN::Effects::Bubble;
 
 namespace TEN::Scripting::Effects
 {
@@ -305,9 +305,9 @@ namespace TEN::Scripting::Effects
 		TriggerBlood(pos.x, pos.y, pos.z, -1, USE_IF_HAVE(int, num, 1));
 	}
 
-/***Emit Air bubble in a water room.
+/***Emit air bubble in a water room.
 @function EmitAirBubble
-@tparam Vec3 position The position where the air bubble will be spawned.
+@tparam Vec3 pos The position where the air bubble will be spawned.
 @tparam int roomNumber The room number where the air bubble will be generated.
 @tparam float size The size of the air bubble.
 @tparam float amplitude The oscillation amplitude of the air bubble.
@@ -317,7 +317,7 @@ namespace TEN::Scripting::Effects
 		SpawnBubble(pos, roomNumber, size, amplitude);
 	}
 
-/***Emit fire for one frame. Will not hurt Lara. Call this each frame if you want a continuous fire.
+/***Emit fire for one frame. Will not hurt player. Call this each frame if you want a continuous fire.
 @function EmitFire
 @tparam Vec3 pos
 @tparam float size (default 1.0)
