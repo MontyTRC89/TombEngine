@@ -258,8 +258,8 @@ void DisplayString::SetColor(const ScriptColor& color)
 	UserDisplayString& displayString = GetItemCallbackRoutine(_id).value();
 	displayString._color = color;
 
-	//todo maybe change getItemCallback to return a ref instead? or move its
-	//todo UserDisplayString object? and then move back?
+	//TODO maybe change getItemCallback to return a ref instead? or move its
+	//TODO UserDisplayString object? and then move back?
 	//s_addItemCallback(m_id, s);
 }
 

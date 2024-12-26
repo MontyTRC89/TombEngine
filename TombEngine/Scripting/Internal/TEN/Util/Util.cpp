@@ -47,11 +47,24 @@ namespace TEN::Scripting::Util
 			ObjectOnLOS2(&vector0, &vector1, &vector, &mesh) == NO_LOS_ITEM);
 	}
 
-	///Calculate the distance between two positions.
-	//@function CalculateDistance
-	//@tparam Vec3 posA First position.
-	//@tparam Vec3 posB Second position.
-	//@treturn float Distance between two positions.
+	/// Calculate the distance between two positions.
+	// @function CalculateDistance
+	// @tparam Vec3 posA First position.
+	// @tparam Vec3 posB Second position.
+	// @treturn float Distance between two positions.
+	// @usage 
+	// levelFuncs.checkDistance = function()
+	//		local shiva = TEN.Objects.GetMoveableByName("shiva_60")
+	//		
+	//		local laraPos = Lara:GetPosition()
+	//		local shivaPos = shiva:GetPosition()
+	//		
+	//		local distance = CalculateDistance(laraPos, shivaPos)
+	//		if distance < 50.0 then
+	//			print("Lara and Shiva are very close")
+	//		else
+	//			print("Lara and Shiva are far from each other")
+	//		end
 	static float CalculateDistance(const Vec3& posA, const Vec3& posB)
 	{
 		return posA.Distance(posB);
@@ -62,6 +75,19 @@ namespace TEN::Scripting::Util
 	// @tparam Vec3 posA First position.
 	// @tparam Vec3 posB Second position.
 	// @treturn float Horizontal distance between the two positions.
+	// @usage
+	// levelFuncs.checkDistance = function()
+	//		local shiva = TEN.Objects.GetMoveableByName("shiva_60")
+	//		
+	//		local laraPos = Lara:GetPosition()
+	//		local shivaPos = shiva:GetPosition()
+	//		
+	//		local hDistance = CalculateHorizontalDistance(laraPos, shivaPos)
+	//		if Hdistance < 50.0 then
+	//			print("Lara and Shiva are very close, horizontally.")
+	//		else
+	//			print("Lara and Shiva are far from each other, horizontally.")
+	//		end
 	static float CalculateHorizontalDistance(const Vec3& posA, const Vec3& posB)
 	{
 		auto pos0 = Vector2(posA.x, posA.z);
@@ -75,9 +101,11 @@ namespace TEN::Scripting::Util
 	// @treturn Vec2 Projected display space position in percent.
 	// @usage 
 	// Example: Display a string at the player's position.
-	// local string = DisplayString('Example', 0, 0, Color(255, 255, 255), false)
-	// local displayPos = GetDisplayPosition(Lara:GetPosition())
-	// string:SetPosition(PercentToScreen(displayPos.x, displayPos.y))
+	// LevelFuncs.GetDisplayPos = function()
+	// 	local string = DisplayString('Example', 0, 0, Color(255, 255, 255), false)
+	// 	local displayPos = GetDisplayPosition(Lara:GetPosition())
+	// 	string:SetPosition(PercentToScreen(displayPos.x, displayPos.y))
+	// end
 	static sol::optional<Vec2> GetDisplayPosition(const Vec3& worldPos)
 	{
 		auto displayPos = g_Renderer.Get2DPosition(worldPos.ToVector3());
@@ -98,7 +126,6 @@ namespace TEN::Scripting::Util
 	//@treturn int y Y coordinate in pixels.
 	//@usage	
 	//local halfwayX, halfwayY = PercentToScreen(50, 50)
-	//local baddy
 	//local spawnLocationNullmesh = GetMoveableByName("position_behind_left_pillar")
 	//local str1 = DisplayString("You spawned an enemy!", halfwayX, halfwayY, Color(255, 100, 100), false, { DisplayStringOption.SHADOW, DisplayStringOption.CENTER })
 	//
@@ -122,6 +149,11 @@ namespace TEN::Scripting::Util
 	//@tparam int y Y pixel coordinate to translate to display position.
 	//@treturn float x X component of display position.
 	//@treturn float y Y component of display position.
+	//@usage
+	//LevelFUncs.GetConvertedScreenToPercent = function()
+	//	local halfWayX, halfWayY = ScreenToPercent(400, 400) -- assume screen width to be 800 px
+	//	print("percentage of half screen is: "..halfWayX.."% "..halfWayY.."% ".."X and Y respectively")
+	//end
 	static std::tuple<float, float> ScreenToPercent(int x, int y)
 	{
 		float fWidth = g_Configuration.ScreenWidth;

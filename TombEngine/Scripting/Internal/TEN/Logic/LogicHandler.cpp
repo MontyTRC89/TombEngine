@@ -1194,7 +1194,11 @@ For example:
 		end
 	end
 @tfield function OnUseItem Will be called when using an item from inventory.
-@tfield function OnFreeze Will be called when any of the Freeze modes are activated.
+@tfield function OnFreeze Will be called when any of the Freeze modes are activated. 
+Note: Freeze mode is handled separately so creating stuff in normal game loop then triggering OnFreeze will not work.
+For example, if you want strings to display on freeze mode, you must:
+	- instantiate string using DisplayString() and use ShowString(), both in LevelFuncs.OnFreeze function.
+
 @table LevelFuncs
 */
 
