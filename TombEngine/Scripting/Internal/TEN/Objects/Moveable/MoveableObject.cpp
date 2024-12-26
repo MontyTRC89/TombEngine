@@ -69,6 +69,8 @@ bool operator ==(const Moveable& first, const Moveable& second)
 	return first.m_item == second.m_item;
 }
 
+// TEN Lua API Function registration below.
+
 /*** Used to generate a new moveable dynamically at runtime. 
 For more information on each parameter, see the
 associated getters and setters. If you do not know what to set for these,
@@ -175,7 +177,7 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 // @function Moveable:Explode
 // @usage
 // levelFuncs.explodeShiva = function()
-//		shiva = TEN.Objects.GetMoveableByName("shiva_60")
+//		local shiva = TEN.Objects.GetMoveableByName("shiva_60")
 //		shiva:Explode()
 // end
 	ScriptReserved_Explode, &Moveable::Explode,
@@ -184,7 +186,7 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 // @function Moveable:Shatter
 // @usage
 // levelFuncs.shatterShiva = function()
-//		shiva = TEN.Objects.GetMoveableByName("shiva_60")
+//		local shiva = TEN.Objects.GetMoveableByName("shiva_60")
 //		shiva:Shatter()
 // end
 	ScriptReserved_Shatter, &Moveable::Shatter,
@@ -195,7 +197,7 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 // @tparam[opt] float timeout time (in seconds) after which effect turns off.
 // @usage
 // levelFuncs.setShivaOnFire = function()
-//		shiva = TEN.Objects.GetMoveableByName("shiva_60")
+//		local shiva = TEN.Objects.GetMoveableByName("shiva_60")
 //		shiva:SetEffect(EffectID.FIRE, 4) -- Shiva is set on fire for 4 seconds.
 // end
 	ScriptReserved_SetEffect, &Moveable::SetEffect,
@@ -207,7 +209,7 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 // @tparam[opt] float timeout time (in seconds) after which effect turns off.
 // @usage
 // levelFuncs.putGreenAndPurpleOnShiva = function()
-//		shiva = TEN.Objects.GetMoveableByName("shiva_60")
+//		local shiva = TEN.Objects.GetMoveableByName("shiva_60")
 //		shiva:SetCustomEffect(Color(0,255,0), Color(128,0,128) 4) 
 //		-- Shiva is set on custom effect for 4 seconds.
 // end
@@ -218,7 +220,7 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 // @treturn Effects.EffectID effect type currently assigned to moveable.
 // @usage 
 // function checkOnFire()
-//		shiva = TEN.Objects.GetMoveableByName("shiva_60")
+//		local shiva = TEN.Objects.GetMoveableByName("shiva_60")
 //		if shiva:GetEffect() == EffectID.FIRE then
 //			print("Shiva is on fire!")
 //		end
@@ -234,7 +236,7 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 // @treturn Objects.MoveableStatus The moveable's status.
 // @usage 
 // levelfuncs.checkShivaStatus = function()
-//		shiva = TEN.Objects.GetMoveableByName("shiva_60")
+//		local shiva = TEN.Objects.GetMoveableByName("shiva_60")
 //		if shiva:GetStatus() == Objects.MoveableStatus.ACTIVE then
 //			print("Shiva is currently active")
 //		else
@@ -248,7 +250,7 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 // @tparam Objects.MoveableStatus status The new status of the moveable.
 // @usage 
 // levelFuncs.setShivaInactive = function()
-//		shiva = TEN.Objects.GetMoveableByName("shiva_60")
+//		local shiva = TEN.Objects.GetMoveableByName("shiva_60")
 //		shiva:SetStatus(Objects.MoveableStatus.INACTIVE)
 // end
 	ScriptReserved_SetStatus, &Moveable::SetStatus,
@@ -256,26 +258,43 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 /// Retrieve the object ID
 // @function Moveable:GetObjectID
 // @treturn int a number representing the ID of the object
+// @usage 
+// LevelFuncs.GetShivaID = function()
+//		local shiva = TEN.Objects.GetMoveableByName("shiva_60")
+//		print(GetOnjectID(shiva)) -- print function prints to TombEngine terminal console
+// end
 	ScriptReserved_GetObjectID, &Moveable::GetObjectID,
 
 /// Change the object's ID. This will literally change the object.
 // @function Moveable:SetObjectID
 // @tparam Objects.ObjID ID the new ID 
 // @usage
-// shiva = TEN.Objects.GetMoveableByName("shiva_60")
-// shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)
+// LevelFuncs.SetShivaID = function()
+// 	local shiva = TEN.Objects.GetMoveableByName("shiva_60")
+// 	shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)
+// end
 	ScriptReserved_SetObjectID, &Moveable::SetObjectID,
 
 /// Retrieve the index of the current state.
 // This corresponds to the number shown in the item's state ID field in WadTool.
 // @function Moveable:GetState
 // @treturn int the index of the active state
+// @usage
+// LevelFuncs.GetShivaState = function()
+// 	local currentShivaState = TEN.Objects.GetMoveableByName("shiva_60"):GetState() -- syntax sugar
+//	print(shivaState)
+// end
 	ScriptReserved_GetStateNumber, &Moveable::GetStateNumber,
 
 /// Retrieve the index of the target state.
 // This corresponds to the state the object is trying to get into, which is sometimes different from the active state.
 // @function Moveable:GetTargetState
 // @treturn int the index of the target state
+// @usage
+// LevelFuncs.GetShivaState = function()
+// 	local currentShivaTargetState = TEN.Objects.GetMoveableByName("shiva_60"):GetShivaState()
+//	print(shivaState)
+// end
 	ScriptReserved_GetTargetStateNumber, &Moveable::GetTargetStateNumber,
 
 /// Set the object's state to the one specified by the given index.
@@ -380,8 +399,14 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @tparam int index of the ItemFlags where store the value.
 	ScriptReserved_SetItemFlags, & Moveable::SetItemFlags,
 
+/// Get the location value stored in the Enemy AI
+// @function Moveable:GetLocationAI
+// @treturn short the value contained in the LocationAI of the creature. Short type max value is 32767
 	ScriptReserved_GetLocationAI, & Moveable::GetLocationAI,
-
+		
+/// Updates the location in the enemy AI with the given value.
+// @function Moveable:SetLocationAI
+// @tparam short value to store. Short type max value is 32767
 	ScriptReserved_SetLocationAI, & Moveable::SetLocationAI,
 
 /// Get the moveable's color
@@ -393,9 +418,31 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @function Moveable:SetColor
 // @tparam Color color the new color of the moveable 
 	ScriptReserved_SetColor, &Moveable::SetColor,
-
+		
+/// Get AIBits of object
+// This will return a table with six values, each corresponding to
+// an active behaviour. If the object is in a certain AI mode, the table will
+// have a *1* in the corresponding cell. Otherwise, the cell will hold
+// a *0*.
+//
+// <br />1 - guard
+// <br />2 - ambush
+// <br />3 - patrol 1
+// <br />4 - modify
+// <br />5 - follow
+// <br />6 - patrol 2
+// @function Moveable:GetAIBits
+// @treturn table a table of AI bits
 	ScriptReserved_GetAIBits, &Moveable::GetAIBits, 
-			
+		
+/// Set AIBits of object
+// Use this to force a moveable into a certain AI mode or modes, as if a certain nullmesh
+// (or more than one) had suddenly spawned beneath their feet.
+// @function Moveable:SetAIBits
+// @tparam table bits the table of AI bits
+// @usage 
+// local sas = TEN.Objects.GetMoveableByName("sas_enemy")
+// sas:SetAIBits({1, 0, 0, 0, 0, 0})
 	ScriptReserved_SetAIBits, &Moveable::SetAIBits,
 
 	ScriptReserved_GetMeshCount, & Moveable::GetMeshCount,
@@ -427,7 +474,10 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 	ScriptReserved_GetRoomNumber, &Moveable::GetRoomNumber,
 
 	ScriptReserved_SetRoomNumber, &Moveable::SetRoomNumber,
-
+		
+/// Get the object's position
+// @function Moveable:GetPosition
+// @treturn Vec3 a copy of the moveable's position
 	ScriptReserved_GetPosition, & Moveable::GetPos,
 
 /// Get the object's joint position
@@ -442,7 +492,14 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // @tparam int index of a joint to get rotation
 // @treturn Rotation a calculated copy of the moveable's joint rotation
 	ScriptReserved_GetJointRotation, & Moveable::GetJointRot,
-
+		
+/// Set the moveable's position
+// If you are moving a moveable whose behaviour involves knowledge of room geometry,
+// (e.g. a BADDY1, which uses it for pathfinding), then the second argument should
+// be true (or omitted, as true is the default). Otherwise, said moveable will not behave correctly.
+// @function Moveable:SetPosition
+// @tparam Vec3 position the new position of the moveable 
+// @bool[opt] updateRoom Will room changes be automatically detected? Set to false if you are using overlapping rooms (default: true)
 	ScriptReserved_SetPosition, & Moveable::SetPos,
 
 /// Get the moveable's rotation
@@ -532,6 +589,8 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 // baddy:SetOnKilled(LevelFuncs.baddyKilled)
 	ScriptReserved_SetOnKilled, &Moveable::SetOnKilled);
 }
+
+// TEN Lua API Function definition and initialization below.
 
 void Moveable::Init()
 {
@@ -641,21 +700,11 @@ bool Moveable::SetName(const std::string& id)
 	return true;
 }
 
-/// Get the object's position
-// @function Moveable:GetPosition
-// @treturn Vec3 a copy of the moveable's position
 Vec3 Moveable::GetPos() const
 {
 	return Vec3(m_item->Pose.Position);
 }
 
-/// Set the moveable's position
-// If you are moving a moveable whose behaviour involves knowledge of room geometry,
-// (e.g. a BADDY1, which uses it for pathfinding), then the second argument should
-// be true (or omitted, as true is the default). Otherwise, said moveable will not behave correctly.
-// @function Moveable:SetPosition
-// @tparam Vec3 position the new position of the moveable 
-// @bool[opt] updateRoom Will room changes be automatically detected? Set to false if you are using overlapping rooms (default: true)
 void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 {
 	constexpr auto BIG_DISTANCE_THRESHOLD = BLOCK(1);
@@ -835,9 +884,6 @@ void Moveable::SetItemFlags(short value, int index)
 	m_item->ItemFlags[index] = value;
 }
 
-/// Get the location value stored in the Enemy AI
-// @function Moveable:GetLocationAI
-// @treturn short the value contained in the LocationAI of the creature.
 short Moveable::GetLocationAI() const
 {
 	if (m_item->IsCreature())
@@ -850,9 +896,6 @@ short Moveable::GetLocationAI() const
 	return 0;
 }
 
-/// Updates the location in the enemy AI with the given value.
-// @function Moveable:SetLocationAI
-// @tparam short value to store.
 void Moveable::SetLocationAI(short value)
 {
 	if (m_item->IsCreature())
@@ -862,7 +905,7 @@ void Moveable::SetLocationAI(short value)
 	}
 	else
 	{
-		TENLog("Trying to set a value in nonexisting variable. Non creature moveable hasn't got LocationAI.", LogLevel::Error);
+		TENLog("Trying to set a value in non-existing variable. Non-creature moveable does not have LocationAI data.", LogLevel::Error);
 	}
 }
 
@@ -876,20 +919,6 @@ void Moveable::SetColor(const ScriptColor& color)
 	m_item->Model.Color = color;
 }
 
-/// Get AIBits of object
-// This will return a table with six values, each corresponding to
-// an active behaviour. If the object is in a certain AI mode, the table will
-// have a *1* in the corresponding cell. Otherwise, the cell will hold
-// a *0*.
-//
-// <br />1 - guard
-// <br />2 - ambush
-// <br />3 - patrol 1
-// <br />4 - modify
-// <br />5 - follow
-// <br />6 - patrol 2
-// @function Moveable:GetAIBits
-// @treturn table a table of AI bits
 aiBitsType Moveable::GetAIBits() const
 {
 	static_assert(63 == ALL_AIOBJ);
@@ -904,15 +933,8 @@ aiBitsType Moveable::GetAIBits() const
 	return ret;
 }
 
-/// Set AIBits of object
-// Use this to force a moveable into a certain AI mode or modes, as if a certain nullmesh
-// (or more than one) had suddenly spawned beneath their feet.
-// @function Moveable:SetAIBits
-// @tparam table bits the table of AI bits
-// @usage 
-// local sas = TEN.Objects.GetMoveableByName("sas_enemy")
-// sas:SetAIBits({1, 0, 0, 0, 0, 0})
-void Moveable::SetAIBits(aiBitsType const & bits)
+
+void Moveable::SetAIBits(aiBitsType const& bits)
 {
 	for (size_t i = 0; i < bits.value().size(); ++i)
 	{
