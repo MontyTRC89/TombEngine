@@ -228,7 +228,7 @@ namespace TEN::Entities::Creatures::TR3
 			SpawnElectricity(origin.ToVector3(), target.ToVector3(), Random::GenerateInt(25, 50), 100, 200, 200, 30, (int)(int)(int)ElectricityFlags::ThinIn | (int)(int)ElectricityFlags::ThinOut, 4, 12);
 			SpawnElectricity(origin.ToVector3(), target.ToVector3(), Random::GenerateInt(25, 50), 100, 250, 255, 30, (int)(int)(int)ElectricityFlags::ThinIn | (int)(int)ElectricityFlags::ThinOut, 2, 12);
 
-			TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 0);
+			SpawnDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 0);
 			SpawnLizard(item);
 		}
 		else
@@ -256,7 +256,7 @@ namespace TEN::Entities::Creatures::TR3
 			SpawnElectricity(origin.ToVector3(), target.ToVector3(), 1, 20, 160, 160, 30, (int)(int)(int)ElectricityFlags::ThinIn | (int)ElectricityFlags::Spline | (int)ElectricityFlags::MoveEnd, 12, 12);
 			SpawnElectricity(origin.ToVector3(), target.ToVector3(), 1, 80, 160, 160, 30, (int)(int)(int)ElectricityFlags::ThinIn | (int)ElectricityFlags::Spline | (int)ElectricityFlags::MoveEnd, 5, 12);
 
-			TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 255);
+			SpawnDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 255);
 
 			auto hitPos = Vector3i::Zero;
 			if (ObjectOnLOS2(&origin, &target, &hitPos, nullptr, ID_LARA) == creature.Enemy->Index)

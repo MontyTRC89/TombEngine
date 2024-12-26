@@ -62,7 +62,8 @@ public:
 	void SetStateNumber(int stateNumber);
 
 	[[nodiscard]] int GetAnimNumber() const;
-	void SetAnimNumber(int animNumber);
+	[[nodiscard]] int GetAnimSlot() const;
+	void SetAnimNumber(int animNumber, sol::optional<int> slotIndex);
 
 	[[nodiscard]] int GetFrameNumber() const;
 	[[nodiscard]] int GetEndFrame() const;

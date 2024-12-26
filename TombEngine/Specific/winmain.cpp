@@ -538,14 +538,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 void WinClose()
 {
+	TENLog("Cleaning up and exiting...", LogLevel::Info);
+
 	WaitForSingleObject((HANDLE)ThreadHandle, 5000);
 
 	DestroyAcceleratorTable(hAccTable);
 
 	Sound_DeInit();
 	DeinitializeInput();
-
-	TENLog("Cleaning up and exiting...", LogLevel::Info);
 	
 	delete g_GameScript;
 	g_GameScript = nullptr;
