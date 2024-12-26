@@ -2410,12 +2410,12 @@ namespace TEN::Renderer
 #ifdef DISABLE_INSTANCING
 			if (rendererPass == RendererPass::GBuffer)
 			{
-				_shaderManager.Bind(Shader::GBuffer);
-				_shaderManager.Bind(Shader::GBufferStatics);
+				_shaders.Bind(Shader::GBuffer);
+				_shaders.Bind(Shader::GBufferStatics);
 			}
 			else
 			{
-				_shaderManager.Bind(Shader::Statics);
+				_shaders.Bind(Shader::Statics);
 			}
 
 			// Bind vertex and index buffer
@@ -2431,7 +2431,7 @@ namespace TEN::Renderer
 				std::vector<RendererStatic*> statics = it->second;
 
 				RendererStatic* refStatic = statics[0];
-				RendererObject& refStaticObj = *_staticObjects[refStatic->ObjectNumber];
+				RendererObject& refStaticObj = GetStaticRendererObject(refStatic->ObjectNumber);
 				if (refStaticObj.ObjectMeshes.size() == 0)
 					continue;
 
