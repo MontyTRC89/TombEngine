@@ -34,6 +34,7 @@ namespace TEN::Renderer
 
 	constexpr auto MenuLoadNumberLeftSide = 80;
 	constexpr auto MenuLoadNameLeftSide   = 150;
+	constexpr auto MenuLoadTimestampRightSide = 600;
 
 	// Vertical spacing templates
 	constexpr auto MenuVerticalLineSpacing = 30;
@@ -657,7 +658,7 @@ namespace TEN::Renderer
 
 				// Timestamp
 				sprintf(stringBuffer, g_GameFlow->GetString(STRING_SAVEGAME_TIMESTAMP), save.Hours, save.Minutes, save.Seconds);
-				AddString(MenuRightSideEntry, y, stringBuffer, PRINTSTRING_COLOR_WHITE, SF(selection == n));
+				AddString(MenuLoadTimestampRightSide, y, stringBuffer, PRINTSTRING_COLOR_WHITE, SF(selection == n));
 			}
 
 			GetNextLinePosition(&y);
@@ -816,8 +817,7 @@ namespace TEN::Renderer
 		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// Set shaders.
-		_context->VSSetShader(_vsInventory.Get(), nullptr, 0);
-		_context->PSSetShader(_psInventory.Get(), nullptr, 0);
+		_shaders.Bind(Shader::Inventory);
 
 		// Set matrices.
 		CCameraMatrixBuffer hudCamera;
@@ -889,7 +889,7 @@ namespace TEN::Renderer
 		if (!texture.Texture)
 			return;
 
-		int timeout = 20;
+		int timeout = 10;
 		float currentFade = FADE_FACTOR;
 
 		while (timeout || currentFade > 0.0f)
@@ -994,24 +994,21 @@ namespace TEN::Renderer
 		_context->ClearRenderTargetView(_renderTarget.RenderTargetView.Get(), Colors::Black);
 
 		if (background != nullptr)
-		{
 			DrawFullScreenImage(background->ShaderResourceView.Get(), backgroundFade, _renderTarget.RenderTargetView.Get(), _renderTarget.DepthStencilView.Get());
-		}
 
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
+		unsigned int stride = sizeof(Vertex);
+		unsigned int offset = 0;
 
-		// Set vertex buffer
+		// Set vertex buffer.
 		_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetInputLayout(_inputLayout.Get());
 		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		// Set shaders
-		_context->VSSetShader(_vsInventory.Get(), nullptr, 0);
-		_context->PSSetShader(_psInventory.Get(), nullptr, 0);
+		// Set shaders.
+		_shaders.Bind(Shader::Inventory);
 
 		if (CurrentLevel == 0)
 		{
@@ -1227,7 +1224,7 @@ namespace TEN::Renderer
 
 	void Renderer::DrawDebugInfo(RenderView& view)
 	{
-#ifdef TEST_BUILD
+#if TEST_BUILD
 		if (CurrentLevel == 0)
 		{
 			AddString("TombEngine " + std::string(TEN_VERSION_STRING) + " test build - not for distribution",

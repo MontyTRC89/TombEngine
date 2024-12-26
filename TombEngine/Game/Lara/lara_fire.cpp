@@ -572,7 +572,7 @@ void HandleWeapon(ItemInfo& laraItem)
 					player.Control.HandStatus = HandStatus::WeaponUndraw;
 				}
 			}
-			else if (player.Inventory.TotalFlares)
+			else if (player.Inventory.TotalFlares && !player.Control.Look.IsUsingBinoculars)
 			{
 				if (player.Inventory.TotalFlares != -1)
 					player.Inventory.TotalFlares--;
@@ -837,7 +837,7 @@ void AimWeapon(ItemInfo& laraItem, ArmInfo& arm, const WeaponInfo& weaponInfo)
 }
 
 // TODO: Include snowmobile gun in GetAmmo(), otherwise the player won't be able to shoot while controlling it. -- TokyoSU 2023.04.21
-FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, ItemInfo& laraItem, const EulerAngles& armOrient)
+FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, ItemInfo& laraItem, const EulerAngles& armOrient)
 {
 	auto& player = *GetLaraInfo(&laraItem);
 	auto& ammo = GetAmmo(player, weaponType);
@@ -872,14 +872,14 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 	GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 	vOrigin.RoomNumber = roomNumber;
 
-	if (&targetEntity == nullptr)
+	if (targetEntity == nullptr)
 	{
 		auto vTarget = GameVector(target);
 		GetTargetOnLOS(&vOrigin, &vTarget, false, true);
 		return FireWeaponType::Miss;
 	}
 
-	auto spheres = targetEntity.GetSpheres();
+	auto spheres = targetEntity->GetSpheres();
 	int closestJointIndex = NO_VALUE;
 	float closestDist = INFINITY;
 	for (int i = 0; i < spheres.size(); i++)
@@ -909,7 +909,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 		// NOTE: It seems that entities hit by the player in the normal way must have GetTargetOnLOS return false.
 		// It's strange, but this replicates original behaviour until we fully understand what is happening.
 		if (!GetTargetOnLOS(&vOrigin, &vTarget, false, true))
-			HitTarget(&laraItem, &targetEntity, &vTarget, weapon.Damage, false, closestJointIndex);
+			HitTarget(&laraItem, targetEntity, &vTarget, weapon.Damage, false, closestJointIndex);
 
 		return FireWeaponType::PossibleHit;
 	}

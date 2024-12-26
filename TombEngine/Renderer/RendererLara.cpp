@@ -111,10 +111,19 @@ void Renderer::UpdateLaraAnimations(bool force)
 	auto frameData = GetFrameInterpData(*LaraItem);
 	UpdateAnimation(&rItem, playerObject, frameData, mask);
 
+	auto gunType = Lara.Control.Weapon.GunType;
+	auto handStatus = Lara.Control.HandStatus;
+
+	// HACK: Treat binoculars as two-handed weapon.
+	if (Lara.Control.Look.IsUsingBinoculars)
+	{
+		gunType = LaraWeaponType::Shotgun;
+		handStatus = HandStatus::WeaponReady;
+	}
+
 	// Then the arms, based on current weapon status.
-	if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare &&
-		(Lara.Control.HandStatus == HandStatus::Free || Lara.Control.HandStatus == HandStatus::Busy) ||
-		Lara.Control.Weapon.GunType == LaraWeaponType::Flare && !Lara.Flare.ControlLeft)
+	if (gunType != LaraWeaponType::Flare && (handStatus == HandStatus::Free || handStatus == HandStatus::Busy) ||
+		gunType == LaraWeaponType::Flare && !Lara.Flare.ControlLeft)
 	{
 		// Both arms
 		mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND) | MESH_BITS(LM_RINARM) | MESH_BITS(LM_ROUTARM) | MESH_BITS(LM_RHAND);
@@ -124,15 +133,14 @@ void Renderer::UpdateLaraAnimations(bool force)
 	else
 	{
 		// While handling weapon, extra rotation may be applied to arms.
-		if (Lara.Control.Weapon.GunType == LaraWeaponType::Pistol ||
-			Lara.Control.Weapon.GunType == LaraWeaponType::Uzi)
+		if (gunType == LaraWeaponType::Revolver)
 		{
-			playerObject.LinearizedBones[LM_LINARM]->ExtraRotation *= Lara.LeftArm.Orientation.ToQuaternion();
+			playerObject.LinearizedBones[LM_LINARM]->ExtraRotation =
 			playerObject.LinearizedBones[LM_RINARM]->ExtraRotation *= Lara.RightArm.Orientation.ToQuaternion();
 		}
 		else
 		{
-			playerObject.LinearizedBones[LM_LINARM]->ExtraRotation =
+			playerObject.LinearizedBones[LM_LINARM]->ExtraRotation *= Lara.LeftArm.Orientation.ToQuaternion();
 			playerObject.LinearizedBones[LM_RINARM]->ExtraRotation *= Lara.RightArm.Orientation.ToQuaternion();
 		}
 
@@ -140,7 +148,7 @@ void Renderer::UpdateLaraAnimations(bool force)
 		ArmInfo* rightArm = &Lara.RightArm;
 
 		// HACK: Back guns are handled differently.
-		switch (Lara.Control.Weapon.GunType)
+		switch (gunType)
 		{
 		case LaraWeaponType::Shotgun:
 		case LaraWeaponType::HK:
@@ -152,7 +160,7 @@ void Renderer::UpdateLaraAnimations(bool force)
 			// Left arm
 			mask = MESH_BITS(LM_LINARM) | MESH_BITS(LM_LOUTARM) | MESH_BITS(LM_LHAND);
 
-			if (shouldAnimateUpperBody(Lara.Control.Weapon.GunType))
+			if (shouldAnimateUpperBody(gunType))
 				mask |= MESH_BITS(LM_TORSO) | MESH_BITS(LM_HEAD);
 
 			auto shotgunFrameData = AnimFrameInterpData
@@ -278,14 +286,11 @@ void Renderer::UpdateLaraAnimations(bool force)
 	rItem.DoneAnimations = true;
 }
 
-void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
+void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 {
-	// Don't draw player if using optics.
-	if (Lara.Control.Look.OpticRange != 0 || SpotcamDontDrawLara)
-		return;
-
-	// Don't draw player if on title level and disabled.
-	if (CurrentLevel == 0 && !g_GameFlow->IsLaraInTitleEnabled())
+	// TODO: Avoid Lara global.
+	// Don't draw player if using optics (but still draw reflections).
+	if (Lara.Control.Look.OpticRange != 0 && _currentMirror == nullptr)
 		return;
 
 	auto* item = &_items[LaraItem->Index];
@@ -305,7 +310,9 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 
 	RendererRoom* room = &_rooms[LaraItem->RoomNumber];
 
-	_stItem.World = item->InterpolatedWorld; // _laraWorldMatrix;
+	_stItem.World = item->InterpolatedWorld;
+	ReflectMatrixOptionally(_stItem.World);
+
 	_stItem.Color = item->Color;
 	_stItem.AmbientLight = item->AmbientLight;
 	memcpy(_stItem.BonesMatrices, item->InterpolatedAnimTransforms, laraObj.AnimationTransforms.size() * sizeof(Matrix));
@@ -313,7 +320,9 @@ void TEN::Renderer::Renderer::DrawLara(RenderView& view, RendererPass rendererPa
 	{
 		_stItem.BoneLightModes[k] = (int)GetMesh(nativeItem->Model.MeshIndex[k])->LightMode;
 	}
-	BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade);
+
+	bool acceptsShadows = laraObj.ShadowType == ShadowMode::None;
+	BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade, acceptsShadows);
 	_cbItem.UpdateData(_stItem, _context.Get());
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
@@ -347,6 +356,7 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 
 		_stItem.World = Matrix::Identity;
 		_stItem.BonesMatrices[0] = itemToDraw->InterpolatedAnimTransforms[HairUnit::GetRootMeshID(i)] * itemToDraw->InterpolatedWorld;
+		ReflectMatrixOptionally(_stItem.BonesMatrices[0]);
 
 		for (int i = 0; i < unit.Segments.size(); i++)
 		{
@@ -356,6 +366,8 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 					Quaternion::Lerp(segment.PrevOrientation, segment.Orientation, GetInterpolationFactor(forceValue))) *
 				Matrix::CreateTranslation(
 					Vector3::Lerp(segment.PrevPosition, segment.Position, GetInterpolationFactor(forceValue)));
+			
+			ReflectMatrixOptionally(worldMatrix);
 
 			_stItem.BonesMatrices[i + 1] = worldMatrix;
 			_stItem.BoneLightModes[i] = (int)LightMode::Dynamic;

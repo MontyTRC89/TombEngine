@@ -126,7 +126,7 @@ namespace TEN::Entities::Creatures::TR5
 					item.MeshBits.Set(AutoGunFlashJoints);
 
 					auto lightColor = Vector3(Random::GenerateFloat(0.75f, 0.85f), Random::GenerateFloat(0.5f, 0.6f), 0.0f) * 255;
-					TriggerDynamicLight(origin.x, origin.y, origin.z, 10, lightColor.x, lightColor.y, lightColor.z);
+					SpawnDynamicLight(origin.x, origin.y, origin.z, 10, lightColor.x, lightColor.y, lightColor.z);
 
 					// Spawn blood.
 					if (Random::TestProbability(AUTO_GUN_BLOOD_EFFECT_CHANCE))
