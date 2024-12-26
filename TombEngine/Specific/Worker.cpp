@@ -30,7 +30,7 @@ namespace TEN::Utils
 
 	unsigned int WorkerManager::GetThreadCount() const
 	{
-		return _threads.size();
+		return (unsigned int)_threads.size();
 	}
 
 	unsigned int WorkerManager::GetCoreCount() const

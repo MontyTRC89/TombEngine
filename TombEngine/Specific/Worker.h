@@ -37,6 +37,37 @@ namespace TEN::Utils
 		void AddTask(const WorkerTask& task, unsigned long groupId = (unsigned long)NO_VALUE);
 		void WaitForGroup(unsigned long groupId);
 		void Deinitialize();
+		
+		// A template to batch parallel operations on a vector
+
+		template <typename T>
+		void ProcessInParallel(std::vector<T>& vec, const std::function<void(int, int)>& task, bool multiThreaded)
+		{
+			constexpr int MAX_GENERIC_THREADS = 4;
+			constexpr int MAX_SERIAL_UNITS = 32;
+			const int itemCount = (int)vec.size();
+
+			if (multiThreaded && itemCount > MAX_SERIAL_UNITS)
+			{
+				const int numThreads = itemCount > MAX_SERIAL_UNITS ? MAX_GENERIC_THREADS : 1;
+				const int chunkSize  = (itemCount + numThreads - 1) / numThreads;
+
+				unsigned long groupID = TEN::Utils::g_Worker.GetNewGroupId();
+
+				for (int threadIndex = 0; threadIndex < numThreads; threadIndex++)
+				{
+					int start = threadIndex * chunkSize;
+					int end = std::min(start + chunkSize, itemCount);
+					g_Worker.AddTask([task, start, end]() { task(start, end); }, groupID);
+				}
+
+				g_Worker.WaitForGroup(groupID);
+			}
+			else
+			{
+				task(0, itemCount);
+			}
+		}
 
 	private:
 		// Helpers
