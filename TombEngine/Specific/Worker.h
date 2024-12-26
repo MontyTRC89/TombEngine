@@ -16,10 +16,10 @@ namespace TEN::Utils
 		std::condition_variable	 _taskCond	   = {};
 		std::atomic<bool>		 _deinitialize = false;
 
-		std::unordered_map<unsigned long, unsigned int> _groupTaskCounts = {}; // Key = group ID, value = task count.
-		std::atomic<unsigned long>						_groupIdCounter	 = {};
-		std::mutex										_groupMutex		 = {};
-		std::condition_variable							_groupCond		 = {};
+		std::unordered_map<uint64_t, unsigned int> _groupTaskCounts = {}; // Key = group ID, value = task count.
+		std::atomic<uint64_t>					   _groupIdCounter	= {};
+		std::mutex								   _groupMutex		= {};
+		std::condition_variable					   _groupCond		= {};
 
 	public:
 		// Constructors
@@ -28,41 +28,40 @@ namespace TEN::Utils
 
 		// Getters
 
-		unsigned long GetNewGroupId();
-		unsigned int  GetThreadCount() const;
-		unsigned int  GetCoreCount() const;
+		uint64_t	 GetNewGroupId();
+		unsigned int GetThreadCount() const;
+		unsigned int GetCoreCount() const;
 
 		// Utilities
 
-		void AddTask(const WorkerTask& task, unsigned long groupId = (unsigned long)NO_VALUE);
-		void WaitForGroup(unsigned long groupId);
+		void AddTask(const WorkerTask& task, uint64_t groupId = (uint64_t)NO_VALUE);
+		void WaitForGroup(uint64_t groupId);
 		void Deinitialize();
 		
-		// A template to batch parallel operations on a vector
-
+		// Template for batching parallel operations on vector.
 		template <typename T>
 		void ProcessInParallel(std::vector<T>& vec, const std::function<void(int, int)>& task, bool multiThreaded)
 		{
-			constexpr int MAX_GENERIC_THREADS = 4;
-			constexpr int MAX_SERIAL_UNITS = 32;
-			const int itemCount = (int)vec.size();
-
-			if (multiThreaded && itemCount > MAX_SERIAL_UNITS)
+			constexpr auto SERIAL_UNIT_COUNT_MAX = 32;
+			
+			// Process in parallel.
+			unsigned int itemCount = (unsigned int)vec.size();
+			if (multiThreaded && itemCount > SERIAL_UNIT_COUNT_MAX)
 			{
-				const int numThreads = itemCount > MAX_SERIAL_UNITS ? MAX_GENERIC_THREADS : 1;
-				const int chunkSize  = (itemCount + numThreads - 1) / numThreads;
+				unsigned int threadCount = (itemCount > SERIAL_UNIT_COUNT_MAX) ? GetCoreCount() : 1;
+				unsigned int chunkSize = ((itemCount + threadCount) - 1) / threadCount;
 
-				unsigned long groupID = TEN::Utils::g_Worker.GetNewGroupId();
-
-				for (int threadIndex = 0; threadIndex < numThreads; threadIndex++)
+				// Handle task batches.
+				auto groupId = GetNewGroupId();
+				for (int i = 0; i < threadCount; i++)
 				{
-					int start = threadIndex * chunkSize;
+					int start = i * chunkSize;
 					int end = std::min(start + chunkSize, itemCount);
-					g_Worker.AddTask([task, start, end]() { task(start, end); }, groupID);
+					g_Worker.AddTask([task, start, end]() { task(start, end); }, groupId);
 				}
-
-				g_Worker.WaitForGroup(groupID);
+				g_Worker.WaitForGroup(groupId);
 			}
+			// Process linearly.
 			else
 			{
 				task(0, itemCount);
@@ -73,7 +72,7 @@ namespace TEN::Utils
 		// Helpers
 
 		void Worker();
-		void HandleTask(const WorkerTask& task, unsigned long groupId);
+		void HandleTask(const WorkerTask& task, uint64_t groupId);
 	};
 
 	extern WorkerManager g_Worker;

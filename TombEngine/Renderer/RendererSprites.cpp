@@ -1,16 +1,17 @@
 #include "framework.h"
 #include "Renderer/Structures/RendererSprite.h"
+
 #include "Renderer/Structures/RendererSpriteBucket.h"
 #include "Renderer/Renderer.h"
-#include "Specific/Worker.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Specific/Worker.h"
+
+using namespace TEN::Renderer::Structures;
 
 namespace TEN::Renderer
 {
-	using namespace TEN::Renderer::Structures;
-
 	void Renderer::AddSpriteBillboard(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D, float scale,
-		Vector2 size, BlendMode blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
+									  Vector2 size, BlendMode blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
 		if (scale <= 0.0f)
 			scale = 1.0f;
@@ -296,9 +297,9 @@ namespace TEN::Renderer
 			{
 				for (int i = start; i < end; i++)
 				{
-					auto& rDrawSprite = spriteBucket.SpritesToDraw[i];
+					const auto& rDrawSprite = spriteBucket.SpritesToDraw[i];
 
-					_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, view);
+					_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(rDrawSprite, view);
 					_stInstancedSpriteBuffer.Sprites[i].Color = rDrawSprite.color;
 					_stInstancedSpriteBuffer.Sprites[i].IsBillboard = 1;
 					_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = rDrawSprite.SoftParticle ? 1 : 0;
@@ -420,11 +421,11 @@ namespace TEN::Renderer
 			_shaders.Bind(Shader::InstancedSprites);
 
 			// Set up vertex buffer and parameters.
-			UINT stride = sizeof(Vertex);
-			UINT offset = 0;
+			unsigned int stride = sizeof(Vertex);
+			unsigned int offset = 0;
 			_context->IASetVertexBuffers(0, 1, _quadVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 
-			_stInstancedSpriteBuffer.Sprites[0].World = GetWorldMatrixForSprite(object->Sprite, view);
+			_stInstancedSpriteBuffer.Sprites[0].World = GetWorldMatrixForSprite(*object->Sprite, view);
 			_stInstancedSpriteBuffer.Sprites[0].Color = object->Sprite->color;
 			_stInstancedSpriteBuffer.Sprites[0].IsBillboard = 1;
 			_stInstancedSpriteBuffer.Sprites[0].IsSoftParticle = object->Sprite->SoftParticle ? 1 : 0;

@@ -15,6 +15,7 @@
 #include "Specific/level.h"
 #include "Specific/configuration.h"
 #include "Specific/trutils.h"
+#include "Specific/Worker.h"
 #include "Scripting/Internal/LanguageScript.h"
 #include "Scripting/Include/ScriptInterfaceState.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
@@ -560,6 +561,8 @@ void WinClose()
 	g_GameStringsHandler = nullptr;
 
 	ShutdownTENLog();
+
+	g_Worker.Deinitialize();
 
 	CoUninitialize();
 }

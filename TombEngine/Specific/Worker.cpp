@@ -18,11 +18,11 @@ namespace TEN::Utils
 		_deinitialize = false;
 	}
 
-	unsigned long WorkerManager::GetNewGroupId()
+	uint64_t WorkerManager::GetNewGroupId()
 	{
 		// Increment group ID counter, skipping NO_VALUE on wrap.
-		unsigned long groupId = _groupIdCounter.fetch_add(1, std::memory_order_relaxed);
-		if (groupId == (unsigned long)NO_VALUE)
+		auto groupId = _groupIdCounter.fetch_add(1, std::memory_order_relaxed);
+		if (groupId == (uint64_t)NO_VALUE)
 			groupId = _groupIdCounter.fetch_add(1, std::memory_order_relaxed);
 
 		return groupId;
@@ -38,7 +38,7 @@ namespace TEN::Utils
 		return std::thread::hardware_concurrency();
 	}
 
-	void WorkerManager::AddTask(const WorkerTask& task, unsigned long groupId)
+	void WorkerManager::AddTask(const WorkerTask& task, uint64_t groupId)
 	{
 		// LOCK: Restrict task queue access.
 		{
@@ -48,7 +48,7 @@ namespace TEN::Utils
 			_tasks.push([this, task, groupId]() { HandleTask(task, groupId); });
 
 			// Increment group task count (if applicable).
-			if (groupId != (unsigned long)NO_VALUE)
+			if (groupId != (uint64_t)NO_VALUE)
 			{
 				// LOCK: Restrict group task count access.
 				{
@@ -63,7 +63,7 @@ namespace TEN::Utils
 		_taskCond.notify_one();
 	}
 
-	void WorkerManager::WaitForGroup(unsigned long groupId)
+	void WorkerManager::WaitForGroup(uint64_t groupId)
 	{
 		// LOCK: Restrict group task completion.
 		{
@@ -85,10 +85,10 @@ namespace TEN::Utils
 		_taskCond.notify_all();
 
 		// Join all threads.
-		for (auto& worker : _threads)
+		for (auto& thread : _threads)
 		{
-			if (worker.joinable())
-				worker.join();
+			if (thread.joinable())
+				thread.join();
 		}
 	}
 
@@ -118,13 +118,13 @@ namespace TEN::Utils
 		}
 	}
 
-	void WorkerManager::HandleTask(const WorkerTask& task, unsigned long groupId)
+	void WorkerManager::HandleTask(const WorkerTask& task, uint64_t groupId)
 	{
 		// Execute task.
 		task();
 
 		// Decrement group task count (if applicable).
-		if (groupId != (unsigned long)NO_VALUE)
+		if (groupId != (uint64_t)NO_VALUE)
 		{
 			// LOCK: Restrict group task count access.
 			{

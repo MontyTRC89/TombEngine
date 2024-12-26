@@ -76,8 +76,8 @@ namespace TEN::Scripting
 
 	struct SystemSettings
 	{
-		ErrorMode ErrorMode	 = ErrorMode::Warn;
-		bool	  FastReload = true;
+		ErrorMode ErrorMode		= ErrorMode::Warn;
+		bool	  FastReload	= true;
 		bool	  MultiThreaded = true;
 
 		static void Register(sol::table& parent);
