@@ -2,6 +2,7 @@
 #include "Scripting/Internal/TEN/Util/Util.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/collision/Los.h"
 #include "Game/control/los.h"
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
@@ -18,6 +19,7 @@
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 
+using namespace TEN::Collision::Los;
 using TEN::Renderer::g_Renderer;
 
 /// Utility functions for various calculations.
@@ -44,7 +46,7 @@ namespace TEN::Scripting::Util
 		MESH_INFO* mesh = nullptr;
 		auto vector = Vector3i::Zero;
 		return (LOS(&vector0, &vector1) &&
-			ObjectOnLOS2(&vector0, &vector1, &vector, &mesh) == NO_LOS_ITEM);
+			ObjectOnLOS2(&vector0, &vector1, &vector, &mesh) == NO_VALUE);
 	}
 
 	///Calculate the distance between two positions.
@@ -143,7 +145,7 @@ namespace TEN::Scripting::Util
 		auto vector = Vector3i::Zero;
 		int itemNumber = ObjectOnLOS2(&ray.first, &ray.second, &vector, nullptr, GAME_OBJECT_ID::ID_LARA);
 
-		if (itemNumber == NO_LOS_ITEM || itemNumber < 0)
+		if (itemNumber == NO_VALUE|| itemNumber < 0)
 			return sol::nullopt;
 
 		return std::make_unique<Moveable>(itemNumber);
@@ -162,7 +164,7 @@ namespace TEN::Scripting::Util
 		auto vector = Vector3i::Zero;
 		int itemNumber = ObjectOnLOS2(&ray.first, &ray.second, &vector, &mesh, GAME_OBJECT_ID::ID_LARA);
 
-		if (itemNumber == NO_LOS_ITEM || itemNumber >= 0)
+		if (itemNumber == NO_VALUE || itemNumber >= 0)
 			return sol::nullopt;
 
 		return std::make_unique<Static>(*mesh);

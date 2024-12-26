@@ -30,3 +30,19 @@ namespace TEN::Math
 	Vector3 Screen(const Vector3& ambient, const Vector3& tint);
 	Vector4 Screen(const Vector4& ambient, const Vector4& tint);
 }
+
+namespace std
+{
+	template <>
+	struct hash<Vector3>
+	{
+		size_t operator ()(const Vector3& vector) const noexcept
+		{
+			size_t seed = 0;
+			seed ^= hash<int>()(vector.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			seed ^= hash<int>()(vector.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			seed ^= hash<int>()(vector.z) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			return seed;
+		}
+	};
+}

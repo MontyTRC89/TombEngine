@@ -22,7 +22,7 @@
 	static auto IndexError = index_error_maker(Room, ScriptReserved_Volume);
 	static auto NewIndexError = newindex_error_maker(Room, ScriptReserved_Volume);
 
-	Room::Room(ROOM_INFO& room) :
+	Room::Room(RoomData& room) :
 		_room(room)
 	{
 	};

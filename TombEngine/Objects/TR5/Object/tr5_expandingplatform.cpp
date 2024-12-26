@@ -5,6 +5,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/floordata.h"
+#include "Game/collision/Point.h"
 #include "Game/control/box.h"
 #include "Game/control/control.h"
 #include "Game/items.h"
@@ -16,6 +17,7 @@
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
+using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 
 namespace TEN::Entities::Generic
@@ -123,15 +125,7 @@ namespace TEN::Entities::Generic
 		item.Data = BridgeObject();
 		auto& bridge = GetBridgeObject(item);
 
-		// Initialize routines.
-		bridge.GetFloorHeight = GetExpandingPlatformFloorHeight;
-		bridge.GetCeilingHeight = GetExpandingPlatformCeilingHeight;
-		bridge.GetFloorBorder = ExpandingPlatformFloorBorder;
-		bridge.GetCeilingBorder = ExpandingPlatformCeilingBorder;
-
-		short roomNumber = item.RoomNumber;
-		FloorInfo* floor = GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &roomNumber);
-		g_Level.PathfindingBoxes[floor->PathfindingBoxID].flags &= ~BLOCKED;
+		g_Level.PathfindingBoxes[GetPointCollision(item).GetSector().PathfindingBoxID].flags &= ~BLOCKED;
 
 		// Set mutators to default.
 		UpdateExpandingPlatformMutators(itemNumber);
@@ -143,7 +137,11 @@ namespace TEN::Entities::Generic
 			item.Status = ITEM_ACTIVE;
 		}
 
-		UpdateBridgeItem(item);
+		bridge.GetFloorHeight = GetExpandingPlatformFloorHeight;
+		bridge.GetCeilingHeight = GetExpandingPlatformCeilingHeight;
+		bridge.GetFloorBorder = ExpandingPlatformFloorBorder;
+		bridge.GetCeilingBorder = ExpandingPlatformCeilingBorder;
+		bridge.Initialize(item);
 	}
 
 	bool IsInFrontOfExpandingPlatform(const ItemInfo& item, const Vector3i& pos, int margin)
@@ -268,6 +266,9 @@ namespace TEN::Entities::Generic
 	void ControlExpandingPlatform(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
+		auto& bridge = GetBridgeObject(item);
+
+		bridge.Update(item);
 
 		if (TriggerActive(&item))
 		{

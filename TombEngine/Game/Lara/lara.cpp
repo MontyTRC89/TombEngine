@@ -63,6 +63,192 @@ LaraInfo	  Lara			= {};
 ItemInfo*	  LaraItem		= nullptr;
 CollisionInfo LaraCollision = {};
 
+//temp debug
+#include <Game/control/los.h>
+#include "Specific/Input/Input.h"
+#include <OISKeyboard.h>
+#include <Game/collision/Los.h>
+using namespace TEN::Collision::Room;
+using namespace TEN::Collision::Los;
+
+//temp debug
+static void HandleLosDebug(const ItemInfo& item)
+{
+	// Hold T/G to rotate LOS ray.
+	static auto rot = EulerAngles::Identity;
+	if (KeyMap[OIS::KC_T])
+	{
+		rot.x += ANGLE(2);
+	}
+	else if (KeyMap[OIS::KC_G])
+	{
+		rot.x -= ANGLE(2);
+	}
+
+	auto dir = (item.Pose.Orientation + rot).ToDirection();
+
+	float dist = BLOCK(4.5f);
+
+	short roomNumber = item.RoomNumber;
+	GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &roomNumber);
+
+	auto origin = (item.Pose.Position + Vector3i(0, -BLOCK(0.9f), 0)).ToVector3();
+	auto target = Geometry::TranslatePoint(origin, dir, dist);
+	auto los = GetLosCollision(origin, roomNumber, dir, dist, true, true, true);
+	float closestDist = los.Room.Distance;
+	target = los.Room.Position;
+
+	for (const auto& movLos : los.Items)
+	{
+		if (movLos.Item->ObjectNumber == ID_LARA)
+			continue;
+
+		if (movLos.Distance < closestDist)
+		{
+			closestDist = movLos.Distance;
+			target = movLos.Position;
+			break;
+		}
+	}
+
+	for (const auto& staticLos : los.Statics)
+	{
+		if (staticLos.Distance < closestDist)
+		{
+			closestDist = staticLos.Distance;
+			target = staticLos.Position;
+			break;
+		}
+	}
+
+	DrawDebugLine(origin, target, Vector4::One);
+	DrawDebugTarget(target, Quaternion::Identity, 100, Color(1, 1, 1));
+}
+
+//temp debug
+static void HandleBridgeDebug(const ItemInfo& item)
+{
+	auto pointColl = GetPointCollision(item);
+
+	// Move bridge with mouse.
+	// Hold Y to move vertically.
+	// Hold R/E to rotate.
+	if (pointColl.GetFloorBridgeItemNumber() != NO_VALUE)
+	{
+		auto& bridgeItem = g_Level.Items[pointColl.GetFloorBridgeItemNumber()];
+
+		auto rot = EulerAngles::Identity;
+		if (KeyMap[OIS::KC_R])
+		{
+			rot.y += ANGLE(2);
+		}
+		else if (KeyMap[OIS::KC_E])
+		{
+			rot.y -= ANGLE(2);
+		}
+		bridgeItem.Pose.Orientation += rot;
+
+		auto matrix = Matrix::CreateRotationY(TO_RAD(Camera.actualAngle));
+		auto delta = KeyMap[OIS::KC_Y] ?
+			Vector3(0.0f, GetMouseAxis().y * BLOCK(0.5f), 0.0f) :
+			Vector3::Transform(Vector3(GetMouseAxis().x * BLOCK(0.5f), 0, GetMouseAxis().y * -BLOCK(0.5f)), matrix);
+
+		bridgeItem.Pose.Position += delta;
+		UpdateItemRoom(bridgeItem.Index);
+	}
+}
+
+static void HandlePlayerDebug(const ItemInfo& item)
+{
+	HandleLosDebug(item);
+	HandleBridgeDebug(item);
+
+	if constexpr (!DebugBuild)
+		return;
+
+	// Collision stats.
+	if (g_Renderer.GetDebugPage() == RendererDebugPage::CollisionStats)
+	{
+		DrawNearbySectorFlags(item);
+	}
+	// Pathfinding stats.
+	else if (g_Renderer.GetDebugPage() == RendererDebugPage::PathfindingStats)
+	{
+		DrawNearbyPathfinding(GetPointCollision(item).GetBottomSector().PathfindingBoxID);
+	}
+	// Room stats.
+	else if (g_Renderer.GetDebugPage() == RendererDebugPage::RoomStats)
+	{
+		const auto& room = g_Level.Rooms[Camera.pos.RoomNumber];
+
+		PrintDebugMessage("Room number: %d", room.RoomNumber);
+		PrintDebugMessage("Sectors: %d", room.Sectors.size());
+		PrintDebugMessage("Bridges: %d", room.Bridges.GetIds().size());
+		PrintDebugMessage("Trigger volumes: %d", room.TriggerVolumes.size());
+
+		// Draw room collision meshes.
+		for (int neighborRoomNumber : room.NeighborRoomNumbers)
+		{
+			const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+
+			neighborRoom.CollisionMesh.DrawDebug();
+		}
+	}
+	// Bridge stats.
+	else if (g_Renderer.GetDebugPage() == RendererDebugPage::BridgeStats)
+	{
+		auto bridgeItemNumbers = std::set<int>{};
+
+		const auto& room = g_Level.Rooms[Camera.pos.RoomNumber];
+		for (int neighborRoomNumber : room.NeighborRoomNumbers)
+		{
+			const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+
+			// Collect bridge item numbers.
+			for (int bridgeItemNumber : neighborRoom.Bridges.GetIds())
+				bridgeItemNumbers.insert(bridgeItemNumber);
+
+			// Draw bridge tree.
+			neighborRoom.Bridges.DrawDebug();
+		}
+
+		// Draw bridge collision meshes.
+		for (int bridgeItemNumber : bridgeItemNumbers)
+		{
+			auto& bridgeItem = g_Level.Items[bridgeItemNumber];
+			auto& bridge = GetBridgeObject(bridgeItem);
+
+			bridge.GetCollisionMesh().DrawDebug();
+		}
+
+		// Print bridge item numbers in sector.
+		auto pointColl = GetPointCollision(item);
+		PrintDebugMessage("Bridge moveable IDs in room %d, sector %d:", pointColl.GetRoomNumber(), pointColl.GetSector().ID);
+		if (pointColl.GetSector().BridgeItemNumbers.empty())
+		{
+			PrintDebugMessage("None");
+		}
+		else
+		{
+			for (int bridgeItemNumber : pointColl.GetSector().BridgeItemNumbers)
+				PrintDebugMessage("%d", bridgeItemNumber);
+		}
+	}
+	// Portal stats.
+	else if (g_Renderer.GetDebugPage() == RendererDebugPage::PortalStats)
+	{
+		const auto& room = g_Level.Rooms[Camera.pos.RoomNumber];
+		PrintDebugMessage("Portals in room %d: %d", room.RoomNumber, room.Portals.size());
+
+		for (int neighborRoomNumber : room.NeighborRoomNumbers)
+		{
+			const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+			for (const auto& portal : neighborRoom.Portals)
+				portal.CollisionMesh.DrawDebug();
+		}
+	}
+}
+
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
@@ -83,7 +269,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			player.Control.HandStatus = HandStatus::Free;
 		}
 
-		++player.Control.Count.PositionAdjust;
+		player.Control.Count.PositionAdjust++;
 	}
 	else
 	{
@@ -335,11 +521,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	SaveGame::Statistics.Game.Distance  += deltaDist;
 	SaveGame::Statistics.Level.Distance += deltaDist;
 
-	if (DebugMode)
-	{
-		DrawNearbyPathfinding(GetPointCollision(*item).GetBottomSector().PathfindingBoxID);
-		DrawNearbySectorFlags(*item);
-	}
+	HandlePlayerDebug(*item);
 }
 
 void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)

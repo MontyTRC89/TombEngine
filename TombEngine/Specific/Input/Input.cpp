@@ -897,4 +897,19 @@ namespace TEN::Input
 	{
 		return (IsDirectionalActionHeld() || IsHeld(In::Action) || IsHeld(In::Crouch) || IsHeld(In::Sprint));
 	}
+
+	const Vector2& GetMoveAxis()
+	{
+		return AxisMap[(int)InputAxis::Move];
+	}
+
+	const Vector2& GetCameraAxis()
+	{
+		return AxisMap[(int)InputAxis::Camera];
+	}
+
+	const Vector2& GetMouseAxis()
+	{
+		return AxisMap[(int)InputAxis::Mouse];
+	}
 }
