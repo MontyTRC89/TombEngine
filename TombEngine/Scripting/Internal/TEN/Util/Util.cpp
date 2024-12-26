@@ -101,9 +101,11 @@ namespace TEN::Scripting::Util
 	// @treturn Vec2 Projected display space position in percent.
 	// @usage 
 	// Example: Display a string at the player's position.
-	// local string = DisplayString('Example', 0, 0, Color(255, 255, 255), false)
-	// local displayPos = GetDisplayPosition(Lara:GetPosition())
-	// string:SetPosition(PercentToScreen(displayPos.x, displayPos.y))
+	// LevelFuncs.GetDisplayPos = function()
+	// 	local string = DisplayString('Example', 0, 0, Color(255, 255, 255), false)
+	// 	local displayPos = GetDisplayPosition(Lara:GetPosition())
+	// 	string:SetPosition(PercentToScreen(displayPos.x, displayPos.y))
+	// end
 	static sol::optional<Vec2> GetDisplayPosition(const Vec3& worldPos)
 	{
 		auto displayPos = g_Renderer.Get2DPosition(worldPos.ToVector3());
@@ -124,7 +126,6 @@ namespace TEN::Scripting::Util
 	//@treturn int y Y coordinate in pixels.
 	//@usage	
 	//local halfwayX, halfwayY = PercentToScreen(50, 50)
-	//local baddy
 	//local spawnLocationNullmesh = GetMoveableByName("position_behind_left_pillar")
 	//local str1 = DisplayString("You spawned an enemy!", halfwayX, halfwayY, Color(255, 100, 100), false, { DisplayStringOption.SHADOW, DisplayStringOption.CENTER })
 	//
@@ -148,6 +149,11 @@ namespace TEN::Scripting::Util
 	//@tparam int y Y pixel coordinate to translate to display position.
 	//@treturn float x X component of display position.
 	//@treturn float y Y component of display position.
+	//@usage
+	//LevelFUncs.GetConvertedScreenToPercent = function()
+	//	local halfWayX, halfWayY = ScreenToPercent(400, 400) -- assume screen width to be 800 px
+	//	print("percentage of half screen is: "..halfWayX.."% "..halfWayY.."% ".."X and Y respectively")
+	//end
 	static std::tuple<float, float> ScreenToPercent(int x, int y)
 	{
 		float fWidth = g_Configuration.ScreenWidth;
