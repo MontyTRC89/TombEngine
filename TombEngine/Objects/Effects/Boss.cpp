@@ -259,7 +259,7 @@ namespace TEN::Effects::Boss
 			SoundEffect(SFX_TR3_BLAST_CIRCLE, &shockwavePos);
 		}
 
-		TriggerDynamicLight(
+		SpawnDynamicLight(
 			item.Pose.Position.x,
 			item.Pose.Position.y - CLICK(2),
 			item.Pose.Position.z,
