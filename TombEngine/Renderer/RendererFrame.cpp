@@ -558,7 +558,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::CollectLights(const Vector3& position, float radius, int roomNumber, int prevRoomNumber, bool prioritizeShadowLight, bool useCachedRoomLights, std::vector<RendererLightNode>* roomsLights, std::vector<RendererLight*>* outputLights)
+	void Renderer::CollectLights(const Vector3& pos, float radius, int roomNumber, int prevRoomNumber, bool prioritizeShadowLight, bool useCachedRoomLights, std::vector<RendererLightNode>* roomsLights, std::vector<RendererLight*>* outputLights)
 	{
 		if (_rooms.size() <= roomNumber)
 			return;
@@ -575,7 +575,7 @@ namespace TEN::Renderer
 		// Dynamic lights have the priority
 		for (auto& light : _dynamicLights[_dynamicLightList])
 		{
-			float distSqr = Vector3::DistanceSquared(position, light.Position);
+			float distSqr = Vector3::DistanceSquared(pos, light.Position);
 
 			// Collect only lights nearer than 20 sectors
 			if (distSqr >= SQUARE(BLOCK(20)))
@@ -620,7 +620,7 @@ namespace TEN::Renderer
 					}
 					else if (light.Type == LightType::Point || light.Type == LightType::Shadow)
 					{
-						float distSqr = Vector3::DistanceSquared(position, light.Position);
+						float distSqr = Vector3::DistanceSquared(pos, light.Position);
 
 						// Collect only lights nearer than 20 blocks.
 						if (distSqr >= SQUARE(BLOCK(20)))
@@ -646,7 +646,7 @@ namespace TEN::Renderer
 					}
 					else if (light.Type == LightType::Spot)
 					{
-						float distSqr = Vector3::DistanceSquared(position, light.Position);
+						float distSqr = Vector3::DistanceSquared(pos, light.Position);
 
 						// Collect only lights nearer than 20 blocks.
 						if (distSqr >= SQUARE(BLOCK(20)))
