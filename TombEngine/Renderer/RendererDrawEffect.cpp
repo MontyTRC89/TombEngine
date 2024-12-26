@@ -31,6 +31,7 @@
 #include "Objects/Utils/object_helper.h"
 #include "Renderer/Structures/RendererSprite2D.h"
 #include "Renderer/Structures/RendererSprite.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
 #include "Structures/RendererSpriteBucket.h"
 
@@ -1009,10 +1010,19 @@ namespace TEN::Renderer
 		}
 	}
 
-	bool Renderer::DrawGunFlashes(RenderView& view) 
+	bool Renderer::DrawGunFlashes(RenderView& view)
 	{
-		_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
-		_context->PSSetShader(_psStatics.Get(), nullptr, 0);
+		if (!Lara.RightArm.GunFlash && !Lara.LeftArm.GunFlash)
+			return false;
+
+		if (Lara.Control.Look.OpticRange > 0 && _currentMirror == nullptr)
+			return false;
+
+		const auto& settings = g_GameFlow->GetSettings()->Weapons[(int)Lara.Control.Weapon.GunType - 1];
+		if (!settings.MuzzleFlash)
+			return false;
+
+		_shaders.Bind(Shader::Statics);
 
 		unsigned int stride = sizeof(Vertex);
 		unsigned int offset = 0;
@@ -1021,16 +1031,11 @@ namespace TEN::Renderer
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		if (!Lara.RightArm.GunFlash && !Lara.LeftArm.GunFlash)
-			return true;
-
-		if (Lara.Control.Look.OpticRange > 0)
-			return true;
-
 		const auto& room = _rooms[LaraItem->RoomNumber];
 		auto* itemPtr = &_items[LaraItem->Index];
 
-		_stStatic.Color = Vector4::One;
+		// Divide gunflash tint by 2 because tinting uses multiplication and additive color which doesn't look good with overbright color values.
+		_stStatic.Color = settings.ColorizeMuzzleFlash ? ((Vector4)settings.FlashColor / 2) : Vector4::One;
 		_stStatic.AmbientLight = room.AmbientLight;
 		_stStatic.LightMode = (int)LightMode::Static;
 		BindStaticLights(itemPtr->LightsToDraw);
@@ -1039,11 +1044,10 @@ namespace TEN::Renderer
 		short zOffset = 0;
 		short rotationX = 0;
 
-		SetBlendMode(BlendMode::Additive);
 		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+		SetBlendMode(BlendMode::Additive);
 
 		if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare &&
-			Lara.Control.Weapon.GunType != LaraWeaponType::Shotgun &&
 			Lara.Control.Weapon.GunType != LaraWeaponType::Crossbow)
 		{
 			switch (Lara.Control.Weapon.GunType)
@@ -1061,6 +1065,7 @@ namespace TEN::Renderer
 				break;
 
 			case LaraWeaponType::HK:
+			case LaraWeaponType::Shotgun:
 				length = 300;
 				zOffset = 92;
 				rotationX = -14560;
@@ -1105,6 +1110,7 @@ namespace TEN::Renderer
 					worldMatrix = itemPtr->AnimTransforms[LM_LHAND] * itemPtr->World;
 					worldMatrix = tMatrix * worldMatrix;
 					worldMatrix = rotMatrix * worldMatrix;
+					ReflectMatrixOptionally(worldMatrix);
 
 					_stStatic.World = worldMatrix;
 					_cbStatic.UpdateData(_stStatic, _context.Get());
@@ -1119,6 +1125,7 @@ namespace TEN::Renderer
 					worldMatrix = itemPtr->AnimTransforms[LM_RHAND] * itemPtr->World;
 					worldMatrix = tMatrix * worldMatrix;
 					worldMatrix = rotMatrix * worldMatrix;
+					ReflectMatrixOptionally(worldMatrix);
 
 					_stStatic.World = worldMatrix;
 					_cbStatic.UpdateData(_stStatic, _context.Get());
@@ -1136,8 +1143,7 @@ namespace TEN::Renderer
 
 	void Renderer::DrawBaddyGunflashes(RenderView& view)
 	{
-		_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
-		_context->PSSetShader(_psStatics.Get(), nullptr, 0);
+		_shaders.Bind(Shader::Statics);
 
 		unsigned int stride = sizeof(Vertex);
 		unsigned int offset = 0;
@@ -1147,6 +1153,9 @@ namespace TEN::Renderer
 
 		for (auto* rRoomPtr : view.RoomsToDraw)
 		{
+			if (IgnoreReflectionPassForRoom(rRoomPtr->RoomNumber))
+				continue;
+
 			for (auto* rItemPtr : rRoomPtr->ItemsToDraw)
 			{
 				auto& nativeItem = g_Level.Items[rItemPtr->ItemNumber];
@@ -1196,6 +1205,8 @@ namespace TEN::Renderer
 						if (creature.MuzzleFlash[0].ApplyZRotation)
 							worldMatrix = rotMatrixZ * worldMatrix;
 
+						ReflectMatrixOptionally(worldMatrix);
+
 						_stStatic.World = worldMatrix;
 						_cbStatic.UpdateData(_stStatic, _context.Get());
 
@@ -1236,6 +1247,8 @@ namespace TEN::Renderer
 						if (creature.MuzzleFlash[1].ApplyZRotation)
 							worldMatrix = rotMatrixZ * worldMatrix;
 
+						ReflectMatrixOptionally(worldMatrix);
+
 						_stStatic.World = worldMatrix;
 						_cbStatic.UpdateData(_stStatic, _context.Get());
 
@@ -1272,12 +1285,23 @@ namespace TEN::Renderer
 		auto spriteMatrix = Matrix::Identity;
 		auto scaleMatrix = Matrix::CreateScale(sprite->Width * sprite->Scale, sprite->Height * sprite->Scale, sprite->Scale);
 
+		auto spritePos = sprite->pos;
+
+		if (sprite->Type == SpriteType::ThreeD)
+		{
+			ReflectMatrixOptionally(spriteMatrix);
+		}
+		else
+		{
+			ReflectVectorOptionally(spritePos);
+		}
+
 		switch (sprite->Type)
 		{
 		case SpriteType::Billboard:
 		{
 			auto cameraUp = Vector3(view.Camera.View._12, view.Camera.View._22, view.Camera.View._32);
-			spriteMatrix = scaleMatrix * Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateBillboard(sprite->pos, Camera.pos.ToVector3(), cameraUp);
+			spriteMatrix = scaleMatrix * Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateBillboard(spritePos, Camera.pos.ToVector3(), cameraUp);
 		}
 		break;
 
@@ -1286,7 +1310,7 @@ namespace TEN::Renderer
 			auto rotMatrix = Matrix::CreateRotationY(sprite->Rotation);
 			auto quadForward = Vector3(0.0f, 0.0f, 1.0f);
 			spriteMatrix = scaleMatrix * Matrix::CreateConstrainedBillboard(
-				sprite->pos,
+				spritePos,
 				Camera.pos.ToVector3(),
 				sprite->ConstrainAxis,
 				nullptr,
@@ -1296,9 +1320,9 @@ namespace TEN::Renderer
 
 		case SpriteType::LookAtBillboard:
 		{
-			auto tMatrix = Matrix::CreateTranslation(sprite->pos);
+			auto translationMatrix = Matrix::CreateTranslation(spritePos);
 			auto rotMatrix = Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateLookAt(Vector3::Zero, sprite->LookAtAxis, Vector3::UnitZ);
-			spriteMatrix = scaleMatrix * rotMatrix * tMatrix;
+			spriteMatrix = scaleMatrix * rotMatrix * translationMatrix;
 		}
 		break;
 
@@ -1310,11 +1334,14 @@ namespace TEN::Renderer
 		return spriteMatrix;
 	}
 
-	void Renderer::DrawEffect(RenderView& view, RendererEffect* effect, RendererPass rendererPass) 
+	void Renderer::DrawEffect(RenderView& view, RendererEffect* effect, RendererPass rendererPass)
 	{
 		const auto& room = _rooms[effect->RoomNumber];
 
-		_stStatic.World = effect->InterpolatedWorld;
+		auto world = effect->InterpolatedWorld;
+		ReflectMatrixOptionally(world);
+
+		_stStatic.World = world;
 		_stStatic.Color = effect->Color;
 		_stStatic.AmbientLight = effect->AmbientLight;
 		_stStatic.LightMode = (int)LightMode::Dynamic;
@@ -1344,10 +1371,9 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawEffects(RenderView& view, RendererPass rendererPass) 
+	void Renderer::DrawEffects(RenderView& view, RendererPass rendererPass)
 	{
-		_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
-		_context->PSSetShader(_psStatics.Get(), nullptr, 0);
+		_shaders.Bind(Shader::Statics);
 
 		unsigned int stride = sizeof(Vertex);
 		unsigned int offset = 0;
@@ -1357,6 +1383,9 @@ namespace TEN::Renderer
 
 		for (auto* roomPtr : view.RoomsToDraw)
 		{
+			if (IgnoreReflectionPassForRoom(roomPtr->RoomNumber))
+				continue;
+
 			for (auto* effectPtr : roomPtr->EffectsToDraw)
 			{
 				const auto& room = _rooms[effectPtr->RoomNumber];
@@ -1375,6 +1404,9 @@ namespace TEN::Renderer
 		{
 			if (deb.active)
 			{
+				if (IgnoreReflectionPassForRoom(deb.roomNumber))
+					continue;
+
 				activeDebrisExist = true;
 				break;
 			}
@@ -1382,8 +1414,7 @@ namespace TEN::Renderer
 
 		if (activeDebrisExist)
 		{
-			_context->VSSetShader(_vsStatics.Get(), nullptr, 0);
-			_context->PSSetShader(_psStatics.Get(), nullptr, 0);
+			_shaders.Bind(Shader::Statics);
 
 			SetCullMode(CullMode::None);
 
@@ -1393,6 +1424,9 @@ namespace TEN::Renderer
 			{
 				if (deb.active)
 				{
+					if (IgnoreReflectionPassForRoom(deb.roomNumber))
+						continue;
+
 					if (!SetupBlendModeAndAlphaTest(deb.mesh.blendMode, rendererPass, 0))
 						continue;
 
@@ -1413,6 +1447,7 @@ namespace TEN::Renderer
 					_cbStatic.UpdateData(_stStatic, _context.Get());
 
 					auto matrix = Matrix::Lerp(deb.PrevTransform, deb.Transform, GetInterpolationFactor());
+					ReflectMatrixOptionally(matrix);
 
 					Vertex vtx0;
 					vtx0.Position = Vector3::Transform(deb.mesh.Positions[0], matrix);
@@ -1447,7 +1482,6 @@ namespace TEN::Renderer
 
 			SetBlendMode(BlendMode::Opaque, true);
 			SetDepthState(DepthState::Write, true);
-			SetCullMode(CullMode::CounterClockwise, true);
 		}
 	}
 

@@ -12,6 +12,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_helpers.h"
+#include "Game/Lara/Optics.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/Lara/lara_two_guns.h"
 #include "Game/pickup/pickup.h"
@@ -620,6 +621,10 @@ namespace TEN::Gui
 				CurrentSettings.Configuration.ScreenWidth = screenResolution.x;
 				CurrentSettings.Configuration.ScreenHeight = screenResolution.y;
 
+				// Determine whether we should update AA shaders.
+				bool shouldRecompileAAShaders = g_Configuration.AntialiasingMode != CurrentSettings.Configuration.AntialiasingMode &&
+												CurrentSettings.Configuration.AntialiasingMode != AntialiasingMode::Low;
+
 				g_Configuration = CurrentSettings.Configuration;
 				SaveConfiguration();
 
@@ -627,6 +632,7 @@ namespace TEN::Gui
 				g_Renderer.ChangeScreenResolution(CurrentSettings.Configuration.ScreenWidth, CurrentSettings.Configuration.ScreenHeight,
 					CurrentSettings.Configuration.EnableWindowedMode);
 
+				g_Renderer.ReloadShaders(shouldRecompileAAShaders);
 				g_Renderer.SetGraphicsSettingsChanged();
 
 				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
@@ -1535,129 +1541,158 @@ namespace TEN::Gui
 		Ammo.CurrentGrenadeGunAmmoType = 0;
 		Ammo.CurrentCrossBowAmmoType = 0;
 
-		if (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() != LaraType::Young)
+		if (player.Weapons[(int)LaraWeaponType::Pistol].Present)
 		{
-			if (player.Weapons[(int)LaraWeaponType::Pistol].Present)
-				InsertObjectIntoList(INV_OBJECT_PISTOLS);
-			else if (Ammo.AmountPistolsAmmo)
-				InsertObjectIntoList(INV_OBJECT_PISTOLS_AMMO);
-
-			if (player.Weapons[(int)LaraWeaponType::Uzi].Present)
-				InsertObjectIntoList(INV_OBJECT_UZIS);
-			else if (Ammo.AmountUziAmmo)
-				InsertObjectIntoList(INV_OBJECT_UZI_AMMO);
-
-			if (player.Weapons[(int)LaraWeaponType::Revolver].Present)
-			{
-				if (player.Weapons[(int)LaraWeaponType::Revolver].HasLasersight)
-					InsertObjectIntoList(INV_OBJECT_REVOLVER_LASER);
-				else
-					InsertObjectIntoList(INV_OBJECT_REVOLVER);
-			}
-			else if (Ammo.AmountRevolverAmmo)
-				InsertObjectIntoList(INV_OBJECT_REVOLVER_AMMO);
-
-			if (player.Weapons[(int)LaraWeaponType::Shotgun].Present)
-			{
-				InsertObjectIntoList(INV_OBJECT_SHOTGUN);
-
-				if (player.Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo2)
-					Ammo.CurrentShotGunAmmoType = 1;
-			}
-			else
-			{
-				if (Ammo.AmountShotGunAmmo1)
-					InsertObjectIntoList(INV_OBJECT_SHOTGUN_AMMO_1);
-
-				if (Ammo.AmountShotGunAmmo2)
-					InsertObjectIntoList(INV_OBJECT_SHOTGUN_AMMO_2);
-			}
-
-			if (player.Weapons[(int)LaraWeaponType::HK].Present)
-			{
-				if (player.Weapons[(int)LaraWeaponType::HK].HasLasersight)
-					InsertObjectIntoList(INV_OBJECT_HK_LASERSIGHT);
-				else
-					InsertObjectIntoList(INV_OBJECT_HK);
-
-				if (player.Weapons[(int)LaraWeaponType::HK].WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_2)
-					Ammo.CurrentHKAmmoType = 1;
-
-				if (player.Weapons[(int)LaraWeaponType::HK].WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_3)
-					Ammo.CurrentHKAmmoType = 2;
-			}
-			else if (Ammo.AmountHKAmmo1)
-				InsertObjectIntoList(INV_OBJECT_HK_AMMO);
-
-			if (player.Weapons[(int)LaraWeaponType::Crossbow].Present)
-			{
-				if (player.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)
-					InsertObjectIntoList(INV_OBJECT_CROSSBOW_LASER);
-				else
-					InsertObjectIntoList(INV_OBJECT_CROSSBOW);
-
-				if (player.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo2)
-					Ammo.CurrentCrossBowAmmoType = 1;
-
-				if (player.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo3)
-					Ammo.CurrentCrossBowAmmoType = 2;
-			}
-			else
-			{
-				if (Ammo.AmountCrossBowAmmo1)
-					InsertObjectIntoList(INV_OBJECT_CROSSBOW_AMMO_1);
-
-				if (Ammo.AmountCrossBowAmmo2)
-					InsertObjectIntoList(INV_OBJECT_CROSSBOW_AMMO_2);
-
-				if (Ammo.AmountCrossBowAmmo3)
-					InsertObjectIntoList(INV_OBJECT_CROSSBOW_AMMO_3);
-			}
-
-			if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
-			{
-				InsertObjectIntoList(INV_OBJECT_GRENADE_LAUNCHER);
-
-				if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo2)
-					Ammo.CurrentGrenadeGunAmmoType = 1;
-
-				if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo3)
-					Ammo.CurrentGrenadeGunAmmoType = 2;
-			}
-			else
-			{
-				if (Ammo.AmountGrenadeAmmo1)
-					InsertObjectIntoList(INV_OBJECT_GRENADE_AMMO_1);
-
-				if (Ammo.AmountGrenadeAmmo2)
-					InsertObjectIntoList(INV_OBJECT_GRENADE_AMMO_2);
-
-				if (Ammo.AmountGrenadeAmmo3)
-					InsertObjectIntoList(INV_OBJECT_GRENADE_AMMO_3);
-			}
-
-			if (player.Weapons[(int)LaraWeaponType::RocketLauncher].Present)
-				InsertObjectIntoList(INV_OBJECT_ROCKET_LAUNCHER);
-			else if (Ammo.AmountRocketsAmmo)
-				InsertObjectIntoList(INV_OBJECT_ROCKET_AMMO);
-
-			if (player.Weapons[(int)LaraWeaponType::HarpoonGun].Present)
-				InsertObjectIntoList(INV_OBJECT_HARPOON_GUN);
-			else if (Ammo.AmountHarpoonAmmo)
-				InsertObjectIntoList(INV_OBJECT_HARPOON_AMMO);
-
-			if (player.Inventory.HasLasersight)
-				InsertObjectIntoList(INV_OBJECT_LASERSIGHT);
-
-			if (player.Inventory.HasSilencer)
-				InsertObjectIntoList(INV_OBJECT_SILENCER);
-
-			if (player.Inventory.HasBinoculars)
-				InsertObjectIntoList(INV_OBJECT_BINOCULARS);
-
-			if (player.Inventory.TotalFlares)
-				InsertObjectIntoList(INV_OBJECT_FLARES);
+			InsertObjectIntoList(INV_OBJECT_PISTOLS);
 		}
+		else if (Ammo.AmountPistolsAmmo)
+		{
+			InsertObjectIntoList(INV_OBJECT_PISTOLS_AMMO);
+		}
+
+		if (player.Weapons[(int)LaraWeaponType::Uzi].Present)
+		{
+			InsertObjectIntoList(INV_OBJECT_UZIS);
+		}
+		else if (Ammo.AmountUziAmmo)
+		{
+			InsertObjectIntoList(INV_OBJECT_UZI_AMMO);
+		}
+
+		if (player.Weapons[(int)LaraWeaponType::Revolver].Present)
+		{
+			if (player.Weapons[(int)LaraWeaponType::Revolver].HasLasersight)
+			{
+				InsertObjectIntoList(INV_OBJECT_REVOLVER_LASER);
+			}
+			else
+			{
+				InsertObjectIntoList(INV_OBJECT_REVOLVER);
+			}
+		}
+		else if (Ammo.AmountRevolverAmmo)
+		{
+			InsertObjectIntoList(INV_OBJECT_REVOLVER_AMMO);
+		}
+
+		if (player.Weapons[(int)LaraWeaponType::Shotgun].Present)
+		{
+			InsertObjectIntoList(INV_OBJECT_SHOTGUN);
+
+			if (player.Weapons[(int)LaraWeaponType::Shotgun].SelectedAmmo == WeaponAmmoType::Ammo2)
+				Ammo.CurrentShotGunAmmoType = 1;
+		}
+		else
+		{
+			if (Ammo.AmountShotGunAmmo1)
+				InsertObjectIntoList(INV_OBJECT_SHOTGUN_AMMO_1);
+
+			if (Ammo.AmountShotGunAmmo2)
+				InsertObjectIntoList(INV_OBJECT_SHOTGUN_AMMO_2);
+		}
+
+		if (player.Weapons[(int)LaraWeaponType::HK].Present)
+		{
+			if (player.Weapons[(int)LaraWeaponType::HK].HasLasersight)
+			{
+				InsertObjectIntoList(INV_OBJECT_HK_LASERSIGHT);
+			}
+			else
+			{
+				InsertObjectIntoList(INV_OBJECT_HK);
+			}
+
+			if (player.Weapons[(int)LaraWeaponType::HK].WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_2)
+				Ammo.CurrentHKAmmoType = 1;
+
+			if (player.Weapons[(int)LaraWeaponType::HK].WeaponMode == LaraWeaponTypeCarried::WTYPE_AMMO_3)
+				Ammo.CurrentHKAmmoType = 2;
+		}
+		else if (Ammo.AmountHKAmmo1)
+		{
+			InsertObjectIntoList(INV_OBJECT_HK_AMMO);
+		}
+
+		if (player.Weapons[(int)LaraWeaponType::Crossbow].Present)
+		{
+			if (player.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)
+			{
+				InsertObjectIntoList(INV_OBJECT_CROSSBOW_LASER);
+			}
+			else
+			{
+				InsertObjectIntoList(INV_OBJECT_CROSSBOW);
+			}
+
+			if (player.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo2)
+				Ammo.CurrentCrossBowAmmoType = 1;
+
+			if (player.Weapons[(int)LaraWeaponType::Crossbow].SelectedAmmo == WeaponAmmoType::Ammo3)
+				Ammo.CurrentCrossBowAmmoType = 2;
+		}
+		else
+		{
+			if (Ammo.AmountCrossBowAmmo1)
+				InsertObjectIntoList(INV_OBJECT_CROSSBOW_AMMO_1);
+
+			if (Ammo.AmountCrossBowAmmo2)
+				InsertObjectIntoList(INV_OBJECT_CROSSBOW_AMMO_2);
+
+			if (Ammo.AmountCrossBowAmmo3)
+				InsertObjectIntoList(INV_OBJECT_CROSSBOW_AMMO_3);
+		}
+
+		if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].Present)
+		{
+			InsertObjectIntoList(INV_OBJECT_GRENADE_LAUNCHER);
+
+			if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo2)
+				Ammo.CurrentGrenadeGunAmmoType = 1;
+
+			if (player.Weapons[(int)LaraWeaponType::GrenadeLauncher].SelectedAmmo == WeaponAmmoType::Ammo3)
+				Ammo.CurrentGrenadeGunAmmoType = 2;
+		}
+		else
+		{
+			if (Ammo.AmountGrenadeAmmo1)
+				InsertObjectIntoList(INV_OBJECT_GRENADE_AMMO_1);
+
+			if (Ammo.AmountGrenadeAmmo2)
+				InsertObjectIntoList(INV_OBJECT_GRENADE_AMMO_2);
+
+			if (Ammo.AmountGrenadeAmmo3)
+				InsertObjectIntoList(INV_OBJECT_GRENADE_AMMO_3);
+		}
+
+		if (player.Weapons[(int)LaraWeaponType::RocketLauncher].Present)
+		{
+			InsertObjectIntoList(INV_OBJECT_ROCKET_LAUNCHER);
+		}
+		else if (Ammo.AmountRocketsAmmo)
+		{
+			InsertObjectIntoList(INV_OBJECT_ROCKET_AMMO);
+		}
+
+		if (player.Weapons[(int)LaraWeaponType::HarpoonGun].Present)
+		{
+			InsertObjectIntoList(INV_OBJECT_HARPOON_GUN);
+		}
+		else if (Ammo.AmountHarpoonAmmo)
+		{
+			InsertObjectIntoList(INV_OBJECT_HARPOON_AMMO);
+		}
+
+		if (player.Inventory.HasLasersight)
+			InsertObjectIntoList(INV_OBJECT_LASERSIGHT);
+
+		if (player.Inventory.HasSilencer)
+			InsertObjectIntoList(INV_OBJECT_SILENCER);
+
+		if (player.Inventory.HasBinoculars)
+			InsertObjectIntoList(INV_OBJECT_BINOCULARS);
+
+		if (player.Inventory.TotalFlares)
+			InsertObjectIntoList(INV_OBJECT_FLARES);
 
 		InsertObjectIntoList(INV_OBJECT_TIMEX);//every level has the timex? what's a good way to check?!
 
@@ -1764,38 +1799,35 @@ namespace TEN::Gui
 		for (int i = 0; i < INVENTORY_TABLE_SIZE; i++)
 			Rings[(int)RingTypes::Ammo].CurrentObjectList[i].InventoryItem = NO_VALUE;
 
-		if (!(g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young))
+		if (player.Weapons[(int)LaraWeaponType::Revolver].Present)
 		{
-			if (player.Weapons[(int)LaraWeaponType::Revolver].Present)
-			{
-				if (player.Weapons[(int)LaraWeaponType::Revolver].HasLasersight)
-					InsertObjectIntoList_v2(INV_OBJECT_REVOLVER_LASER);
-				else
-					InsertObjectIntoList_v2(INV_OBJECT_REVOLVER);
-			}
-
-			if (player.Weapons[(int)LaraWeaponType::HK].Present)
-			{
-				if (player.Weapons[(int)LaraWeaponType::HK].HasLasersight)
-					InsertObjectIntoList_v2(INV_OBJECT_HK_LASERSIGHT);
-				else
-					InsertObjectIntoList_v2(INV_OBJECT_HK);
-			}
-
-			if (player.Weapons[(int)LaraWeaponType::Crossbow].Present)
-			{
-				if (player.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)
-					InsertObjectIntoList_v2(INV_OBJECT_CROSSBOW_LASER);
-				else
-					InsertObjectIntoList_v2(INV_OBJECT_CROSSBOW);
-			}
-
-			if (player.Inventory.HasLasersight)
-				InsertObjectIntoList_v2(INV_OBJECT_LASERSIGHT);
-
-			if (player.Inventory.HasSilencer)
-				InsertObjectIntoList_v2(INV_OBJECT_SILENCER);
+			if (player.Weapons[(int)LaraWeaponType::Revolver].HasLasersight)
+				InsertObjectIntoList_v2(INV_OBJECT_REVOLVER_LASER);
+			else
+				InsertObjectIntoList_v2(INV_OBJECT_REVOLVER);
 		}
+
+		if (player.Weapons[(int)LaraWeaponType::HK].Present)
+		{
+			if (player.Weapons[(int)LaraWeaponType::HK].HasLasersight)
+				InsertObjectIntoList_v2(INV_OBJECT_HK_LASERSIGHT);
+			else
+				InsertObjectIntoList_v2(INV_OBJECT_HK);
+		}
+
+		if (player.Weapons[(int)LaraWeaponType::Crossbow].Present)
+		{
+			if (player.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)
+				InsertObjectIntoList_v2(INV_OBJECT_CROSSBOW_LASER);
+			else
+				InsertObjectIntoList_v2(INV_OBJECT_CROSSBOW);
+		}
+
+		if (player.Inventory.HasLasersight)
+			InsertObjectIntoList_v2(INV_OBJECT_LASERSIGHT);
+
+		if (player.Inventory.HasSilencer)
+			InsertObjectIntoList_v2(INV_OBJECT_SILENCER);
 
 		if (player.Inventory.BeetleComponents)
 		{
@@ -2031,8 +2063,6 @@ namespace TEN::Gui
 
 		auto& player = GetLaraInfo(item);
 
-		short prevOpticRange = player.Control.Look.OpticRange;
-		player.Control.Look.OpticRange = 0;
 		player.Inventory.OldBusy = false;
 		item.MeshBits = ALL_JOINT_BITS;
 
@@ -2175,25 +2205,11 @@ namespace TEN::Gui
 				(player.Control.IsLow && !IsHeld(In::Crouch))) &&
 				!UseSpotCam && !TrackCameraInit)
 			{
-				player.Control.Look.OpticRange = ANGLE(0.7f);
+				SetScreenFadeIn(OPTICS_FADE_SPEED);
+				BinocularOldCamera = Camera.oldType;
+				player.Control.Look.OpticRange = OPTICS_RANGE_DEFAULT;
 				player.Control.Look.IsUsingBinoculars = true;
 				player.Inventory.OldBusy = true;
-
-				// TODO: To prevent Lara from crouching or performing other actions, the inherent state of
-				// LA_BINOCULARS_IDLE must be changed to LS_IDLE. @Sezz 2022.05.19
-				//SetAnimation(item, LA_BINOCULARS_IDLE);
-
-				if (player.Control.HandStatus != HandStatus::Free)
-					player.Control.HandStatus = HandStatus::WeaponUndraw;
-			}
-
-			if (prevOpticRange != ANGLE(0.0f))
-			{
-				player.Control.Look.OpticRange = prevOpticRange;
-			}
-			else
-			{
-				BinocularOldCamera = Camera.oldType;
 			}
 
 			InventoryItemChosen = NO_VALUE;
@@ -3276,7 +3292,9 @@ namespace TEN::Gui
 			while (g_Synchronizer.Synced())
 			{
 				TimeInMenu++;
-				GameTimer++;
+				GlobalCounter++;
+				SaveGame::Statistics.Game.TimeTaken++;
+				SaveGame::Statistics.Level.TimeTaken++;
 
 				UpdateInputActions(item);
 
@@ -3422,8 +3440,8 @@ namespace TEN::Gui
 		auto needleOrient = EulerAngles(0, CompassNeedleAngle, 0);
 		needleOrient.Lerp(EulerAngles(0, item->Pose.Orientation.y, 0), LERP_ALPHA);
 
-		float wibble = std::sin((float(GameTimer & 0x3F) / (float)0x3F) * PI_MUL_2);
-		CompassNeedleAngle = needleOrient.y + ANGLE(wibble / 2);
+		float wibble = std::sin((float(GlobalCounter & 0x3F) / (float)0x3F) * PI_MUL_2);
+		CompassNeedleAngle = needleOrient.y + ANGLE(wibble);
 
 		// HACK: Needle is rotated in the draw function.
 		const auto& invObject = InventoryObjectTable[INV_OBJECT_COMPASS];

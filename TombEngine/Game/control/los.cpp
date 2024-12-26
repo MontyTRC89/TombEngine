@@ -14,6 +14,7 @@
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/switch.h"
 #include "Renderer/Renderer.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
@@ -261,6 +262,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 	{
 		Lara.Control.Weapon.HasFired = true;
 		Lara.Control.Weapon.Fired = true;
+		Lara.RightArm.GunFlash = Weapons[(int)Lara.Control.Weapon.GunType].FlashTime;
 
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
 			SoundEffect(SFX_TR4_REVOLVER_FIRE, nullptr);
@@ -345,7 +347,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 										}
 									}
 
-									HitTarget(LaraItem, item, &target2, Weapons[(int)Lara.Control.Weapon.GunType].Damage, false, bestJointIndex);
+									HitTarget(LaraItem, item, &target2, Weapons[(int)Lara.Control.Weapon.GunType].AlternateDamage, false, bestJointIndex);
 									hitProcessed = true;
 								}
 								else
@@ -439,15 +441,6 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 			if (isFiring && !result)
 				TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y);
 		}
-	}
-
-	if (drawTarget && (hasHit || !result))
-	{
-		TriggerDynamicLight(target2.x, target2.y, target2.z, 64, 255, 0, 0);
-		LaserSightActive = 1;
-		LaserSightX = target2.x;
-		LaserSightY = target2.y;
-		LaserSightZ = target2.z;
 	}
 
 	return hitProcessed;

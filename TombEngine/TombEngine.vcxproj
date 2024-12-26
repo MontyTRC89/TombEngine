@@ -88,7 +88,7 @@
     <IntDir>$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)Build\$(Configuration)\Bin\x86\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
     <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
@@ -100,7 +100,7 @@
     <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x64;$(SolutionDir)Libs\spdlog\x64;$(SolutionDir)Libs\lua\x64;$(SolutionDir)Libs\zlib\x64;$(SolutionDir)Libs\bass\x64;$(SolutionDir)Libs\ois\x64</LibraryPath>
     <TargetExt>.exe</TargetExt>
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)Build\$(Configuration)\Bin\x64\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
@@ -297,7 +297,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeaderFile>framework.h</PrecompiledHeaderFile>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MinSpace</Optimization>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -321,7 +321,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <LargeAddressAware>true</LargeAddressAware>
       <TargetMachine>MachineX86</TargetMachine>
-      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
       <Command>del "$(TargetDir)*.pdb" /q
@@ -377,7 +377,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeaderFile>framework.h</PrecompiledHeaderFile>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <Optimization>Disabled</Optimization>
+      <Optimization>MinSpace</Optimization>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -400,7 +400,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
       <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;version.lib;zlib.lib;spdlog.lib;OIS.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <LargeAddressAware>true</LargeAddressAware>
-      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
       <Command>del "$(TargetDir)*.pdb" /q
@@ -448,6 +448,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClInclude Include="Game\Debug\Debug.h" />
     <ClInclude Include="Game\effects\Bubble.h" />
     <ClInclude Include="Game\effects\DisplaySprite.h" />
+    <ClInclude Include="Game\effects\Light.h" />
     <ClInclude Include="Game\GuiObjects.h" />
     <ClInclude Include="Game\Hud\Hud.h" />
     <ClInclude Include="Game\Hud\PickupSummary.h" />
@@ -512,6 +513,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClInclude Include="Game\itemdata\door_data.h" />
     <ClInclude Include="Game\itemdata\itemdata.h" />
     <ClInclude Include="Game\items.h" />
+    <ClInclude Include="Game\Lara\Optics.h" />
     <ClInclude Include="Game\Lara\PlayerContext.h" />
     <ClInclude Include="Game\Lara\PlayerContextData.h" />
     <ClInclude Include="Game\Lara\PlayerStateMachine.h" />
@@ -821,6 +823,8 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClInclude Include="Renderer\Graphics\Vertices\Vertex.h" />
     <ClInclude Include="Renderer\Renderer.h" />
     <ClInclude Include="Renderer\RendererEnums.h" />
+    <ClInclude Include="Renderer\ShaderManager\ShaderManager.h" />
+    <ClInclude Include="Renderer\Structures\RendererMirror.h" />
     <ClInclude Include="Renderer\RendererSprite2D.h" />
     <ClInclude Include="Renderer\RendererBucket.h" />
     <ClInclude Include="Renderer\RendererPolygon.h" />
@@ -852,6 +856,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClInclude Include="Renderer\Structures\RendererRoom.h" />
     <ClInclude Include="Renderer\Structures\RendererRoomAmbientMap.h" />
     <ClInclude Include="Renderer\Structures\RendererRoomNode.h" />
+    <ClInclude Include="Renderer\Structures\RendererShader.h" />
     <ClInclude Include="Renderer\Structures\RendererSortableObject.h" />
     <ClInclude Include="Renderer\Structures\RendererSprite.h" />
     <ClInclude Include="Renderer\Structures\RendererSprite2D.h" />
@@ -875,12 +880,16 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClInclude Include="Scripting\Internal\ReservedScriptNames.h" />
     <ClInclude Include="Scripting\Internal\ScriptAssert.h" />
     <ClInclude Include="Scripting\Internal\ScriptUtil.h" />
-    <ClInclude Include="Scripting\Internal\TEN\Color\Color.h" />
-    <ClInclude Include="Scripting\Internal\TEN\DisplaySprite\ScriptDisplaySprite.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\Lara\WeaponTypes.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\Enums\ErrorModes.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\Statistics\Statistics.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Types\Color\Color.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Types\Time\Time.h" />
+    <ClInclude Include="Scripting\Internal\TEN\View\DisplaySprite\ScriptDisplaySprite.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\BlendIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectIDs.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\EffectsFunctions.h" />
-    <ClInclude Include="Scripting\Internal\TEN\Flow\Animations\Animations.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\Settings\Settings.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\FlowHandler.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Fog\Fog.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Enums\FreezeModes.h" />
@@ -888,8 +897,6 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClInclude Include="Scripting\Internal\TEN\Flow\InventoryItem\InventoryItem.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\LensFlare\LensFlare.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Level\FlowLevel.h" />
-    <ClInclude Include="Scripting\Internal\TEN\Flow\Mirror\Mirror.h" />
-    <ClInclude Include="Scripting\Internal\TEN\Flow\Settings\Settings.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\SkyLayer\SkyLayer.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Starfield\Starfield.h" />
     <ClInclude Include="Scripting\Internal\TEN\Input\ActionIDs.h" />
@@ -918,15 +925,15 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClInclude Include="Scripting\Internal\TEN\Objects\SoundSource\SoundSourceObject.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Static\StaticObject.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Volume\VolumeObject.h" />
-    <ClInclude Include="Scripting\Internal\TEN\Rotation\Rotation.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Types\Rotation\Rotation.h" />
     <ClInclude Include="Scripting\Internal\TEN\Sound\SoundHandler.h" />
     <ClInclude Include="Scripting\Internal\TEN\Sound\SoundTrackTypes.h" />
     <ClInclude Include="Scripting\Internal\TEN\Strings\DisplayString\DisplayString.h" />
     <ClInclude Include="Scripting\Internal\TEN\Strings\StringsHandler.h" />
     <ClInclude Include="Scripting\Internal\TEN\Util\LevelLog.h" />
     <ClInclude Include="Scripting\Internal\TEN\Util\Util.h" />
-    <ClInclude Include="Scripting\Internal\TEN\Vec2\Vec2.h" />
-    <ClInclude Include="Scripting\Internal\TEN\Vec3\Vec3.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Types\Vec2\Vec2.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Types\Vec3\Vec3.h" />
     <ClInclude Include="Scripting\Internal\TEN\View\AlignModes.h" />
     <ClInclude Include="Scripting\Internal\TEN\View\CameraTypes.h" />
     <ClInclude Include="Scripting\Internal\TEN\View\PostProcessEffects.h" />
@@ -995,6 +1002,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClCompile Include="Game\effects\Footprint.cpp" />
     <ClCompile Include="Game\effects\Hair.cpp" />
     <ClCompile Include="Game\effects\item_fx.cpp" />
+    <ClCompile Include="Game\effects\Light.cpp" />
     <ClCompile Include="Game\effects\Ripple.cpp" />
     <ClCompile Include="Game\effects\simple_particle.cpp" />
     <ClCompile Include="Game\effects\smoke.cpp" />
@@ -1033,6 +1041,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClCompile Include="Game\Lara\lara_swim.cpp" />
     <ClCompile Include="Game\Lara\lara_tests.cpp" />
     <ClCompile Include="Game\Lara\lara_two_guns.cpp" />
+    <ClCompile Include="Game\Lara\Optics.cpp" />
     <ClCompile Include="Game\Lara\PlayerContext.cpp" />
     <ClCompile Include="Game\Lara\PlayerStateMachine.cpp" />
     <ClCompile Include="Game\misc.cpp" />
@@ -1311,21 +1320,22 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClCompile Include="Renderer\RendererString.cpp" />
     <ClCompile Include="Renderer\RendererUtils.cpp" />
     <ClCompile Include="Renderer\RenderView.cpp" />
+    <ClCompile Include="Renderer\ShaderManager\ShaderManager.cpp" />
     <ClCompile Include="Scripting\Internal\LuaHandler.cpp" />
     <ClCompile Include="Scripting\Internal\ScriptAssert.cpp" />
     <ClCompile Include="Scripting\Internal\ScriptInterfaceState.cpp" />
     <ClCompile Include="Scripting\Internal\ScriptUtil.cpp" />
-    <ClCompile Include="Scripting\Internal\TEN\Color\Color.cpp" />
-    <ClCompile Include="Scripting\Internal\TEN\DisplaySprite\ScriptDisplaySprite.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Flow\Statistics\Statistics.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Types\Color\Color.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Types\Time\Time.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\View\DisplaySprite\ScriptDisplaySprite.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Effects\EffectsFunctions.cpp" />
-    <ClCompile Include="Scripting\Internal\TEN\Flow\Animations\Animations.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Flow\Settings\Settings.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\FlowHandler.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\Fog\Fog.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\InventoryItem\InventoryItem.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\LensFlare\LensFlare.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\Level\FlowLevel.cpp" />
-    <ClCompile Include="Scripting\Internal\TEN\Flow\Mirror\Mirror.cpp" />
-    <ClCompile Include="Scripting\Internal\TEN\Flow\Settings\Settings.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\SkyLayer\SkyLayer.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\Starfield\Starfield.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Input\InputHandler.cpp" />
@@ -1341,13 +1351,13 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClCompile Include="Scripting\Internal\TEN\Objects\SoundSource\SoundSourceObject.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Objects\Static\StaticObject.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Objects\Volume\VolumeObject.cpp" />
-    <ClCompile Include="Scripting\Internal\TEN\Rotation\Rotation.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Types\Rotation\Rotation.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Sound\SoundHandler.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Strings\DisplayString\DisplayString.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Strings\StringsHandler.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Util\Util.cpp" />
-    <ClCompile Include="Scripting\Internal\TEN\Vec2\Vec2.cpp" />
-    <ClCompile Include="Scripting\Internal\TEN\Vec3\Vec3.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Types\Vec2\Vec2.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Types\Vec3\Vec3.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\View\ViewHandler.cpp" />
     <ClCompile Include="Sound\sound.cpp" />
     <ClCompile Include="Specific\BitField.cpp" />

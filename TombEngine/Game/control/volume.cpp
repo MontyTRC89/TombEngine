@@ -168,7 +168,7 @@ namespace TEN::Control::Volumes
 
 					if (candidate.Status == VolumeStateStatus::Leaving)
 					{
-						if ((GameTimer - candidate.Timestamp) > VOLUME_BUSY_TIMEOUT)
+						if ((SaveGame::Statistics.Level.TimeTaken - candidate.Timestamp) > VOLUME_BUSY_TIMEOUT)
 							candidate.Status = VolumeStateStatus::Outside;
 					}
 					else if (candidate.Status != VolumeStateStatus::Outside)
@@ -191,7 +191,7 @@ namespace TEN::Control::Volumes
 							{
 								VolumeStateStatus::Entering,
 								activator,
-								GameTimer
+								SaveGame::Statistics.Level.TimeTaken
 							});
 
 						HandleEvent(set.Events[(int)EventType::Enter], activator);
@@ -199,7 +199,7 @@ namespace TEN::Control::Volumes
 					else
 					{
 						entryPtr->Status = VolumeStateStatus::Inside;
-						entryPtr->Timestamp = GameTimer;
+						entryPtr->Timestamp = SaveGame::Statistics.Level.TimeTaken;
 
 						HandleEvent(set.Events[(int)EventType::Inside], activator);
 					}
@@ -209,10 +209,10 @@ namespace TEN::Control::Volumes
 					// Only fire leave event when a certain timeout has passed.
 					// This helps to filter out borderline cases when moving around volumes.
 
-					if ((GameTimer - entryPtr->Timestamp) > VOLUME_LEAVE_TIMEOUT)
+					if ((SaveGame::Statistics.Level.TimeTaken - entryPtr->Timestamp) > VOLUME_LEAVE_TIMEOUT)
 					{
 						entryPtr->Status = VolumeStateStatus::Leaving;
-						entryPtr->Timestamp = GameTimer;
+						entryPtr->Timestamp = SaveGame::Statistics.Level.TimeTaken;
 
 						HandleEvent(set.Events[(int)EventType::Leave], activator);
 					}

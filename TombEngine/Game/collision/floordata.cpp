@@ -543,8 +543,14 @@ namespace TEN::Collision::Floordata
 		auto* sector = &currentSector;
 		do
 		{
+			// For bridges with zero thickness (which is incorrect setup, but still possible), break out of
+			// infinite loop caused by infinite traversal over the same height value.
+			int nextPos = sector->GetBridgeSurfaceHeight(pos, !isBottom);
+			if (nextPos == pos.y)
+				nextPos += (isBottom ? 1 : -1);
+
 			// Set vertical position to lowest bridge ceiling height or highest bridge floor height.
-			pos.y = sector->GetBridgeSurfaceHeight(pos, !isBottom);
+			pos.y = nextPos;
 
 			// Find sector at lowest bridge floor height or highest bridge ceiling height.
 			while (isBottom ?

@@ -1,15 +1,14 @@
 #pragma once
 
-#include "Scripting/Internal/TEN/Objects/NamedBase.h"
 #include "Game/room.h"
+#include "Scripting/Internal/TEN/Objects/NamedBase.h"
 
-namespace sol {
-	class state;
-}
-
-class Vec3;
-class Rotation;
 class ScriptColor;
+class Vec3;
+namespace sol { class state; }
+namespace TEN::Scripting { class Rotation; }
+
+using namespace TEN::Scripting;
 
 class Static : public NamedBase<Static, MESH_INFO&>
 {

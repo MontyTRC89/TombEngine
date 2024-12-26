@@ -16,11 +16,11 @@
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptUtil.h"
-#include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Effects/BlendIDs.h"
 #include "Scripting/Internal/TEN/Effects/EffectIDs.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
-#include "Scripting/Internal/TEN/Vec2/Vec2.h"
+#include "Scripting/Internal/TEN/Types/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/trutils.h"
@@ -269,7 +269,7 @@ namespace TEN::Scripting::Effects
 	{
 		auto color = USE_IF_HAVE(ScriptColor, col, ScriptColor(255, 255, 255));
 		int rad = (float)(USE_IF_HAVE(int, radius, 20) * BLOCK(0.25f));
-		TriggerDynamicPointLight(pos.ToVector3(), color, rad, USE_IF_HAVE(bool, castShadows, false), GetHash(USE_IF_HAVE(std::string, name, std::string())));
+		SpawnDynamicPointLight(pos.ToVector3(), color, rad, USE_IF_HAVE(bool, castShadows, false), GetHash(USE_IF_HAVE(std::string, name, std::string())));
 	}
 
 /***Emit dynamic directional spotlight that lasts for a single frame.
@@ -290,7 +290,7 @@ namespace TEN::Scripting::Effects
 		int rad =	  (float)(USE_IF_HAVE(int, radius,   10) * BLOCK(0.25f));
 		int fallOff = (float)(USE_IF_HAVE(int, falloff,   5) * BLOCK(0.25f));
 		int dist =	  (float)(USE_IF_HAVE(int, distance, 20) * BLOCK(0.25f));
-		TriggerDynamicSpotLight(pos.ToVector3(), dir.ToVector3(), color, rad, fallOff, dist, USE_IF_HAVE(bool, castShadows, false), GetHash(USE_IF_HAVE(std::string, name, std::string())));
+		SpawnDynamicSpotLight(pos.ToVector3(), dir.ToVector3(), color, rad, fallOff, dist, USE_IF_HAVE(bool, castShadows, false), GetHash(USE_IF_HAVE(std::string, name, std::string())));
 	}
 
 /***Emit blood.

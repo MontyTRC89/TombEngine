@@ -3,19 +3,34 @@
 The dates are in European standard format where date is presented as **YYYY-MM-DD**.
 TombEngine releases are located in this repository (alongside with Tomb Editor): https://github.com/TombEngine/TombEditorReleases
 
-## Version 1.6 - xxxx-xx-xx
+## Version 1.8 - xxxx-xx-xx
+
+### Bug fixes
+* Fixed static meshes with dynamic light mode not accepting room lights.
+* Fixed antialiasing quality not changing after changing it in display settings.
+
+
+### New Features
+* Added realtime shader reloading in debug mode by pressing F9 key.
+
+### Lua API changes
+
+## [Version 1.7](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.3) - 2024-12-25
 
 ### Bug fixes
 * Significantly improved renderer performance.
 * Improved engine performance around bridges.
 * Improved engine performance if weather or bubble effects are active.
+* Improved engine start-up time.
 * Fixed silent crashes if loaded level is corrupted or in incorrect format.
 * Fixed occasional crashes if there are static meshes placed within room border walls.
+* Fixed climbable pushables clipping Lara under the bridges when pulled.
 * Fixed incorrect clipping of scaled off-centered static meshes.
 * Fixed incorrect collision detection for off-centered moveables.
 * Fixed incorrect slide directions for sub-click geometry.
 * Fixed stutter during jumps between cameras in a flyby sequence.
 * Fixed uzi targeting issues after using flycheat.
+* Fixed hair object vertices not always linking properly.
 * Fixed snow particles not always melting on the ground.
 * Fixed enemies not damaging Lara if she is staying on the sector where enemies were triggered.
 * Fixed enemy pickups dropping on death sectors.
@@ -28,18 +43,23 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed incorrect object camera position.
 * Fixed incorrect camera movement near walls after leaving look mode.
 * Fixed binocular or lasersight camera not switching off correctly after flyby.
+* Fixed binocular or lasersight camera transitions.
+* Fixed target highlighter still being active in binocular or lasersight mode.
 * Fixed Lara's Home entry not working.
 * Fixed exploding TR3 bosses.
 * Fixed original issue with deactivation of Dart Emitter.
 * Fixed original issue with weapon hotkeys available in binoculars or lasersight mode.
+* Fixed Electricity Wires object not doing instant kill when Lara is in close proximity.
 * Fixed Lens Flare object not functioning properly.
 * Fixed lens flares not being occluded by static meshes and moveables.
 * Fixed spotlight shadows.
 * Fixed Skeleton and Mummy not reacting to shotgun hits.
 
 ### New Features
-* Added fast savegame reloading.
+* Added classic mirror effect with ability to reflect moveables and static meshes.
+* Added ability to customize many hardcoded parameters, such as flare, weapon, and hair settings.
 * Added dynamic shadow casting on objects and static meshes.
+* Added fast savegame reloading.
 * Added ricochet sounds and make the effect more prominent.
 * Allow camera shake during flybys.
 * Allow to run the engine without title level.
@@ -47,24 +67,29 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Allow more than 1000 static mesh slots in a level.
 
 ### Lua API changes
-* Added Moveable:GetCollidable() and Moveable:SetCollidable() functions.
+* Added Flow.Statistics class, Flow.GetStatistics() and Flow.SetStatistics() functions.
 * Added Flow.GetFreezeMode() and Flow.SetFreezeMode() functions.
-* Added Flow.GetNextLevel() function to get script entry for incoming level, if it's about to start.
 * Added Effects.EmitSpotLight() function for directional spotlights.
 * Added optional cast shadow and name parameters for Effects.EmitLight() function.
 * Added Effects.GetWind() function to get current wind speed vector.
+* Added Moveable:GetCollidable() and Moveable:SetCollidable() functions.
+* Added Moveable:GetAnimSlot() and optional second argument for Moveable:SetAnim() to access different animation slots.
 * Added Rotation:Direction() method to get directional vector.
-* Added support for transparency value in DisplayString class.
-* Added extra argument for SetAmbientTrack() function to specify if new ambient track should play from the beginning.
-* Use load camera instead of load screen by playing fixed camera from OnEnd() event and removing loadScreenFile field from level's gameflow entry.
-* Fixed DisplayString class not supporting some Unicode characters and empty lines in multiline strings.
-* Fixed DisplayString not being deallocated after showing.
+* Added support for transparency value in Strings.DisplayString class.
+* Added extra argument for Sound.SetAmbientTrack() function to specify if new ambient track should play from the beginning.
+* Added new View.CameraType enum entries and return it by View.GetCameraType(), when flyby camera or binoculars/lasersight is active.
+* Added new primitive Time class, which allows to manipulate and format game time without precision loss.
+* Renamed Flow.WeaponType enumeration to Objects.WeaponType, and removed similar Objects.LaraWeaponType enumeration for consistency.
+* Renamed Objects.PlayerAmmoType to Objects.AmmoType for consistency.
+* Fixed Strings.DisplayString class not supporting some Unicode characters and empty lines in multiline strings.
+* Fixed Strings.DisplayString not being deallocated after showing.
 * Fixed GameVars not transferring between levels in hub mode.
+* Fixed incorrect return value of Moveable:GetAnim() function, if animation from another slot is currently playing.
 * Fixed incorrect behaviour of Moveable:GetJointRotation() function.
 * Fixed incorrect behaviour of Logic.EnableEvent() and Logic.DisableEvent() functions.
 * Fixed Util.HasLineOfSight() not taking static meshes into consideration.
 * Fixed collision callbacks not properly clearing after leveljump.
-* Fixed SetIntroImagePath() not using the correct path
+* Fixed Flow.SetIntroImagePath() not using the correct path.
 
 ## [Version 1.5](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.2) - 2024-11-03
 

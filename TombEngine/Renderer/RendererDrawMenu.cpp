@@ -34,6 +34,7 @@ namespace TEN::Renderer
 
 	constexpr auto MenuLoadNumberLeftSide = 80;
 	constexpr auto MenuLoadNameLeftSide   = 150;
+	constexpr auto MenuLoadTimestampRightSide = 600;
 
 	// Vertical spacing templates
 	constexpr auto MenuVerticalLineSpacing = 30;
@@ -656,8 +657,8 @@ namespace TEN::Renderer
 				AddString(MenuLoadNameLeftSide, y, (char*)save.LevelName.c_str(), PRINTSTRING_COLOR_WHITE, SF(selection == n));
 
 				// Timestamp
-				sprintf(stringBuffer, g_GameFlow->GetString(STRING_SAVEGAME_TIMESTAMP), save.Days, save.Hours, save.Minutes, save.Seconds);
-				AddString(MenuRightSideEntry, y, stringBuffer, PRINTSTRING_COLOR_WHITE, SF(selection == n));
+				sprintf(stringBuffer, g_GameFlow->GetString(STRING_SAVEGAME_TIMESTAMP), save.Hours, save.Minutes, save.Seconds);
+				AddString(MenuLoadTimestampRightSide, y, stringBuffer, PRINTSTRING_COLOR_WHITE, SF(selection == n));
 			}
 
 			GetNextLinePosition(&y);
@@ -682,8 +683,8 @@ namespace TEN::Renderer
 		GetNextBlockPosition(&y);
 
 		// Time taken
-		auto gameTime = GetGameTime(GameTimer);
-		sprintf(buffer, "%02d:%02d:%02d", (gameTime.Days * DAY_UNIT) + gameTime.Hours, gameTime.Minutes, gameTime.Seconds);
+		auto& gameTime = SaveGame::Statistics.Game.TimeTaken;
+		sprintf(buffer, "%02d:%02d:%02d", gameTime.GetHours(), gameTime.GetMinutes(), gameTime.GetSeconds());
 		AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
 		AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_TIME_TAKEN), PRINTSTRING_COLOR_WHITE, SF());
 		GetNextLinePosition(&y);
@@ -709,8 +710,7 @@ namespace TEN::Renderer
 		// Secrets found in Level
 		if (g_GameFlow->GetLevel(CurrentLevel)->GetSecrets() > 0)
 		{
-			std::bitset<32> levelSecretBitSet(SaveGame::Statistics.Level.Secrets);
-			sprintf(buffer, "%d / %d", (int)levelSecretBitSet.count(), g_GameFlow->GetLevel(CurrentLevel)->GetSecrets());
+			sprintf(buffer, "%d / %d", SaveGame::Statistics.Level.Secrets, g_GameFlow->GetLevel(CurrentLevel)->GetSecrets());
 			AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_LEVEL_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, SF());
 			GetNextLinePosition(&y);
@@ -817,8 +817,7 @@ namespace TEN::Renderer
 		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// Set shaders.
-		_context->VSSetShader(_vsInventory.Get(), nullptr, 0);
-		_context->PSSetShader(_psInventory.Get(), nullptr, 0);
+		_shaders.Bind(Shader::Inventory);
 
 		// Set matrices.
 		CCameraMatrixBuffer hudCamera;
@@ -890,7 +889,7 @@ namespace TEN::Renderer
 		if (!texture.Texture)
 			return;
 
-		int timeout = 20;
+		int timeout = 10;
 		float currentFade = FADE_FACTOR;
 
 		while (timeout || currentFade > 0.0f)
@@ -995,24 +994,21 @@ namespace TEN::Renderer
 		_context->ClearRenderTargetView(_renderTarget.RenderTargetView.Get(), Colors::Black);
 
 		if (background != nullptr)
-		{
 			DrawFullScreenImage(background->ShaderResourceView.Get(), backgroundFade, _renderTarget.RenderTargetView.Get(), _renderTarget.DepthStencilView.Get());
-		}
 
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
+		unsigned int stride = sizeof(Vertex);
+		unsigned int offset = 0;
 
-		// Set vertex buffer
+		// Set vertex buffer.
 		_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetInputLayout(_inputLayout.Get());
 		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		// Set shaders
-		_context->VSSetShader(_vsInventory.Get(), nullptr, 0);
-		_context->PSSetShader(_psInventory.Get(), nullptr, 0);
+		// Set shaders.
+		_shaders.Bind(Shader::Inventory);
 
 		if (CurrentLevel == 0)
 		{
@@ -1228,7 +1224,7 @@ namespace TEN::Renderer
 
 	void Renderer::DrawDebugInfo(RenderView& view)
 	{
-#ifdef TEST_BUILD
+#if TEST_BUILD
 		if (CurrentLevel == 0)
 		{
 			AddString("TombEngine " + std::string(TEN_VERSION_STRING) + " test build - not for distribution",
