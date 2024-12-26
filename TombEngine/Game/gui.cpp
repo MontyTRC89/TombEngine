@@ -621,6 +621,10 @@ namespace TEN::Gui
 				CurrentSettings.Configuration.ScreenWidth = screenResolution.x;
 				CurrentSettings.Configuration.ScreenHeight = screenResolution.y;
 
+				// Determine whether we should update AA shaders.
+				bool shouldRecompileAAShaders = g_Configuration.AntialiasingMode != CurrentSettings.Configuration.AntialiasingMode &&
+												CurrentSettings.Configuration.AntialiasingMode != AntialiasingMode::Low;
+
 				g_Configuration = CurrentSettings.Configuration;
 				SaveConfiguration();
 
@@ -628,6 +632,7 @@ namespace TEN::Gui
 				g_Renderer.ChangeScreenResolution(CurrentSettings.Configuration.ScreenWidth, CurrentSettings.Configuration.ScreenHeight,
 					CurrentSettings.Configuration.EnableWindowedMode);
 
+				g_Renderer.ReloadShaders(shouldRecompileAAShaders);
 				g_Renderer.SetGraphicsSettingsChanged();
 
 				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;

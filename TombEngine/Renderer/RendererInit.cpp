@@ -18,11 +18,6 @@ extern GameConfiguration g_Configuration;
 
 using namespace TEN::Renderer::Utils;
 
-static std::wstring GetAssetPath(const wchar_t* fileName)
-{
-	return TEN::Utils::ToWString(g_GameFlow->GetGameDir()) + fileName;
-}
-
 namespace TEN::Renderer
 {
 	void Renderer::Initialize(int w, int h, bool windowed, HWND handle)
@@ -35,12 +30,11 @@ namespace TEN::Renderer
 		InitializeScreen(w, h, handle, false);
 		InitializeCommonTextures();
 
-		// Initialize render states
-		_renderStates = std::make_unique<CommonStates>(_device.Get());
+		// Load shaders.
+		_shaders.LoadShaders(w, h);
 
-		// Load shaders
-		const D3D_SHADER_MACRO roomDefinesAnimated[] = { "ANIMATED", "", nullptr, nullptr };
-		const D3D_SHADER_MACRO roomDefinesShadowMap[] = { "SHADOW_MAP", "", nullptr, nullptr };
+		// Initialize render states.
+		_renderStates = std::make_unique<CommonStates>(_device.Get());
 
 		// Initialize input layout using first vertex shader.
 		D3D11_INPUT_ELEMENT_DESC inputLayoutItems[] =
@@ -59,42 +53,10 @@ namespace TEN::Renderer
 			{ "HASH", 0, DXGI_FORMAT_R32_SINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
 
-		_sRooms = CompileOrLoadShader("Rooms", "", ShaderType::PixelAndVertex);
-		Utils::throwIfFailed(_device->CreateInputLayout(inputLayoutItems, 12, _sRooms.Vertex.Blob->GetBufferPointer(), _sRooms.Vertex.Blob->GetBufferSize(), &_inputLayout));
+		const auto& roomShader = _shaders.Get(Shader::Rooms);
+		Utils::throwIfFailed(_device->CreateInputLayout(inputLayoutItems, 12, roomShader.Vertex.Blob->GetBufferPointer(), roomShader.Vertex.Blob->GetBufferSize(), &_inputLayout));
 
-		_sRoomsAnimated = CompileOrLoadShader("Rooms", "", ShaderType::Vertex, &roomDefinesAnimated[0]);
-		_sItems = CompileOrLoadShader("Items", "", ShaderType::PixelAndVertex);
-		_sStatics = CompileOrLoadShader("Statics", "", ShaderType::PixelAndVertex);
-		_sSky = CompileOrLoadShader("Sky", "", ShaderType::PixelAndVertex);
-		_sSprites = CompileOrLoadShader("Sprites", "", ShaderType::PixelAndVertex);
-		_sSolid = CompileOrLoadShader("Solid", "", ShaderType::PixelAndVertex);
-		_sInventory = CompileOrLoadShader("Inventory", "", ShaderType::PixelAndVertex);
-		_sFullScreenQuad = CompileOrLoadShader("FullScreenQuad", "", ShaderType::PixelAndVertex);
-		_sShadowMap = CompileOrLoadShader("ShadowMap", "", ShaderType::PixelAndVertex, &roomDefinesShadowMap[0]);
-		_sHUD = CompileOrLoadShader("HUD", "", ShaderType::Vertex);
-		_sHUDColor = CompileOrLoadShader("HUD", "ColoredHUD", ShaderType::Pixel);
-		_sHUDTexture = CompileOrLoadShader("HUD", "TexturedHUD", ShaderType::Pixel);
-		_sHUDBarColor = CompileOrLoadShader("HUD", "TexturedHUDBar", ShaderType::Pixel);
-		_sInstancedStatics = CompileOrLoadShader("InstancedStatics", "", ShaderType::PixelAndVertex);
-		_sInstancedSprites = CompileOrLoadShader("InstancedSprites", "", ShaderType::PixelAndVertex);
-
-		_sGBuffer = CompileOrLoadShader("GBuffer", "", ShaderType::Pixel);
-		_sGBufferRooms = CompileOrLoadShader("GBuffer", "Rooms", ShaderType::Vertex);
-		_sGBufferRoomsAnimated = CompileOrLoadShader("GBuffer", "Rooms", ShaderType::Vertex, &roomDefinesAnimated[0]);
-		_sGBufferItems = CompileOrLoadShader("GBuffer", "Items", ShaderType::Vertex);
-		_sGBufferStatics = CompileOrLoadShader("GBuffer", "Statics", ShaderType::Vertex);
-		_sGBufferInstancedStatics = CompileOrLoadShader("GBuffer", "InstancedStatics", ShaderType::Vertex);
-
-		_sRoomAmbient = CompileOrLoadShader("RoomAmbient", "", ShaderType::PixelAndVertex);
-		_sRoomAmbientSky = CompileOrLoadShader("RoomAmbient", "Sky", ShaderType::Vertex);
-		_sFXAA = CompileOrLoadShader("FXAA", "", ShaderType::Pixel);
-		_sSSAO = CompileOrLoadShader("SSAO", "", ShaderType::Pixel);
-		_sSSAOBlur = CompileOrLoadShader("SSAO", "Blur", ShaderType::Pixel);
-
-		const D3D_SHADER_MACRO transparentDefines[] = { "TRANSPARENT", "", nullptr, nullptr };
-		_sRoomsTransparent = CompileOrLoadShader("Rooms", "", ShaderType::Pixel, &transparentDefines[0]);
-
-		// Initialize constant buffers
+		// Initialize constant buffers.
 		_cbCameraMatrices = CreateConstantBuffer<CCameraMatrixBuffer>();
 		_cbItem = CreateConstantBuffer<CItemBuffer>();
 		_cbStatic = CreateConstantBuffer<CStaticBuffer>();
@@ -108,7 +70,7 @@ namespace TEN::Renderer
 		_cbInstancedStaticMeshBuffer = CreateConstantBuffer<CInstancedStaticMeshBuffer>();
 		_cbSMAABuffer = CreateConstantBuffer<CSMAABuffer>();
 
-		// Prepare HUD Constant buffer  
+		// Prepare HUD Constant buffer.
 		_cbHUDBar = CreateConstantBuffer<CHUDBarBuffer>();
 		_cbHUD = CreateConstantBuffer<CHUDBuffer>();
 		_cbSprite = CreateConstantBuffer<CSpriteBuffer>();
@@ -117,7 +79,7 @@ namespace TEN::Renderer
 		_cbHUD.UpdateData(_stHUD, _context.Get());
 		_currentCausticsFrame = 0;
 
-		// Preallocate lists
+		// Preallocate lists.
 		_lines2DToDraw = createVector<RendererLine2D>(MAX_LINES_2D);
 		_lines3DToDraw = createVector<RendererLine3D>(MAX_LINES_3D);
 		_triangles3DToDraw = createVector<RendererTriangle3D>(MAX_TRIANGLES_3D);
@@ -219,7 +181,7 @@ namespace TEN::Renderer
 		shadowSamplerDesc.ComparisonFunc = D3D11_COMPARISON_LESS_EQUAL;
 		shadowSamplerDesc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
 		Utils::throwIfFailed(_device->CreateSamplerState(&shadowSamplerDesc, _shadowSampler.GetAddressOf()));
-		_shadowSampler->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof("ShadowSampler") + 1, "ShadowSampler");
+		_shadowSampler->SetPrivateData(WKPDID_D3DDebugObjectName, sizeof("ShadowSampler") - 1, "ShadowSampler");
 
 		D3D11_RASTERIZER_DESC rasterizerStateDesc = {};
 
@@ -284,8 +246,6 @@ namespace TEN::Renderer
 
 		_fullscreenTriangleVertexBuffer = VertexBuffer<PostProcessVertex>(_device.Get(), 3, &vertices[0]);
 
-		_sPostProcess = CompileOrLoadShader("PostProcess", "", ShaderType::PixelAndVertex);
-
 		D3D11_INPUT_ELEMENT_DESC postProcessInputLayoutItems[] =
 		{
 			{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
@@ -293,14 +253,9 @@ namespace TEN::Renderer
 			{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
 
+		const auto& ppShader = _shaders.Get(Shader::PostProcess);
 		Utils::throwIfFailed(_device->CreateInputLayout(postProcessInputLayoutItems, 3, 
-			_sPostProcess.Vertex.Blob->GetBufferPointer(), _sPostProcess.Vertex.Blob->GetBufferSize(), &_fullscreenTriangleInputLayout));
-
-		_sPostProcessMonochrome = CompileOrLoadShader("PostProcess", "Monochrome", ShaderType::Pixel);
-		_sPostProcessNegative   = CompileOrLoadShader("PostProcess", "Negative",   ShaderType::Pixel);
-		_sPostProcessExclusion  = CompileOrLoadShader("PostProcess", "Exclusion",  ShaderType::Pixel);
-		_sPostProcessFinalPass  = CompileOrLoadShader("PostProcess", "FinalPass",  ShaderType::Pixel);
-		_sPostProcessLensFlare  = CompileOrLoadShader("PostProcess", "LensFlare",  ShaderType::Pixel);
+							 ppShader.Vertex.Blob->GetBufferPointer(), ppShader.Vertex.Blob->GetBufferSize(), &_fullscreenTriangleInputLayout));
 	}
 
 	void Renderer::CreateSSAONoiseTexture()
@@ -381,8 +336,9 @@ namespace TEN::Renderer
 
 	void Renderer::InitializeSky()
 	{
-		Vertex vertices[SKY_VERTICES_COUNT];
-		int indices[SKY_INDICES_COUNT];
+		auto vertices = std::vector<Vertex>(SKY_VERTICES_COUNT);
+		auto indices = std::vector<int>(SKY_INDICES_COUNT);
+
 		int size = SKY_SIZE;
 
 		int lastVertex = 0;
@@ -451,8 +407,8 @@ namespace TEN::Renderer
 			}
 		}
 
-		_skyVertexBuffer = VertexBuffer<Vertex>(_device.Get(), SKY_VERTICES_COUNT, vertices);
-		_skyIndexBuffer = IndexBuffer(_device.Get(), SKY_INDICES_COUNT, indices);
+		_skyVertexBuffer = VertexBuffer<Vertex>(_device.Get(), SKY_VERTICES_COUNT, vertices.data());
+		_skyIndexBuffer = IndexBuffer(_device.Get(), SKY_INDICES_COUNT, indices.data());
 	}
 
 	void Renderer::InitializeScreen(int w, int h, HWND handle, bool reset)
@@ -560,40 +516,6 @@ namespace TEN::Renderer
 		_SMAASceneSRGBRenderTarget = RenderTarget2D(_device.Get(), &_SMAASceneRenderTarget, DXGI_FORMAT_R8G8B8A8_UNORM_SRGB);
 		_SMAAEdgesRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8_UNORM, false, DXGI_FORMAT_UNKNOWN);
 		_SMAABlendRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN);
-
-		auto string = std::stringstream{};
-		auto defines = std::vector<D3D10_SHADER_MACRO>{};
-
-		// Set up pixel size macro.
-		string << "float4(1.0 / " << w << ", 1.0 / " << h << ", " << w << ", " << h << ")";
-		auto pixelSizeText = string.str();
-		auto renderTargetMetricsMacro = D3D10_SHADER_MACRO{ "SMAA_RT_METRICS", pixelSizeText.c_str() };
-		defines.push_back(renderTargetMetricsMacro);
-
-		if (g_Configuration.AntialiasingMode == AntialiasingMode::Medium)
-		{
-			defines.push_back({ "SMAA_PRESET_HIGH", nullptr });
-		}
-		else
-		{
-			defines.push_back({ "SMAA_PRESET_ULTRA", nullptr });
-		}
-
-		// defines.push_back({ "SMAA_PREDICATION", "1" });
-
-		// Set up target macro.
-		auto dx101Macro = D3D10_SHADER_MACRO{ "SMAA_HLSL_4_1", "1" };
-		defines.push_back(dx101Macro);
-
-		auto null = D3D10_SHADER_MACRO{ nullptr, nullptr };
-		defines.push_back(null);
-
-		_sSMAALumaEdgeDetection = CompileOrLoadShader("SMAA", "LumaEdgeDetection", ShaderType::Pixel, defines.data());
-		_sSMAAColorEdgeDetection = CompileOrLoadShader("SMAA", "ColorEdgeDetection", ShaderType::Pixel, defines.data());
-		_sSMAADepthEdgeDetection = CompileOrLoadShader("SMAA", "DepthEdgeDetection", ShaderType::Pixel, defines.data());
-		_sSMAABlendingWeightCalculation = CompileOrLoadShader("SMAA", "BlendingWeightCalculation", ShaderType::PixelAndVertex, defines.data());
-		_sSMAANeighborhoodBlending = CompileOrLoadShader("SMAA", "NeighborhoodBlending", ShaderType::PixelAndVertex, defines.data());
-		_sSMAAEdgeDetection = CompileOrLoadShader("SMAA", "EdgeDetection", ShaderType::Vertex, defines.data());
 	}
 
 	void Renderer::InitializeCommonTextures()
@@ -631,15 +553,18 @@ namespace TEN::Renderer
 		if constexpr (DebugBuild)
 		{
 			res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG,
-				levels, 1, D3D11_SDK_VERSION, &_device, &featureLevel, &_context);
+									levels, 1, D3D11_SDK_VERSION, &_device, &featureLevel, &_context);
 		}
 		else
 		{
 			res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL,
-				levels, 1, D3D11_SDK_VERSION, &_device, &featureLevel, &_context);
+									levels, 1, D3D11_SDK_VERSION, &_device, &featureLevel, &_context);
 		}
 
 		Utils::throwIfFailed(res);
+
+		// Initialize shader manager.
+		_shaders.Initialize(_device, _context);
 	}
 
 	void Renderer::ToggleFullScreen(bool force)
@@ -674,153 +599,5 @@ namespace TEN::Renderer
 		}
 
 		UpdateWindow(WindowsHandle);
-	}
-
-	void Renderer::BindShader(const RendererShader& shader)
-	{
-		if (shader.Vertex.Shader != nullptr)  _context->VSSetShader(shader.Vertex.Shader.Get(), nullptr, 0);
-		if (shader.Pixel.Shader != nullptr)   _context->PSSetShader(shader.Pixel.Shader.Get(), nullptr, 0);
-		if (shader.Compute.Shader != nullptr) _context->CSSetShader(shader.Compute.Shader.Get(), nullptr, 0);
-	}
-
-	RendererShader Renderer::CompileOrLoadShader(const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines)
-	{
-		RendererShader result = {};
-
-		// We need to increment the counter to avoid overwriting compiled shaders with the same source file name.
-		static int compileCounter = 0;
-
-		// Define paths for native (uncompiled) shaders and compiled shaders.
-		std::wstring shaderPath = GetAssetPath(L"Shaders\\");
-		std::wstring compiledShaderPath = shaderPath + L"Bin\\";
-		std::wstring wideFileName = TEN::Utils::ToWString(fileName);
-
-		// Ensure the /Bin subdirectory exists.
-		std::filesystem::create_directories(compiledShaderPath);
-
-		// Helper function to load or compile a shader.
-		auto loadOrCompileShader = [this, type, defines, shaderPath, compiledShaderPath]
-		(const std::wstring& baseFileName, const std::string& shaderType, const std::string& functionName, const char* model, ComPtr<ID3D10Blob>& bytecode)
-		{
-			// Construct the full paths using GetAssetPath.
-			auto prefix = ((compileCounter < 10) ? L"0" : L"") + std::to_wstring(compileCounter) + L"_";
-			auto csoFileName = compiledShaderPath + prefix + baseFileName + L"." + std::wstring(shaderType.begin(), shaderType.end()) + L".cso";
-			auto srcFileName = shaderPath + baseFileName;
-
-			// Try both .hlsl and .fx extensions for the source shader.
-			auto srcFileNameWithExtension = srcFileName + L".hlsl";
-			if (!std::filesystem::exists(srcFileNameWithExtension))
-			{
-				srcFileNameWithExtension = srcFileName + L".fx";
-				if (!std::filesystem::exists(srcFileNameWithExtension))
-				{
-					TENLog("Shader source file not found: " + TEN::Utils::ToString(srcFileNameWithExtension), LogLevel::Error);
-					throw std::runtime_error("Shader source file not found");
-				}
-			}
-
-			// Check modification dates of the source and compiled files.
-			bool shouldRecompile = false;
-			if (std::filesystem::exists(csoFileName))
-			{
-				auto csoTime = std::filesystem::last_write_time(csoFileName);
-				auto srcTime = std::filesystem::last_write_time(srcFileNameWithExtension);
-				shouldRecompile = srcTime > csoTime; // Recompile if the source is newer.
-			}
-
-			// Load compiled shader if it exists and is up to date.
-			if (!shouldRecompile)
-			{
-				std::ifstream csoFile(csoFileName, std::ios::binary);
-
-				if (csoFile.is_open())
-				{
-					// Load compiled shader.
-					csoFile.seekg(0, std::ios::end);
-					size_t fileSize = csoFile.tellg();
-					csoFile.seekg(0, std::ios::beg);
-
-					std::vector<char> buffer(fileSize);
-					csoFile.read(buffer.data(), fileSize);
-					csoFile.close();
-
-					D3DCreateBlob(fileSize, &bytecode);
-					memcpy(bytecode->GetBufferPointer(), buffer.data(), fileSize);
-
-					return;
-				}
-			}
-
-			// Set up compilation flags according to the build configuration.
-			unsigned int flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
-
-			if constexpr (DebugBuild)
-				flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-			else
-				flags |= D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_IEEE_STRICTNESS;
-
-			auto trimmedFileName = std::filesystem::path(srcFileNameWithExtension).filename().string();
-			TENLog("Compiling shader: " + trimmedFileName, LogLevel::Info);
-
-			// Compile shader.
-			ComPtr<ID3D10Blob> errors;
-			HRESULT res = D3DCompileFromFile(srcFileNameWithExtension.c_str(), defines, D3D_COMPILE_STANDARD_FILE_INCLUDE,
-				(shaderType + functionName).c_str(), model, flags, 0, bytecode.GetAddressOf(), errors.GetAddressOf());
-
-			if (FAILED(res))
-			{
-				if (errors)
-				{
-					auto error = std::string(static_cast<const char*>(errors->GetBufferPointer()));
-					TENLog(error, LogLevel::Error);
-					throw std::runtime_error(error);
-				}
-				else
-				{
-					TENLog("Error while compiling shader: " + trimmedFileName, LogLevel::Error);
-					throwIfFailed(res);
-				}
-			}
-
-			// Save compiled shader to .cso file.
-			std::ofstream outCsoFile(csoFileName, std::ios::binary);
-			if (outCsoFile.is_open())
-			{
-				outCsoFile.write(reinterpret_cast<const char*>(bytecode->GetBufferPointer()), bytecode->GetBufferSize());
-				outCsoFile.close();
-			}
-		};
-
-		// Load or compile and create pixel shader.
-		if (type == ShaderType::Pixel || type == ShaderType::PixelAndVertex)
-		{
-			loadOrCompileShader(wideFileName, "PS", funcName, "ps_5_0", result.Pixel.Blob);
-			throwIfFailed(_device->CreatePixelShader(result.Pixel.Blob->GetBufferPointer(), result.Pixel.Blob->GetBufferSize(),
-				nullptr, result.Pixel.Shader.GetAddressOf()
-			));
-		}
-
-		// Load or compile and create vertex shader.
-		if (type == ShaderType::Vertex || type == ShaderType::PixelAndVertex)
-		{
-			loadOrCompileShader(wideFileName, "VS", funcName, "vs_5_0", result.Vertex.Blob);
-			throwIfFailed(_device->CreateVertexShader(result.Vertex.Blob->GetBufferPointer(), result.Vertex.Blob->GetBufferSize(),
-				nullptr, result.Vertex.Shader.GetAddressOf()
-			));
-		}
-
-		// Load or compile and create compute shader.
-		if (type == ShaderType::Compute)
-		{
-			loadOrCompileShader(wideFileName, "CS", funcName, "cs_5_0", result.Compute.Blob);
-			throwIfFailed(_device->CreateComputeShader(result.Compute.Blob->GetBufferPointer(), result.Compute.Blob->GetBufferSize(),
-				nullptr, result.Compute.Shader.GetAddressOf()
-			));
-		}
-
-		// Increment the compile counter.
-		compileCounter++;
-
-		return result;
 	}
 }
