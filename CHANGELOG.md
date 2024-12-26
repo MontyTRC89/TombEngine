@@ -6,8 +6,12 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ## Version 1.8 - xxxx-xx-xx
 
 ### Bug fixes
+* Fixed static meshes with dynamic light mode not accepting room lights.
+* Fixed antialiasing quality not changing after changing it in display settings.
+
 
 ### New Features
+* Added realtime shader reloading in debug mode by pressing F9 key.
 
 ### Lua API changes
 
