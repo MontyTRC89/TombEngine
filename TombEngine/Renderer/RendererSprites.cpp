@@ -2,6 +2,8 @@
 #include "Renderer/Structures/RendererSprite.h"
 #include "Renderer/Structures/RendererSpriteBucket.h"
 #include "Renderer/Renderer.h"
+#include "Specific/Worker.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 namespace TEN::Renderer
 {
@@ -264,7 +266,7 @@ namespace TEN::Renderer
 		bool wasGPUSet = false;
 		for (auto& spriteBucket : _spriteBuckets)
 		{
-			if (spriteBucket.SpritesToDraw.size() == 0 || !spriteBucket.IsBillboard)
+			if (spriteBucket.SpritesToDraw.empty() || !spriteBucket.IsBillboard)
 				continue;
 
 			if (!SetupBlendModeAndAlphaTest(spriteBucket.BlendMode, rendererPass, 0))
@@ -289,29 +291,33 @@ namespace TEN::Renderer
 				wasGPUSet = true;
 			}
 
-			// Prepare constant buffer for instanced sprites.
-			for (int i = 0; i < spriteBucket.SpritesToDraw.size(); i++)
+			// Define sprite preparation logic.
+			auto prepareSprites = [&](int start, int end)
 			{
-				auto& rDrawSprite = spriteBucket.SpritesToDraw[i];
+				for (int i = start; i < end; i++)
+				{
+					auto& rDrawSprite = spriteBucket.SpritesToDraw[i];
 
-				_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, view);
-				_stInstancedSpriteBuffer.Sprites[i].Color = rDrawSprite.color;
-				_stInstancedSpriteBuffer.Sprites[i].IsBillboard = 1;
-				_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = rDrawSprite.SoftParticle ? 1 : 0;
+					_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, view);
+					_stInstancedSpriteBuffer.Sprites[i].Color = rDrawSprite.color;
+					_stInstancedSpriteBuffer.Sprites[i].IsBillboard = 1;
+					_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = rDrawSprite.SoftParticle ? 1 : 0;
 
-				// NOTE: Strange packing due to particular HLSL 16 byte alignment requirements.
-				_stInstancedSpriteBuffer.Sprites[i].UV[0].x = rDrawSprite.Sprite->UV[0].x;
-				_stInstancedSpriteBuffer.Sprites[i].UV[0].y = rDrawSprite.Sprite->UV[1].x;
-				_stInstancedSpriteBuffer.Sprites[i].UV[0].z = rDrawSprite.Sprite->UV[2].x;
-				_stInstancedSpriteBuffer.Sprites[i].UV[0].w = rDrawSprite.Sprite->UV[3].x;
-				_stInstancedSpriteBuffer.Sprites[i].UV[1].x = rDrawSprite.Sprite->UV[0].y;
-				_stInstancedSpriteBuffer.Sprites[i].UV[1].y = rDrawSprite.Sprite->UV[1].y;
-				_stInstancedSpriteBuffer.Sprites[i].UV[1].z = rDrawSprite.Sprite->UV[2].y;
-				_stInstancedSpriteBuffer.Sprites[i].UV[1].w = rDrawSprite.Sprite->UV[3].y;
-			}
+					// NOTE: Strange packing due to particular HLSL 16 byte alignment requirements.
+					_stInstancedSpriteBuffer.Sprites[i].UV[0].x = rDrawSprite.Sprite->UV[0].x;
+					_stInstancedSpriteBuffer.Sprites[i].UV[0].y = rDrawSprite.Sprite->UV[1].x;
+					_stInstancedSpriteBuffer.Sprites[i].UV[0].z = rDrawSprite.Sprite->UV[2].x;
+					_stInstancedSpriteBuffer.Sprites[i].UV[0].w = rDrawSprite.Sprite->UV[3].x;
+					_stInstancedSpriteBuffer.Sprites[i].UV[1].x = rDrawSprite.Sprite->UV[0].y;
+					_stInstancedSpriteBuffer.Sprites[i].UV[1].y = rDrawSprite.Sprite->UV[1].y;
+					_stInstancedSpriteBuffer.Sprites[i].UV[1].z = rDrawSprite.Sprite->UV[2].y;
+					_stInstancedSpriteBuffer.Sprites[i].UV[1].w = rDrawSprite.Sprite->UV[3].y;
+				}
+			};
+
+			g_Worker.ProcessInParallel(spriteBucket.SpritesToDraw, prepareSprites, g_GameFlow->GetSettings()->System.MultiThreaded);
 
 			BindTexture(TextureRegister::ColorMap, spriteBucket.Sprite->Texture, SamplerStateRegister::LinearClamp);
-
 			_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
 
 			// Draw sprites with instancing.

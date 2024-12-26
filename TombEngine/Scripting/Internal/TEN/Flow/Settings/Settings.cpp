@@ -326,6 +326,12 @@ namespace TEN::Scripting
 		// @tfield Flow.ErrorMode errorMode error mode to use. */
 		"errorMode", &SystemSettings::ErrorMode,
 
+		/// Use multithreading in certain calculations. <br>
+		// When set to `true`, some performance-critical calculations will be performed in parallel, which can give
+		// significant performance boost. Don't disable unless you have problems with launching or using TEN.
+		// @tfield bool multiThreaded determines whether to use multithreading or not. */
+		"multiThreaded", & SystemSettings::MultiThreaded,
+
 		/// Can the game utilize the fast reload feature? <br>
 		// When set to `true`, the game will attempt to perform fast savegame reloading if current level is the same as
 		// the level loaded from the savegame. It will not work if the level timestamp or checksum has changed

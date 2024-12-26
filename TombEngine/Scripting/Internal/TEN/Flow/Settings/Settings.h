@@ -78,6 +78,7 @@ namespace TEN::Scripting
 	{
 		ErrorMode ErrorMode	 = ErrorMode::Warn;
 		bool	  FastReload = true;
+		bool	  MultiThreaded = true;
 
 		static void Register(sol::table& parent);
 	};
