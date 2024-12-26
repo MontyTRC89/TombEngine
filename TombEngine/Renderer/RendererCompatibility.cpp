@@ -672,18 +672,25 @@ namespace TEN::Renderer
 											{
 												auto* skinVertex = &_moveablesVertices[skinBucket->StartVertex + v2];
 
-												auto vertex0 = _moveablesVertices[jointBucket->StartVertex + v1].Position + jointBone->GlobalTranslation;
-												auto vertex1 = _moveablesVertices[skinBucket->StartVertex + v2].Position + skinBone->GlobalTranslation;
+												// NOTE: Don't vectorize these coordinates, it breaks the connection in some cases. -- Lwmte, 21.12.24
 
-												if (Vector3::Distance(vertex0, vertex1) > 2)
-													continue;
+												int x1 = _moveablesVertices[jointBucket->StartVertex + v1].Position.x + jointBone->GlobalTranslation.x;
+												int y1 = _moveablesVertices[jointBucket->StartVertex + v1].Position.y + jointBone->GlobalTranslation.y;
+												int z1 = _moveablesVertices[jointBucket->StartVertex + v1].Position.z + jointBone->GlobalTranslation.z;
 
-												jointVertex->Bone = bonesToCheck[k];
-												jointVertex->Position = skinVertex->Position;
-												jointVertex->Normal = skinVertex->Normal;
+												int x2 = _moveablesVertices[skinBucket->StartVertex + v2].Position.x + skinBone->GlobalTranslation.x;
+												int y2 = _moveablesVertices[skinBucket->StartVertex + v2].Position.y + skinBone->GlobalTranslation.y;
+												int z2 = _moveablesVertices[skinBucket->StartVertex + v2].Position.z + skinBone->GlobalTranslation.z;
 
-												isDone = true;
-												break;
+												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
+												{
+													jointVertex->Bone = bonesToCheck[k];
+													jointVertex->Position = skinVertex->Position;
+													jointVertex->Normal = skinVertex->Normal;
+
+													isDone = true;
+													break;
+												}
 											}
 
 											if (isDone)
@@ -766,17 +773,23 @@ namespace TEN::Renderer
 											{
 												auto* parentVertex = &_moveablesVertices[parentBucket->StartVertex + v2];
 
-												auto vertex1 = _moveablesVertices[currentBucket.StartVertex + v1].Position + currentBone->GlobalTranslation;
-												auto vertex2 = _moveablesVertices[parentBucket->StartVertex + v2].Position + parentBone->GlobalTranslation;
+												int x1 = _moveablesVertices[currentBucket.StartVertex + v1].Position.x + currentBone->GlobalTranslation.x;
+												int y1 = _moveablesVertices[currentBucket.StartVertex + v1].Position.y + currentBone->GlobalTranslation.y;
+												int z1 = _moveablesVertices[currentBucket.StartVertex + v1].Position.z + currentBone->GlobalTranslation.z;
+
+												int x2 = _moveablesVertices[parentBucket->StartVertex + v2].Position.x + parentBone->GlobalTranslation.x;
+												int y2 = _moveablesVertices[parentBucket->StartVertex + v2].Position.y + parentBone->GlobalTranslation.y;
+												int z2 = _moveablesVertices[parentBucket->StartVertex + v2].Position.z + parentBone->GlobalTranslation.z;
 
 												// FIXME: If a tolerance is used, a strange bug occurs where certain vertices don't connect. -- Lwmte, 14.12.2024
-												if (vertex1 != vertex2)
-													continue;
 
-												currentVertex->Bone = j;
-												currentVertex->Position = parentVertex->Position;
-												currentVertex->Normal = parentVertex->Normal;
-												break;
+												if (abs(x1 - x2) == 0 && abs(y1 - y2) == 0 && abs(z1 - z2) == 0)
+												{
+													currentVertex->Bone = j;
+													currentVertex->Position = parentVertex->Position;
+													currentVertex->Normal = parentVertex->Normal;
+													break;
+												}
 											}
 										}
 									}

@@ -58,7 +58,7 @@ namespace TEN::Scripting
 	// @treturn Time A new Time object initialized with the given frame count.
 	Time::Time(int gameFrames)
 	{
-		_frameCount = gameFrames;
+		_frameCount = std::clamp(gameFrames, 0, INT_MAX);
 	}
 
 	/// Create a Time object from a formatted string.
@@ -194,18 +194,18 @@ namespace TEN::Scripting
 
 	Time& Time::operator -=(const Time& time)
 	{
-		_frameCount -= time._frameCount;
+		_frameCount = std::clamp(_frameCount - time._frameCount, 0, INT_MAX);
 		return *this;
 	}
 
 	Time Time::operator +(int frameCount) const
 	{
-		return Time(frameCount + _frameCount);
+		return Time(_frameCount + frameCount);
 	}
 
 	Time Time::operator -(int frameCount) const
 	{
-		return Time(frameCount - _frameCount);
+		return Time(std::clamp(_frameCount - frameCount, 0, INT_MAX));
 	}
 
 	Time Time::operator +(const Time& time) const
@@ -215,17 +215,17 @@ namespace TEN::Scripting
 
 	Time Time::operator -(const Time& time) const
 	{
-		return Time(_frameCount - time._frameCount);
+		return Time(std::clamp(_frameCount - time._frameCount, 0, INT_MAX));
 	}
 
-	Time Time::operator <(const Time& time) const
+	bool Time::operator <(const Time& time) const
 	{
-		return Time(_frameCount < time._frameCount);
+		return _frameCount < time._frameCount;
 	}
 
-	Time Time::operator <=(const Time& time) const
+	bool Time::operator <=(const Time& time) const
 	{
-		return Time(_frameCount <= time._frameCount);
+		return _frameCount <= time._frameCount;
 	}
 
 	bool Time::operator ==(const Time& time) const
@@ -248,22 +248,21 @@ namespace TEN::Scripting
 
 	Time::Hmsc Time::ParseFormattedString(const std::string& formattedTime)
 	{
-		std::regex timeFormat(R"((\d{2}):(\d{2}):(\d{2})\.(\d{2}))");
+		std::regex timeFormat(R"((?:(\d+):)?(\d+):(\d+)(?:\.(\d+))?)");
 		std::smatch match;
 
 		if (!std::regex_match(formattedTime, match, timeFormat))
 		{
-			TENLog("Invalid time format. Expected HH:MM:SS or HH:MM:SS.CC", LogLevel::Warning);
+			TENLog("Invalid time format. Supported formats: HH:MM:SS.CC, HH:MM:SS, MM:SS, or MM:SS.CC.", LogLevel::Warning);
 			return Time::Hmsc();
 		}
 
-		return
-		{
-			std::stoi(match[1].str()),
-			std::stoi(match[2].str()),
-			std::stoi(match[3].str()),
-			match[4].matched ? std::stoi(match[4].str()) : 0
-		};
+		int hours   = match[1].matched ? std::stoi(match[1].str()) : 0;
+		int minutes = match[2].matched ? std::stoi(match[2].str()) : 0;
+		int seconds = match[3].matched ? std::stoi(match[3].str()) : 0;
+		int cents   = match[4].matched ? std::stoi(match[4].str()) : 0;
+
+		return { hours, minutes, seconds, cents };
 	}
 
 	void Time::SetFromHMSC(int hours, int minutes, int seconds, int cents)

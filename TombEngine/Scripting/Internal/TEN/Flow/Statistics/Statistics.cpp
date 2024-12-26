@@ -31,9 +31,9 @@ namespace TEN::Scripting
 			"ammoUsed", &Statistics::AmmoUsed,
 
 			/*** Distance traveled.
-			@tfield int traveledDistance amount of traveled distance in world units. One meter is 420 world units.
+			@tfield int distanceTraveled amount of traveled distance in world units. One meter is 420 world units.
 			*/
-			"traveledDistance", &Statistics::Distance,
+			"distanceTraveled", &Statistics::Distance,
 
 			/*** Health packs used.
 			@tfield int healthPacksUsed amount of used medipacks.

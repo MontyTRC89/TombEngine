@@ -67,21 +67,21 @@ namespace TEN::Scripting::View
 		return TO_DEGREES(GetCurrentFOV());
 	}
 
-	static CameraType GetCameraType()
+	static ScriptCameraType GetCameraType()
 	{
 		if (UseSpotCam)
-			return CameraType::Flyby;
+			return ScriptCameraType::Flyby;
 
 		if (Lara.Control.Look.IsUsingLasersight)
-			return CameraType::Lasersight;
+			return ScriptCameraType::Lasersight;
 
 		if (Lara.Control.Look.IsUsingBinoculars)
-			return CameraType::Binoculars;
+			return ScriptCameraType::Binoculars;
 
 		if (Camera.oldType == CameraType::Heavy)
-			return CameraType::Fixed;
+			return ScriptCameraType::Fixed;
 
-		return Camera.oldType;
+		return (ScriptCameraType)Camera.oldType;
 	}
 	
 	static Vec3 GetCameraPosition()

@@ -65,6 +65,7 @@
 #include "Renderer/Structures/RendererRoomAmbientMap.h"
 #include "Renderer/Structures/RendererObject.h"
 #include "Renderer/Structures/RendererStar.h"
+#include "Structures/RendererShader.h"
 
 enum GAME_OBJECT_ID : short;
 enum class SphereSpaceType;
@@ -124,43 +125,31 @@ namespace TEN::Renderer
 
 		// Shaders
 
-		ComPtr<ID3D11VertexShader> _vsRooms;
-		ComPtr<ID3D11VertexShader> _vsRoomsAnimatedTextures;
-		ComPtr<ID3D11PixelShader> _psRooms;
-		ComPtr<ID3D11PixelShader> _psRoomsTransparent;
-		ComPtr<ID3D11VertexShader> _vsItems;
-		ComPtr<ID3D11PixelShader> _psItems;
-		ComPtr<ID3D11VertexShader> _vsStatics;
-		ComPtr<ID3D11PixelShader> _psStatics;
-		ComPtr<ID3D11VertexShader> _vsSky;
-		ComPtr<ID3D11PixelShader> _psSky;
-		ComPtr<ID3D11VertexShader> _vsSprites;
-		ComPtr<ID3D11PixelShader> _psSprites;
-		ComPtr<ID3D11VertexShader> _vsInstancedSprites;
-		ComPtr<ID3D11PixelShader> _psInstancedSprites;
-		ComPtr<ID3D11VertexShader> _vsInstancedStaticMeshes;
-		ComPtr<ID3D11PixelShader> _psInstancedStaticMeshes;
-		ComPtr<ID3D11VertexShader> _vsSolid;
-		ComPtr<ID3D11PixelShader> _psSolid;
-		ComPtr<ID3D11VertexShader> _vsInventory;
-		ComPtr<ID3D11PixelShader> _psInventory;
-		ComPtr<ID3D11VertexShader> _vsFullScreenQuad;
-		ComPtr<ID3D11PixelShader> _psFullScreenQuad;
-		ComPtr<ID3D11VertexShader> _vsShadowMap;
-		ComPtr<ID3D11PixelShader> _psShadowMap;
-		ComPtr<ID3D11VertexShader> _vsHUD;
-		ComPtr<ID3D11PixelShader> _psHUDColor;
-		ComPtr<ID3D11PixelShader> _psHUDTexture;
-		ComPtr<ID3D11PixelShader> _psHUDBarColor;
-		ComPtr<ID3D11VertexShader> _vsGBufferRooms;
-		ComPtr<ID3D11VertexShader> _vsGBufferRoomsAnimated;
-		ComPtr<ID3D11VertexShader> _vsGBufferItems;
-		ComPtr<ID3D11VertexShader> _vsGBufferStatics;
-		ComPtr<ID3D11VertexShader> _vsGBufferInstancedStatics;
-		ComPtr<ID3D11PixelShader> _psGBuffer;
-		ComPtr<ID3D11VertexShader> _vsRoomAmbient;
-		ComPtr<ID3D11VertexShader> _vsRoomAmbientSky;
-		ComPtr<ID3D11PixelShader> _psRoomAmbient;
+		RendererShader _sRooms;
+		RendererShader _sRoomsAnimated;
+		RendererShader _sRoomsTransparent;
+		RendererShader _sRoomAmbient;
+		RendererShader _sRoomAmbientSky;
+		RendererShader _sItems;
+		RendererShader _sStatics;
+		RendererShader _sInstancedStatics;
+		RendererShader _sSprites;
+		RendererShader _sInstancedSprites;
+		RendererShader _sSky;
+		RendererShader _sSolid;
+		RendererShader _sInventory;
+		RendererShader _sFullScreenQuad;
+		RendererShader _sShadowMap;
+		RendererShader _sHUD;
+		RendererShader _sHUDColor;
+		RendererShader _sHUDTexture;
+		RendererShader _sHUDBarColor;
+		RendererShader _sGBuffer;
+		RendererShader _sGBufferRooms;
+		RendererShader _sGBufferRoomsAnimated;
+		RendererShader _sGBufferItems;
+		RendererShader _sGBufferStatics;
+		RendererShader _sGBufferInstancedStatics;
 
 		// Constant buffers
 
@@ -352,17 +341,13 @@ namespace TEN::Renderer
 		RenderTarget2D _SMAAEdgesRenderTarget;
 		RenderTarget2D _SMAABlendRenderTarget;
 
-		ComPtr<ID3D11VertexShader> _SMAAEdgeDetectionVS;
-		ComPtr<ID3D11PixelShader> _SMAALumaEdgeDetectionPS;
-		ComPtr<ID3D11PixelShader> _SMAAColorEdgeDetectionPS;
-		ComPtr<ID3D11PixelShader> _SMAADepthEdgeDetectionPS;
-		ComPtr<ID3D11VertexShader> _SMAABlendingWeightCalculationVS;
-		ComPtr<ID3D11PixelShader> _SMAABlendingWeightCalculationPS;
-		ComPtr<ID3D11VertexShader> _SMAANeighborhoodBlendingVS;
-		ComPtr<ID3D11PixelShader> _SMAANeighborhoodBlendingPS;
-
-		ComPtr<ID3D11VertexShader> _vsFXAA;
-		ComPtr<ID3D11PixelShader> _psFXAA;
+		RendererShader _sSMAAEdgeDetection;
+		RendererShader _sSMAALumaEdgeDetection;
+		RendererShader _sSMAAColorEdgeDetection;
+		RendererShader _sSMAADepthEdgeDetection;
+		RendererShader _sSMAABlendingWeightCalculation;
+		RendererShader _sSMAANeighborhoodBlending;
+		RendererShader _sFXAA;
 
 		// Post-process
 
@@ -372,33 +357,34 @@ namespace TEN::Renderer
 
 		VertexBuffer<PostProcessVertex> _fullscreenTriangleVertexBuffer;
 		ComPtr<ID3D11InputLayout> _fullscreenTriangleInputLayout = nullptr;
-		ComPtr<ID3D11VertexShader> _vsPostProcess;
-		ComPtr<ID3D11PixelShader> _psPostProcessCopy;
-		ComPtr<ID3D11PixelShader> _psPostProcessMonochrome;
-		ComPtr<ID3D11PixelShader> _psPostProcessNegative;
-		ComPtr<ID3D11PixelShader> _psPostProcessExclusion;
-		ComPtr<ID3D11PixelShader> _psPostProcessFinalPass;
-		ComPtr<ID3D11PixelShader> _psPostProcessLensFlare;
+		RendererShader _sPostProcess;
+		RendererShader _sPostProcessMonochrome;
+		RendererShader _sPostProcessNegative;
+		RendererShader _sPostProcessExclusion;
+		RendererShader _sPostProcessFinalPass;
+		RendererShader _sPostProcessLensFlare;
 
 		bool _doingFullscreenPass = false;
 
 		// SSAO
 
-		ComPtr<ID3D11VertexShader> _vsSSAO;
-		ComPtr<ID3D11PixelShader> _psSSAO;
-		ComPtr<ID3D11PixelShader> _psSSAOBlur;
 		Texture2D _SSAONoiseTexture;
 		RenderTarget2D _SSAORenderTarget;
 		RenderTarget2D _SSAOBlurredRenderTarget;
 		std::vector<Vector4> _SSAOKernel;
 
+		RendererShader _sSSAO;
+		RendererShader _sSSAOBlur;
+
 		// New ambient light techinque
+
 		RenderTarget2D _roomAmbientMapFront;
 		RenderTarget2D _roomAmbientMapBack;
 
 		// Special effects
 
 		std::vector<Texture2D> _causticTextures;
+		RendererMirror* _currentMirror = nullptr;
 
 		// Transparency
 
@@ -410,10 +396,12 @@ namespace TEN::Renderer
 		// High framerate.
 
 		float _interpolationFactor = 0.0f;
-
 		bool _graphicsSettingsChanged = false;
 
 		// Private functions
+
+		RendererShader CompileOrLoadShader(const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines = nullptr);
+		void BindShader(const RendererShader& shader);
 
 		void ApplySMAA(RenderTarget2D* renderTarget, RenderView& view);
 		void ApplyFXAA(RenderTarget2D* renderTarget, RenderView& view);
@@ -422,7 +410,7 @@ namespace TEN::Renderer
 		void BindRoomLights(std::vector<RendererLight*>& lights);
 		void BindStaticLights(std::vector<RendererLight*>& lights);
 		void BindInstancedStaticLights(std::vector<RendererLight*>& lights, int instanceID);
-		void BindMoveableLights(std::vector<RendererLight*>& lights, int roomNumber, int prevRoomNumber, float fade);
+		void BindMoveableLights(std::vector<RendererLight*>& lights, int roomNumber, int prevRoomNumber, float fade, bool shadow);
 		void BindRenderTargetAsTexture(TextureRegister registerType, RenderTarget2D* target, SamplerStateRegister samplerType);
 		void BindConstantBufferVS(ConstantBufferRegister constantBufferType, ID3D11Buffer** buffer);
 		void BindConstantBufferPS(ConstantBufferRegister constantBufferType, ID3D11Buffer** buffer);
@@ -431,6 +419,7 @@ namespace TEN::Renderer
 		void UpdateAnimation(RendererItem* item, RendererObject& obj, const AnimFrameInterpData& frameData, int mask, bool useObjectWorldRotation = false);
 		bool CheckPortal(short parentRoomNumber, RendererDoor* door, Vector4 viewPort, Vector4* clipPort, RenderView& renderView);
 		void GetVisibleRooms(short from, short to, Vector4 viewPort, bool water, int count, bool onlyRooms, RenderView& renderView);
+		void CollectMirrors(RenderView& renderView);
 		void CollectRooms(RenderView& renderView, bool onlyRooms);
 		void CollectItems(short roomNumber, RenderView& renderView);
 		void CollectStatics(short roomNumber, RenderView& renderView);
@@ -450,11 +439,12 @@ namespace TEN::Renderer
 		void InitializeMenuBars(int y);
 		void InitializeSky();
 		void DrawAllStrings();
+		void PrepareDynamicLight(RendererLight& light);
 		void PrepareLaserBarriers(RenderView& view);
 		void PrepareSingleLaserBeam(RenderView& view);
 		void DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
 		void DrawRooms(RenderView& view, RendererPass rendererPass);
-		void DrawItems(RenderView& view, RendererPass rendererPass);
+		void DrawItems(RenderView& view, RendererPass rendererPass, bool onlyPlayer = false);
 		void DrawAnimatingItem(RendererItem* item, RenderView& view, RendererPass rendererPass);
 		void DrawWaterfalls(RendererItem* item, RenderView& view, int fps, RendererPass rendererPass);
 		void DrawBaddyGunflashes(RenderView& view);
@@ -469,6 +459,8 @@ namespace TEN::Renderer
 		void PrepareWeatherParticles(RenderView& view);
 		void PrepareDrips(RenderView& view);
 		void PrepareBubbles(RenderView& view);
+		void DoRenderPass(RendererPass pass, RenderView& view, bool drawMirrors);
+		void DrawObjects(RendererPass pass, RenderView& view, bool player, bool moveables, bool statics, bool sprites);
 		void DrawEffects(RenderView& view, RendererPass rendererPass);
 		void DrawEffect(RenderView& view, RendererEffect* effect, RendererPass rendererPass);
 		void PrepareSplashes(RenderView& view);
@@ -534,6 +526,7 @@ namespace TEN::Renderer
 		void SetScissor(RendererRectangle rectangle);
 		bool SetupBlendModeAndAlphaTest(BlendMode blendMode, RendererPass rendererPass, int drawPass);
 		void SortAndPrepareSprites(RenderView& view);
+		void SortTransparentFaces(RenderView& view);
 		void ResetItems();
 		void ResetScissor();
 		void ResetDebugVariables();
@@ -571,6 +564,29 @@ namespace TEN::Renderer
 		void InitializePostProcess();
 		void CreateSSAONoiseTexture();
 		void InitializeSMAA();
+
+		bool IsRoomReflected(RenderView& renderView, int roomNumber);
+
+		inline bool IgnoreReflectionPassForRoom(int roomNumber)
+		{
+			return (_currentMirror != nullptr && roomNumber != _currentMirror->RoomNumber);
+		}
+		
+		inline void ReflectVectorOptionally(Vector3& vector)
+		{
+			if (_currentMirror == nullptr)
+				return;
+
+			vector = Vector3::Transform(vector, _currentMirror->ReflectionMatrix);
+		}
+
+		inline void ReflectMatrixOptionally(Matrix& matrix)
+		{
+			if (_currentMirror == nullptr)
+				return;
+
+			matrix = matrix * _currentMirror->ReflectionMatrix;
+		}
 
 		inline void DrawIndexedTriangles(int count, int baseIndex, int baseVertex)
 		{
@@ -647,7 +663,6 @@ namespace TEN::Renderer
 		void FreeRendererData();
 		void AddDynamicPointLight(const Vector3& pos, float radius, const Color& color, bool castShadows, int hash = 0);
 		void AddDynamicSpotLight(const Vector3& pos, const Vector3& dir, float radius, float falloff, float distance, const Color& color, bool castShadows, int hash = 0);
-		void StoreInterpolatedDynamicLightData(RendererLight& light);
 		void RenderLoadingScreen(float percentage);
 		void RenderFreezeMode(float interpFactor, bool staticBackground);
 		void UpdateProgress(float value);

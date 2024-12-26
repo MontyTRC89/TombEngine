@@ -7,6 +7,17 @@ Constants for the type of the Camera.
 @pragma nostrip
 */
 
+enum class ScriptCameraType
+{
+	Normal,
+	Fixed,
+	Look,
+	Combat,
+	Flyby,
+	Binoculars,
+	Lasersight
+};
+
 /*** Table of View.CameraType constants. To be used with @{View.GetCameraType} function.
 @table CameraType
 
@@ -19,15 +30,15 @@ Constants for the type of the Camera.
  - `LASERSIGHT` - lasersight is active.
 */
 
-static const std::unordered_map<std::string, CameraType> CAMERA_TYPE
+static const std::unordered_map<std::string, ScriptCameraType> CAMERA_TYPE
 {
-	{ "CHASE",		CameraType::Chase		}, // DEPRECATED
-	{ "NORMAL",		CameraType::Chase		},
-	{ "COMBAT",		CameraType::Combat		},
-	{ "FIXED",		CameraType::Fixed		},
-	{ "HEAVY",		CameraType::Fixed		}, // DEPRECATED
-	{ "LOOK",		CameraType::Look		},
-	{ "FLYBY",		CameraType::Flyby		},
-	{ "BINOCULARS", CameraType::Binoculars	},
-	{ "LASERSIGHT", CameraType::Lasersight	}
+	{ "CHASE",		ScriptCameraType::Normal		}, // DEPRECATED
+	{ "NORMAL",		ScriptCameraType::Normal		},
+	{ "COMBAT",		ScriptCameraType::Combat		},
+	{ "FIXED",		ScriptCameraType::Fixed			},
+	{ "HEAVY",		ScriptCameraType::Fixed			}, // DEPRECATED
+	{ "LOOK",		ScriptCameraType::Look			},
+	{ "FLYBY",		ScriptCameraType::Flyby			},
+	{ "BINOCULARS", ScriptCameraType::Binoculars	},
+	{ "LASERSIGHT", ScriptCameraType::Lasersight	}
 };
