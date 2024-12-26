@@ -305,7 +305,7 @@ namespace TEN::Scripting::Effects
 		TriggerBlood(pos.x, pos.y, pos.z, -1, USE_IF_HAVE(int, num, 1));
 	}
 
-/***Emit Air bubble.
+/***Emit Air bubble in a water room.
 @function EmitAirBubble
 @tparam Vec3 position The position where the air bubble will be spawned.
 @tparam int roomNumber The room number where the air bubble will be generated.
