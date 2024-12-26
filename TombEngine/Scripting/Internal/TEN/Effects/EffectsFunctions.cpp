@@ -303,6 +303,16 @@ namespace TEN::Scripting::Effects
 		TriggerBlood(pos.x, pos.y, pos.z, -1, USE_IF_HAVE(int, num, 1));
 	}
 
+/***Emit Air bubble.
+@function EmitBlood
+@tparam Vec3 pos
+@tparam int count (default 1) "amount" of blood. Higher numbers won't add more blood but will make it more "flickery", with higher numbers turning it into a kind of red orb.
+*/
+	static void EmitAirBubble(Vec3 pos, int roomNumber, float size, float amplitude)
+	{
+		SpawnBubble(pos, roomNumber, size, amplitude);
+	}
+
 /***Emit fire for one frame. Will not hurt Lara. Call this each frame if you want a continuous fire.
 @function EmitFire
 @tparam Vec3 pos
