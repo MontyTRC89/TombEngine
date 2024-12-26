@@ -86,12 +86,16 @@ namespace TEN::Renderer::Utils
 		const RendererShader& Get(Shader shader);
 
 		void Initialize(ComPtr<ID3D11Device>& device, ComPtr<ID3D11DeviceContext>& context);
-		void LoadAllShaders(int width, int height);
+		void LoadShaders(int width, int height, bool recompileAAShaders = false);
 		void Bind(Shader shader, bool forceNull = false);
 
 	private:
-		RendererShader LoadOrCompile(const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines);
-		void		   Load(Shader shader, const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines = nullptr);
+		void LoadCommonShaders();
+		void LoadPostprocessShaders();
+		void LoadAAShaders(int width, int height, bool recompile);
+
+		RendererShader LoadOrCompile(const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines, bool forceRecompile);
+		void		   Load(Shader shader, const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines = nullptr, bool forceRecompile = false);
 		void		   Destroy(Shader shader);
 	};
 }

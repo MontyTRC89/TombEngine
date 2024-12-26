@@ -61,11 +61,11 @@ namespace TEN::Renderer
 		_isLocked = true;
 	}
 
-	void Renderer::ReloadShaders()
+	void Renderer::ReloadShaders(bool recompileAAShaders)
 	{
 		try
 		{
-			_shaders.LoadAllShaders(_screenWidth, _screenHeight);
+			_shaders.LoadShaders(_screenWidth, _screenHeight, recompileAAShaders);
 		}
 		catch (const std::exception& e)
 		{

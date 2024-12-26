@@ -30,55 +30,8 @@ namespace TEN::Renderer::Utils
 		_context = context;
 	}
 
-	void ShaderManager::LoadAllShaders(int width, int height)
+	void ShaderManager::LoadPostprocessShaders()
 	{
-		TENLog("Loading shaders...", LogLevel::Info);
-
-		// Unbind any currently bound shader.
-		Bind(Shader::None, true);
-
-		// Reset compile counter.
-		_compileCounter = 0;
-
-		// Generic shaders.
-		D3D_SHADER_MACRO roomDefinesAnimated[] = { "ANIMATED", "", nullptr, nullptr };
-		D3D_SHADER_MACRO roomDefinesShadowMap[] = { "SHADOW_MAP", "", nullptr, nullptr };
-
-		Load(Shader::Rooms, "Rooms", "", ShaderType::PixelAndVertex);
-		Load(Shader::RoomsAnimated, "Rooms", "", ShaderType::Vertex, roomDefinesAnimated);
-		Load(Shader::Items, "Items", "", ShaderType::PixelAndVertex);
-		Load(Shader::Statics, "Statics", "", ShaderType::PixelAndVertex);
-		Load(Shader::Sky, "Sky", "", ShaderType::PixelAndVertex);
-		Load(Shader::Sprites, "Sprites", "", ShaderType::PixelAndVertex);
-		Load(Shader::Solid, "Solid", "", ShaderType::PixelAndVertex);
-		Load(Shader::Inventory, "Inventory", "", ShaderType::PixelAndVertex);
-		Load(Shader::FullScreenQuad, "FullScreenQuad", "", ShaderType::PixelAndVertex);
-		Load(Shader::ShadowMap, "ShadowMap", "", ShaderType::PixelAndVertex, roomDefinesShadowMap);
-
-		Load(Shader::Hud, "HUD", "", ShaderType::Vertex);
-		Load(Shader::HudColor, "HUD", "ColoredHUD", ShaderType::Pixel);
-		Load(Shader::HudDTexture, "HUD", "TexturedHUD", ShaderType::Pixel);
-		Load(Shader::HudBarColor, "HUD", "TexturedHUDBar", ShaderType::Pixel);
-		Load(Shader::InstancedStatics, "InstancedStatics", "", ShaderType::PixelAndVertex);
-		Load(Shader::InstancedSprites, "InstancedSprites", "", ShaderType::PixelAndVertex);
-
-		Load(Shader::GBuffer, "GBuffer", "", ShaderType::Pixel);
-		Load(Shader::GBufferRooms, "GBuffer", "Rooms", ShaderType::Vertex);
-		Load(Shader::GBufferRoomsAnimated, "GBuffer", "Rooms", ShaderType::Vertex, roomDefinesAnimated);
-		Load(Shader::GBufferItems, "GBuffer", "Items", ShaderType::Vertex);
-		Load(Shader::GBufferStatics, "GBuffer", "Statics", ShaderType::Vertex);
-		Load(Shader::GBufferInstancedStatics, "GBuffer", "InstancedStatics", ShaderType::Vertex);
-
-		Load(Shader::RoomAmbient, "RoomAmbient", "", ShaderType::PixelAndVertex);
-		Load(Shader::RoomAmbientSky, "RoomAmbient", "Sky", ShaderType::Vertex);
-		Load(Shader::Fxaa, "FXAA", "", ShaderType::Pixel);
-		Load(Shader::Ssao, "SSAO", "", ShaderType::Pixel);
-		Load(Shader::SsaoBlur, "SSAO", "Blur", ShaderType::Pixel);
-
-		D3D_SHADER_MACRO transparentDefines[] = { "TRANSPARENT", "", nullptr, nullptr };
-		Load(Shader::RoomsTransparent, "Rooms", "", ShaderType::Pixel, transparentDefines);
-
-		// Post-process shaders.
 		Load(Shader::PostProcess, "PostProcess", "", ShaderType::PixelAndVertex);
 
 		Load(Shader::PostProcessMonochrome, "PostProcess", "Monochrome", ShaderType::Pixel);
@@ -87,7 +40,12 @@ namespace TEN::Renderer::Utils
 		Load(Shader::PostProcessFinalPass, "PostProcess", "FinalPass", ShaderType::Pixel);
 		Load(Shader::PostProcessLensFlare, "PostProcess", "LensFlare", ShaderType::Pixel);
 
-		// SMAA shaders.
+		Load(Shader::Ssao, "SSAO", "", ShaderType::Pixel);
+		Load(Shader::SsaoBlur, "SSAO", "Blur", ShaderType::Pixel);
+	}
+
+	void ShaderManager::LoadAAShaders(int width, int height, bool recompile)
+	{
 		auto string = std::stringstream{};
 		auto defines = std::vector<D3D10_SHADER_MACRO>{};
 
@@ -99,7 +57,7 @@ namespace TEN::Renderer::Utils
 
 		if (g_Configuration.AntialiasingMode == AntialiasingMode::Medium)
 		{
-			defines.push_back({ "SMAA_PRESET_HIGH", nullptr });
+			defines.push_back({ "SMAA_PRESET_MEDIUM", nullptr });
 		}
 		else
 		{
@@ -115,12 +73,67 @@ namespace TEN::Renderer::Utils
 		auto null = D3D10_SHADER_MACRO{ nullptr, nullptr };
 		defines.push_back(null);
 
-		Load(Shader::SmaaEdgeDetection, "SMAA", "EdgeDetection", ShaderType::Vertex, defines.data());
-		Load(Shader::SmaaLumaEdgeDetection, "SMAA", "LumaEdgeDetection", ShaderType::Pixel, defines.data());
-		Load(Shader::SmaaColorEdgeDetection, "SMAA", "ColorEdgeDetection", ShaderType::Pixel, defines.data());
-		Load(Shader::SmaaDepthEdgeDetection, "SMAA", "DepthEdgeDetection", ShaderType::Pixel, defines.data());
-		Load(Shader::SmaaBlendingWeightCalculation, "SMAA", "BlendingWeightCalculation", ShaderType::PixelAndVertex, defines.data());
-		Load(Shader::SmaaNeighborhoodBlending, "SMAA", "NeighborhoodBlending", ShaderType::PixelAndVertex, defines.data());
+		Load(Shader::SmaaEdgeDetection, "SMAA", "EdgeDetection", ShaderType::Vertex, defines.data(), recompile);
+		Load(Shader::SmaaLumaEdgeDetection, "SMAA", "LumaEdgeDetection", ShaderType::Pixel, defines.data(), recompile);
+		Load(Shader::SmaaColorEdgeDetection, "SMAA", "ColorEdgeDetection", ShaderType::Pixel, defines.data(), recompile);
+		Load(Shader::SmaaDepthEdgeDetection, "SMAA", "DepthEdgeDetection", ShaderType::Pixel, defines.data(), recompile);
+		Load(Shader::SmaaBlendingWeightCalculation, "SMAA", "BlendingWeightCalculation", ShaderType::PixelAndVertex, defines.data(), recompile);
+		Load(Shader::SmaaNeighborhoodBlending, "SMAA", "NeighborhoodBlending", ShaderType::PixelAndVertex, defines.data(), recompile);
+
+		Load(Shader::Fxaa, "FXAA", "", ShaderType::Pixel);
+	}
+
+	void ShaderManager::LoadCommonShaders()
+	{
+		D3D_SHADER_MACRO roomAnimated[] = { "ANIMATED", "", nullptr, nullptr };
+		D3D_SHADER_MACRO roomTransparent[] = { "TRANSPARENT", "", nullptr, nullptr };
+		D3D_SHADER_MACRO shadowMap[] = { "SHADOW_MAP", "", nullptr, nullptr };
+
+		Load(Shader::Rooms, "Rooms", "", ShaderType::PixelAndVertex);
+		Load(Shader::RoomsAnimated, "Rooms", "", ShaderType::Vertex, roomAnimated);
+		Load(Shader::RoomsTransparent, "Rooms", "", ShaderType::Pixel, roomTransparent);
+
+		Load(Shader::RoomAmbient, "RoomAmbient", "", ShaderType::PixelAndVertex);
+		Load(Shader::RoomAmbientSky, "RoomAmbient", "Sky", ShaderType::Vertex);
+
+		Load(Shader::Items, "Items", "", ShaderType::PixelAndVertex);
+		Load(Shader::Statics, "Statics", "", ShaderType::PixelAndVertex);
+		Load(Shader::Sky, "Sky", "", ShaderType::PixelAndVertex);
+		Load(Shader::Sprites, "Sprites", "", ShaderType::PixelAndVertex);
+		Load(Shader::Solid, "Solid", "", ShaderType::PixelAndVertex);
+		Load(Shader::Inventory, "Inventory", "", ShaderType::PixelAndVertex);
+		Load(Shader::FullScreenQuad, "FullScreenQuad", "", ShaderType::PixelAndVertex);
+		Load(Shader::ShadowMap, "ShadowMap", "", ShaderType::PixelAndVertex, shadowMap);
+
+		Load(Shader::Hud, "HUD", "", ShaderType::Vertex);
+		Load(Shader::HudColor, "HUD", "ColoredHUD", ShaderType::Pixel);
+		Load(Shader::HudDTexture, "HUD", "TexturedHUD", ShaderType::Pixel);
+		Load(Shader::HudBarColor, "HUD", "TexturedHUDBar", ShaderType::Pixel);
+
+		Load(Shader::InstancedStatics, "InstancedStatics", "", ShaderType::PixelAndVertex);
+		Load(Shader::InstancedSprites, "InstancedSprites", "", ShaderType::PixelAndVertex);
+
+		Load(Shader::GBuffer, "GBuffer", "", ShaderType::Pixel);
+		Load(Shader::GBufferRooms, "GBuffer", "Rooms", ShaderType::Vertex);
+		Load(Shader::GBufferRoomsAnimated, "GBuffer", "Rooms", ShaderType::Vertex, roomAnimated);
+		Load(Shader::GBufferItems, "GBuffer", "Items", ShaderType::Vertex);
+		Load(Shader::GBufferStatics, "GBuffer", "Statics", ShaderType::Vertex);
+		Load(Shader::GBufferInstancedStatics, "GBuffer", "InstancedStatics", ShaderType::Vertex);
+	}
+
+	void ShaderManager::LoadShaders(int width, int height, bool recompileAAShaders)
+	{
+		TENLog("Loading shaders...", LogLevel::Info);
+
+		// Unbind any currently bound shader.
+		Bind(Shader::None, true);
+
+		// Reset compile counter.
+		_compileCounter = 0;
+
+		LoadCommonShaders();
+		LoadPostprocessShaders();
+		LoadAAShaders(width, height, recompileAAShaders);
 	}
 
 	void ShaderManager::Bind(Shader shader, bool forceNull)
@@ -137,7 +150,7 @@ namespace TEN::Renderer::Utils
 			_context->CSSetShader(shaderObj.Compute.Shader.Get(), nullptr, 0);
 	}
 
-	RendererShader ShaderManager::LoadOrCompile(const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines)
+	RendererShader ShaderManager::LoadOrCompile(const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines, bool forceRecompile)
 	{
 		auto rendererShader = RendererShader{};
 
@@ -150,7 +163,7 @@ namespace TEN::Renderer::Utils
 		std::filesystem::create_directories(compiledShaderPath);
 
 		// Helper function to load or compile a shader.
-		auto loadOrCompileShader = [this, type, defines, shaderPath, compiledShaderPath]
+		auto loadOrCompileShader = [this, type, defines, forceRecompile, shaderPath, compiledShaderPath]
 			(const std::wstring& baseFileName, const std::string& shaderType, const std::string& functionName, const char* model, ComPtr<ID3D10Blob>& bytecode)
 		{
 			// Construct full paths using GetAssetPath.
@@ -171,34 +184,32 @@ namespace TEN::Renderer::Utils
 			}
 
 			// Check modification dates of source and compiled files.
-			bool shouldRecompile = true;
-			if (std::filesystem::exists(csoFileName))
+			if (!forceRecompile && std::filesystem::exists(csoFileName))
 			{
 				auto csoTime = std::filesystem::last_write_time(csoFileName);
 				auto srcTime = std::filesystem::last_write_time(srcFileNameWithExtension);
-				shouldRecompile = (srcTime > csoTime); // Set to recompile if source is newer.
-			}
 
-			// Load compiled shader if it exists and is up-to-date.
-			if (!shouldRecompile)
-			{
-				auto csoFile = std::ifstream(csoFileName, std::ios::binary);
-
-				if (csoFile.is_open())
+				// Load compiled shader if it exists and is up-to-date.
+				if (srcTime < csoTime)
 				{
-					// Load compiled shader.
-					csoFile.seekg(0, std::ios::end);
-					auto fileSize = csoFile.tellg();
-					csoFile.seekg(0, std::ios::beg);
+					auto csoFile = std::ifstream(csoFileName, std::ios::binary);
 
-					auto buffer = std::vector<char>(fileSize);
-					csoFile.read(buffer.data(), fileSize);
-					csoFile.close();
+					if (csoFile.is_open())
+					{
+						// Load compiled shader.
+						csoFile.seekg(0, std::ios::end);
+						auto fileSize = csoFile.tellg();
+						csoFile.seekg(0, std::ios::beg);
 
-					D3DCreateBlob(fileSize, &bytecode);
-					memcpy(bytecode->GetBufferPointer(), buffer.data(), fileSize);
+						auto buffer = std::vector<char>(fileSize);
+						csoFile.read(buffer.data(), fileSize);
+						csoFile.close();
 
-					return;
+						D3DCreateBlob(fileSize, &bytecode);
+						memcpy(bytecode->GetBufferPointer(), buffer.data(), fileSize);
+
+						return;
+					}
 				}
 			}
 
@@ -275,10 +286,10 @@ namespace TEN::Renderer::Utils
 		return rendererShader;
 	}
 
-	void ShaderManager::Load(Shader shader, const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines)
+	void ShaderManager::Load(Shader shader, const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines, bool forceRecompile)
 	{
 		Destroy(shader);
-		_shaders[(int)shader] = LoadOrCompile(fileName, funcName, type, defines);
+		_shaders[(int)shader] = LoadOrCompile(fileName, funcName, type, defines, forceRecompile);
 	}
 
 	void ShaderManager::Destroy(Shader shader)

@@ -31,7 +31,7 @@ namespace TEN::Renderer
 		InitializeCommonTextures();
 
 		// Load shaders.
-		_shaders.LoadAllShaders(w, h);
+		_shaders.LoadShaders(w, h);
 
 		// Initialize render states.
 		_renderStates = std::make_unique<CommonStates>(_device.Get());
