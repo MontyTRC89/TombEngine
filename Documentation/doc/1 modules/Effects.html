@@ -140,7 +140,7 @@
 	<td class="summary">Emit blood.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#EmitBlood">EmitBlood(pos, count)</a></td>
+	<td class="name" ><a href="#EmitAirBubble">EmitAirBubble(position, roomNumber, size, amplitude)</a></td>
 	<td class="summary">Emit Air bubble.</td>
 	</tr>
 	<tr>
@@ -501,8 +501,8 @@
 
 </dd>
     <dt>
-    <a name = "EmitBlood"></a>
-    <strong>EmitBlood(pos, count)</strong>
+    <a name = "EmitAirBubble"></a>
+    <strong>EmitAirBubble(position, roomNumber, size, amplitude)</strong>
     </dt>
     <dd>
     Emit Air bubble.
@@ -511,15 +511,21 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">pos</span>
+        <li><span class="parameter">position</span>
             <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-
-
-
+         The position where the air bubble will be spawned.
         </li>
-        <li><span class="parameter">count</span>
+        <li><span class="parameter">roomNumber</span>
             <span class="types"><span class="type">int</span></span>
-         (default 1) "amount" of blood. Higher numbers won't add more blood but will make it more "flickery", with higher numbers turning it into a kind of red orb.
+         The room number where the air bubble will be generated.
+        </li>
+        <li><span class="parameter">size</span>
+            <span class="types"><span class="type">float</span></span>
+         The size of the air bubble.
+        </li>
+        <li><span class="parameter">amplitude</span>
+            <span class="types"><span class="type">float</span></span>
+         The oscillation amplitude of the air bubble.
         </li>
     </ul>
 

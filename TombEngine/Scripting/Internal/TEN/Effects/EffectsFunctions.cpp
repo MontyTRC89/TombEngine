@@ -306,9 +306,11 @@ namespace TEN::Scripting::Effects
 	}
 
 /***Emit Air bubble.
-@function EmitBlood
-@tparam Vec3 pos
-@tparam int count (default 1) "amount" of blood. Higher numbers won't add more blood but will make it more "flickery", with higher numbers turning it into a kind of red orb.
+@function EmitAirBubble
+@tparam Vec3 position The position where the air bubble will be spawned.
+@tparam int roomNumber The room number where the air bubble will be generated.
+@tparam float size The size of the air bubble.
+@tparam float amplitude The oscillation amplitude of the air bubble.
 */
 	static void EmitAirBubble(Vec3 pos, int roomNumber, float size, float amplitude)
 	{
