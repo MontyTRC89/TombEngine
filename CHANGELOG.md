@@ -14,6 +14,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added realtime shader reloading in debug mode by pressing F9 key.
 
 ### Lua API changes
+* Fixed Flow.FreezeMode.FULL drawing incorrect background.
 * Fixed DisplayString scale argument not being optional, as stated in documentation.
 
 ## [Version 1.7](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.3) - 2024-12-25
