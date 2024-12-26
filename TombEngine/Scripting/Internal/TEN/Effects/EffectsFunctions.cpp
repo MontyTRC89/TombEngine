@@ -11,6 +11,7 @@
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
+#include "Game/effects/Bubble.h"
 #include "Game/Setup.h"
 #include "Objects/Utils/object_helper.h"
 #include "Scripting/Internal/LuaHandler.h"
@@ -36,6 +37,7 @@ using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
+using namespace TEN::Effects::Bubble;
 
 namespace TEN::Scripting::Effects
 {
@@ -364,6 +366,7 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_EmitLight, &EmitLight);
 		tableEffects.set_function(ScriptReserved_EmitSpotLight, &EmitSpotLight);
 		tableEffects.set_function(ScriptReserved_EmitBlood, &EmitBlood);
+		tableEffects.set_function(ScriptReserved_EmitAirBubble, &EmitAirBubble);
 		tableEffects.set_function(ScriptReserved_MakeExplosion, &MakeExplosion);
 		tableEffects.set_function(ScriptReserved_EmitFire, &EmitFire);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
