@@ -8,7 +8,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### Bug fixes
 
 ### New Features
-
+* Added ability to use keys and puzzle items underwater.
+* 
 ### Lua API changes
 
 ## [Version 1.7](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.3) - 2024-12-25
