@@ -138,7 +138,15 @@ namespace TEN::Renderer::Utils
 
 	void ShaderManager::Bind(Shader shader, bool forceNull)
 	{
-		const auto& shaderObj = _shaders[(int)shader];
+		int shaderIndex = (int)shader;
+
+		if (shaderIndex >= _shaders.size())
+		{
+			TENLog("Attempt to access nonexistent shader with index " + std::to_string(shaderIndex), LogLevel::Error);
+			return;
+		}
+
+		const auto& shaderObj = _shaders[shaderIndex];
 
 		if (shaderObj.Vertex.Shader != nullptr || forceNull)
 			_context->VSSetShader(shaderObj.Vertex.Shader.Get(), nullptr, 0);
