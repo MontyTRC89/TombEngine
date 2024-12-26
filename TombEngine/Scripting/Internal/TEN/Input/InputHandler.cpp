@@ -6,7 +6,7 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Input/ActionIDs.h"
-#include "Scripting/Internal/TEN/Vec2/Vec2.h"
+#include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 #include "Specific/Input/Input.h"
 
 using namespace TEN::Input;

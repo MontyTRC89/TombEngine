@@ -494,6 +494,7 @@ void CalculateSpotCameras()
 			Camera.target.x = ctx;
 			Camera.target.y = cty;
 			Camera.target.z = ctz;
+			CalculateBounce(false);
 		}
 
 		int outsideRoom = IsRoomOutside(cpx, cpy, cpz);
@@ -659,10 +660,7 @@ void CalculateSpotCameras()
 				SpotcamPaused = 0;
 
 				if (LastCamera >= CurrentSplineCamera)
-				{
-					Camera.DisableInterpolation = true;
 					return;
-				}
 
 				if (s->flags & SCF_LOOP_SEQUENCE)
 				{
@@ -693,13 +691,14 @@ void CalculateSpotCameras()
 
 					SetCinematicBars(0.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 
-					Camera.DisableInterpolation = true;
 					UseSpotCam = false;
-					Lara.Control.IsLocked = false;
 					CheckTrigger = false;
+					Lara.Control.IsLocked = false;
+					Lara.Control.Look.IsUsingBinoculars = false;
 					Camera.oldType = CameraType::Fixed;
 					Camera.type = CameraType::Chase;
 					Camera.speed = 1;
+					Camera.DisableInterpolation = true;
 
 					if (s->flags & SCF_CUT_TO_LARA_CAM)
 					{

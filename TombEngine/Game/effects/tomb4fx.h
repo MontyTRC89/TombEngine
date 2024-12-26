@@ -51,7 +51,6 @@ struct SMOKE_SPARKS
 	BlendMode blendMode;
 	byte fxObj;
 	byte nodeNumber;
-	byte mirror;
 
 	Vector3i oldPosition;
 	byte oldShade;
@@ -280,12 +279,6 @@ enum class ShockwaveStyle
 #define ENERGY_ARC_STRAIGHT_LINE	0
 #define ENERGY_ARC_CIRCLE			1
 #define ENERGY_ARC_NO_RANDOMIZE		1
-
-extern int LaserSightX;
-extern int LaserSightY;
-extern int LaserSightZ;
-extern char LaserSightActive;
-extern char LaserSightCol;
 
 extern int NextFireSpark;
 extern int NextSmokeSpark;

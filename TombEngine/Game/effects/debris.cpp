@@ -5,8 +5,9 @@
 #include "Game/collision/Sphere.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Setup.h"
-#include "Specific/level.h"
 #include "Math/Math.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Specific/level.h"
 
 using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
@@ -70,7 +71,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 			return;
 
 		isStatic = true;
-		meshIndex = StaticObjects[mesh->staticNumber].meshNumber;
+		meshIndex = Statics[mesh->staticNumber].meshNumber;
 		yRot = mesh->pos.Orientation.y;
 		pos = Vector3(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z);
 		scale = mesh->scale;
@@ -172,7 +173,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 				fragment->isStatic = isStatic;
 				fragment->active = true;
 				fragment->terminalVelocity = 1024;
-				fragment->gravity = Vector3(0, 7, 0);
+				fragment->gravity = Vector3(0, g_GameFlow->GetSettings()->Physics.Gravity, 0);
 				fragment->restitution = 0.6f;
 				fragment->friction = 0.6f;
 				fragment->linearDrag = .99f;
@@ -183,6 +184,9 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 				fragment->numBounces = 0;
 				fragment->color = isStatic ? mesh->color : item->color;
 				fragment->lightMode = fragmentsMesh->lightMode;
+
+				fragment->UpdateTransform();
+				fragment->StoreInterpolationData();
 			}
 		}
 	}
@@ -259,9 +263,7 @@ void UpdateDebris()
 				deb.numBounces++;
 			}
 
-			auto translation = Matrix::CreateTranslation(deb.worldPosition.x, deb.worldPosition.y, deb.worldPosition.z);
-			auto rotation = Matrix::CreateFromQuaternion(deb.rotation);
-			deb.Transform = rotation * translation;
+			deb.UpdateTransform();
 		}
 	}
 }
