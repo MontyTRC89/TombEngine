@@ -656,6 +656,7 @@ namespace TEN::Input
 		static bool dbReloadShaders = true;
 		if (KeyMap[KC_F9] && dbReloadShaders)
 			g_Renderer.ReloadShaders();
+		dbReloadShaders = !KeyMap[KC_F9];
 	}
 
 	static void UpdateRumble()

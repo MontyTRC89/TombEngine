@@ -1,16 +1,35 @@
 #include "framework.h"
 #include "Renderer/ShaderManager/ShaderManager.h"
 
-#include <d3dcompiler.h>
-#include <filesystem>
-#include <fstream>
-
 #include "Renderer/RendererUtils.h"
+#include "Renderer/Structures/RendererShader.h"
 #include "Specific/configuration.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Renderer::Structures;
+
 namespace TEN::Renderer::Utils
 {
+	ShaderManager::~ShaderManager()
+	{
+		_device = nullptr;
+		_context = nullptr;
+
+		for (int i = 0; i < (int)Shader::Count; i++)
+			Destroy((Shader)i);
+	}
+
+	const RendererShader& ShaderManager::Get(Shader shader)
+	{
+		return _shaders[(int)shader];
+	}
+
+	void ShaderManager::Initialize(ComPtr<ID3D11Device>& device, ComPtr<ID3D11DeviceContext>& context)
+	{
+		_device = device;
+		_context = context;
+	}
+
 	void ShaderManager::LoadAllShaders(int width, int height)
 	{
 		TENLog("Loading shaders...", LogLevel::Info);
@@ -22,9 +41,8 @@ namespace TEN::Renderer::Utils
 		_compileCounter = 0;
 
 		// Generic shaders.
-
-		const D3D_SHADER_MACRO roomDefinesAnimated[] = { "ANIMATED", "", nullptr, nullptr };
-		const D3D_SHADER_MACRO roomDefinesShadowMap[] = { "SHADOW_MAP", "", nullptr, nullptr };
+		D3D_SHADER_MACRO roomDefinesAnimated[] = { "ANIMATED", "", nullptr, nullptr };
+		D3D_SHADER_MACRO roomDefinesShadowMap[] = { "SHADOW_MAP", "", nullptr, nullptr };
 
 		Load(Shader::Rooms, "Rooms", "", ShaderType::PixelAndVertex);
 		Load(Shader::RoomsAnimated, "Rooms", "", ShaderType::Vertex, roomDefinesAnimated);
@@ -37,10 +55,10 @@ namespace TEN::Renderer::Utils
 		Load(Shader::FullScreenQuad, "FullScreenQuad", "", ShaderType::PixelAndVertex);
 		Load(Shader::ShadowMap, "ShadowMap", "", ShaderType::PixelAndVertex, roomDefinesShadowMap);
 
-		Load(Shader::HUD, "HUD", "", ShaderType::Vertex);
-		Load(Shader::HUDColor, "HUD", "ColoredHUD", ShaderType::Pixel);
-		Load(Shader::HUDTexture, "HUD", "TexturedHUD", ShaderType::Pixel);
-		Load(Shader::HUDBarColor, "HUD", "TexturedHUDBar", ShaderType::Pixel);
+		Load(Shader::Hud, "HUD", "", ShaderType::Vertex);
+		Load(Shader::HudColor, "HUD", "ColoredHUD", ShaderType::Pixel);
+		Load(Shader::HudDTexture, "HUD", "TexturedHUD", ShaderType::Pixel);
+		Load(Shader::HudBarColor, "HUD", "TexturedHUDBar", ShaderType::Pixel);
 		Load(Shader::InstancedStatics, "InstancedStatics", "", ShaderType::PixelAndVertex);
 		Load(Shader::InstancedSprites, "InstancedSprites", "", ShaderType::PixelAndVertex);
 
@@ -53,15 +71,14 @@ namespace TEN::Renderer::Utils
 
 		Load(Shader::RoomAmbient, "RoomAmbient", "", ShaderType::PixelAndVertex);
 		Load(Shader::RoomAmbientSky, "RoomAmbient", "Sky", ShaderType::Vertex);
-		Load(Shader::FXAA, "FXAA", "", ShaderType::Pixel);
-		Load(Shader::SSAO, "SSAO", "", ShaderType::Pixel);
-		Load(Shader::SSAOBlur, "SSAO", "Blur", ShaderType::Pixel);
+		Load(Shader::Fxaa, "FXAA", "", ShaderType::Pixel);
+		Load(Shader::Ssao, "SSAO", "", ShaderType::Pixel);
+		Load(Shader::SsaoBlur, "SSAO", "Blur", ShaderType::Pixel);
 
-		const D3D_SHADER_MACRO transparentDefines[] = { "TRANSPARENT", "", nullptr, nullptr };
+		D3D_SHADER_MACRO transparentDefines[] = { "TRANSPARENT", "", nullptr, nullptr };
 		Load(Shader::RoomsTransparent, "Rooms", "", ShaderType::Pixel, transparentDefines);
 
 		// Post-process shaders.
-
 		Load(Shader::PostProcess, "PostProcess", "", ShaderType::PixelAndVertex);
 
 		Load(Shader::PostProcessMonochrome, "PostProcess", "Monochrome", ShaderType::Pixel);
@@ -71,12 +88,10 @@ namespace TEN::Renderer::Utils
 		Load(Shader::PostProcessLensFlare, "PostProcess", "LensFlare", ShaderType::Pixel);
 
 		// SMAA shaders.
-
 		auto string = std::stringstream{};
 		auto defines = std::vector<D3D10_SHADER_MACRO>{};
 
 		// Set up pixel size macro.
-
 		string << "float4(1.0 / " << width << ", 1.0 / " << height << ", " << width << ", " << height << ")";
 		auto pixelSizeText = string.str();
 		auto renderTargetMetricsMacro = D3D10_SHADER_MACRO{ "SMAA_RT_METRICS", pixelSizeText.c_str() };
@@ -100,27 +115,170 @@ namespace TEN::Renderer::Utils
 		auto null = D3D10_SHADER_MACRO{ nullptr, nullptr };
 		defines.push_back(null);
 
-		Load(Shader::SMAAEdgeDetection, "SMAA", "EdgeDetection", ShaderType::Vertex, defines.data());
-		Load(Shader::SMAALumaEdgeDetection, "SMAA", "LumaEdgeDetection", ShaderType::Pixel, defines.data());
-		Load(Shader::SMAAColorEdgeDetection, "SMAA", "ColorEdgeDetection", ShaderType::Pixel, defines.data());
-		Load(Shader::SMAADepthEdgeDetection, "SMAA", "DepthEdgeDetection", ShaderType::Pixel, defines.data());
-		Load(Shader::SMAABlendingWeightCalculation, "SMAA", "BlendingWeightCalculation", ShaderType::PixelAndVertex, defines.data());
-		Load(Shader::SMAANeighborhoodBlending, "SMAA", "NeighborhoodBlending", ShaderType::PixelAndVertex, defines.data());
+		Load(Shader::SmaaEdgeDetection, "SMAA", "EdgeDetection", ShaderType::Vertex, defines.data());
+		Load(Shader::SmaaLumaEdgeDetection, "SMAA", "LumaEdgeDetection", ShaderType::Pixel, defines.data());
+		Load(Shader::SmaaColorEdgeDetection, "SMAA", "ColorEdgeDetection", ShaderType::Pixel, defines.data());
+		Load(Shader::SmaaDepthEdgeDetection, "SMAA", "DepthEdgeDetection", ShaderType::Pixel, defines.data());
+		Load(Shader::SmaaBlendingWeightCalculation, "SMAA", "BlendingWeightCalculation", ShaderType::PixelAndVertex, defines.data());
+		Load(Shader::SmaaNeighborhoodBlending, "SMAA", "NeighborhoodBlending", ShaderType::PixelAndVertex, defines.data());
 	}
 
-	void ShaderManager::Initialize(ComPtr<ID3D11Device>& device, ComPtr<ID3D11DeviceContext>& context)
+	void ShaderManager::Bind(Shader shader, bool forceNull)
 	{
-		_device = device;
-		_context = context;
+		const auto& shaderObj = _shaders[(int)shader];
+
+		if (shaderObj.Vertex.Shader != nullptr || forceNull)
+			_context->VSSetShader(shaderObj.Vertex.Shader.Get(), nullptr, 0);
+
+		if (shaderObj.Pixel.Shader != nullptr || forceNull)
+			_context->PSSetShader(shaderObj.Pixel.Shader.Get(), nullptr, 0);
+
+		if (shaderObj.Compute.Shader != nullptr || forceNull)
+			_context->CSSetShader(shaderObj.Compute.Shader.Get(), nullptr, 0);
 	}
 
-	ShaderManager::~ShaderManager()
+	RendererShader ShaderManager::LoadOrCompile(const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines)
 	{
-		_device = nullptr;
-		_context = nullptr;	
+		auto rendererShader = RendererShader{};
 
-		for (int i = 0; i < (int)Shader::Count; i++)
-			Destroy((Shader)i);
+		// Define paths for native (uncompiled) shaders and compiled shaders.
+		auto shaderPath = GetAssetPath(L"Shaders\\");
+		auto compiledShaderPath = shaderPath + L"Bin\\";
+		auto wideFileName = TEN::Utils::ToWString(fileName);
+
+		// Ensure the /Bin subdirectory exists.
+		std::filesystem::create_directories(compiledShaderPath);
+
+		// Helper function to load or compile a shader.
+		auto loadOrCompileShader = [this, type, defines, shaderPath, compiledShaderPath]
+			(const std::wstring& baseFileName, const std::string& shaderType, const std::string& functionName, const char* model, ComPtr<ID3D10Blob>& bytecode)
+		{
+			// Construct full paths using GetAssetPath.
+			auto prefix = ((_compileCounter < 10) ? L"0" : L"") + std::to_wstring(_compileCounter) + L"_";
+			auto csoFileName = compiledShaderPath + prefix + baseFileName + L"." + std::wstring(shaderType.begin(), shaderType.end()) + L".cso";
+			auto srcFileName = shaderPath + baseFileName;
+
+			// Try both .hlsl and .fx extensions for source shader.
+			auto srcFileNameWithExtension = srcFileName + L".hlsl";
+			if (!std::filesystem::exists(srcFileNameWithExtension))
+			{
+				srcFileNameWithExtension = srcFileName + L".fx";
+				if (!std::filesystem::exists(srcFileNameWithExtension))
+				{
+					TENLog("Shader source file not found: " + TEN::Utils::ToString(srcFileNameWithExtension), LogLevel::Error);
+					throw std::runtime_error("Shader source file not found.");
+				}
+			}
+
+			// Check modification dates of source and compiled files.
+			bool shouldRecompile = true;
+			if (std::filesystem::exists(csoFileName))
+			{
+				auto csoTime = std::filesystem::last_write_time(csoFileName);
+				auto srcTime = std::filesystem::last_write_time(srcFileNameWithExtension);
+				shouldRecompile = (srcTime > csoTime); // Set to recompile if source is newer.
+			}
+
+			// Load compiled shader if it exists and is up-to-date.
+			if (!shouldRecompile)
+			{
+				auto csoFile = std::ifstream(csoFileName, std::ios::binary);
+
+				if (csoFile.is_open())
+				{
+					// Load compiled shader.
+					csoFile.seekg(0, std::ios::end);
+					auto fileSize = csoFile.tellg();
+					csoFile.seekg(0, std::ios::beg);
+
+					auto buffer = std::vector<char>(fileSize);
+					csoFile.read(buffer.data(), fileSize);
+					csoFile.close();
+
+					D3DCreateBlob(fileSize, &bytecode);
+					memcpy(bytecode->GetBufferPointer(), buffer.data(), fileSize);
+
+					return;
+				}
+			}
+
+			// Set up compilation flags according to build configuration.
+			unsigned int flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
+			if constexpr (DebugBuild)
+			{
+				flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+			}
+			else
+			{
+				flags |= D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_IEEE_STRICTNESS;
+			}
+
+			auto trimmedFileName = std::filesystem::path(srcFileNameWithExtension).filename().string();
+			TENLog("Compiling shader: " + trimmedFileName, LogLevel::Info);
+
+			// Compile shader.
+			auto errors = ComPtr<ID3D10Blob>{};
+			HRESULT res = D3DCompileFromFile(srcFileNameWithExtension.c_str(), defines, D3D_COMPILE_STANDARD_FILE_INCLUDE,
+											 (shaderType + functionName).c_str(), model, flags, 0, bytecode.GetAddressOf(), errors.GetAddressOf());
+
+			if (FAILED(res))
+			{
+				if (errors)
+				{
+					auto error = std::string((const char*)(errors->GetBufferPointer()));
+					TENLog(error, LogLevel::Error);
+					throw std::runtime_error(error);
+				}
+				else
+				{
+					TENLog("Error while compiling shader: " + trimmedFileName, LogLevel::Error);
+					throwIfFailed(res);
+				}
+			}
+
+			// Save compiled shader to .cso file.
+			auto outCsoFile = std::ofstream(csoFileName, std::ios::binary);
+			if (outCsoFile.is_open())
+			{
+				outCsoFile.write((const char*)(bytecode->GetBufferPointer()), bytecode->GetBufferSize());
+				outCsoFile.close();
+			}
+		};
+
+		// Load or compile and create pixel shader.
+		if (type == ShaderType::Pixel || type == ShaderType::PixelAndVertex)
+		{
+			loadOrCompileShader(wideFileName, "PS", funcName, "ps_5_0", rendererShader.Pixel.Blob);
+			throwIfFailed(_device->CreatePixelShader(rendererShader.Pixel.Blob->GetBufferPointer(), rendererShader.Pixel.Blob->GetBufferSize(),
+													 nullptr, rendererShader.Pixel.Shader.GetAddressOf()));
+		}
+
+		// Load or compile and create vertex shader.
+		if (type == ShaderType::Vertex || type == ShaderType::PixelAndVertex)
+		{
+			loadOrCompileShader(wideFileName, "VS", funcName, "vs_5_0", rendererShader.Vertex.Blob);
+			throwIfFailed(_device->CreateVertexShader(rendererShader.Vertex.Blob->GetBufferPointer(), rendererShader.Vertex.Blob->GetBufferSize(),
+													  nullptr, rendererShader.Vertex.Shader.GetAddressOf()));
+		}
+
+		// Load or compile and create compute shader.
+		if (type == ShaderType::Compute)
+		{
+			loadOrCompileShader(wideFileName, "CS", funcName, "cs_5_0", rendererShader.Compute.Blob);
+			throwIfFailed(_device->CreateComputeShader(rendererShader.Compute.Blob->GetBufferPointer(), rendererShader.Compute.Blob->GetBufferSize(),
+													   nullptr, rendererShader.Compute.Shader.GetAddressOf()));
+		}
+
+		// Increment compile counter.
+		_compileCounter++;
+
+		return rendererShader;
+	}
+
+	void ShaderManager::Load(Shader shader, const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines)
+	{
+		Destroy(shader);
+		_shaders[(int)shader] = LoadOrCompile(fileName, funcName, type, defines);
 	}
 
 	void ShaderManager::Destroy(Shader shader)
@@ -144,163 +302,5 @@ namespace TEN::Renderer::Utils
 			shaderData.Compute.Shader.Reset();
 			shaderData.Compute.Blob.Reset();
 		}
-	}
-
-	RendererShader ShaderManager::LoadOrCompile(const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines)
-	{
-		RendererShader result = {};
-
-		// Define paths for native (uncompiled) shaders and compiled shaders.
-		std::wstring shaderPath = GetAssetPath(L"Shaders\\");
-		std::wstring compiledShaderPath = shaderPath + L"Bin\\";
-		std::wstring wideFileName = TEN::Utils::ToWString(fileName);
-
-		// Ensure the /Bin subdirectory exists.
-		std::filesystem::create_directories(compiledShaderPath);
-
-		// Helper function to load or compile a shader.
-		auto loadOrCompileShader = [this, type, defines, shaderPath, compiledShaderPath]
-		(const std::wstring& baseFileName, const std::string& shaderType, const std::string& functionName, const char* model, ComPtr<ID3D10Blob>& bytecode)
-		{
-			// Construct the full paths using GetAssetPath.
-			auto prefix = ((_compileCounter < 10) ? L"0" : L"") + std::to_wstring(_compileCounter) + L"_";
-			auto csoFileName = compiledShaderPath + prefix + baseFileName + L"." + std::wstring(shaderType.begin(), shaderType.end()) + L".cso";
-			auto srcFileName = shaderPath + baseFileName;
-
-			// Try both .hlsl and .fx extensions for the source shader.
-			auto srcFileNameWithExtension = srcFileName + L".hlsl";
-			if (!std::filesystem::exists(srcFileNameWithExtension))
-			{
-				srcFileNameWithExtension = srcFileName + L".fx";
-				if (!std::filesystem::exists(srcFileNameWithExtension))
-				{
-					TENLog("Shader source file not found: " + TEN::Utils::ToString(srcFileNameWithExtension), LogLevel::Error);
-					throw std::runtime_error("Shader source file not found");
-				}
-			}
-
-			// Check modification dates of the source and compiled files.
-			bool shouldRecompile = true;
-			if (std::filesystem::exists(csoFileName))
-			{
-				auto csoTime = std::filesystem::last_write_time(csoFileName);
-				auto srcTime = std::filesystem::last_write_time(srcFileNameWithExtension);
-				shouldRecompile = srcTime > csoTime; // Recompile if the source is newer.
-			}
-
-			// Load compiled shader if it exists and is up to date.
-			if (!shouldRecompile)
-			{
-				std::ifstream csoFile(csoFileName, std::ios::binary);
-
-				if (csoFile.is_open())
-				{
-					// Load compiled shader.
-					csoFile.seekg(0, std::ios::end);
-					size_t fileSize = csoFile.tellg();
-					csoFile.seekg(0, std::ios::beg);
-
-					std::vector<char> buffer(fileSize);
-					csoFile.read(buffer.data(), fileSize);
-					csoFile.close();
-
-					D3DCreateBlob(fileSize, &bytecode);
-					memcpy(bytecode->GetBufferPointer(), buffer.data(), fileSize);
-
-					return;
-				}
-			}
-
-			// Set up compilation flags according to the build configuration.
-			unsigned int flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
-
-			if constexpr (DebugBuild)
-				flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
-			else
-				flags |= D3DCOMPILE_OPTIMIZATION_LEVEL3 | D3DCOMPILE_IEEE_STRICTNESS;
-
-			auto trimmedFileName = std::filesystem::path(srcFileNameWithExtension).filename().string();
-			TENLog("Compiling shader: " + trimmedFileName, LogLevel::Info);
-
-			// Compile shader.
-			ComPtr<ID3D10Blob> errors;
-			HRESULT res = D3DCompileFromFile(srcFileNameWithExtension.c_str(), defines, D3D_COMPILE_STANDARD_FILE_INCLUDE,
-				(shaderType + functionName).c_str(), model, flags, 0, bytecode.GetAddressOf(), errors.GetAddressOf());
-
-			if (FAILED(res))
-			{
-				if (errors)
-				{
-					auto error = std::string(static_cast<const char*>(errors->GetBufferPointer()));
-					TENLog(error, LogLevel::Error);
-					throw std::runtime_error(error);
-				}
-				else
-				{
-					TENLog("Error while compiling shader: " + trimmedFileName, LogLevel::Error);
-					throwIfFailed(res);
-				}
-			}
-
-			// Save compiled shader to .cso file.
-			std::ofstream outCsoFile(csoFileName, std::ios::binary);
-			if (outCsoFile.is_open())
-			{
-				outCsoFile.write(reinterpret_cast<const char*>(bytecode->GetBufferPointer()), bytecode->GetBufferSize());
-				outCsoFile.close();
-			}
-		};
-
-		// Load or compile and create pixel shader.
-		if (type == ShaderType::Pixel || type == ShaderType::PixelAndVertex)
-		{
-			loadOrCompileShader(wideFileName, "PS", funcName, "ps_5_0", result.Pixel.Blob);
-			throwIfFailed(_device->CreatePixelShader(result.Pixel.Blob->GetBufferPointer(), result.Pixel.Blob->GetBufferSize(),
-				nullptr, result.Pixel.Shader.GetAddressOf()
-			));
-		}
-
-		// Load or compile and create vertex shader.
-		if (type == ShaderType::Vertex || type == ShaderType::PixelAndVertex)
-		{
-			loadOrCompileShader(wideFileName, "VS", funcName, "vs_5_0", result.Vertex.Blob);
-			throwIfFailed(_device->CreateVertexShader(result.Vertex.Blob->GetBufferPointer(), result.Vertex.Blob->GetBufferSize(),
-				nullptr, result.Vertex.Shader.GetAddressOf()
-			));
-		}
-
-		// Load or compile and create compute shader.
-		if (type == ShaderType::Compute)
-		{
-			loadOrCompileShader(wideFileName, "CS", funcName, "cs_5_0", result.Compute.Blob);
-			throwIfFailed(_device->CreateComputeShader(result.Compute.Blob->GetBufferPointer(), result.Compute.Blob->GetBufferSize(),
-				nullptr, result.Compute.Shader.GetAddressOf()
-			));
-		}
-
-		// Increment the compile counter.
-		_compileCounter++;
-
-		return result;
-	}
-
-	void ShaderManager::Load(Shader shader, const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines)
-	{
-		Destroy(shader);
-		_shaders[(int)shader] = LoadOrCompile(fileName, funcName, type, defines);
-	}
-
-	void ShaderManager::Bind(Shader shader, bool forceNull)
-	{
-		auto& shaderObj = _shaders[(int)shader];
-
-		if (shaderObj.Vertex.Shader  != nullptr || forceNull) _context->VSSetShader(shaderObj.Vertex.Shader.Get(),  nullptr, 0);
-		if (shaderObj.Pixel.Shader   != nullptr || forceNull) _context->PSSetShader(shaderObj.Pixel.Shader.Get(),   nullptr, 0);
-		if (shaderObj.Compute.Shader != nullptr || forceNull) _context->CSSetShader(shaderObj.Compute.Shader.Get(), nullptr, 0);
-	}
-
-	const RendererShader& ShaderManager::Get(Shader shader)
-	{
-		return _shaders[(int)shader];
 	}
 }

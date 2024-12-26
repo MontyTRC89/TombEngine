@@ -14,7 +14,7 @@ namespace TEN::Renderer
 		ResetScissor();
 
 		// Common vertex shader to all fullscreen effects
-		_shaderManager.Bind(Shader::PostProcess);
+		_shaders.Bind(Shader::PostProcess);
 
 		// We draw a fullscreen triangle
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -40,8 +40,8 @@ namespace TEN::Renderer
 		SetCullMode(CullMode::CounterClockwise);
 		_context->OMSetRenderTargets(1, _SMAAEdgesRenderTarget.RenderTargetView.GetAddressOf(), nullptr);
 
-		_shaderManager.Bind(Shader::SMAAEdgeDetection);
-		_shaderManager.Bind(Shader::SMAAColorEdgeDetection);
+		_shaders.Bind(Shader::SmaaEdgeDetection);
+		_shaders.Bind(Shader::SmaaColorEdgeDetection);
 		 
 		_stSMAABuffer.BlendFactor = 1.0f;
 		_cbSMAABuffer.UpdateData(_stSMAABuffer, _context.Get());
@@ -59,7 +59,7 @@ namespace TEN::Renderer
 		// 2) Blend weights calculation.
 		_context->OMSetRenderTargets(1, _SMAABlendRenderTarget.RenderTargetView.GetAddressOf(), nullptr);
 
-		_shaderManager.Bind(Shader::SMAABlendingWeightCalculation);
+		_shaders.Bind(Shader::SmaaBlendingWeightCalculation);
 
 		_stSMAABuffer.SubsampleIndices = Vector4::Zero;
 		_cbSMAABuffer.UpdateData(_stSMAABuffer, _context.Get());
@@ -76,7 +76,7 @@ namespace TEN::Renderer
 		// 3) Neighborhood blending.
 		_context->OMSetRenderTargets(1, renderTarget->RenderTargetView.GetAddressOf(), nullptr);
 
-		_shaderManager.Bind(Shader::SMAANeighborhoodBlending);
+		_shaders.Bind(Shader::SmaaNeighborhoodBlending);
 
 		BindRenderTargetAsTexture(static_cast<TextureRegister>(0), &_SMAASceneRenderTarget, SamplerStateRegister::LinearClamp);
 		BindRenderTargetAsTexture(static_cast<TextureRegister>(1), &_SMAASceneSRGBRenderTarget, SamplerStateRegister::LinearClamp);
@@ -100,7 +100,7 @@ namespace TEN::Renderer
 		ResetScissor();
 
 		// Common vertex shader to all fullscreen effects
-		_shaderManager.Bind(Shader::PostProcess);
+		_shaders.Bind(Shader::PostProcess);
 
 		// We draw a fullscreen triangle
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -123,7 +123,7 @@ namespace TEN::Renderer
 		_context->ClearRenderTargetView(renderTarget->RenderTargetView.Get(), Colors::Black);
 		_context->OMSetRenderTargets(1, renderTarget->RenderTargetView.GetAddressOf(), nullptr);
 
-		_shaderManager.Bind(Shader::FXAA);
+		_shaders.Bind(Shader::Fxaa);
 
 		_stPostProcessBuffer.ViewportWidth = _screenWidth;
 		_stPostProcessBuffer.ViewportHeight = _screenHeight;

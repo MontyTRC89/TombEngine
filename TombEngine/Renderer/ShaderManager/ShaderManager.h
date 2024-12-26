@@ -1,13 +1,15 @@
 #pragma once
-#include "framework.h"
+
 #include "Renderer/Structures/RendererShader.h"
+
+using namespace TEN::Renderer::Structures;
 
 namespace TEN::Renderer::Utils
 {
-	using namespace TEN::Renderer::Structures;
-
 	enum class Shader
 	{
+		// General
+
 		None,
 		Rooms,
 		RoomsAnimated,
@@ -25,10 +27,14 @@ namespace TEN::Renderer::Utils
 		FullScreenQuad,
 		ShadowMap,
 
-		HUD,
-		HUDColor,
-		HUDTexture,
-		HUDBarColor,
+		// HUD
+
+		Hud,
+		HudColor,
+		HudDTexture,
+		HudBarColor,
+
+		// GBuffer
 
 		GBuffer,
 		GBufferRooms,
@@ -37,13 +43,17 @@ namespace TEN::Renderer::Utils
 		GBufferStatics,
 		GBufferInstancedStatics,
 
-		SMAAEdgeDetection,
-		SMAALumaEdgeDetection,
-		SMAAColorEdgeDetection,
-		SMAADepthEdgeDetection,
-		SMAABlendingWeightCalculation,
-		SMAANeighborhoodBlending,
-		FXAA,
+		// SMAA
+
+		SmaaEdgeDetection,
+		SmaaLumaEdgeDetection,
+		SmaaColorEdgeDetection,
+		SmaaDepthEdgeDetection,
+		SmaaBlendingWeightCalculation,
+		SmaaNeighborhoodBlending,
+		Fxaa,
+
+		// Post-process
 
 		PostProcess,
 		PostProcessMonochrome,
@@ -52,33 +62,36 @@ namespace TEN::Renderer::Utils
 		PostProcessFinalPass,
 		PostProcessLensFlare,
 
-		SSAO,
-		SSAOBlur,
+		// SSAO
+
+		Ssao,
+		SsaoBlur,
 
 		Count
 	};
 
 	class ShaderManager
 	{
-		private:
-			ComPtr<ID3D11Device> _device = nullptr;
-			ComPtr<ID3D11DeviceContext> _context = nullptr;
+	private:
+		ComPtr<ID3D11Device>		_device	 = nullptr;
+		ComPtr<ID3D11DeviceContext> _context = nullptr;
 
-			int _compileCounter = 0;
-			std::array<RendererShader, (int)Shader::Count> _shaders = {};
+		int											   _compileCounter = 0;
+		std::array<RendererShader, (int)Shader::Count> _shaders		   = {};
 
-			RendererShader LoadOrCompile(const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines);
-			void Load(Shader shader, const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines = nullptr);
-			void Destroy(Shader shader);
+	public:
+		ShaderManager() = default;
+		~ShaderManager();
 
-		public:
-			ShaderManager() = default;
-			~ShaderManager();
+		const RendererShader& Get(Shader shader);
 
-			void Initialize(ComPtr<ID3D11Device>& device, ComPtr<ID3D11DeviceContext>& context);
-			void LoadAllShaders(int width, int height);
+		void Initialize(ComPtr<ID3D11Device>& device, ComPtr<ID3D11DeviceContext>& context);
+		void LoadAllShaders(int width, int height);
+		void Bind(Shader shader, bool forceNull = false);
 
-			void Bind(Shader shader, bool forceNull = false);
-			const RendererShader& Get(Shader shader);
+	private:
+		RendererShader LoadOrCompile(const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines);
+		void		   Load(Shader shader, const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines = nullptr);
+		void		   Destroy(Shader shader);
 	};
 }

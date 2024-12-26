@@ -65,7 +65,7 @@ namespace TEN::Renderer
 	{
 		try
 		{
-			_shaderManager.LoadAllShaders(_screenWidth, _screenHeight);
+			_shaders.LoadAllShaders(_screenWidth, _screenHeight);
 		}
 		catch (const std::exception& e)
 		{

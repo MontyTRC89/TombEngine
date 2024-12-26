@@ -350,14 +350,14 @@ namespace TEN::Renderer
 		VertexBuffer<Vertex> _sortedPolygonsVertexBuffer;
 		IndexBuffer _sortedPolygonsIndexBuffer;
 
-		// High framerate.
+		// High framerate
 
-		float _interpolationFactor = 0.0f;
-		bool _graphicsSettingsChanged = false;
+		float _interpolationFactor	   = 0.0f;
+		bool  _graphicsSettingsChanged = false;
 
-		// Shader manager.
+		// Shader manager
 
-		ShaderManager _shaderManager;
+		ShaderManager _shaders;
 
 		void ApplySMAA(RenderTarget2D* renderTarget, RenderView& view);
 		void ApplyFXAA(RenderTarget2D* renderTarget, RenderView& view);

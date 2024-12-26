@@ -30,10 +30,10 @@ namespace TEN::Renderer
 		InitializeScreen(w, h, handle, false);
 		InitializeCommonTextures();
 
-		// Load shaders
-		_shaderManager.LoadAllShaders(w, h);
+		// Load shaders.
+		_shaders.LoadAllShaders(w, h);
 
-		// Initialize render states
+		// Initialize render states.
 		_renderStates = std::make_unique<CommonStates>(_device.Get());
 
 		// Initialize input layout using first vertex shader.
@@ -53,10 +53,10 @@ namespace TEN::Renderer
 			{ "HASH", 0, DXGI_FORMAT_R32_SINT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
 
-		auto& roomShader = _shaderManager.Get(Shader::Rooms);
+		const auto& roomShader = _shaders.Get(Shader::Rooms);
 		Utils::throwIfFailed(_device->CreateInputLayout(inputLayoutItems, 12, roomShader.Vertex.Blob->GetBufferPointer(), roomShader.Vertex.Blob->GetBufferSize(), &_inputLayout));
 
-		// Initialize constant buffers
+		// Initialize constant buffers.
 		_cbCameraMatrices = CreateConstantBuffer<CCameraMatrixBuffer>();
 		_cbItem = CreateConstantBuffer<CItemBuffer>();
 		_cbStatic = CreateConstantBuffer<CStaticBuffer>();
@@ -70,7 +70,7 @@ namespace TEN::Renderer
 		_cbInstancedStaticMeshBuffer = CreateConstantBuffer<CInstancedStaticMeshBuffer>();
 		_cbSMAABuffer = CreateConstantBuffer<CSMAABuffer>();
 
-		// Prepare HUD Constant buffer  
+		// Prepare HUD Constant buffer.
 		_cbHUDBar = CreateConstantBuffer<CHUDBarBuffer>();
 		_cbHUD = CreateConstantBuffer<CHUDBuffer>();
 		_cbSprite = CreateConstantBuffer<CSpriteBuffer>();
@@ -79,7 +79,7 @@ namespace TEN::Renderer
 		_cbHUD.UpdateData(_stHUD, _context.Get());
 		_currentCausticsFrame = 0;
 
-		// Preallocate lists
+		// Preallocate lists.
 		_lines2DToDraw = createVector<RendererLine2D>(MAX_LINES_2D);
 		_lines3DToDraw = createVector<RendererLine3D>(MAX_LINES_3D);
 		_triangles3DToDraw = createVector<RendererTriangle3D>(MAX_TRIANGLES_3D);
@@ -253,9 +253,9 @@ namespace TEN::Renderer
 			{ "COLOR", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 }
 		};
 
-		auto& ppShader = _shaderManager.Get(Shader::PostProcess);
+		const auto& ppShader = _shaders.Get(Shader::PostProcess);
 		Utils::throwIfFailed(_device->CreateInputLayout(postProcessInputLayoutItems, 3, 
-			ppShader.Vertex.Blob->GetBufferPointer(), ppShader.Vertex.Blob->GetBufferSize(), &_fullscreenTriangleInputLayout));
+							 ppShader.Vertex.Blob->GetBufferPointer(), ppShader.Vertex.Blob->GetBufferSize(), &_fullscreenTriangleInputLayout));
 	}
 
 	void Renderer::CreateSSAONoiseTexture()
@@ -336,8 +336,8 @@ namespace TEN::Renderer
 
 	void Renderer::InitializeSky()
 	{
-		std::vector<Vertex> vertices(SKY_VERTICES_COUNT);
-		std::vector<int> indices(SKY_INDICES_COUNT);
+		auto vertices = std::vector<Vertex>(SKY_VERTICES_COUNT);
+		auto indices = std::vector<int>(SKY_INDICES_COUNT);
 
 		int size = SKY_SIZE;
 
@@ -553,18 +553,18 @@ namespace TEN::Renderer
 		if constexpr (DebugBuild)
 		{
 			res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, D3D11_CREATE_DEVICE_DEBUG,
-				levels, 1, D3D11_SDK_VERSION, &_device, &featureLevel, &_context);
+									levels, 1, D3D11_SDK_VERSION, &_device, &featureLevel, &_context);
 		}
 		else
 		{
 			res = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, NULL,
-				levels, 1, D3D11_SDK_VERSION, &_device, &featureLevel, &_context);
+									levels, 1, D3D11_SDK_VERSION, &_device, &featureLevel, &_context);
 		}
 
 		Utils::throwIfFailed(res);
 
-		// Initialize shader manager
-		_shaderManager.Initialize(_device, _context);
+		// Initialize shader manager.
+		_shaders.Initialize(_device, _context);
 	}
 
 	void Renderer::ToggleFullScreen(bool force)
