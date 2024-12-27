@@ -1,31 +1,55 @@
------
+------
 --- Custom Bars - Draws custom bars on screen.
---The module provides functions to create and manage custom progress bars. It maintains state through LevelVars.Engine.CustomBars, which stores bar definitions and configurations.
--- Each bar is controlled by its specific functions. 
+-- This module provides functions for creating and managing custom progress bars. It stores bar definitions and configurations in `LevelVars.Engine.CustomBars`, enabling seamless state management. 
+-- Each bar is independently controlled through its associated functions.
 --
 -- Example usage:
+--
 --	local CustomBar = require("Engine.CustomBar")
 --
---	local ObjID = TEN.Objects.ObjID.CUSTOM_BAR_GRAPHIC
---	local colorBar = TEN.Color(255,255,255)
---	local posBar =  TEN.Vec2(21.6, 5.79)
---	local scaleBar = TEN.Vec2(19.05, 19.1)
---	local posBG = TEN.Vec2(posBar.x+0.15, posBar.y)
---	local scaleBG = TEN.Vec2(scaleBar.x-0.35, scaleBar.y-0.62)
---	local alignMode = TEN.View.AlignMode.CENTER
---	local scaleMode = TEN.View.ScaleMode.FIT
---	local blendMode = TEN.Effects.BlendID.ALPHATEST
---	local textPos = TEN.Vec2(posBar.x, posBar.y+10)
+--	--Create a table with all the bar properties
+--	local barData = {
+--	barName             = "water",
+--	startValue          = 0,
+--	maxValue            = 1000,
+--	objectIdBg          = TEN.Objects.ObjID.CUSTOM_BAR_GRAPHIC,
+--	spriteIdBg          = 0,
+--	colorBg             = TEN.Color(255,255,255),
+--	posBg               = TEN.Vec2(20, 20),
+--	rotBg               = 0,
+--	scaleBg             = TEN.Vec2(19.05, 19.1),
+--	alignModeBg         = TEN.View.AlignMode.CENTER_LEFT,
+--	scaleModeBg         = TEN.View.ScaleMode.FIT,
+--	blendModeBg         = TEN.Effects.BlendID.ALPHABLEND,
+--	objectIdBar         = TEN.Objects.ObjID.CUSTOM_BAR_GRAPHIC,
+--	spriteIdBar         = 1,
+--	colorBar            = TEN.Color(255,0,0),
+--	posBar              = TEN.Vec2(20.15, 20),
+--	rot                 = 0,
+--	scaleBar            = TEN.Vec2(18.7, 18.48),
+--	alignMode           = TEN.View.AlignMode.CENTER_LEFT,
+--	scaleMode           = TEN.View.ScaleMode.FIT,
+--	blendMode           = TEN.Effects.BlendID.ALPHABLEND,
+--	text                = "Water Bar",
+--	textPos             = TEN.Vec2(20, 15),
+--	textOptions         = {TEN.Strings.DisplayStringOption.SHADOW,TEN.Strings.DisplayStringOption.CENTER},
+--	textScale           = 1,
+--	textColor           = TEN.Color(255,0,0),
+--	hideText            = false,
+--	alphaBlendSpeed     = 50,
+--	blink               = false,
+--	blinkLimit          = 0.25
+--	}
 --
---	-- This function creates the bar and displays it
---	CustomBar.Create("Test", 50, 1000,
---		ObjID, 2, colorBar, posBar, 0, scaleBar, alignMode, scaleMode, blendMode,
---		ObjID, 4, colorBar, posBG, 0, scaleBG, alignMode, scaleMode, blendMode,
---		"Test 1", textPos, {}, 1, colorBar, false, 50, true, 0.25)
+--	--This function creates the bar and displays it
+--	CustomBar.Create(barData)
 --
---		-- This method displays the bar
---		bar:SetVisibility(true)
---	end
+--	--This method gets the bar with name "water" and stores it in variable bar.
+--	local bar = CustomBar.Get("water")
+--	--This method displays the bar
+--	bar:SetVisibility(true)
+--	--This method sets the bar value to 1000 over 5 seconds.
+--	bar:SetBarValue(1000,5)
 --
 -- @luautil CustomBar
 
@@ -35,93 +59,93 @@ local CustomBar = {}
 CustomBar.__index = CustomBar
 
 LevelFuncs.Engine.CustomBar = {}
-LevelVars.Engine.CustomBars = {bars = {}, EnemiesHpBar = {status = nil}}
+LevelVars.Engine.CustomBars = {bars = {}, enemiesHpBar = {status = nil}}
 
 ---
 -- Creates a custom progress bar with extensive configuration options.
--- Parameters:
--- @tparam string barName Unique name for the bar.
--- @tparam float startvalue Initial value of the bar.
--- @tparam float maxvalue Maximum value of the bar.
--- @tparam Objects.ObjID objectIDbg Object ID for the bar's background sprite.
--- @tparam number spriteIDbg SpriteID from the specified object for the bar's background.
--- @tparam Color colorbg Color of bar's background.
--- @tparam Vec2 posBG X,Y position of the bar's background in screen percent (0-100).
--- @tparam float rotBG rotation of the bar's background. sprite (0-360).
--- @tparam Vec2 scaleBG X,Y Scaling factor for the bar's background sprite.
--- @tparam View.AlignMode alignModebg Alignment for the bar's background.
--- @tparam View.ScaleMode scaleModebg Scaling for the bar's background.
--- @tparam Effects.BlendID blendModebg Blending modes for the bar's background.
--- @tparam Objects.ObjID objectIDbar Object ID for the bar sprite.
--- @tparam number spriteIDbar SpriteID from the specified object for the bar.
--- @tparam Color colorbar Color of the bar.
--- @tparam Vec2 posBar X,Y position of the bar in screen percent (0-100).
--- @tparam float rot rotation of the bar's sprite (0-360).
--- @tparam Vec2 scaleBar X,Y Scaling factor for the bar's sprite.
--- @tparam View.AlignMode alignMode Alignment for the bar.
--- @tparam View.ScaleMode scaleMode Scaling for the bar.
--- @tparam Effects.BlendID blendMode Blending modes for the bar.
--- @tparam string text Text to display on the bar.
--- @tparam Vec2 textPos X,Y position of the text.
--- @tparam Strings.DisplayStringOption textOptions alignment and effects for the text. Default: None. Please note text is automatically aligned to the LEFT
--- @tparam number textScale Scale factor for the text.
--- @tparam Color textColor Color of the text.
--- @tparam bool hideText Whether to hide the text.
--- @tparam number alphaBlendSpeed Speed of alpha blending for bar visibility (0-255).
--- @tparam bool blink Whether the bar blinks.
--- @tparam number blinkLimit % Limit below which bar starts blinking (0-1).
+-- @tparam table barData The table that contains all the bar data. Refer to table setup for barData.
 --
 -- @treturn CustomBar The custombar in its hidden state
 --
-CustomBar.Create = function (barName, startvalue, maxvalue,
-							objectIDbg, spriteIDbg, colorbg, posBG, rotBG, scaleBG, alignModebg, scaleModebg, blendModebg, 
-							objectIDbar, spriteIDbar, colorbar, posBar, rot, scaleBar, alignMode, scaleMode, blendMode,
-							text, textPos, textOptions, textScale, textColor, hideText, alphaBlendSpeed, blink, blinkLimit)
+CustomBar.Create = function (barData)
 
-	local dataName	= barName .. "_bar_data"
+	local dataName	= barData.barName .. "_bar_data"
 	local self = {name = dataName}
 
 	if LevelVars.Engine.CustomBars.bars[dataName] then
         print("Warning: a customBar with name " .. dataName .. " already exists; overwriting it with a new one...")
 	end
+---
+-- Table setup for creating custom bar.
+-- @table barData
+-- @tfield string barName Unique identifier for the bar.
+-- @tfield float startValue Initial value of the bar.
+-- @tfield float maxValue Maximum value of the bar.
+-- @tfield Objects.ObjID objectIdBg Object ID for the bar's background sprite.
+-- @tfield number spriteIdBg SpriteID from the specified object for the bar's background.
+-- @tfield Color colorBg Color of bar's background.
+-- @tfield Vec2 posBg X,Y position of the bar's background in screen percent (0-100).
+-- @tfield float rotBg rotation of the bar's background. sprite (0-360).
+-- @tfield Vec2 scaleBg X,Y Scaling factor for the bar's background sprite.
+-- @tfield View.AlignMode alignModeBg Alignment for the bar's background.
+-- @tfield View.ScaleMode scaleModeBg Scaling for the bar's background.
+-- @tfield Effects.BlendID blendModeBg Blending modes for the bar's background.
+-- @tfield Objects.ObjID objectIdBar Object ID for the bar sprite.
+-- @tfield number spriteIdBar SpriteID from the specified object for the bar.
+-- @tfield Color colorBar Color of the bar.
+-- @tfield Vec2 posBar X,Y position of the bar in screen percent (0-100).
+-- @tfield float rot rotation of the bar's sprite (0-360).
+-- @tfield Vec2 scaleBar X,Y Scaling factor for the bar's sprite.
+-- @tfield View.AlignMode alignMode Alignment for the bar.
+-- @tfield View.ScaleMode scaleMode Scaling for the bar.
+-- @tfield Effects.BlendID blendMode Blending modes for the bar.
+-- @tfield string text Text to display on the bar.
+-- @tfield Vec2 textPos X,Y position of the text.
+-- @tfield Strings.DisplayStringOption textOptions alignment and effects for the text. Default: None. Please note text is automatically aligned to the LEFT
+-- @tfield number textScale Scale factor for the text.
+-- @tfield Color textColor Color of the text.
+-- @tfield bool hideText Whether to hide the text.
+-- @tfield number alphaBlendSpeed Speed of alpha blending for bar visibility (0-255).
+-- @tfield bool blink Whether the bar blinks.
+-- @tfield number blinkLimit % Limit below which bar starts blinking (0-1).
 
 	LevelVars.Engine.CustomBars.bars[dataName]			        = {}
 	LevelVars.Engine.CustomBars.bars[dataName].name				= dataName
 	LevelVars.Engine.CustomBars.bars[dataName].fixedInterval	= 1/30
-	LevelVars.Engine.CustomBars.bars[dataName].progress			= startvalue / maxvalue -- Set initial progress from start value
-	LevelVars.Engine.CustomBars.bars[dataName].objectIDbg		= objectIDbg
-	LevelVars.Engine.CustomBars.bars[dataName].spriteIDbg		= spriteIDbg
-	LevelVars.Engine.CustomBars.bars[dataName].colorBG			= colorbg
-	LevelVars.Engine.CustomBars.bars[dataName].posBG			= posBG
-	LevelVars.Engine.CustomBars.bars[dataName].scaleBG			= scaleBG
-	LevelVars.Engine.CustomBars.bars[dataName].rotBG			= rotBG
-	LevelVars.Engine.CustomBars.bars[dataName].alignModeBG	    = alignModebg
-	LevelVars.Engine.CustomBars.bars[dataName].scaleModeBG	    = scaleModebg
-	LevelVars.Engine.CustomBars.bars[dataName].blendModeBG	    = blendModebg
-	LevelVars.Engine.CustomBars.bars[dataName].objectIDbar		= objectIDbar
-	LevelVars.Engine.CustomBars.bars[dataName].spriteIDbar		= spriteIDbar
-	LevelVars.Engine.CustomBars.bars[dataName].colorBar			= colorbar
-	LevelVars.Engine.CustomBars.bars[dataName].posBar			= posBar
-	LevelVars.Engine.CustomBars.bars[dataName].scaleBar			= scaleBar
-	LevelVars.Engine.CustomBars.bars[dataName].rot				= rot
-	LevelVars.Engine.CustomBars.bars[dataName].alignMode		= alignMode
-	LevelVars.Engine.CustomBars.bars[dataName].scaleMode		= scaleMode
-	LevelVars.Engine.CustomBars.bars[dataName].blendMode		= blendMode
-	LevelVars.Engine.CustomBars.bars[dataName].oldValue			= startvalue  -- stores the current bar value
-	LevelVars.Engine.CustomBars.bars[dataName].targetValue		= startvalue  -- target value to reach
-	LevelVars.Engine.CustomBars.bars[dataName].maxValue			= maxvalue
-	LevelVars.Engine.CustomBars.bars[dataName].text				= text
-	LevelVars.Engine.CustomBars.bars[dataName].textPos			= textPos
-	LevelVars.Engine.CustomBars.bars[dataName].textOptions		= textOptions
-	LevelVars.Engine.CustomBars.bars[dataName].textScale		= textScale
-	LevelVars.Engine.CustomBars.bars[dataName].textColor		= textColor
-	LevelVars.Engine.CustomBars.bars[dataName].hideText			= hideText  -- required to hide bar text
+	LevelVars.Engine.CustomBars.bars[dataName].progress			= barData.startValue / barData.maxValue -- Set initial progress from start value
+	LevelVars.Engine.CustomBars.bars[dataName].objectIdBg		= barData.objectIdBg
+	LevelVars.Engine.CustomBars.bars[dataName].spriteIdBg		= barData.spriteIdBg
+	LevelVars.Engine.CustomBars.bars[dataName].colorBg			= barData.colorBg
+	LevelVars.Engine.CustomBars.bars[dataName].posBg			= barData.posBg
+	LevelVars.Engine.CustomBars.bars[dataName].scaleBg			= barData.scaleBg
+	LevelVars.Engine.CustomBars.bars[dataName].rotBg			= barData.rotBg
+	LevelVars.Engine.CustomBars.bars[dataName].alignModeBg	    = barData.alignModeBg
+	LevelVars.Engine.CustomBars.bars[dataName].scaleModeBg	    = barData.scaleModeBg
+	LevelVars.Engine.CustomBars.bars[dataName].blendModeBg	    = barData.blendModeBg
+	LevelVars.Engine.CustomBars.bars[dataName].objectIdBar		= barData.objectIdBar
+	LevelVars.Engine.CustomBars.bars[dataName].spriteIdBar		= barData.spriteIdBar
+	LevelVars.Engine.CustomBars.bars[dataName].colorBar			= barData.colorBar
+	LevelVars.Engine.CustomBars.bars[dataName].posBar			= barData.posBar
+	LevelVars.Engine.CustomBars.bars[dataName].scaleBar			= barData.scaleBar
+	LevelVars.Engine.CustomBars.bars[dataName].rot				= barData.rot
+	LevelVars.Engine.CustomBars.bars[dataName].alignMode		= barData.alignMode
+	LevelVars.Engine.CustomBars.bars[dataName].scaleMode		= barData.scaleMode
+	LevelVars.Engine.CustomBars.bars[dataName].blendMode		= barData.blendMode
+	LevelVars.Engine.CustomBars.bars[dataName].oldValue			= barData.startValue  -- stores the current bar value
+	LevelVars.Engine.CustomBars.bars[dataName].targetValue		= barData.startValue  -- target value to reach
+	LevelVars.Engine.CustomBars.bars[dataName].maxValue			= barData.maxValue
+	LevelVars.Engine.CustomBars.bars[dataName].text				= barData.text
+	LevelVars.Engine.CustomBars.bars[dataName].textPos			= barData.textPos
+	LevelVars.Engine.CustomBars.bars[dataName].textOptions		= barData.textOptions
+	LevelVars.Engine.CustomBars.bars[dataName].textScale		= barData.textScale
+	LevelVars.Engine.CustomBars.bars[dataName].textColor		= barData.textColor
+	LevelVars.Engine.CustomBars.bars[dataName].hideText			= barData.hideText  -- required to hide bar text
 	LevelVars.Engine.CustomBars.bars[dataName].visible			= false
 	LevelVars.Engine.CustomBars.bars[dataName].currentAlpha		= 0
 	LevelVars.Engine.CustomBars.bars[dataName].targetAlpha		= 0
-	LevelVars.Engine.CustomBars.bars[dataName].alphaBlendSpeed	= alphaBlendSpeed
-	LevelVars.Engine.CustomBars.bars[dataName].blink			= blink
-	LevelVars.Engine.CustomBars.bars[dataName].blinkLimit		= blinkLimit
+	LevelVars.Engine.CustomBars.bars[dataName].alphaBlendSpeed	= barData.alphaBlendSpeed
+	LevelVars.Engine.CustomBars.bars[dataName].blink			= barData.blink
+	LevelVars.Engine.CustomBars.bars[dataName].blinkLimit		= barData.blinkLimit
 	LevelVars.Engine.CustomBars.bars[dataName].blinkSpeed		= 8
 	LevelVars.Engine.CustomBars.bars[dataName].showBar			= nil --required to hide bar when enemy is not targeted
 	LevelVars.Engine.CustomBars.bars[dataName].object			= nil
@@ -131,184 +155,255 @@ CustomBar.Create = function (barName, startvalue, maxvalue,
 end
 
 ---
--- Creates a bar tied to Lara's attributes (Health, Air, Stamina).
--- @tparam Objects.ObjID objectIDbg Object ID for the bar's background sprite.
--- @tparam number spriteIDbg SpriteID from the specified object for the bar's background.
--- @tparam Color colorbg Color of bar's background.
--- @tparam Vec2 posBG X,Y position of the bar's background in screen percent (0-100).
--- @tparam number rotBG rotation of the bar's background. sprite (0-360).
--- @tparam Vec2 scaleBG X,Y Scaling factor for the bar's background sprite.
--- @tparam View.AlignMode alignModebg Alignment for the bar's background.
--- @tparam View.ScaleMode scaleModebg Scaling for the bar's background.
--- @tparam Effects.BlendID blendModebg Blending modes for the bar's background.
--- @tparam Objects.ObjID objectIDbar Object ID for the bar sprite.
--- @tparam number spriteIDbar SpriteID from the specified object for the bar.
--- @tparam Color colorbar Color of the bar.
--- @tparam Vec2 posBar X,Y position of the bar in screen percent (0-100).
--- @tparam number rot rotation of the bar's sprite (0-360).
--- @tparam Vec2 scaleBar X,Y Scaling factor for the bar's sprite.
--- @tparam View.AlignMode alignMode Alignment for the bar.
--- @tparam View.ScaleMode scaleMode Scaling for the bar.
--- @tparam Effects.BlendID blendMode Blending modes for the bar.
--- @tparam number alphaBlendSpeed Speed of alpha blending for bar visibility (0-255).
--- @tparam number getActionType Determines the bar type: 1: Health, 2: Air, 3: Stamina.
--- @tparam bool showBar Option to always show the bar. If set to false, the bars will automatically hide when they stop updating.
--- @tparam bool blink Whether the bar blinks.
--- @tparam number blinkLimit % Limit below which bar starts blinking (0-1).
+-- Creates a bar tied to Players's attributes (Health, Air, Stamina).
+-- @tparam table playerBarData The table that contains all the player bar data. Refer to table setup for playerBarData.
 --
--- @treturn CustomBar The custombar in its hidden state
-CustomBar.CreateLaraBar = function (objectIDbg, spriteIDbg, colorbg, posBG, rotBG, scaleBG, alignModebg, scaleModebg, blendModebg,
-							objectIDbar, spriteIDbar, colorbar, posBar, rot, scaleBar, alignMode, scaleMode, blendMode,
-							alphaBlendSpeed, getActionType, showBar, blink, blinkLimit)
+-- @treturn CustomBar Player attribute bar.
 
-	local barName = "Lara" .. getActionType
+CustomBar.CreatePlayerBar = function (playerBarData)
+
+	local barName = "Player" .. playerBarData.getActionType
 	local dataName	= barName .. "_bar_data"
 
-	if getActionType >= 1 and getActionType <= 3 then
-		local startValue = getActionType == 1 and Lara:GetHP() or (getActionType == 2 and Lara:GetAir() or (getActionType == 3 and Lara:GetStamina()))
-		local maxValue = getActionType == 1 and 1000 or (getActionType == 2 and 1800 or (getActionType == 3 and 120))
-		
-		CustomBar.Create(barName, startValue, maxValue,
-						objectIDbg, spriteIDbg, colorbg, posBG, rotBG, scaleBG, alignModebg, scaleModebg, blendModebg, 
-						objectIDbar, spriteIDbar, colorbar, posBar, rot, scaleBar, alignMode, scaleMode, blendMode,
-						"BLANK", TEN.Vec2(0,0), {}, 0, TEN.Color(0,0,0), true, alphaBlendSpeed, blink, blinkLimit)
-		
-		-- LevelVars.Engine.CustomBars.bars[dataName].oldValue			= maxValue
+	if playerBarData.getActionType >= 1 and playerBarData.getActionType <= 3 then
+		local startValue = playerBarData.getActionType == 1 and Lara:GetHP() or (playerBarData.getActionType == 2 and Lara:GetAir() or (playerBarData.getActionType == 3 and Lara:GetStamina()))
+		local maxValue = playerBarData.getActionType == 1 and 1000 or (playerBarData.getActionType == 2 and 1800 or (playerBarData.getActionType == 3 and 120))
+
+---
+-- Table setup for creating custom player attribute bar.
+-- @table playerBarData
+-- @tfield number getActionType Determines the bar type: 1: Health, 2: Air, 3: Stamina.
+-- @tfield Objects.ObjID objectIdBg Object ID for the bar's background sprite.
+-- @tfield number spriteIdBg SpriteID from the specified object for the bar's background.
+-- @tfield Color colorBg Color of bar's background.
+-- @tfield Vec2 posBg X,Y position of the bar's background in screen percent (0-100).
+-- @tfield number rotBg rotation of the bar's background. sprite (0-360).
+-- @tfield Vec2 scaleBg X,Y Scaling factor for the bar's background sprite.
+-- @tfield View.AlignMode alignModeBg Alignment for the bar's background.
+-- @tfield View.ScaleMode scaleModeBg Scaling for the bar's background.
+-- @tfield Effects.BlendID blendModeBg Blending modes for the bar's background.
+-- @tfield Objects.ObjID objectIdBar Object ID for the bar sprite.
+-- @tfield number spriteIdBar SpriteID from the specified object for the bar.
+-- @tfield Color colorBar Color of the bar.
+-- @tfield Vec2 posBar X,Y position of the bar in screen percent (0-100).
+-- @tfield number rot rotation of the bar's sprite (0-360).
+-- @tfield Vec2 scaleBar X,Y Scaling factor for the bar's sprite.
+-- @tfield View.AlignMode alignMode Alignment for the bar.
+-- @tfield View.ScaleMode scaleMode Scaling for the bar.
+-- @tfield Effects.BlendID blendMode Blending modes for the bar.
+-- @tfield number alphaBlendSpeed Speed of alpha blending for bar visibility (0-255).
+-- @tfield bool showBar Option to always show the bar. If set to false, the bars will automatically hide when they stop updating.
+-- @tfield bool blink Whether the bar blinks.
+-- @tfield number blinkLimit % Limit below which bar starts blinking (0-1).
+
+		local playerBar = {
+			barName			= barName,
+			startValue		= startValue,
+			maxValue		= maxValue,
+			objectIdBg		= playerBarData.objectIdBg,
+			spriteIdBg		= playerBarData.spriteIdBg,
+			colorBg			= playerBarData.colorBg,
+			posBg			= playerBarData.posBg,
+			rotBg			= playerBarData.rotBg,
+			scaleBg			= playerBarData.scaleBg,
+			alignModeBg		= playerBarData.alignModeBg,
+			scaleModeBg		= playerBarData.scaleModeBg,
+			blendModeBg		= playerBarData.blendModeBg,
+			objectIdBar		= playerBarData.objectIdBar,
+			spriteIdBar		= playerBarData.spriteIdBar,
+			colorBar		= playerBarData.colorBar,
+			posBar			= playerBarData.posBar,
+			rot				= playerBarData.rot,
+			scaleBar		= playerBarData.scaleBar,
+			alignMode		= playerBarData.alignMode,
+			scaleMode		= playerBarData.scaleMode,
+			blendMode		= playerBarData.blendMode,
+			text			= "BLANK",
+			textPos			= TEN.Vec2(0,0),
+			textOptions		= {},
+			textScale		= 0,
+			textColor		= TEN.Color(0,0,0),
+			hideText		= true,
+			alphaBlendSpeed	= playerBarData.alphaBlendSpeed,
+			blink			= playerBarData.blink,
+			blinkLimit		= playerBarData.blinkLimit,
+		}
+
+		CustomBar.Create(playerBar)
+
 	end
 
-	
-	LevelVars.Engine.CustomBars.bars[dataName].getActionType	= getActionType
-	LevelVars.Engine.CustomBars.bars[dataName].showBar			= showBar
+	LevelVars.Engine.CustomBars.bars[dataName].getActionType	= playerBarData.getActionType
+	LevelVars.Engine.CustomBars.bars[dataName].showBar			= playerBarData.showBar
 	LevelVars.Engine.CustomBars.bars[dataName].visible			= true
 	LevelVars.Engine.CustomBars.bars[dataName].targetAlpha		= 255
 
-	
 end
 
 ---
--- Creates a custom progress bar for an enemy with extensive configuration options. Ensure this function is called before Lara aims at the enemy if using generic enemy HP bars.
--- @tparam string barName Unique name for the bar.
--- @tparam Objects.ObjID objectIDbg Object ID for the bar's background sprite.
--- @tparam number spriteIDbg SpriteID from the specified object for the bar's background.
--- @tparam Color colorbg Color of bar's background.
--- @tparam Vec2 posBG X,Y position of the bar's background in screen percent (0-100).
--- @tparam number rotBG rotation of the bar's background. sprite (0-360).
--- @tparam Vec2 scaleBG X,Y Scaling factor for the bar's background sprite.
--- @tparam View.AlignMode alignModebg Alignment for the bar's background.
--- @tparam View.ScaleMode scaleModebg Scaling for the bar's background.
--- @tparam Effects.BlendID blendModebg Blending modes for the bar's background.
--- @tparam Objects.ObjID objectIDbar Object ID for the bar sprite.
--- @tparam number spriteIDbar SpriteID from the specified object for the bar.
--- @tparam Color colorbar Color of the bar.
--- @tparam Vec2 posBar X,Y position of the bar in screen percent (0-100).
--- @tparam number rot rotation of the bar's sprite (0-360).
--- @tparam Vec2 scaleBar X,Y Scaling factor for the bar's sprite.
--- @tparam View.AlignMode alignMode Alignment for the bar.
--- @tparam View.ScaleMode scaleMode Scaling for the bar.
--- @tparam Effects.BlendID blendMode Blending modes for the bar.
--- @tparam string text Text to display for the enemy.
--- @tparam Vec2 textPos X,Y position of the text.
--- @tparam Strings.DisplayStringOption textOptions alignment and effects for the text. Default: None. Please note text is automatically aligned to the LEFT
--- @tparam number textScale Scale factor for the text.
--- @tparam Color textColor Color of the text.
--- @tparam bool hideText Whether to hide the text.
--- @tparam number alphaBlendSpeed Speed of alpha blending for bar visibility (0-255).
--- @tparam string object Enemy name set in Editor for which to create HP for.
--- @tparam bool showBar Option to always show the bar whether the enemy is current target or not. Useful for boss health bars.
--- @tparam bool blink Whether the bar blinks.
--- @tparam number blinkLimit %Limit below which bar starts blinking (0-1).
+-- Creates a custom health bar for a specific enemy (like a boss). Ensure this function is called before Lara aims at the enemy if using generic enemy HP bars as well.
+-- Also be sure to call this function after increasing the HP of the enemy via LUA.
+-- @tparam table enemyBarData The table that contains all the enemy bar data. Refer to table setup for enemyBarData.
 --
--- @treturn CustomBar The custombar in its hidden state
-CustomBar.CreateEnemyHpBar = function (barName,
-							objectIDbg, spriteIDbg, colorbg, posBG, rotBG, scaleBG, alignModebg, scaleModebg, blendModebg, 
-							objectIDbar, spriteIDbar, colorbar, posBar, rot, scaleBar, alignMode, scaleMode, blendMode,
-							text, textPos, textOptions, textScale, textColor, hideText, alphaBlendSpeed, object, showBar, blink, blinkLimit)
+-- @treturn CustomBar Enemy health bar.
+CustomBar.CreateEnemyHpBar = function (enemyBarData)
 
-    local dataName	= barName .. "_bar_data"
-	local enemyHP = TEN.Objects.GetMoveableByName(object):GetHP()
+	local dataName	= enemyBarData.barName .. "_bar_data"
+	local enemyHP = TEN.Objects.GetMoveableByName(enemyBarData.object):GetHP()
 
-
-	CustomBar.Create(barName, enemyHP, enemyHP,
-							objectIDbg, spriteIDbg, colorbg, posBG, rotBG, scaleBG, alignModebg, scaleModebg, blendModebg, 
-							objectIDbar, spriteIDbar, colorbar, posBar, rot, scaleBar, alignMode, scaleMode, blendMode,
-							text, textPos, textOptions, textScale, textColor, hideText, alphaBlendSpeed, blink, blinkLimit)
+---
+-- Table setup for creating a specific enemy health bar.
+-- @table enemyBarData
+-- @tfield string barName Unique identifier for the bar.
+-- @tfield Objects.ObjID objectIdBg Object ID for the bar's background sprite.
+-- @tfield number spriteIdBg SpriteID from the specified object for the bar's background.
+-- @tfield Color colorBg Color of bar's background.
+-- @tfield Vec2 posBg X,Y position of the bar's background in screen percent (0-100).
+-- @tfield number rotBg rotation of the bar's background. sprite (0-360).
+-- @tfield Vec2 scaleBg X,Y Scaling factor for the bar's background sprite.
+-- @tfield View.AlignMode alignModeBg Alignment for the bar's background.
+-- @tfield View.ScaleMode scaleModeBg Scaling for the bar's background.
+-- @tfield Effects.BlendID blendModeBg Blending modes for the bar's background.
+-- @tfield Objects.ObjID objectIdBar Object ID for the bar sprite.
+-- @tfield number spriteIdBar SpriteID from the specified object for the bar.
+-- @tfield Color colorBar Color of the bar.
+-- @tfield Vec2 posBar X,Y position of the bar in screen percent (0-100).
+-- @tfield number rot rotation of the bar's sprite (0-360).
+-- @tfield Vec2 scaleBar X,Y Scaling factor for the bar's sprite.
+-- @tfield View.AlignMode alignMode Alignment for the bar.
+-- @tfield View.ScaleMode scaleMode Scaling for the bar.
+-- @tfield Effects.BlendID blendMode Blending modes for the bar.
+-- @tfield string text Text to display for the enemy.
+-- @tfield Vec2 textPos X,Y position of the text.
+-- @tfield Strings.DisplayStringOption textOptions alignment and effects for the text. Default: None. Please note text is automatically aligned to the LEFT
+-- @tfield number textScale Scale factor for the text.
+-- @tfield Color textColor Color of the text.
+-- @tfield bool hideText Whether to hide the text.
+-- @tfield number alphaBlendSpeed Speed of alpha blending for bar visibility (0-255).
+-- @tfield string object Enemy name set in Editor for which to create HP for.
+-- @tfield bool showBar Option to always show the bar whether the enemy is current target or not. Useful for boss health bars.
+-- @tfield bool blink Whether the bar blinks.
+-- @tfield number blinkLimit %Limit below which bar starts blinking (0-1).
 	
-	LevelVars.Engine.CustomBars.bars[dataName].showBar			= showBar
-	LevelVars.Engine.CustomBars.bars[dataName].object			= object
+	local enemyBar = {
+		barName			= enemyBarData.barName,
+		startValue		= enemyHP,
+		maxValue		= enemyHP,
+		objectIdBg		= enemyBarData.objectIdBg,
+		spriteIdBg		= enemyBarData.spriteIdBg,
+		colorBg			= enemyBarData.colorBg,
+		posBg			= enemyBarData.posBg,
+		rotBg			= enemyBarData.rotBg,
+		scaleBg			= enemyBarData.scaleBg,
+		alignModeBg		= enemyBarData.alignModeBg,
+		scaleModeBg		= enemyBarData.scaleModeBg,
+		blendModeBg		= enemyBarData.blendModeBg,
+		objectIdBar		= enemyBarData.objectIdBar,
+		spriteIdBar		= enemyBarData.spriteIdBar,
+		colorBar		= enemyBarData.colorBar,
+		posBar			= enemyBarData.posBar,
+		rot				= enemyBarData.rot,
+		scaleBar		= enemyBarData.scaleBar,
+		alignMode		= enemyBarData.alignMode,
+		scaleMode		= enemyBarData.scaleMode,
+		blendMode		= enemyBarData.blendMode,
+		text			= enemyBarData.text,
+		textPos			= enemyBarData.textPos,
+		textOptions		= enemyBarData.textOptions,
+		textScale		= enemyBarData.textScale,
+		textColor		= enemyBarData.textColor,
+		hideText		= enemyBarData.hideText,
+		alphaBlendSpeed	= enemyBarData.alphaBlendSpeed,
+		blink			= enemyBarData.blink,
+		blinkLimit		= enemyBarData.blinkLimit
+	}
+
+	CustomBar.Create(enemyBar)
+
+	LevelVars.Engine.CustomBars.bars[dataName].showBar			= enemyBarData.showBar
+	LevelVars.Engine.CustomBars.bars[dataName].object			= enemyBarData.object
 	LevelVars.Engine.CustomBars.bars[dataName].getActionType	= 0
 	LevelVars.Engine.CustomBars.bars[dataName].visible			= true
 	LevelVars.Engine.CustomBars.bars[dataName].fixedInterval	= 1/3
 	LevelVars.Engine.CustomBars.bars[dataName].currentAlpha		= 0
 	LevelVars.Engine.CustomBars.bars[dataName].targetAlpha		= 255
-	
+
 end
 
 ---
--- Generates health bars for all enemies. A new bar appears whenever Lara aims at an enemy. If the "hide text" option is disabled, the enemy's name (as set in the editor) is displayed. Multiple enemies can share the same name by appending _number to the name in the editor. If adjusting an enemy's max HP, ensure this is done before Lara targets the enemy. To create health bars for specific enemies, use CustomBar.CreateEnemyHpBar, ensuring the bar is created prior to targeting.
--- @tparam Objects.ObjID objectIDbg Object ID for the bar's background sprite.
--- @tparam number spriteIDbg SpriteID from the specified object for the bar's background.
--- @tparam Color colorbg Color of bar's background.
--- @tparam Vec2 posBG X,Y position of the bar's background in screen percent (0-100).
--- @tparam number rotBG rotation of the bar's background. sprite (0-360).
--- @tparam Vec2 scaleBG X,Y Scaling factor for the bar's background sprite.
--- @tparam View.AlignMode alignModebg Alignment for the bar's background.
--- @tparam View.ScaleMode scaleModebg Scaling for the bar's background.
--- @tparam Effects.BlendID blendModebg Blending modes for the bar's background.
--- @tparam Objects.ObjID objectIDbar Object ID for the bar sprite.
--- @tparam number spriteIDbar SpriteID from the specified object for the bar.
--- @tparam Color colorbar Color of the bar.
--- @tparam Vec2 posBar X,Y position of the bar in screen percent (0-100).
--- @tparam number rot rotation of the bar's sprite (0-360).
--- @tparam Vec2 scaleBar X,Y Scaling factor for the bar's sprite.
--- @tparam View.AlignMode alignMode Alignment for the bar.
--- @tparam View.ScaleMode scaleMode Scaling for the bar.
--- @tparam Effects.BlendID blendMode Blending modes for the bar.
--- @tparam number textPos X position of the text.
--- @tparam Strings.DisplayStringOption textOptions alignment and effects for the text. Default: None. Please note text is automatically aligned to the LEFT
--- @tparam number textScale Scale factor for the text.
--- @tparam Color textColor Color of the text.
--- @tparam bool hideText Whether to hide the enemy name text.
--- @tparam number alphaBlendSpeed Speed of alpha blending for bar visibility (0-255).
--- @tparam bool blink Whether the bar blinks.
--- @tparam number blinkLimit %Limit below which bar starts blinking (0-1).
+-- Creates health bars for all enemies. A new bar is generated whenever Lara targets an enemy. If the "hide text" option is disabled, the enemy's name (as set in the editor) is displayed. 
+-- Multiple enemies can share the same name by appending _number to the name in the editor. If adjusting an enemy's max HP, ensure this is done before Lara targets the enemy.
+-- To create health bars for specific enemies, use CustomBar.CreateEnemyHpBar, ensuring the bar is created prior to targeting.
+-- @tparam table enemiesBarData The table that contains all the enemies bar data. Refer to table setup for enemiesBarData.
 --
-CustomBar.SetEnemiesHpGenericBar = function (objectIDbg, spriteIDbg, colorbg, posBG, rotBG, scaleBG, alignModebg, scaleModebg, blendModebg, 
-							objectIDbar, spriteIDbar, colorbar, posBar, rot, scaleBar, alignMode, scaleMode, blendMode,
-							textPos, textOptions, textScale, textColor, hideText, alphaBlendSpeed, blink, blinkLimit)
-	
-	if LevelVars.Engine.CustomBars.EnemiesHpBar.objectIDbg then
+-- @treturn CustomBar Enemy health bars.
+--
+CustomBar.SetEnemiesHpGenericBar = function (enemiesBarData)
+
+	if LevelVars.Engine.CustomBars.enemiesHpBar.objectIdBg then
         print("Warning: Overwriting enemy HP bar definitions")
 	end
 
-	LevelVars.Engine.CustomBars.EnemiesHpBar.objectIDbg			= objectIDbg
-	LevelVars.Engine.CustomBars.EnemiesHpBar.spriteIDbg			= spriteIDbg
-	LevelVars.Engine.CustomBars.EnemiesHpBar.colorBG			= colorbg
-	LevelVars.Engine.CustomBars.EnemiesHpBar.posBG				= posBG
-	LevelVars.Engine.CustomBars.EnemiesHpBar.scaleBG			= scaleBG
-	LevelVars.Engine.CustomBars.EnemiesHpBar.rotBG				= rotBG
-	LevelVars.Engine.CustomBars.EnemiesHpBar.alignModeBG	    = alignModebg
-	LevelVars.Engine.CustomBars.EnemiesHpBar.scaleModeBG	    = scaleModebg
-	LevelVars.Engine.CustomBars.EnemiesHpBar.blendModeBG	    = blendModebg
-	LevelVars.Engine.CustomBars.EnemiesHpBar.objectIDbar		= objectIDbar
-	LevelVars.Engine.CustomBars.EnemiesHpBar.spriteIDbar		= spriteIDbar
-	LevelVars.Engine.CustomBars.EnemiesHpBar.colorBar			= colorbar
-	LevelVars.Engine.CustomBars.EnemiesHpBar.posBar				= posBar
-	LevelVars.Engine.CustomBars.EnemiesHpBar.scaleBar			= scaleBar
-	LevelVars.Engine.CustomBars.EnemiesHpBar.rot				= rot
-	LevelVars.Engine.CustomBars.EnemiesHpBar.alignMode			= alignMode
-	LevelVars.Engine.CustomBars.EnemiesHpBar.scaleMode			= scaleMode
-	LevelVars.Engine.CustomBars.EnemiesHpBar.blendMode			= blendMode
-	LevelVars.Engine.CustomBars.EnemiesHpBar.textPos			= textPos
-	LevelVars.Engine.CustomBars.EnemiesHpBar.textOptions		= textOptions
-	LevelVars.Engine.CustomBars.EnemiesHpBar.textScale			= textScale
-	LevelVars.Engine.CustomBars.EnemiesHpBar.textColor			= textColor
-	LevelVars.Engine.CustomBars.EnemiesHpBar.hideText			= hideText  -- required to hide bar text
-	LevelVars.Engine.CustomBars.EnemiesHpBar.alphaBlendSpeed	= alphaBlendSpeed
-	LevelVars.Engine.CustomBars.EnemiesHpBar.blink				= blink
-	LevelVars.Engine.CustomBars.EnemiesHpBar.blinkLimit			= blinkLimit
+---
+-- Table setup for creating health bars for all enemies.
+-- @table enemiesBarData
+-- @tfield Objects.ObjID objectIdBg Object ID for the bar's background sprite.
+-- @tfield number spriteIdBg SpriteID from the specified object for the bar's background.
+-- @tfield Color colorBg Color of bar's background.
+-- @tfield Vec2 posBg X,Y position of the bar's background in screen percent (0-100).
+-- @tfield number rotBg rotation of the bar's background. sprite (0-360).
+-- @tfield Vec2 scaleBg X,Y Scaling factor for the bar's background sprite.
+-- @tfield View.AlignMode alignModeBg Alignment for the bar's background.
+-- @tfield View.ScaleMode scaleModeBg Scaling for the bar's background.
+-- @tfield Effects.BlendID blendModeBg Blending modes for the bar's background.
+-- @tfield Objects.ObjID objectIdBar Object ID for the bar sprite.
+-- @tfield number spriteIdBar SpriteID from the specified object for the bar.
+-- @tfield Color colorBar Color of the bar.
+-- @tfield Vec2 posBar X,Y position of the bar in screen percent (0-100).
+-- @tfield number rot rotation of the bar's sprite (0-360).
+-- @tfield Vec2 scaleBar X,Y Scaling factor for the bar's sprite.
+-- @tfield View.AlignMode alignMode Alignment for the bar.
+-- @tfield View.ScaleMode scaleMode Scaling for the bar.
+-- @tfield Effects.BlendID blendMode Blending modes for the bar.
+-- @tfield number textPos X position of the text.
+-- @tfield Strings.DisplayStringOption textOptions alignment and effects for the text. Default: None. Please note text is automatically aligned to the LEFT
+-- @tfield number textScale Scale factor for the text.
+-- @tfield Color textColor Color of the text.
+-- @tfield bool hideText Whether to hide the enemy name text.
+-- @tfield number alphaBlendSpeed Speed of alpha blending for bar visibility (0-255).
+-- @tfield bool blink Whether the bar blinks.
+-- @tfield number blinkLimit %Limit below which bar starts blinking (0-1).
+
+	LevelVars.Engine.CustomBars.enemiesHpBar.objectIdBg			= enemiesBarData.objectIdBg
+	LevelVars.Engine.CustomBars.enemiesHpBar.spriteIdBg			= enemiesBarData.spriteIdBg
+	LevelVars.Engine.CustomBars.enemiesHpBar.colorBg			= enemiesBarData.colorBg
+	LevelVars.Engine.CustomBars.enemiesHpBar.posBg				= enemiesBarData.posBg
+	LevelVars.Engine.CustomBars.enemiesHpBar.scaleBg			= enemiesBarData.scaleBg
+	LevelVars.Engine.CustomBars.enemiesHpBar.rotBg				= enemiesBarData.rotBg
+	LevelVars.Engine.CustomBars.enemiesHpBar.alignModeBg	    = enemiesBarData.alignModeBg
+	LevelVars.Engine.CustomBars.enemiesHpBar.scaleModeBg	    = enemiesBarData.scaleModeBg
+	LevelVars.Engine.CustomBars.enemiesHpBar.blendModeBg	    = enemiesBarData.blendModeBg
+	LevelVars.Engine.CustomBars.enemiesHpBar.objectIdBar		= enemiesBarData.objectIdBar
+	LevelVars.Engine.CustomBars.enemiesHpBar.spriteIdBar		= enemiesBarData.spriteIdBar
+	LevelVars.Engine.CustomBars.enemiesHpBar.colorBar			= enemiesBarData.colorBar
+	LevelVars.Engine.CustomBars.enemiesHpBar.posBar				= enemiesBarData.posBar
+	LevelVars.Engine.CustomBars.enemiesHpBar.scaleBar			= enemiesBarData.scaleBar
+	LevelVars.Engine.CustomBars.enemiesHpBar.rot				= enemiesBarData.rot
+	LevelVars.Engine.CustomBars.enemiesHpBar.alignMode			= enemiesBarData.alignMode
+	LevelVars.Engine.CustomBars.enemiesHpBar.scaleMode			= enemiesBarData.scaleMode
+	LevelVars.Engine.CustomBars.enemiesHpBar.blendMode			= enemiesBarData.blendMode
+	LevelVars.Engine.CustomBars.enemiesHpBar.textPos			= enemiesBarData.textPos
+	LevelVars.Engine.CustomBars.enemiesHpBar.textOptions		= enemiesBarData.textOptions
+	LevelVars.Engine.CustomBars.enemiesHpBar.textScale			= enemiesBarData.textScale
+	LevelVars.Engine.CustomBars.enemiesHpBar.textColor			= enemiesBarData.textColor
+	LevelVars.Engine.CustomBars.enemiesHpBar.hideText			= enemiesBarData.hideText
+	LevelVars.Engine.CustomBars.enemiesHpBar.alphaBlendSpeed	= enemiesBarData.alphaBlendSpeed
+	LevelVars.Engine.CustomBars.enemiesHpBar.blink				= enemiesBarData.blink
+	LevelVars.Engine.CustomBars.enemiesHpBar.blinkLimit			= enemiesBarData.blinkLimit
 
 
-	LevelVars.Engine.CustomBars.EnemiesHpBar.status = true
+	LevelVars.Engine.CustomBars.enemiesHpBar.status = true
+
 end
 
 -- The function retrieves an existing bar instance by its unique identifier (barName). This function is useful when you need to access or manipulate a bar that has already been created.
@@ -418,7 +513,7 @@ end
 -- @bool value Specifies whether new health bars for enemies should be created. 
 CustomBar.ShowEnemiesHpGenericBar = function(value)
 	if type(value) == "boolean" then
-		LevelVars.Engine.CustomBars.EnemiesHpBar.status = value
+		LevelVars.Engine.CustomBars.enemiesHpBar.status = value
 	end
 end
 
@@ -431,97 +526,94 @@ CustomBar.DeleteExistingHpGenericBars = function ()
 	end
 end
 
----Set background properties
 ---
 -- Sets the custom bar background sprite position.
--- @tparam Vec2 posBG X,Y position of the bar's background in screen percent (0-100).
+-- @tparam Vec2 pos X,Y position of the bar's background in screen percent (0-100).
 --
 function CustomBar:SetBackgroundPosition(pos)
 	if pos and LevelVars.Engine.CustomBars.bars[self.name] then
-		LevelVars.Engine.CustomBars.bars[self.name].posBG = pos
+		LevelVars.Engine.CustomBars.bars[self.name].posBg = pos
 	end
 end
 
 ---
 -- Sets the custom bar background sprite rotation.
--- @tparam number rotBG rotation of the bar's background. sprite (0-360).
+-- @tparam number rot rotation of the bar's background. sprite (0-360).
 --
 function CustomBar:SetBackgroundRotation(rot)
 	if rot and  LevelVars.Engine.CustomBars.bars[self.name] then
-		LevelVars.Engine.CustomBars.bars[self.name].rotBG = rot
+		LevelVars.Engine.CustomBars.bars[self.name].rotBg = rot
 	end
 end
 
 ---
 -- Sets the custom bar background sprite color.
--- @tparam Objects.ObjID objectIDbg Object ID for the bar's background sprite.
--- @tparam number spriteIDbg SpriteID from the specified object for the bar's background.
--- @tparam Color colorbg Color of bar's background.
+-- @tparam Color color Color of bar's background.
 --
 function CustomBar:SetBackgroundColor(color)
 	if color and LevelVars.Engine.CustomBars.bars[self.name] then
-		LevelVars.Engine.CustomBars.bars[self.name].colorBG = color
+		LevelVars.Engine.CustomBars.bars[self.name].colorBg = color
 	end
 end
 
 ---
 -- Sets the custom bar background sprite scale.
--- @tparam Vec2 scaleBG X,Y Scaling factor for the bar's background sprite.
+-- @tparam Vec2 scale X,Y Scaling factor for the bar's background sprite.
 --
 function CustomBar:SetBackgroundScale(scale)
 	if scale and LevelVars.Engine.CustomBars.bars[self.name] then
-		LevelVars.Engine.CustomBars.bars[self.name].scaleBG = scale
+		LevelVars.Engine.CustomBars.bars[self.name].scaleBg = scale
 	end
 end
 
 ---
 -- Sets the custom bar background sprite slot and sprite ID.
--- @tparam Objects.ObjID objectIDbg Object ID for the bar's background sprite.
--- @tparam number spriteIDbg SpriteID from the specified object for the bar's background.
+-- @tparam Objects.ObjID slot Object ID for the bar's background sprite.
+-- @tparam number id SpriteID from the specified object for the bar's background.
 --
 function CustomBar:SetBackgroundSpriteSlot(slot, id)
 	if slot and id and LevelVars.Engine.CustomBars.bars[self.name] then
-		LevelVars.Engine.CustomBars.bars[self.name].objectIDbar = slot
-		LevelVars.Engine.CustomBars.bars[self.name].spriteIDbar = id
+		LevelVars.Engine.CustomBars.bars[self.name].objectIdBar = slot
+		LevelVars.Engine.CustomBars.bars[self.name].spriteIdBar = id
 	end
 end
 
 ---
 -- Sets the custom bar background sprite align mode.
--- @tparam View.AlignMode alignModebg Alignment for the bar's background.
+-- @tparam View.AlignMode alignMode Alignment for the bar's background.
 --
-function CustomBar:SetBackgroudAlignMode(alignMode)
+function CustomBar:SetBackgroundAlignMode(alignMode)
 	if alignMode and LevelVars.Engine.CustomBars.bars[self.name] then
 		LevelVars.Engine.CustomBars.bars[self.name].alignMode = alignMode
 	end
 end
 ---
 -- Sets the custom bar background sprite scale mode.
--- @tparam View.ScaleMode scaleModebg Scaling for the bar's background.
+-- @tparam View.ScaleMode scaleMode Scaling for the bar's background.
 --
-function CustomBar:SetBackgroudScaleMode(scaleMode)
+function CustomBar:SetBackgroundScaleMode(scaleMode)
 	if scaleMode and LevelVars.Engine.CustomBars.bars[self.name] then
 		LevelVars.Engine.CustomBars.bars[self.name].scaleMode = scaleMode
 	end
 end
 ---
 -- Sets the custom bar background sprite blend mode.
--- @tparam Effects.BlendID blendModebg Blending modes for the bar's background.
+-- @tparam Effects.BlendID blendMode Blending modes for the bar's background.
 --
-function CustomBar:SetBackgroudBlendMode(blendMode)
+function CustomBar:SetBackgroundBlendMode(blendMode)
 	if blendMode and LevelVars.Engine.CustomBars.bars[self.name] then
-		LevelVars.Engine.CustomBars.bars[self.name].blendModeBG = blendMode
+		LevelVars.Engine.CustomBars.bars[self.name].blendModeBg = blendMode
 	end
 end
 
 ---Set bar properties
 ---
 -- Sets the custom bar sprite position.
--- @tparam Vec2 posBar X,Y position of the bar in screen percent (0-100).
+-- @tparam Vec2 pos X,Y position of the bar in screen percent (0-100).
 --
 function CustomBar:SetBarPosition(pos)
 	if pos and LevelVars.Engine.CustomBars.bars[self.name] then
-		LevelVars.Engine.CustomBars.bars[self.name].posBG = pos
+		LevelVars.Engine.CustomBars.bars[self.name].posBg = pos
 	end
 end
 ---
@@ -535,7 +627,7 @@ function CustomBar:SetBarRotation(rot)
 end
 ---
 -- Sets the custom bar sprite color.
--- @tparam Color colorbar Color of the bar.
+-- @tparam Color color Color of the bar.
 --
 function CustomBar:SetBarColor(color)
 	if color and LevelVars.Engine.CustomBars.bars[self.name] then
@@ -544,7 +636,7 @@ function CustomBar:SetBarColor(color)
 end
 ---
 -- Sets the custom bar sprite scale.
--- @tparam Vec2 scaleBar X,Y Scaling factor for the bar's sprite.
+-- @tparam Vec2 scale X,Y Scaling factor for the bar's sprite.
 --
 function CustomBar:SetBarScale(scale)
 	if scale and LevelVars.Engine.CustomBars.bars[self.name] then
@@ -553,13 +645,13 @@ function CustomBar:SetBarScale(scale)
 end
 ---
 -- Sets the custom bar sprite slot and sprite ID.
--- @tparam Objects.ObjID objectIDbar Object ID for the bar sprite.
--- @tparam number spriteIDbar SpriteID from the specified object for the bar.
+-- @tparam Objects.ObjID slot Object ID for the bar sprite.
+-- @tparam number id SpriteID from the specified object for the bar.
 --
 function CustomBar:SetBarSpriteSlot(slot, id)
 	if slot and id and LevelVars.Engine.CustomBars.bars[self.name] then
-		LevelVars.Engine.CustomBars.bars[self.name].objectIDbg = slot
-		LevelVars.Engine.CustomBars.bars[self.name].spriteIDbg = id
+		LevelVars.Engine.CustomBars.bars[self.name].objectIdBg = slot
+		LevelVars.Engine.CustomBars.bars[self.name].spriteIdBg = id
 	end
 end
 ---
@@ -568,7 +660,7 @@ end
 --
 function CustomBar:SetBarAlignMode(alignMode)
 	if alignMode and LevelVars.Engine.CustomBars.bars[self.name] then
-		LevelVars.Engine.CustomBars.bars[self.name].alignModeBG = alignMode
+		LevelVars.Engine.CustomBars.bars[self.name].alignModeBg = alignMode
 	end
 end
 ---
@@ -577,7 +669,7 @@ end
 --
 function CustomBar:SetBarScaleMode(scaleMode)
 	if scaleMode and LevelVars.Engine.CustomBars.bars[self.name] then
-		LevelVars.Engine.CustomBars.bars[self.name].scaleModeBG = scaleMode
+		LevelVars.Engine.CustomBars.bars[self.name].scaleModeBg = scaleMode
 	end
 end
 ---
@@ -594,18 +686,49 @@ LevelFuncs.Engine.CustomBar.UpdateCustomBars = function()
 	
 	local playerTarget = Lara:GetTarget()
 	
-	if playerTarget ~= nil and LevelVars.Engine.CustomBars.EnemiesHpBar.status then
+	if playerTarget ~= nil and LevelVars.Engine.CustomBars.enemiesHpBar.status then
 		local playerTargetName = playerTarget:GetName()
 		local displayName = LevelFuncs.Engine.Node.SplitString(playerTargetName, "_")
 		local enemytable = playerTargetName .. "_bar_data"
 		if LevelVars.Engine.CustomBars.bars[enemytable] == nil then
-			local eB = LevelVars.Engine.CustomBars.EnemiesHpBar
-			CustomBar.CreateEnemyHpBar(playerTargetName,
-			eB.objectIDbg, eB.spriteIDbg, eB.colorBG, eB.posBG, eB.rotBG, eB.scaleBG, eB.alignModeBG, eB.scaleModeBG, eB.blendModeBG,
-			eB.objectIDbar, eB.spriteIDbar, eB.colorBar, eB.posBar, eB.rot, eB.scaleBar, eB.alignMode, eB.scaleMode, eB.blendMode,
-			displayName[1], eB.textPos, eB.textOptions, eB.textScale, eB.textColor, eB.hideText,
-			eB.alphaBlendSpeed, playerTargetName, false, eB.blink, eB.blinkLimit)
+			local eB = LevelVars.Engine.CustomBars.enemiesHpBar
+
+			local enemyBar = {
+				barName			= playerTargetName,
+				objectIdBg		= eB.objectIdBg,
+				spriteIdBg		= eB.spriteIdBg,
+				colorBg			= eB.colorBg,
+				posBg			= eB.posBg,
+				rotBg			= eB.rotBg,
+				scaleBg			= eB.scaleBg,
+				alignModeBg		= eB.alignModeBg,
+				scaleModeBg		= eB.scaleModeBg,
+				blendModeBg		= eB.blendModeBg,
+				objectIdBar		= eB.objectIdBar,
+				spriteIdBar		= eB.spriteIdBar,
+				colorBar		= eB.colorBar,
+				posBar			= eB.posBar,
+				rot				= eB.rot,
+				scaleBar		= eB.scaleBar,
+				alignMode		= eB.alignMode,
+				scaleMode		= eB.scaleMode,
+				blendMode		= eB.blendMode,
+				text			= displayName[1],
+				textPos			= eB.textPos,
+				textOptions		= eB.textOptions,
+				textScale		= eB.textScale,
+				textColor		= eB.textColor,
+				hideText		= eB.hideText,
+				alphaBlendSpeed	= eB.alphaBlendSpeed,
+				blink			= eB.blink,
+				blinkLimit		= eB.blinkLimit,
+				showBar 		= false,
+				object			= playerTargetName
+			}
+			
+			CustomBar.CreateEnemyHpBar(enemyBar)
 			LevelVars.Engine.CustomBars.bars[enemytable].getActionType = 4
+
 		end
 	end
 	
@@ -754,15 +877,15 @@ LevelFuncs.Engine.CustomBar.UpdateCustomBars = function()
 			end
 			
 			-- Set parameters to draw the background
-			local posBG = customBar.posBG
-			local scaleBG = customBar.scaleBG
-			local rotBG = customBar.rotBG
-			local alignMBG = LevelFuncs.Engine.Node.GetDisplaySpriteAlignMode(customBar.alignModeBG)
-			local scaleMBG = LevelFuncs.Engine.Node.GetDisplaySpriteScaleMode(customBar.scaleModeBG)
-			local blendIDBG = LevelFuncs.Engine.Node.GetBlendMode(customBar.blendModeBG)
-			local normalAlpha = (customBar.currentAlpha/255)
+			local posBg = customBar.posBg
+			local scaleBg = customBar.scaleBg
+			local rotBg = customBar.rotBg
+			local alignMBg = LevelFuncs.Engine.Node.GetDisplaySpriteAlignMode(customBar.alignModeBg)
+			local scaleMBg = LevelFuncs.Engine.Node.GetDisplaySpriteScaleMode(customBar.scaleModeBg)
+			local blendIdBg = LevelFuncs.Engine.Node.GetBlendMode(customBar.blendModeBg)
+
 			-- Adjust color with alpha blending
-			local bgColor = Color(customBar.colorBG.r,customBar.colorBG.g,customBar.colorBG.b,customBar.currentAlpha)
+			local bgColor = Color(customBar.colorBg.r,customBar.colorBg.g,customBar.colorBg.b,customBar.currentAlpha)
 			
 			-- Set parameters to draw the bar
 			local pos = customBar.posBar
@@ -782,12 +905,12 @@ LevelFuncs.Engine.CustomBar.UpdateCustomBars = function()
 			--draw bar if alpha is greater than 1 and visibility is true
 			if customBar.visible and customBar.currentAlpha > 0 then
 				-- Draw background sprite
-				local bgSprite = TEN.DisplaySprite(customBar.objectIDbg, customBar.spriteIDbg, posBG, rotBG, scaleBG, bgColor)
-				bgSprite:Draw(0, alignMBG, scaleMBG, blendIDBG)
+				local bgSprite = TEN.DisplaySprite(customBar.objectIdBg, customBar.spriteIdBg, posBg, rotBg, scaleBg, bgColor)
+				bgSprite:Draw(0, alignMBg, scaleMBg, blendIdBg)
 
 				-- Draw foreground sprite (the bar itself) proportional to Progress
 				local barScale = TEN.Vec2(customBar.scaleBar.x * customBar.progress, customBar.scaleBar.y)
-				local barSprite = TEN.DisplaySprite(customBar.objectIDbar, customBar.spriteIDbar, pos, rot, barScale, barColor)
+				local barSprite = TEN.DisplaySprite(customBar.objectIdBar, customBar.spriteIdBar, pos, rot, barScale, barColor)
 				
 				if customBar.frameCounter == nil then
 					customBar.frameCounter = 0
@@ -824,24 +947,19 @@ LevelFuncs.Engine.CustomBar.UpdateCustomBars = function()
 					local myText = TEN.Strings.DisplayString(barText, posInPixel, customBar.textScale, textColor, IsString, customBar.textOptions)
 					TEN.Strings.ShowString(myText, 1/30)
 				end
-				-- Debugging code
-				--local barValue = math.floor(customBar.oldValue)
-				--local myTextString = "Bar Value: " .. barValue
-				--local myText = DisplayString(myTextString, customBar.posX, customBar.posY-10, customBar.colorBar)
-				--TEN.Strings.ShowString(myText,1/30)
 			end
 		end
 	end
 end
 
-LevelFuncs.Engine.CustomBar.GenerateStringOption = function (alignment, effects)
-	local options = {}
-	if (effects == 1 or effects == 3) then table.insert(options, TEN.Strings.DisplayStringOption.SHADOW) end
-	if (effects == 2 or effects == 3) then table.insert(options, TEN.Strings.DisplayStringOption.BLINK) end
-	if (alignment == 1) then table.insert(options, TEN.Strings.DisplayStringOption.CENTER) end
-	if (alignment == 2) then table.insert(options, TEN.Strings.DisplayStringOption.RIGHT) end
-	return options
-end
+-- LevelFuncs.Engine.CustomBar.GenerateStringOption = function (alignment, effects)
+-- 	local options = {}
+-- 	if (effects == 1 or effects == 3) then table.insert(options, TEN.Strings.DisplayStringOption.SHADOW) end
+-- 	if (effects == 2 or effects == 3) then table.insert(options, TEN.Strings.DisplayStringOption.BLINK) end
+-- 	if (alignment == 1) then table.insert(options, TEN.Strings.DisplayStringOption.CENTER) end
+-- 	if (alignment == 2) then table.insert(options, TEN.Strings.DisplayStringOption.RIGHT) end
+-- 	return options
+-- end
 
 TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRELOOP, LevelFuncs.Engine.CustomBar.UpdateCustomBars)
 
