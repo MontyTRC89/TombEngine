@@ -114,6 +114,7 @@ namespace TEN::Scripting::Effects
 	@tparam bool damage (default false) specifies whether particle can damage Lara (does a very small amount of damage, like the small lava emitters in TR1)
 	@tparam bool poison (default false) specifies whether particle can poison Lara
 	@tparam Objects.ObjID ID of the sprite object.
+	@tparam float startRot (default random) specifies the starting rotation value of the particle.
 	@usage
 	EmitParticle(
 		yourPositionVarHere,
@@ -134,7 +135,7 @@ namespace TEN::Scripting::Effects
 	static void EmitParticle(Vec3 pos, Vec3 velocity, int spriteIndex, TypeOrNil<int> gravity, TypeOrNil<float> rot, 
 							TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<BlendMode> blendMode, 
 							TypeOrNil<int> startSize, TypeOrNil<int> endSize, TypeOrNil<float> lifetime, 
-							TypeOrNil<bool> damage, TypeOrNil<bool> poison, TypeOrNil<GAME_OBJECT_ID> objectID)
+							TypeOrNil<bool> damage, TypeOrNil<bool> poison, TypeOrNil<GAME_OBJECT_ID> objectID, TypeOrNil<float> startRot)
 	{
 		// Ensure objectID is valid 
 		GAME_OBJECT_ID effectiveObjectID = USE_IF_HAVE(GAME_OBJECT_ID, objectID, ID_DEFAULT_SPRITES); 
@@ -212,7 +213,7 @@ namespace TEN::Scripting::Effects
 
 		float rotAdd = USE_IF_HAVE(float, rot, 0.0f);
 
-		s->rotAng = (GetRandomControl() & 0x0FFF); 
+		s->rotAng = USE_IF_HAVE(float, startRot,(GetRandomControl() & 0x0FFF));
 		s->rotAdd = byte(ANGLE(rotAdd) >> 4);
 
 		s->friction = 0;
