@@ -7,6 +7,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### Bug fixes
 * Fixed static meshes with dynamic light mode not accepting room lights.
+* Fixed silent crashes if no Visual C++ runtimes are installed, and provide a dialog box to download them instead.
 * Fixed issues with launching the engine from directories with non-Western characters in the path.
 * Fixed rare case of not being able to start a new game or exit game from the main menu on very slow GPUs.
 * Fixed occasional crashes with creatures stuck in a sector with no pathfinding set.

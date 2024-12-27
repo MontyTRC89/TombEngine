@@ -49,6 +49,53 @@ bool ArgEquals(wchar_t* incomingArg, std::string name)
 	return (lowerArg == "-" + name) || (lowerArg == "/" + name);
 }
 
+bool IsRedistInstalled()
+{
+	const char* redistKey =
+#ifdef _WIN64
+		R"(SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64)";
+#else
+		R"(SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x86)";
+#endif
+
+	HKEY hKey;
+	LSTATUS result = RegOpenKeyExA(HKEY_LOCAL_MACHINE, redistKey, 0, KEY_READ, &hKey);
+	if (result == ERROR_SUCCESS)
+	{
+		RegCloseKey(hKey);
+
+		HMODULE hModule = LoadLibraryW(L"vcruntime140.dll");
+		if (hModule != NULL)
+		{
+			FreeLibrary(hModule);
+			return true;
+		}
+	}
+
+	const char* redistUrl =
+#ifdef _WIN64
+		R"(https://aka.ms/vs/17/release/vc_redist.x64.exe)";
+#else
+		R"(https://aka.ms/vs/17/release/vc_redist.x86.exe)";
+#endif
+
+	const char* message = "TombEngine requires Visual C++ Redistributable to be installed. Would you like to download it now?";
+	int msgBoxResult = MessageBoxA(NULL, message, "Missing libraries", MB_ICONWARNING | MB_OKCANCEL);
+
+	if (msgBoxResult == IDOK)
+	{
+		HINSTANCE hResult = ShellExecuteA(NULL, "open", redistUrl, NULL, NULL, SW_SHOWNORMAL);
+
+		if ((intptr_t)hResult <= 32)
+		{
+			MessageBoxA(NULL, (LPCSTR)("Failed to start browser to download runtimes. Error code: " +
+				std::to_string((long)(intptr_t)hResult)).c_str(), "Error", MB_ICONERROR | MB_OK);
+		}
+	}
+
+	return false;
+}
+
 Vector2i GetScreenResolution()
 {
 	RECT desktop;
@@ -298,6 +345,12 @@ int main()
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
+	if (!IsRedistInstalled())
+	{
+		WinClose();
+		exit(EXIT_SUCCESS);
+	}
+
 	// Process command line arguments.
 	bool setup = false;
 	std::string levelFile = {};
@@ -539,14 +592,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	while (DoTheGame);
 
+	TENLog("Cleaning up and exiting...", LogLevel::Info);
+
 	WinClose();
 	exit(EXIT_SUCCESS);
 }
 
 void WinClose()
 {
-	TENLog("Cleaning up and exiting...", LogLevel::Info);
-
 	WaitForSingleObject((HANDLE)ThreadHandle, 5000);
 
 	DestroyAcceleratorTable(hAccTable);
