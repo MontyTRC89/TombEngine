@@ -8,7 +8,7 @@ namespace TEN::Utils
 	WorkerManager::WorkerManager()
 	{
 		// Reserve threads.
-		unsigned int threadCount = std::thread::hardware_concurrency() * 2;
+		unsigned int threadCount = GetCoreCount() * 2;
 		_threads.reserve(threadCount);
 
 		// Create threads.
@@ -20,12 +20,7 @@ namespace TEN::Utils
 
 	WorkerManager::~WorkerManager()
 	{
-		// LOCK: Restrict shutdown flag access.
-		{
-			auto taskLock = std::lock_guard(_taskMutex);
-
-			_deinitialize = true;
-		}
+		_deinitialize = true;
 
 		// Notify all threads they should stop.
 		_taskCond.notify_all();
@@ -55,7 +50,7 @@ namespace TEN::Utils
 
 	unsigned int WorkerManager::GetCoreCount() const
 	{
-		return std::thread::hardware_concurrency();
+		return std::max(std::thread::hardware_concurrency(), 1u);
 	}
 
 	void WorkerManager::AddTask(const WorkerTask& task, uint64_t groupId)

@@ -14,7 +14,7 @@ namespace TEN::Utils
 		std::queue<WorkerTask>	 _tasks		   = {};
 		std::mutex				 _taskMutex	   = {};
 		std::condition_variable	 _taskCond	   = {};
-		std::atomic<bool>		 _deinitialize = false;
+		bool					 _deinitialize = false;
 
 		std::unordered_map<uint64_t, unsigned int> _groupTaskCounts = {}; // Key = group ID, value = task count.
 		std::atomic<uint64_t>					   _groupIdCounter	= {};
@@ -57,9 +57,9 @@ namespace TEN::Utils
 				{
 					int start = i * chunkSize;
 					int end = std::min(start + chunkSize, itemCount);
-					g_Worker.AddTask([task, start, end]() { task(start, end); }, groupId);
+					AddTask([task, start, end]() { task(start, end); }, groupId);
 				}
-				g_Worker.WaitForGroup(groupId);
+				WaitForGroup(groupId);
 			}
 			// Process linearly.
 			else
