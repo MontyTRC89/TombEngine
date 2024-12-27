@@ -347,19 +347,26 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Initialize logging.
 	InitTENLog(gameDir);
 
+	auto windowName = std::string("Starting TombEngine");
+
 	// Indicate version.
 	auto ver = GetProductOrFileVersion(false);
-	auto windowName = (std::string("Starting TombEngine version ") +
-					   std::to_string(ver[0]) + "." +
-					   std::to_string(ver[1]) + "." +
-					   std::to_string(ver[2]) + "." +
-					   std::to_string(ver[3]) + " " +
+
+	if (ver.size() == 4)
+	{
+		windowName = windowName + " version " +
+					 std::to_string(ver[0]) + "." +
+					 std::to_string(ver[1]) + "." +
+					 std::to_string(ver[2]) + "." +
+					 std::to_string(ver[3]);
+	}
+
 #ifdef _WIN64
-					   "(64-bit)"
+	windowName = windowName + " (64-bit)";
 #else
-					   "(32-bit)"
+	windowName = windowName + " (32-bit)";
 #endif
-					   );
+
 	TENLog(windowName, LogLevel::Info);
 
 	// Initialize savegame and scripting systems.
