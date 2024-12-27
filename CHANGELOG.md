@@ -10,7 +10,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### New Features
 
 ### Lua API changes
-* Added additional argument for Sprite object slot and starting rotation value for EmitParticle function.
+* Added additional arguments for Sprite object slot and starting rotation value for EmitParticle function.
   
 ## [Version 1.7](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.3) - 2024-12-25
 
