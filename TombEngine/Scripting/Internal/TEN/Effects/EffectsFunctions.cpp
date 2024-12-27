@@ -113,6 +113,7 @@ namespace TEN::Scripting::Effects
 	@tparam float lifetime (default 2) Lifespan in seconds 
 	@tparam bool damage (default false) specifies whether particle can damage Lara (does a very small amount of damage, like the small lava emitters in TR1)
 	@tparam bool poison (default false) specifies whether particle can poison Lara
+	@tparam Objects.ObjID ID of the sprite object.
 	@usage
 	EmitParticle(
 		yourPositionVarHere,
@@ -133,10 +134,15 @@ namespace TEN::Scripting::Effects
 	static void EmitParticle(Vec3 pos, Vec3 velocity, int spriteIndex, TypeOrNil<int> gravity, TypeOrNil<float> rot, 
 							TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<BlendMode> blendMode, 
 							TypeOrNil<int> startSize, TypeOrNil<int> endSize, TypeOrNil<float> lifetime, 
-							TypeOrNil<bool> damage, TypeOrNil<bool> poison)
+							TypeOrNil<bool> damage, TypeOrNil<bool> poison, TypeOrNil<GAME_OBJECT_ID> objectID)
 	{
-		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Particle spawn script function"))
-			return;
+		// Ensure objectID is valid 
+		GAME_OBJECT_ID effectiveObjectID = USE_IF_HAVE(GAME_OBJECT_ID, objectID, ID_DEFAULT_SPRITES); 
+		
+		// Validate the effective object ID 
+		if (!CheckIfSlotExists(effectiveObjectID, "Particle spawn script function"))
+		return;
+		
 
 		int grav = USE_IF_HAVE(int, gravity, 0);
 
@@ -146,7 +152,7 @@ namespace TEN::Scripting::Effects
 
 		s->on = true;
 
-		s->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + spriteIndex;
+		s->spriteIndex = Objects[effectiveObjectID].meshIndex + spriteIndex;
 
 		ScriptColor colorStart = USE_IF_HAVE(ScriptColor, startColor, ScriptColor( 255, 255, 255 ));
 		ScriptColor colorEnd = USE_IF_HAVE(ScriptColor, endColor, ScriptColor( 255, 255, 255 ));
