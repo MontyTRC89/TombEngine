@@ -133,10 +133,11 @@ namespace TEN::Scripting::Effects
 	static void EmitParticle(Vec3 pos, Vec3 velocity, int spriteIndex, TypeOrNil<int> gravity, TypeOrNil<float> rot, 
 							TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<BlendMode> blendMode, 
 							TypeOrNil<int> startSize, TypeOrNil<int> endSize, TypeOrNil<float> lifetime, 
-							TypeOrNil<bool> damage, TypeOrNil<bool> poison)
+							TypeOrNil<bool> damage, TypeOrNil<bool> poison, TypeOrNil<GAME_OBJECT_ID> objectID)
 	{
-		if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Particle spawn script function"))
-			return;
+		// This seems unnecessary now
+		//if (!CheckIfSlotExists(objectID, "Particle spawn script function"))
+		//	return;
 
 		int grav = USE_IF_HAVE(int, gravity, 0);
 
@@ -146,7 +147,7 @@ namespace TEN::Scripting::Effects
 
 		s->on = true;
 
-		s->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + spriteIndex;
+		s->spriteIndex = Objects[(USE_IF_HAVE(GAME_OBJECT_ID, objectID, ID_DEFAULT_SPRITES))].meshIndex + spriteIndex;
 
 		ScriptColor colorStart = USE_IF_HAVE(ScriptColor, startColor, ScriptColor( 255, 255, 255 ));
 		ScriptColor colorEnd = USE_IF_HAVE(ScriptColor, endColor, ScriptColor( 255, 255, 255 ));
