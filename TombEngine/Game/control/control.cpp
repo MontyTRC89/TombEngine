@@ -643,24 +643,18 @@ GameStatus DoGameLoop(int levelIndex)
 	status = GamePhase(false);
 
 	g_Synchronizer.Init();
-
-	bool legacy30FpsDrawDone = false;
-	bool controlPhaseDone    = false;
+	bool legacy30FpsDoneDraw = false;
 
 	while (DoTheGame)
 	{
 		g_Synchronizer.Sync();
-		controlPhaseDone = false;
 
 		while (g_Synchronizer.Synced())
 		{
-			if (!controlPhaseDone)
-				status = ControlPhase(false);
-			
+			status = ControlPhase(false);
 			g_Synchronizer.Step();
 
-			controlPhaseDone = true;
-			legacy30FpsDrawDone = false;
+			legacy30FpsDoneDraw = false;
 		}
 
 		if (status != GameStatus::Normal)
@@ -671,10 +665,10 @@ GameStatus DoGameLoop(int levelIndex)
 
 		if (!g_Configuration.EnableHighFramerate)
 		{
-			if (!legacy30FpsDrawDone)
+			if (!legacy30FpsDoneDraw)
 			{
 				DrawPhase(!levelIndex, 0.0f);
-				legacy30FpsDrawDone = true;
+				legacy30FpsDoneDraw = true;
 			}
 		}
 		else
