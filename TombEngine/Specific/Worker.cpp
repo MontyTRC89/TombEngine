@@ -20,7 +20,12 @@ namespace TEN::Utils
 
 	WorkerManager::~WorkerManager()
 	{
-		_deinitialize = true;
+		// LOCK: Restrict shutdown flag access.
+		{
+			auto taskLock = std::lock_guard(_taskMutex);
+
+			_deinitialize = true;
+		}
 
 		// Notify all threads they should stop.
 		_taskCond.notify_all();
@@ -108,7 +113,7 @@ namespace TEN::Utils
 			}
 
 			// Execute task.
-			if (task != nullptr)
+			if (task)
 				task();
 		}
 	}
