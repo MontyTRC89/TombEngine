@@ -11,6 +11,7 @@
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
+#include "Game/effects/Bubble.h"
 #include "Game/Setup.h"
 #include "Objects/Utils/object_helper.h"
 #include "Scripting/Internal/LuaHandler.h"
@@ -36,6 +37,7 @@ using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
+using namespace TEN::Effects::Bubble;
 
 namespace TEN::Scripting::Effects
 {
@@ -303,6 +305,18 @@ namespace TEN::Scripting::Effects
 		TriggerBlood(pos.x, pos.y, pos.z, -1, USE_IF_HAVE(int, num, 1));
 	}
 
+/***Emit Air bubble in a water room.
+@function EmitAirBubble
+@tparam Vec3 position The position where the air bubble will be spawned.
+@tparam int roomNumber The room number where the air bubble will be generated.
+@tparam float size The size of the air bubble.
+@tparam float amplitude The oscillation amplitude of the air bubble.
+*/
+	static void EmitAirBubble(Vec3 pos, int roomNumber, float size, float amplitude)
+	{
+		SpawnBubble(pos, roomNumber, size, amplitude);
+	}
+
 /***Emit fire for one frame. Will not hurt Lara. Call this each frame if you want a continuous fire.
 @function EmitFire
 @tparam Vec3 pos
@@ -354,6 +368,7 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_EmitLight, &EmitLight);
 		tableEffects.set_function(ScriptReserved_EmitSpotLight, &EmitSpotLight);
 		tableEffects.set_function(ScriptReserved_EmitBlood, &EmitBlood);
+		tableEffects.set_function(ScriptReserved_EmitAirBubble, &EmitAirBubble);
 		tableEffects.set_function(ScriptReserved_MakeExplosion, &MakeExplosion);
 		tableEffects.set_function(ScriptReserved_EmitFire, &EmitFire);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
