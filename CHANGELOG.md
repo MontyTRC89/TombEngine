@@ -7,6 +7,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### Bug fixes
 * Fixed static meshes with dynamic light mode not accepting room lights.
+* Fixed rare case of not being able to start a new game or exit game from main menu.
 * Fixed antialiasing quality not changing after changing it in display settings.
 * Fixed endless explosion effect for Puna.
 
