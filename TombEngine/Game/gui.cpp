@@ -713,11 +713,9 @@ namespace TEN::Gui
 					}
 					else
 					{
-						// Just for updating blink time
-						g_Renderer.PrepareScene();
+						g_Renderer.PrepareScene(); // Just for updating blink time.
+						UpdateInputActions(item);
 					}
-
-					UpdateInputActions(item);
 
 					if (CurrentSettings.IgnoreInput)
 					{
