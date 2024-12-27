@@ -113,6 +113,7 @@ namespace TEN::Scripting::Effects
 	@tparam float lifetime (default 2) Lifespan in seconds 
 	@tparam bool damage (default false) specifies whether particle can damage Lara (does a very small amount of damage, like the small lava emitters in TR1)
 	@tparam bool poison (default false) specifies whether particle can poison Lara
+	@tparam Objects.ObjID ID of the sprite object.
 	@usage
 	EmitParticle(
 		yourPositionVarHere,
@@ -135,7 +136,7 @@ namespace TEN::Scripting::Effects
 							TypeOrNil<int> startSize, TypeOrNil<int> endSize, TypeOrNil<float> lifetime, 
 							TypeOrNil<bool> damage, TypeOrNil<bool> poison, TypeOrNil<GAME_OBJECT_ID> objectID)
 	{
-		// This seems unnecessary now
+		//Unable to figure this out
 		//if (!CheckIfSlotExists(objectID, "Particle spawn script function"))
 		//	return;
 
