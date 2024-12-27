@@ -136,13 +136,13 @@ namespace TEN::Scripting::Effects
 							TypeOrNil<int> startSize, TypeOrNil<int> endSize, TypeOrNil<float> lifetime, 
 							TypeOrNil<bool> damage, TypeOrNil<bool> poison, TypeOrNil<GAME_OBJECT_ID> objectID)
 	{
-
-		{ // Ensure objectID is valid 
+		// Ensure objectID is valid 
 		GAME_OBJECT_ID effectiveObjectID = USE_IF_HAVE(GAME_OBJECT_ID, objectID, ID_DEFAULT_SPRITES); 
 		
 		// Validate the effective object ID 
 		if (!CheckIfSlotExists(effectiveObjectID, "Particle spawn script function"))
 		return;
+		
 
 		int grav = USE_IF_HAVE(int, gravity, 0);
 
