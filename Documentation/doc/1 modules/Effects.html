@@ -120,7 +120,7 @@
 	<td class="summary">Emit a lightning arc.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#EmitParticle">EmitParticle(pos, velocity, spriteIndex, gravity, rot, startColor, endColor, blendMode, startSize, endSize, lifetime, damage, poison, ID)</a></td>
+	<td class="name" ><a href="#EmitParticle">EmitParticle(pos, velocity, spriteIndex, gravity, rot, startColor, endColor, blendMode, startSize, endSize, lifetime, damage, poison, ID, startRot)</a></td>
 	<td class="summary">Emit a particle.</td>
 	</tr>
 	<tr>
@@ -224,7 +224,7 @@
 </dd>
     <dt>
     <a name = "EmitParticle"></a>
-    <strong>EmitParticle(pos, velocity, spriteIndex, gravity, rot, startColor, endColor, blendMode, startSize, endSize, lifetime, damage, poison, ID)</strong>
+    <strong>EmitParticle(pos, velocity, spriteIndex, gravity, rot, startColor, endColor, blendMode, startSize, endSize, lifetime, damage, poison, ID, startRot)</strong>
     </dt>
     <dd>
 
@@ -296,6 +296,10 @@
         <li><span class="parameter">ID</span>
             <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
          of the sprite object.
+        </li>
+        <li><span class="parameter">startRot</span>
+            <span class="types"><span class="type">float</span></span>
+         (default random) specifies the starting rotation value of the particle.
         </li>
     </ul>
 
