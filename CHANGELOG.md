@@ -13,6 +13,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### New Features
 * Added realtime shader reloading in debug mode by pressing F9 key.
+* Increased particle limit from 1024 to 4096.
 
 ### Lua API changes
 * Fixed Flow.FreezeMode.FULL drawing incorrect background.
