@@ -41,7 +41,7 @@
 --	blinkLimit          = 0.25
 --	}
 --
---	--This function creates the bar and displays it
+--	--This function creates the bar.
 --	CustomBar.Create(barData)
 --
 --	--This method gets the bar with name "water" and stores it in variable bar.
