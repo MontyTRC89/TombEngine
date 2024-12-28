@@ -212,7 +212,7 @@ namespace TEN::Effects::SmokeEmitter
 		part.friction = 3;
 		part.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
 
-		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_OUTSIDE, item.RoomNumber))
+		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_SKYBOX, item.RoomNumber))
 			part.flags |= SP_WIND;
 
 		part.rotAng = Random::GenerateInt(0, 4095);

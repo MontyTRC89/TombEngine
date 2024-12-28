@@ -3,7 +3,6 @@
 
 #include <CommCtrl.h>
 #include <process.h>
-#include <resource.h>
 #include <iostream>
 #include <codecvt>
 #include <filesystem>
@@ -11,6 +10,7 @@
 #include "Game/control/control.h"
 #include "Game/savegame.h"
 #include "Renderer/Renderer.h"
+#include "resource.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/configuration.h"
@@ -47,6 +47,53 @@ bool ArgEquals(wchar_t* incomingArg, std::string name)
 {
 	auto lowerArg = TEN::Utils::ToLower(TEN::Utils::ToString(incomingArg));
 	return (lowerArg == "-" + name) || (lowerArg == "/" + name);
+}
+
+bool IsRedistInstalled()
+{
+	const char* redistKey =
+#ifdef _WIN64
+		R"(SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64)";
+#else
+		R"(SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x86)";
+#endif
+
+	HKEY hKey;
+	LSTATUS result = RegOpenKeyExA(HKEY_LOCAL_MACHINE, redistKey, 0, KEY_READ, &hKey);
+	if (result == ERROR_SUCCESS)
+	{
+		RegCloseKey(hKey);
+
+		HMODULE hModule = LoadLibraryW(L"vcruntime140.dll");
+		if (hModule != NULL)
+		{
+			FreeLibrary(hModule);
+			return true;
+		}
+	}
+
+	const char* redistUrl =
+#ifdef _WIN64
+		R"(https://aka.ms/vs/17/release/vc_redist.x64.exe)";
+#else
+		R"(https://aka.ms/vs/17/release/vc_redist.x86.exe)";
+#endif
+
+	const char* message = "TombEngine requires Visual C++ Redistributable to be installed. Would you like to download it now?";
+	int msgBoxResult = MessageBoxA(NULL, message, "Missing libraries", MB_ICONWARNING | MB_OKCANCEL);
+
+	if (msgBoxResult == IDOK)
+	{
+		HINSTANCE hResult = ShellExecuteA(NULL, "open", redistUrl, NULL, NULL, SW_SHOWNORMAL);
+
+		if ((intptr_t)hResult <= 32)
+		{
+			MessageBoxA(NULL, (LPCSTR)("Failed to start browser to download runtimes. Error code: " +
+				std::to_string((long)(intptr_t)hResult)).c_str(), "Error", MB_ICONERROR | MB_OK);
+		}
+	}
+
+	return false;
 }
 
 Vector2i GetScreenResolution()
@@ -129,20 +176,68 @@ void DisableDpiAwareness()
 	FreeLibrary(lib);
 }
 
+bool GenerateDummyLevel(const std::string& levelPath)
+{
+	// Try loading embedded resource "data.bin"
+	HRSRC hResource = FindResource(NULL, MAKEINTRESOURCE(IDR_TITLELEVEL), "BIN");
+	if (hResource == NULL)
+	{
+		TENLog("Embedded title level file not found.", LogLevel::Error);
+		return false;
+	}
+
+	// Load resource into memory.
+	HGLOBAL hGlobal = LoadResource(NULL, hResource);
+	if (hGlobal == NULL)
+	{
+		TENLog("Failed to load embedded title level file.", LogLevel::Error);
+		return false;
+	}
+
+	// Lock resource to get data pointer.
+	void* pData = LockResource(hGlobal);
+	DWORD dwSize = SizeofResource(NULL, hResource);
+
+	// Write resource data to file.
+	try
+	{
+		auto dir = std::filesystem::path(levelPath).parent_path();
+		if (!dir.empty())
+			std::filesystem::create_directories(dir);
+
+		auto outFile = std::ofstream(levelPath, std::ios::binary);
+		if (!outFile)
+			throw std::ios_base::failure("Failed to create title level file.");
+
+		outFile.write(reinterpret_cast<const char*>(pData), dwSize);
+		if (!outFile)
+			throw std::ios_base::failure("Failed to write to title level file.");
+
+		outFile.close();
+	}
+	catch (const std::exception& ex)
+	{
+		TENLog("Error while generating title level file: " + std::string(ex.what()), LogLevel::Error);
+		return false;
+	}
+
+	return true;
+}
+
 void WinProcMsg()
 {
-	MSG Msg;
+	MSG msg;
 
 	do
 	{
-		GetMessage(&Msg, 0, 0, 0);
-		if (!TranslateAccelerator(WindowsHandle, hAccTable, &Msg))
+		GetMessage(&msg, 0, 0, 0);
+		if (!TranslateAccelerator(WindowsHandle, hAccTable, &msg))
 		{
-			TranslateMessage(&Msg);
-			DispatchMessage(&Msg);
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
 		}
 	}
-	while (!ThreadEnded && Msg.message != WM_QUIT);
+	while (!ThreadEnded && msg.message != WM_QUIT);
 }
 
 void CALLBACK HandleWmCommand(unsigned short wParam)
@@ -250,6 +345,12 @@ int main()
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
+	if (!IsRedistInstalled())
+	{
+		WinClose();
+		exit(EXIT_SUCCESS);
+	}
+
 	// Process command line arguments.
 	bool setup = false;
 	std::string levelFile = {};
@@ -299,18 +400,26 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Initialize logging.
 	InitTENLog(gameDir);
 
+	auto windowName = std::string("Starting TombEngine");
+
 	// Indicate version.
 	auto ver = GetProductOrFileVersion(false);
-	auto windowName = (std::string("Starting TombEngine version ") +
-					   std::to_string(ver[0]) + "." +
-					   std::to_string(ver[1]) + "." +
-					   std::to_string(ver[2]) + " " +
+
+	if (ver.size() == 4)
+	{
+		windowName = windowName + " version " +
+					 std::to_string(ver[0]) + "." +
+					 std::to_string(ver[1]) + "." +
+					 std::to_string(ver[2]) + "." +
+					 std::to_string(ver[3]);
+	}
+
 #ifdef _WIN64
-					   "(64-bit)"
+	windowName = windowName + " (64-bit)";
 #else
-					   "(32-bit)"
+	windowName = windowName + " (32-bit)";
 #endif
-					   );
+
 	TENLog(windowName, LogLevel::Info);
 
 	// Initialize savegame and scripting systems.
@@ -483,6 +592,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	while (DoTheGame);
 
+	TENLog("Cleaning up and exiting...", LogLevel::Info);
+
 	WinClose();
 	exit(EXIT_SUCCESS);
 }
@@ -495,8 +606,6 @@ void WinClose()
 
 	Sound_DeInit();
 	DeinitializeInput();
-
-	TENLog("Cleaning up and exiting...", LogLevel::Info);
 	
 	delete g_GameScript;
 	g_GameScript = nullptr;

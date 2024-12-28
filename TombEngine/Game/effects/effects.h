@@ -1,6 +1,11 @@
 #pragma once
+
+#include "Game/Items.h"
+#include "Game/effects/Light.h"
 #include "Math/Math.h"
 #include "Renderer/RendererEnums.h"
+
+using namespace TEN::Effects::Light;
 
 enum class LaraWeaponType;
 enum GAME_OBJECT_ID : short;
@@ -13,9 +18,8 @@ constexpr auto SD_UWEXPLOSION = 2;
 constexpr auto MAX_NODE		= 23;
 constexpr auto MAX_DYNAMICS = 64;
 constexpr auto MAX_SPLASHES = 8;
-constexpr auto NUM_EFFECTS	= 256;
 
-constexpr auto MAX_PARTICLES		 = 1024;
+constexpr auto MAX_PARTICLES		 = 4096;
 constexpr auto MAX_PARTICLE_DYNAMICS = 8;
 
 extern int Wibble;
@@ -239,7 +243,7 @@ extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern Vector3i NodeVectors[ParticleNodeOffsetIDs::NodeMax];
 extern NODEOFFSET_INFO NodeOffsets[ParticleNodeOffsetIDs::NodeMax];
 
-extern FX_INFO EffectList[NUM_EFFECTS];
+extern FX_INFO EffectList[MAX_SPAWNED_ITEM_COUNT];
 
 template <typename TEffect>
 TEffect& GetNewEffect(std::vector<TEffect>& effects, unsigned int countMax)
@@ -284,7 +288,7 @@ void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID);
 
 void DetatchSpark(int num, SpriteEnumFlag type);
 void UpdateSparks();
-void TriggerRicochetSpark(const GameVector& pos, short angle, int count, int unk);
+void TriggerRicochetSpark(const GameVector& pos, short angle, bool sound = true);
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv);
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber, const Vector3& mainColor = Vector3::Zero, const Vector3& secondColor = Vector3::Zero);
 void TriggerExplosionSmokeEnd(int x, int y, int z, int uw);
@@ -299,7 +303,6 @@ void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNu
 void ControlWaterfallMist(short itemNumber);
 void TriggerWaterfallMist(const ItemInfo& item);
 void KillAllCurrentItems(short itemNumber);
-void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
 void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber);
 void TriggerRocketSmoke(int x, int y, int z);
 void TriggerFlashSmoke(int x, int y, int z, short roomNumber);
@@ -313,5 +316,3 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber);
 void Ricochet(Pose& pos);
 void ProcessEffects(ItemInfo* item);
 void UpdateWibble();
-
-void TriggerDynamicLight(const Vector3& pos, const Color& color, float falloff);

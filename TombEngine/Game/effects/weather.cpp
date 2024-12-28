@@ -361,8 +361,9 @@ namespace TEN::Effects::Environment
 			if (part.Type == WeatherType::None)
 				continue;
 
-			auto pointColl = GetPointCollision(part.Position, part.RoomNumber);
+			PointCollisionData pointColl;
 			bool collisionCalculated = false;
+			bool landed = false;
 
 			if (part.CollisionCheckDelay <= 0)
 			{
@@ -393,9 +394,8 @@ namespace TEN::Effects::Environment
 
 				if (pointColl.GetRoomNumber() == part.RoomNumber)
 				{
-					// Not landed on door, so out of room bounds - delete.
-					part.Enabled = false;
-					continue;
+					// Not landed on door, so out of room bounds - land.
+					landed = true;
 				}
 				else
 				{
@@ -409,7 +409,7 @@ namespace TEN::Effects::Environment
 				// If particle is inside water or swamp, count it as "inSubstance".
 				// If particle got below floor or above ceiling, count it as "landed".
 				bool inSubstance = g_Level.Rooms[pointColl.GetRoomNumber()].flags & (ENV_FLAG_WATER | ENV_FLAG_SWAMP);
-				bool landed = (pointColl.GetFloorHeight() <= part.Position.y) || (pointColl.GetCeilingHeight() >= part.Position.y);
+				landed = landed || (pointColl.GetFloorHeight() <= part.Position.y) || (pointColl.GetCeilingHeight() >= part.Position.y);
 
 				if (inSubstance || landed)
 				{
@@ -427,6 +427,8 @@ namespace TEN::Effects::Environment
 						part.Enabled = false;
 						AddWaterSparks(prevPos.x, prevPos.y, prevPos.z, 6);
 					}
+
+					continue;
 				}
 			}
 
@@ -500,37 +502,33 @@ namespace TEN::Effects::Environment
 	{
 		for (int i = 0; i < DUST_SPAWN_DENSITY; i++)
 		{
-			int xPos = Camera.pos.x + rand() % DUST_SPAWN_RADIUS - DUST_SPAWN_RADIUS / 2.0f;
-			int yPos = Camera.pos.y + rand() % DUST_SPAWN_RADIUS - DUST_SPAWN_RADIUS / 2.0f;
-			int zPos = Camera.pos.z + rand() % DUST_SPAWN_RADIUS - DUST_SPAWN_RADIUS / 2.0f;
+			// TODO: Use functions in Math::Random namespace.
+			auto pos = Camera.pos.ToVector3i() + Vector3i(
+				(rand() % DUST_SPAWN_RADIUS) - (DUST_SPAWN_RADIUS / 2),
+				(rand() % DUST_SPAWN_RADIUS) - (DUST_SPAWN_RADIUS / 2),
+				(rand() % DUST_SPAWN_RADIUS) - (DUST_SPAWN_RADIUS / 2));
 
-			// Use more memory-efficient GetFloor() instead of GetPointCollision() as a lot of dust may spawn at a time.
-			short roomNumber = Camera.pos.RoomNumber;
-			auto* floor = GetFloor(xPos, yPos, zPos, &roomNumber);
+			int roomNumber = Camera.pos.RoomNumber;
+			if (!IsPointInRoom(pos, roomNumber))
+				roomNumber = FindRoomNumber(pos, Camera.pos.RoomNumber, true);
+
+			if (roomNumber == NO_VALUE)
+				continue;
 
 			// Check if water room.
 			if (!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, roomNumber))
 				continue;
 
-			if (!IsPointInRoom(Vector3i(xPos, yPos, zPos), roomNumber))
-				continue;
-
 			auto part = WeatherParticle();
-
 			part.Velocity = Random::GenerateDirection() * DUST_VELOCITY_MAX;
-
 			part.Size = Random::GenerateFloat(DUST_SIZE_MAX / 2, DUST_SIZE_MAX);
-
 			part.Type = WeatherType::None;
 			part.Life = DUST_LIFE + Random::GenerateInt(-10, 10);
 			part.RoomNumber = roomNumber;
-			part.Position.x = xPos;
-			part.Position.y = yPos;
-			part.Position.z = zPos;
+			part.Position = pos.ToVector3();
 			part.Stopped = false;
 			part.Enabled = true;
 			part.StartLife = part.Life;
-
 			Particles.push_back(part);
 		}
 	}

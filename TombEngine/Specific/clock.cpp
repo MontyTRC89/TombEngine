@@ -43,6 +43,13 @@ void HighFramerateSynchronizer::Sync()
 		_lastTime = _currentTime;
 		_controlDelay += _frameTime;
 	}
+
+	_locked = true;
+}
+
+bool HighFramerateSynchronizer::Locked()
+{
+	return _locked;
 }
 
 bool HighFramerateSynchronizer::Synced()
@@ -56,6 +63,13 @@ bool HighFramerateSynchronizer::Synced()
 	}
 #endif
 
+	// If frameskip is in action, lock flag will remain set until synchronizer is 
+	// about to break out from it. This flag is later reused in input polling to
+	// prevent engine from de-registering input events prematurely.
+
+	if (_controlDelay > CONTROL_FRAME_TIME && _controlDelay <= CONTROL_FRAME_TIME * 2)
+		_locked = false;
+
 	return (_controlDelay >= CONTROL_FRAME_TIME);
 }
 
@@ -68,7 +82,6 @@ float HighFramerateSynchronizer::GetInterpolationFactor()
 {
 	return std::min((float)_controlDelay / (float)CONTROL_FRAME_TIME, 1.0f);
 }
-
 
 int TimeSync()
 {
@@ -103,18 +116,6 @@ bool TimeInit()
 	LdFreq /= 60.0;
 	TimeReset();
 	return true;
-}
-
-GameTime GetGameTime(int ticks)
-{
-	auto gameTime = GameTime{};
-	int seconds = ticks / FPS;
-
-	gameTime.Days    = (seconds / (DAY_UNIT * SQUARE(TIME_UNIT)));
-	gameTime.Hours   = (seconds % (DAY_UNIT * SQUARE(TIME_UNIT))) / SQUARE(TIME_UNIT);
-	gameTime.Minutes = (seconds / TIME_UNIT) % TIME_UNIT;
-	gameTime.Seconds = seconds % TIME_UNIT;
-	return gameTime;
 }
 
 bool TestGlobalTimeInterval(float intervalSecs, float offsetSecs)

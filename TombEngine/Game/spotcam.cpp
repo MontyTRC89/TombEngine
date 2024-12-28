@@ -56,6 +56,7 @@ int NumberSpotcams;
 
 bool CheckTrigger = false;
 bool UseSpotCam = false;
+bool SpotcamSwitched = false;
 bool SpotcamDontDrawLara = false;
 bool SpotcamOverlay = false;
 
@@ -471,11 +472,11 @@ void CalculateSpotCameras()
 	if ((s->flags & SCF_DISABLE_BREAKOUT) || !lookPressed)
 	{
 		// Disable interpolation if camera traveled too far.
-		auto p1 = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-		auto p2 = Vector3(cpx, cpy, cpz);
-		auto dist = Vector3::Distance(p1, p2);
+		auto origin = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+		auto target = Vector3(cpx, cpy, cpz);
+		float dist = Vector3::Distance(origin, target);
 
-		if (dist > CLICK(1))
+		if (dist > BLOCK(0.25f))
 			Camera.DisableInterpolation = true;
 
 		Camera.pos.x = cpx;
@@ -493,9 +494,10 @@ void CalculateSpotCameras()
 			Camera.target.x = ctx;
 			Camera.target.y = cty;
 			Camera.target.z = ctz;
+			CalculateBounce(false);
 		}
 
-		auto outsideRoom = IsRoomOutside(cpx, cpy, cpz);
+		int outsideRoom = IsRoomOutside(cpx, cpy, cpz);
 		if (outsideRoom == NO_VALUE)
 		{
 			// HACK: Sometimes actual camera room number desyncs from room number derived using floordata functions.
@@ -658,10 +660,7 @@ void CalculateSpotCameras()
 				SpotcamPaused = 0;
 
 				if (LastCamera >= CurrentSplineCamera)
-				{
-					Camera.DisableInterpolation = true;
 					return;
-				}
 
 				if (s->flags & SCF_LOOP_SEQUENCE)
 				{
@@ -692,13 +691,14 @@ void CalculateSpotCameras()
 
 					SetCinematicBars(0.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 
-					Camera.DisableInterpolation = true;
 					UseSpotCam = false;
-					Lara.Control.IsLocked = false;
 					CheckTrigger = false;
+					Lara.Control.IsLocked = false;
+					Lara.Control.Look.IsUsingBinoculars = false;
 					Camera.oldType = CameraType::Fixed;
 					Camera.type = CameraType::Chase;
 					Camera.speed = 1;
+					Camera.DisableInterpolation = true;
 
 					if (s->flags & SCF_CUT_TO_LARA_CAM)
 					{

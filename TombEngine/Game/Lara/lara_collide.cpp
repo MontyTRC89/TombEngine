@@ -436,7 +436,7 @@ void LaraResetGravityStatus(ItemInfo* item, CollisionInfo* coll)
 void LaraSnapToHeight(ItemInfo* item, CollisionInfo* coll)
 {
 	if (TestEnvironment(ENV_FLAG_SWAMP, item) && coll->Middle.Floor > 0)
-		item->Pose.Position.y += SWAMP_GRAVITY;
+		item->Pose.Position.y += g_GameFlow->GetSettings()->Physics.Gravity / SWAMP_GRAVITY_COEFF;
 	else if (coll->Middle.Floor != NO_HEIGHT)
 		item->Pose.Position.y += coll->Middle.Floor;
 }

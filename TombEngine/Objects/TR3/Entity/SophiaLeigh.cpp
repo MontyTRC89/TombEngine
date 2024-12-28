@@ -150,7 +150,7 @@ namespace TEN::Entities::Creatures::TR3
 
 	static void KnockbackCollision(ItemInfo& item, short headingAngle)
 	{
-		item.HitPoints -= 200;
+		DoDamage(&item, 200);
 		item.HitStatus = true;
 
 		short diff = item.Pose.Orientation.y - headingAngle;
@@ -224,7 +224,7 @@ namespace TEN::Entities::Creatures::TR3
 			(item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SCEPTER_SHOOT) && item.Animation.FrameNumber > GetFrameIndex(&item, 39) && item.Animation.FrameNumber < GetFrameIndex(&item, 47)) ||
 			(item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SCEPTER_SMALL_SHOOT) && item.Animation.FrameNumber > GetFrameIndex(&item, 14) && item.Animation.FrameNumber < GetFrameIndex(&item, 18)))
 		{
-			TriggerDynamicLight(
+			SpawnDynamicLight(
 				pos.x, pos.y, pos.z,
 				item.ItemFlags[1] + SOPHIALEIGH_LIGHTNING_GLOW_SIZE,
 				SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX);
@@ -234,7 +234,7 @@ namespace TEN::Entities::Creatures::TR3
 		}
 		else if (item.Animation.AnimNumber == GetAnimIndex(item, SOPHIALEIGH_ANIM_SUMMON_END) && item.Animation.FrameNumber >= GetFrameIndex(&item, 3) && item.ItemFlags[1] > 0)
 		{
-			TriggerDynamicLight(
+			SpawnDynamicLight(
 				pos.x, pos.y, pos.z,
 				item.ItemFlags[1] + SOPHIALEIGH_LIGHTNING_GLOW_SIZE,
 				SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX);
@@ -289,7 +289,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		// Check the previous and next position of AI object to
 		// allow Sophia to go up or down based on enemy's vertical position.
-		FindAITargetObject(item, ID_AI_X1, creature->LocationAI, false);
+		FindAITargetObject(creature, ID_AI_X1, creature->LocationAI, false);
 
 		if (Vector3i::Distance(item.Pose.Position, creature->Enemy->Pose.Position) < SOPHIALEIGH_REACHED_GOAL_RANGE)
 		{

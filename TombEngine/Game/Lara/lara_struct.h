@@ -1146,29 +1146,6 @@ struct TorchData
 	TorchState State = TorchState::Holding;
 };
 
-// TODO: Troye's abandoned dairy feature.
-constexpr int MAX_DIARY_PAGES			 = 64;
-constexpr int MAX_DIARY_STRINGS_PER_PAGE = 8;
-
-struct DiaryString
-{
-	Vector2i Position = Vector2i::Zero;
-	int		 StringID = 0;
-};
-
-struct DiaryPage
-{
-	DiaryString	Strings[MAX_DIARY_STRINGS_PER_PAGE] = {};
-};
-
-struct DiaryInfo
-{
-	bool		 Present				= false;
-	DiaryPage	 Pages[MAX_DIARY_PAGES] = {};
-	unsigned int NumPages				= 0;
-	unsigned int CurrentPage			= 0;
-};
-
 struct LaraCountData
 {
 	unsigned int Pose			= 0;
@@ -1302,8 +1279,6 @@ struct PlayerInventoryData
 	bool IsBusy	 = false;
 	bool OldBusy = false;
 
-	DiaryInfo Diary = {};
-
 	byte BeetleLife;
 	int BeetleComponents; // BeetleComponentFlags enum
 	byte SmallWaterskin;  // 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 4 (has skin + 3 = 4)
@@ -1315,6 +1290,11 @@ struct PlayerInventoryData
 	int TotalFlares;
 	unsigned int TotalSecrets;
 
+	bool HasLoad	   = false;
+	bool HasSave	   = false;
+	bool HasStopwatch  = false;
+	bool HasCompass	   = false;
+	bool HasDiary	   = false;
 	bool HasBinoculars = false;
 	bool HasCrowbar	   = false;
 	bool HasTorch	   = false;
