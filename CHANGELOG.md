@@ -13,9 +13,11 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed occasional crashes with creatures stuck in a sector with no pathfinding set.
 * Fixed antialiasing quality not changing after changing it in display settings.
 * Fixed endless explosion effect for Puna.
+* Fixed diary pick-up item inventory state not preserved in the savegame.
 
 ### New Features
 * Added realtime shader reloading in debug mode by pressing F9 key.
+* Added load, save, stopwatch and compass as a functional pick-up items with ability to add or remove them from inventory.
 * Increased particle limit from 1024 to 4096.
 
 ### Lua API changes

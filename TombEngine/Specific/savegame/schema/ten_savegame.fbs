@@ -143,6 +143,11 @@ table LaraInventoryData {
 	small_waterskin: int32;
 	big_waterskin: int32;
 	has_binoculars: bool;
+	has_compass: bool;
+	has_stopwatch: bool;
+	has_diary: bool;
+	has_load: bool;
+	has_save: bool;
 	has_crowbar: bool;
 	has_torch: bool;
 	has_lasersight: bool;
