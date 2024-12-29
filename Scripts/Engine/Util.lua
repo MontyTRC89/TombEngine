@@ -120,8 +120,8 @@ Utility.SplitString = function(inputStr, delimiter)
 	return t
 end
 
--- Helper function to set time format for timer and stopwatch.
-Utility.SetTimeFormat = function (timerFormat)
+-- Helper function to check time format for timer and stopwatch.
+Utility.CheckTimeFormat = function (timerFormat)
     local set = false
 
     if Type.IsTable(timerFormat) then
@@ -177,7 +177,7 @@ Utility.GenerateTimeFormattedString = function (time, timerFormat)
         TEN.Util.PrintLog("Error in Utility.GenerateTimeFormattedString() function: invalid time", TEN.Util.LogLevel.ERROR)
         return ""
     end
-    timerFormat = Utility.SetTimeFormat(timerFormat)
+    timerFormat = Utility.CheckTimeFormat(timerFormat)
     if timerFormat == false then
         TEN.Util.PrintLog("Error in Utility.GenerateTimeFormattedString() function: invalid options", TEN.Util.LogLevel.ERROR)
         return ""
@@ -205,7 +205,7 @@ Utility.GenerateTimeFormattedString = function (time, timerFormat)
         if index == 1 then
             return deciseconds
         end
-        return  table.concat{formattedString, ".", deciseconds}
+        return  formattedString .. "." .. deciseconds
     end
 
     return formattedString
