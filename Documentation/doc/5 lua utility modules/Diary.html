@@ -110,8 +110,62 @@
 <h1>Lua utility module <code>Diary</code></h1>
 <p>Diaries:
 The module provides functions to create and manage Diaries.</p>
+<p>
 <p> It maintains state through LevelVars.Engine.Diaries which stores diary definitions and configurations.
  Each diary is accessed by the object that was used to create it. </p>
+
+<p> Example usage:</p>
+
+
+<pre>
+<span class="keyword">local</span> CustomDiary = <span class="global">require</span>(<span class="string">"Engine.CustomDiary"</span>)
+
+<span class="comment">--Create a table with all the bar properties
+</span><span class="keyword">local</span> barData = {
+barName             = <span class="string">"water"</span>,
+startValue          = <span class="number">0</span>,
+maxValue            = <span class="number">1000</span>,
+objectIdBg          = TEN.Objects.ObjID.CUSTOM_BAR_GRAPHIC,
+spriteIdBg          = <span class="number">0</span>,
+colorBg             = TEN.Color(<span class="number">255</span>,<span class="number">255</span>,<span class="number">255</span>),
+posBg               = TEN.Vec2(<span class="number">20</span>, <span class="number">20</span>),
+rotBg               = <span class="number">0</span>,
+scaleBg             = TEN.Vec2(<span class="number">19.05</span>, <span class="number">19.1</span>),
+alignModeBg         = TEN.View.AlignMode.CENTER_LEFT,
+scaleModeBg         = TEN.View.ScaleMode.FIT,
+blendModeBg         = TEN.Effects.BlendID.ALPHABLEND,
+objectIdBar         = TEN.Objects.ObjID.CUSTOM_BAR_GRAPHIC,
+spriteIdBar         = <span class="number">1</span>,
+colorBar            = TEN.Color(<span class="number">255</span>,<span class="number">0</span>,<span class="number">0</span>),
+posBar              = TEN.Vec2(<span class="number">20.15</span>, <span class="number">20</span>),
+rot                 = <span class="number">0</span>,
+scaleBar            = TEN.Vec2(<span class="number">18.7</span>, <span class="number">18.48</span>),
+alignMode           = TEN.View.AlignMode.CENTER_LEFT,
+scaleMode           = TEN.View.ScaleMode.FIT,
+blendMode           = TEN.Effects.BlendID.ALPHABLEND,
+text                = <span class="string">"Water Bar"</span>,
+textPos             = TEN.Vec2(<span class="number">20</span>, <span class="number">15</span>),
+textOptions         = {TEN.Strings.DisplayStringOption.SHADOW,TEN.Strings.DisplayStringOption.CENTER},
+textScale           = <span class="number">1</span>,
+textColor           = TEN.Color(<span class="number">255</span>,<span class="number">0</span>,<span class="number">0</span>),
+hideText            = <span class="keyword">false</span>,
+alphaBlendSpeed     = <span class="number">50</span>,
+blink               = <span class="keyword">false</span>,
+blinkLimit          = <span class="number">0.25</span>
+}
+
+<span class="comment">--This function creates the bar and displays it
+</span>CustomBar.Create(barData)
+
+<span class="comment">--This method gets the bar with name "water" and stores it in variable bar.
+</span><span class="keyword">local</span> diary = CustomBar.Get(<span class="string">"water"</span>)
+<span class="comment">--This method displays the bar
+</span>diary:SetVisibility(<span class="keyword">true</span>)
+<span class="comment">--This method sets the bar value to 1000 over 5 seconds.
+</span>bar:SetBarValue(<span class="number">1000</span>,<span class="number">5</span>)
+</pre>
+
+</p>
 
 
 <h2><a href="#Functions">Functions</a></h2>
@@ -121,7 +175,7 @@ The module provides functions to create and manage Diaries.</p>
 	<td class="summary">Imports diary from an external file.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#CustomDiary.Create">CustomDiary.Create(object, objectIdBg, spriteIdBg, colorBg, posBg, rotBG, scaleBg, alignModebg, scaleModebg, blendModebg, pageSound, exitSound)</a></td>
+	<td class="name" ><a href="#CustomDiary.Create">CustomDiary.Create(object, objectIdBg, spriteIdBg, colorBg, pos, rot, scale, alignMode, scaleMode, blendMode, alpha, pageSound, exitSound)</a></td>
 	<td class="summary">Creates a diary with extensive configuration options.</td>
 	</tr>
 	<tr>
@@ -137,27 +191,27 @@ The module provides functions to create and manage Diaries.</p>
 	<td class="summary">The function checks whether the specified diary is currently visible.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#CustomDiary:showDiary">CustomDiary:showDiary()</a></td>
+	<td class="name" ><a href="#CustomDiary:showDiary">CustomDiary:showDiary(pageIndex)</a></td>
 	<td class="summary">The function displays the specified diary.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#CustomDiary:getUnlockedPageCount">CustomDiary:getUnlockedPageCount()</a></td>
-	<td class="summary">The function returns the number of pages in the diary.</td>
+	<td class="summary">The function returns the number of unlocked pages in the diary.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#CustomDiary:unlockPages">CustomDiary:unlockPages(pageIndex, notification)</a></td>
-	<td class="summary">The function sets the value of a custom bar over a specified time period.</td>
+	<td class="summary">The function unlocks the specified diary up to the given page number.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#CustomDiary:clearPage">CustomDiary:clearPage(pageIndex)</a></td>
-	<td class="summary">The function clears the page number for the diary.</td>
+	<td class="summary">The function clears the page for the diary.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#CustomDiary:addTextEntry">CustomDiary:addTextEntry(pageIndex, text, textPos, textOptions, textScale, textColor)</a></td>
 	<td class="summary">Adds a text entry to the specified page for the diary.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#CustomDiary:addImageEntry">CustomDiary:addImageEntry(pageIndex, objectIDbg, spriteID, color, posBg, rot, scaleBg, alignMode, scaleMode, blendMode)</a></td>
+	<td class="name" ><a href="#CustomDiary:addImageEntry">CustomDiary:addImageEntry(pageIndex, objectId, spriteId, color, pos, rot, scale, alignMode, scaleMode, blendMode)</a></td>
 	<td class="summary">Adds an image entry to the specified page for the diary.</td>
 	</tr>
 	<tr>
@@ -169,7 +223,7 @@ The module provides functions to create and manage Diaries.</p>
 	<td class="summary">Remove the narration track from the page of the specified diary.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#CustomDiary:addBackground">CustomDiary:addBackground(objectIdBg, spriteIdBg, colorBg, pos, rot, scale, alignModebg, scaleModebg, blendModebg)</a></td>
+	<td class="name" ><a href="#CustomDiary:addBackground">CustomDiary:addBackground(objectId, spriteId, color, pos, rot, scale, alignMode, scaleMode, blendMode, alpha)</a></td>
 	<td class="summary">Add a background image for the diary.</td>
 	</tr>
 	<tr>
@@ -194,15 +248,15 @@ The module provides functions to create and manage Diaries.</p>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#CustomDiary:customizeControls">CustomDiary:customizeControls(textPos, textOptions, textScale, textColor)</a></td>
-	<td class="summary">Customizes the controls bar for the diary.</td>
+	<td class="summary">Customizes the controls text for the diary.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#CustomDiary:customizeControlsText">CustomDiary:customizeControlsText(Text, Text, Text, Text)</a></td>
+	<td class="name" ><a href="#CustomDiary:customizeControlsText">CustomDiary:customizeControlsText(string1, string2, string3, string4, separator)</a></td>
 	<td class="summary">Customizes the display text for controls for specified diary.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#CustomDiary:clearControls">CustomDiary:clearControls()</a></td>
-	<td class="summary">Clears settings for the control display system for the specified diary.</td>
+	<td class="summary">Clears settings for the specified diary's controls text.</td>
 	</tr>
 </table>
 
@@ -237,7 +291,7 @@ The module provides functions to create and manage Diaries.</p>
 </dd>
     <dt>
     <a name = "CustomDiary.Create"></a>
-    <strong>CustomDiary.Create(object, objectIdBg, spriteIdBg, colorBg, posBg, rotBG, scaleBg, alignModebg, scaleModebg, blendModebg, pageSound, exitSound)</strong>
+    <strong>CustomDiary.Create(object, objectIdBg, spriteIdBg, colorBg, pos, rot, scale, alignMode, scaleMode, blendMode, alpha, pageSound, exitSound)</strong>
     </dt>
     <dd>
     Creates a diary with extensive configuration options.
@@ -249,43 +303,47 @@ The module provides functions to create and manage Diaries.</p>
     <ul>
         <li><span class="parameter">object</span>
             <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-         The pickup object that will be used to create the diary. Access the diary by selecting the item in the inventory. (596-611)
+         The pickup object that will be used to create the diary. The diary can be created using PICKUP<em>ITEMX (596-611) or DIARY</em>ITEM (986). Access the diary by selecting the item in the inventory.
         </li>
         <li><span class="parameter">objectIdBg</span>
             <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
          Object ID for the diary's sprite.
         </li>
         <li><span class="parameter">spriteIdBg</span>
-            <span class="types"><span class="type">number</span></span>
+            <span class="types"><span class="type">int</span></span>
          SpriteID from the specified object for the diary's sprite.
         </li>
         <li><span class="parameter">colorBg</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
          Color of diary's sprite.
         </li>
-        <li><span class="parameter">posBg</span>
+        <li><span class="parameter">pos</span>
             <span class="types"><a class="type" href="../3 primitive classes/Vec2.html#">Vec2</a></span>
          X,Y position of the bar's background in screen percent (0-100).
         </li>
-        <li><span class="parameter">rotBG</span>
+        <li><span class="parameter">rot</span>
             <span class="types"><span class="type">float</span></span>
          rotation of the diary's sprite (0-360).
         </li>
-        <li><span class="parameter">scaleBg</span>
+        <li><span class="parameter">scale</span>
             <span class="types"><a class="type" href="../3 primitive classes/Vec2.html#">Vec2</a></span>
          X,Y Scaling factor for the bar's background sprite.
         </li>
-        <li><span class="parameter">alignModebg</span>
+        <li><span class="parameter">alignMode</span>
             <span class="types"><a class="type" href="../4 enums/View.AlignMode.html#">AlignMode</a></span>
          Alignment for the diary's sprite.
         </li>
-        <li><span class="parameter">scaleModebg</span>
+        <li><span class="parameter">scaleMode</span>
             <span class="types"><a class="type" href="../4 enums/View.ScaleMode.html#">ScaleMode</a></span>
          Scaling for the diary's sprite.
         </li>
-        <li><span class="parameter">blendModebg</span>
+        <li><span class="parameter">blendMode</span>
             <span class="types"><a class="type" href="../4 enums/Effects.BlendID.html#">BlendID</a></span>
          Blending modes for the diary's sprite.
+        </li>
+        <li><span class="parameter">alpha</span>
+            <span class="types"><span class="type">number</span></span>
+         alpha value for the diary's sprite (0-255).
         </li>
         <li><span class="parameter">pageSound</span>
             <span class="types"><a class="type" href="../1 modules/Sound.html#">Sound</a></span>
@@ -300,8 +358,10 @@ The module provides functions to create and manage Diaries.</p>
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">the</span></span>
-        Diary table
+           <span class="types"><span class="type">CustomDiary</span></span>
+
+
+
     </ol>
 
 
@@ -321,15 +381,15 @@ The module provides functions to create and manage Diaries.</p>
     <ul>
         <li><span class="parameter">object</span>
             <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-         The pickup object that was used to create the diary (596-611).
+         The pickup object that was used to create the diary (596-611,986).
         </li>
     </ul>
 
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">The</span></span>
-        diary
+           <span class="types"><span class="type">CustomDiary</span></span>
+        The diary created using the object.
     </ol>
 
 
@@ -342,6 +402,7 @@ The module provides functions to create and manage Diaries.</p>
     </dt>
     <dd>
     The function removes a custom diary and its associated data from the system.  It ensures that the diary is no longer tracked or accessible in the LevelVars.Engine.Diaries.
+ Please call this once a diary has served its purpose. It helps reduce the savegame size.
 
 
 
@@ -349,7 +410,7 @@ The module provides functions to create and manage Diaries.</p>
     <ul>
         <li><span class="parameter">object</span>
             <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-         The pickup object that was used to create the diary (596-611).
+         The pickup object that was used to create the diary (596-611,986).
         </li>
     </ul>
 
@@ -381,13 +442,20 @@ The module provides functions to create and manage Diaries.</p>
 </dd>
     <dt>
     <a name = "CustomDiary:showDiary"></a>
-    <strong>CustomDiary:showDiary()</strong>
+    <strong>CustomDiary:showDiary(pageIndex)</strong>
     </dt>
     <dd>
-    The function displays the specified diary.
+    The function displays the specified diary.  Can be used to call the diary directly using volume or classic triggers.
 
 
 
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pageIndex</span>
+            <span class="types"><span class="type">int</span></span>
+         (Optional) The page number at which diary should be opened.
+        </li>
+    </ul>
 
 
 
@@ -399,7 +467,7 @@ The module provides functions to create and manage Diaries.</p>
     <strong>CustomDiary:getUnlockedPageCount()</strong>
     </dt>
     <dd>
-    The function returns the number of pages in the diary.
+    The function returns the number of unlocked pages in the diary.
 
 
 
@@ -420,7 +488,9 @@ The module provides functions to create and manage Diaries.</p>
     <strong>CustomDiary:unlockPages(pageIndex, notification)</strong>
     </dt>
     <dd>
-    The function sets the value of a custom bar over a specified time period.
+    The function unlocks the specified diary up to the given page number. <br/>
+ This value can be overridden to lock or unlock pages as needed.
+ A lower number can be set to restrict access to previously unlocked pages.
 
 
 
@@ -446,7 +516,7 @@ The module provides functions to create and manage Diaries.</p>
     <strong>CustomDiary:clearPage(pageIndex)</strong>
     </dt>
     <dd>
-    The function clears the page number for the diary.
+    The function clears the page for the diary.
 
 
 
@@ -507,7 +577,7 @@ The module provides functions to create and manage Diaries.</p>
 </dd>
     <dt>
     <a name = "CustomDiary:addImageEntry"></a>
-    <strong>CustomDiary:addImageEntry(pageIndex, objectIDbg, spriteID, color, posBg, rot, scaleBg, alignMode, scaleMode, blendMode)</strong>
+    <strong>CustomDiary:addImageEntry(pageIndex, objectId, spriteId, color, pos, rot, scale, alignMode, scaleMode, blendMode)</strong>
     </dt>
     <dd>
     Adds an image entry to the specified page for the diary.
@@ -520,11 +590,11 @@ The module provides functions to create and manage Diaries.</p>
             <span class="types"><span class="type">int</span></span>
          page number to add the image entry to.
         </li>
-        <li><span class="parameter">objectIDbg</span>
+        <li><span class="parameter">objectId</span>
             <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
          Object ID for the image entry sprite.
         </li>
-        <li><span class="parameter">spriteID</span>
+        <li><span class="parameter">spriteId</span>
             <span class="types"><span class="type">number</span></span>
          SpriteID from the specified object for the image entry.
         </li>
@@ -532,7 +602,7 @@ The module provides functions to create and manage Diaries.</p>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
          Color of image entry.
         </li>
-        <li><span class="parameter">posBg</span>
+        <li><span class="parameter">pos</span>
             <span class="types"><a class="type" href="../3 primitive classes/Vec2.html#">Vec2</a></span>
          X,Y position of the image entry in screen percent (0-100).
         </li>
@@ -540,7 +610,7 @@ The module provides functions to create and manage Diaries.</p>
             <span class="types"><span class="type">number</span></span>
          rotation of the image entry (0-360).
         </li>
-        <li><span class="parameter">scaleBg</span>
+        <li><span class="parameter">scale</span>
             <span class="types"><a class="type" href="../3 primitive classes/Vec2.html#">Vec2</a></span>
          X,Y Scaling factor for the image entry.
         </li>
@@ -602,7 +672,7 @@ The module provides functions to create and manage Diaries.</p>
     <ul>
         <li><span class="parameter">pageIndex</span>
             <span class="types"><span class="type">int</span></span>
-         page number to add the narration track to.
+         page number to remove the narration track from.
         </li>
     </ul>
 
@@ -613,7 +683,7 @@ The module provides functions to create and manage Diaries.</p>
 </dd>
     <dt>
     <a name = "CustomDiary:addBackground"></a>
-    <strong>CustomDiary:addBackground(objectIdBg, spriteIdBg, colorBg, pos, rot, scale, alignModebg, scaleModebg, blendModebg)</strong>
+    <strong>CustomDiary:addBackground(objectId, spriteId, color, pos, rot, scale, alignMode, scaleMode, blendMode, alpha)</strong>
     </dt>
     <dd>
     Add a background image for the diary.
@@ -622,15 +692,15 @@ The module provides functions to create and manage Diaries.</p>
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">objectIdBg</span>
+        <li><span class="parameter">objectId</span>
             <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
          Object ID for the diary's background.
         </li>
-        <li><span class="parameter">spriteIdBg</span>
+        <li><span class="parameter">spriteId</span>
             <span class="types"><span class="type">number</span></span>
          SpriteID from the specified object for the diary's background.
         </li>
-        <li><span class="parameter">colorBg</span>
+        <li><span class="parameter">color</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
          Color of diary's background.
         </li>
@@ -646,17 +716,21 @@ The module provides functions to create and manage Diaries.</p>
             <span class="types"><a class="type" href="../3 primitive classes/Vec2.html#">Vec2</a></span>
          X,Y Scaling factor for the diary's background.
         </li>
-        <li><span class="parameter">alignModebg</span>
+        <li><span class="parameter">alignMode</span>
             <span class="types"><a class="type" href="../4 enums/View.AlignMode.html#">AlignMode</a></span>
          Alignment for the diary's background.
         </li>
-        <li><span class="parameter">scaleModebg</span>
+        <li><span class="parameter">scaleMode</span>
             <span class="types"><a class="type" href="../4 enums/View.ScaleMode.html#">ScaleMode</a></span>
          Scaling for the diary's background.
         </li>
-        <li><span class="parameter">blendModebg</span>
+        <li><span class="parameter">blendMode</span>
             <span class="types"><a class="type" href="../4 enums/Effects.BlendID.html#">BlendID</a></span>
          Blending modes for the diary's background.
+        </li>
+        <li><span class="parameter">alpha</span>
+            <span class="types"><span class="type">number</span></span>
+         alpha value for the diary's background (0-255).
         </li>
     </ul>
 
@@ -823,7 +897,7 @@ The module provides functions to create and manage Diaries.</p>
     <strong>CustomDiary:customizeControls(textPos, textOptions, textScale, textColor)</strong>
     </dt>
     <dd>
-    Customizes the controls bar for the diary.
+    Customizes the controls text for the diary.
 
 
 
@@ -854,7 +928,7 @@ The module provides functions to create and manage Diaries.</p>
 </dd>
     <dt>
     <a name = "CustomDiary:customizeControlsText"></a>
-    <strong>CustomDiary:customizeControlsText(Text, Text, Text, Text)</strong>
+    <strong>CustomDiary:customizeControlsText(string1, string2, string3, string4, separator)</strong>
     </dt>
     <dd>
     Customizes the display text for controls for specified diary.
@@ -863,21 +937,25 @@ The module provides functions to create and manage Diaries.</p>
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">Text</span>
+        <li><span class="parameter">string1</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-         for Esc key controls text.
+         Text for Space key controls text.
         </li>
-        <li><span class="parameter">Text</span>
+        <li><span class="parameter">string2</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-         for Esc key controls text.
+         Text for Left key controls text.
         </li>
-        <li><span class="parameter">Text</span>
+        <li><span class="parameter">string3</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-         for Esc key controls text.
+         Text for Right key controls text.
         </li>
-        <li><span class="parameter">Text</span>
+        <li><span class="parameter">string4</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-         for Esc key controls text.
+         Text for Esc key controls text.
+        </li>
+        <li><span class="parameter">separator</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         Text for separator between controls text.
         </li>
     </ul>
 
@@ -891,7 +969,7 @@ The module provides functions to create and manage Diaries.</p>
     <strong>CustomDiary:clearControls()</strong>
     </dt>
     <dd>
-    Clears settings for the control display system for the specified diary.
+    Clears settings for the specified diary's controls text.
 
 
 
