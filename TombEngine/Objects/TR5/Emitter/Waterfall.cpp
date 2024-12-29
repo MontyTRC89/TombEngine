@@ -20,7 +20,6 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Effects::WaterfallEmitter
 {
-
     enum WaterfallItemFlags
     {
         Velocity,
@@ -39,19 +38,22 @@ namespace TEN::Effects::WaterfallEmitter
 	{
         auto& item = g_Level.Items[itemNumber];
 
-        //Customize x and z vel.
+        // Customize x and z vel.
         item.ItemFlags[WaterfallItemFlags::Velocity] = 100;
 
-        //Customize waterfall sprite scale.
+        // Customize waterfall sprite scale.
         item.ItemFlags[WaterfallItemFlags::WaterfallSpriteScale] = 3;
 
-        //Customize density.
+        // Customize density.
         item.ItemFlags[WaterfallItemFlags::Density] = 120;
 
         //Customize waterfallmist sprite scale.
         item.ItemFlags[WaterfallItemFlags::MistSpriteScale] = 4;
 
-        //Customize waterfall sound.   0 = ON, 1 = OFF.
+        // Customize waterfallmist sprite scale.
+        item.ItemFlags[WaterfallItemFlags::MistSpriteScale] = 3;
+
+        // Customize waterfall sound.   0 = ON, 1 = OFF.
         item.ItemFlags[WaterfallItemFlags::Sound] = 0;
 	}
 
