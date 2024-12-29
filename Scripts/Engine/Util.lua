@@ -17,15 +17,15 @@ local Type= require("Engine.Type")
 --@advancedDesc
 -- Operators:
 --
--- 0 : If operand time is equal to the reference
+-- 0 : If operand is equal to the reference
 --
--- 1 : If operand time is different from the reference
+-- 1 : If operand is different from the reference
 --
--- 2 : If operand time is less the value
+-- 2 : If operand is less the value
 --
--- 3 : If operand time is less or equal to the reference
+-- 3 : If operand is less or equal to the reference
 --
--- 4 : If operand time is greater the reference
+-- 4 : If operand is greater the reference
 -- @treturn bool __true__ if comparison is true, __false__ if comparison is false
 Utility.CompareValue = function(operand, reference, operator)
 	local result = false
