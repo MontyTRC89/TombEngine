@@ -55,6 +55,7 @@ const ObjectCollisionBounds KeyHoleBounds =
 		EulerAngles(ANGLE(10.0f), ANGLE(30.0f), ANGLE(10.0f)))
 };
 
+// -571 is the standard height of all puzzle and key items.
 const auto WaterKeyHolePosition = Vector3i(0, -571, 0);
 const ObjectCollisionBounds WaterKeyHoleBounds =
 {
@@ -123,11 +124,8 @@ void PuzzleHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	}
 
 	bool isUnderwater = (player.Control.WaterStatus == WaterStatus::Underwater);
-
 	bool actionActive = player.Control.IsMoving && player.Context.InteractedItem == itemNumber;
-
 	bool isActionReady = (IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() != NO_VALUE);
-
 	bool isPlayerAvailable = (!isUnderwater &&
 		player.Control.Look.OpticRange == 0 &&
 		laraItem->Animation.ActiveState == LS_IDLE &&
@@ -290,11 +288,8 @@ void PuzzleDoneCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* co
 	auto puzzleType = PuzzleType::Normal;
 
 	bool isUnderwater = (player.Control.WaterStatus == WaterStatus::Underwater);
-
 	bool actionActive = player.Control.IsMoving && player.Context.InteractedItem == itemNumber;
-
 	bool isActionReady = IsHeld(In::Action);
-
 	bool isPlayerAvailable = (!isUnderwater &&
 		player.Control.Look.OpticRange == 0 &&
 		laraItem->Animation.ActiveState == LS_IDLE &&
@@ -495,9 +490,7 @@ void KeyHoleCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	short triggerType = (*(triggerIndexPtr++) >> 8) & TRIGGER_BITS;
 
 	bool isUnderwater = (player->Control.WaterStatus == WaterStatus::Underwater);
-
 	bool isActionReady = (IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() != NO_VALUE);
-
 	bool isPlayerAvailable = (!isUnderwater &&
 		player->Control.Look.OpticRange == 0 &&
 		laraItem->Animation.ActiveState == LS_IDLE &&
