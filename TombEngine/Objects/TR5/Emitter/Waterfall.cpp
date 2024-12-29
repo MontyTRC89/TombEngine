@@ -49,7 +49,7 @@ namespace TEN::Effects::WaterfallEmitter
         item.ItemFlags[WaterfallItemFlags::Density] = 120;
 
         //Customize waterfallmist sprite scale.
-        item.ItemFlags[WaterfallItemFlags::MistSpriteScale] = 3;
+        item.ItemFlags[WaterfallItemFlags::MistSpriteScale] = 4;
 
         //Customize waterfall sound.   0 = ON, 1 = OFF.
         item.ItemFlags[WaterfallItemFlags::Sound] = 0;
@@ -164,10 +164,10 @@ namespace TEN::Effects::WaterfallEmitter
 	{
 		auto& part = *GetFreeParticle();
 
-		auto colorOffset = Color(40.0f, 40.0f, 40.0f); // make constant. Color is Vector 4. 4th value should not be changed.
+		auto colorOffset = Vector3i(40.0f, 40.0f, 40.0f);
 
-		auto startColor = (color + colorOffset);
-		auto endColor = (color + colorOffset);
+		auto startColor = (Vector3i(color.x, color.y, color.z) + colorOffset);
+		auto endColor = (Vector3i(color.x, color.y, color.z) + colorOffset);
 
 		part.SpriteSeqID = ID_WATERFALL;
 		part.SpriteID = Random::TestProbability(1 / 2.0f) ? WATERFALL_STREAM_2_SPRITE_ID : WATERFALL_STREAM_1_SPRITE_ID;
@@ -182,14 +182,13 @@ namespace TEN::Effects::WaterfallEmitter
 		part.z = pos.z;
         part.roomNumber = roomNumber;
 
-		// TODO: Generate normal color representation, then convert to legacy.
 		int colorVariation = (Random::GenerateInt(-8, 8)); 
-		part.sR = std::clamp((int)startColor.x + colorVariation, 0, SCHAR_MAX);
-		part.sG = std::clamp((int)startColor.y + colorVariation, 0, SCHAR_MAX);
-		part.sB = std::clamp((int)startColor.z + colorVariation, 0, SCHAR_MAX);
-		part.dR = std::clamp((int)endColor.x + colorVariation, 0, SCHAR_MAX);
-		part.dG = std::clamp((int)endColor.y + colorVariation, 0, SCHAR_MAX);
-		part.dB = std::clamp((int)endColor.z + colorVariation, 0, SCHAR_MAX);
+		part.sR = std::clamp((int)startColor.x + colorVariation, 0, UCHAR_MAX);
+		part.sG = std::clamp((int)startColor.y + colorVariation, 0, UCHAR_MAX);
+		part.sB = std::clamp((int)startColor.z + colorVariation, 0, UCHAR_MAX);
+		part.dR = std::clamp((int)endColor.x + colorVariation, 0, UCHAR_MAX);
+		part.dG = std::clamp((int)endColor.y + colorVariation, 0, UCHAR_MAX);
+		part.dB = std::clamp((int)endColor.z + colorVariation, 0, UCHAR_MAX);
 
 		part.colFadeSpeed = 1;
 		part.blendMode = BlendMode::Additive;
@@ -210,9 +209,9 @@ namespace TEN::Effects::WaterfallEmitter
 		part.gravity = 0;
 		part.maxYvel = 0;
 
-		float size1 = (GetRandomControl() & 8) + size ;
+		float size1 = (GetRandomControl() & 8) + size;
 		part.size =
-		part.sSize = size1 / 4 ;
+		part.sSize = size1 / 4;
 		part.dSize = size1;
 
 		part.flags = SP_SCALE | SP_DEF | SP_ROTATE;
