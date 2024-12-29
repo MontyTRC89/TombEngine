@@ -47,7 +47,7 @@ namespace TEN::Effects::WaterfallEmitter
         // Customize density.
         item.ItemFlags[WaterfallItemFlags::Density] = 120;
 
-        //Customize waterfallmist sprite scale.
+        // Customize waterfallmist sprite scale.
         item.ItemFlags[WaterfallItemFlags::MistSpriteScale] = 4;
 
         // Customize waterfallmist sprite scale.

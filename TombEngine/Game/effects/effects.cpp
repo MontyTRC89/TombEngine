@@ -280,7 +280,7 @@ void UpdateSparks()
 				spark.rotAng = (spark.rotAng + spark.rotAdd) & 0x0FFF;
 
 			if (spark.sLife - spark.life == spark.extras >> 3 &&
-				spark.extras & 7)
+					spark.extras & 7)
 			{
 				int explosionType;
 
