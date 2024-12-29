@@ -308,12 +308,12 @@ namespace TEN::Scripting::Effects
 /***Emit air bubble in a water room.
 @function EmitAirBubble
 @tparam Vec3 pos The position where the air bubble will be spawned.
-@tparam int roomNumber The room number where the air bubble will be generated.
 @tparam float size The size of the air bubble.
 @tparam float amplitude The oscillation amplitude of the air bubble.
 */
-	static void EmitAirBubble(Vec3 pos, int roomNumber, float size, float amplitude)
+	static void EmitAirBubble(Vec3 pos, float size, float amplitude)
 	{
+		int roomNumber = FindRoomNumber(Vector3i(pos.x, pos.y, pos.z));
 		SpawnBubble(pos, roomNumber, size, amplitude);
 	}
 
