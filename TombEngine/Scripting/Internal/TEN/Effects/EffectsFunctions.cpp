@@ -143,7 +143,6 @@ namespace TEN::Scripting::Effects
 		// Validate the effective object ID 
 		if (!CheckIfSlotExists(effectiveObjectID, "Particle spawn script function"))
 		return;
-		
 
 		int grav = USE_IF_HAVE(int, gravity, 0);
 
@@ -213,7 +212,7 @@ namespace TEN::Scripting::Effects
 
 		float rotAdd = USE_IF_HAVE(float, rot, 0.0f);
 
-		s->rotAng = USE_IF_HAVE(float, startRot,(GetRandomControl() & 0x0FFF));
+		s->rotAng = USE_IF_HAVE(float, startRot, (GetRandomControl() & 0x0FFF));
 		s->rotAdd = byte(ANGLE(rotAdd) >> 4);
 
 		s->friction = 0;
