@@ -307,7 +307,7 @@ namespace TEN::Scripting::Effects
 
 /***Emit air bubble in a water room.
 @function EmitAirBubble
-@tparam Vec3 pos The position where the air bubble will be spawned.
+@tparam Vec3 pos The position where the air bubble will be spawned. Needs to be in a water room.
 @tparam float size The size of the air bubble.
 @tparam float amplitude The oscillation amplitude of the air bubble.
 */
