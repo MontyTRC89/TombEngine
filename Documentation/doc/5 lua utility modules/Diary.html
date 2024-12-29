@@ -120,49 +120,13 @@ The module provides functions to create and manage Diaries.</p>
 <pre>
 <span class="keyword">local</span> CustomDiary = <span class="global">require</span>(<span class="string">"Engine.CustomDiary"</span>)
 
-<span class="comment">--Create a table with all the bar properties
-</span><span class="keyword">local</span> barData = {
-barName             = <span class="string">"water"</span>,
-startValue          = <span class="number">0</span>,
-maxValue            = <span class="number">1000</span>,
-objectIdBg          = TEN.Objects.ObjID.CUSTOM_BAR_GRAPHIC,
-spriteIdBg          = <span class="number">0</span>,
-colorBg             = TEN.Color(<span class="number">255</span>,<span class="number">255</span>,<span class="number">255</span>),
-posBg               = TEN.Vec2(<span class="number">20</span>, <span class="number">20</span>),
-rotBg               = <span class="number">0</span>,
-scaleBg             = TEN.Vec2(<span class="number">19.05</span>, <span class="number">19.1</span>),
-alignModeBg         = TEN.View.AlignMode.CENTER_LEFT,
-scaleModeBg         = TEN.View.ScaleMode.FIT,
-blendModeBg         = TEN.Effects.BlendID.ALPHABLEND,
-objectIdBar         = TEN.Objects.ObjID.CUSTOM_BAR_GRAPHIC,
-spriteIdBar         = <span class="number">1</span>,
-colorBar            = TEN.Color(<span class="number">255</span>,<span class="number">0</span>,<span class="number">0</span>),
-posBar              = TEN.Vec2(<span class="number">20.15</span>, <span class="number">20</span>),
-rot                 = <span class="number">0</span>,
-scaleBar            = TEN.Vec2(<span class="number">18.7</span>, <span class="number">18.48</span>),
-alignMode           = TEN.View.AlignMode.CENTER_LEFT,
-scaleMode           = TEN.View.ScaleMode.FIT,
-blendMode           = TEN.Effects.BlendID.ALPHABLEND,
-text                = <span class="string">"Water Bar"</span>,
-textPos             = TEN.Vec2(<span class="number">20</span>, <span class="number">15</span>),
-textOptions         = {TEN.Strings.DisplayStringOption.SHADOW,TEN.Strings.DisplayStringOption.CENTER},
-textScale           = <span class="number">1</span>,
-textColor           = TEN.Color(<span class="number">255</span>,<span class="number">0</span>,<span class="number">0</span>),
-hideText            = <span class="keyword">false</span>,
-alphaBlendSpeed     = <span class="number">50</span>,
-blink               = <span class="keyword">false</span>,
-blinkLimit          = <span class="number">0.25</span>
-}
+<span class="comment">--This function creates a diary from the DiarySetup.lua template file in script folder
+</span>CustomDiary.ImportDiary(<span class="string">"DiarySetup"</span>)
 
-<span class="comment">--This function creates the bar and displays it
-</span>CustomBar.Create(barData)
-
-<span class="comment">--This method gets the bar with name "water" and stores it in variable bar.
-</span><span class="keyword">local</span> diary = CustomBar.Get(<span class="string">"water"</span>)
-<span class="comment">--This method displays the bar
-</span>diary:SetVisibility(<span class="keyword">true</span>)
-<span class="comment">--This method sets the bar value to 1000 over 5 seconds.
-</span>bar:SetBarValue(<span class="number">1000</span>,<span class="number">5</span>)
+<span class="comment">--This method gets the diary that was created with the DIARY_ITEM object and stores it in variable diary.
+</span><span class="keyword">local</span> diary = CustomDiary.Get(TEN.Objects.ObjID.DIARY_ITEM)
+<span class="comment">--This method opens the diary on the 3rd page
+</span>diary:showDiary(<span class="number">3</span>)
 </pre>
 
 </p>

@@ -7,49 +7,13 @@
 --
 --	local CustomDiary = require("Engine.CustomDiary")
 --
---	--Create a table with all the bar properties
---	local barData = {
---	barName             = "water",
---	startValue          = 0,
---	maxValue            = 1000,
---	objectIdBg          = TEN.Objects.ObjID.CUSTOM_BAR_GRAPHIC,
---	spriteIdBg          = 0,
---	colorBg             = TEN.Color(255,255,255),
---	posBg               = TEN.Vec2(20, 20),
---	rotBg               = 0,
---	scaleBg             = TEN.Vec2(19.05, 19.1),
---	alignModeBg         = TEN.View.AlignMode.CENTER_LEFT,
---	scaleModeBg         = TEN.View.ScaleMode.FIT,
---	blendModeBg         = TEN.Effects.BlendID.ALPHABLEND,
---	objectIdBar         = TEN.Objects.ObjID.CUSTOM_BAR_GRAPHIC,
---	spriteIdBar         = 1,
---	colorBar            = TEN.Color(255,0,0),
---	posBar              = TEN.Vec2(20.15, 20),
---	rot                 = 0,
---	scaleBar            = TEN.Vec2(18.7, 18.48),
---	alignMode           = TEN.View.AlignMode.CENTER_LEFT,
---	scaleMode           = TEN.View.ScaleMode.FIT,
---	blendMode           = TEN.Effects.BlendID.ALPHABLEND,
---	text                = "Water Bar",
---	textPos             = TEN.Vec2(20, 15),
---	textOptions         = {TEN.Strings.DisplayStringOption.SHADOW,TEN.Strings.DisplayStringOption.CENTER},
---	textScale           = 1,
---	textColor           = TEN.Color(255,0,0),
---	hideText            = false,
---	alphaBlendSpeed     = 50,
---	blink               = false,
---	blinkLimit          = 0.25
---	}
+--	--This function creates a diary from the DiarySetup.lua template file in script folder
+--	CustomDiary.ImportDiary("DiarySetup")
 --
---	--This function creates the bar and displays it
---	CustomBar.Create(barData)
---
---	--This method gets the bar with name "water" and stores it in variable bar.
---	local diary = CustomBar.Get("water")
---	--This method displays the bar
---	diary:SetVisibility(true)
---	--This method sets the bar value to 1000 over 5 seconds.
---	bar:SetBarValue(1000,5)
+--	--This method gets the diary that was created with the DIARY_ITEM object and stores it in variable diary.
+--	local diary = CustomDiary.Get(TEN.Objects.ObjID.DIARY_ITEM)
+--	--This method opens the diary on the 3rd page
+--	diary:showDiary(3)
 --
 -- @luautil Diary
 local CustomDiary = {}
