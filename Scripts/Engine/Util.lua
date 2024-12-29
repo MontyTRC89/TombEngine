@@ -26,6 +26,8 @@ local Type= require("Engine.Type")
 -- 3 : If operand is less or equal to the reference
 --
 -- 4 : If operand is greater the reference
+--
+-- 5 : If operand is greater or equal the reference
 -- @treturn bool __true__ if comparison is true, __false__ if comparison is false
 Utility.CompareValue = function(operand, reference, operator)
 	local result = false
