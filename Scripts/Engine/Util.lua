@@ -1,8 +1,5 @@
 -----
---- Utility - This molule is a collection of help functions
---
---
--- To use the functions within the scripts, the module must be called:
+--- Utility - This molule is a collection of help functions. To use the functions within the scripts, the module must be called:
 --	local Utility = require("Engine.Util")
 -- @luautil Utility
 
