@@ -1,6 +1,6 @@
 -----
 --- Diaries:
---The module provides functions to create and manage Diaries. It maintains state through LevelVars.Engine.Diaries which stores diary definitions and configurations.
+--The module provides functions to create and manage Diaries. It maintains state through GameVars.Diaries which stores diary definitions and configurations.
 -- Each diary is accessed by the object that was used to create it. 
 --
 -- Example usage:
@@ -20,8 +20,8 @@ local CustomDiary = {}
 CustomDiary.__index = CustomDiary
 
 LevelFuncs.Engine.Diaries = {}
-GameVars.Engine.Diaries = {}
-GameVars.Engine.LastUsedDiary=nil
+GameVars.Diaries = {}
+GameVars.LastUsedDiary=nil
 
 ---
 -- Imports diary from an external file.
@@ -144,7 +144,7 @@ function CustomDiary.ImportDiary(fileName)
 
     importDiary:unlockPages(diaryUnlock, false)
 
-    print("External diary from file: "..tostring(filename).." imported")
+    print("External diary from file: "..tostring(fileName).." imported")
 end
 
 ---
@@ -173,44 +173,44 @@ CustomDiary.Create = function(object, objectIdBg, spriteIdBg, colorBg, pos, rot,
 
 	local dataName = object .. "_diarydata"
     local self = {Name = dataName}
-    GameVars.Engine.LastUsedDiary = object
+    GameVars.LastUsedDiary = object
 
-	if GameVars.Engine.Diaries[dataName] then
+	if GameVars.Diaries[dataName] then
 		return setmetatable(self, CustomDiary)
 	end
 	
-	GameVars.Engine.Diaries[dataName]				        = {}
-	GameVars.Engine.Diaries[dataName].Name			        = dataName
-	GameVars.Engine.Diaries[dataName].CurrentPageIndex      = 1
-    GameVars.Engine.Diaries[dataName].UnlockedPages         = 1
-	GameVars.Engine.Diaries[dataName].Pages  		        = {NarrationTrack=nil,TextEntries={},ImageEntries={}}
-	GameVars.Engine.Diaries[dataName].Object		        = object
-	GameVars.Engine.Diaries[dataName].ObjectIDbg	        = objectIdBg
-	GameVars.Engine.Diaries[dataName].SpriteIDbg	        = spriteIdBg
-	GameVars.Engine.Diaries[dataName].ColorBg		        = colorBg
-	GameVars.Engine.Diaries[dataName].Pos			        = pos
-	GameVars.Engine.Diaries[dataName].Rot			        = rot
-	GameVars.Engine.Diaries[dataName].Scale 		        = scale
-	GameVars.Engine.Diaries[dataName].AlignMode		        = alignMode
-	GameVars.Engine.Diaries[dataName].ScaleMode		        = scaleMode
-	GameVars.Engine.Diaries[dataName].BlendMode		        = blendMode
-    GameVars.Engine.Diaries[dataName].Alpha     	        = alpha
-	GameVars.Engine.Diaries[dataName].PageSound		        = pageSound
-	GameVars.Engine.Diaries[dataName].ExitSound		        = exitSound
-    GameVars.Engine.Diaries[dataName].PostProcessMode       = View.PostProcessMode.NONE
-	GameVars.Engine.Diaries[dataName].PostProcessPower      = 1
-    GameVars.Engine.Diaries[dataName].PostProcessColor      = TEN.Color(255,255,255)
-    GameVars.Engine.Diaries[dataName].CurrentAlpha		    = 0
-	GameVars.Engine.Diaries[dataName].TargetAlpha		    = 255
-    GameVars.Engine.Diaries[dataName].EntryCurrentAlpha		= 0
-	GameVars.Engine.Diaries[dataName].EntryTargetAlpha		= 255
-    GameVars.Engine.Diaries[dataName].Visible               = false
-    GameVars.Engine.Diaries[dataName].Notification          = {}
-    GameVars.Engine.Diaries[dataName].PageNumbers           = {}
-    GameVars.Engine.Diaries[dataName].Controls              = {}
-    GameVars.Engine.Diaries[dataName].Background            = {}
-    GameVars.Engine.Diaries[dataName].AlphaBlendSpeed       = 100
-    GameVars.Engine.Diaries[dataName].EntryFadingIn         = true
+	GameVars.Diaries[dataName]				        = {}
+	GameVars.Diaries[dataName].Name			        = dataName
+	GameVars.Diaries[dataName].CurrentPageIndex      = 1
+    GameVars.Diaries[dataName].UnlockedPages         = 1
+	GameVars.Diaries[dataName].Pages  		        = {NarrationTrack=nil,TextEntries={},ImageEntries={}}
+	GameVars.Diaries[dataName].Object		        = object
+	GameVars.Diaries[dataName].ObjectIdBg	        = objectIdBg
+	GameVars.Diaries[dataName].SpriteIdBg	        = spriteIdBg
+	GameVars.Diaries[dataName].ColorBg		        = colorBg
+	GameVars.Diaries[dataName].Pos			        = pos
+	GameVars.Diaries[dataName].Rot			        = rot
+	GameVars.Diaries[dataName].Scale 		        = scale
+	GameVars.Diaries[dataName].AlignMode		        = alignMode
+	GameVars.Diaries[dataName].ScaleMode		        = scaleMode
+	GameVars.Diaries[dataName].BlendMode		        = blendMode
+    GameVars.Diaries[dataName].Alpha     	        = alpha
+	GameVars.Diaries[dataName].PageSound		        = pageSound
+	GameVars.Diaries[dataName].ExitSound		        = exitSound
+    GameVars.Diaries[dataName].PostProcessMode       = View.PostProcessMode.NONE
+	GameVars.Diaries[dataName].PostProcessPower      = 1
+    GameVars.Diaries[dataName].PostProcessColor      = TEN.Color(255,255,255)
+    GameVars.Diaries[dataName].CurrentAlpha		    = 0
+	GameVars.Diaries[dataName].TargetAlpha		    = 255
+    GameVars.Diaries[dataName].EntryCurrentAlpha		= 0
+	GameVars.Diaries[dataName].EntryTargetAlpha         = 255
+    GameVars.Diaries[dataName].Visible               = false
+    GameVars.Diaries[dataName].Notification          = {}
+    GameVars.Diaries[dataName].PageNumbers           = {}
+    GameVars.Diaries[dataName].Controls              = {}
+    GameVars.Diaries[dataName].Background            = {}
+    GameVars.Diaries[dataName].AlphaBlendSpeed       = 100
+    GameVars.Diaries[dataName].EntryFadingIn         = true
 
 	
 	print("CustomDiary Constructed for CustomDiary: " .. dataName)
@@ -223,7 +223,7 @@ end
 -- @treturn CustomDiary The diary created using the object.
 CustomDiary.Get = function(object)
 	local dataName = object .. "_diarydata"
-    if GameVars.Engine.Diaries[dataName] then
+    if GameVars.Diaries[dataName] then
         local self = {Name = dataName}
         return setmetatable(self, CustomDiary)
     end
@@ -235,8 +235,8 @@ end
 -- @tparam Objects.ObjID object The pickup object that was used to create the diary (596-611,986).
 CustomDiary.Delete = function (object)
     local dataName = object .. "_diarydata"
-	if GameVars.Engine.Diaries[dataName] then
-		GameVars.Engine.Diaries[dataName] = nil
+	if GameVars.Diaries[dataName] then
+		GameVars.Diaries[dataName] = nil
 	end
 end
 
@@ -244,7 +244,7 @@ end
 -- 	@bool value True enables the diaries to be activated. False would disable the diaries.
 CustomDiary.Status = function(value)
 
-	if GameVars.Engine.Diaries then
+	if GameVars.Diaries then
 		if value == true then
 			TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.POSTUSEITEM, LevelFuncs.Engine.Diaries.ActivateDiary)
             print("Diary Started")
@@ -261,8 +261,8 @@ end
 -- @treturn bool true if the diary is visible and false if it is not.
 function CustomDiary:IsVisible()
     
-	if GameVars.Engine.Diaries[self.Name] then
-		return GameVars.Engine.Diaries[self.Name].Visible
+	if GameVars.Diaries[self.Name] then
+		return GameVars.Diaries[self.Name].Visible
 	end
 end
 
@@ -273,18 +273,18 @@ function CustomDiary:showDiary(pageIndex)
     
     pageIndex = pageIndex or 1
 
-	if GameVars.Engine.Diaries[self.Name] then
+	if GameVars.Diaries[self.Name] then
 
-		local object = GameVars.Engine.Diaries[self.Name].Object
+		local object = GameVars.Diaries[self.Name].Object
 
-        if pageIndex > #GameVars.Engine.Diaries[self.Name].Pages or pageIndex <=0 then
+        if pageIndex > #GameVars.Diaries[self.Name].Pages or pageIndex <=0 then
             print("Index provided is higher than the page count.")
             return
         end
         --Set the page index if provided otherwise ignore.
         if pageIndex > 1 then
-            GameVars.Engine.Diaries[self.Name].CurrentPageIndex = pageIndex
-            GameVars.Engine.Diaries[self.Name].NextPageIndex = pageIndex
+            GameVars.Diaries[self.Name].CurrentPageIndex = pageIndex
+            GameVars.Diaries[self.Name].NextPageIndex = pageIndex
         end
         LevelFuncs.Engine.Diaries.ActivateDiary(object)
 
@@ -297,8 +297,8 @@ end
 -- @treturn int total number of unlocked pages in the diary.
 function CustomDiary:getUnlockedPageCount()
     
-	if GameVars.Engine.Diaries[self.Name] then
-		return GameVars.Engine.Diaries[self.Name].UnlockedPages
+	if GameVars.Diaries[self.Name] then
+		return GameVars.Diaries[self.Name].UnlockedPages
 	end
 end
 
@@ -309,14 +309,14 @@ end
 -- @tparam int pageIndex The page number up to which the diary should be unlocked.
 -- @tparam bool notification If true, and notification has been defined, a notification icon and sound will be played.
 function CustomDiary:unlockPages(pageIndex, notification)
-    if GameVars.Engine.Diaries[self.Name] then
+    if GameVars.Diaries[self.Name] then
 
-        if pageIndex > #GameVars.Engine.Diaries[self.Name].Pages or pageIndex <=0 then
+        if pageIndex > #GameVars.Diaries[self.Name].Pages or pageIndex <=0 then
             print("Index provided is higher than the page count.")
             return
         end
 
-        local diary = GameVars.Engine.Diaries[self.Name]
+        local diary = GameVars.Diaries[self.Name]
 		diary.UnlockedPages = pageIndex
         diary.CurrentPageIndex = pageIndex
         diary.NextPageIndex = pageIndex
@@ -336,8 +336,8 @@ end
 -- The function clears the page for the diary.
 -- @tparam int pageIndex The page number to be cleared.
 function CustomDiary:clearPage(pageIndex)
-    if GameVars.Engine.Diaries[self.Name] then
-        GameVars.Engine.Diaries[self.Name].Pages[pageIndex]= {NarrationTrack=nil,TextEntries={},ImageEntries={}}
+    if GameVars.Diaries[self.Name] then
+        GameVars.Diaries[self.Name].Pages[pageIndex]= {NarrationTrack=nil,TextEntries={},ImageEntries={}}
         print("Page Cleared")
     end
 end
@@ -358,10 +358,10 @@ function CustomDiary:addTextEntry(pageIndex, text, textPos, textOptions, textSca
             textScale = textScale,
             textColor = textColor
         }
-        if not GameVars.Engine.Diaries[self.Name].Pages[pageIndex] then
-            GameVars.Engine.Diaries[self.Name].Pages[pageIndex] = {NarrationTrack=nil, TextEntries = {}, ImageEntries = {}}
+        if not GameVars.Diaries[self.Name].Pages[pageIndex] then
+            GameVars.Diaries[self.Name].Pages[pageIndex] = {NarrationTrack=nil, TextEntries = {}, ImageEntries = {}}
         end
-        table.insert(GameVars.Engine.Diaries[self.Name].Pages[pageIndex].TextEntries, textEntry)
+        table.insert(GameVars.Diaries[self.Name].Pages[pageIndex].TextEntries, textEntry)
         print("Text entry added to page: ")
 end
 
@@ -389,10 +389,10 @@ function CustomDiary:addImageEntry(pageIndex, objectId, spriteId, color, pos, ro
             scaleMode = scaleMode,
             blendMode = blendMode
         }
-        if not GameVars.Engine.Diaries[self.Name].Pages[pageIndex] then
-            GameVars.Engine.Diaries[self.Name].Pages[pageIndex] = {NarrationTrack=nil, TextEntries = {}, ImageEntries = {}}
+        if not GameVars.Diaries[self.Name].Pages[pageIndex] then
+            GameVars.Diaries[self.Name].Pages[pageIndex] = {NarrationTrack=nil, TextEntries = {}, ImageEntries = {}}
         end
-        table.insert(GameVars.Engine.Diaries[self.Name].Pages[pageIndex].ImageEntries, imageEntry)
+        table.insert(GameVars.Diaries[self.Name].Pages[pageIndex].ImageEntries, imageEntry)
         print("Image entry added to page: ")
 end
 
@@ -401,10 +401,10 @@ end
 -- @tparam int pageIndex page number to add the narration track to.
 -- @tparam string trackName of track (without file extension) to play.
 function CustomDiary:addNarration(pageIndex, trackName)
-    if not GameVars.Engine.Diaries[self.Name].Pages[pageIndex] then
-        GameVars.Engine.Diaries[self.Name].Pages[pageIndex] = {NarrationTrack=nil, TextEntries = {}, ImageEntries = {}}
+    if not GameVars.Diaries[self.Name].Pages[pageIndex] then
+        GameVars.Diaries[self.Name].Pages[pageIndex] = {NarrationTrack=nil, TextEntries = {}, ImageEntries = {}}
     end
-    GameVars.Engine.Diaries[self.Name].Pages[pageIndex].NarrationTrack = trackName
+    GameVars.Diaries[self.Name].Pages[pageIndex].NarrationTrack = trackName
     print("Narration added to page: ")
 end
 
@@ -412,8 +412,8 @@ end
 -- Remove the narration track from the page of the specified diary.
 -- @tparam int pageIndex page number to remove the narration track from.
 function CustomDiary:removeNarration(pageIndex)
-    if GameVars.Engine.Diaries[self.Name].Pages[pageIndex] then
-		GameVars.Engine.Diaries[self.Name].Pages[pageIndex].NarrationTrack = {}
+    if GameVars.Diaries[self.Name].Pages[pageIndex] then
+		GameVars.Diaries[self.Name].Pages[pageIndex].NarrationTrack = {}
 	end
     print("Narration added to page: ".. pageIndex)
  end
@@ -431,17 +431,17 @@ function CustomDiary:removeNarration(pageIndex)
 -- @tparam Effects.BlendID blendMode Blending modes for the diary's background.
 -- @tparam number alpha alpha value for the diary's background (0-255).
 function CustomDiary:addBackground(objectId, spriteId, color, pos, rot, scale, alignMode, scaleMode, blendMode, alpha)
-    if GameVars.Engine.Diaries[self.Name] then
-        GameVars.Engine.Diaries[self.Name].Background.ObjectIdBg	    = objectId
-	    GameVars.Engine.Diaries[self.Name].Background.SpriteIdBg	    = spriteId
-	    GameVars.Engine.Diaries[self.Name].Background.ColorBg		    = color
-	    GameVars.Engine.Diaries[self.Name].Background.Pos			    = pos
-	    GameVars.Engine.Diaries[self.Name].Background.Rot			    = rot
-	    GameVars.Engine.Diaries[self.Name].Background.Scale		        = scale
-	    GameVars.Engine.Diaries[self.Name].Background.AlignMode		    = alignMode
-	    GameVars.Engine.Diaries[self.Name].Background.ScaleMode		    = scaleMode
-	    GameVars.Engine.Diaries[self.Name].Background.BlendMode 	    = blendMode
-        GameVars.Engine.Diaries[self.Name].Background.Alpha		        = alpha
+    if GameVars.Diaries[self.Name] then
+        GameVars.Diaries[self.Name].Background.ObjectIdBg	    = objectId
+	    GameVars.Diaries[self.Name].Background.SpriteIdBg	    = spriteId
+	    GameVars.Diaries[self.Name].Background.ColorBg		    = color
+	    GameVars.Diaries[self.Name].Background.Pos			    = pos
+	    GameVars.Diaries[self.Name].Background.Rot			    = rot
+	    GameVars.Diaries[self.Name].Background.Scale		        = scale
+	    GameVars.Diaries[self.Name].Background.AlignMode		    = alignMode
+	    GameVars.Diaries[self.Name].Background.ScaleMode		    = scaleMode
+	    GameVars.Diaries[self.Name].Background.BlendMode 	    = blendMode
+        GameVars.Diaries[self.Name].Background.Alpha		        = alpha
         print("Background added to diary: ")
     end
 end
@@ -449,8 +449,8 @@ end
 ---
 -- Clears settings for the background for the specified diary.
 function CustomDiary:clearBackground()
-    if GameVars.Engine.Diaries[self.Name] then
-        GameVars.Engine.Diaries[self.Name].Background = {}
+    if GameVars.Diaries[self.Name] then
+        GameVars.Diaries[self.Name].Background = {}
         
         print("Background cleared")
     end
@@ -470,19 +470,19 @@ end
 -- @tparam Effects.BlendID blendMode Blending modes for the notification icon.
 -- @tparam Sound notificationSound Sound to play with notification icon.
 function CustomDiary:customizeNotification(notificationTime, objectId, spriteId, color, pos, rot, scale, alignMode, scaleMode, blendMode, notificationSound)
-    if GameVars.Engine.Diaries[self.Name] then
-        GameVars.Engine.Diaries[self.Name].Notification.ObjectID            = objectId
-        GameVars.Engine.Diaries[self.Name].Notification.SpriteID	        = spriteId
-        GameVars.Engine.Diaries[self.Name].Notification.Color		        = color
-        GameVars.Engine.Diaries[self.Name].Notification.Pos			        = pos
-        GameVars.Engine.Diaries[self.Name].Notification.Rot			        = rot
-        GameVars.Engine.Diaries[self.Name].Notification.Scale		        = scale
-        GameVars.Engine.Diaries[self.Name].Notification.AlignMode		    = alignMode
-        GameVars.Engine.Diaries[self.Name].Notification.ScaleMode		    = scaleMode
-        GameVars.Engine.Diaries[self.Name].Notification.BlendMode		    = blendMode
-        GameVars.Engine.Diaries[self.Name].Notification.NotificationSound	= notificationSound
-        GameVars.Engine.Diaries[self.Name].Notification.NotificationTime    = notificationTime
-        GameVars.Engine.Diaries[self.Name].Notification.ElapsedTime         = 0
+    if GameVars.Diaries[self.Name] then
+        GameVars.Diaries[self.Name].Notification.ObjectID            = objectId
+        GameVars.Diaries[self.Name].Notification.SpriteID	        = spriteId
+        GameVars.Diaries[self.Name].Notification.Color		        = color
+        GameVars.Diaries[self.Name].Notification.Pos			        = pos
+        GameVars.Diaries[self.Name].Notification.Rot			        = rot
+        GameVars.Diaries[self.Name].Notification.Scale		        = scale
+        GameVars.Diaries[self.Name].Notification.AlignMode		    = alignMode
+        GameVars.Diaries[self.Name].Notification.ScaleMode		    = scaleMode
+        GameVars.Diaries[self.Name].Notification.BlendMode		    = blendMode
+        GameVars.Diaries[self.Name].Notification.NotificationSound	= notificationSound
+        GameVars.Diaries[self.Name].Notification.NotificationTime    = notificationTime
+        GameVars.Diaries[self.Name].Notification.ElapsedTime         = 0
         
         print("Notification updated")
     end
@@ -491,8 +491,8 @@ end
 ---
 -- Clears settings for the notification system for the specified diary.
 function CustomDiary:clearNotification()
-    if GameVars.Engine.Diaries[self.Name] then
-        GameVars.Engine.Diaries[self.Name].Notification = {}
+    if GameVars.Diaries[self.Name] then
+        GameVars.Diaries[self.Name].Notification = {}
         
         print("Notifications cleared")
     end
@@ -508,14 +508,14 @@ end
 -- @tparam number textScale Scale factor for the page numbers.
 -- @tparam Color textColor Color of the page numbers.
 function CustomDiary:customizePageNumbers(pageNoType, prefix, separator, textPos, textOptions, textScale, textColor)
-    if GameVars.Engine.Diaries[self.Name] and pageNoType >0 and pageNoType <=2 then
-        GameVars.Engine.Diaries[self.Name].PageNumbers.pageNoType       = pageNoType
-        GameVars.Engine.Diaries[self.Name].PageNumbers.prefix           = prefix 
-        GameVars.Engine.Diaries[self.Name].PageNumbers.separator        = separator 
-        GameVars.Engine.Diaries[self.Name].PageNumbers.textPos          = textPos
-        GameVars.Engine.Diaries[self.Name].PageNumbers.textOptions      = textOptions
-        GameVars.Engine.Diaries[self.Name].PageNumbers.textScale		= textScale
-        GameVars.Engine.Diaries[self.Name].PageNumbers.textColor		= textColor
+    if GameVars.Diaries[self.Name] and pageNoType >0 and pageNoType <=2 then
+        GameVars.Diaries[self.Name].PageNumbers.pageNoType       = pageNoType
+        GameVars.Diaries[self.Name].PageNumbers.prefix           = prefix 
+        GameVars.Diaries[self.Name].PageNumbers.separator        = separator 
+        GameVars.Diaries[self.Name].PageNumbers.textPos          = textPos
+        GameVars.Diaries[self.Name].PageNumbers.textOptions      = textOptions
+        GameVars.Diaries[self.Name].PageNumbers.textScale		= textScale
+        GameVars.Diaries[self.Name].PageNumbers.textColor		= textColor
         
         print("Page Numbers updated")
     end
@@ -524,8 +524,8 @@ end
 ---
 -- Clears settings for the page numbers for the specified diary.
 function CustomDiary:clearPageNumbers()
-    if GameVars.Engine.Diaries[self.Name] then
-        GameVars.Engine.Diaries[self.Name].PageNumbers = nil
+    if GameVars.Diaries[self.Name] then
+        GameVars.Diaries[self.Name].PageNumbers = nil
 		print("Page Numbers cleared")
     end
 end
@@ -537,16 +537,16 @@ end
 -- @tparam number textScale Scale factor for the controls.
 -- @tparam Color textColor Color of the page controls.
 function CustomDiary:customizeControls(textPos, textOptions, textScale, textColor)
-    if GameVars.Engine.Diaries[self.Name] then
-        GameVars.Engine.Diaries[self.Name].Controls.text1           = "Space: Play Voice Note"
-        GameVars.Engine.Diaries[self.Name].Controls.text2           = "Left Key: Previous Page" 
-        GameVars.Engine.Diaries[self.Name].Controls.text3           = "Right Key: Next Page"
-        GameVars.Engine.Diaries[self.Name].Controls.text4           = "Esc: Back"
-        GameVars.Engine.Diaries[self.Name].Controls.separator       = "|"
-        GameVars.Engine.Diaries[self.Name].Controls.textPos         = textPos
-        GameVars.Engine.Diaries[self.Name].Controls.textOptions     = textOptions
-        GameVars.Engine.Diaries[self.Name].Controls.textScale		= textScale
-        GameVars.Engine.Diaries[self.Name].Controls.textColor		= textColor
+    if GameVars.Diaries[self.Name] then
+        GameVars.Diaries[self.Name].Controls.text1           = "Space: Play Voice Note"
+        GameVars.Diaries[self.Name].Controls.text2           = "Left Key: Previous Page" 
+        GameVars.Diaries[self.Name].Controls.text3           = "Right Key: Next Page"
+        GameVars.Diaries[self.Name].Controls.text4           = "Esc: Back"
+        GameVars.Diaries[self.Name].Controls.separator       = "|"
+        GameVars.Diaries[self.Name].Controls.textPos         = textPos
+        GameVars.Diaries[self.Name].Controls.textOptions     = textOptions
+        GameVars.Diaries[self.Name].Controls.textScale		= textScale
+        GameVars.Diaries[self.Name].Controls.textColor		= textColor
         
         print("Controls updated")
     end
@@ -560,12 +560,12 @@ end
 -- @tparam string string4 Text for Esc key controls text.
 -- @tparam string separator Text for separator between controls text.
 function CustomDiary:customizeControlsText(string1, string2, string3, string4, separator)
-    if GameVars.Engine.Diaries[self.Name] then
-        GameVars.Engine.Diaries[self.Name].Controls.text1           = string1
-        GameVars.Engine.Diaries[self.Name].Controls.text2           = string2
-        GameVars.Engine.Diaries[self.Name].Controls.text3           = string3
-        GameVars.Engine.Diaries[self.Name].Controls.text4           = string4
-        GameVars.Engine.Diaries[self.Name].Controls.separator       = separator
+    if GameVars.Diaries[self.Name] then
+        GameVars.Diaries[self.Name].Controls.text1           = string1
+        GameVars.Diaries[self.Name].Controls.text2           = string2
+        GameVars.Diaries[self.Name].Controls.text3           = string3
+        GameVars.Diaries[self.Name].Controls.text4           = string4
+        GameVars.Diaries[self.Name].Controls.separator       = separator
         print("Controls text updated")
     end
 end
@@ -574,8 +574,8 @@ end
 ---
 -- Clears settings for the specified diary's controls text.
 function CustomDiary:clearControls()
-    if GameVars.Engine.Diaries[self.Name] then
-        GameVars.Engine.Diaries[self.Name].Controls ={}
+    if GameVars.Diaries[self.Name] then
+        GameVars.Diaries[self.Name].Controls ={}
         
         print("Controls cleared")
     end
@@ -584,12 +584,12 @@ end
 -- !Ignore
 LevelFuncs.Engine.Diaries.ShowDiary = function()
 
-    local objectNumber = GameVars.Engine.LastUsedDiary
+    local objectNumber = GameVars.LastUsedDiary
 	local dataName = objectNumber .. "_diarydata"
 
-    if GameVars.Engine.Diaries[dataName] then
+    if GameVars.Diaries[dataName] then
         
-        local diary             = GameVars.Engine.Diaries[dataName]
+        local diary             = GameVars.Diaries[dataName]
         local currentIndex      = diary.CurrentPageIndex
         local maxPages          = diary.UnlockedPages
         local narrationTrack    = diary.Pages[currentIndex].NarrationTrack
@@ -654,8 +654,8 @@ LevelFuncs.Engine.Diaries.ShowDiary = function()
 
        --Sets the currentindex so that the diary opens at the same page
         diary.CurrentPageIndex = currentIndex
-        local textEntries = GameVars.Engine.Diaries[dataName].Pages[currentIndex].TextEntries
-        local imageEntries = GameVars.Engine.Diaries[dataName].Pages[currentIndex].ImageEntries
+        local textEntries = GameVars.Diaries[dataName].Pages[currentIndex].TextEntries
+        local imageEntries = GameVars.Diaries[dataName].Pages[currentIndex].ImageEntries
 
         if diary.CurrentAlpha > 0 then
             diary.Visible = true
@@ -672,7 +672,7 @@ LevelFuncs.Engine.Diaries.ShowDiary = function()
             -- Draw Diary sprite
             local dAlpha = math.min(diary.CurrentAlpha, diary.Alpha)
             local dColor = TEN.Color(diary.ColorBg.r, diary.ColorBg.g, diary.ColorBg.b, dAlpha)
-            local dSprite = TEN.DisplaySprite(diary.ObjectIDbg, diary.SpriteIDbg, diary.Pos, diary.Rot, diary.Scale, dColor)
+            local dSprite = TEN.DisplaySprite(diary.ObjectIdBg, diary.SpriteIdBg, diary.Pos, diary.Rot, diary.Scale, dColor)
             dSprite:Draw(1, diary.AlignMode, diary.ScaleMode, diary.BlendMode)
 
             -- Draw Background Image
@@ -762,11 +762,11 @@ LevelFuncs.Engine.Diaries.ActivateDiary = function(objectNumber)
 	
     local dataName = objectNumber .. "_diarydata"
 
-	if GameVars.Engine.Diaries[dataName] then
-        GameVars.Engine.LastUsedDiary = objectNumber
+	if GameVars.Diaries[dataName] then
+        GameVars.LastUsedDiary = objectNumber
         TEN.Inventory.ClearUsedItem()
-        GameVars.Engine.Diaries[dataName].TargetAlpha = 255
-        GameVars.Engine.Diaries[dataName].EntryTargetAlpha = 255
+        GameVars.Diaries[dataName].TargetAlpha = 255
+        GameVars.Diaries[dataName].EntryTargetAlpha = 255
 		TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PREFREEZE, LevelFuncs.Engine.Diaries.ShowDiary)
         Flow.SetFreezeMode(Flow.FreezeMode.FULL)
 	end
@@ -776,10 +776,10 @@ end
 -- !Ignore
 LevelFuncs.Engine.Diaries.ShowNotification = function(dt)
 
-    local dataName = GameVars.Engine.LastUsedDiary .. "_diarydata"
+    local dataName = GameVars.LastUsedDiary .. "_diarydata"
   
-    if GameVars.Engine.Diaries[dataName] then
-        local diary = GameVars.Engine.Diaries[dataName]
+    if GameVars.Diaries[dataName] then
+        local diary = GameVars.Diaries[dataName]
        
         if diary.CurrentAlpha ~= diary.TargetAlpha then
             
@@ -791,9 +791,9 @@ LevelFuncs.Engine.Diaries.ShowNotification = function(dt)
 
         end
 
-        GameVars.Engine.Diaries[dataName].Notification.ElapsedTime  = GameVars.Engine.Diaries[dataName].Notification.ElapsedTime + dt
+        GameVars.Diaries[dataName].Notification.ElapsedTime  = GameVars.Diaries[dataName].Notification.ElapsedTime + dt
         
-        if GameVars.Engine.Diaries[dataName].Notification.ElapsedTime <= GameVars.Engine.Diaries[dataName].Notification.NotificationTime then
+        if GameVars.Diaries[dataName].Notification.ElapsedTime <= GameVars.Diaries[dataName].Notification.NotificationTime then
             diary.TargetAlpha = 255
         else
             diary.TargetAlpha = 0
@@ -814,11 +814,11 @@ end
 -- !Ignore
 LevelFuncs.Engine.Diaries.PrepareNotification = function()
 	
-	local dataName = GameVars.Engine.LastUsedDiary .. "_diarydata"
+	local dataName = GameVars.LastUsedDiary .. "_diarydata"
 	
-    if GameVars.Engine.Diaries[dataName] then
+    if GameVars.Diaries[dataName] then
 
-        local diary = GameVars.Engine.Diaries[dataName]
+        local diary = GameVars.Diaries[dataName]
         local notif = diary.Notification
         local spriteColor = Color(notif.Color.r, notif.Color.g, notif.Color.b, diary.CurrentAlpha)
 
