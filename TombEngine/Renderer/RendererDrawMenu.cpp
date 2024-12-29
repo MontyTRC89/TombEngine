@@ -955,29 +955,6 @@ namespace TEN::Renderer
 		object.Scale1 = savedScale;
 	}
 
-	void Renderer::DrawDiary()
-	{
-		constexpr auto SCREEN_POS = Vector2(400.0f, 300.0f);
-
-		const auto& object = InventoryObjectTable[INV_OBJECT_OPEN_DIARY];
-		unsigned int currentPage = Lara.Inventory.Diary.CurrentPage;
-
-		DrawObjectIn2DSpace(g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), SCREEN_POS, object.Orientation, object.Scale1);
-
-		for (int i = 0; i < MAX_DIARY_STRINGS_PER_PAGE; i++)
-		{
-			if (!Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.CurrentPage].Strings[i].Position.x && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.CurrentPage].
-				Strings[i].Position.y && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.CurrentPage].Strings[i].StringID)
-			{
-				break;
-			}
-
-			//AddString(Lara.Diary.Pages[currentPage].Strings[i].x, Lara.Diary.Pages[currentPage].Strings[i].y, g_GameFlow->GetString(Lara.Diary.Pages[currentPage].Strings[i].stringID), PRINTSTRING_COLOR_WHITE, 0);
-		}
-
-		DrawAllStrings();
-	}
-
 	void Renderer::RenderInventoryScene(RenderTarget2D* renderTarget, TextureBase* background, float backgroundFade)
 	{
 		// Set basic render states
@@ -1069,10 +1046,6 @@ namespace TEN::Renderer
 
 			case InventoryMode::Pause:
 				RenderPauseMenu(g_Gui.GetMenuToDisplay());
-				break;
-
-			case InventoryMode::Diary:
-				DrawDiary();
 				break;
 			}
 		}

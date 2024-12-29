@@ -131,14 +131,25 @@ namespace TEN::Renderer::Utils
 		// Reset compile counter.
 		_compileCounter = 0;
 
+		// LoadAAShaders should always be the first in the list, so that when AA settings are changed,
+		// they recompile with the same index as before.
+
+		LoadAAShaders(width, height, recompileAAShaders); 
 		LoadCommonShaders();
 		LoadPostprocessShaders();
-		LoadAAShaders(width, height, recompileAAShaders);
 	}
 
 	void ShaderManager::Bind(Shader shader, bool forceNull)
 	{
-		const auto& shaderObj = _shaders[(int)shader];
+		int shaderIndex = (int)shader;
+
+		if (shaderIndex >= _shaders.size())
+		{
+			TENLog("Attempt to access nonexistent shader with index " + std::to_string(shaderIndex), LogLevel::Error);
+			return;
+		}
+
+		const auto& shaderObj = _shaders[shaderIndex];
 
 		if (shaderObj.Vertex.Shader != nullptr || forceNull)
 			_context->VSSetShader(shaderObj.Vertex.Shader.Get(), nullptr, 0);
