@@ -273,7 +273,7 @@ GameStatus FreezePhase()
 	if (g_GameFlow->LastFreezeMode == FreezeMode::None)
 	{
 		// Capture the screen for drawing it as a background.
-		if (g_GameFlow->LastFreezeMode == FreezeMode::Full)
+		if (g_GameFlow->CurrentFreezeMode == FreezeMode::Full)
 			g_Renderer.DumpGameScene(SceneRenderMode::NoHud);
 
 		StopRumble();
@@ -751,13 +751,13 @@ GameStatus HandleMenuCalls(bool isTitle)
 	bool doInventory = (IsClicked(In::Inventory) || g_Gui.GetEnterInventory() != NO_VALUE) && playerAlive;
 
 	// Handle inventory.
-	if (doSave && g_GameFlow->IsLoadSaveEnabled() && g_Gui.GetInventoryMode() != InventoryMode::Save)
+	if (doSave && g_GameFlow->IsLoadSaveEnabled() && Lara.Inventory.HasSave && g_Gui.GetInventoryMode() != InventoryMode::Save)
 	{
 		SaveGame::LoadHeaders();
 		g_Gui.SetInventoryMode(InventoryMode::Save);
 		g_Gui.CallInventory(LaraItem, false);
 	}
-	else if (doLoad && g_GameFlow->IsLoadSaveEnabled() && g_Gui.GetInventoryMode() != InventoryMode::Load)
+	else if (doLoad && g_GameFlow->IsLoadSaveEnabled() && Lara.Inventory.HasLoad && g_Gui.GetInventoryMode() != InventoryMode::Load)
 	{
 		SaveGame::LoadHeaders();
 		g_Gui.SetInventoryMode(InventoryMode::Load);
