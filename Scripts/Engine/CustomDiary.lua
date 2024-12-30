@@ -232,7 +232,7 @@ function CustomDiary.ImportDiary(fileName)
                 return
             else
                 for _, data in pairs(entry.textOptions) do
-                    if type(data) ~= "number" or data < 0 or data > 3 or data == nil then
+                    if type(data) ~= "number" or data < 0 or data > 3 then
                         Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                         return
                     end
@@ -289,7 +289,7 @@ function CustomDiary.ImportDiary(fileName)
                 return
             else
                 for _, data in pairs(entry.textOptions) do
-                    if type(data) ~= "number" or data < 0 or data > 3 or data == nil then
+                    if type(data) ~= "number" or data < 0 or data > 3 then
                         Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                         return
                     end
@@ -472,7 +472,7 @@ function CustomDiary.ImportDiary(fileName)
                 return
             else
                 for _, data in pairs(entry.textOptions) do
-                    if type(data) ~= "number" or data < 0 or data > 3 or data == nil then
+                    if type(data) ~= "number" or data < 0 or data > 3 then
                         Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                         return
                     end
@@ -832,7 +832,7 @@ function CustomDiary:addTextEntry(pageIndex, text, textPos, textOptions, textSca
         return
     else
         for _, data in pairs(textOptions) do
-            if type(data) ~= "number" or data < 0 or data > 3 or data == nil then
+            if type(data) ~= "number" or data < 0 or data > 3 then
                 Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
                 return
             end
@@ -1246,7 +1246,7 @@ function CustomDiary:customizePageNumbers(pageNoType, prefix, separator, textPos
                 return
             else
                 for _, data in pairs(textOptions) do
-                    if type(data) ~= "number" or data < 0 or data > 3 or data == nil then
+                    if type(data) ~= "number" or data < 0 or data > 3 then
                         Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
                         return
                     end
@@ -1305,7 +1305,7 @@ function CustomDiary:customizeControls(textPos, textOptions, textScale, textColo
             return
         else
             for _, data in pairs(textOptions) do
-                if type(data) ~= "number" or data < 0 or data > 3 or data == nil then
+                if type(data) ~= "number" or data < 0 or data > 3 then
                     Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type in function 'customizeControls' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
                     return
                 end
