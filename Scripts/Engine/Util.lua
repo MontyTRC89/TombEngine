@@ -48,13 +48,12 @@ end
 -- @number source
 -- @treturn float result
 Utility.Smoothstep = function(source)
-	if Type.IsNumber(source) then
-		source = math.max(0, math.min(1, source))
-		return ((source ^ 3) * (source * (source * 6 - 15) + 10))
-	else
+	if not Type.IsNumber(source) then
 		TEN.Util.PrintLog("Error in Utility.Smoothstep() function: invalid source", TEN.Util.LogLevel.ERROR)
 		return 0.0
 	end
+	source = math.max(0, math.min(1, source))
+	return ((source ^ 3) * (source * (source * 6 - 15) + 10))
 end
 
 --- Linear interpolation. Calculates a number between two numbers at a specific increment.
@@ -63,27 +62,24 @@ end
 -- @number factor amount to interpolate between the two values
 -- @treturn float result lerped value
 Utility.Lerp = function(val1, val2, factor)
-	if Type.IsNumber(val1) and Type.IsNumber(val2) and Type.IsNumber(factor) then
-		return val1 * (1 - factor) + val2 * factor
-	else
+	if not (Type.IsNumber(val1) and Type.IsNumber(val2) and Type.IsNumber(factor)) then
 		TEN.Util.PrintLog("Error in Utility.Lerp() function: invalid arguments", TEN.Util.LogLevel.ERROR)
 		return 0.0
 	end
+	return val1 * (1 - factor) + val2 * factor
 end
 
 --- Counts the number of elements in a table. Nil values are not counted
 -- @tparam table table table to be examined
 -- @treturn int the length of the table
 Utility.TableLength = function (table)
-	if Type.IsTable(table) then
-		    local count = 0
-    	for _ in pairs(table) do count = count + 1 end
-    	return count
-	else
+	if not Type.IsTable(table) then
 		TEN.Util.PrintLog("Error in Utility.TableLength() function: invalid table", TEN.Util.LogLevel.ERROR)
 		return 0
 	end
-
+	local count = 0
+	for _ in pairs(table) do count = count + 1 end
+	return count
 end
 
 --- Verify that two float numbers are equal based on a tolerance
@@ -93,12 +89,11 @@ end
 -- @treturn bool __true__ if numbers are equal, __false__ if numbers are't equal
 Utility.FloatEquals = function(num1, num2, epsilon)
     epsilon = epsilon or .00001
-	if Type.IsNumber(num1) and Type.IsNumber(num2) and Type.IsNumber(epsilon) then
-		return math.abs(num1 - num2) < epsilon
-	else
+	if not (Type.IsNumber(num1) and Type.IsNumber(num2) and Type.IsNumber(epsilon)) then
 		TEN.Util.PrintLog("Error in Utility.FloatEquals() function: invalid arguments", TEN.Util.LogLevel.ERROR)
 		return false
 	end
+	return math.abs(num1 - num2) < epsilon
 end
 
 --- Split string using specified delimiter.
@@ -106,16 +101,14 @@ end
 -- @tparam string delimiter __Default: space__
 -- @treturn table the collection of strings generated
 Utility.SplitString = function(inputStr, delimiter)
-	if inputStr == nil then
-		inputStr = "%s"
-	end
+	delimiter = delimiter or "%s"
 	local t = {}
-	if Type.IsString(inputStr) and Type.IsString(delimiter) then
+	if not (Type.IsString(inputStr) and Type.IsString(delimiter)) then
+		TEN.Util.PrintLog("Error in Utility.SplitString() function: invalid arguments", TEN.Util.LogLevel.ERROR)
+	else
 		for str in string.gmatch(inputStr, "([^" .. delimiter .. "]+)") do
 			table.insert(t, str)
 		end
-	else
-		TEN.Util.PrintLog("Error in Utility.SplitString() function: invalid arguments", TEN.Util.LogLevel.ERROR)
 	end
 	return t
 end
@@ -179,7 +172,6 @@ Utility.GenerateTimeFormattedString = function (time, timerFormat)
     end
     timerFormat = Utility.CheckTimeFormat(timerFormat)
     if timerFormat == false then
-        TEN.Util.PrintLog("Error in Utility.GenerateTimeFormattedString() function: invalid options", TEN.Util.LogLevel.ERROR)
         return ""
     end
 	local result = {}
