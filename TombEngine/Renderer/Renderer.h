@@ -232,7 +232,7 @@ namespace TEN::Renderer
 		std::vector<TexturePair>							   _staticTextures;
 		std::vector<Texture2D>								   _spritesTextures;
 
-		Matrix _laraWorldMatrix;
+		Matrix _playerWorldMatrix;
 
 		// Preallocated pools of objects for avoiding new/delete.
 		// Items and effects are safe (can't be more than 1024 items in TR), 
