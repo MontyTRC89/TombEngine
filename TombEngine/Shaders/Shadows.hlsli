@@ -78,14 +78,14 @@ float3 DoBlobShadows(float3 worldPos, float3 lighting)
     {
         Sphere s = Spheres[i];
         float dist = distance(worldPos, s.position);
-        float insideSphere = saturate(1.0f - step(s.radius, dist)); // Eliminates branching
+        float insideSphere = saturate(1.0f - step(s.radius, dist));
         float radiusFactor = dist / s.radius;
         float factor = (1.0f - saturate(radiusFactor)) * insideSphere;
         shadowFactor -= factor * shadowFactor;
     }
 
     shadowFactor = saturate(shadowFactor);
-    return lighting * saturate(shadowFactor + SHADOW_INTENSITY);
+    return lighting * saturate(1.0f - (1.0f - shadowFactor) * SHADOW_INTENSITY);
 }
 
 float3 DoShadow(float3 worldPos, float3 normal, float3 lighting, float bias)
@@ -142,8 +142,8 @@ float3 DoShadow(float3 worldPos, float3 normal, float3 lighting, float bias)
     float pointFactor = Luma(DoPointLight(worldPos, normal, Light));
     float spotFactor  = Luma(DoSpotLight(worldPos, normal, Light));
 
-    float3 pointShadow = lighting * (1.0f - (1.0f - shadowFactor) * SHADOW_INTENSITY * pointFactor);
-    float3 spotShadow  = lighting * (1.0f - (1.0f - shadowFactor) * SHADOW_INTENSITY * spotFactor );
+    float3 pointShadow = lighting * saturate(1.0f - (1.0f - shadowFactor) * SHADOW_INTENSITY * pointFactor);
+    float3 spotShadow  = lighting * saturate(1.0f - (1.0f - shadowFactor) * SHADOW_INTENSITY * spotFactor );
 
     return pointShadow * isPoint + spotShadow * isSpot + lighting * isOther;
 }
