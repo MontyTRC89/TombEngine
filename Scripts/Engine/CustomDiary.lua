@@ -32,7 +32,7 @@ GameVars.Engine.LastUsedDiary = GameVars.Engine.LastUsedDiary or nil
 function CustomDiary.ImportDiary(fileName)
 
     if not Type.IsString(fileName) then
-        Util.PrintLog("'fileName' is in an incorrect format. Expected a string type in function 'CustomDiary.ImportDiary' for the diary system.", Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'fileName' is in an incorrect format. Expected a string type in function 'CustomDiary.ImportDiary' for the diary system.", Util.LogLevel.WARNING)
         return
     end
 
@@ -46,72 +46,72 @@ function CustomDiary.ImportDiary(fileName)
         if entry.type == "diary" then
 
             if (entry.object < 596 or entry.object > 611) and entry.object ~= 986 then
-                print("Invalid object slot. Please use a pickup object slot in the range PICKUP_ITEM1 (596) to PICKUP_ITEM 16 (611) or DIARY_ITEM (986). Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("Invalid object slot. Please use a pickup object slot in the range PICKUP_ITEM1 (596) to PICKUP_ITEM 16 (611) or DIARY_ITEM (986). Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if entry.objectIdBg < 1353 or entry.objectIdBg > 1400 then
-                print("Invalid objectIdBg slot. Please use a sprite slot. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("Invalid objectIdBg slot. Please use a sprite slot. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsNumber(entry.spriteIdBg) then
-                Util.PrintLog("'spriteIdBg' is not a number. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'spriteIdBg' is not a number. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsColor(entry.colorBg) then
-                Util.PrintLog("'colorBg' is not in a Color format. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'colorBg' is not in a Color format. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsVec2(entry.pos) then
-                Util.PrintLog("'pos' is not a Vec2. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'pos' is not a Vec2. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsNumber(entry.rot) then
-                Util.PrintLog("'rot' is not a number. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'rot' is not a number. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsVec2(entry.scale) then
-                Util.PrintLog("'scale' is not a Vec2. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'scale' is not a Vec2. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if  not (entry.alignMode ~= nil and entry.alignMode >= 0 and entry.alignMode <= 8) then
-                Util.PrintLog("'alignMode' is not a valid View.AlignMode type. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'alignMode' is not a valid View.AlignMode type. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if  not (entry.blendMode ~= nil and entry.blendMode >= 0 and entry.blendMode <= 11) then
-                Util.PrintLog("'blendMode' is not a valid Effects.BlendID type. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'blendMode' is not a valid Effects.BlendID type. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if  not (entry.scaleMode ~= nil and entry.scaleMode >= 0 and entry.scaleMode <= 2) then
-                Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsNumber(entry.alpha) or entry.alpha < 0 or entry.alpha > 255 then
-                Util.PrintLog("'alpha' is not a number or not within range (0-255). Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'alpha' is not a number or not within range (0-255). Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsNumber(entry.pageSound) or entry.pageSound <=0 then
-                Util.PrintLog("'pageSound' is not a valid number. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'pageSound' is not a valid number. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsNumber(entry.exitSound) or entry.exitSound <=0 then
-                Util.PrintLog("'exitSound' is not a valid number. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'exitSound' is not a valid number. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsNumber(entry.pagesToUnlock) or entry.pagesToUnlock <=0 then
-                Util.PrintLog("'pagesToUnlock' is not a valid page number. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'pagesToUnlock' is not a valid page number. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
@@ -144,52 +144,52 @@ function CustomDiary.ImportDiary(fileName)
         if entry.type == "background" then
 
             if entry.objectIdBg < 1353 or entry.objectIdBg > 1400 then
-                print("Invalid objectIdBg slot. Please use a sprite slot. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("Invalid objectIdBg slot. Please use a sprite slot. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsNumber(entry.spriteIdBg) then
-                Util.PrintLog("'spriteIdBg' is not a number. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'spriteIdBg' is not a number. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsColor(entry.colorBg) then
-                Util.PrintLog("'colorBg' is not in a Color format. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'colorBg' is not in a Color format. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsVec2(entry.pos) then
-                Util.PrintLog("'pos' is not a Vec2. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'pos' is not a Vec2. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsNumber(entry.rot) then
-                Util.PrintLog("'rot' is not a number. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'rot' is not a number. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsVec2(entry.scale) then
-                Util.PrintLog("'scale' is not a Vec2. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'scale' is not a Vec2. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if  not (entry.alignMode ~= nil and entry.alignMode >= 0 and entry.alignMode <= 8) then
-                Util.PrintLog("'alignMode' is not a valid View.AlignMode type. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'alignMode' is not a valid View.AlignMode type. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if  not (entry.blendMode ~= nil and entry.blendMode >= 0 and entry.blendMode <= 11) then
-                Util.PrintLog("'blendMode' is not a valid Effects.BlendID type. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'blendMode' is not a valid Effects.BlendID type. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if  not (entry.scaleMode ~= nil and entry.scaleMode >= 0 and entry.scaleMode <= 2) then
-                Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsNumber(entry.alpha) or entry.alpha < 0 or entry.alpha > 255 then
-                Util.PrintLog("'alpha' is not a number or not within range (0-255). Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'alpha' is not a number or not within range (0-255). Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
@@ -208,44 +208,44 @@ function CustomDiary.ImportDiary(fileName)
         elseif entry.type == "pageNumbers" then
 
             if not Type.IsNumber(entry.pageNoType) or entry.pageNoType < 1 or entry.pageNoType > 2 then
-                Util.PrintLog("'pageNoType' is not a a valid option (1 or 2). Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'pageNoType' is not a a valid option (1 or 2). Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsString(entry.prefix) then
-                Util.PrintLog("'prefix' is not a a string. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'prefix' is not a a string. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsString(entry.separator) then
-                Util.PrintLog("'separator' is not a a string. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'separator' is not a a string. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsVec2(entry.textPos) then
-                Util.PrintLog("'textPos' is not a a Vec2. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'textPos' is not a a Vec2. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsTable(entry.textOptions) then
-                Util.PrintLog("'textOptions' is not a table. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'textOptions' is not a table. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             else
                 for _, data in pairs(entry.textOptions) do
                     if type(data) ~= "number" or data < 0 or data > 3 then
-                        Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                        TEN.Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                         return
                     end
                 end
             end
 
             if not Type.IsNumber(entry.textScale) then
-                Util.PrintLog("'textScale' is not a number. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'textScale' is not a number. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsColor(entry.textColor) then
-                Util.PrintLog("'textColor' is not in a Color format. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'textColor' is not in a Color format. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
@@ -260,49 +260,49 @@ function CustomDiary.ImportDiary(fileName)
             )
         elseif entry.type == "controls" then
             if not Type.IsString(entry.string1) then
-                Util.PrintLog("'string1' is not a string. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'string1' is not a string. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
             if not Type.IsString(entry.string2) then
-                Util.PrintLog("'string2' is not a string. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'string2' is not a string. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
             if not Type.IsString(entry.string3) then
-                Util.PrintLog("'string3' is not a string. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'string3' is not a string. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
             if not Type.IsString(entry.string4) then
-                Util.PrintLog("'string4' is not a string. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'string4' is not a string. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
             if not Type.IsString(entry.separator) then
-                Util.PrintLog("'separator' is not a string. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'separator' is not a string. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
             if not Type.IsVec2(entry.textPos) then
-                Util.PrintLog("'textPos' is not a Vec2. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'textPos' is not a Vec2. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsTable(entry.textOptions) then
-                Util.PrintLog("'textOptions' is not a table. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'textOptions' is not a table. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             else
                 for _, data in pairs(entry.textOptions) do
                     if type(data) ~= "number" or data < 0 or data > 3 then
-                        Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                        TEN.Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                         return
                     end
                 end
             end
 
             if not Type.IsNumber(entry.textScale) then
-                Util.PrintLog("'textScale' is not a number. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'textScale' is not a number. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsColor(entry.textColor) then
-                Util.PrintLog("'textColor' is not in a Color format. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'textColor' is not in a Color format. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
@@ -319,57 +319,57 @@ function CustomDiary.ImportDiary(fileName)
                 entry.separator)
         elseif entry.type == "notification" then
             if not Type.IsNumber(entry.notificationTime) or entry.notificationTime <=0 then
-                Util.PrintLog("'notificationTime' is not a valid number. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'notificationTime' is not a valid number. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if entry.objectId < 1353 or entry.objectId > 1400 then
-                print("Invalid objectId slot. Please use a sprite slot. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("Invalid objectId slot. Please use a sprite slot. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsNumber(entry.spriteId) then
-                Util.PrintLog("'spriteId' is not a number. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'spriteId' is not a number. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsColor(entry.color) then
-                Util.PrintLog("'color' is not in a Color format. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'color' is not in a Color format. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsVec2(entry.pos) then
-                Util.PrintLog("'pos' is not a Vec2. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'pos' is not a Vec2. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsNumber(entry.rot) then
-                Util.PrintLog("'rot' is not a number. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'rot' is not a number. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsVec2(entry.scale) then
-                Util.PrintLog("'scale' is not a Vec2. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'scale' is not a Vec2. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if  not (entry.alignMode ~= nil and entry.alignMode >= 0 and entry.alignMode <= 8) then
-                Util.PrintLog("'alignMode' is not a valid View.AlignMode type. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'alignMode' is not a valid View.AlignMode type. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if  not (entry.blendMode ~= nil and entry.blendMode >= 0 and entry.blendMode <= 11) then
-                Util.PrintLog("'blendMode' is not a valid Effects.BlendID type. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'blendMode' is not a valid Effects.BlendID type. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if  not (entry.scaleMode ~= nil and entry.scaleMode >= 0 and entry.scaleMode <= 2) then
-                Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsNumber(entry.notificationSound) or entry.notificationSound <=0 then
-                Util.PrintLog("'notificationSound' is not a valid number. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'notificationSound' is not a valid number. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
@@ -389,52 +389,52 @@ function CustomDiary.ImportDiary(fileName)
         elseif entry.type == "image" then
 
             if not Type.IsNumber(entry.pageIndex) or entry.pageIndex <=0 then
-                Util.PrintLog("'pageIndex' is not a valid page number. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'pageIndex' is not a valid page number. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if entry.objectId < 1353 or entry.objectId > 1400 then
-                print("Invalid objectId slot. Please use a sprite slot. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("Invalid objectId slot. Please use a sprite slot. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsNumber(entry.spriteId) then
-                Util.PrintLog("'spriteId' is not a number. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'spriteId' is not a number. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsColor(entry.color) then
-                Util.PrintLog("'color' is not in a Color format. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'color' is not in a Color format. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsVec2(entry.pos) then
-                Util.PrintLog("'pos' is not a Vec2. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'pos' is not a Vec2. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsNumber(entry.rot) then
-                Util.PrintLog("'rot' is not a number. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'rot' is not a number. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsVec2(entry.scale) then
-                Util.PrintLog("'scale' is not a Vec2. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'scale' is not a Vec2. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if  not (entry.alignMode ~= nil and entry.alignMode >= 0 and entry.alignMode <= 8) then
-                Util.PrintLog("'alignMode' is not a valid View.AlignMode type for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'alignMode' is not a valid View.AlignMode type for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if  not (entry.blendMode ~= nil and entry.blendMode >= 0 and entry.blendMode <= 11) then
-                Util.PrintLog("'blendMode' is not a valid Effects.BlendID type for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'blendMode' is not a valid Effects.BlendID type for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if  not (entry.scaleMode ~= nil and entry.scaleMode >= 0 and entry.scaleMode <= 2) then
-                Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
@@ -453,39 +453,39 @@ function CustomDiary.ImportDiary(fileName)
         elseif entry.type == "text" then
 
             if not Type.IsNumber(entry.pageIndex) or entry.pageIndex <=0 then
-                Util.PrintLog("'pageIndex' is not a valid page number. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'pageIndex' is not a valid page number. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsString(entry.text) then
-                Util.PrintLog("'text' is not a string. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'text' is not a string. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsVec2(entry.textPos) then
-                Util.PrintLog("'textPos' is not a a Vec2. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'textPos' is not a a Vec2. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsTable(entry.textOptions) then
-                Util.PrintLog("'textOptions' is not a table. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'textOptions' is not a table. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             else
                 for _, data in pairs(entry.textOptions) do
                     if type(data) ~= "number" or data < 0 or data > 3 then
-                        Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                        TEN.Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                         return
                     end
                 end
             end
 
             if not Type.IsNumber(entry.textScale) then
-                Util.PrintLog("'textScale' is not a number. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'textScale' is not a number. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsColor(entry.textColor) then
-                Util.PrintLog("'textColor' is not in a Color format. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'textColor' is not in a Color format. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
@@ -500,12 +500,12 @@ function CustomDiary.ImportDiary(fileName)
         elseif entry.type == "narration" then
 
             if not Type.IsNumber(entry.pageIndex) or entry.pageIndex <=0 then
-                Util.PrintLog("'pageIndex' is not a valid page number. Error in template data for narration entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'pageIndex' is not a valid page number. Error in template data for narration entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsString(entry.trackName) then
-                Util.PrintLog("'trackName' is not a string. Error in template data for narration entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'trackName' is not a string. Error in template data for narration entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
@@ -516,7 +516,7 @@ function CustomDiary.ImportDiary(fileName)
         elseif entry.type == "diary" then
         -- Skip this entry as diary is already imported. This comment is needed to avouid the error of Unknown type for diary.
         else
-            print("Unknown entry type: " .. tostring(entry.type))
+            TEN.Util.PrintLog("Unknown entry type: " .. tostring(entry.type).." in file: "..tostring(fileName), Util.LogLevel.WARNING)
         end
     end
     
@@ -545,7 +545,7 @@ end
 CustomDiary.Create = function(object, objectIdBg, spriteIdBg, colorBg, pos, rot, scale, alignMode, scaleMode, blendMode, alpha, pageSound, exitSound)
 
     if (object < 596 or object > 611) and object ~= 986 then
-        print("Error: Invalid object slot for diary creation. Please use a pickup object slot PICKUP_ITEM1 (596) to PICKUP_ITEM 16 (611) or DIARY_ITEM (986).")
+        TEN.Util.PrintLog("Error: Invalid object slot for diary creation. Please use a pickup object slot PICKUP_ITEM1 (596) to PICKUP_ITEM 16 (611) or DIARY_ITEM (986).", Util.LogLevel.WARNING)
         return
     end
 
@@ -562,84 +562,84 @@ CustomDiary.Create = function(object, objectIdBg, spriteIdBg, colorBg, pos, rot,
     if objectIdBg >= 1353 and objectIdBg <= 1400 then
         GameVars.Engine.Diaries[dataName].ObjectIdBg	        = objectIdBg
     else
-        print("Invalid objectIdBg slot. Please use a sprite slot. Expected a sprite slot in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("Invalid objectIdBg slot. Please use a sprite slot. Expected a sprite slot in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
 
     if Type.IsNumber(spriteIdBg) then
         GameVars.Engine.Diaries[dataName].SpriteIdBg	        = spriteIdBg
     else
-        Util.PrintLog("'spriteIdBg' is in an incorrect format. Expected a number type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'spriteIdBg' is in an incorrect format. Expected a number type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
 
     if Type.IsColor(colorBg) then
         GameVars.Engine.Diaries[dataName].ColorBg		        = colorBg
     else
-        Util.PrintLog("'colorBg' is in an incorrect format. Expected a Color type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'colorBg' is in an incorrect format. Expected a Color type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
 
     if Type.IsVec2(pos) then
         GameVars.Engine.Diaries[dataName].Pos			        = pos
     else
-        Util.PrintLog("'posBg' is in an incorrect format. Expected a Vec2 type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'posBg' is in an incorrect format. Expected a Vec2 type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
 
     if Type.IsNumber(rot) then
         GameVars.Engine.Diaries[dataName].Rot			        = rot
     else
-        Util.PrintLog("'rot' is in an incorrect format. Expected a number type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'rot' is in an incorrect format. Expected a number type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
 
     if Type.IsVec2(scale) then
         GameVars.Engine.Diaries[dataName].Scale 		        = scale
     else
-        Util.PrintLog("'scale' is in an incorrect format. Expected a Vec2 type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'scale' is in an incorrect format. Expected a Vec2 type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
 
     if  (alignMode ~= nil and alignMode >= 0 and alignMode <= 8) then
         GameVars.Engine.Diaries[dataName].AlignMode            = alignMode
     else
-        Util.PrintLog("'alignMode' is not a valid View.AlignMode type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'alignMode' is not a valid View.AlignMode type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
 
     if  (blendMode ~= nil and blendMode >= 0 and blendMode <= 11) then
         GameVars.Engine.Diaries[dataName].BlendMode	        = blendMode
     else
-        Util.PrintLog("'blendMode' is not a valid Effects.BlendID type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'blendMode' is not a valid Effects.BlendID type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
 
     if  (scaleMode ~= nil and scaleMode >= 0 and scaleMode <= 2) then
         GameVars.Engine.Diaries[dataName].ScaleMode            = scaleMode
     else
-        Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
 
     if Type.IsNumber(alpha) and alpha>=0 and alpha <= 255 then
         GameVars.Engine.Diaries[dataName].Alpha     	        = alpha
     else
-        Util.PrintLog("'alpha is in an incorrect format. Expected a number (0-255) type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'alpha is in an incorrect format. Expected a number (0-255) type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
 
     if Type.IsNumber(pageSound) and pageSound > 0 then
         GameVars.Engine.Diaries[dataName].PageSound	        = pageSound
     else
-        Util.PrintLog("'pageSound' is in an incorrect format. Expected a number type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'pageSound' is in an incorrect format. Expected a number type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
 
     if Type.IsNumber(exitSound) and exitSound > 0 then
         GameVars.Engine.Diaries[dataName].ExitSound            = exitSound
     else
-        Util.PrintLog("'exitSound' is in an incorrect format. Expected a number type in function 'CustomDiary.Create' for the diary system:.", Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'exitSound' is in an incorrect format. Expected a number type in function 'CustomDiary.Create' for the diary system:.", Util.LogLevel.WARNING)
         return
     end
 
@@ -674,7 +674,7 @@ CustomDiary.Get = function(object)
         local self = {Name = dataName}
         return setmetatable(self, CustomDiary)
     else
-        print("Diary does not exist for object: "..tostring(object))
+        TEN.Util.PrintLog("Diary does not exist for object: "..tostring(object), Util.LogLevel.WARNING)
     end
 end
 
@@ -698,14 +698,14 @@ CustomDiary.Status = function(value)
         if GameVars.Engine.Diaries then
             if value == true then
                 TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.POSTUSEITEM, LevelFuncs.Engine.Diaries.ActivateDiary)
-                print("Diary system started.")
+                TEN.Util.PrintLog("Diary system started.", Util.LogLevel.WARNING)
             elseif value == false then
                 TEN.Logic.RemoveCallback(TEN.Logic.CallbackPoint.POSTUSEITEM, LevelFuncs.Engine.Diaries.ActivateDiary)
-                print("Diary system stopped.")
+                TEN.Util.PrintLog("Diary system stopped.", Util.LogLevel.WARNING)
             end
         end
     else
-        Util.PrintLog("'value' is in an incorrect format. Expected a bool type in function 'CustomDiary.Status' for the diary system", Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'value' is in an incorrect format. Expected a bool type in function 'CustomDiary.Status' for the diary system", Util.LogLevel.WARNING)
     end
 end
 
@@ -729,7 +729,7 @@ function CustomDiary:showDiary(pageIndex)
 		local object = GameVars.Engine.Diaries[self.Name].Object
 
         if not Type.IsNumber(pageIndex) or pageIndex > #GameVars.Engine.Diaries[self.Name].Pages or pageIndex <=0 then
-            print("'pageIndex' is in an incorrect format or not a valid page number. Expected a number type in function 'showDiary' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'pageIndex' is in an incorrect format or not a valid page number. Expected a number type in function 'showDiary' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
@@ -761,12 +761,12 @@ function CustomDiary:unlockPages(pageIndex, notification)
     if GameVars.Engine.Diaries[self.Name] then
 
         if not Type.IsNumber(pageIndex) or pageIndex > #GameVars.Engine.Diaries[self.Name].Pages or pageIndex <= 0 then
-            Util.PrintLog("'pageIndex' is in an incorrect format or not a valid page number. Expected a number type in function 'unlockPages' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'pageIndex' is in an incorrect format or not a valid page number. Expected a number type in function 'unlockPages' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if not Type.IsBoolean(notification) then
-            Util.PrintLog("'notification' is in an incorrect format. Expected a bool type in function 'unlockPages' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'notification' is in an incorrect format. Expected a bool type in function 'unlockPages' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
@@ -792,13 +792,13 @@ end
 function CustomDiary:clearPage(pageIndex)
 
     if not Type.IsNumber(pageIndex) or pageIndex > #GameVars.Engine.Diaries[self.Name].Pages or pageIndex <=0 then
-        Util.PrintLog("'pageIndex' is in an incorrect format or not a valid page number. Expected a number type in function 'clearPage' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'pageIndex' is in an incorrect format or not a valid page number. Expected a number type in function 'clearPage' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
 
     if GameVars.Engine.Diaries[self.Name] then
         GameVars.Engine.Diaries[self.Name].Pages[pageIndex]= {NarrationTrack=nil,TextEntries={},ImageEntries={}}
-        print("Page Cleared: ".. tostring(pageIndex).." for the diary system: "..tostring(self.Name))
+        TEN.Util.PrintLog("Page Cleared: ".. tostring(pageIndex).." for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
     end
 end
 
@@ -816,24 +816,24 @@ function CustomDiary:addTextEntry(pageIndex, text, textPos, textOptions, textSca
     if Type.IsString(text) then
         textEntry.text = text
     else
-        Util.PrintLog("'text' is in an incorrect format. Expected a string type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'text' is in an incorrect format. Expected a string type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
 
     if Type.IsVec2(textPos) then
         textEntry.textPos = textPos
     else
-        Util.PrintLog("'textPos' is in an incorrect format. Expected a Vec2 type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'textPos' is in an incorrect format. Expected a Vec2 type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
 
     if not Type.IsTable(textOptions) then
-        Util.PrintLog("'textOptions' is in an incorrect format. Expected a table type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'textOptions' is in an incorrect format. Expected a table type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     else
         for _, data in pairs(textOptions) do
             if type(data) ~= "number" or data < 0 or data > 3 then
-                Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
                 return
             end
         end
@@ -843,14 +843,14 @@ function CustomDiary:addTextEntry(pageIndex, text, textPos, textOptions, textSca
     if Type.IsNumber(textScale) then
         textEntry.textScale = textScale
     else
-        Util.PrintLog("'textScale' is in an incorrect format. Expected a number type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'textScale' is in an incorrect format. Expected a number type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
 
     if Type.IsColor(textColor) then
         textEntry.textColor = textColor
     else
-        Util.PrintLog("'textColor' is in an incorrect format. Expected a Color type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'textColor' is in an incorrect format. Expected a Color type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
 
@@ -861,7 +861,7 @@ function CustomDiary:addTextEntry(pageIndex, text, textPos, textOptions, textSca
         table.insert(GameVars.Engine.Diaries[self.Name].Pages[pageIndex].TextEntries, textEntry)
         print("Text entry added to page: ".. tostring(pageIndex).." for the diary system: "..tostring(self.Name))
     else
-        Util.PrintLog("'pageIndex' is in an incorrect format. Expected a number type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'pageIndex' is in an incorrect format. Expected a number type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
     end
 end
 
@@ -884,63 +884,63 @@ function CustomDiary:addImageEntry(pageIndex, objectId, spriteId, color, pos, ro
     if objectId >= 1353 and objectId <= 1400 then
         imageEntry.objectId     = objectId
     else
-        print("Invalid objectId slot. Please use a sprite slot. Expected a sprite slot in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("Invalid objectId slot. Please use a sprite slot. Expected a sprite slot in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
 
     if Type.IsNumber(spriteId) then
         imageEntry.spriteId     = spriteId
     else
-        Util.PrintLog("'spriteId' is in an incorrect format. Expected a number type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'spriteId' is in an incorrect format. Expected a number type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
 
     if Type.IsColor(color) then
         imageEntry.color        = color
     else
-        Util.PrintLog("'color' is in an incorrect format. Expected a Color type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'color' is in an incorrect format. Expected a Color type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
 
     if Type.IsVec2(pos) then
         imageEntry.pos          = pos
     else
-        Util.PrintLog("'pos' is in an incorrect format. Expected a Vec2 type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'pos' is in an incorrect format. Expected a Vec2 type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
 
     if Type.IsNumber(rot) then
         imageEntry.rot          = rot
     else
-        Util.PrintLog("'rot' is in an incorrect format. Expected a number type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'rot' is in an incorrect format. Expected a number type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
 
     if Type.IsVec2(scale) then
         imageEntry.scale        = scale
     else
-        Util.PrintLog("'scale' is in an incorrect format. Expected a Vec2 type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'scale' is in an incorrect format. Expected a Vec2 type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
     
     if  (alignMode ~= nil and alignMode >= 0 and alignMode <= 8) then
         imageEntry.alignMode    = alignMode
     else
-        Util.PrintLog("'alignMode' is not a valid View.AlignMode type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'alignMode' is not a valid View.AlignMode type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
 
     if  (scaleMode ~= nil and scaleMode >= 0 and scaleMode <= 2) then
         imageEntry.scaleMode    = scaleMode
     else
-        Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
 
     if  (blendMode ~= nil and blendMode >= 0 and blendMode <= 11) then
         imageEntry.blendMode    = blendMode
     else
-        Util.PrintLog("'blendMode' is not a valid Effects.BlendID type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'blendMode' is not a valid Effects.BlendID type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
    
@@ -951,7 +951,7 @@ function CustomDiary:addImageEntry(pageIndex, objectId, spriteId, color, pos, ro
         table.insert(GameVars.Engine.Diaries[self.Name].Pages[pageIndex].ImageEntries, imageEntry)
         print("Image entry added to page: ".. tostring(pageIndex).." for the diary system: "..tostring(self.Name))
     else
-        Util.PrintLog("'pageIndex' is in an incorrect format. Expected a number type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'pageIndex' is in an incorrect format. Expected a number type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
     end
 end
 
@@ -970,12 +970,12 @@ function CustomDiary:addNarration(pageIndex, trackName)
             GameVars.Engine.Diaries[self.Name].Pages[pageIndex].NarrationTrack = trackName
             print("Narration added to page: ".. tostring(pageIndex).." for the diary system: "..tostring(self.Name))
         else
-            Util.PrintLog("'trackName' is in an incorrect format. Expected a string type in function 'addNarration' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'trackName' is in an incorrect format. Expected a string type in function 'addNarration' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
     else
-        Util.PrintLog("'pageIndex' is in an incorrect format. Expected a number type in function 'addNarration' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'pageIndex' is in an incorrect format. Expected a number type in function 'addNarration' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
     end
 
 end
@@ -986,7 +986,7 @@ end
 function CustomDiary:removeNarration(pageIndex)
 
     if not Type.IsNumber(pageIndex) or pageIndex > #GameVars.Engine.Diaries[self.Name].Pages or pageIndex <=0 then
-        Util.PrintLog("'pageIndex' is in an incorrect format or not a valid page number. Expected a number type in function 'removeNarration' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'pageIndex' is in an incorrect format or not a valid page number. Expected a number type in function 'removeNarration' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
 
@@ -1014,70 +1014,70 @@ function CustomDiary:addBackground(objectId, spriteId, color, pos, rot, scale, a
         if objectId >= 1353 and objectId <= 1400 then
             GameVars.Engine.Diaries[self.Name].Background.ObjectIdBg	    = objectId
         else
-            print("Invalid objectId slot. Please use a sprite slot. Expected a sprite slot in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("Invalid objectId slot. Please use a sprite slot. Expected a sprite slot in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsNumber(spriteId) then
             GameVars.Engine.Diaries[self.Name].Background.SpriteIdBg	    = spriteId
         else
-            Util.PrintLog("'spriteId' is in an incorrect format. Expected a number type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'spriteId' is in an incorrect format. Expected a number type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsColor(color) then
             GameVars.Engine.Diaries[self.Name].Background.ColorBg		    = color
         else
-            Util.PrintLog("'color' is in an incorrect format. Expected a Color type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'color' is in an incorrect format. Expected a Color type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsVec2(pos) then
             GameVars.Engine.Diaries[self.Name].Background.Pos			    = pos
         else
-            Util.PrintLog("'pos' is in an incorrect format. Expected a Vec2 type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'pos' is in an incorrect format. Expected a Vec2 type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsNumber(rot) then
             GameVars.Engine.Diaries[self.Name].Background.Rot			    = rot
         else
-            Util.PrintLog("'rot' is in an incorrect format. Expected a number type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'rot' is in an incorrect format. Expected a number type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsVec2(scale) then
             GameVars.Engine.Diaries[self.Name].Background.Scale            = scale
         else
-            Util.PrintLog("'scale' is in an incorrect format. Expected a Vec2 type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'scale' is in an incorrect format. Expected a Vec2 type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if  (alignMode ~= nil and alignMode >= 0 and alignMode <= 8) then
             GameVars.Engine.Diaries[self.Name].Background.AlignMode        = alignMode
         else
-            Util.PrintLog("'alignMode' is not a valid View.AlignMode type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'alignMode' is not a valid View.AlignMode type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if  (scaleMode ~= nil and scaleMode >= 0 and scaleMode <= 2) then
             GameVars.Engine.Diaries[self.Name].Background.ScaleMode        = scaleMode
         else
-            Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if  (blendMode ~= nil and blendMode >= 0 and blendMode <= 11) then
             GameVars.Engine.Diaries[self.Name].Background.BlendMode 	    = blendMode
         else
-            Util.PrintLog("'blendMode' is not a valid Effects.BlendID type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'blendMode' is not a valid Effects.BlendID type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
         
         if Type.IsNumber(alpha) and alpha>=0 and alpha <= 255 then
             GameVars.Engine.Diaries[self.Name].Background.Alpha		        = alpha
         else
-            Util.PrintLog("'alpha is in an incorrect format. Expected a number (0-255) type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'alpha is in an incorrect format. Expected a number (0-255) type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
@@ -1114,77 +1114,77 @@ function CustomDiary:customizeNotification(notificationTime, objectId, spriteId,
         if Type.IsNumber(notificationTime) and notificationTime > 0 then
             GameVars.Engine.Diaries[self.Name].Notification.NotificationTime    = notificationTime
         else
-            Util.PrintLog("'notificationTime' is in an incorrect format. Expected a number type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'notificationTime' is in an incorrect format. Expected a number type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if objectId >= 1353 and objectId <= 1400 then
             GameVars.Engine.Diaries[self.Name].Notification.ObjectID           = objectId
         else
-            print("Invalid objectId slot. Please use a sprite slot. Expected a sprite slot in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("Invalid objectId slot. Please use a sprite slot. Expected a sprite slot in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsNumber(spriteId) then
             GameVars.Engine.Diaries[self.Name].Notification.SpriteID	        = spriteId
         else
-            Util.PrintLog("'spriteId' is in an incorrect format. Expected a number type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'spriteId' is in an incorrect format. Expected a number type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsColor(color) then
             GameVars.Engine.Diaries[self.Name].Notification.Color		        = color
         else
-            Util.PrintLog("'color' is in an incorrect format. Expected a Color type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'color' is in an incorrect format. Expected a Color type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsVec2(pos) then
             GameVars.Engine.Diaries[self.Name].Notification.Pos			    = pos
         else
-            Util.PrintLog("'pos' is in an incorrect format. Expected a Vec2 type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'pos' is in an incorrect format. Expected a Vec2 type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsNumber(rot) then
             GameVars.Engine.Diaries[self.Name].Notification.Rot			    = rot
         else
-            Util.PrintLog("'rot' is in an incorrect format. Expected a number type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'rot' is in an incorrect format. Expected a number type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsVec2(scale) then
             GameVars.Engine.Diaries[self.Name].Notification.Scale		        = scale
         else
-            Util.PrintLog("'scale' is in an incorrect format. Expected a Vec2 type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'scale' is in an incorrect format. Expected a Vec2 type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if  (alignMode ~= nil and alignMode >= 0 and alignMode <= 8) then
             GameVars.Engine.Diaries[self.Name].Notification.AlignMode		    = alignMode
         else
-            Util.PrintLog("'alignMode' is not a valid View.AlignMode type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'alignMode' is not a valid View.AlignMode type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
                 
         if  (scaleMode ~= nil and scaleMode >= 0 and scaleMode <= 2) then
             GameVars.Engine.Diaries[self.Name].Notification.ScaleMode		    = scaleMode
         else
-            Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
         
         if  (blendMode ~= nil and blendMode >= 0 and blendMode <= 11) then
             GameVars.Engine.Diaries[self.Name].Notification.BlendMode		    = blendMode
         else
-            Util.PrintLog("'blendMode' is not a valid Effects.BlendID type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'blendMode' is not a valid Effects.BlendID type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsNumber(notificationSound) and notificationSound > 0 then
             GameVars.Engine.Diaries[self.Name].Notification.NotificationSound	= notificationSound
         else
-            Util.PrintLog("'notificationSound' is in an incorrect format. Expected a number type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'notificationSound' is in an incorrect format. Expected a number type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
@@ -1223,31 +1223,31 @@ function CustomDiary:customizePageNumbers(pageNoType, prefix, separator, textPos
             if Type.IsString(prefix) then
                 GameVars.Engine.Diaries[self.Name].PageNumbers.prefix           = prefix
             else
-                Util.PrintLog("'prefix' is in an incorrect format. Expected a string type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'prefix' is in an incorrect format. Expected a string type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
                 return
             end
 
             if Type.IsString(separator) then
                 GameVars.Engine.Diaries[self.Name].PageNumbers.separator        = separator
             else
-                Util.PrintLog("'separator' is in an incorrect format. Expected a string type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'separator' is in an incorrect format. Expected a string type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
                 return
             end
 
             if Type.IsVec2(textPos) then
                 GameVars.Engine.Diaries[self.Name].PageNumbers.textPos          = textPos
             else
-                Util.PrintLog("'textPos' is in an incorrect format. Expected a Vec2 type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'textPos' is in an incorrect format. Expected a Vec2 type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
                 return
             end
 
             if not Type.IsTable(textOptions) then
-                Util.PrintLog("'textOptions' is in an incorrect format. Expected a table type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'textOptions' is in an incorrect format. Expected a table type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
                 return
             else
                 for _, data in pairs(textOptions) do
                     if type(data) ~= "number" or data < 0 or data > 3 then
-                        Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+                        TEN.Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
                         return
                     end
                 end
@@ -1257,19 +1257,19 @@ function CustomDiary:customizePageNumbers(pageNoType, prefix, separator, textPos
             if Type.IsNumber(textScale) then
                 GameVars.Engine.Diaries[self.Name].PageNumbers.textScale		= textScale
             else
-                Util.PrintLog("'textScale' is in an incorrect format. Expected a number type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'textScale' is in an incorrect format. Expected a number type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
                 return
             end
 
             if Type.IsColor(textColor) then
                 GameVars.Engine.Diaries[self.Name].PageNumbers.textColor		= textColor
             else
-                Util.PrintLog("'textColor' is in an incorrect format. Expected a Color type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("'textColor' is in an incorrect format. Expected a Color type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
                 return
             end
         end
     else
-        Util.PrintLog("'pageNoType' is in an incorrect format. Expected a number type (1 or 2) in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        TEN.Util.PrintLog("'pageNoType' is in an incorrect format. Expected a number type (1 or 2) in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
     print("Page Numbers updated for the diary system: "..tostring(self.Name))
@@ -1296,17 +1296,17 @@ function CustomDiary:customizeControls(textPos, textOptions, textScale, textColo
         if Type.IsVec2(textPos) then
             GameVars.Engine.Diaries[self.Name].Controls.textPos         = textPos
         else
-            Util.PrintLog("'textPos' is in an incorrect format. Expected a Vec2 type in function 'customizeControls' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'textPos' is in an incorrect format. Expected a Vec2 type in function 'customizeControls' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if not Type.IsTable(textOptions) then
-            Util.PrintLog("'textOptions' is in an incorrect format. Expected a table type in function 'customizeControls' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'textOptions' is in an incorrect format. Expected a table type in function 'customizeControls' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         else
             for _, data in pairs(textOptions) do
                 if type(data) ~= "number" or data < 0 or data > 3 then
-                    Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type in function 'customizeControls' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+                    TEN.Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type in function 'customizeControls' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
                     return
                 end
             end
@@ -1316,14 +1316,14 @@ function CustomDiary:customizeControls(textPos, textOptions, textScale, textColo
         if Type.IsNumber(textScale) then
             GameVars.Engine.Diaries[self.Name].Controls.textScale        = textScale
         else
-            Util.PrintLog("'textScale' is in an incorrect format. Expected a number type in function 'customizeControls' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'textScale' is in an incorrect format. Expected a number type in function 'customizeControls' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsColor(textColor) then
             GameVars.Engine.Diaries[self.Name].Controls.textColor		= textColor
         else
-            Util.PrintLog("'textColor' is in an incorrect format. Expected a Color type in function 'customizeControls' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'textColor' is in an incorrect format. Expected a Color type in function 'customizeControls' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
         GameVars.Engine.Diaries[self.Name].Controls.text1           = "Space: Play Voice Note"
@@ -1348,36 +1348,36 @@ function CustomDiary:customizeControlsText(string1, string2, string3, string4, s
         if Type.IsString(string1) then
             GameVars.Engine.Diaries[self.Name].Controls.text1           = string1
         else
-            Util.PrintLog("'string1' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'string1' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsString(string2) then
             GameVars.Engine.Diaries[self.Name].Controls.text2           = string2
         else
-            Util.PrintLog("'string2' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'string2' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsString(string3) then
             GameVars.Engine.Diaries[self.Name].Controls.text3           = string3
         else
-            Util.PrintLog("'string3' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'string3' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsString(string4) then
             GameVars.Engine.Diaries[self.Name].Controls.text4           = string4
         else
-            Util.PrintLog("'string4' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'string4' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsString(separator) then
             GameVars.Engine.Diaries[self.Name].Controls.separator       = separator
-            print("Controls text updated")
+            print("Controls text updated for the diary system: "..tostring(self.Name))
         else
-            Util.PrintLog("'separator' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            TEN.Util.PrintLog("'separator' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
     end
@@ -1617,7 +1617,7 @@ LevelFuncs.Engine.Diaries.ShowNotification = function(dt)
         elseif diary.CurrentAlpha == 0 then
             diary.Notification.ElapsedTime = 0
             TEN.Logic.RemoveCallback(TEN.Logic.CallbackPoint.PRELOOP, LevelFuncs.Engine.Diaries.ShowNotification)
-            print("Notification Callback removed")
+            --print("Notification Callback removed")
             return
         end
 	end
