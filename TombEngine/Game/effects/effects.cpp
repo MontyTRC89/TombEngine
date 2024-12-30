@@ -465,7 +465,7 @@ void UpdateSparks()
 
 					if (spark.flags & SP_COLOR)
 					{
-						SpawnDynamicLight(x, y, z, falloff, spark->dR, spark->dG, spark->dB);
+						SpawnDynamicLight(x, y, z, falloff, spark.dR, spark.dG, spark.dB);
 					}
 					else
 					{
