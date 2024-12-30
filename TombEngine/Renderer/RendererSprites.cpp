@@ -316,7 +316,8 @@ namespace TEN::Renderer
 				}
 			};
 
-			g_Worker.ProcessInParallel(spriteBucket.SpritesToDraw, prepareSprites, g_GameFlow->GetSettings()->System.MultiThreaded);
+			auto future = g_Worker.AddVectorTasks(spriteBucket.SpritesToDraw, prepareSprites, g_GameFlow->GetSettings()->System.MultiThreaded);
+			future.get();
 
 			BindTexture(TextureRegister::ColorMap, spriteBucket.Sprite->Texture, SamplerStateRegister::LinearClamp);
 			_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());

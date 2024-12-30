@@ -38,16 +38,6 @@ namespace TEN::Utils
 		}
 	}
 
-	uint64_t WorkerManager::GetNewGroupId()
-	{
-		// Increment group ID counter, skipping NO_VALUE on wrap.
-		auto groupId = _groupIdCounter.fetch_add(1, std::memory_order_relaxed);
-		if (groupId == (uint64_t)NO_VALUE)
-			groupId = _groupIdCounter.fetch_add(1, std::memory_order_relaxed);
-
-		return groupId;
-	}
-
 	unsigned int WorkerManager::GetThreadCount() const
 	{
 		return (unsigned int)_threads.size();
@@ -58,38 +48,23 @@ namespace TEN::Utils
 		return std::max(std::thread::hardware_concurrency(), 1u);
 	}
 
-	void WorkerManager::AddTask(const WorkerTask& task, uint64_t groupId)
+	std::future<void> WorkerManager::AddTasks(const WorkerTaskGroup& tasks)
 	{
-		// LOCK: Restrict task queue access.
-		{
-			auto taskLock = std::lock_guard(_taskMutex);
+		// TODO: Maybe store internally instead of using shared pointers.
+		auto counter = std::make_shared<std::atomic<int>>();
+		auto promise = std::make_shared<std::promise<void>>();
 
-			// Add task to queue.
-			_tasks.push([this, task, groupId]() { HandleTask(task, groupId); });
+		counter->store((int)tasks.size(), std::memory_order_release);
 
-			// Increment group task count (if applicable).
-			if (groupId != (uint64_t)NO_VALUE)
-			{
-				// LOCK: Restrict group task count access.
-				{
-					auto groupLock = std::lock_guard(_groupMutex);
+		// Add group tasks.
+		for (const auto& task : tasks)
+			AddTask(task, counter, promise);
 
-					_groupTaskCounts[groupId]++;
-				}
-			}
-		}
+		// Notify available threads to handle tasks.
+		_taskCond.notify_all();
 
-		// Notify one thread to handle task.
-		_taskCond.notify_one();
-	}
-
-	void WorkerManager::WaitForGroup(uint64_t groupId)
-	{
-		// LOCK: Restrict group task completion.
-		{
-			auto groupLock = std::unique_lock(_groupMutex);
-			_groupCond.wait(groupLock, [this, groupId]() { return (_groupTaskCounts.find(groupId) == _groupTaskCounts.end()); });
-		}
+		// Return future to wait on task group completion if needed.
+		return promise->get_future();
 	}
 
 	void WorkerManager::Worker()
@@ -118,27 +93,23 @@ namespace TEN::Utils
 		}
 	}
 
-	void WorkerManager::HandleTask(const WorkerTask& task, uint64_t groupId)
+	void WorkerManager::AddTask(const WorkerTask& task, std::shared_ptr<std::atomic<int>> counter, std::shared_ptr<std::promise<void>> promise)
+	{
+		// Increment counter for task group.
+		counter->fetch_add(1, std::memory_order_relaxed);
+
+		// Add task with promise and counter handling.
+		_tasks.push([this, task, counter, promise]() { HandleTask(task, *counter, *promise); });
+	}
+
+	void WorkerManager::HandleTask(const WorkerTask& task, std::atomic<int>& counter, std::promise<void>& promise)
 	{
 		// Execute task.
-		task();
+		if (task)
+			task();
 
-		// Decrement group task count (if applicable).
-		if (groupId != (uint64_t)NO_VALUE)
-		{
-			// LOCK: Restrict group task count access.
-			{
-				auto groupLock = std::lock_guard(_groupMutex);
-
-				_groupTaskCounts[groupId]--;
-				if (_groupTaskCounts[groupId] == 0)
-				{
-					_groupTaskCounts.erase(groupId);
-
-					// Notify waiting threads that a task group has completed.
-					_groupCond.notify_all();
-				}
-			}
-		}
+		// Check for task group completion.
+		if (counter.fetch_sub(1, std::memory_order_acq_rel) == 1)
+			promise.set_value();
 	}
 }

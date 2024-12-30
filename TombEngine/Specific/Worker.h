@@ -16,11 +16,6 @@ namespace TEN::Utils
 		std::condition_variable	 _taskCond	   = {};
 		bool					 _deinitialize = false;
 
-		std::unordered_map<uint64_t, unsigned int> _groupTaskCounts = {}; // Key = group ID, value = task count.
-		std::atomic<uint64_t>					   _groupIdCounter	= {};
-		std::mutex								   _groupMutex		= {};
-		std::condition_variable					   _groupCond		= {};
-
 	public:
 		// Constructors and destructors
 
@@ -29,50 +24,52 @@ namespace TEN::Utils
 
 		// Getters
 
-		uint64_t	 GetNewGroupId();
 		unsigned int GetThreadCount() const;
 		unsigned int GetCoreCount() const;
 
 		// Utilities
 
-		void AddTask(const WorkerTask& task, uint64_t groupId = (uint64_t)NO_VALUE);
-		void WaitForGroup(uint64_t groupId);
-		
-		// Template for batching parallel operations on vector.
-		template <typename T>
-		void ProcessInParallel(std::vector<T>& vec, const std::function<void(int, int)>& task, bool multiThreaded)
+		std::future<void> AddTasks(const WorkerTaskGroup& tasks);
+
+		template<typename T>
+		std::future<void> AddVectorTasks(std::vector<T>& vector, const std::function<void(int, int)>& task, bool multiThreaded)
 		{
 			constexpr auto SERIAL_UNIT_COUNT_MAX = 32;
-			
-			// Process in parallel.
-			unsigned int itemCount = (unsigned int)vec.size();
-			if (multiThreaded && itemCount > SERIAL_UNIT_COUNT_MAX)
-			{
-				unsigned int threadCount = (itemCount > SERIAL_UNIT_COUNT_MAX) ? GetCoreCount() : 1;
-				unsigned int chunkSize = ((itemCount + threadCount) - 1) / threadCount;
 
-				// Handle task batches.
-				auto groupId = GetNewGroupId();
-				for (int i = 0; i < threadCount; i++)
+			// TODO: Allow linera processing while still returning a valid std::future.
+
+			// Process in parallel.
+			//if (multiThreaded)
+			{
+				int threadCount = ((int)vector.size() > SERIAL_UNIT_COUNT_MAX) ? GetCoreCount() : 1;
+				int chunkSize = (((int)vector.size() + threadCount) - 1) / threadCount;
+
+				// Collect group tasks.
+				auto tasks = WorkerTaskGroup{};
+				tasks.reserve(threadCount);
+				for (int i = 0; i < threadCount; ++i)
 				{
 					int start = i * chunkSize;
-					int end = std::min(start + chunkSize, itemCount);
-					AddTask([task, start, end]() { task(start, end); }, groupId);
+					int end = std::min(start + chunkSize, (int)vector.size());
+					tasks.push_back([&task, start, end]() { task(start, end); });
 				}
-				WaitForGroup(groupId);
+
+				// Return future to wait on task group completion if needed.
+				return AddTasks(tasks);
 			}
 			// Process linearly.
-			else
+			/*else
 			{
-				task(0, itemCount);
-			}
+				task(0, (int)vector.size());
+			}*/
 		}
 
 	private:
 		// Helpers
 
 		void Worker();
-		void HandleTask(const WorkerTask& task, uint64_t groupId);
+		void AddTask(const WorkerTask& task, std::shared_ptr<std::atomic<int>> counter, std::shared_ptr<std::promise<void>> promise);
+		void HandleTask(const WorkerTask& task, std::atomic<int>& counter, std::promise<void>& promise);
 	};
 
 	extern WorkerManager g_Worker;
