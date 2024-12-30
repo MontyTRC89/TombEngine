@@ -1,6 +1,6 @@
 -----
 --- Diaries:
---The module provides functions to create and manage Diaries. It maintains state through GameVars.Diaries which stores diary definitions and configurations.
+--The module provides functions to create and manage Diaries. It maintains diary definitions and configurations in GameVars.Diaries and GameVars.LastUsedDiary so please do not use them for anything else.
 -- Each diary is accessed by the object that was used to create it. 
 --
 -- Example usage:
@@ -23,8 +23,8 @@ local CustomDiary = {}
 CustomDiary.__index = CustomDiary
 
 LevelFuncs.Engine.Diaries = {}
-GameVars.Diaries = {}
-GameVars.LastUsedDiary=nil
+GameVars.Diaries = GameVars.Diaries or {}
+GameVars.LastUsedDiary = GameVars.LastUsedDiary or nil
 
 ---
 -- Imports diary from an external file.
