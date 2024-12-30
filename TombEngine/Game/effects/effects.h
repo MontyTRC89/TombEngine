@@ -167,7 +167,7 @@ struct Particle
 	unsigned char extras;
 	signed char dynamic;
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
-	Vector4 targetPos;
+	Vector3 targetPos;
 
 	int PrevX;
 	int PrevY;

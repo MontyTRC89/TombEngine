@@ -1185,7 +1185,7 @@ const std::vector<byte> SaveGame::Build()
 		particleInfo.add_y_vel(particle->yVel);
 		particleInfo.add_z(particle->z);
 		particleInfo.add_z_vel(particle->zVel);
-		particleInfo.add_target_pos(&FromVector4(particle->targetPos));
+		particleInfo.add_target_pos(&FromVector3(particle->targetPos));
 		particleInfo.add_sprite_id(particle->SpriteID);
 
 		particles.push_back(particleInfo.Finish());
@@ -2216,7 +2216,7 @@ static void ParseEffects(const Save::SaveGame* s)
 		particle->fxObj = particleInfo->fx_obj();
 		particle->roomNumber = particleInfo->room_number();
 		particle->nodeNumber = particleInfo->node_number();
-		particle->targetPos = ToVector4(particleInfo->target_pos());
+		particle->targetPos = ToVector3(particleInfo->target_pos());
 		particle->SpriteID = particleInfo->sprite_id();
 	}
 

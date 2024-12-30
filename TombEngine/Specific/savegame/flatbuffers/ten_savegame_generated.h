@@ -4887,7 +4887,7 @@ struct ParticleInfoT : public flatbuffers::NativeTable {
   int32_t fx_obj = 0;
   int32_t room_number = 0;
   int32_t node_number = 0;
-  std::unique_ptr<TEN::Save::Vector4> target_pos{};
+  std::unique_ptr<TEN::Save::Vector3> target_pos{};
   int32_t sprite_id = 0;
 };
 
@@ -5047,8 +5047,8 @@ struct ParticleInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t node_number() const {
     return GetField<int32_t>(VT_NODE_NUMBER, 0);
   }
-  const TEN::Save::Vector4 *target_pos() const {
-    return GetStruct<const TEN::Save::Vector4 *>(VT_TARGET_POS);
+  const TEN::Save::Vector3 *target_pos() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_TARGET_POS);
   }
   int32_t sprite_id() const {
     return GetField<int32_t>(VT_SPRITE_ID, 0);
@@ -5092,7 +5092,7 @@ struct ParticleInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_FX_OBJ) &&
            VerifyField<int32_t>(verifier, VT_ROOM_NUMBER) &&
            VerifyField<int32_t>(verifier, VT_NODE_NUMBER) &&
-           VerifyField<TEN::Save::Vector4>(verifier, VT_TARGET_POS) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_TARGET_POS) &&
            VerifyField<int32_t>(verifier, VT_SPRITE_ID) &&
            verifier.EndTable();
   }
@@ -5216,7 +5216,7 @@ struct ParticleInfoBuilder {
   void add_node_number(int32_t node_number) {
     fbb_.AddElement<int32_t>(ParticleInfo::VT_NODE_NUMBER, node_number, 0);
   }
-  void add_target_pos(const TEN::Save::Vector4 *target_pos) {
+  void add_target_pos(const TEN::Save::Vector3 *target_pos) {
     fbb_.AddStruct(ParticleInfo::VT_TARGET_POS, target_pos);
   }
   void add_sprite_id(int32_t sprite_id) {
@@ -5272,7 +5272,7 @@ inline flatbuffers::Offset<ParticleInfo> CreateParticleInfo(
     int32_t fx_obj = 0,
     int32_t room_number = 0,
     int32_t node_number = 0,
-    const TEN::Save::Vector4 *target_pos = 0,
+    const TEN::Save::Vector3 *target_pos = 0,
     int32_t sprite_id = 0) {
   ParticleInfoBuilder builder_(_fbb);
   builder_.add_sprite_id(sprite_id);
@@ -9728,7 +9728,7 @@ inline void ParticleInfo::UnPackTo(ParticleInfoT *_o, const flatbuffers::resolve
   { auto _e = fx_obj(); _o->fx_obj = _e; }
   { auto _e = room_number(); _o->room_number = _e; }
   { auto _e = node_number(); _o->node_number = _e; }
-  { auto _e = target_pos(); if (_e) _o->target_pos = std::unique_ptr<TEN::Save::Vector4>(new TEN::Save::Vector4(*_e)); }
+  { auto _e = target_pos(); if (_e) _o->target_pos = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = sprite_id(); _o->sprite_id = _e; }
 }
 

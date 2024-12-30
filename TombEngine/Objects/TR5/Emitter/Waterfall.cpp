@@ -112,7 +112,7 @@ namespace TEN::Effects::WaterfallEmitter
             auto pointColl = GetPointCollision(origin2, item.RoomNumber, item.Pose.Orientation.y, BLOCK(customVel));
 
             int relFloorHeight = pointColl.GetFloorHeight() - part.y;
-            part.targetPos = Vector4(origin2.x, origin2.y + relFloorHeight, origin2.z, itemNumber);
+            part.targetPos = Vector3(origin2.x, origin2.y + relFloorHeight, origin2.z);
 
             //If targetpos is in a wall, calculate targetpos from the main item coordinates so the particles still spawn.
             if (pointColl.GetSector().IsWall(part.targetPos.x, part.targetPos.z))
@@ -122,7 +122,7 @@ namespace TEN::Effects::WaterfallEmitter
                 origin2 = Geometry::TranslatePoint(Vector3(pos.x, pos.y, pos.z), orient2, BLOCK(0.0f));
 
                 //Set the right height.
-                part.targetPos = Vector4(origin2.x, origin2.y + relFloorHeight, origin2.z, itemNumber);
+                part.targetPos = Vector3(origin2.x, origin2.y + relFloorHeight, origin2.z);
 
                 //Stop spawning particles if there is a wall directly at the spawnpoint
                 if (pointColl.GetSector().IsWall(pos.x, pos.z))
@@ -162,7 +162,7 @@ namespace TEN::Effects::WaterfallEmitter
         }
     }
 
-	void SpawnWaterfallMist(const Vector4& pos, int roomNumber, float scalar, float size, const Color& color)
+	void SpawnWaterfallMist(const Vector3& pos, int roomNumber, float scalar, float size, const Color& color)
 	{
 		auto& part = *GetFreeParticle();
 
@@ -205,7 +205,7 @@ namespace TEN::Effects::WaterfallEmitter
 		part.friction = 3;
 		part.rotAng = Random::GenerateAngle();
         part.scalar = scalar;
-        part.targetPos = Vector4::Zero;
+        part.targetPos = Vector3::Zero;
 
 		part.rotAdd = Random::GenerateInt(-16, 16);
 		part.gravity = 0;

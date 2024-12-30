@@ -226,8 +226,7 @@ void UpdateSparks()
 			}
 
 			if (spark.SpriteSeqID == ID_WATERFALL &&
-				spark.y >= spark.targetPos.y && 
-				spark.targetPos.w == spark.fxObj)
+				spark.y >= spark.targetPos.y)
 			{
 					spark.targetPos.y = spark.y - 80;
 					spark.targetPos.x = spark.x;
