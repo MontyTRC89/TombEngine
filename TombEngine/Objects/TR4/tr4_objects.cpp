@@ -51,6 +51,7 @@
 #include "Objects/TR4/Object/tr4_clockwork_beetle.h"
 #include "Objects/TR4/Object/tr4_obelisk.h"
 #include "Objects/TR4/Object/tr4_scales.h"
+#include "Objects/TR4/Object/tr4_statue_plinth.h"
 
 // Switches
 
@@ -687,6 +688,15 @@ namespace TEN::Entities
 		}
 
 		obj = &Objects[ID_ELEMENT_PUZZLE];
+		if (obj->loaded)
+		{
+			obj->Initialize = InitializeElementPuzzle;
+			obj->control = ElementPuzzleControl;
+			obj->collision = ElementPuzzleCollision;
+			obj->SetHitEffect(true);
+		}
+
+		obj = &Objects[ID_STATUE_PLINTH];
 		if (obj->loaded)
 		{
 			obj->Initialize = InitializeElementPuzzle;
