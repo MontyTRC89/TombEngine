@@ -12,6 +12,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed rare case of not being able to start a new game or exit game from the main menu on very slow GPUs.
 * Fixed occasional crashes with creatures stuck in a sector with no pathfinding set.
 * Fixed occasional cases of underwater switch animation not playing, if player spams jump key while pulling the switch.
+* Fixed Lara's blob shadows not rendering on moveables and static meshes.
 * Fixed antialiasing quality not changing after changing it in display settings.
 * Fixed endless explosion effect for Puna.
 * Fixed diary pick-up item inventory state not preserved in the savegame.
