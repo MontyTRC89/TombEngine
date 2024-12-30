@@ -120,10 +120,10 @@ Utility.CheckTimeFormat = function (timerFormat)
     if Type.IsTable(timerFormat) then
         local validKeys = {hours = true, minutes = true, seconds = true, deciseconds = true}
         for k, v in pairs(timerFormat) do
-            if not validKeys[k] or type(v) ~= "boolean" then
-                TEN.Util.PrintLog("Warning: Incorrect time format ", Util.LogLevel.ERROR)
-                return false
-            end
+        	if not validKeys[k] or type(v) ~= "boolean" then
+				TEN.Util.PrintLog("Warning: Incorrect time format ", Util.LogLevel.ERROR)
+				return false
+			end
         end
         set = timerFormat
     elseif Type.IsBoolean(timerFormat) then
