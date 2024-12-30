@@ -85,7 +85,7 @@ float3 DoBlobShadows(float3 worldPos, float3 lighting)
     }
 
     shadowFactor = saturate(shadowFactor);
-    return lighting * saturate(1.0f - (1.0f - shadowFactor) * SHADOW_INTENSITY);
+    return lighting * saturate(1.0f - (1.0f - shadowFactor) * (SHADOW_INTENSITY * 0.5f));
 }
 
 float3 DoShadow(float3 worldPos, float3 normal, float3 lighting, float bias)
