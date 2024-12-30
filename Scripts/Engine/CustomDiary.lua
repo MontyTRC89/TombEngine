@@ -1,6 +1,6 @@
 -----
 --- Diaries:
---The module provides functions to create and manage Diaries. It maintains diary definitions and configurations in GameVars.Diaries and GameVars.LastUsedDiary so please do not use them for anything else.
+-- The module provides functions to create and manage Diaries. It maintains diary definitions and entries through all levels and hubs.
 -- Each diary is accessed by the object that was used to create it. 
 --
 -- Example usage:
@@ -23,8 +23,8 @@ local CustomDiary = {}
 CustomDiary.__index = CustomDiary
 
 LevelFuncs.Engine.Diaries = {}
-GameVars.Diaries = GameVars.Diaries or {}
-GameVars.LastUsedDiary = GameVars.LastUsedDiary or nil
+GameVars.Engine.Diaries = GameVars.Engine.Diaries or {}
+GameVars.Engine.LastUsedDiary = GameVars.Engine.LastUsedDiary or nil
 
 ---
 -- Imports diary from an external file.
@@ -444,90 +444,90 @@ CustomDiary.Create = function(object, objectIdBg, spriteIdBg, colorBg, pos, rot,
 
 	local dataName = object .. "_diarydata"
     local self = {Name = dataName}
-    GameVars.LastUsedDiary = object
+    GameVars.Engine.LastUsedDiary = object
 
-	if GameVars.Diaries[dataName] then
+	if GameVars.Engine.Diaries[dataName] then
 		return setmetatable(self, CustomDiary)
 	end
 
-	GameVars.Diaries[dataName]				        = {}
+	GameVars.Engine.Diaries[dataName]				        = {}
 
     if Type.IsNumber(spriteIdBg) then
-        GameVars.Diaries[dataName].SpriteIdBg	        = spriteIdBg
+        GameVars.Engine.Diaries[dataName].SpriteIdBg	        = spriteIdBg
     else
         Util.PrintLog("'spriteIdBg' is in an incorrect format. Expected a number type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
 
     if Type.IsColor(colorBg) then
-        GameVars.Diaries[dataName].ColorBg		        = colorBg
+        GameVars.Engine.Diaries[dataName].ColorBg		        = colorBg
     else
         Util.PrintLog("'colorBg' is in an incorrect format. Expected a Color type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
 
     if Type.IsVec2(pos) then
-        GameVars.Diaries[dataName].Pos			        = pos
+        GameVars.Engine.Diaries[dataName].Pos			        = pos
     else
         Util.PrintLog("'posBg' is in an incorrect format. Expected a Vec2 type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
 
     if Type.IsNumber(rot) then
-        GameVars.Diaries[dataName].Rot			        = rot
+        GameVars.Engine.Diaries[dataName].Rot			        = rot
     else
         Util.PrintLog("'rot' is in an incorrect format. Expected a number type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
 
     if Type.IsVec2(scale) then
-        GameVars.Diaries[dataName].Scale 		        = scale
+        GameVars.Engine.Diaries[dataName].Scale 		        = scale
     else
         Util.PrintLog("'scale' is in an incorrect format. Expected a Vec2 type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
 
     if Type.IsNumber(alpha) and alpha>-1 and alpha < 266 then
-        GameVars.Diaries[dataName].Alpha     	        = alpha
+        GameVars.Engine.Diaries[dataName].Alpha     	        = alpha
     else
         Util.PrintLog("'alpha is in an incorrect format. Expected a number (0-255) type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
 
     if Type.IsNumber(pageSound) and pageSound > 0 then
-        GameVars.Diaries[dataName].PageSound	        = pageSound
+        GameVars.Engine.Diaries[dataName].PageSound	        = pageSound
     else
         Util.PrintLog("'pageSound' is in an incorrect format. Expected a number type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
 
     if Type.IsNumber(exitSound) and exitSound > 0 then
-        GameVars.Diaries[dataName].ExitSound            = exitSound
+        GameVars.Engine.Diaries[dataName].ExitSound            = exitSound
     else
         Util.PrintLog("'exitSound' is in an incorrect format. Expected a number type in function 'CustomDiary.Create' for the diary system:.", Util.LogLevel.WARNING)
         return
     end
 
-    GameVars.Diaries[dataName].Name			        = dataName
-	GameVars.Diaries[dataName].CurrentPageIndex     = 1
-    GameVars.Diaries[dataName].UnlockedPages        = 1
-	GameVars.Diaries[dataName].Pages  		        = {NarrationTrack=nil,TextEntries={},ImageEntries={}}
-	GameVars.Diaries[dataName].Object		        = object
-	GameVars.Diaries[dataName].ObjectIdBg	        = objectIdBg
-	GameVars.Diaries[dataName].AlignMode            = alignMode
-	GameVars.Diaries[dataName].ScaleMode            = scaleMode
-	GameVars.Diaries[dataName].BlendMode	        = blendMode
-    GameVars.Diaries[dataName].CurrentAlpha		    = 0
-	GameVars.Diaries[dataName].TargetAlpha		    = 255
-    GameVars.Diaries[dataName].EntryCurrentAlpha	= 0
-	GameVars.Diaries[dataName].EntryTargetAlpha     = 255
-    GameVars.Diaries[dataName].Visible              = false
-    GameVars.Diaries[dataName].Notification         = {}
-    GameVars.Diaries[dataName].PageNumbers          = {}
-    GameVars.Diaries[dataName].Controls             = {}
-    GameVars.Diaries[dataName].Background           = {}
-    GameVars.Diaries[dataName].AlphaBlendSpeed      = 100
-    GameVars.Diaries[dataName].EntryFadingIn        = true
+    GameVars.Engine.Diaries[dataName].Name			        = dataName
+	GameVars.Engine.Diaries[dataName].CurrentPageIndex     = 1
+    GameVars.Engine.Diaries[dataName].UnlockedPages        = 1
+	GameVars.Engine.Diaries[dataName].Pages  		        = {NarrationTrack=nil,TextEntries={},ImageEntries={}}
+	GameVars.Engine.Diaries[dataName].Object		        = object
+	GameVars.Engine.Diaries[dataName].ObjectIdBg	        = objectIdBg
+	GameVars.Engine.Diaries[dataName].AlignMode            = alignMode
+	GameVars.Engine.Diaries[dataName].ScaleMode            = scaleMode
+	GameVars.Engine.Diaries[dataName].BlendMode	        = blendMode
+    GameVars.Engine.Diaries[dataName].CurrentAlpha		    = 0
+	GameVars.Engine.Diaries[dataName].TargetAlpha		    = 255
+    GameVars.Engine.Diaries[dataName].EntryCurrentAlpha	= 0
+	GameVars.Engine.Diaries[dataName].EntryTargetAlpha     = 255
+    GameVars.Engine.Diaries[dataName].Visible              = false
+    GameVars.Engine.Diaries[dataName].Notification         = {}
+    GameVars.Engine.Diaries[dataName].PageNumbers          = {}
+    GameVars.Engine.Diaries[dataName].Controls             = {}
+    GameVars.Engine.Diaries[dataName].Background           = {}
+    GameVars.Engine.Diaries[dataName].AlphaBlendSpeed      = 100
+    GameVars.Engine.Diaries[dataName].EntryFadingIn        = true
 
 	print("CustomDiary Constructed for CustomDiary: " .. dataName)
     return setmetatable(self, CustomDiary)
@@ -539,7 +539,7 @@ end
 -- @treturn CustomDiary The diary created using the object.
 CustomDiary.Get = function(object)
 	local dataName = object .. "_diarydata"
-    if GameVars.Diaries[dataName] then
+    if GameVars.Engine.Diaries[dataName] then
         local self = {Name = dataName}
         return setmetatable(self, CustomDiary)
     end
@@ -551,8 +551,8 @@ end
 -- @tparam Objects.ObjID object The pickup object that was used to create the diary (596-611,986).
 CustomDiary.Delete = function (object)
     local dataName = object .. "_diarydata"
-	if GameVars.Diaries[dataName] then
-		GameVars.Diaries[dataName] = nil
+	if GameVars.Engine.Diaries[dataName] then
+		GameVars.Engine.Diaries[dataName] = nil
 	end
 end
 
@@ -562,7 +562,7 @@ end
 CustomDiary.Status = function(value)
 
     if Type.IsBoolean(value) then
-        if GameVars.Diaries then
+        if GameVars.Engine.Diaries then
             if value == true then
                 TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.POSTUSEITEM, LevelFuncs.Engine.Diaries.ActivateDiary)
                 print("Diary system started.")
@@ -583,8 +583,8 @@ end
 -- @treturn bool true if the diary is visible and false if it is not.
 function CustomDiary:IsVisible()
 
-	if GameVars.Diaries[self.Name] then
-		return GameVars.Diaries[self.Name].Visible
+	if GameVars.Engine.Diaries[self.Name] then
+		return GameVars.Engine.Diaries[self.Name].Visible
 	end
 end
 
@@ -593,17 +593,17 @@ end
 -- @tparam int pageIndex The page number at which diary should be opened.
 function CustomDiary:showDiary(pageIndex)
 
-	if GameVars.Diaries[self.Name] then
+	if GameVars.Engine.Diaries[self.Name] then
 
-		local object = GameVars.Diaries[self.Name].Object
+		local object = GameVars.Engine.Diaries[self.Name].Object
 
-        if not Type.IsNumber(pageIndex) or pageIndex > #GameVars.Diaries[self.Name].Pages or pageIndex <=0 then
+        if not Type.IsNumber(pageIndex) or pageIndex > #GameVars.Engine.Diaries[self.Name].Pages or pageIndex <=0 then
             print("'pageIndex' is in an incorrect format or not a valid page number. Expected a number type in function 'showDiary' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
-        GameVars.Diaries[self.Name].CurrentPageIndex    = pageIndex
-        GameVars.Diaries[self.Name].NextPageIndex       = pageIndex
+        GameVars.Engine.Diaries[self.Name].CurrentPageIndex    = pageIndex
+        GameVars.Engine.Diaries[self.Name].NextPageIndex       = pageIndex
 
         LevelFuncs.Engine.Diaries.ActivateDiary(object)
 
@@ -615,8 +615,8 @@ end
 -- @treturn int total number of unlocked pages in the diary.
 function CustomDiary:getUnlockedPageCount()
 
-	if GameVars.Diaries[self.Name] then
-		return GameVars.Diaries[self.Name].UnlockedPages
+	if GameVars.Engine.Diaries[self.Name] then
+		return GameVars.Engine.Diaries[self.Name].UnlockedPages
 	end
 end
 
@@ -627,14 +627,14 @@ end
 -- @tparam int pageIndex The page number up to which the diary should be unlocked.
 -- @tparam bool notification If true, and notification has been defined, a notification icon and sound will be played.
 function CustomDiary:unlockPages(pageIndex, notification)
-    if GameVars.Diaries[self.Name] then
+    if GameVars.Engine.Diaries[self.Name] then
 
-        if not Type.IsNumber(pageIndex) or pageIndex > #GameVars.Diaries[self.Name].Pages or pageIndex <= 0 then
+        if not Type.IsNumber(pageIndex) or pageIndex > #GameVars.Engine.Diaries[self.Name].Pages or pageIndex <= 0 then
             Util.PrintLog("'pageIndex' is in an incorrect format or not a valid page number. Expected a number type in function 'unlockPages' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
-        local diary = GameVars.Diaries[self.Name]
+        local diary = GameVars.Engine.Diaries[self.Name]
 		diary.UnlockedPages = pageIndex
         diary.CurrentPageIndex = pageIndex
         diary.NextPageIndex = pageIndex
@@ -655,13 +655,13 @@ end
 -- @tparam int pageIndex The page number to be cleared.
 function CustomDiary:clearPage(pageIndex)
 
-    if not Type.IsNumber(pageIndex) or pageIndex > #GameVars.Diaries[self.Name].Pages or pageIndex <=0 then
+    if not Type.IsNumber(pageIndex) or pageIndex > #GameVars.Engine.Diaries[self.Name].Pages or pageIndex <=0 then
         Util.PrintLog("'pageIndex' is in an incorrect format or not a valid page number. Expected a number type in function 'clearPage' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
 
-    if GameVars.Diaries[self.Name] then
-        GameVars.Diaries[self.Name].Pages[pageIndex]= {NarrationTrack=nil,TextEntries={},ImageEntries={}}
+    if GameVars.Engine.Diaries[self.Name] then
+        GameVars.Engine.Diaries[self.Name].Pages[pageIndex]= {NarrationTrack=nil,TextEntries={},ImageEntries={}}
         print("Page Cleared: ".. tostring(pageIndex).." for the diary system: "..tostring(self.Name))
     end
 end
@@ -713,10 +713,10 @@ function CustomDiary:addTextEntry(pageIndex, text, textPos, textOptions, textSca
     end
 
     if Type.IsNumber(pageIndex) and pageIndex > 0 then
-        if not GameVars.Diaries[self.Name].Pages[pageIndex] then
-            GameVars.Diaries[self.Name].Pages[pageIndex] = {NarrationTrack=nil, TextEntries = {}, ImageEntries = {}}
+        if not GameVars.Engine.Diaries[self.Name].Pages[pageIndex] then
+            GameVars.Engine.Diaries[self.Name].Pages[pageIndex] = {NarrationTrack=nil, TextEntries = {}, ImageEntries = {}}
         end
-        table.insert(GameVars.Diaries[self.Name].Pages[pageIndex].TextEntries, textEntry)
+        table.insert(GameVars.Engine.Diaries[self.Name].Pages[pageIndex].TextEntries, textEntry)
         print("Text entry added to page: ".. tostring(pageIndex).." for the diary system: "..tostring(self.Name))
     else
         Util.PrintLog("'pageIndex' is in an incorrect format. Expected a number type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
@@ -780,10 +780,10 @@ function CustomDiary:addImageEntry(pageIndex, objectId, spriteId, color, pos, ro
     imageEntry.blendMode    = blendMode
 
     if Type.IsNumber(pageIndex) and pageIndex > 0 then
-        if not GameVars.Diaries[self.Name].Pages[pageIndex] then
-            GameVars.Diaries[self.Name].Pages[pageIndex] = {NarrationTrack=nil, TextEntries = {}, ImageEntries = {}}
+        if not GameVars.Engine.Diaries[self.Name].Pages[pageIndex] then
+            GameVars.Engine.Diaries[self.Name].Pages[pageIndex] = {NarrationTrack=nil, TextEntries = {}, ImageEntries = {}}
         end
-        table.insert(GameVars.Diaries[self.Name].Pages[pageIndex].ImageEntries, imageEntry)
+        table.insert(GameVars.Engine.Diaries[self.Name].Pages[pageIndex].ImageEntries, imageEntry)
         print("Image entry added to page: ".. tostring(pageIndex).." for the diary system: "..tostring(self.Name))
     else
         Util.PrintLog("'pageIndex' is in an incorrect format. Expected a number type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
@@ -797,12 +797,12 @@ end
 function CustomDiary:addNarration(pageIndex, trackName)
 
     if Type.IsNumber(pageIndex) and pageIndex > 0 then
-        if not GameVars.Diaries[self.Name].Pages[pageIndex] then
-            GameVars.Diaries[self.Name].Pages[pageIndex] = {NarrationTrack=nil, TextEntries = {}, ImageEntries = {}}
+        if not GameVars.Engine.Diaries[self.Name].Pages[pageIndex] then
+            GameVars.Engine.Diaries[self.Name].Pages[pageIndex] = {NarrationTrack=nil, TextEntries = {}, ImageEntries = {}}
         end
 
         if Type.IsString(trackName) then
-            GameVars.Diaries[self.Name].Pages[pageIndex].NarrationTrack = trackName
+            GameVars.Engine.Diaries[self.Name].Pages[pageIndex].NarrationTrack = trackName
             print("Narration added to page: ".. tostring(pageIndex).." for the diary system: "..tostring(self.Name))
         else
             Util.PrintLog("'trackName' is in an incorrect format. Expected a string type in function 'addNarration' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
@@ -820,13 +820,13 @@ end
 -- @tparam int pageIndex page number to remove the narration track from.
 function CustomDiary:removeNarration(pageIndex)
 
-    if not Type.IsNumber(pageIndex) or pageIndex > #GameVars.Diaries[self.Name].Pages or pageIndex <=0 then
+    if not Type.IsNumber(pageIndex) or pageIndex > #GameVars.Engine.Diaries[self.Name].Pages or pageIndex <=0 then
         Util.PrintLog("'pageIndex' is in an incorrect format or not a valid page number. Expected a number type in function 'removeNarration' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
 
-    if GameVars.Diaries[self.Name].Pages[pageIndex] then
-        GameVars.Diaries[self.Name].Pages[pageIndex].NarrationTrack = {}
+    if GameVars.Engine.Diaries[self.Name].Pages[pageIndex] then
+        GameVars.Engine.Diaries[self.Name].Pages[pageIndex].NarrationTrack = {}
     end
         print("Narration removed from the page: ".. tostring(pageIndex).." for the diary system: "..tostring(self.Name))
  end
@@ -844,53 +844,53 @@ function CustomDiary:removeNarration(pageIndex)
 -- @tparam Effects.BlendID blendMode Blending modes for the diary's background.
 -- @tparam number alpha alpha value for the diary's background (0-255).
 function CustomDiary:addBackground(objectId, spriteId, color, pos, rot, scale, alignMode, scaleMode, blendMode, alpha)
-    if GameVars.Diaries[self.Name] then
+    if GameVars.Engine.Diaries[self.Name] then
 
         if Type.IsNumber(spriteId) then
-            GameVars.Diaries[self.Name].Background.SpriteIdBg	    = spriteId
+            GameVars.Engine.Diaries[self.Name].Background.SpriteIdBg	    = spriteId
         else
             Util.PrintLog("'spriteId' is in an incorrect format. Expected a number type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsColor(color) then
-            GameVars.Diaries[self.Name].Background.ColorBg		    = color
+            GameVars.Engine.Diaries[self.Name].Background.ColorBg		    = color
         else
             Util.PrintLog("'color' is in an incorrect format. Expected a Color type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsVec2(pos) then
-            GameVars.Diaries[self.Name].Background.Pos			    = pos
+            GameVars.Engine.Diaries[self.Name].Background.Pos			    = pos
         else
             Util.PrintLog("'pos' is in an incorrect format. Expected a Vec2 type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsNumber(rot) then
-            GameVars.Diaries[self.Name].Background.Rot			    = rot
+            GameVars.Engine.Diaries[self.Name].Background.Rot			    = rot
         else
             Util.PrintLog("'rot' is in an incorrect format. Expected a number type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsVec2(scale) then
-            GameVars.Diaries[self.Name].Background.Scale            = scale
+            GameVars.Engine.Diaries[self.Name].Background.Scale            = scale
         else
             Util.PrintLog("'scale' is in an incorrect format. Expected a Vec2 type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsNumber(alpha) and alpha>-1 and alpha < 266 then
-            GameVars.Diaries[self.Name].Background.Alpha		        = alpha
+            GameVars.Engine.Diaries[self.Name].Background.Alpha		        = alpha
         else
             Util.PrintLog("'alpha is in an incorrect format. Expected a number (0-255) type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
-        GameVars.Diaries[self.Name].Background.ObjectIdBg	    = objectId
-	    GameVars.Diaries[self.Name].Background.AlignMode        = alignMode
-	    GameVars.Diaries[self.Name].Background.ScaleMode        = scaleMode
-	    GameVars.Diaries[self.Name].Background.BlendMode 	    = blendMode
+        GameVars.Engine.Diaries[self.Name].Background.ObjectIdBg	    = objectId
+	    GameVars.Engine.Diaries[self.Name].Background.AlignMode        = alignMode
+	    GameVars.Engine.Diaries[self.Name].Background.ScaleMode        = scaleMode
+	    GameVars.Engine.Diaries[self.Name].Background.BlendMode 	    = blendMode
 
         print("Background added for the diary system: "..tostring(self.Name))
     end
@@ -899,8 +899,8 @@ end
 ---
 -- Clears settings for the background for the specified diary.
 function CustomDiary:clearBackground()
-    if GameVars.Diaries[self.Name] then
-        GameVars.Diaries[self.Name].Background = {}
+    if GameVars.Engine.Diaries[self.Name] then
+        GameVars.Engine.Diaries[self.Name].Background = {}
 
         print("Background cleared for the diary system: "..tostring(self.Name))
     end
@@ -920,62 +920,62 @@ end
 -- @tparam Effects.BlendID blendMode Blending modes for the notification icon.
 -- @tparam Sound notificationSound Sound to play with notification icon.
 function CustomDiary:customizeNotification(notificationTime, objectId, spriteId, color, pos, rot, scale, alignMode, scaleMode, blendMode, notificationSound)
-    if GameVars.Diaries[self.Name] then
+    if GameVars.Engine.Diaries[self.Name] then
 
         if Type.IsNumber(spriteId) then
-            GameVars.Diaries[self.Name].Notification.SpriteID	        = spriteId
+            GameVars.Engine.Diaries[self.Name].Notification.SpriteID	        = spriteId
         else
             Util.PrintLog("'spriteId' is in an incorrect format. Expected a number type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsColor(color) then
-            GameVars.Diaries[self.Name].Notification.Color		        = color
+            GameVars.Engine.Diaries[self.Name].Notification.Color		        = color
         else
             Util.PrintLog("'color' is in an incorrect format. Expected a Color type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsVec2(pos) then
-            GameVars.Diaries[self.Name].Notification.Pos			    = pos
+            GameVars.Engine.Diaries[self.Name].Notification.Pos			    = pos
         else
             Util.PrintLog("'pos' is in an incorrect format. Expected a Vec2 type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsNumber(rot) then
-            GameVars.Diaries[self.Name].Notification.Rot			    = rot
+            GameVars.Engine.Diaries[self.Name].Notification.Rot			    = rot
         else
             Util.PrintLog("'rot' is in an incorrect format. Expected a number type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsVec2(scale) then
-            GameVars.Diaries[self.Name].Notification.Scale		        = scale
+            GameVars.Engine.Diaries[self.Name].Notification.Scale		        = scale
         else
             Util.PrintLog("'scale' is in an incorrect format. Expected a Vec2 type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsNumber(notificationSound) and notificationSound > 0 then
-            GameVars.Diaries[self.Name].Notification.NotificationSound	= notificationSound
+            GameVars.Engine.Diaries[self.Name].Notification.NotificationSound	= notificationSound
         else
             Util.PrintLog("'notificationSound' is in an incorrect format. Expected a number type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsNumber(notificationTime) and notificationTime > 0 then
-            GameVars.Diaries[self.Name].Notification.NotificationTime    = notificationTime
+            GameVars.Engine.Diaries[self.Name].Notification.NotificationTime    = notificationTime
         else
             Util.PrintLog("'notificationTime' is in an incorrect format. Expected a number type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
-        GameVars.Diaries[self.Name].Notification.ObjectID           = objectId
-        GameVars.Diaries[self.Name].Notification.AlignMode		    = alignMode
-        GameVars.Diaries[self.Name].Notification.ScaleMode		    = scaleMode
-        GameVars.Diaries[self.Name].Notification.BlendMode		    = blendMode
-        GameVars.Diaries[self.Name].Notification.ElapsedTime         = 0
+        GameVars.Engine.Diaries[self.Name].Notification.ObjectID           = objectId
+        GameVars.Engine.Diaries[self.Name].Notification.AlignMode		    = alignMode
+        GameVars.Engine.Diaries[self.Name].Notification.ScaleMode		    = scaleMode
+        GameVars.Engine.Diaries[self.Name].Notification.BlendMode		    = blendMode
+        GameVars.Engine.Diaries[self.Name].Notification.ElapsedTime         = 0
 
         print("Notification updated for the diary system: "..tostring(self.Name))
     end
@@ -984,8 +984,8 @@ end
 ---
 -- Clears settings for the notification system for the specified diary.
 function CustomDiary:clearNotification()
-    if GameVars.Diaries[self.Name] then
-        GameVars.Diaries[self.Name].Notification = {}
+    if GameVars.Engine.Diaries[self.Name] then
+        GameVars.Engine.Diaries[self.Name].Notification = {}
 
         print("Notifications cleared for the diary system: "..tostring(self.Name))
     end
@@ -1003,47 +1003,47 @@ end
 function CustomDiary:customizePageNumbers(pageNoType, prefix, separator, textPos, textOptions, textScale, textColor)
 
     if Type.IsNumber(pageNoType) then
-        if GameVars.Diaries[self.Name] and pageNoType >0 and pageNoType <=2 then
+        if GameVars.Engine.Diaries[self.Name] and pageNoType >0 and pageNoType <=2 then
 
-            GameVars.Diaries[self.Name].PageNumbers.pageNoType       = pageNoType
+            GameVars.Engine.Diaries[self.Name].PageNumbers.pageNoType       = pageNoType
 
             if Type.IsString(prefix) then
-                GameVars.Diaries[self.Name].PageNumbers.prefix           = prefix
+                GameVars.Engine.Diaries[self.Name].PageNumbers.prefix           = prefix
             else
                 Util.PrintLog("'prefix' is in an incorrect format. Expected a string type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
                 return
             end
 
             if Type.IsString(separator) then
-                GameVars.Diaries[self.Name].PageNumbers.separator        = separator
+                GameVars.Engine.Diaries[self.Name].PageNumbers.separator        = separator
             else
                 Util.PrintLog("'separator' is in an incorrect format. Expected a string type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
                 return
             end
 
             if Type.IsVec2(textPos) then
-                GameVars.Diaries[self.Name].PageNumbers.textPos          = textPos
+                GameVars.Engine.Diaries[self.Name].PageNumbers.textPos          = textPos
             else
                 Util.PrintLog("'textPos' is in an incorrect format. Expected a Vec2 type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
                 return
             end
 
             if Type.IsTable(textOptions) then
-                GameVars.Diaries[self.Name].PageNumbers.textOptions      = textOptions
+                GameVars.Engine.Diaries[self.Name].PageNumbers.textOptions      = textOptions
             else
                 Util.PrintLog("'textOptions' is in an incorrect format. Expected a table type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
                 return
             end
 
             if Type.IsNumber(textScale) then
-                GameVars.Diaries[self.Name].PageNumbers.textScale		= textScale
+                GameVars.Engine.Diaries[self.Name].PageNumbers.textScale		= textScale
             else
                 Util.PrintLog("'textScale' is in an incorrect format. Expected a number type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
                 return
             end
 
             if Type.IsColor(textColor) then
-                GameVars.Diaries[self.Name].PageNumbers.textColor		= textColor
+                GameVars.Engine.Diaries[self.Name].PageNumbers.textColor		= textColor
             else
                 Util.PrintLog("'textColor' is in an incorrect format. Expected a Color type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
                 return
@@ -1060,8 +1060,8 @@ end
 ---
 -- Clears settings for the page numbers for the specified diary.
 function CustomDiary:clearPageNumbers()
-    if GameVars.Diaries[self.Name] then
-        GameVars.Diaries[self.Name].PageNumbers = nil
+    if GameVars.Engine.Diaries[self.Name] then
+        GameVars.Engine.Diaries[self.Name].PageNumbers = nil
 		print("Page Numbers cleared for the diary system: "..tostring(self.Name))
     end
 end
@@ -1073,39 +1073,39 @@ end
 -- @tparam number textScale Scale factor for the controls.
 -- @tparam Color textColor Color of the page controls.
 function CustomDiary:customizeControls(textPos, textOptions, textScale, textColor)
-    if GameVars.Diaries[self.Name] then
+    if GameVars.Engine.Diaries[self.Name] then
         if Type.IsVec2(textPos) then
-            GameVars.Diaries[self.Name].Controls.textPos         = textPos
+            GameVars.Engine.Diaries[self.Name].Controls.textPos         = textPos
         else
             Util.PrintLog("'textPos' is in an incorrect format. Expected a Vec2 type in function 'customizeControls' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsTable(textOptions) then
-            GameVars.Diaries[self.Name].Controls.textOptions    = textOptions
+            GameVars.Engine.Diaries[self.Name].Controls.textOptions    = textOptions
         else
             Util.PrintLog("'textOptions' is in an incorrect format. Expected a table type in function 'customizeControls' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsNumber(textScale) then
-            GameVars.Diaries[self.Name].Controls.textScale        = textScale
+            GameVars.Engine.Diaries[self.Name].Controls.textScale        = textScale
         else
             Util.PrintLog("'textScale' is in an incorrect format. Expected a number type in function 'customizeControls' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsColor(textColor) then
-            GameVars.Diaries[self.Name].Controls.textColor		= textColor
+            GameVars.Engine.Diaries[self.Name].Controls.textColor		= textColor
         else
             Util.PrintLog("'textColor' is in an incorrect format. Expected a Color type in function 'customizeControls' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
-        GameVars.Diaries[self.Name].Controls.text1           = "Space: Play Voice Note"
-        GameVars.Diaries[self.Name].Controls.text2           = "Left Key: Previous Page"
-        GameVars.Diaries[self.Name].Controls.text3           = "Right Key: Next Page"
-        GameVars.Diaries[self.Name].Controls.text4           = "Esc: Back"
-        GameVars.Diaries[self.Name].Controls.separator       = "|"
+        GameVars.Engine.Diaries[self.Name].Controls.text1           = "Space: Play Voice Note"
+        GameVars.Engine.Diaries[self.Name].Controls.text2           = "Left Key: Previous Page"
+        GameVars.Engine.Diaries[self.Name].Controls.text3           = "Right Key: Next Page"
+        GameVars.Engine.Diaries[self.Name].Controls.text4           = "Esc: Back"
+        GameVars.Engine.Diaries[self.Name].Controls.separator       = "|"
         print("Controls updated for the diary system: "..tostring(self.Name))
     end
 end
@@ -1118,38 +1118,38 @@ end
 -- @tparam string string4 Text for Esc key controls text.
 -- @tparam string separator Text for separator between controls text.
 function CustomDiary:customizeControlsText(string1, string2, string3, string4, separator)
-    if GameVars.Diaries[self.Name] then
+    if GameVars.Engine.Diaries[self.Name] then
 
         if Type.IsString(string1) then
-            GameVars.Diaries[self.Name].Controls.text1           = string1
+            GameVars.Engine.Diaries[self.Name].Controls.text1           = string1
         else
             Util.PrintLog("'string1' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsString(string2) then
-            GameVars.Diaries[self.Name].Controls.text2           = string2
+            GameVars.Engine.Diaries[self.Name].Controls.text2           = string2
         else
             Util.PrintLog("'string2' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsString(string3) then
-            GameVars.Diaries[self.Name].Controls.text3           = string3
+            GameVars.Engine.Diaries[self.Name].Controls.text3           = string3
         else
             Util.PrintLog("'string3' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsString(string4) then
-            GameVars.Diaries[self.Name].Controls.text4           = string4
+            GameVars.Engine.Diaries[self.Name].Controls.text4           = string4
         else
             Util.PrintLog("'string4' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
         if Type.IsString(separator) then
-            GameVars.Diaries[self.Name].Controls.separator       = separator
+            GameVars.Engine.Diaries[self.Name].Controls.separator       = separator
             print("Controls text updated")
         else
             Util.PrintLog("'separator' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
@@ -1162,8 +1162,8 @@ end
 ---
 -- Clears settings for the specified diary's controls text.
 function CustomDiary:clearControls()
-    if GameVars.Diaries[self.Name] then
-        GameVars.Diaries[self.Name].Controls ={}
+    if GameVars.Engine.Diaries[self.Name] then
+        GameVars.Engine.Diaries[self.Name].Controls ={}
 
         print("Controls cleared for the diary system: "..tostring(self.Name))
     end
@@ -1172,12 +1172,12 @@ end
 -- !Ignore
 LevelFuncs.Engine.Diaries.ShowDiary = function()
 
-    local objectNumber = GameVars.LastUsedDiary
+    local objectNumber = GameVars.Engine.LastUsedDiary
 	local dataName = objectNumber .. "_diarydata"
 
-    if GameVars.Diaries[dataName] then
+    if GameVars.Engine.Diaries[dataName] then
 
-        local diary             = GameVars.Diaries[dataName]
+        local diary             = GameVars.Engine.Diaries[dataName]
         local currentIndex      = diary.CurrentPageIndex
         local maxPages          = diary.UnlockedPages
         local narrationTrack    = diary.Pages[currentIndex].NarrationTrack
@@ -1242,8 +1242,8 @@ LevelFuncs.Engine.Diaries.ShowDiary = function()
 
        --Sets the currentindex so that the diary opens at the same page
         diary.CurrentPageIndex = currentIndex
-        local textEntries = GameVars.Diaries[dataName].Pages[currentIndex].TextEntries
-        local imageEntries = GameVars.Diaries[dataName].Pages[currentIndex].ImageEntries
+        local textEntries = GameVars.Engine.Diaries[dataName].Pages[currentIndex].TextEntries
+        local imageEntries = GameVars.Engine.Diaries[dataName].Pages[currentIndex].ImageEntries
 
         if diary.CurrentAlpha > 0 then
             diary.Visible = true
@@ -1350,11 +1350,11 @@ LevelFuncs.Engine.Diaries.ActivateDiary = function(objectNumber)
 
     local dataName = objectNumber .. "_diarydata"
 
-	if GameVars.Diaries[dataName] then
-        GameVars.LastUsedDiary = objectNumber
+	if GameVars.Engine.Diaries[dataName] then
+        GameVars.Engine.LastUsedDiary = objectNumber
         TEN.Inventory.ClearUsedItem()
-        GameVars.Diaries[dataName].TargetAlpha = 255
-        GameVars.Diaries[dataName].EntryTargetAlpha = 255
+        GameVars.Engine.Diaries[dataName].TargetAlpha = 255
+        GameVars.Engine.Diaries[dataName].EntryTargetAlpha = 255
 		TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PREFREEZE, LevelFuncs.Engine.Diaries.ShowDiary)
         Flow.SetFreezeMode(Flow.FreezeMode.FULL)
 	end
@@ -1364,10 +1364,10 @@ end
 -- !Ignore
 LevelFuncs.Engine.Diaries.ShowNotification = function(dt)
 
-    local dataName = GameVars.LastUsedDiary .. "_diarydata"
+    local dataName = GameVars.Engine.LastUsedDiary .. "_diarydata"
 
-    if GameVars.Diaries[dataName] then
-        local diary = GameVars.Diaries[dataName]
+    if GameVars.Engine.Diaries[dataName] then
+        local diary = GameVars.Engine.Diaries[dataName]
 
         if diary.CurrentAlpha ~= diary.TargetAlpha then
 
@@ -1379,9 +1379,9 @@ LevelFuncs.Engine.Diaries.ShowNotification = function(dt)
 
         end
 
-        GameVars.Diaries[dataName].Notification.ElapsedTime  = GameVars.Diaries[dataName].Notification.ElapsedTime + dt
+        GameVars.Engine.Diaries[dataName].Notification.ElapsedTime  = GameVars.Engine.Diaries[dataName].Notification.ElapsedTime + dt
 
-        if GameVars.Diaries[dataName].Notification.ElapsedTime <= GameVars.Diaries[dataName].Notification.NotificationTime then
+        if GameVars.Engine.Diaries[dataName].Notification.ElapsedTime <= GameVars.Engine.Diaries[dataName].Notification.NotificationTime then
             diary.TargetAlpha = 255
         else
             diary.TargetAlpha = 0
@@ -1402,11 +1402,11 @@ end
 -- !Ignore
 LevelFuncs.Engine.Diaries.PrepareNotification = function()
 
-	local dataName = GameVars.LastUsedDiary .. "_diarydata"
+	local dataName = GameVars.Engine.LastUsedDiary .. "_diarydata"
 
-    if GameVars.Diaries[dataName] then
+    if GameVars.Engine.Diaries[dataName] then
 
-        local diary = GameVars.Diaries[dataName]
+        local diary = GameVars.Engine.Diaries[dataName]
         local notif = diary.Notification
         local spriteColor = Color(notif.Color.r, notif.Color.g, notif.Color.b, diary.CurrentAlpha)
 
