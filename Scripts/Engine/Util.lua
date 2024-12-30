@@ -115,9 +115,9 @@ end
 
 -- Helper function to check time format for timer and stopwatch.
 Utility.CheckTimeFormat = function (timerFormat)
-    local set = false
+	local set = false
 
-    if Type.IsTable(timerFormat) then
+	if Type.IsTable(timerFormat) then
         local validKeys = {hours = true, minutes = true, seconds = true, deciseconds = true}
         for k, v in pairs(timerFormat) do
         	if not validKeys[k] or type(v) ~= "boolean" then
@@ -125,12 +125,12 @@ Utility.CheckTimeFormat = function (timerFormat)
 				return false
 			end
         end
-        set = timerFormat
-    elseif Type.IsBoolean(timerFormat) then
-        set = timerFormat and {seconds = true} or false
-    else
-        TEN.Util.PrintLog("Warning: Incorrect time format ", Util.LogLevel.ERROR)
-    end
+		set = timerFormat
+	elseif Type.IsBoolean(timerFormat) then
+		set = timerFormat and {seconds = true} or false
+	else
+		TEN.Util.PrintLog("Warning: Incorrect time format ", Util.LogLevel.ERROR)
+	end
 
     return set
 end
