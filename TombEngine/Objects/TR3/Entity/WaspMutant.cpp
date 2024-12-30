@@ -114,7 +114,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		// Spawn light.
 		auto pos = GetJointPosition(&item, WaspVenomSackBite);
-		TriggerDynamicLight(
+		SpawnDynamicLight(
 			pos.x, pos.y, pos.z,
 			item.ItemFlags[0],
 			WaspVenomSackLightColor.x * UCHAR_MAX,

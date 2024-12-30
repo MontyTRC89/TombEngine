@@ -1,9 +1,11 @@
 #pragma once
 
-#include "Objects/game_object_ids.h"
-#include "Math/Math.h"
 #include "Game/Items.h"
+#include "Game/effects/Light.h"
+#include "Math/Math.h"
 #include "Renderer/RendererEnums.h"
+
+using namespace TEN::Effects::Light;
 
 enum class LaraWeaponType;
 enum GAME_OBJECT_ID : short;
@@ -314,9 +316,6 @@ void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNu
 void ControlWaterfallMist(short itemNumber);
 void TriggerWaterfallMist(const ItemInfo& item);
 void KillAllCurrentItems(short itemNumber);
-void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
-void TriggerDynamicPointLight(const Vector3& pos, const Color& color, float falloff, bool castShadows = false, int hash = 0);
-void TriggerDynamicSpotLight(const Vector3& pos, const Vector3& dir, const Color& color, float radius, float falloff, float distance, bool castShadows = false, int hash = 0);
 void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber);
 void TriggerRocketSmoke(int x, int y, int z);
 void TriggerFlashSmoke(int x, int y, int z, short roomNumber);

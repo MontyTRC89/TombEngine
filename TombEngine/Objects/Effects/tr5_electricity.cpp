@@ -161,7 +161,7 @@ void ElectricityWiresControl(short itemNumber)
 			continue;
 
 		if (((GetRandomControl() & 0x0F) < 8) && flashingNode == currentEndNode)
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 0, ((GetRandomControl() & 0x3F) + 96) / 2, (GetRandomControl() & 0x3F) + 128);
+			SpawnDynamicLight(pos.x, pos.y, pos.z, 10, 0, ((GetRandomControl() & 0x3F) + 96) / 2, (GetRandomControl() & 0x3F) + 128);
 
 		for (int s = 0; s < 3; s++)
 		{
@@ -224,7 +224,7 @@ void ElectricityWiresControl(short itemNumber)
 					isWaterNearby = true;
 			}
 
-			bool instantKill = BoundingSphere(Vector3(pos.x, pos.y, pos.z), CLICK(0.25f)).Intersects(npcBox);
+			bool instantKill = BoundingSphere(Vector3(pos.x, pos.y, pos.z), BLOCK(0.25f)).Intersects(npcBox);
 
 			if (isWaterNearby || instantKill)
 			{
@@ -255,7 +255,7 @@ void ElectricityWiresControl(short itemNumber)
 						TriggerElectricitySparks(itemPtr, j, false);
 				}
 
-				TriggerDynamicLight(
+				SpawnDynamicLight(
 					itemPtr->Pose.Position.x,
 					itemPtr->Pose.Position.y,
 					itemPtr->Pose.Position.z,

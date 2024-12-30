@@ -396,6 +396,11 @@ const std::vector<byte> SaveGame::Build()
 	inventory.add_examines_combo(examinesComboOffset);
 	inventory.add_beetle_components(Lara.Inventory.BeetleComponents);
 	inventory.add_has_binoculars(Lara.Inventory.HasBinoculars);
+	inventory.add_has_diary(Lara.Inventory.HasDiary);
+	inventory.add_has_load(Lara.Inventory.HasLoad);
+	inventory.add_has_save(Lara.Inventory.HasSave);
+	inventory.add_has_compass(Lara.Inventory.HasCompass);
+	inventory.add_has_stopwatch(Lara.Inventory.HasStopwatch);
 	inventory.add_has_crowbar(Lara.Inventory.HasCrowbar);
 	inventory.add_has_lasersight(Lara.Inventory.HasLasersight);
 	inventory.add_has_silencer(Lara.Inventory.HasSilencer);
@@ -1998,6 +2003,11 @@ static void ParsePlayer(const Save::SaveGame* s)
 	Lara.Inventory.BeetleLife = s->lara()->inventory()->beetle_life();
 	Lara.Inventory.BigWaterskin = s->lara()->inventory()->big_waterskin();
 	Lara.Inventory.HasBinoculars = s->lara()->inventory()->has_binoculars();
+	Lara.Inventory.HasDiary = s->lara()->inventory()->has_diary();
+	Lara.Inventory.HasLoad = s->lara()->inventory()->has_load();
+	Lara.Inventory.HasSave = s->lara()->inventory()->has_save();
+	Lara.Inventory.HasStopwatch = s->lara()->inventory()->has_stopwatch();
+	Lara.Inventory.HasCompass = s->lara()->inventory()->has_compass();
 	Lara.Inventory.HasCrowbar = s->lara()->inventory()->has_crowbar();
 	Lara.Inventory.HasLasersight = s->lara()->inventory()->has_lasersight();
 	Lara.Inventory.HasSilencer = s->lara()->inventory()->has_silencer();
