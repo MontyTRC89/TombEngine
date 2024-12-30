@@ -44,6 +44,17 @@ function CustomDiary.ImportDiary(fileName)
     --Create the diary
     for _, entry in ipairs(diaryData) do
         if entry.type == "diary" then
+
+            if (entry.object < 596 or entry.object > 611) and entry.object ~= 986 then
+                print("Invalid object slot. Please use a pickup object slot in the range PICKUP_ITEM1 (596) to PICKUP_ITEM 16 (611) or DIARY_ITEM (986). Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if entry.objectIdBg < 1353 or entry.objectIdBg > 1400 then
+                print("Invalid objectIdBg slot. Please use a sprite slot. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
             if not Type.IsNumber(entry.spriteIdBg) then
                 Util.PrintLog("'spriteIdBg' is not a number. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
@@ -69,7 +80,22 @@ function CustomDiary.ImportDiary(fileName)
                 return
             end
 
-            if not Type.IsNumber(entry.alpha) or entry.alpha < 0 or entry.alpha > 256 then
+            if  not (entry.alignMode ~= nil and entry.alignMode >= 0 and entry.alignMode <= 8) then
+                Util.PrintLog("'alignMode' is not a valid View.AlignMode type. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if  not (entry.blendMode ~= nil and entry.blendMode >= 0 and entry.blendMode <= 11) then
+                Util.PrintLog("'blendMode' is not a valid Effects.BlendID type. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if  not (entry.scaleMode ~= nil and entry.scaleMode >= 0 and entry.scaleMode <= 2) then
+                Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsNumber(entry.alpha) or entry.alpha < 0 or entry.alpha > 255 then
                 Util.PrintLog("'alpha' is not a number or not within range (0-255). Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
@@ -117,6 +143,11 @@ function CustomDiary.ImportDiary(fileName)
     for _, entry in ipairs(diaryData) do
         if entry.type == "background" then
 
+            if entry.objectIdBg < 1353 or entry.objectIdBg > 1400 then
+                print("Invalid objectIdBg slot. Please use a sprite slot. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
             if not Type.IsNumber(entry.spriteIdBg) then
                 Util.PrintLog("'spriteIdBg' is not a number. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
@@ -142,7 +173,22 @@ function CustomDiary.ImportDiary(fileName)
                 return
             end
 
-            if not Type.IsNumber(entry.alpha) or entry.alpha < 0 or entry.alpha > 256 then
+            if  not (entry.alignMode ~= nil and entry.alignMode >= 0 and entry.alignMode <= 8) then
+                Util.PrintLog("'alignMode' is not a valid View.AlignMode type. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if  not (entry.blendMode ~= nil and entry.blendMode >= 0 and entry.blendMode <= 11) then
+                Util.PrintLog("'blendMode' is not a valid Effects.BlendID type. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if  not (entry.scaleMode ~= nil and entry.scaleMode >= 0 and entry.scaleMode <= 2) then
+                Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsNumber(entry.alpha) or entry.alpha < 0 or entry.alpha > 255 then
                 Util.PrintLog("'alpha' is not a number or not within range (0-255). Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
@@ -161,22 +207,21 @@ function CustomDiary.ImportDiary(fileName)
             )
         elseif entry.type == "pageNumbers" then
 
-            if not Type.IsNumber(entry.pageNoType) or entry.pageNoType < 0 or entry.pageNoType > 2 then
+            if not Type.IsNumber(entry.pageNoType) or entry.pageNoType < 1 or entry.pageNoType > 2 then
                 Util.PrintLog("'pageNoType' is not a a valid option (1 or 2). Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
+
             if not Type.IsString(entry.prefix) then
                 Util.PrintLog("'prefix' is not a a string. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
+
             if not Type.IsString(entry.separator) then
                 Util.PrintLog("'separator' is not a a string. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
-            if not Type.IsString(entry.separator) then
-                Util.PrintLog("'separator' is not a a string. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
-                return
-            end
+
             if not Type.IsVec2(entry.textPos) then
                 Util.PrintLog("'textPos' is not a a Vec2. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
@@ -185,6 +230,13 @@ function CustomDiary.ImportDiary(fileName)
             if not Type.IsTable(entry.textOptions) then
                 Util.PrintLog("'textOptions' is not a table. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
+            else
+                for _, data in pairs(entry.textOptions) do
+                    if type(data) ~= "number" or data < 0 or data > 3 or data == nil then
+                        Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                        return
+                    end
+                end
             end
 
             if not Type.IsNumber(entry.textScale) then
@@ -235,6 +287,13 @@ function CustomDiary.ImportDiary(fileName)
             if not Type.IsTable(entry.textOptions) then
                 Util.PrintLog("'textOptions' is not a table. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
+            else
+                for _, data in pairs(entry.textOptions) do
+                    if type(data) ~= "number" or data < 0 or data > 3 or data == nil then
+                        Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                        return
+                    end
+                end
             end
 
             if not Type.IsNumber(entry.textScale) then
@@ -264,6 +323,11 @@ function CustomDiary.ImportDiary(fileName)
                 return
             end
 
+            if entry.objectId < 1353 or entry.objectId > 1400 then
+                print("Invalid objectId slot. Please use a sprite slot. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
             if not Type.IsNumber(entry.spriteId) then
                 Util.PrintLog("'spriteId' is not a number. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
@@ -288,6 +352,22 @@ function CustomDiary.ImportDiary(fileName)
                 Util.PrintLog("'scale' is not a Vec2. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
+
+            if  not (entry.alignMode ~= nil and entry.alignMode >= 0 and entry.alignMode <= 8) then
+                Util.PrintLog("'alignMode' is not a valid View.AlignMode type. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if  not (entry.blendMode ~= nil and entry.blendMode >= 0 and entry.blendMode <= 11) then
+                Util.PrintLog("'blendMode' is not a valid Effects.BlendID type. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if  not (entry.scaleMode ~= nil and entry.scaleMode >= 0 and entry.scaleMode <= 2) then
+                Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
             if not Type.IsNumber(entry.notificationSound) or entry.notificationSound <=0 then
                 Util.PrintLog("'notificationSound' is not a valid number. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
@@ -313,6 +393,11 @@ function CustomDiary.ImportDiary(fileName)
                 return
             end
 
+            if entry.objectId < 1353 or entry.objectId > 1400 then
+                print("Invalid objectId slot. Please use a sprite slot. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
             if not Type.IsNumber(entry.spriteId) then
                 Util.PrintLog("'spriteId' is not a number. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
@@ -335,6 +420,21 @@ function CustomDiary.ImportDiary(fileName)
 
             if not Type.IsVec2(entry.scale) then
                 Util.PrintLog("'scale' is not a Vec2. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if  not (entry.alignMode ~= nil and entry.alignMode >= 0 and entry.alignMode <= 8) then
+                Util.PrintLog("'alignMode' is not a valid View.AlignMode type for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if  not (entry.blendMode ~= nil and entry.blendMode >= 0 and entry.blendMode <= 11) then
+                Util.PrintLog("'blendMode' is not a valid Effects.BlendID type for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if  not (entry.scaleMode ~= nil and entry.scaleMode >= 0 and entry.scaleMode <= 2) then
+                Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
@@ -370,6 +470,13 @@ function CustomDiary.ImportDiary(fileName)
             if not Type.IsTable(entry.textOptions) then
                 Util.PrintLog("'textOptions' is not a table. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
+            else
+                for _, data in pairs(entry.textOptions) do
+                    if type(data) ~= "number" or data < 0 or data > 3 or data == nil then
+                        Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                        return
+                    end
+                end
             end
 
             if not Type.IsNumber(entry.textScale) then
@@ -407,7 +514,7 @@ function CustomDiary.ImportDiary(fileName)
                 entry.trackName
             )
         elseif entry.type == "diary" then
-        print()
+        -- Skip this entry as diary is already imported. This comment is needed to avouid the error of Unknown type for diary.
         else
             print("Unknown entry type: " .. tostring(entry.type))
         end
@@ -438,7 +545,7 @@ end
 CustomDiary.Create = function(object, objectIdBg, spriteIdBg, colorBg, pos, rot, scale, alignMode, scaleMode, blendMode, alpha, pageSound, exitSound)
 
     if (object < 596 or object > 611) and object ~= 986 then
-        print("Error: Invalid object slot for diary creation. Please use a pickup object slot in the range 596 to 611 and 986.")
+        print("Error: Invalid object slot for diary creation. Please use a pickup object slot PICKUP_ITEM1 (596) to PICKUP_ITEM 16 (611) or DIARY_ITEM (986).")
         return
     end
 
@@ -451,6 +558,13 @@ CustomDiary.Create = function(object, objectIdBg, spriteIdBg, colorBg, pos, rot,
 	end
 
 	GameVars.Engine.Diaries[dataName]				        = {}
+
+    if objectIdBg >= 1353 and objectIdBg <= 1400 then
+        GameVars.Engine.Diaries[dataName].ObjectIdBg	        = objectIdBg
+    else
+        print("Invalid objectIdBg slot. Please use a sprite slot. Expected a sprite slot in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
+        return
+    end
 
     if Type.IsNumber(spriteIdBg) then
         GameVars.Engine.Diaries[dataName].SpriteIdBg	        = spriteIdBg
@@ -487,7 +601,28 @@ CustomDiary.Create = function(object, objectIdBg, spriteIdBg, colorBg, pos, rot,
         return
     end
 
-    if Type.IsNumber(alpha) and alpha>-1 and alpha < 266 then
+    if  (alignMode ~= nil and alignMode >= 0 and alignMode <= 8) then
+        GameVars.Engine.Diaries[dataName].AlignMode            = alignMode
+    else
+        Util.PrintLog("'alignMode' is not a valid View.AlignMode type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
+        return
+    end
+
+    if  (blendMode ~= nil and blendMode >= 0 and blendMode <= 11) then
+        GameVars.Engine.Diaries[dataName].BlendMode	        = blendMode
+    else
+        Util.PrintLog("'blendMode' is not a valid Effects.BlendID type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
+        return
+    end
+
+    if  (scaleMode ~= nil and scaleMode >= 0 and scaleMode <= 2) then
+        GameVars.Engine.Diaries[dataName].ScaleMode            = scaleMode
+    else
+        Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
+        return
+    end
+
+    if Type.IsNumber(alpha) and alpha>=0 and alpha <= 255 then
         GameVars.Engine.Diaries[dataName].Alpha     	        = alpha
     else
         Util.PrintLog("'alpha is in an incorrect format. Expected a number (0-255) type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
@@ -513,10 +648,6 @@ CustomDiary.Create = function(object, objectIdBg, spriteIdBg, colorBg, pos, rot,
     GameVars.Engine.Diaries[dataName].UnlockedPages        = 1
 	GameVars.Engine.Diaries[dataName].Pages  		        = {NarrationTrack=nil,TextEntries={},ImageEntries={}}
 	GameVars.Engine.Diaries[dataName].Object		        = object
-	GameVars.Engine.Diaries[dataName].ObjectIdBg	        = objectIdBg
-	GameVars.Engine.Diaries[dataName].AlignMode            = alignMode
-	GameVars.Engine.Diaries[dataName].ScaleMode            = scaleMode
-	GameVars.Engine.Diaries[dataName].BlendMode	        = blendMode
     GameVars.Engine.Diaries[dataName].CurrentAlpha		    = 0
 	GameVars.Engine.Diaries[dataName].TargetAlpha		    = 255
     GameVars.Engine.Diaries[dataName].EntryCurrentAlpha	= 0
@@ -542,6 +673,8 @@ CustomDiary.Get = function(object)
     if GameVars.Engine.Diaries[dataName] then
         local self = {Name = dataName}
         return setmetatable(self, CustomDiary)
+    else
+        print("Diary does not exist for object: "..tostring(object))
     end
 end
 
@@ -574,8 +707,6 @@ CustomDiary.Status = function(value)
     else
         Util.PrintLog("'value' is in an incorrect format. Expected a bool type in function 'CustomDiary.Status' for the diary system", Util.LogLevel.WARNING)
     end
-
-
 end
 
 ---
@@ -631,6 +762,11 @@ function CustomDiary:unlockPages(pageIndex, notification)
 
         if not Type.IsNumber(pageIndex) or pageIndex > #GameVars.Engine.Diaries[self.Name].Pages or pageIndex <= 0 then
             Util.PrintLog("'pageIndex' is in an incorrect format or not a valid page number. Expected a number type in function 'unlockPages' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        if not Type.IsBoolean(notification) then
+            Util.PrintLog("'notification' is in an incorrect format. Expected a bool type in function 'unlockPages' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
@@ -691,11 +827,17 @@ function CustomDiary:addTextEntry(pageIndex, text, textPos, textOptions, textSca
         return
     end
 
-    if Type.IsTable(textOptions) then
-        textEntry.textOptions = textOptions
-    else
+    if not Type.IsTable(textOptions) then
         Util.PrintLog("'textOptions' is in an incorrect format. Expected a table type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
+    else
+        for _, data in pairs(textOptions) do
+            if type(data) ~= "number" or data < 0 or data > 3 or data == nil then
+                Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+                return
+            end
+        end
+        textEntry.textOptions = textOptions
     end
 
     if Type.IsNumber(textScale) then
@@ -739,6 +881,13 @@ function CustomDiary:addImageEntry(pageIndex, objectId, spriteId, color, pos, ro
 
     local imageEntry = {}
 
+    if objectId >= 1353 and objectId <= 1400 then
+        imageEntry.objectId     = objectId
+    else
+        print("Invalid objectId slot. Please use a sprite slot. Expected a sprite slot in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        return
+    end
+
     if Type.IsNumber(spriteId) then
         imageEntry.spriteId     = spriteId
     else
@@ -773,12 +922,28 @@ function CustomDiary:addImageEntry(pageIndex, objectId, spriteId, color, pos, ro
         Util.PrintLog("'scale' is in an incorrect format. Expected a Vec2 type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
+    
+    if  (alignMode ~= nil and alignMode >= 0 and alignMode <= 8) then
+        imageEntry.alignMode    = alignMode
+    else
+        Util.PrintLog("'alignMode' is not a valid View.AlignMode type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        return
+    end
 
-    imageEntry.objectId     = objectId
-    imageEntry.alignMode    = alignMode
-    imageEntry.scaleMode    = scaleMode
-    imageEntry.blendMode    = blendMode
+    if  (scaleMode ~= nil and scaleMode >= 0 and scaleMode <= 2) then
+        imageEntry.scaleMode    = scaleMode
+    else
+        Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        return
+    end
 
+    if  (blendMode ~= nil and blendMode >= 0 and blendMode <= 11) then
+        imageEntry.blendMode    = blendMode
+    else
+        Util.PrintLog("'blendMode' is not a valid Effects.BlendID type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        return
+    end
+   
     if Type.IsNumber(pageIndex) and pageIndex > 0 then
         if not GameVars.Engine.Diaries[self.Name].Pages[pageIndex] then
             GameVars.Engine.Diaries[self.Name].Pages[pageIndex] = {NarrationTrack=nil, TextEntries = {}, ImageEntries = {}}
@@ -846,6 +1011,13 @@ function CustomDiary:removeNarration(pageIndex)
 function CustomDiary:addBackground(objectId, spriteId, color, pos, rot, scale, alignMode, scaleMode, blendMode, alpha)
     if GameVars.Engine.Diaries[self.Name] then
 
+        if objectId >= 1353 and objectId <= 1400 then
+            GameVars.Engine.Diaries[self.Name].Background.ObjectIdBg	    = objectId
+        else
+            print("Invalid objectId slot. Please use a sprite slot. Expected a sprite slot in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
         if Type.IsNumber(spriteId) then
             GameVars.Engine.Diaries[self.Name].Background.SpriteIdBg	    = spriteId
         else
@@ -881,16 +1053,33 @@ function CustomDiary:addBackground(objectId, spriteId, color, pos, rot, scale, a
             return
         end
 
-        if Type.IsNumber(alpha) and alpha>-1 and alpha < 266 then
+        if  (alignMode ~= nil and alignMode >= 0 and alignMode <= 8) then
+            GameVars.Engine.Diaries[self.Name].Background.AlignMode        = alignMode
+        else
+            Util.PrintLog("'alignMode' is not a valid View.AlignMode type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        if  (scaleMode ~= nil and scaleMode >= 0 and scaleMode <= 2) then
+            GameVars.Engine.Diaries[self.Name].Background.ScaleMode        = scaleMode
+        else
+            Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        if  (blendMode ~= nil and blendMode >= 0 and blendMode <= 11) then
+            GameVars.Engine.Diaries[self.Name].Background.BlendMode 	    = blendMode
+        else
+            Util.PrintLog("'blendMode' is not a valid Effects.BlendID type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+        
+        if Type.IsNumber(alpha) and alpha>=0 and alpha <= 255 then
             GameVars.Engine.Diaries[self.Name].Background.Alpha		        = alpha
         else
             Util.PrintLog("'alpha is in an incorrect format. Expected a number (0-255) type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
-        GameVars.Engine.Diaries[self.Name].Background.ObjectIdBg	    = objectId
-	    GameVars.Engine.Diaries[self.Name].Background.AlignMode        = alignMode
-	    GameVars.Engine.Diaries[self.Name].Background.ScaleMode        = scaleMode
-	    GameVars.Engine.Diaries[self.Name].Background.BlendMode 	    = blendMode
 
         print("Background added for the diary system: "..tostring(self.Name))
     end
@@ -921,6 +1110,20 @@ end
 -- @tparam Sound notificationSound Sound to play with notification icon.
 function CustomDiary:customizeNotification(notificationTime, objectId, spriteId, color, pos, rot, scale, alignMode, scaleMode, blendMode, notificationSound)
     if GameVars.Engine.Diaries[self.Name] then
+
+        if Type.IsNumber(notificationTime) and notificationTime > 0 then
+            GameVars.Engine.Diaries[self.Name].Notification.NotificationTime    = notificationTime
+        else
+            Util.PrintLog("'notificationTime' is in an incorrect format. Expected a number type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        if objectId >= 1353 and objectId <= 1400 then
+            GameVars.Engine.Diaries[self.Name].Notification.ObjectID           = objectId
+        else
+            print("Invalid objectId slot. Please use a sprite slot. Expected a sprite slot in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
 
         if Type.IsNumber(spriteId) then
             GameVars.Engine.Diaries[self.Name].Notification.SpriteID	        = spriteId
@@ -957,6 +1160,27 @@ function CustomDiary:customizeNotification(notificationTime, objectId, spriteId,
             return
         end
 
+        if  (alignMode ~= nil and alignMode >= 0 and alignMode <= 8) then
+            GameVars.Engine.Diaries[self.Name].Notification.AlignMode		    = alignMode
+        else
+            Util.PrintLog("'alignMode' is not a valid View.AlignMode type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+                
+        if  (scaleMode ~= nil and scaleMode >= 0 and scaleMode <= 2) then
+            GameVars.Engine.Diaries[self.Name].Notification.ScaleMode		    = scaleMode
+        else
+            Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+        
+        if  (blendMode ~= nil and blendMode >= 0 and blendMode <= 11) then
+            GameVars.Engine.Diaries[self.Name].Notification.BlendMode		    = blendMode
+        else
+            Util.PrintLog("'blendMode' is not a valid Effects.BlendID type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
         if Type.IsNumber(notificationSound) and notificationSound > 0 then
             GameVars.Engine.Diaries[self.Name].Notification.NotificationSound	= notificationSound
         else
@@ -964,17 +1188,6 @@ function CustomDiary:customizeNotification(notificationTime, objectId, spriteId,
             return
         end
 
-        if Type.IsNumber(notificationTime) and notificationTime > 0 then
-            GameVars.Engine.Diaries[self.Name].Notification.NotificationTime    = notificationTime
-        else
-            Util.PrintLog("'notificationTime' is in an incorrect format. Expected a number type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
-            return
-        end
-
-        GameVars.Engine.Diaries[self.Name].Notification.ObjectID           = objectId
-        GameVars.Engine.Diaries[self.Name].Notification.AlignMode		    = alignMode
-        GameVars.Engine.Diaries[self.Name].Notification.ScaleMode		    = scaleMode
-        GameVars.Engine.Diaries[self.Name].Notification.BlendMode		    = blendMode
         GameVars.Engine.Diaries[self.Name].Notification.ElapsedTime         = 0
 
         print("Notification updated for the diary system: "..tostring(self.Name))
@@ -1028,11 +1241,17 @@ function CustomDiary:customizePageNumbers(pageNoType, prefix, separator, textPos
                 return
             end
 
-            if Type.IsTable(textOptions) then
-                GameVars.Engine.Diaries[self.Name].PageNumbers.textOptions      = textOptions
-            else
+            if not Type.IsTable(textOptions) then
                 Util.PrintLog("'textOptions' is in an incorrect format. Expected a table type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
                 return
+            else
+                for _, data in pairs(textOptions) do
+                    if type(data) ~= "number" or data < 0 or data > 3 or data == nil then
+                        Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+                        return
+                    end
+                end
+                GameVars.Engine.Diaries[self.Name].PageNumbers.textOptions      = textOptions
             end
 
             if Type.IsNumber(textScale) then
@@ -1081,11 +1300,17 @@ function CustomDiary:customizeControls(textPos, textOptions, textScale, textColo
             return
         end
 
-        if Type.IsTable(textOptions) then
-            GameVars.Engine.Diaries[self.Name].Controls.textOptions    = textOptions
-        else
+        if not Type.IsTable(textOptions) then
             Util.PrintLog("'textOptions' is in an incorrect format. Expected a table type in function 'customizeControls' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
+        else
+            for _, data in pairs(textOptions) do
+                if type(data) ~= "number" or data < 0 or data > 3 or data == nil then
+                    Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type in function 'customizeControls' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+                    return
+                end
+            end
+            GameVars.Engine.Diaries[self.Name].Controls.textOptions    = textOptions
         end
 
         if Type.IsNumber(textScale) then
