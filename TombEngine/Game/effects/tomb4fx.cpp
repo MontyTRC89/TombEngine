@@ -609,21 +609,6 @@ void UpdateSmoke()
 	}
 }
 
-byte TriggerGunSmoke_SubFunction(LaraWeaponType weaponType)
-{
-	switch (weaponType)
-	{
-	case LaraWeaponType::HK:
-	case LaraWeaponType::RocketLauncher:
-	case LaraWeaponType::GrenadeLauncher:
-		return 24; //(12) Rocket and Grenade value for TriggerGunSmoke in TR3 have the value 12 ! (the HK is not included there)
-
-	// other weapon
-	default:
-		return 0;
-	}
-}
-
 void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte initial, LaraWeaponType weaponType, byte count)
 {
 	TriggerGunSmokeParticles(x, y, z, xv, yv, zv, initial, weaponType, count);
@@ -740,12 +725,12 @@ void TriggerBlood(int x, int y, int z, int unk, int num)
 		blood->sSize = blood->size = size;
 		blood->dSize = size >> 2;
 
-		blood->oldX = blood->x;
-		blood->oldY = blood->y;
-		blood->oldZ = blood->z;
-		blood->oldRotAng = blood->rotAng;
-		blood->oldSize = blood->size;
-		blood->oldShade = blood->shade;
+		blood->PrevPosition.x = blood->x;
+		blood->PrevPosition.y = blood->y;
+		blood->PrevPosition.z = blood->z;
+		blood->PrevRotAng = blood->rotAng;
+		blood->PrevSize = blood->size;
+		blood->PrevShade = blood->shade;
 	}
 }
 
