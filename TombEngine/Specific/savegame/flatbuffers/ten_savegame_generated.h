@@ -4887,6 +4887,8 @@ struct ParticleInfoT : public flatbuffers::NativeTable {
   int32_t fx_obj = 0;
   int32_t room_number = 0;
   int32_t node_number = 0;
+  std::unique_ptr<TEN::Save::Vector4> target_pos{};
+  int32_t sprite_id = 0;
 };
 
 struct ParticleInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -4930,7 +4932,9 @@ struct ParticleInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_DYNAMIC = 70,
     VT_FX_OBJ = 72,
     VT_ROOM_NUMBER = 74,
-    VT_NODE_NUMBER = 76
+    VT_NODE_NUMBER = 76,
+    VT_TARGET_POS = 78,
+    VT_SPRITE_ID = 80
   };
   int32_t x() const {
     return GetField<int32_t>(VT_X, 0);
@@ -5043,6 +5047,12 @@ struct ParticleInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t node_number() const {
     return GetField<int32_t>(VT_NODE_NUMBER, 0);
   }
+  const TEN::Save::Vector4 *target_pos() const {
+    return GetStruct<const TEN::Save::Vector4 *>(VT_TARGET_POS);
+  }
+  int32_t sprite_id() const {
+    return GetField<int32_t>(VT_SPRITE_ID, 0);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_X) &&
@@ -5082,6 +5092,8 @@ struct ParticleInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_FX_OBJ) &&
            VerifyField<int32_t>(verifier, VT_ROOM_NUMBER) &&
            VerifyField<int32_t>(verifier, VT_NODE_NUMBER) &&
+           VerifyField<TEN::Save::Vector4>(verifier, VT_TARGET_POS) &&
+           VerifyField<int32_t>(verifier, VT_SPRITE_ID) &&
            verifier.EndTable();
   }
   ParticleInfoT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -5204,6 +5216,12 @@ struct ParticleInfoBuilder {
   void add_node_number(int32_t node_number) {
     fbb_.AddElement<int32_t>(ParticleInfo::VT_NODE_NUMBER, node_number, 0);
   }
+  void add_target_pos(const TEN::Save::Vector4 *target_pos) {
+    fbb_.AddStruct(ParticleInfo::VT_TARGET_POS, target_pos);
+  }
+  void add_sprite_id(int32_t sprite_id) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_SPRITE_ID, sprite_id, 0);
+  }
   explicit ParticleInfoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -5253,8 +5271,12 @@ inline flatbuffers::Offset<ParticleInfo> CreateParticleInfo(
     int32_t dynamic = 0,
     int32_t fx_obj = 0,
     int32_t room_number = 0,
-    int32_t node_number = 0) {
+    int32_t node_number = 0,
+    const TEN::Save::Vector4 *target_pos = 0,
+    int32_t sprite_id = 0) {
   ParticleInfoBuilder builder_(_fbb);
+  builder_.add_sprite_id(sprite_id);
+  builder_.add_target_pos(target_pos);
   builder_.add_node_number(node_number);
   builder_.add_room_number(room_number);
   builder_.add_fx_obj(fx_obj);
@@ -9706,6 +9728,8 @@ inline void ParticleInfo::UnPackTo(ParticleInfoT *_o, const flatbuffers::resolve
   { auto _e = fx_obj(); _o->fx_obj = _e; }
   { auto _e = room_number(); _o->room_number = _e; }
   { auto _e = node_number(); _o->node_number = _e; }
+  { auto _e = target_pos(); if (_e) _o->target_pos = std::unique_ptr<TEN::Save::Vector4>(new TEN::Save::Vector4(*_e)); }
+  { auto _e = sprite_id(); _o->sprite_id = _e; }
 }
 
 inline flatbuffers::Offset<ParticleInfo> ParticleInfo::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ParticleInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -9753,6 +9777,8 @@ inline flatbuffers::Offset<ParticleInfo> CreateParticleInfo(flatbuffers::FlatBuf
   auto _fx_obj = _o->fx_obj;
   auto _room_number = _o->room_number;
   auto _node_number = _o->node_number;
+  auto _target_pos = _o->target_pos ? _o->target_pos.get() : 0;
+  auto _sprite_id = _o->sprite_id;
   return TEN::Save::CreateParticleInfo(
       _fbb,
       _x,
@@ -9791,7 +9817,9 @@ inline flatbuffers::Offset<ParticleInfo> CreateParticleInfo(flatbuffers::FlatBuf
       _dynamic,
       _fx_obj,
       _room_number,
-      _node_number);
+      _node_number,
+      _target_pos,
+      _sprite_id);
 }
 
 inline SoundtrackT *Soundtrack::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
