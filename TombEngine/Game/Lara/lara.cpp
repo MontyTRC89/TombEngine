@@ -67,36 +67,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	static float time = 0.0f;
-	static float oscillationRange = 0.0f;
-	static float centerValue = 1.0f;
-
-	if (IsClicked(In::Action))
-	{
-		oscillationRange = 0.4f;
-		time = 0.0f;
-	}
-
-	// Calculate the scale based on sine wave
-	float oscillation = (sin(time) * 0.5f + 0.5f) * oscillationRange;
-	item->Pose.Scale.y = centerValue - oscillation;
-	item->Pose.Scale.x = centerValue + oscillation;
-	item->Pose.Scale.z = centerValue + oscillation;
-
-	time += 0.5f;
-	if (time > PI_MUL_2)
-		time -= PI_MUL_2;
-
-	oscillationRange *= 0.96f;
-
-	/*auto delta = AxisMap[(int)InputAxis::Mouse].y;
-	item->Pose.Scale.y = std::max(item->Pose.Scale.y + delta, 0.01f);
-	if (item->Pose.Scale.y != 0.01f)
-	{
-		item->Pose.Scale.x -= delta;
-		item->Pose.Scale.z -= delta;
-	}*/
-
 	// Alert nearby creatures.
 	if (player.Control.Weapon.HasFired)
 	{

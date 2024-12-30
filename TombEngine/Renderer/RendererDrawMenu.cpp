@@ -1313,7 +1313,6 @@ namespace TEN::Renderer
 			PrintDebugMessage("DIMENSION STATS");
 			PrintDebugMessage("Position: %d, %d, %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
 			PrintDebugMessage("Orientation: %d, %d, %d", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
-			PrintDebugMessage("Scale: %.3f, %.3f, %.3f", LaraItem->Pose.Scale.x, LaraItem->Pose.Scale.y, LaraItem->Pose.Scale.z);
 			PrintDebugMessage("RoomNumber: %d", LaraItem->RoomNumber);
 			PrintDebugMessage("PathfindingBoxID: %d", LaraItem->BoxNumber);
 			PrintDebugMessage((Lara.Context.WaterSurfaceDist == -NO_HEIGHT ? "WaterSurfaceDist: N/A" : "WaterSurfaceDist: %d"), Lara.Context.WaterSurfaceDist);
