@@ -151,6 +151,10 @@ The module provides functions to create and manage Diaries.</p>
 	<td class="summary">The function removes a custom diary and its associated data from the system.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#CustomDiary.Status">CustomDiary.Status(value)</a></td>
+	<td class="summary">The function adds the callback to enable diaries in levels.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#CustomDiary:IsVisible">CustomDiary:IsVisible()</a></td>
 	<td class="summary">The function checks whether the specified diary is currently visible.</td>
 	</tr>
@@ -384,6 +388,28 @@ The module provides functions to create and manage Diaries.</p>
 
 </dd>
     <dt>
+    <a name = "CustomDiary.Status"></a>
+    <strong>CustomDiary.Status(value)</strong>
+    </dt>
+    <dd>
+    The function adds the callback to enable diaries in levels.  This needs to be added to every level preferably in the LevelFuncs.OnStart.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">value</span>
+            <span class="types"><span class="type">bool</span></span>
+         True enables the diaries to be activated. False would disable the diaries.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
     <a name = "CustomDiary:IsVisible"></a>
     <strong>CustomDiary:IsVisible()</strong>
     </dt>
@@ -417,7 +443,7 @@ The module provides functions to create and manage Diaries.</p>
     <ul>
         <li><span class="parameter">pageIndex</span>
             <span class="types"><span class="type">int</span></span>
-         (Optional) The page number at which diary should be opened.
+         The page number at which diary should be opened.
         </li>
     </ul>
 

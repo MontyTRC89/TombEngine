@@ -16,6 +16,9 @@
 --	diary:showDiary(3)
 --
 -- @luautil Diary
+
+local Type = require("Engine.Type")
+
 local CustomDiary = {}
 CustomDiary.__index = CustomDiary
 
@@ -27,15 +30,65 @@ GameVars.LastUsedDiary=nil
 -- Imports diary from an external file.
 -- @tparam string fileName Name of file in the script folder without extension to import the diary from.
 function CustomDiary.ImportDiary(fileName)
-    
+
+    if not Type.IsString(fileName) then
+        Util.PrintLog("'fileName' is in an incorrect format. Expected a string type in function 'CustomDiary.ImportDiary' for the diary system.", Util.LogLevel.WARNING)
+        return
+    end
+
     local importDiary = nil
     local diaryObject = nil
-    local diaryUnlock = 1
+    local unlockCount = 1
     local diaryData = require(fileName)
-    
+
     --Create the diary
     for _, entry in ipairs(diaryData) do
         if entry.type == "diary" then
+            if not Type.IsNumber(entry.spriteIdBg) then
+                Util.PrintLog("'spriteIdBg' is not a number. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsColor(entry.colorBg) then
+                Util.PrintLog("'colorBg' is not in a Color format. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsVec2(entry.pos) then
+                Util.PrintLog("'pos' is not a Vec2. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsNumber(entry.rot) then
+                Util.PrintLog("'rot' is not a number. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsVec2(entry.scale) then
+                Util.PrintLog("'scale' is not a Vec2. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsNumber(entry.alpha) or entry.alpha < 0 or entry.alpha > 256 then
+                Util.PrintLog("'alpha' is not a number or not within range (0-255). Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsNumber(entry.pageSound) or entry.pageSound <=0 then
+                Util.PrintLog("'pageSound' is not a valid number. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsNumber(entry.exitSound) or entry.exitSound <=0 then
+                Util.PrintLog("'exitSound' is not a valid number. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsNumber(entry.pagesToUnlock) or entry.pagesToUnlock <=0 then
+                Util.PrintLog("'pagesToUnlock' is not a valid page number. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
             CustomDiary.Create(
                 entry.object,
                 entry.objectIdBg,
@@ -51,8 +104,9 @@ function CustomDiary.ImportDiary(fileName)
                 entry.pageSound,
                 entry.exitSound
             )
+
+            unlockCount = entry.pagesToUnlock
             diaryObject = entry.object
-            diaryUnlock = entry.pagesToUnlock
         end
     end
 
@@ -62,6 +116,37 @@ function CustomDiary.ImportDiary(fileName)
 
     for _, entry in ipairs(diaryData) do
         if entry.type == "background" then
+
+            if not Type.IsNumber(entry.spriteIdBg) then
+                Util.PrintLog("'spriteIdBg' is not a number. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsColor(entry.colorBg) then
+                Util.PrintLog("'colorBg' is not in a Color format. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsVec2(entry.pos) then
+                Util.PrintLog("'pos' is not a Vec2. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsNumber(entry.rot) then
+                Util.PrintLog("'rot' is not a number. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsVec2(entry.scale) then
+                Util.PrintLog("'scale' is not a Vec2. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsNumber(entry.alpha) or entry.alpha < 0 or entry.alpha > 256 then
+                Util.PrintLog("'alpha' is not a number or not within range (0-255). Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
             importDiary:addBackground(
                 entry.objectIdBg,
                 entry.spriteIdBg,
@@ -75,6 +160,43 @@ function CustomDiary.ImportDiary(fileName)
                 entry.alpha
             )
         elseif entry.type == "pageNumbers" then
+
+            if not Type.IsNumber(entry.pageNoType) or entry.pageNoType < 0 or entry.pageNoType > 2 then
+                Util.PrintLog("'pageNoType' is not a a valid option (1 or 2). Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+            if not Type.IsString(entry.prefix) then
+                Util.PrintLog("'prefix' is not a a string. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+            if not Type.IsString(entry.separator) then
+                Util.PrintLog("'separator' is not a a string. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+            if not Type.IsString(entry.separator) then
+                Util.PrintLog("'separator' is not a a string. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+            if not Type.IsVec2(entry.textPos) then
+                Util.PrintLog("'textPos' is not a a Vec2. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsTable(entry.textOptions) then
+                Util.PrintLog("'textOptions' is not a table. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsNumber(entry.textScale) then
+                Util.PrintLog("'textScale' is not a number. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsColor(entry.textColor) then
+                Util.PrintLog("'textColor' is not in a Color format. Error in template data for page numbers entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
             importDiary:customizePageNumbers(
                 entry.pageNoType,
                 entry.prefix,
@@ -85,6 +207,46 @@ function CustomDiary.ImportDiary(fileName)
                 entry.textColor
             )
         elseif entry.type == "controls" then
+            if not Type.IsString(entry.string1) then
+                Util.PrintLog("'string1' is not a string. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+            if not Type.IsString(entry.string2) then
+                Util.PrintLog("'string2' is not a string. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+            if not Type.IsString(entry.string3) then
+                Util.PrintLog("'string3' is not a string. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+            if not Type.IsString(entry.string4) then
+                Util.PrintLog("'string4' is not a string. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+            if not Type.IsString(entry.separator) then
+                Util.PrintLog("'separator' is not a string. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+            if not Type.IsVec2(entry.textPos) then
+                Util.PrintLog("'textPos' is not a Vec2. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsTable(entry.textOptions) then
+                Util.PrintLog("'textOptions' is not a table. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsNumber(entry.textScale) then
+                Util.PrintLog("'textScale' is not a number. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsColor(entry.textColor) then
+                Util.PrintLog("'textColor' is not in a Color format. Error in template data for controls entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
             importDiary:customizeControls(
                 entry.textPos,
                 entry.textOptions,
@@ -97,53 +259,162 @@ function CustomDiary.ImportDiary(fileName)
                 entry.string4,
                 entry.separator)
         elseif entry.type == "notification" then
+            if not Type.IsNumber(entry.notificationTime) or entry.notificationTime <=0 then
+                Util.PrintLog("'notificationTime' is not a valid number. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsNumber(entry.spriteId) then
+                Util.PrintLog("'spriteId' is not a number. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsColor(entry.color) then
+                Util.PrintLog("'color' is not in a Color format. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsVec2(entry.pos) then
+                Util.PrintLog("'pos' is not a Vec2. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsNumber(entry.rot) then
+                Util.PrintLog("'rot' is not a number. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsVec2(entry.scale) then
+                Util.PrintLog("'scale' is not a Vec2. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+            if not Type.IsNumber(entry.notificationSound) or entry.notificationSound <=0 then
+                Util.PrintLog("'notificationSound' is not a valid number. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
             importDiary:customizeNotification(
                 entry.notificationTime,
-                entry.objectId, 
-                entry.spriteId, 
-                entry.color, 
-                entry.pos, 
-                entry.rot, 
-                entry.scale, 
-                entry.alignMode, 
-                entry.scaleMode, 
-                entry.blendMode, 
+                entry.objectId,
+                entry.spriteId,
+                entry.color,
+                entry.pos,
+                entry.rot,
+                entry.scale,
+                entry.alignMode,
+                entry.scaleMode,
+                entry.blendMode,
                 entry.notificationSound
             )
         elseif entry.type == "image" then
+
+            if not Type.IsNumber(entry.pageIndex) or entry.pageIndex <=0 then
+                Util.PrintLog("'pageIndex' is not a valid page number. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsNumber(entry.spriteId) then
+                Util.PrintLog("'spriteId' is not a number. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsColor(entry.color) then
+                Util.PrintLog("'color' is not in a Color format. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsVec2(entry.pos) then
+                Util.PrintLog("'pos' is not a Vec2. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsNumber(entry.rot) then
+                Util.PrintLog("'rot' is not a number. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsVec2(entry.scale) then
+                Util.PrintLog("'scale' is not a Vec2. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
             importDiary:addImageEntry(
-                entry.pageIndex, 
-                entry.objectId, 
-                entry.spriteId, 
-                entry.color, 
+                entry.pageIndex,
+                entry.objectId,
+                entry.spriteId,
+                entry.color,
                 entry.pos,
-                entry.rot, 
+                entry.rot,
                 entry.scale,
                 entry.alignMode,
                 entry.scaleMode,
                 entry.blendMode
             )
         elseif entry.type == "text" then
+
+            if not Type.IsNumber(entry.pageIndex) or entry.pageIndex <=0 then
+                Util.PrintLog("'pageIndex' is not a valid page number. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsString(entry.text) then
+                Util.PrintLog("'text' is not a string. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsVec2(entry.textPos) then
+                Util.PrintLog("'textPos' is not a a Vec2. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsTable(entry.textOptions) then
+                Util.PrintLog("'textOptions' is not a table. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsNumber(entry.textScale) then
+                Util.PrintLog("'textScale' is not a number. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsColor(entry.textColor) then
+                Util.PrintLog("'textColor' is not in a Color format. Error in template data for text entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
             importDiary:addTextEntry(
                 entry.pageIndex,
                 entry.text,
-                entry.textPos, 
+                entry.textPos,
                 entry.textOptions,
                 entry.textScale,
                 entry.textColor
             )
         elseif entry.type == "narration" then
+
+            if not Type.IsNumber(entry.pageIndex) or entry.pageIndex <=0 then
+                Util.PrintLog("'pageIndex' is not a valid page number. Error in template data for narration entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
+            if not Type.IsString(entry.trackName) then
+                Util.PrintLog("'trackName' is not a string. Error in template data for narration entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
+                return
+            end
+
             importDiary:addNarration(
                 entry.pageIndex,
                 entry.trackName
             )
+        elseif entry.type == "diary" then
+        print()
         else
             print("Unknown entry type: " .. tostring(entry.type))
         end
     end
-
-    importDiary:unlockPages(diaryUnlock, false)
-
+    
+    --Unlock the pages as per the template
+    importDiary:unlockPages(unlockCount, false)
     print("External diary from file: "..tostring(fileName).." imported")
 end
 
@@ -178,41 +449,86 @@ CustomDiary.Create = function(object, objectIdBg, spriteIdBg, colorBg, pos, rot,
 	if GameVars.Diaries[dataName] then
 		return setmetatable(self, CustomDiary)
 	end
-	
+
 	GameVars.Diaries[dataName]				        = {}
-	GameVars.Diaries[dataName].Name			        = dataName
-	GameVars.Diaries[dataName].CurrentPageIndex      = 1
-    GameVars.Diaries[dataName].UnlockedPages         = 1
+
+    if Type.IsNumber(spriteIdBg) then
+        GameVars.Diaries[dataName].SpriteIdBg	        = spriteIdBg
+    else
+        Util.PrintLog("'spriteIdBg' is in an incorrect format. Expected a number type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
+        return
+    end
+
+    if Type.IsColor(colorBg) then
+        GameVars.Diaries[dataName].ColorBg		        = colorBg
+    else
+        Util.PrintLog("'colorBg' is in an incorrect format. Expected a Color type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
+        return
+    end
+
+    if Type.IsVec2(pos) then
+        GameVars.Diaries[dataName].Pos			        = pos
+    else
+        Util.PrintLog("'posBg' is in an incorrect format. Expected a Vec2 type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
+        return
+    end
+
+    if Type.IsNumber(rot) then
+        GameVars.Diaries[dataName].Rot			        = rot
+    else
+        Util.PrintLog("'rot' is in an incorrect format. Expected a number type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
+        return
+    end
+
+    if Type.IsVec2(scale) then
+        GameVars.Diaries[dataName].Scale 		        = scale
+    else
+        Util.PrintLog("'scale' is in an incorrect format. Expected a Vec2 type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
+        return
+    end
+
+    if Type.IsNumber(alpha) and alpha>-1 and alpha < 266 then
+        GameVars.Diaries[dataName].Alpha     	        = alpha
+    else
+        Util.PrintLog("'alpha is in an incorrect format. Expected a number (0-255) type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
+        return
+    end
+
+    if Type.IsNumber(pageSound) and pageSound > 0 then
+        GameVars.Diaries[dataName].PageSound	        = pageSound
+    else
+        Util.PrintLog("'pageSound' is in an incorrect format. Expected a number type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
+        return
+    end
+
+    if Type.IsNumber(exitSound) and exitSound > 0 then
+        GameVars.Diaries[dataName].ExitSound            = exitSound
+    else
+        Util.PrintLog("'exitSound' is in an incorrect format. Expected a number type in function 'CustomDiary.Create' for the diary system:.", Util.LogLevel.WARNING)
+        return
+    end
+
+    GameVars.Diaries[dataName].Name			        = dataName
+	GameVars.Diaries[dataName].CurrentPageIndex     = 1
+    GameVars.Diaries[dataName].UnlockedPages        = 1
 	GameVars.Diaries[dataName].Pages  		        = {NarrationTrack=nil,TextEntries={},ImageEntries={}}
 	GameVars.Diaries[dataName].Object		        = object
 	GameVars.Diaries[dataName].ObjectIdBg	        = objectIdBg
-	GameVars.Diaries[dataName].SpriteIdBg	        = spriteIdBg
-	GameVars.Diaries[dataName].ColorBg		        = colorBg
-	GameVars.Diaries[dataName].Pos			        = pos
-	GameVars.Diaries[dataName].Rot			        = rot
-	GameVars.Diaries[dataName].Scale 		        = scale
-	GameVars.Diaries[dataName].AlignMode		        = alignMode
-	GameVars.Diaries[dataName].ScaleMode		        = scaleMode
-	GameVars.Diaries[dataName].BlendMode		        = blendMode
-    GameVars.Diaries[dataName].Alpha     	        = alpha
-	GameVars.Diaries[dataName].PageSound		        = pageSound
-	GameVars.Diaries[dataName].ExitSound		        = exitSound
-    GameVars.Diaries[dataName].PostProcessMode       = View.PostProcessMode.NONE
-	GameVars.Diaries[dataName].PostProcessPower      = 1
-    GameVars.Diaries[dataName].PostProcessColor      = TEN.Color(255,255,255)
+	GameVars.Diaries[dataName].AlignMode            = alignMode
+	GameVars.Diaries[dataName].ScaleMode            = scaleMode
+	GameVars.Diaries[dataName].BlendMode	        = blendMode
     GameVars.Diaries[dataName].CurrentAlpha		    = 0
 	GameVars.Diaries[dataName].TargetAlpha		    = 255
-    GameVars.Diaries[dataName].EntryCurrentAlpha		= 0
-	GameVars.Diaries[dataName].EntryTargetAlpha         = 255
-    GameVars.Diaries[dataName].Visible               = false
-    GameVars.Diaries[dataName].Notification          = {}
-    GameVars.Diaries[dataName].PageNumbers           = {}
-    GameVars.Diaries[dataName].Controls              = {}
-    GameVars.Diaries[dataName].Background            = {}
-    GameVars.Diaries[dataName].AlphaBlendSpeed       = 100
-    GameVars.Diaries[dataName].EntryFadingIn         = true
+    GameVars.Diaries[dataName].EntryCurrentAlpha	= 0
+	GameVars.Diaries[dataName].EntryTargetAlpha     = 255
+    GameVars.Diaries[dataName].Visible              = false
+    GameVars.Diaries[dataName].Notification         = {}
+    GameVars.Diaries[dataName].PageNumbers          = {}
+    GameVars.Diaries[dataName].Controls             = {}
+    GameVars.Diaries[dataName].Background           = {}
+    GameVars.Diaries[dataName].AlphaBlendSpeed      = 100
+    GameVars.Diaries[dataName].EntryFadingIn        = true
 
-	
 	print("CustomDiary Constructed for CustomDiary: " .. dataName)
     return setmetatable(self, CustomDiary)
 end
@@ -240,27 +556,33 @@ CustomDiary.Delete = function (object)
 	end
 end
 
--- The function add the callback to enabl diaries in levels. This needs to be added to every level preferably in the startLevelFuncs.OnStart.
+--- 
+-- The function adds the callback to enable diaries in levels. This needs to be added to every level preferably in the LevelFuncs.OnStart.
 -- 	@bool value True enables the diaries to be activated. False would disable the diaries.
 CustomDiary.Status = function(value)
 
-	if GameVars.Diaries then
-		if value == true then
-			TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.POSTUSEITEM, LevelFuncs.Engine.Diaries.ActivateDiary)
-            print("Diary Started")
-		elseif value == false then
-			TEN.Logic.RemoveCallback(TEN.Logic.CallbackPoint.POSTUSEITEM, LevelFuncs.Engine.Diaries.ActivateDiary)
-            print("Diary Stopped")
-		end
-	end
+    if Type.IsBoolean(value) then
+        if GameVars.Diaries then
+            if value == true then
+                TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.POSTUSEITEM, LevelFuncs.Engine.Diaries.ActivateDiary)
+                print("Diary system started.")
+            elseif value == false then
+                TEN.Logic.RemoveCallback(TEN.Logic.CallbackPoint.POSTUSEITEM, LevelFuncs.Engine.Diaries.ActivateDiary)
+                print("Diary system stopped.")
+            end
+        end
+    else
+        Util.PrintLog("'value' is in an incorrect format. Expected a bool type in function 'CustomDiary.Status' for the diary system", Util.LogLevel.WARNING)
+    end
+
 
 end
 
---- 
+---
 -- The function checks whether the specified diary is currently visible.
 -- @treturn bool true if the diary is visible and false if it is not.
 function CustomDiary:IsVisible()
-    
+
 	if GameVars.Diaries[self.Name] then
 		return GameVars.Diaries[self.Name].Visible
 	end
@@ -268,35 +590,31 @@ end
 
 --- 
 -- The function displays the specified diary. Can be used to call the diary directly using volume or classic triggers.
--- @tparam int pageIndex (Optional) The page number at which diary should be opened.
+-- @tparam int pageIndex The page number at which diary should be opened.
 function CustomDiary:showDiary(pageIndex)
-    
-    pageIndex = pageIndex or 1
 
 	if GameVars.Diaries[self.Name] then
 
 		local object = GameVars.Diaries[self.Name].Object
 
-        if pageIndex > #GameVars.Diaries[self.Name].Pages or pageIndex <=0 then
-            print("Index provided is higher than the page count.")
+        if not Type.IsNumber(pageIndex) or pageIndex > #GameVars.Diaries[self.Name].Pages or pageIndex <=0 then
+            print("'pageIndex' is in an incorrect format or not a valid page number. Expected a number type in function 'showDiary' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
-        --Set the page index if provided otherwise ignore.
-        if pageIndex > 1 then
-            GameVars.Diaries[self.Name].CurrentPageIndex = pageIndex
-            GameVars.Diaries[self.Name].NextPageIndex = pageIndex
-        end
+
+        GameVars.Diaries[self.Name].CurrentPageIndex    = pageIndex
+        GameVars.Diaries[self.Name].NextPageIndex       = pageIndex
+
         LevelFuncs.Engine.Diaries.ActivateDiary(object)
 
 	end
-
 end
 
 --- 
 -- The function returns the number of unlocked pages in the diary.
 -- @treturn int total number of unlocked pages in the diary.
 function CustomDiary:getUnlockedPageCount()
-    
+
 	if GameVars.Diaries[self.Name] then
 		return GameVars.Diaries[self.Name].UnlockedPages
 	end
@@ -311,8 +629,8 @@ end
 function CustomDiary:unlockPages(pageIndex, notification)
     if GameVars.Diaries[self.Name] then
 
-        if pageIndex > #GameVars.Diaries[self.Name].Pages or pageIndex <=0 then
-            print("Index provided is higher than the page count.")
+        if not Type.IsNumber(pageIndex) or pageIndex > #GameVars.Diaries[self.Name].Pages or pageIndex <= 0 then
+            Util.PrintLog("'pageIndex' is in an incorrect format or not a valid page number. Expected a number type in function 'unlockPages' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
 
@@ -336,9 +654,15 @@ end
 -- The function clears the page for the diary.
 -- @tparam int pageIndex The page number to be cleared.
 function CustomDiary:clearPage(pageIndex)
+
+    if not Type.IsNumber(pageIndex) or pageIndex > #GameVars.Diaries[self.Name].Pages or pageIndex <=0 then
+        Util.PrintLog("'pageIndex' is in an incorrect format or not a valid page number. Expected a number type in function 'clearPage' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        return
+    end
+
     if GameVars.Diaries[self.Name] then
         GameVars.Diaries[self.Name].Pages[pageIndex]= {NarrationTrack=nil,TextEntries={},ImageEntries={}}
-        print("Page Cleared")
+        print("Page Cleared: ".. tostring(pageIndex).." for the diary system: "..tostring(self.Name))
     end
 end
 
@@ -351,18 +675,52 @@ end
 -- @tparam number textScale Scale factor for the text.
 -- @tparam Color textColor Color of the text.
 function CustomDiary:addTextEntry(pageIndex, text, textPos, textOptions, textScale, textColor)
-    local textEntry = {
-            text = text,
-            textPos = textPos,
-            textOptions = textOptions,
-            textScale = textScale,
-            textColor = textColor
-        }
+    local textEntry = {}
+
+    if Type.IsString(text) then
+        textEntry.text = text
+    else
+        Util.PrintLog("'text' is in an incorrect format. Expected a string type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        return
+    end
+
+    if Type.IsVec2(textPos) then
+        textEntry.textPos = textPos
+    else
+        Util.PrintLog("'textPos' is in an incorrect format. Expected a Vec2 type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        return
+    end
+
+    if Type.IsTable(textOptions) then
+        textEntry.textOptions = textOptions
+    else
+        Util.PrintLog("'textOptions' is in an incorrect format. Expected a table type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        return
+    end
+
+    if Type.IsNumber(textScale) then
+        textEntry.textScale = textScale
+    else
+        Util.PrintLog("'textScale' is in an incorrect format. Expected a number type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        return
+    end
+
+    if Type.IsColor(textColor) then
+        textEntry.textColor = textColor
+    else
+        Util.PrintLog("'textColor' is in an incorrect format. Expected a Color type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        return
+    end
+
+    if Type.IsNumber(pageIndex) and pageIndex > 0 then
         if not GameVars.Diaries[self.Name].Pages[pageIndex] then
             GameVars.Diaries[self.Name].Pages[pageIndex] = {NarrationTrack=nil, TextEntries = {}, ImageEntries = {}}
         end
         table.insert(GameVars.Diaries[self.Name].Pages[pageIndex].TextEntries, textEntry)
-        print("Text entry added to page: ")
+        print("Text entry added to page: ".. tostring(pageIndex).." for the diary system: "..tostring(self.Name))
+    else
+        Util.PrintLog("'pageIndex' is in an incorrect format. Expected a number type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+    end
 end
 
 ---
@@ -378,22 +736,58 @@ end
 -- @tparam View.ScaleMode scaleMode Scaling for the image entry.
 -- @tparam Effects.BlendID blendMode Blending modes for the image entry.
 function CustomDiary:addImageEntry(pageIndex, objectId, spriteId, color, pos, rot, scale, alignMode, scaleMode, blendMode)
-   local imageEntry = {
-            objectId = objectId,
-            spriteId = spriteId,
-            color = color,
-            pos = pos,
-            rot = rot,
-            scale = scale,
-            alignMode = alignMode,
-            scaleMode = scaleMode,
-            blendMode = blendMode
-        }
+
+    local imageEntry = {}
+
+    if Type.IsNumber(spriteId) then
+        imageEntry.spriteId     = spriteId
+    else
+        Util.PrintLog("'spriteId' is in an incorrect format. Expected a number type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        return
+    end
+
+    if Type.IsColor(color) then
+        imageEntry.color        = color
+    else
+        Util.PrintLog("'color' is in an incorrect format. Expected a Color type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        return
+    end
+
+    if Type.IsVec2(pos) then
+        imageEntry.pos          = pos
+    else
+        Util.PrintLog("'pos' is in an incorrect format. Expected a Vec2 type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        return
+    end
+
+    if Type.IsNumber(rot) then
+        imageEntry.rot          = rot
+    else
+        Util.PrintLog("'rot' is in an incorrect format. Expected a number type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        return
+    end
+
+    if Type.IsVec2(scale) then
+        imageEntry.scale        = scale
+    else
+        Util.PrintLog("'scale' is in an incorrect format. Expected a Vec2 type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        return
+    end
+
+    imageEntry.objectId     = objectId
+    imageEntry.alignMode    = alignMode
+    imageEntry.scaleMode    = scaleMode
+    imageEntry.blendMode    = blendMode
+
+    if Type.IsNumber(pageIndex) and pageIndex > 0 then
         if not GameVars.Diaries[self.Name].Pages[pageIndex] then
             GameVars.Diaries[self.Name].Pages[pageIndex] = {NarrationTrack=nil, TextEntries = {}, ImageEntries = {}}
         end
         table.insert(GameVars.Diaries[self.Name].Pages[pageIndex].ImageEntries, imageEntry)
-        print("Image entry added to page: ")
+        print("Image entry added to page: ".. tostring(pageIndex).." for the diary system: "..tostring(self.Name))
+    else
+        Util.PrintLog("'pageIndex' is in an incorrect format. Expected a number type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+    end
 end
 
 ---
@@ -401,21 +795,40 @@ end
 -- @tparam int pageIndex page number to add the narration track to.
 -- @tparam string trackName of track (without file extension) to play.
 function CustomDiary:addNarration(pageIndex, trackName)
-    if not GameVars.Diaries[self.Name].Pages[pageIndex] then
-        GameVars.Diaries[self.Name].Pages[pageIndex] = {NarrationTrack=nil, TextEntries = {}, ImageEntries = {}}
+
+    if Type.IsNumber(pageIndex) and pageIndex > 0 then
+        if not GameVars.Diaries[self.Name].Pages[pageIndex] then
+            GameVars.Diaries[self.Name].Pages[pageIndex] = {NarrationTrack=nil, TextEntries = {}, ImageEntries = {}}
+        end
+
+        if Type.IsString(trackName) then
+            GameVars.Diaries[self.Name].Pages[pageIndex].NarrationTrack = trackName
+            print("Narration added to page: ".. tostring(pageIndex).." for the diary system: "..tostring(self.Name))
+        else
+            Util.PrintLog("'trackName' is in an incorrect format. Expected a string type in function 'addNarration' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+    else
+        Util.PrintLog("'pageIndex' is in an incorrect format. Expected a number type in function 'addNarration' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
     end
-    GameVars.Diaries[self.Name].Pages[pageIndex].NarrationTrack = trackName
-    print("Narration added to page: ")
+
 end
 
 ---
 -- Remove the narration track from the page of the specified diary.
 -- @tparam int pageIndex page number to remove the narration track from.
 function CustomDiary:removeNarration(pageIndex)
+
+    if not Type.IsNumber(pageIndex) or pageIndex > #GameVars.Diaries[self.Name].Pages or pageIndex <=0 then
+        Util.PrintLog("'pageIndex' is in an incorrect format or not a valid page number. Expected a number type in function 'removeNarration' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        return
+    end
+
     if GameVars.Diaries[self.Name].Pages[pageIndex] then
-		GameVars.Diaries[self.Name].Pages[pageIndex].NarrationTrack = {}
-	end
-    print("Narration added to page: ".. pageIndex)
+        GameVars.Diaries[self.Name].Pages[pageIndex].NarrationTrack = {}
+    end
+        print("Narration removed from the page: ".. tostring(pageIndex).." for the diary system: "..tostring(self.Name))
  end
 
 ---
@@ -432,17 +845,54 @@ function CustomDiary:removeNarration(pageIndex)
 -- @tparam number alpha alpha value for the diary's background (0-255).
 function CustomDiary:addBackground(objectId, spriteId, color, pos, rot, scale, alignMode, scaleMode, blendMode, alpha)
     if GameVars.Diaries[self.Name] then
+
+        if Type.IsNumber(spriteId) then
+            GameVars.Diaries[self.Name].Background.SpriteIdBg	    = spriteId
+        else
+            Util.PrintLog("'spriteId' is in an incorrect format. Expected a number type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        if Type.IsColor(color) then
+            GameVars.Diaries[self.Name].Background.ColorBg		    = color
+        else
+            Util.PrintLog("'color' is in an incorrect format. Expected a Color type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        if Type.IsVec2(pos) then
+            GameVars.Diaries[self.Name].Background.Pos			    = pos
+        else
+            Util.PrintLog("'pos' is in an incorrect format. Expected a Vec2 type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        if Type.IsNumber(rot) then
+            GameVars.Diaries[self.Name].Background.Rot			    = rot
+        else
+            Util.PrintLog("'rot' is in an incorrect format. Expected a number type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        if Type.IsVec2(scale) then
+            GameVars.Diaries[self.Name].Background.Scale            = scale
+        else
+            Util.PrintLog("'scale' is in an incorrect format. Expected a Vec2 type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        if Type.IsNumber(alpha) and alpha>-1 and alpha < 266 then
+            GameVars.Diaries[self.Name].Background.Alpha		        = alpha
+        else
+            Util.PrintLog("'alpha is in an incorrect format. Expected a number (0-255) type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
         GameVars.Diaries[self.Name].Background.ObjectIdBg	    = objectId
-	    GameVars.Diaries[self.Name].Background.SpriteIdBg	    = spriteId
-	    GameVars.Diaries[self.Name].Background.ColorBg		    = color
-	    GameVars.Diaries[self.Name].Background.Pos			    = pos
-	    GameVars.Diaries[self.Name].Background.Rot			    = rot
-	    GameVars.Diaries[self.Name].Background.Scale		        = scale
-	    GameVars.Diaries[self.Name].Background.AlignMode		    = alignMode
-	    GameVars.Diaries[self.Name].Background.ScaleMode		    = scaleMode
+	    GameVars.Diaries[self.Name].Background.AlignMode        = alignMode
+	    GameVars.Diaries[self.Name].Background.ScaleMode        = scaleMode
 	    GameVars.Diaries[self.Name].Background.BlendMode 	    = blendMode
-        GameVars.Diaries[self.Name].Background.Alpha		        = alpha
-        print("Background added to diary: ")
+
+        print("Background added for the diary system: "..tostring(self.Name))
     end
 end
 
@@ -451,8 +901,8 @@ end
 function CustomDiary:clearBackground()
     if GameVars.Diaries[self.Name] then
         GameVars.Diaries[self.Name].Background = {}
-        
-        print("Background cleared")
+
+        print("Background cleared for the diary system: "..tostring(self.Name))
     end
 end
 
@@ -471,20 +921,63 @@ end
 -- @tparam Sound notificationSound Sound to play with notification icon.
 function CustomDiary:customizeNotification(notificationTime, objectId, spriteId, color, pos, rot, scale, alignMode, scaleMode, blendMode, notificationSound)
     if GameVars.Diaries[self.Name] then
-        GameVars.Diaries[self.Name].Notification.ObjectID            = objectId
-        GameVars.Diaries[self.Name].Notification.SpriteID	        = spriteId
-        GameVars.Diaries[self.Name].Notification.Color		        = color
-        GameVars.Diaries[self.Name].Notification.Pos			        = pos
-        GameVars.Diaries[self.Name].Notification.Rot			        = rot
-        GameVars.Diaries[self.Name].Notification.Scale		        = scale
+
+        if Type.IsNumber(spriteId) then
+            GameVars.Diaries[self.Name].Notification.SpriteID	        = spriteId
+        else
+            Util.PrintLog("'spriteId' is in an incorrect format. Expected a number type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        if Type.IsColor(color) then
+            GameVars.Diaries[self.Name].Notification.Color		        = color
+        else
+            Util.PrintLog("'color' is in an incorrect format. Expected a Color type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        if Type.IsVec2(pos) then
+            GameVars.Diaries[self.Name].Notification.Pos			    = pos
+        else
+            Util.PrintLog("'pos' is in an incorrect format. Expected a Vec2 type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        if Type.IsNumber(rot) then
+            GameVars.Diaries[self.Name].Notification.Rot			    = rot
+        else
+            Util.PrintLog("'rot' is in an incorrect format. Expected a number type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        if Type.IsVec2(scale) then
+            GameVars.Diaries[self.Name].Notification.Scale		        = scale
+        else
+            Util.PrintLog("'scale' is in an incorrect format. Expected a Vec2 type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        if Type.IsNumber(notificationSound) and notificationSound > 0 then
+            GameVars.Diaries[self.Name].Notification.NotificationSound	= notificationSound
+        else
+            Util.PrintLog("'notificationSound' is in an incorrect format. Expected a number type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        if Type.IsNumber(notificationTime) and notificationTime > 0 then
+            GameVars.Diaries[self.Name].Notification.NotificationTime    = notificationTime
+        else
+            Util.PrintLog("'notificationTime' is in an incorrect format. Expected a number type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        GameVars.Diaries[self.Name].Notification.ObjectID           = objectId
         GameVars.Diaries[self.Name].Notification.AlignMode		    = alignMode
         GameVars.Diaries[self.Name].Notification.ScaleMode		    = scaleMode
         GameVars.Diaries[self.Name].Notification.BlendMode		    = blendMode
-        GameVars.Diaries[self.Name].Notification.NotificationSound	= notificationSound
-        GameVars.Diaries[self.Name].Notification.NotificationTime    = notificationTime
         GameVars.Diaries[self.Name].Notification.ElapsedTime         = 0
-        
-        print("Notification updated")
+
+        print("Notification updated for the diary system: "..tostring(self.Name))
     end
 end
 
@@ -493,8 +986,8 @@ end
 function CustomDiary:clearNotification()
     if GameVars.Diaries[self.Name] then
         GameVars.Diaries[self.Name].Notification = {}
-        
-        print("Notifications cleared")
+
+        print("Notifications cleared for the diary system: "..tostring(self.Name))
     end
 end
 
@@ -508,25 +1001,68 @@ end
 -- @tparam number textScale Scale factor for the page numbers.
 -- @tparam Color textColor Color of the page numbers.
 function CustomDiary:customizePageNumbers(pageNoType, prefix, separator, textPos, textOptions, textScale, textColor)
-    if GameVars.Diaries[self.Name] and pageNoType >0 and pageNoType <=2 then
-        GameVars.Diaries[self.Name].PageNumbers.pageNoType       = pageNoType
-        GameVars.Diaries[self.Name].PageNumbers.prefix           = prefix 
-        GameVars.Diaries[self.Name].PageNumbers.separator        = separator 
-        GameVars.Diaries[self.Name].PageNumbers.textPos          = textPos
-        GameVars.Diaries[self.Name].PageNumbers.textOptions      = textOptions
-        GameVars.Diaries[self.Name].PageNumbers.textScale		= textScale
-        GameVars.Diaries[self.Name].PageNumbers.textColor		= textColor
-        
-        print("Page Numbers updated")
+
+    if Type.IsNumber(pageNoType) then
+        if GameVars.Diaries[self.Name] and pageNoType >0 and pageNoType <=2 then
+
+            GameVars.Diaries[self.Name].PageNumbers.pageNoType       = pageNoType
+
+            if Type.IsString(prefix) then
+                GameVars.Diaries[self.Name].PageNumbers.prefix           = prefix
+            else
+                Util.PrintLog("'prefix' is in an incorrect format. Expected a string type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+                return
+            end
+
+            if Type.IsString(separator) then
+                GameVars.Diaries[self.Name].PageNumbers.separator        = separator
+            else
+                Util.PrintLog("'separator' is in an incorrect format. Expected a string type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+                return
+            end
+
+            if Type.IsVec2(textPos) then
+                GameVars.Diaries[self.Name].PageNumbers.textPos          = textPos
+            else
+                Util.PrintLog("'textPos' is in an incorrect format. Expected a Vec2 type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+                return
+            end
+
+            if Type.IsTable(textOptions) then
+                GameVars.Diaries[self.Name].PageNumbers.textOptions      = textOptions
+            else
+                Util.PrintLog("'textOptions' is in an incorrect format. Expected a table type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+                return
+            end
+
+            if Type.IsNumber(textScale) then
+                GameVars.Diaries[self.Name].PageNumbers.textScale		= textScale
+            else
+                Util.PrintLog("'textScale' is in an incorrect format. Expected a number type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+                return
+            end
+
+            if Type.IsColor(textColor) then
+                GameVars.Diaries[self.Name].PageNumbers.textColor		= textColor
+            else
+                Util.PrintLog("'textColor' is in an incorrect format. Expected a Color type in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+                return
+            end
+        end
+    else
+        Util.PrintLog("'pageNoType' is in an incorrect format. Expected a number type (1 or 2) in function 'customizePageNumbers' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        return
     end
+    print("Page Numbers updated for the diary system: "..tostring(self.Name))
 end
+
 
 ---
 -- Clears settings for the page numbers for the specified diary.
 function CustomDiary:clearPageNumbers()
     if GameVars.Diaries[self.Name] then
         GameVars.Diaries[self.Name].PageNumbers = nil
-		print("Page Numbers cleared")
+		print("Page Numbers cleared for the diary system: "..tostring(self.Name))
     end
 end
 
@@ -538,17 +1074,39 @@ end
 -- @tparam Color textColor Color of the page controls.
 function CustomDiary:customizeControls(textPos, textOptions, textScale, textColor)
     if GameVars.Diaries[self.Name] then
+        if Type.IsVec2(textPos) then
+            GameVars.Diaries[self.Name].Controls.textPos         = textPos
+        else
+            Util.PrintLog("'textPos' is in an incorrect format. Expected a Vec2 type in function 'customizeControls' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        if Type.IsTable(textOptions) then
+            GameVars.Diaries[self.Name].Controls.textOptions    = textOptions
+        else
+            Util.PrintLog("'textOptions' is in an incorrect format. Expected a table type in function 'customizeControls' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        if Type.IsNumber(textScale) then
+            GameVars.Diaries[self.Name].Controls.textScale        = textScale
+        else
+            Util.PrintLog("'textScale' is in an incorrect format. Expected a number type in function 'customizeControls' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        if Type.IsColor(textColor) then
+            GameVars.Diaries[self.Name].Controls.textColor		= textColor
+        else
+            Util.PrintLog("'textColor' is in an incorrect format. Expected a Color type in function 'customizeControls' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
         GameVars.Diaries[self.Name].Controls.text1           = "Space: Play Voice Note"
-        GameVars.Diaries[self.Name].Controls.text2           = "Left Key: Previous Page" 
+        GameVars.Diaries[self.Name].Controls.text2           = "Left Key: Previous Page"
         GameVars.Diaries[self.Name].Controls.text3           = "Right Key: Next Page"
         GameVars.Diaries[self.Name].Controls.text4           = "Esc: Back"
         GameVars.Diaries[self.Name].Controls.separator       = "|"
-        GameVars.Diaries[self.Name].Controls.textPos         = textPos
-        GameVars.Diaries[self.Name].Controls.textOptions     = textOptions
-        GameVars.Diaries[self.Name].Controls.textScale		= textScale
-        GameVars.Diaries[self.Name].Controls.textColor		= textColor
-        
-        print("Controls updated")
+        print("Controls updated for the diary system: "..tostring(self.Name))
     end
 end
 
@@ -561,12 +1119,42 @@ end
 -- @tparam string separator Text for separator between controls text.
 function CustomDiary:customizeControlsText(string1, string2, string3, string4, separator)
     if GameVars.Diaries[self.Name] then
-        GameVars.Diaries[self.Name].Controls.text1           = string1
-        GameVars.Diaries[self.Name].Controls.text2           = string2
-        GameVars.Diaries[self.Name].Controls.text3           = string3
-        GameVars.Diaries[self.Name].Controls.text4           = string4
-        GameVars.Diaries[self.Name].Controls.separator       = separator
-        print("Controls text updated")
+
+        if Type.IsString(string1) then
+            GameVars.Diaries[self.Name].Controls.text1           = string1
+        else
+            Util.PrintLog("'string1' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        if Type.IsString(string2) then
+            GameVars.Diaries[self.Name].Controls.text2           = string2
+        else
+            Util.PrintLog("'string2' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        if Type.IsString(string3) then
+            GameVars.Diaries[self.Name].Controls.text3           = string3
+        else
+            Util.PrintLog("'string3' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        if Type.IsString(string4) then
+            GameVars.Diaries[self.Name].Controls.text4           = string4
+        else
+            Util.PrintLog("'string4' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+
+        if Type.IsString(separator) then
+            GameVars.Diaries[self.Name].Controls.separator       = separator
+            print("Controls text updated")
+        else
+            Util.PrintLog("'separator' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
     end
 end
 
@@ -576,8 +1164,8 @@ end
 function CustomDiary:clearControls()
     if GameVars.Diaries[self.Name] then
         GameVars.Diaries[self.Name].Controls ={}
-        
-        print("Controls cleared")
+
+        print("Controls cleared for the diary system: "..tostring(self.Name))
     end
 end
 
@@ -588,15 +1176,15 @@ LevelFuncs.Engine.Diaries.ShowDiary = function()
 	local dataName = objectNumber .. "_diarydata"
 
     if GameVars.Diaries[dataName] then
-        
+
         local diary             = GameVars.Diaries[dataName]
         local currentIndex      = diary.CurrentPageIndex
         local maxPages          = diary.UnlockedPages
         local narrationTrack    = diary.Pages[currentIndex].NarrationTrack
-        local alphaDelta        = diary.AlphaBlendSpeed 
-        
+        local alphaDelta        = diary.AlphaBlendSpeed
+
         if diary.CurrentAlpha ~= diary.TargetAlpha then
-            
+
             if diary.CurrentAlpha < diary.TargetAlpha then
                 diary.CurrentAlpha = math.floor(math.min(diary.CurrentAlpha + alphaDelta, diary.TargetAlpha))
             else
@@ -645,7 +1233,7 @@ LevelFuncs.Engine.Diaries.ShowDiary = function()
                     diary.NextPageIndex = math.min(maxPages, currentIndex + 1)
                     StopAudioTrack(Sound.SoundTrackType.VOICE)
                     PlaySound(diary.PageSound)
-                end            
+                end
         elseif KeyIsHit(ActionID.INVENTORY) then
             PlaySound(diary.ExitSound)
             diary.TargetAlpha = 0
@@ -759,7 +1347,7 @@ end
 
 -- !Ignore
 LevelFuncs.Engine.Diaries.ActivateDiary = function(objectNumber)
-	
+
     local dataName = objectNumber .. "_diarydata"
 
 	if GameVars.Diaries[dataName] then
@@ -777,12 +1365,12 @@ end
 LevelFuncs.Engine.Diaries.ShowNotification = function(dt)
 
     local dataName = GameVars.LastUsedDiary .. "_diarydata"
-  
+
     if GameVars.Diaries[dataName] then
         local diary = GameVars.Diaries[dataName]
-       
+
         if diary.CurrentAlpha ~= diary.TargetAlpha then
-            
+
             if diary.CurrentAlpha < diary.TargetAlpha then
                 diary.CurrentAlpha = math.floor(math.min(diary.CurrentAlpha + diary.AlphaBlendSpeed, diary.TargetAlpha))
             else
@@ -792,7 +1380,7 @@ LevelFuncs.Engine.Diaries.ShowNotification = function(dt)
         end
 
         GameVars.Diaries[dataName].Notification.ElapsedTime  = GameVars.Diaries[dataName].Notification.ElapsedTime + dt
-        
+
         if GameVars.Diaries[dataName].Notification.ElapsedTime <= GameVars.Diaries[dataName].Notification.NotificationTime then
             diary.TargetAlpha = 255
         else
@@ -813,9 +1401,9 @@ end
 
 -- !Ignore
 LevelFuncs.Engine.Diaries.PrepareNotification = function()
-	
+
 	local dataName = GameVars.LastUsedDiary .. "_diarydata"
-	
+
     if GameVars.Diaries[dataName] then
 
         local diary = GameVars.Diaries[dataName]
