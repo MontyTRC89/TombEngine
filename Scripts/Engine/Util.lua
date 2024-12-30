@@ -191,7 +191,7 @@ Utility.GenerateTimeFormattedString = function (time, timerFormat)
     end
 
     local formattedString = table.concat(result, ":")
-    
+
     if timerFormat.deciseconds then
         local deciseconds = string.sub(string.format("%02d", time.c), 1, -2)
         if index == 1 then
