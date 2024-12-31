@@ -18,7 +18,7 @@ local Type= require("Engine.Type")
 --
 -- 1 : If operand is different from the reference
 --
--- 2 : If operand is less the value
+-- 2 : If operand is less the reference
 --
 -- 3 : If operand is less or equal to the reference
 --
