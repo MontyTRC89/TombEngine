@@ -97,7 +97,7 @@ namespace TEN::Effects::WaterfallEmitter
             vel.y = Random::GenerateFloat(0.0f, 16.0f);
 
             part.on = true;
-            part.SpriteSeqID = ID_WATERFALL;
+            part.SpriteSeqID = ID_WATERFALL_SPRITES;
             part.SpriteID = Random::TestProbability(1 / 2.2f) ? WATERFALL_STREAM_2_SPRITE_ID : WATERFALL_SPLASH_SPRITE_ID;
             part.x = pos.x;
             part.y = pos.y;
@@ -171,7 +171,7 @@ namespace TEN::Effects::WaterfallEmitter
 		auto startColor = (Vector3i(color.x, color.y, color.z) + colorOffset);
 		auto endColor = (Vector3i(color.x, color.y, color.z) + colorOffset);
 
-		part.SpriteSeqID = ID_WATERFALL;
+		part.SpriteSeqID = ID_WATERFALL_SPRITES;
 		part.SpriteID = Random::TestProbability(1 / 2.0f) ? WATERFALL_STREAM_2_SPRITE_ID : WATERFALL_STREAM_1_SPRITE_ID;
 
 		part.on = true;
@@ -221,7 +221,7 @@ namespace TEN::Effects::WaterfallEmitter
 
 	bool HandleWaterfallParticle(Particle& particle)
 	{
-		if (particle.SpriteSeqID != ID_WATERFALL)
+		if (particle.SpriteSeqID != ID_WATERFALL_SPRITES)
 			return false;
 			
 		if (particle.y < particle.targetPos.y)
