@@ -162,11 +162,11 @@ end
 --	local str = TEN.Strings.DisplayString("Timer: " .. text, pos)
 --	TEN.Strings.ShowString(str, 1)
 Utility.GenerateTimeFormattedString = function (time, timerFormat)
-    if not Type.IsTime(time) then
-        TEN.Util.PrintLog("Error in Utility.GenerateTimeFormattedString() function: invalid time", TEN.Util.LogLevel.ERROR)
-        return ""
-    end
-    timerFormat = Utility.CheckTimeFormat(timerFormat)
+	if not Type.IsTime(time) then
+		TEN.Util.PrintLog("Error in Utility.GenerateTimeFormattedString() function: invalid time", TEN.Util.LogLevel.ERROR)
+		return ""
+	end
+	timerFormat = Utility.CheckTimeFormat(timerFormat)
 
 	if not timerFormat then
 		return ""
@@ -174,24 +174,24 @@ Utility.GenerateTimeFormattedString = function (time, timerFormat)
 		local result = {}
 		local index = 1
 		if timerFormat.hours then
-        	result[index] = string.format("%02d", time.h)
-        	index = index + 1
-    	end
-    	if timerFormat.minutes then
-        	result[index] = string.format("%02d", timerFormat.hours and time.m or (time.m + (60 * time.h)))
-        	index = index + 1
-    	end
-    	if timerFormat.seconds then
-        	result[index] = string.format("%02d", timerFormat.minutes and time.s or (time.s + (60 * time.m)))
-        	index = index + 1
-    	end
-	local formattedString = table.concat(result, ":")
+			result[index] = string.format("%02d", time.h)
+			index = index + 1
+		end
+		if timerFormat.minutes then
+			result[index] = string.format("%02d", timerFormat.hours and time.m or (time.m + (60 * time.h)))
+			index = index + 1
+		end
+		if timerFormat.seconds then
+			result[index] = string.format("%02d", timerFormat.minutes and time.s or (time.s + (60 * time.m)))
+			index = index + 1
+		end
+		local formattedString = table.concat(result, ":")
 
-    	if timerFormat.deciseconds then
-        	local deciseconds = string.sub(string.format("%02d", time.c), 1, -2)
-		return (index == 1) and deciseconds or formattedString .. "." .. deciseconds
-    	end
-    	return formattedString
+		if timerFormat.deciseconds then
+			local deciseconds = string.sub(string.format("%02d", time.c), 1, -2)
+			return (index == 1) and deciseconds or formattedString .. "." .. deciseconds
+		end
+		return formattedString
 	end
 end
 
