@@ -115,24 +115,20 @@ end
 
 -- Helper function to check time format for timer and stopwatch.
 Utility.CheckTimeFormat = function (timerFormat)
-	local set = false
-
 	if Type.IsTable(timerFormat) then
         local validKeys = {hours = true, minutes = true, seconds = true, deciseconds = true}
         for k, v in pairs(timerFormat) do
         	if not validKeys[k] or type(v) ~= "boolean" then
-				TEN.Util.PrintLog("Warning: Incorrect time format ", Util.LogLevel.ERROR)
+				TEN.Util.PrintLog("Warning: Incorrect time format ", TEN.Util.LogLevel.ERROR)
 				return false
 			end
         end
-		set = timerFormat
+		return timerFormat
 	elseif Type.IsBoolean(timerFormat) then
-		set = timerFormat and {seconds = true} or false
-	else
-		TEN.Util.PrintLog("Warning: Incorrect time format ", Util.LogLevel.ERROR)
+		return timerFormat and {seconds = true} or timerFormat
 	end
-
-    return set
+	TEN.Util.PrintLog("Warning: Incorrect time format ", TEN.Util.LogLevel.ERROR)
+	return false
 end
 
 --- Generate time formatted string for Timer object
@@ -171,40 +167,36 @@ Utility.GenerateTimeFormattedString = function (time, timerFormat)
         return ""
     end
     timerFormat = Utility.CheckTimeFormat(timerFormat)
-    if timerFormat == false then
-        return ""
-    end
-	local result = {}
-    local index = 1
 
-    if timerFormat.hours then
-        result[index] = string.format("%02d", time.h)
-        index = index + 1
-    end
-    if timerFormat.minutes then
-        result[index] = string.format("%02d", timerFormat.hours and time.m or (time.m + (60 * time.h)))
-        index = index + 1
-    end
-    if timerFormat.seconds then
-        result[index] = string.format("%02d", timerFormat.minutes and time.s or (time.s + (60 * time.m)))
-        index = index + 1
-    end
+	if not timerFormat then
+		return ""
+	else
+		local result = {}
+		local index = 1
+		if timerFormat.hours then
+        	result[index] = string.format("%02d", time.h)
+        	index = index + 1
+    	end
+    	if timerFormat.minutes then
+        	result[index] = string.format("%02d", timerFormat.hours and time.m or (time.m + (60 * time.h)))
+        	index = index + 1
+    	end
+    	if timerFormat.seconds then
+        	result[index] = string.format("%02d", timerFormat.minutes and time.s or (time.s + (60 * time.m)))
+        	index = index + 1
+    	end
+		local formattedString = table.concat(result, ":")
 
-    local formattedString = table.concat(result, ":")
-
-    if timerFormat.deciseconds then
-        local deciseconds = string.sub(string.format("%02d", time.c), 1, -2)
-        if index == 1 then
-            return deciseconds
-        end
-        return  formattedString .. "." .. deciseconds
-    end
-
-    return formattedString
+    	if timerFormat.deciseconds then
+        	local deciseconds = string.sub(string.format("%02d", time.c), 1, -2)
+			return (index == 1) and deciseconds or formattedString .. "." .. deciseconds
+    	end
+    	return formattedString
+	end
 end
 
 Utility.ShortenTENCalls = function()
-	print("Util.ShortenTENCalls is deprecated; its functionality is now performed automatically by TombEngine.")
+	TEN.Util.PrintLog("Util.ShortenTENCalls is deprecated; its functionality is now performed automatically by TombEngine.", TEN.Util.LogLevel.INFO)
 end
 
 return Utility
