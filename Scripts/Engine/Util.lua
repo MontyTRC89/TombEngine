@@ -185,7 +185,7 @@ Utility.GenerateTimeFormattedString = function (time, timerFormat)
         	result[index] = string.format("%02d", timerFormat.minutes and time.s or (time.s + (60 * time.m)))
         	index = index + 1
     	end
-		local formattedString = table.concat(result, ":")
+	local formattedString = table.concat(result, ":")
 
     	if timerFormat.deciseconds then
         	local deciseconds = string.sub(string.format("%02d", time.c), 1, -2)
