@@ -189,7 +189,7 @@ Utility.GenerateTimeFormattedString = function (time, timerFormat)
 
     	if timerFormat.deciseconds then
         	local deciseconds = string.sub(string.format("%02d", time.c), 1, -2)
-			return (index == 1) and deciseconds or formattedString .. "." .. deciseconds
+		return (index == 1) and deciseconds or formattedString .. "." .. deciseconds
     	end
     	return formattedString
 	end
