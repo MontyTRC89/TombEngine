@@ -465,7 +465,7 @@ void StartServiceObjects(ObjectInfo* object)
 		object->usingDrawAnimatingItem = false;
 	}
 
-	object = &Objects[ID_WATERFALL_MIST];
+	object = &Objects[ID_WATERFALLMIST];
 	if (object->loaded)
 	{
 		object->control = ControlWaterfallMist;
