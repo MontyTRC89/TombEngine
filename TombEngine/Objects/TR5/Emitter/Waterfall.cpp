@@ -8,12 +8,12 @@
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Utils/object_helper.h"
-#include "Renderer/Renderer.h"
 #include "Specific/clock.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Math;
-using TEN::Renderer::g_Renderer;
+
+constexpr int WATERFALL_SPRITE_SIZE = 62;
 
 // NOTES
 // item.TriggetFlags: Waterfall width. 1 unit = BLOCK(1 / 8.0f).
@@ -217,5 +217,29 @@ namespace TEN::Effects::WaterfallEmitter
 		part.dSize = size1;
 
 		part.flags = SP_SCALE | SP_DEF | SP_ROTATE;
+	}
+
+	bool HandleWaterfallParticle(Particle& particle)
+	{
+		if (particle.SpriteSeqID != ID_WATERFALL)
+			return false;
+			
+		if (particle.y < particle.targetPos.y)
+			return false;
+
+		particle.targetPos.y = particle.y - 80;
+		particle.targetPos.x = particle.x;
+		particle.targetPos.z = particle.z;
+
+		if (particle.fxObj != NO_VALUE)
+		{
+			auto& item = g_Level.Items[particle.fxObj];
+			if (Random::TestProbability(1.0f / 2.0f))
+				SpawnWaterfallMist(particle.targetPos, particle.roomNumber, item.ItemFlags[3], WATERFALL_SPRITE_SIZE, Color(particle.sR, particle.sG, particle.sB));
+		}
+
+		particle.life = 0;
+		particle.on = false;
+		return true;
 	}
 }

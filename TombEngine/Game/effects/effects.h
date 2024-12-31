@@ -123,13 +123,14 @@ struct Particle
 	bool on;
 
 	GAME_OBJECT_ID SpriteSeqID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
-	int			   SpriteID	   = 0;
-	int			   fxObj;
+	int	SpriteID = 0;
+	int	fxObj;
 
 	int x;
 	int y;
 	int z;
 	int roomNumber;
+	Vector3 targetPos;
 
 	short xVel;
 	short yVel;
@@ -169,7 +170,6 @@ struct Particle
 	unsigned char extras;
 	signed char dynamic;
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
-	Vector3 targetPos;
 
 	int PrevX;
 	int PrevY;

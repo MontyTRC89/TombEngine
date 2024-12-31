@@ -1156,7 +1156,8 @@ const std::vector<byte> SaveGame::Build()
 		particleInfo.add_b(particle->b);
 		particleInfo.add_col_fade_speed(particle->colFadeSpeed);
 		particleInfo.add_d_b(particle->dB);
-		particleInfo.add_sprite_index(particle->SpriteSeqID); // TODO: Save SpriteID.
+		particleInfo.add_sprite_index(particle->SpriteSeqID);
+		particleInfo.add_sprite_id(particle->SpriteID);
 		particleInfo.add_d_g(particle->dG);
 		particleInfo.add_d_r(particle->dR);
 		particleInfo.add_d_size(particle->dSize);
@@ -1191,7 +1192,6 @@ const std::vector<byte> SaveGame::Build()
 		particleInfo.add_z(particle->z);
 		particleInfo.add_z_vel(particle->zVel);
 		particleInfo.add_target_pos(&FromVector3(particle->targetPos));
-		particleInfo.add_sprite_id(particle->SpriteID);
 
 		particles.push_back(particleInfo.Finish());
 	}
@@ -2203,7 +2203,8 @@ static void ParseEffects(const Save::SaveGame* s)
 		particle->size = particleInfo->size();
 		particle->friction = particleInfo->friction();
 		particle->scalar = particleInfo->scalar();
-		particle->SpriteSeqID = (GAME_OBJECT_ID)particleInfo->sprite_index(); // TODO: Save SpriteID.
+		particle->SpriteSeqID = (GAME_OBJECT_ID)particleInfo->sprite_index();
+		particle->SpriteID = particleInfo->sprite_id();
 		particle->rotAdd = particleInfo->rot_add();
 		particle->maxYvel = particleInfo->max_y_vel();
 		particle->on = particleInfo->on();
@@ -2227,7 +2228,6 @@ static void ParseEffects(const Save::SaveGame* s)
 		particle->roomNumber = particleInfo->room_number();
 		particle->nodeNumber = particleInfo->node_number();
 		particle->targetPos = ToVector3(particleInfo->target_pos());
-		particle->SpriteID = particleInfo->sprite_id();
 	}
 
 	for (int i = 0; i < s->bats()->size(); i++)
