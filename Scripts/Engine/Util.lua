@@ -70,15 +70,15 @@ Utility.Lerp = function(val1, val2, factor)
 end
 
 --- Counts the number of elements in a table. Nil values are not counted
--- @tparam table table table to be examined
+-- @tparam table _table table to be examined
 -- @treturn int the length of the table
-Utility.TableLength = function (table)
-	if not Type.IsTable(table) then
+Utility.TableLength = function (_table)
+	if not Type.IsTable(_table) then
 		TEN.Util.PrintLog("Error in Utility.TableLength() function: invalid table", TEN.Util.LogLevel.ERROR)
 		return 0
 	end
 	local count = 0
-	for _ in pairs(table) do count = count + 1 end
+	for _ in pairs(_table) do count = count + 1 end
 	return count
 end
 
@@ -133,7 +133,7 @@ end
 
 --- Generate time formatted string for Timer object
 -- @tparam Time time time in game frames
--- @tparam ?table|bool timerFormat the string to be split. If a table is given, the remaining time will be shown as a string, formatted according to the values in the table. If true, the only seconds
+-- @tparam ?table|bool timerFormat If a table is given, the time will be shown as a string, formatted according to the values in the table. If true, only seconds will be displayed
 --@advancedDesc
 -- Examples of timerFormat:
 --		-- hours:mins:secs.decisecs
@@ -149,7 +149,7 @@ end
 --		local myTimeFormat3 = {seconds = true, deciseconds = true}
 --		
 --		-- secs
---		local myTimeFormat4 = {seconds = true}
+--		local myTimeFormat4 = true
 -- @treturn string the formatted time
 -- @usage
 --  -- Example:

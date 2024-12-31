@@ -90,6 +90,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added extra argument for Sound.SetAmbientTrack() function to specify if new ambient track should play from the beginning.
 * Added new View.CameraType enum entries and return it by View.GetCameraType(), when flyby camera or binoculars/lasersight is active.
 * Added new primitive Time class, which allows to manipulate and format game time without precision loss.
+* Added support functions in the Utility module (Util)
 * Renamed Flow.WeaponType enumeration to Objects.WeaponType, and removed similar Objects.LaraWeaponType enumeration for consistency.
 * Renamed Objects.PlayerAmmoType to Objects.AmmoType for consistency.
 * Fixed Strings.DisplayString class not supporting some Unicode characters and empty lines in multiline strings.
