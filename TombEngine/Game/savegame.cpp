@@ -89,97 +89,89 @@ void SaveGame::LoadHeaders()
 	}
 }
 
-Save::Pose FromPose(const Pose& pose)
-{
-	return Save::Pose(
-		pose.Position.x,
-		pose.Position.y,
-		pose.Position.z,
-		pose.Orientation.x,
-		pose.Orientation.y,
-		pose.Orientation.z);
-}
-
-Save::EulerAngles FromEulerAngles(const EulerAngles& eulers)
+static Save::EulerAngles FromEulerAngles(const EulerAngles& eulers)
 {
 	return Save::EulerAngles(eulers.x, eulers.y, eulers.z);
 }
 
-Save::Vector2 FromVector2(const Vector2& vec)
+static Save::Vector2 FromVector2(const Vector2& vec)
 {
 	return Save::Vector2(vec.x, vec.y);
 }
 
-Save::Vector2 FromVector2i(const Vector2i& vec)
+static Save::Vector2 FromVector2i(const Vector2i& vec)
 {
 	return Save::Vector2(vec.x, vec.y);
 }
 
-Save::Vector3 FromVector3(const Vector3& vec)
+static Save::Vector3 FromVector3(const Vector3& vec)
 {
 	return Save::Vector3(vec.x, vec.y, vec.z);
 }
 
-Save::Vector3 FromVector3i(const Vector3i& vec)
+static Save::Vector3 FromVector3i(const Vector3i& vec)
 {
 	return Save::Vector3(vec.x, vec.y, vec.z);
 }
 
-Save::Vector4 FromVector4(const Vector4& vec)
+static Save::Vector4 FromVector4(const Vector4& vec)
 {
 	return Save::Vector4(vec.x, vec.y, vec.z, vec.w);
 }
 
-Save::GameVector FromGameVector(const GameVector& vec)
+static Save::GameVector FromGameVector(const GameVector& vec)
 {
 	return Save::GameVector(vec.x, vec.y, vec.z, (int)vec.RoomNumber);
 }
 
-Pose ToPose(const Save::Pose& pose)
+static Save::Pose FromPose(const Pose& pose)
 {
-	return Pose(
-		pose.x_pos(), pose.y_pos(), pose.z_pos(),
-		(short)pose.x_rot(), (short)pose.y_rot(), (short)pose.z_rot());
+	return Save::Pose(FromVector3i(pose.Position), FromEulerAngles(pose.Orientation), FromVector3(pose.Scale));
 }
 
-EulerAngles ToEulerAngles(const Save::EulerAngles* eulers)
+static EulerAngles ToEulerAngles(const Save::EulerAngles* eulers)
 {
 	return EulerAngles((short)round(eulers->x()), (short)round(eulers->y()), (short)round(eulers->z()));
 }
 
-Vector2 ToVector2(const Save::Vector2* vec)
+static Vector2 ToVector2(const Save::Vector2* vec)
 {
 	return Vector2(vec->x(), vec->y());
 }
 
-Vector2i ToVector2i(const Save::Vector2* vec)
+static Vector2i ToVector2i(const Save::Vector2* vec)
 {
 	return Vector2i((int)round(vec->x()), (int)round(vec->y()));
 }
 
-Vector3i ToVector3i(const Save::Vector3* vec)
+static Vector3i ToVector3i(const Save::Vector3* vec)
 {
 	return Vector3i((int)round(vec->x()), (int)round(vec->y()), (int)round(vec->z()));
 }
 
-Vector3 ToVector3(const Save::Vector3* vec)
+static Vector3 ToVector3(const Save::Vector3* vec)
 {
 	return Vector3(vec->x(), vec->y(), vec->z());
 }
 
-Vector4 ToVector4(const Save::Vector3* vec)
+static Vector4 ToVector4(const Save::Vector3* vec)
 {
 	return Vector4(vec->x(), vec->y(), vec->z(), 1.0f);
 }
 
-Vector4 ToVector4(const Save::Vector4* vec)
+static Vector4 ToVector4(const Save::Vector4* vec)
 {
 	return Vector4(vec->x(), vec->y(), vec->z(), vec->w());
 }
 
-GameVector ToGameVector(const Save::GameVector* vec)
+static GameVector ToGameVector(const Save::GameVector* vec)
 {
 	return GameVector(vec->x(), vec->y(), vec->z(), (short)vec->room_number());
+}
+
+static Pose ToPose(const Save::Pose& pose)
+{
+	return Pose(ToVector3i(&pose.position()), ToEulerAngles(&pose.orientation()), ToVector3(&pose.scale()));
 }
 
 bool SaveGame::IsSaveGameSlotValid(int slot)

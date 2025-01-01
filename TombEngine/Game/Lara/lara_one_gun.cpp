@@ -1084,7 +1084,7 @@ void FireCrossbow(ItemInfo& laraItem, const std::optional<Pose>& pose)
 void FireCrossBowFromLaserSight(ItemInfo& laraItem, GameVector* origin, GameVector* target)
 {
 	auto orient = Geometry::GetOrientToPoint(origin->ToVector3(), target->ToVector3());
-	auto boltPose = Pose(origin->x, origin->y, origin->z, orient);
+	auto boltPose = Pose(origin->ToVector3i(), orient);
 	FireCrossbow(laraItem, boltPose);
 }
 
@@ -1584,7 +1584,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 				continue;
 
 			TriggerExplosionSparks(staticPtr->pos.Position.x, staticPtr->pos.Position.y, staticPtr->pos.Position.z, 3, -2, 0, projectile.RoomNumber);
-			auto pose = Pose(staticPtr->pos.Position.x, staticPtr->pos.Position.y - 128, staticPtr->pos.Position.z, 0, staticPtr->pos.Orientation.y, 0);
+			auto pose = Pose(Vector3i(staticPtr->pos.Position.x, staticPtr->pos.Position.y - 128, staticPtr->pos.Position.z), EulerAngles(0, staticPtr->pos.Orientation.y, 0));
 			TriggerShockwave(&pose, 40, 176, 64, 0, 96, 128, 16, EulerAngles::Identity, 0, true, false, false, (int)ShockwaveStyle::Normal);
 		}
 
