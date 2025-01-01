@@ -5,10 +5,10 @@
 #include "Renderer/Structures/RendererShader.h"
 #include "Specific/configuration.h"
 #include "Specific/trutils.h"
-#include "version.h"
+#include "Version.h"
 
-using namespace TEN::Utils;
 using namespace TEN::Renderer::Structures;
+using namespace TEN::Utils;
 
 namespace TEN::Renderer::Utils
 {
