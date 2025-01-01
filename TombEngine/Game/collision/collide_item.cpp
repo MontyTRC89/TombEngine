@@ -331,9 +331,27 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 
 bool TestLaraPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, ItemInfo* laraItem)
 {
+	constexpr auto DEBUG_BOX_COLOR = Color(1.0f, 0.0f, 0.0f);
+
+	// Draw oriented debug interaction box.
 	if (DebugMode)
 	{
-		DrawDebugBox(bounds.BoundingBox.ToBoundingOrientedBox(item->Pose), Color(1.0f, 0.0f, 0.0f), RendererDebugPage::CollisionStats);
+		auto obb = bounds.BoundingBox.ToBoundingOrientedBox(item->Pose);
+		auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
+
+		DrawDebugBox(obb, DEBUG_BOX_COLOR, RendererDebugPage::CollisionStats);
+		DrawDebugLine(
+			obb.Center + Vector3::Transform(Vector3(0.0f, -obb.Extents.y, 0.0f), rotMatrix),
+			obb.Center + Vector3::Transform(Vector3(0.0f, -obb.Extents.y, obb.Extents.z), rotMatrix),
+			DEBUG_BOX_COLOR, RendererDebugPage::CollisionStats);
+		DrawDebugLine(
+			obb.Center + Vector3::Transform(Vector3(0.0f, -obb.Extents.y, obb.Extents.z), rotMatrix),
+			obb.Center + Vector3::Transform(Vector3(0.0f, obb.Extents.y, obb.Extents.z), rotMatrix),
+			DEBUG_BOX_COLOR, RendererDebugPage::CollisionStats);
+		DrawDebugLine(
+			obb.Center + Vector3::Transform(Vector3(0.0f, obb.Extents.y, 0.0f), rotMatrix),
+			obb.Center + Vector3::Transform(Vector3(0.0f, obb.Extents.y, obb.Extents.z), rotMatrix),
+			DEBUG_BOX_COLOR, RendererDebugPage::CollisionStats);
 	}
 
 	auto deltaOrient = laraItem->Pose.Orientation - item->Pose.Orientation;
