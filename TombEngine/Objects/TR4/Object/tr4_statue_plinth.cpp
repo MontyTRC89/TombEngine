@@ -28,7 +28,7 @@ using namespace TEN::Debug;
 
 namespace TEN::Entities::TR4
 {
-	const auto KeyHolePosition = Vector3i(0, 0, -310);
+	const auto KeyHolePosition = Vector3i(0, 0, -390);
 	const ObjectCollisionBounds KeyHoleBounds =
 	{
 		GameBoundingBox(
@@ -45,12 +45,11 @@ namespace TEN::Entities::TR4
 		auto* item = &g_Level.Items[itemNumber];
 
 		// Hide the mesh 1 
-		item->MeshBits = 1;
+		//item->MeshBits = 1;
 	}
 
-	//TODO ocb for puzzle item
 	//TODO frame hardcore or check how puzzle items do
-	//TODO Switch actions
+	//TODO Switch actions - Will not work as the object will rotate to face lara and break the illusion.
 
 	void StatuePlinthCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
@@ -58,7 +57,7 @@ namespace TEN::Entities::TR4
 		auto* player = GetLaraInfo(laraItem);
 
 		short* triggerIndexPtr = GetTriggerIndex(keyHoleItem);
-		short y_rot;
+		short y_rot = keyHoleItem->Pose.Orientation.y;
 
 		GAME_OBJECT_ID keyItem;
 
@@ -87,8 +86,6 @@ namespace TEN::Entities::TR4
 
 		if (actionActive || (isActionReady && isPlayerAvailable))
 		{	
-			y_rot = keyHoleItem->Pose.Orientation.y;
-
 			int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
 			keyHoleItem->DisableInterpolation = true;
 			switch (quadrant)
@@ -118,6 +115,7 @@ namespace TEN::Entities::TR4
 				if (!player->Control.IsMoving)
 				{
 					if (keyHoleItem->Status != ITEM_NOT_ACTIVE && triggerType != TRIGGER_TYPES::SWITCH)
+						keyHoleItem->Pose.Orientation.y = y_rot;
 						return;
 
 					if (g_Gui.GetInventoryItemChosen() == NO_VALUE)
@@ -139,6 +137,8 @@ namespace TEN::Entities::TR4
 
 				if (MoveLaraPosition(KeyHolePosition, keyHoleItem, laraItem))
 				{
+					keyHoleItem->Pose.Orientation.y = y_rot;
+
 					if (triggerType = TRIGGER_TYPES::SWITCH)
 						keyHoleItem->ItemFlags[1] = true;
 
@@ -168,7 +168,7 @@ namespace TEN::Entities::TR4
 					keyHoleItem->Model.MeshIndex[1] = Objects[keyItem].meshIndex + 0;
 					keyHoleItem->Model.Mutators[1].Offset = Vector3(0.0f, -384.0f, 0.0f);
 					keyHoleItem->MeshBits = 255;
-
+					
 				}
 
 				g_Gui.SetInventoryItemChosen(NO_VALUE);
@@ -184,8 +184,9 @@ namespace TEN::Entities::TR4
 		else
 		{
 			ObjectCollision(itemNumber, laraItem, coll);
-		}
 
+		}
+		keyHoleItem->Pose.Orientation.y = y_rot;
 		return;
 	}
 }
