@@ -319,7 +319,7 @@ function Timer:GetRemainingTimeInSeconds()
     return thisTimer.precise and seconds or nil
 end
 
---- Getting the formatted remaining time of a timer.
+--- Get the formatted remaining time of a timer.
 -- @tparam ?table|bool timerFormat If a table is given, the time will be shown as a string, formatted according to the values in the table. If true, only seconds will be displayed.
 -- @treturn ?string|nil the formatted remaining time or nil if timer does not exist
 --
@@ -381,7 +381,6 @@ end
 -- 4 : If the remaining time is greater the value
 --
 -- 5 : If the remaining time is greater or equal to the value
---
 -- @tparam float seconds the value in seconds to compare.
 --
 -- Values with only 1 tenth of a second (0.1) are accepted. Example: 1.5 - 6.0 - 9.9 - 123.6
@@ -454,7 +453,7 @@ function Timer:GetTotalTimeInSeconds()
     return thisTimer.precise and math.floor((thisTimer.totalTime:GetFrameCount() / 30) * 10) / 10
 end
 
---- Getting the formatted total time of a timer.
+--- Get the formatted total time of a timer.
 -- This is the amount of time the timer will start with, as well as when starting a new loop
 -- @tparam ?table|bool timerFormat If a table is given, the time will be shown as a string, formatted according to the values in the table. If true, only seconds will be displayed. If false, the time will not be displayed on the screen.
 -- @treturn ?string|nil the formatted total time or nil if timer does not exist
@@ -515,7 +514,6 @@ end
 -- 4 : If the total time is greater the value
 --
 -- 5 : If the total time is greater or equal to the value
---
 -- @tparam float seconds the value in seconds to compare
 --
 -- Values with only 1 tenth of a second (0.1) are accepted. Example: 1.5 - 6.0 - 9.9 - 123.6
