@@ -699,9 +699,8 @@ namespace TEN::Entities
 		obj = &Objects[ID_STATUE_PLINTH];
 		if (obj->loaded)
 		{
-			obj->Initialize = InitializeElementPuzzle;
-			obj->control = ElementPuzzleControl;
-			obj->collision = ElementPuzzleCollision;
+			obj->Initialize = InitialiseStatuePlinth;
+			obj->collision = StatuePlinthCollision;
 			obj->SetHitEffect(true);
 		}
 
