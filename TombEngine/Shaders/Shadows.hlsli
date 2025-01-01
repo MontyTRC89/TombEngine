@@ -3,8 +3,7 @@
 #include "./ShaderLight.hlsli"
 
 #define SHADOW_INTENSITY (0.6f)
-#define SHADOW_BLUR_MIN  (2.0f)
-#define SHADOW_BLUR_MAX  (8.0f)
+#define SHADOW_BLUR      (2.0f)
 
 struct Sphere
 {
@@ -79,14 +78,14 @@ float3 DoBlobShadows(float3 worldPos, float3 lighting)
     {
         Sphere s = Spheres[i];
         float dist = distance(worldPos, s.position);
-        float insideSphere = saturate(1.0f - step(s.radius, dist)); // Eliminates branching
+        float insideSphere = saturate(1.0f - step(s.radius, dist));
         float radiusFactor = dist / s.radius;
         float factor = (1.0f - saturate(radiusFactor)) * insideSphere;
         shadowFactor -= factor * shadowFactor;
     }
 
     shadowFactor = saturate(shadowFactor);
-    return lighting * saturate(shadowFactor + SHADOW_INTENSITY);
+    return lighting * saturate(1.0f - (1.0f - shadowFactor) * (SHADOW_INTENSITY * 0.5f));
 }
 
 float3 DoShadow(float3 worldPos, float3 normal, float3 lighting, float bias)
@@ -102,11 +101,6 @@ float3 DoShadow(float3 worldPos, float3 normal, float3 lighting, float bias)
     float3 dir = normalize(Light.Position - worldPos);
     float ndot = dot(normal, dir);
     float facingFactor = saturate((ndot - bias) / (1.0f - bias + EPSILON));
-
-    // Calculate distance-based blur factor with non-linear progression
-    float distanceToLight = length(Light.Position - worldPos);
-    float blurFactor = pow(saturate(distanceToLight / Light.Out), 2.0f);
-    float kernelSize = lerp(SHADOW_BLUR_MIN, SHADOW_BLUR_MAX, blurFactor);
 
     [unroll]
     for (int i = 0; i < 6; i++)
@@ -127,10 +121,10 @@ float3 DoShadow(float3 worldPos, float3 normal, float3 lighting, float bias)
             float sum = 0;
             float samples = 0;
 
-            // Perform basic PCF filtering with distance-based kernel size
-            for (float y = -SHADOW_BLUR_MIN; y <= SHADOW_BLUR_MIN; y += 1.0)
+            // Perform basic PCF filtering
+            for (float y = -SHADOW_BLUR; y <= SHADOW_BLUR; y += 1.0)
             {
-                for (float x = -SHADOW_BLUR_MIN; x <= SHADOW_BLUR_MIN; x += 1.0)
+                for (float x = -SHADOW_BLUR; x <= SHADOW_BLUR; x += 1.0)
                 {
                     sum += ShadowMap.SampleCmpLevelZero(ShadowMapSampler, float3(lightClipSpace.xy + TexOffset(x, y), i), lightClipSpace.z);
                     samples += 1.0;
@@ -148,8 +142,8 @@ float3 DoShadow(float3 worldPos, float3 normal, float3 lighting, float bias)
     float pointFactor = Luma(DoPointLight(worldPos, normal, Light));
     float spotFactor  = Luma(DoSpotLight(worldPos, normal, Light));
 
-    float3 pointShadow = lighting * (1.0f - (1.0f - shadowFactor) * SHADOW_INTENSITY * pointFactor);
-    float3 spotShadow  = lighting * (1.0f - (1.0f - shadowFactor) * SHADOW_INTENSITY * spotFactor );
+    float3 pointShadow = lighting * saturate(1.0f - (1.0f - shadowFactor) * SHADOW_INTENSITY * pointFactor);
+    float3 spotShadow  = lighting * saturate(1.0f - (1.0f - shadowFactor) * SHADOW_INTENSITY * spotFactor );
 
     return pointShadow * isPoint + spotShadow * isSpot + lighting * isOther;
 }

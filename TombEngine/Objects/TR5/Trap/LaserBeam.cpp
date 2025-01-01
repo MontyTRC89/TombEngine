@@ -75,7 +75,7 @@ namespace TEN::Entities::Traps
 		constexpr auto LASER_BEAM_FALLOFF = BLOCK(1.5f);
 
 		float intensityNorm = intensity - Random::GenerateFloat(0.0f, amplitudeMax);
-		TriggerDynamicPointLight(pos, color * intensityNorm, LASER_BEAM_FALLOFF);
+		SpawnDynamicPointLight(pos, color * intensityNorm, LASER_BEAM_FALLOFF);
 	}
 
 	void LaserBeamEffect::StoreInterpolationData()

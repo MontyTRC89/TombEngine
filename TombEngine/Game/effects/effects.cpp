@@ -10,6 +10,7 @@
 #include "Game/effects/Drip.h"
 #include "Game/effects/explosion.h"
 #include "Game/effects/item_fx.h"
+#include "Game/effects/Light.h"
 #include "Game/effects/Ripple.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
@@ -33,6 +34,7 @@ using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Items;
+using namespace TEN::Effects::Light;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Math;
@@ -430,7 +432,7 @@ void UpdateSparks()
 					else
 						falloff = 31;
 
-					TriggerDynamicLight(x, y, z, falloff, r, g, b);
+					SpawnDynamicLight(x, y, z, falloff, r, g, b);
 				}
 				else
 				{
@@ -438,11 +440,11 @@ void UpdateSparks()
 
 					if (spark->flags & SP_COLOR)
 					{
-						TriggerDynamicLight(x, y, z, falloff, spark->dR, spark->dG, spark->dB);
+						SpawnDynamicLight(x, y, z, falloff, spark->dR, spark->dG, spark->dB);
 					}
 					else
 					{
-						TriggerDynamicLight(x, y, z, falloff, g, b, r);
+						SpawnDynamicLight(x, y, z, falloff, g, b, r);
 					}
 				}
 			}
@@ -1247,22 +1249,6 @@ void KillAllCurrentItems(short itemNumber)
 	// TODO: Reimplement this functionality.
 }
 
-void TriggerDynamicPointLight(const Vector3& pos, const Color& color, float falloff, bool castShadows, int hash)
-{
-	g_Renderer.AddDynamicPointLight(pos, falloff , color, castShadows, hash);
-}
-
-void TriggerDynamicSpotLight(const Vector3& pos, const Vector3& dir, const Color& color, float radius, float falloff, float distance, bool castShadows, int hash)
-{
-	g_Renderer.AddDynamicSpotLight(pos, dir, radius, falloff, distance, color, castShadows, hash);
-}
-
-// Deprecated. Use above version instead.
-void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b)
-{
-	g_Renderer.AddDynamicPointLight(Vector3(x, y, z), (float)(falloff * UCHAR_MAX), Color(r / (float)CHAR_MAX, g / (float)CHAR_MAX, b / (float)CHAR_MAX), false);
-}
-
 void SpawnPlayerWaterSurfaceEffects(const ItemInfo& item, int waterHeight, int waterDepth)
 {
 	const auto& player = GetLaraInfo(item);
@@ -1919,7 +1905,7 @@ void ProcessEffects(ItemInfo* item)
 			MAX_LIGHT_FALLOFF - std::clamp(MAX_LIGHT_FALLOFF - item->Effect.Count, 0, MAX_LIGHT_FALLOFF);
 
 		auto pos = GetJointPosition(item, 0);
-		TriggerDynamicLight(
+		SpawnDynamicLight(
 			pos.x, pos.y, pos.z, falloff,
 			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.x * UCHAR_MAX), 0, UCHAR_MAX),
 			std::clamp(Random::GenerateInt(-32, 32) + int(item->Effect.LightColor.y * UCHAR_MAX), 0, UCHAR_MAX),
