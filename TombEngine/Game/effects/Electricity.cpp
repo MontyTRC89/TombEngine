@@ -107,7 +107,8 @@ namespace TEN::Effects::Electricity
 		auto& spark = *GetFreeParticle();
 
 		spark.on = true;
-		spark.spriteIndex = Objects[ID_MISC_SPRITES].meshIndex;
+		spark.SpriteSeqID = ID_MISC_SPRITES;
+		spark.SpriteID = 0;
 		spark.blendMode = BlendMode::Additive;
 		spark.x = pos.x;
 		spark.y = pos.y;

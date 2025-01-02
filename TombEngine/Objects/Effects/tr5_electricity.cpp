@@ -74,13 +74,15 @@ void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glo
 	if (glow)
 	{
 		spark->scalar = 1;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENS_FLARE_LIGHT;
+		spark->SpriteSeqID = ID_DEFAULT_SPRITES;
+		spark->SpriteID = SPR_LENS_FLARE_LIGHT;
 		spark->size = spark->sSize = (GetRandomControl() & 0x1F) + 160;
 	}
 	else
 	{
 		spark->scalar = 0;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST;
+		spark->SpriteSeqID = ID_DEFAULT_SPRITES;
+		spark->SpriteID = SPR_UNDERWATERDUST;
 		spark->size = spark->sSize = (GetRandomControl() & 7) + 8;
 	}
 
