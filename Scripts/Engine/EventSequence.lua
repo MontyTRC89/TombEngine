@@ -215,7 +215,7 @@ EventSequence.Get = function(name)
 		TEN.Util.PrintLog("Error in EventSequence.Get() function: invalid name", TEN.Util.LogLevel.ERROR)
 		self = {name = "noError", errorName = name}
 	elseif not LevelVars.Engine.EventSequence.sequences[name] then
-		TEN.Util.PrintLog("Error in EventSequence.Get() function: sequence with name '".. name .."' sequence does not exist", TEN.Util.LogLevel.ERROR)
+		TEN.Util.PrintLog("Warning in EventSequence.Get() function: sequence with name '".. name .."' sequence not found", TEN.Util.LogLevel.WARNING)
 		self = {name = "noError", errorName = name}
 	else
 		self = {name = name}
