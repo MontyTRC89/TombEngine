@@ -666,7 +666,7 @@ end
 --  -- left alignment
 --  Timer.Get("my_timer"):SetTextOption()
 function Timer:SetTextOption(_table)
-	_table = _table or {}
+    _table = _table or {}
     if self.errorName then
         TEN.Util.PrintLog("Error in SetTextOption(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
     elseif type(_table) ~= "table" then
