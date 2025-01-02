@@ -26,6 +26,10 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed Flow.FreezeMode.FULL drawing incorrect background.
 * Fixed DisplayString scale argument not being optional, as stated in documentation.
 
+### Lua Modules changes
+* Timer module uses the Time class for greater precision
+* Timer module contains new methods
+
 ## [Version 1.7](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.3) - 2024-12-25
 
 ### Bug fixes

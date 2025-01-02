@@ -168,7 +168,7 @@ Timer.Get = function (name)
     elseif LevelVars.Engine.Timer.timers[name] then
 		self = {name = name}
 	else
-		TEN.Util.PrintLog("Error in Timer.Get() function, '".. name .."' timer does not exist", TEN.Util.LogLevel.ERROR)
+		TEN.Util.PrintLog("Warning in Timer.Get() function: '".. name .."' timer not found", TEN.Util.LogLevel.ERROR)
 		self = {name = "noError", errorName = name}
 	end
     return setmetatable(self, Timer)
