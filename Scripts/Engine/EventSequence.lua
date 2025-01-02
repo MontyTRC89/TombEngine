@@ -131,12 +131,12 @@ end
 --	    {LevelFuncs.Func, "3"})
 EventSequence.Create =function (name, loop, timerFormat, ...)
 	if not Type.IsString(name) then
-        TEN.Util.PrintLog("Error in EventSequence.Create() function: invalid name, sequence was not created", TEN.Util.LogLevel.ERROR)
+        TEN.Util.PrintLog("Error in EventSequence.Create(): invalid name, sequence was not created", TEN.Util.LogLevel.ERROR)
         return
     end
 	local self = {name = name}
 	if LevelVars.Engine.EventSequence.sequences[name] then
-		print("Warning: an EventSequence with name " .. name .. " already exists; overwriting it with a new one...")
+		TEN.Util.PrintLog("Warning in EventSequence.Create(): an EventSequence with name " .. name .. " already exists; overwriting it with a new one...", TEN.Util.LogLevel.WARNING)
 	end
 	LevelVars.Engine.EventSequence.sequences[name] = {}
 	local thisES = LevelVars.Engine.EventSequence.sequences[name]
@@ -145,13 +145,12 @@ EventSequence.Create =function (name, loop, timerFormat, ...)
 	thisES.currentTimer = 1
 
 	if not Type.IsBoolean(loop) then
-		TEN.Util.PrintLog("Error in EventSequence.Create() function: wrong value for loop, '".. name .."' sequence was not created", TEN.Util.LogLevel.ERROR)
-		LevelVars.Engine.EventSequence.sequences[name] = nil
-        return
+		TEN.Util.PrintLog("Warning in EventSequence.Create(): wrong value for loop, loop for '".. name .."' sequence will be set to false", TEN.Util.LogLevel.WARNING)
+		loop = false
 	end
 	thisES.loop = loop
 
-	local errorCheckFormat = "Warning! Wrong value for timerFormat, timerFormat for '".. name .."' sequence will be set to false"
+	local errorCheckFormat = "Warning in EventSequence.Create(): wrong value for timerFormat, timerFormat for '".. name .."' sequence will be set to false"
 	thisES.timerFormat = Utility.CheckTimeFormat(timerFormat, errorCheckFormat)
 
 	thisES.timesFuncsAndArgs = {...}
@@ -162,10 +161,10 @@ EventSequence.Create =function (name, loop, timerFormat, ...)
 		local funcAndArgs = tfa[i+1]
 		local error = false
 		if not Type.IsNumber(timer) then
-			TEN.Util.PrintLog("Error in EventSequence.Create() function: wrong value for seconds, '".. name .."' sequence was not created", TEN.Util.LogLevel.ERROR)
+			TEN.Util.PrintLog("Error in EventSequence.Create(): wrong value for seconds, '".. name .."' sequence was not created", TEN.Util.LogLevel.ERROR)
 			error = true
 		elseif not (Type.IsLevelFunc(funcAndArgs) or (Type.IsTable(funcAndArgs) and Type.IsLevelFunc(funcAndArgs[1]))) then
-			TEN.Util.PrintLog("Error in EventSequence.Create() function: wrong value for function, '".. name .."' sequence was not created", TEN.Util.LogLevel.ERROR)
+			TEN.Util.PrintLog("Error in EventSequence.Create(): wrong value for function, '".. name .."' sequence was not created", TEN.Util.LogLevel.ERROR)
 			error = true
 		end
 		if error then
@@ -212,10 +211,10 @@ end
 EventSequence.Get = function(name)
 	local self = {}
 	if not Type.IsString(name) then
-		TEN.Util.PrintLog("Error in EventSequence.Get() function: invalid name", TEN.Util.LogLevel.ERROR)
+		TEN.Util.PrintLog("Error in EventSequence.Get(): invalid name", TEN.Util.LogLevel.ERROR)
 		self = {name = "noError", errorName = name}
 	elseif not LevelVars.Engine.EventSequence.sequences[name] then
-		TEN.Util.PrintLog("Warning in EventSequence.Get() function: sequence with name '".. name .."' sequence not found", TEN.Util.LogLevel.WARNING)
+		TEN.Util.PrintLog("Warning in EventSequence.Get(): sequence with name '".. name .."' sequence not found", TEN.Util.LogLevel.WARNING)
 		self = {name = "noError", errorName = name}
 	else
 		self = {name = name}
@@ -235,7 +234,7 @@ end
 --	end
 EventSequence.IfExists = function (name)
 	if not Type.IsString(name) then
-		TEN.Util.PrintLog("Error in EventSequence.IfExists() function: invalid name", TEN.Util.LogLevel.ERROR)
+		TEN.Util.PrintLog("Error in EventSequence.IfExists(): invalid name", TEN.Util.LogLevel.ERROR)
 		return false
 	end
 	return LevelVars.Engine.EventSequence.sequences[name] and true or false
@@ -248,10 +247,10 @@ end
 --  EventSequence.Delete("my_seq")
 EventSequence.Delete = function (name)
 	if not Type.IsString(name) then
-		TEN.Util.PrintLog("Error in EventSequence.Delete() function: invalid name", TEN.Util.LogLevel.ERROR)
+		TEN.Util.PrintLog("Error in EventSequence.Delete(): invalid name", TEN.Util.LogLevel.ERROR)
 		return
 	elseif not LevelVars.Engine.EventSequence.sequences[name] then
-		TEN.Util.PrintLog("Error in EventSequence.Delete() function: sequence with name '".. name .."' sequence does not exist", TEN.Util.LogLevel.ERROR)
+		TEN.Util.PrintLog("Error in EventSequence.Delete(): sequence with name '".. name .."' sequence does not exist", TEN.Util.LogLevel.ERROR)
 	else
 		for i = 1, #LevelVars.Engine.EventSequence.sequences[name].timers do
 			Timer.Delete(LevelVars.Engine.EventSequence.sequences[name].timers[i])
@@ -275,7 +274,7 @@ end
 --	EventSequence.Get("my_seq"):Start()
 function EventSequence:Start()
 	if self.name == "noError" then
-		TEN.Util.PrintLog("Error in EventSequence:Start() method: '" .. self.errorName .. "' sequence does not exist", TEN.Util.LogLevel.ERROR)
+		TEN.Util.PrintLog("Error in EventSequence:Start(): '" .. self.errorName .. "' sequence does not exist", TEN.Util.LogLevel.ERROR)
 	else
 		local thisES = LevelVars.Engine.EventSequence.sequences[self.name]
 		Timer.Get(thisES.timers[thisES.currentTimer]):Start(true)
@@ -292,11 +291,11 @@ end
 --	EventSequence.Get("my_seq"):SetPaused(false)
 function EventSequence:SetPaused(p)
 	if self.name == "noError" then
-		TEN.Util.PrintLog("Error in EventSequence:SetPaused() method: '" .. self.errorName .. "' sequence does not exist", TEN.Util.LogLevel.ERROR)
+		TEN.Util.PrintLog("Error in EventSequence:SetPaused(): '" .. self.errorName .. "' sequence does not exist", TEN.Util.LogLevel.ERROR)
 		return
 	end
 	if not Type.IsBoolean(p) then
-		TEN.Util.PrintLog("Error in EventSequence:SetPaused() method: invalid value for p", TEN.Util.LogLevel.ERROR)
+		TEN.Util.PrintLog("Error in EventSequence:SetPaused(): invalid value for p", TEN.Util.LogLevel.ERROR)
 	else
 		local thisES = LevelVars.Engine.EventSequence.sequences[self.name]
 		Timer.Get(thisES.timers[thisES.currentTimer]):SetPaused(p)
@@ -309,7 +308,7 @@ end
 --	EventSequence.Get("my_seq"):Stop()
 function EventSequence:Stop()
 	if self.name == "noError" then
-		TEN.Util.PrintLog("Error in EventSequence:Stop() method: '" .. self.errorName .. "' sequence does not exist", TEN.Util.LogLevel.ERROR)
+		TEN.Util.PrintLog("Error in EventSequence:Stop(): '" .. self.errorName .. "' sequence does not exist", TEN.Util.LogLevel.ERROR)
 	else
 		local thisES = LevelVars.Engine.EventSequence.sequences[self.name]
 		Timer.Get(thisES.timers[thisES.currentTimer]):Stop()
@@ -325,7 +324,7 @@ end
 --	end
 function EventSequence:IsPaused()
 	if self.name == "noError" then
-		TEN.Util.PrintLog("Error in EventSequence:IsPaused() method: '" .. self.errorName .. "' sequence does not exist", TEN.Util.LogLevel.ERROR)
+		TEN.Util.PrintLog("Error in EventSequence:IsPaused(): '" .. self.errorName .. "' sequence does not exist", TEN.Util.LogLevel.ERROR)
 		return false
 	end
 	local thisES = LevelVars.Engine.EventSequence.sequences[self.name]
@@ -341,7 +340,7 @@ end
 --	end
 function EventSequence:IsActive()
 	if self.name == "noError" then
-		TEN.Util.PrintLog("Error in EventSequence:IsActive() method: '" .. self.errorName .. "' sequence does not exist", TEN.Util.LogLevel.ERROR)
+		TEN.Util.PrintLog("Error in EventSequence:IsActive(): '" .. self.errorName .. "' sequence does not exist", TEN.Util.LogLevel.ERROR)
 		return false
 	end
 	local thisES = LevelVars.Engine.EventSequence.sequences[self.name]
