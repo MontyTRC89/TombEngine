@@ -273,7 +273,7 @@ end
 --	-- Example:
 --	EventSequence.Get("my_seq"):Start()
 function EventSequence:Start()
-	if self.name == "noError" then
+	if self.errorName then
 		TEN.Util.PrintLog("Error in EventSequence:Start(): '" .. self.errorName .. "' sequence does not exist", TEN.Util.LogLevel.ERROR)
 	else
 		local thisES = LevelVars.Engine.EventSequence.sequences[self.name]
@@ -290,7 +290,7 @@ end
 --	-- Example 2: Unpause the sequence
 --	EventSequence.Get("my_seq"):SetPaused(false)
 function EventSequence:SetPaused(p)
-	if self.name == "noError" then
+	if self.errorName then
 		TEN.Util.PrintLog("Error in EventSequence:SetPaused(): '" .. self.errorName .. "' sequence does not exist", TEN.Util.LogLevel.ERROR)
 		return
 	end
@@ -307,7 +307,7 @@ end
 --	-- Example:
 --	EventSequence.Get("my_seq"):Stop()
 function EventSequence:Stop()
-	if self.name == "noError" then
+	if self.errorName then
 		TEN.Util.PrintLog("Error in EventSequence:Stop(): '" .. self.errorName .. "' sequence does not exist", TEN.Util.LogLevel.ERROR)
 	else
 		local thisES = LevelVars.Engine.EventSequence.sequences[self.name]
@@ -323,7 +323,7 @@ end
 --		EventSequence.Get("my_seq"):SetPaused(false)
 --	end
 function EventSequence:IsPaused()
-	if self.name == "noError" then
+	if self.errorName then
 		TEN.Util.PrintLog("Error in EventSequence:IsPaused(): '" .. self.errorName .. "' sequence does not exist", TEN.Util.LogLevel.ERROR)
 		return false
 	end
@@ -339,7 +339,7 @@ end
 --		EventSequence.Get("my_seq"):Start()
 --	end
 function EventSequence:IsActive()
-	if self.name == "noError" then
+	if self.errorName then
 		TEN.Util.PrintLog("Error in EventSequence:IsActive(): '" .. self.errorName .. "' sequence does not exist", TEN.Util.LogLevel.ERROR)
 		return false
 	end
