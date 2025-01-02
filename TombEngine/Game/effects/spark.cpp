@@ -123,7 +123,7 @@ namespace TEN::Effects::Spark
 		sptr.xVel = 0;
 		sptr.yVel = 0;
 		sptr.zVel = 0;
-		sptr.flags = 26;
+		sptr.flags = SP_SCALE | SP_DEF | SP_ROTATE;
 		sptr.rotAng = GenerateAngle(0, 4095);
 
 		if (TestProbability(1 / 2.0f))
