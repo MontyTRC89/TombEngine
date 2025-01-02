@@ -131,9 +131,9 @@ end
 --	    {LevelFuncs.Func, "3"})
 EventSequence.Create =function (name, loop, timerFormat, ...)
 	if not Type.IsString(name) then
-        TEN.Util.PrintLog("Error in EventSequence.Create(): invalid name, sequence was not created", TEN.Util.LogLevel.ERROR)
-        return
-    end
+        	TEN.Util.PrintLog("Error in EventSequence.Create(): invalid name, sequence was not created", TEN.Util.LogLevel.ERROR)
+        	return
+    	end
 	local self = {name = name}
 	if LevelVars.Engine.EventSequence.sequences[name] then
 		TEN.Util.PrintLog("Warning in EventSequence.Create(): an EventSequence with name " .. name .. " already exists; overwriting it with a new one...", TEN.Util.LogLevel.WARNING)
