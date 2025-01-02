@@ -18,7 +18,7 @@ This is the credit list of **all** the people who contributed to TombEngine in a
 - Squidshire (Hispidence) (Lua implementation, bug fixing)
 - Stranger1992 (sound asset refactoring and organisation, assets)
 - TokyoSU (entity and vehicle decompilation)
-- Tomo (general coding, special FX coding, bug fixing)
+- Tomo (general coding, bug fixing)
 - Troye (general coding, refactoring)
 - Nickelony (general coding)
 - JesseG, aka WolfCheese (general coding)
