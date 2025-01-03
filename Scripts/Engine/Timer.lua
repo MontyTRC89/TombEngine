@@ -1,7 +1,7 @@
 -----
---- Basic timer - after a specified number of seconds, the specified thing happens.
+--- Basic timer - after a specified number of seconds, the chosen event happens.
 --
--- Timers are updated automatically every frame before OnLoop.
+-- Timers are updated automatically at every frame before OnLoop event.
 --
 --
 -- To use Timer inside scripts you need to call the module:
@@ -63,18 +63,15 @@ LevelVars.Engine.Timer = {timers = {}}
 --
 --At any given time, multiple timers can show their countdown.
 --
--- @string name A label to give this timer; used to retrieve the timer later.
+-- @tparam string name A label to give this timer; used to retrieve the timer later.
 --
 -- __Do not give your timers a name beginning with __TEN, as this is reserved for timers used by other internal libaries__.
--- @tparam float totalTime The duration of the timer, in seconds.
+-- @tparam float totalTime Duration of the timer, in seconds.
 --
--- Values with only 1 tenth of a second (0.1) are accepted. Example: 1.5 - 6.0 - 9.9 - 123.6
---
--- No negative values allowed!
---
+-- Values with only 1 tenth of a second (0.1) are accepted, example: 1.5 - 6.0 - 9.9 - 123.6. No negative values allowed!
 -- @tparam[opt] bool loop if true, the timer will start again immediately after the time has elapsed. __Default: false__
 -- @tparam[opt] ?table|bool timerFormat If a table is given, the remaining time will be shown as a string, formatted according to the values in the table. If true, the remaining seconds, rounded up, will show at the bottom of the screen. If false, the remaining time will not be shown on screen. __Default: false__
--- @tparam[opt] LevelFunc func The *LevelFunc* function to call when the time is up
+-- @tparam[opt] LevelFunc func function defined in the *LevelFuncs* table to call when the time is up
 -- @tparam[opt] any ... a variable number of arguments with which the above function will be called
 -- @treturn Timer The timer in its paused state
 --
@@ -346,10 +343,7 @@ end
 --- Set the remaining time of a timer.
 -- @tparam float remainingTime the new time remaining for the timer
 --
--- Values with only 1 tenth of a second (0.1) are accepted. Example: 1.5 - 6.0 - 9.9 - 123.6
---
--- No negative values allowed!
---
+-- Values with only 1 tenth of a second (0.1) are accepted, example: 1.5 - 6.0 - 9.9 - 123.6. No negative values allowed!
 -- @usage
 --  -- Example:
 --  Timer.Get("my_timer"):SetRemainingTime(3.5)
@@ -383,9 +377,7 @@ end
 -- 5 : If the remaining time is greater or equal to the value
 -- @tparam float seconds the value in seconds to compare.
 --
--- Values with only 1 tenth of a second (0.1) are accepted. Example: 1.5 - 6.0 - 9.9 - 123.6
---
--- No negative values allowed!
+-- Values with only 1 tenth of a second (0.1) are accepted, example: 1.5 - 6.0 - 9.9 - 123.6. No negative values allowed!
 -- @treturn bool *true* if comparison is true, *false* if comparison is false or timer does not exist
 -- @usage
 --  -- Example:
@@ -483,9 +475,7 @@ end
 -- The total time is changed only if the timer loops
 -- @tparam float totalTime timer's new total time
 --
--- Values with only 1 tenth of a second (0.1) are accepted. Example: 1.5 - 6.0 - 9.9 - 123.6
---
--- No negative values allowed!
+-- Values with only 1 tenth of a second (0.1) are accepted, example: 1.5 - 6.0 - 9.9 - 123.6. No negative values allowed!
 -- @usage
 --  -- Example:
 --  Timer.Get("my_timer"):SetTotalTime(3.5)
@@ -518,9 +508,7 @@ end
 -- 5 : If the total time is greater or equal to the value
 -- @tparam float seconds the value in seconds to compare
 --
--- Values with only 1 tenth of a second (0.1) are accepted. Example: 1.5 - 6.0 - 9.9 - 123.6
---
--- No negative values allowed!
+-- Values with only 1 tenth of a second (0.1) are accepted, example: 1.5 - 6.0 - 9.9 - 123.6. No negative values allowed!
 -- @treturn bool *true* if comparison is true, *false* if comparison is false or timer does not exist
 -- @usage
 --  -- Example:
