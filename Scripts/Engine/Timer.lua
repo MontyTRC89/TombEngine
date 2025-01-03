@@ -72,10 +72,10 @@ LevelVars.Engine.Timer = {timers = {}}
 --
 -- No negative values allowed!
 --
--- @bool[opt] loop if true, the timer will start again immediately after the time has elapsed. __Default: false__
+-- @tparam[opt] bool loop if true, the timer will start again immediately after the time has elapsed. __Default: false__
 -- @tparam[opt] ?table|bool timerFormat If a table is given, the remaining time will be shown as a string, formatted according to the values in the table. If true, the remaining seconds, rounded up, will show at the bottom of the screen. If false, the remaining time will not be shown on screen. __Default: false__
--- @func[opt] func The *LevelFunc* function to call when the time is up
--- @param[opt] ... a variable number of arguments with which the above function will be called
+-- @tparam[opt] LevelFunc func The *LevelFunc* function to call when the time is up
+-- @tparam[opt] any ... a variable number of arguments with which the above function will be called
 -- @treturn Timer The timer in its paused state
 --
 -- @usage
@@ -140,7 +140,7 @@ Timer.Create = function (name, totalTime, loop, timerFormat, func, ...)
 end
 
 --- Delete a timer.
--- @string name The label that was given to the timer when it was created
+-- @tparam string name The label that was given to the timer when it was created
 -- @usage
 --	-- Example:
 --  Timer.Delete("my_timer")
@@ -155,7 +155,7 @@ Timer.Delete = function (name)
 end
 
 --- Get a timer by its name.
--- @string name The label that was given to the timer when it was created
+-- @tparam string name The label that was given to the timer when it was created
 -- @treturn Timer The timer
 -- @usage
 --	-- Example:
@@ -175,7 +175,7 @@ Timer.Get = function (name)
 end
 
 --- Check if a timer exists.
--- @string name The label that was given to the timer when it was created
+-- @tparam string name The label that was given to the timer when it was created
 -- @usage
 --	-- Example:
 --	-- This function checks if a timer named "my_timer" exists and starts it
@@ -254,7 +254,7 @@ function Timer:Stop()
 end
 
 --- Pause or unpause the timer. If showing the remaining time on-screen, its default color will be set to yellow (paused) or white (unpaused).
--- @bool p if true, the timer will be paused; if false, it would be unpaused
+-- @tparam bool p if true, the timer will be paused; if false, it would be unpaused
 -- @usage
 --  local TimeFormat = {minutes = true, seconds = true, deciseconds = true}
 --  Timer.Create("my_timer", 6.1, false, TimerFormat)
@@ -356,7 +356,7 @@ end
 function Timer:SetRemainingTime(remainingTime)
 	if self.errorName then
 		TEN.Util.PrintLog("Error in Timer:SetRemainingTime(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
-	elseif not Type.IsNumber(remainingTime) then
+	elseif not Type.IsNumber(remainingTime) or remainingTime < 0 then
 		TEN.Util.PrintLog("Error in Timer:SetRemainingTime(): wrong value for remainingTime ir '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 	else
         local thisTimer = LevelVars.Engine.Timer.timers[self.name]
@@ -492,7 +492,7 @@ end
 function Timer:SetTotalTime(totalTime)
 	if self.errorName then
 		TEN.Util.PrintLog("Error in Timer:SetTotalTime(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
-	elseif not Type.IsNumber(totalTime) then
+	elseif not Type.IsNumber(totalTime) or totalTime < 0 then
 		TEN.Util.PrintLog("Error in Timer:SetTotalTime(): wrong value for totalTime in '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 	else
 		local seconds = math.floor(totalTime * 10) / 10
@@ -543,7 +543,7 @@ function Timer:IfTotalTimeIs(operator, seconds)
 end
 
 --- Set whether or not the timer loops
--- @bool looping whether or not the timer loops
+-- @tparam bool looping whether or not the timer loops
 -- @usage
 --  -- Example:
 --  Timer.Get("my_timer"):SetLooping(true)
@@ -558,8 +558,8 @@ function Timer:SetLooping(looping)
 end
 
 --- Give the timer a new function and args
--- @tparam function func The *LevelFunc* member to call when the time is up
--- @param[opt] ... a variable number of arguments with which the above function will be called
+-- @tparam LevelFunc func The *LevelFunc* member to call when the time is up
+-- @tparam[opt] any ... a variable number of arguments with which the above function will be called
 -- @usage
 --  -- Example:
 --  -- This function kills Lara when the timer runs out
@@ -582,9 +582,9 @@ end
 
 --- Set the on-screen position in percent of the displayed timer when active.
 --
--- The coordinate (0,0) is in the upper left-hand corner
+-- The coordinate (0,0) is in the upper left-hand corner.
 --
---  The default position of the timer is (50,90)
+-- Default position of the timer is (50,90)
 -- @tparam float x the x-coordinate in percent
 -- @tparam float y the y-coordinate in percent
 -- @usage
@@ -603,9 +603,9 @@ function Timer:SetPosition(x,y)
 end
 
 --- Set the scale of the displayed timer when it is active.
+-- @tparam float scale new scale value
 --
 --  The default scale of the timer is 1.0
--- @tparam float scale new scale value
 -- @usage
 --  -- Example:
 --  Timer.Get("my_timer"):SetScale(1.5)
@@ -620,9 +620,9 @@ function Timer:SetScale(scale)
 end
 
 --- Set the paused color of the displayed timer when it is active.
---
---  The default paused color of the timer is yellow: TEN.Color(255, 255, 0, 255)
 -- @tparam Color color timer's new paused color
+--
+--  Default paused color of the timer is yellow: TEN.Color(255, 255, 0, 255)
 -- @usage
 --  -- Example:
 --  Timer.Get("my_timer"):SetPausedColor(TEN.Color(0, 255, 0, 255))
@@ -637,9 +637,9 @@ function Timer:SetPausedColor(color)
 end
 
 --- Set the color of the displayed timer when it is active.
---
---  The default color of the timer is white: TEN.Color(255, 255, 255, 255)
 -- @tparam Color color timer's new color
+--
+--  Default color of the timer is white: TEN.Color(255, 255, 255, 255)
 -- @usage
 --  -- Example:
 --  Timer.Get("my_timer"):SetUnpausedColor(TEN.Color(0, 255, 255, 255))
@@ -654,15 +654,24 @@ function Timer:SetUnpausedColor(color)
 end
 
 --- Set text options for a timer
--- @tparam Strings.DisplayStringOption _table timer's new text options
---@advancedDesc
--- Default options: TEN.Strings.DisplayStringOption.CENTER, TEN.Strings.DisplayStringOption.SHADOW
+-- @tparam table _table table containing timer's new text options. See @{Strings.DisplayStringOption}
+--
+-- Default options: {TEN.Strings.DisplayStringOption.CENTER, TEN.Strings.DisplayStringOption.SHADOW}
+--
+-- __Please note:__ the new table overwrites the existing options
 -- @usage
 --  -- Example 1
 --  -- right alignment
 --  Timer.Get("my_timer"):SetTextOption({TEN.Strings.DisplayStringOption.RIGHT})
 --
 --  -- Example 2
+--  -- defaul arguments + BLINK effect
+--	newOptins = {TEN.Strings.DisplayStringOption.CENTER,
+--		TEN.Strings.DisplayStringOption.SHADOW,
+--		TEN.Strings.DisplayStringOption.BLINK}
+--  Timer.Get("my_timer"):SetTextOption(newOptins)
+--
+--  -- Example 3
 --  -- left alignment
 --  Timer.Get("my_timer"):SetTextOption()
 function Timer:SetTextOption(_table)
