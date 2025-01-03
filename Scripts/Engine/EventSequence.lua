@@ -84,7 +84,7 @@ end
 --
 -- a time in seconds (positive values are accepted and with only 1 tenth of a second [__0.1__]),
 --
--- followed by the function (must be defined in the *LevelFuncs* table) to call once the time has elapsed,
+-- followed by the function defined in the *LevelFuncs* table to call once the time has elapsed,
 --
 -- followed by another duration in seconds, another function name, etc.
 --
