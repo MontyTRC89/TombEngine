@@ -319,7 +319,12 @@ end
 --- Get whether or not the sequence is paused
 -- @treturn bool true if the timer is paused, false if otherwise
 -- @usage
---	-- Example:
+--	-- Example 1: paused sequence
+--	if not EventSequence.Get("my_seq"):IsPaused() then
+--		EventSequence.Get("my_seq"):SetPaused(true)
+--	end
+--
+--	-- Example 2: unpause the sequence
 --	if EventSequence.Get("my_seq"):IsPaused() then
 --		EventSequence.Get("my_seq"):SetPaused(false)
 --	end
