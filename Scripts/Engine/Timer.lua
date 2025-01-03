@@ -86,19 +86,16 @@ LevelVars.Engine.Timer = {timers = {}}
 --  end
 --  Timer.Create("my_timer", 6.1, false, TimerFormat, LevelFuncs.FinishTimer)
 Timer.Create = function (name, totalTime, loop, timerFormat, func, ...)
-	local error = false
 	if not Type.IsString(name) then
-		TEN.Util.PrintLog("Error in Timer.Create(): invalid name, timer was not created", TEN.Util.LogLevel.ERROR)
-        	error = true
-	elseif not Type.IsNumber(totalTime) then
-        	TEN.Util.PrintLog("Error in Timer.Create(): wrong value for totalTime, '".. name .."' timer was not created", TEN.Util.LogLevel.ERROR)
-		error = true
-	elseif not Type.IsNull(func) and not Type.IsLevelFunc(func) then
-		TEN.Util.PrintLog("Error in Timer.Create(): wrong value for func, '".. name .."' timer was not created", TEN.Util.LogLevel.ERROR)
-		error = true
+		TEN.Util.PrintLog("Error in Timer.Create(): invalid name, '" .. tostring(name) .."' timer was not created", TEN.Util.LogLevel.ERROR)
+		return
 	end
-	if error then
-        	LevelVars.Engine.Timer.timers[name] = nil
+	if not Type.IsNumber(totalTime) then
+		TEN.Util.PrintLog("Error in Timer.Create(): wrong value for totalTime, '".. name .."' timer was not created", TEN.Util.LogLevel.ERROR)
+		return
+	end
+	if not Type.IsNull(func) and not Type.IsLevelFunc(func) then
+		TEN.Util.PrintLog("Error in Timer.Create(): wrong value for func, '".. name .."' timer was not created", TEN.Util.LogLevel.ERROR)
 		return
 	end
 
@@ -143,12 +140,11 @@ end
 --  Timer.Delete("my_timer")
 Timer.Delete = function (name)
 	if not Type.IsString(name) then
-        	TEN.Util.PrintLog("Error in Timer.Delete(): invalid name", TEN.Util.LogLevel.ERROR)
+		TEN.Util.PrintLog("Error in Timer.Delete(): invalid name", TEN.Util.LogLevel.ERROR)
 	elseif LevelVars.Engine.Timer.timers[name] then
 		LevelVars.Engine.Timer.timers[name] = nil
-	else
-		TEN.Util.PrintLog("Warning in Timer.Delete(): " .. name .. " timer does not exist and can't be deleted.", TEN.Util.LogLevel.WARNING)
 	end
+	TEN.Util.PrintLog("Warning in Timer.Delete(): " .. name .. " timer does not exist and can't be deleted.", TEN.Util.LogLevel.WARNING)
 end
 
 --- Get a timer by its name.
@@ -390,7 +386,7 @@ function Timer:IfRemainingTimeIs(operator, seconds)
 	if self.errorName then
 		TEN.Util.PrintLog("Error in Timer:IfRemainingTimeIs(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
 		return false
-	elseif not Type.IsNumber(operator) or (Type.IsNumber(operator) and operator < 0 or operator > 5) then
+	elseif not Type.IsNumber(operator) or operator < 0 or operator > 5 then
 		TEN.Util.PrintLog("Error in Timer:IfRemainingTimeIs(): invalid operator for '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 		return false
 	elseif not Type.IsNumber(seconds) then
@@ -517,7 +513,7 @@ function Timer:IfTotalTimeIs(operator, seconds)
 	if self.errorName then
 		TEN.Util.PrintLog("Error in Timer:IfTotalTimeIs(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
 		return false
-	elseif not Type.IsNumber(operator) or (Type.IsNumber(operator) and operator < 0 or operator > 5) then
+	elseif not Type.IsNumber(operator) or operator < 0 or operator > 5 then
 		TEN.Util.PrintLog("Error in Timer:IfTotalTimeIs(): invalid operator for '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 		return false
 	elseif not Type.IsNumber(seconds) then

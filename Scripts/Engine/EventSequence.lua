@@ -163,7 +163,8 @@ EventSequence.Create =function (name, loop, timerFormat, ...)
 		if not Type.IsNumber(timer) then
 			TEN.Util.PrintLog("Error in EventSequence.Create(): wrong value for seconds, '".. name .."' sequence was not created", TEN.Util.LogLevel.ERROR)
 			error = true
-		elseif not (Type.IsLevelFunc(funcAndArgs) or (Type.IsTable(funcAndArgs) and Type.IsLevelFunc(funcAndArgs[1]))) then
+		end
+		if not (Type.IsLevelFunc(funcAndArgs) or (Type.IsTable(funcAndArgs) and Type.IsLevelFunc(funcAndArgs[1]))) then
 			TEN.Util.PrintLog("Error in EventSequence.Create(): wrong value for function, '".. name .."' sequence was not created", TEN.Util.LogLevel.ERROR)
 			error = true
 		end
