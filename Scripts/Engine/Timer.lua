@@ -667,13 +667,13 @@ function Timer:SetTextOption(_table)
 		TEN.Util.PrintLog("Error in SetTextOption(): options is not a table for '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 	else
 		for _, v in pairs(_table) do
-			if not Type.IsNumber(v) or (Type.IsNumber(v) and v < 0 or v > 3) then
-			TEN.Util.PrintLog("Error in SetTextOption(): invalid value in options for '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
-			return
+			if not Type.IsNumber(v) or v < 0 or v > 3 then
+				TEN.Util.PrintLog("Error in SetTextOption(): invalid value in options for '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
+				return
+			end
 		end
+		LevelVars.Engine.Timer.timers[self.name].stringOption = _table
 	end
-	LevelVars.Engine.Timer.timers[self.name].stringOption = _table
-    end
 end
 
 --- Get whether or not the timer is paused
