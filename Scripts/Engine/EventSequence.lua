@@ -77,7 +77,7 @@ end
 
 --- Create (but do not start) a new event sequence.
 --
--- @string name A label to give the sequence; used to retrieve the timer later as well as internally by TEN.
+-- @tparam string name A label to give the sequence; used to retrieve the timer later as well as internally by TEN.
 -- @tparam bool loop if true, the sequence will start again from its first timer once its final function has been called
 -- @tparam ?table|bool timerFormat same as in @{Timer.Create}. This is mainly for debugging. __This will not work properly if another sequence or timer is showing a countdown.__
 -- @tparam ?float|table|LevelFuncs ... a variable number of pairs of arguments, each pair consisting of:
@@ -100,7 +100,7 @@ end
 --	-- and finally LevelFuncs.Func after 4 seconds
 --	LevelFuncs.Func = function ()
 --		local pos = TEN.Vec2(TEN.Util.PercentToScreen(50, 10))
---		local str = TEN.Strings.DisplayString("Function!", pos, 1)
+--		local str = TEN.Strings.DisplayString("Repeated function without arguments", pos, 1)
 --		TEN.Strings.ShowString(str, 1)
 --	end
 --	EventSequence.Create(
@@ -206,7 +206,7 @@ EventSequence.Create =function (name, loop, timerFormat, ...)
 end
 
 --- Get an event sequence by its name.
--- @string name The label that was given to the sequence when it was created
+-- @tparam string name The label that was given to the sequence when it was created
 -- @treturn EventSequence The sequence
 EventSequence.Get = function(name)
 	local self = {}
@@ -223,7 +223,7 @@ EventSequence.Get = function(name)
 end
 
 --- Check if an event sequence exists.
--- @string name The label that was given to the event sequence when it was created
+-- @tparam string name The label that was given to the event sequence when it was created
 -- @usage
 --	-- Example:
 --	-- This function checks if an event sequence named "my_seq" exists and starts it
@@ -241,7 +241,7 @@ EventSequence.IfExists = function (name)
 end
 
 --- Delete an event sequence.
--- @string name The label that was given to the event sequence when it was created
+-- @tparam string name The label that was given to the event sequence when it was created
 -- @usage
 --	-- Example:
 --  EventSequence.Delete("my_seq")
@@ -282,7 +282,7 @@ function EventSequence:Start()
 end
 
 --- Pause or unpause the sequence. If showing the remaining time on-screen, its color will be set to yellow (paused) or white (unpaused).
--- @bool p if true, the sequence will be paused; if false, it will be unpaused
+-- @tparam bool p if true, the sequence will be paused; if false, it will be unpaused
 -- @usage
 --	-- Example 1: Pause the sequence
 --	EventSequence.Get("my_seq"):SetPaused(true)
