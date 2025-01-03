@@ -143,8 +143,9 @@ Timer.Delete = function (name)
 		TEN.Util.PrintLog("Error in Timer.Delete(): invalid name", TEN.Util.LogLevel.ERROR)
 	elseif LevelVars.Engine.Timer.timers[name] then
 		LevelVars.Engine.Timer.timers[name] = nil
+	else
+		TEN.Util.PrintLog("Warning in Timer.Delete(): " .. name .. " timer does not exist and can't be deleted.", TEN.Util.LogLevel.WARNING)
 	end
-	TEN.Util.PrintLog("Warning in Timer.Delete(): " .. name .. " timer does not exist and can't be deleted.", TEN.Util.LogLevel.WARNING)
 end
 
 --- Get a timer by its name.
