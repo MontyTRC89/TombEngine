@@ -17,7 +17,8 @@ body:
       Please select the TombEngine Version from the dropdown list.
     options:
       - Development Build
-      - v1.7 (Latest release)
+      - v1.7.1 (Latest release)
+      - v1.7
       - v1.6
   validations:
     required: true
@@ -29,7 +30,8 @@ body:
       Please select the Tomb Editor version used from the dropdown list.
     options:
       - Development Build
-      - v1.7.3 (Latest release)
+      - v1.7.4 (Latest release)
+      - v1.7.3 
       - v1.7.2
       - v1.7.1
       - v1.7.0
