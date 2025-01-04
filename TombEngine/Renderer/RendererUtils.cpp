@@ -8,8 +8,9 @@
 #include <wrl/client.h>
 
 #include "Renderer/Renderer.h"
+#include "Renderer/Structures/RendererShader.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/trutils.h"
-#include "Structures/RendererShader.h"
 
 namespace TEN::Renderer::Utils
 {
@@ -41,5 +42,10 @@ namespace TEN::Renderer::Utils
 			TENLog(message, LogLevel::Error);
 			throw std::runtime_error("An error occured!");
 		}
+	}
+
+	std::wstring GetAssetPath(const wchar_t* fileName)
+	{
+		return TEN::Utils::ToWString(g_GameFlow->GetGameDir()) + fileName;
 	}
 }

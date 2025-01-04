@@ -205,44 +205,46 @@ namespace TEN::Utils
             ((1.0f - ndc.y) * DISPLAY_SPACE_RES.y) / 2);
     }
 
-    std::vector<unsigned short> GetProductOrFileVersion(bool productVersion)
-    {
-        char fileName[UCHAR_MAX] = {};
+	std::vector<unsigned short> GetProductOrFileVersion(bool productVersion)
+	{
+		wchar_t fileName[UCHAR_MAX] = {};
 
-		if (!GetModuleFileNameA(nullptr, fileName, UCHAR_MAX))
+		if (!GetModuleFileNameW(nullptr, fileName, UCHAR_MAX))
 		{
 			TENLog("Can't get current assembly filename", LogLevel::Error);
 			return {};
 		}
 
-		int size = GetFileVersionInfoSizeA(fileName, NULL);
+		DWORD dummy;
+		DWORD size = GetFileVersionInfoSizeW(fileName, &dummy);
 
 		if (size == 0)
 		{
-			TENLog("GetFileVersionInfoSizeA failed", LogLevel::Error);
+			TENLog("GetFileVersionInfoSizeW failed", LogLevel::Error);
 			return {};
 		}
-		std::unique_ptr<unsigned char> buffer(new unsigned char[size]);
+
+		std::unique_ptr<unsigned char[]> buffer(new unsigned char[size]);
 
 		// Load version info.
-		if (!GetFileVersionInfoA(fileName, 0, size, buffer.get()))
+		if (!GetFileVersionInfoW(fileName, 0, size, buffer.get()))
 		{
-			TENLog("GetFileVersionInfoA failed", LogLevel::Error);
+			TENLog("GetFileVersionInfoW failed", LogLevel::Error);
 			return {};
 		}
 
 		VS_FIXEDFILEINFO* info;
 		unsigned int infoSize;
 
-		if (!VerQueryValueA(buffer.get(), "\\", (void**)&info, &infoSize))
+		if (!VerQueryValueW(buffer.get(), L"\\", (void**)&info, &infoSize))
 		{
-			TENLog("VerQueryValueA failed", LogLevel::Error);
+			TENLog("VerQueryValueW failed", LogLevel::Error);
 			return {};
 		}
 
 		if (infoSize != sizeof(VS_FIXEDFILEINFO))
 		{
-			TENLog("VerQueryValueA returned wrong size for VS_FIXEDFILEINFO", LogLevel::Error);
+			TENLog("VerQueryValueW returned wrong size for VS_FIXEDFILEINFO", LogLevel::Error);
 			return {};
 		}
 

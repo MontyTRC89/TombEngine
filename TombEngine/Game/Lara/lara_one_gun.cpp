@@ -14,6 +14,7 @@
 #include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/Ripple.h"
+#include "Game/effects/Splash.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/items.h"
@@ -38,6 +39,7 @@ using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Ripple;
+using namespace TEN::Effects::Splash;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -972,7 +974,7 @@ void RocketControl(short itemNumber)
 	// Trigger fire, smoke, and light.
 	TriggerRocketSmoke(wx + rocketItem.Pose.Position.x, wy + rocketItem.Pose.Position.y, wz + rocketItem.Pose.Position.z);
 	TriggerRocketFire(wx + rocketItem.Pose.Position.x, wy + rocketItem.Pose.Position.y, wz + rocketItem.Pose.Position.z);
-	TriggerDynamicLight(
+	SpawnDynamicLight(
 		wx + rocketItem.Pose.Position.x + (GetRandomControl() & 15) - 8, 
 		wy + rocketItem.Pose.Position.y + (GetRandomControl() & 15) - 8, 
 		wz + rocketItem.Pose.Position.z + (GetRandomControl() & 15) - 8, 
@@ -1305,12 +1307,12 @@ void RifleHandler(ItemInfo& laraItem, LaraWeaponType weaponType)
 		if (weaponType == LaraWeaponType::Shotgun || weaponType == LaraWeaponType::HK)
 		{
 			auto pos = GetJointPosition(&laraItem, LM_RHAND, Vector3i(0, -64, 0));
-			TriggerDynamicPointLight(pos.ToVector3(), color, CLICK(settings.FlashRange));
+			SpawnDynamicPointLight(pos.ToVector3(), color, CLICK(settings.FlashRange));
 		}
 		else if (weaponType == LaraWeaponType::Revolver)
 		{
 			auto pos = GetJointPosition(&laraItem, LM_RHAND, Vector3i(0, -32, 0));
-			TriggerDynamicPointLight(pos.ToVector3(), color, CLICK(settings.FlashRange));
+			SpawnDynamicPointLight(pos.ToVector3(), color, CLICK(settings.FlashRange));
 		}
 	}
 }

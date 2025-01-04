@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Game/Lara/lara_optics.h"
+#include "Game/Lara/Optics.h"
 
 #include "Game/camera.h"
 #include "Game/control/los.h"
@@ -178,7 +178,7 @@ static void DoOpticsHighlight(const ItemInfo& item, const Vector3i& origin, cons
 	const auto& lasersightColor = g_GameFlow->GetSettings()->Camera.LasersightLightColor;
 	const auto& color = GetLaraInfo(item).Control.Look.IsUsingLasersight ? lasersightColor : binocularsColor;
 
-	TriggerDynamicLight(origin2.x, origin2.y, origin2.z, 12, color.GetR(), color.GetG(), color.GetB());
+	SpawnDynamicLight(origin2.x, origin2.y, origin2.z, 12, color.GetR(), color.GetG(), color.GetB());
 
 	if (!LOS(&origin2, &target2))
 	{
@@ -193,7 +193,7 @@ static void DoOpticsHighlight(const ItemInfo& item, const Vector3i& origin, cons
 		byte r = std::max(0, color.GetR() - luma);
 		byte g = std::max(0, color.GetG() - luma);
 		byte b = std::max(0, color.GetB() - luma);
-		TriggerDynamicLight(target2.x + dir.x, target2.y + dir.y, target2.z + dir.z, luma + 12, r, g, b);
+		SpawnDynamicLight(target2.x + dir.x, target2.y + dir.y, target2.z + dir.z, luma + 12, r, g, b);
 	}
 }
 

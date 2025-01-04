@@ -157,6 +157,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 
 	float shadowable = step(0.5f, float((NumItemLights & SHADOWABLE_MASK) == SHADOWABLE_MASK));
 	float3 shadow = DoShadow(input.WorldPosition, normal, color, -0.5f);
+	shadow = DoBlobShadows(input.WorldPosition, shadow);
 	color = lerp(color, shadow, shadowable);
 
 	output.Color = saturate(float4(color * occlusion, tex.w));
