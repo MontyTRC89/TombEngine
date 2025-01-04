@@ -14,6 +14,7 @@
 #include "Game/effects/Ripple.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
+#include "Game/effects/Splash.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/items.h"
@@ -37,6 +38,7 @@ using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Light;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Spark;
+using namespace TEN::Effects::Splash;
 using namespace TEN::Math;
 using namespace TEN::Math::Random;
 
@@ -52,10 +54,7 @@ ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
 FX_INFO EffectList[MAX_SPAWNED_ITEM_COUNT];
 
 GameBoundingBox DeadlyBounds;
-SPLASH_SETUP SplashSetup;
-SPLASH_STRUCT Splashes[MAX_SPLASHES];
 
-int SplashCount = 0;
 int Wibble = 0;
 
 Vector3i NodeVectors[ParticleNodeOffsetIDs::NodeMax];
@@ -969,123 +968,6 @@ void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly)
 	}
 }
 
-void SetupSplash(const SPLASH_SETUP* const setup, int room)
-{
-	constexpr size_t NUM_SPLASHES = 3;
-	int numSplashesSetup = 0;
-	float splashVelocity;
-
-	for (int i = 0; i < MAX_SPLASHES; i++)
-	{
-		SPLASH_STRUCT& splash = Splashes[i];
-
-		if (!splash.isActive)
-		{
-			if (numSplashesSetup == 0)
-			{
-				float splashPower = fmin(256, setup->splashPower);
-				splash.isActive = true;
-				splash.x = setup->x;
-				splash.y = setup->y;
-				splash.z = setup->z;
-				splash.life = 62;
-				splash.isRipple = false;
-				splash.innerRad = setup->innerRadius;
-				splashVelocity = splashPower / 16;
-				splash.innerRadVel = splashVelocity;
-				splash.heightSpeed = splashPower * 1.2f;
-				splash.height = 0;
-				splash.heightVel = -16;
-				splash.outerRad = setup->innerRadius / 3;
-				splash.outerRadVel = splashVelocity * 1.5f;
-				splash.spriteSequenceStart = 8; // Splash texture.
-				numSplashesSetup++;
-			}
-			else
-			{
-				float thickness = Random::GenerateFloat(64,128);
-				splash.isActive = true;
-				splash.x = setup->x;
-				splash.y = setup->y;
-				splash.z = setup->z;
-				splash.isRipple = true;
-				float vel;
-
-				if (numSplashesSetup == 2)
-					vel = (splashVelocity / 16) + Random::GenerateFloat(2, 4);
-				else
-					vel = (splashVelocity / 7) + Random::GenerateFloat(3, 7);
-				
-				float innerRadius = 0;
-				splash.innerRad = innerRadius;
-				splash.innerRadVel = vel * 1.3f;
-				splash.outerRad = innerRadius+thickness;
-				splash.outerRadVel = vel * 2.3f;
-				splash.heightSpeed = 128;
-				splash.height = 0;
-				splash.heightVel = -16;
-
-				float t = vel / (splashVelocity / 2) + 16;
-				t = fmax(0, fmin(t, 1));
-				splash.life = Lerp(48.0f, 70.0f, t);
-				splash.spriteSequenceStart = 4; // Splash texture.
-				splash.spriteSequenceEnd = 7; // Splash texture.
-				splash.animationSpeed = fmin(0.6f, (1 / splash.outerRadVel) * 2);
-
-				numSplashesSetup++;
-			}
-
-			if (numSplashesSetup == NUM_SPLASHES)
-				break;
-			
-			continue;
-		}
-	}
-
-	SpawnSplashDrips(Vector3(setup->x, setup->y - 15, setup->z), room, 32);
-
-	auto soundPosition = Pose(Vector3i(setup->x, setup->y, setup->z));
-	SoundEffect(SFX_TR4_LARA_SPLASH, &soundPosition);
-}
-
-void UpdateSplashes()
-{
-	if (SplashCount)
-		SplashCount--;
-
-	for (int i = 0; i < MAX_SPLASHES; i++)
-	{
-		auto& splash = Splashes[i];
-
-		if (splash.isActive)
-		{
-			splash.StoreInterpolationData();
-
-			splash.life--;
-			if (splash.life <= 0)
-				splash.isActive = false;
-			
-			splash.heightSpeed += splash.heightVel;
-			splash.height += splash.heightSpeed;
-
-			if (splash.height < 0)
-			{
-				splash.height = 0;
-				if (!splash.isRipple)
-					splash.isActive = false;
-			}
-			
-			splash.innerRad += splash.innerRadVel;
-			splash.outerRad += splash.outerRadVel;
-			splash.animationPhase += splash.animationSpeed;
-			short sequenceLength = splash.spriteSequenceEnd - splash.spriteSequenceStart;
-
-			if (splash.animationPhase > sequenceLength)
-				splash.animationPhase = fmod(splash.animationPhase, sequenceLength);
-		}
-	}
-}
-
 short DoBloodSplat(int x, int y, int z, short speed, short direction, short roomNumber)
 {
 	short probedRoomNumber = GetPointCollision(Vector3i(x, y, z), roomNumber).GetRoomNumber();
@@ -1247,75 +1129,6 @@ void TriggerWaterfallMist(const ItemInfo& item)
 void KillAllCurrentItems(short itemNumber)
 {
 	// TODO: Reimplement this functionality.
-}
-
-void SpawnPlayerWaterSurfaceEffects(const ItemInfo& item, int waterHeight, int waterDepth)
-{
-	const auto& player = GetLaraInfo(item);
-
-	// Player underwater; return early.
-	if (player.Control.WaterStatus == WaterStatus::Underwater)
-		return;
-
-	// Get point collision.
-	auto pointColl0 = GetPointCollision(item, 0, 0, -(LARA_HEIGHT / 2));
-	auto pointColl1 = GetPointCollision(item, 0, 0, item.Animation.Velocity.y);
-
-	// In swamp; return early.
-	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl1.GetRoomNumber()))
-		return;
-
-	bool isWater0 = TestEnvironment(ENV_FLAG_WATER, pointColl0.GetRoomNumber());
-	bool isWater1 = TestEnvironment(ENV_FLAG_WATER, pointColl1.GetRoomNumber());
-
-	// Spawn splash.
-	if (!isWater0 && isWater1 &&
-		item.Animation.Velocity.y > 0.0f && SplashCount == 0 &&
-		player.Control.WaterStatus != WaterStatus::TreadWater)
-	{
-		SplashSetup.x = item.Pose.Position.x;
-		SplashSetup.y = waterHeight - 1;
-		SplashSetup.z = item.Pose.Position.z;
-		SplashSetup.innerRadius = 16;
-		SplashSetup.splashPower = item.Animation.Velocity.z;
-
-		SetupSplash(&SplashSetup, pointColl0.GetRoomNumber());
-		SplashCount = 16;
-	}
-	// Spawn ripple.
-	else if (isWater1)
-	{
-		if (Wibble & 0xF)
-			return;
-
-		if (Random::TestProbability(1 / 2000.0f) && item.Animation.ActiveState == LS_IDLE)
-			return;
-
-		int flags = (item.Animation.ActiveState == LS_IDLE) ?
-			(int)RippleFlags::LowOpacity :
-			(int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity;
-
-		SpawnRipple(
-			Vector3(item.Pose.Position.x, waterHeight - 1, item.Pose.Position.z),
-			item.RoomNumber, Random::GenerateFloat(112.0f, 128.0f),
-			flags);
-	}
-}
-
-void Splash(ItemInfo* item)
-{
-	int probedRoomNumber = GetPointCollision(*item).GetRoomNumber();
-	if (!TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
-		return;
-
-	int waterHeight = GetPointCollision(*item).GetWaterTopHeight();
-
-	SplashSetup.x = item->Pose.Position.x;
-	SplashSetup.y = waterHeight - 1;
-	SplashSetup.z = item->Pose.Position.z;
-	SplashSetup.splashPower = item->Animation.Velocity.y;
-	SplashSetup.innerRadius = 64;
-	SetupSplash(&SplashSetup, probedRoomNumber);
 }
 
 void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber)
@@ -1988,4 +1801,55 @@ void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int scale)
 	spark.size = Random::GenerateInt(0, 16) + scale;
 	spark.sSize = spark.size;
 	spark.dSize = spark.size / 4;
+}
+
+void SpawnPlayerWaterSurfaceEffects(const ItemInfo& item, int waterHeight, int waterDepth)
+{
+	const auto& player = GetLaraInfo(item);
+
+	// Player underwater; return early.
+	if (player.Control.WaterStatus == WaterStatus::Underwater)
+		return;
+
+	// Get point collision.
+	auto pointColl0 = GetPointCollision(item, 0, 0, -(LARA_HEIGHT / 2));
+	auto pointColl1 = GetPointCollision(item, 0, 0, item.Animation.Velocity.y);
+
+	// In swamp; return early.
+	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl1.GetRoomNumber()))
+		return;
+
+	bool isWater0 = TestEnvironment(ENV_FLAG_WATER, pointColl0.GetRoomNumber());
+	bool isWater1 = TestEnvironment(ENV_FLAG_WATER, pointColl1.GetRoomNumber());
+
+	// Spawn splash.
+	if (!isWater0 && isWater1 &&
+		item.Animation.Velocity.y > 0.0f && SplashCount == 0 &&
+		player.Control.WaterStatus != WaterStatus::TreadWater)
+	{
+		SplashSetup.Position = Vector3(item.Pose.Position.x, waterHeight - 1, item.Pose.Position.z);
+		SplashSetup.InnerRadius = 16;
+		SplashSetup.SplashPower = item.Animation.Velocity.z;
+
+		SetupSplash(&SplashSetup, pointColl0.GetRoomNumber());
+		SplashCount = 16;
+	}
+	// Spawn ripple.
+	else if (isWater1)
+	{
+		if (Wibble & 0xF)
+			return;
+
+		if (Random::TestProbability(1 / 2000.0f) && item.Animation.ActiveState == LS_IDLE)
+			return;
+
+		int flags = (item.Animation.ActiveState == LS_IDLE) ?
+			(int)RippleFlags::LowOpacity :
+			(int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity;
+
+		SpawnRipple(
+			Vector3(item.Pose.Position.x, waterHeight - 1, item.Pose.Position.z),
+			item.RoomNumber, Random::GenerateFloat(112.0f, 128.0f),
+			flags);
+	}
 }
