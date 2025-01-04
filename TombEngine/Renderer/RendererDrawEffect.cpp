@@ -18,6 +18,7 @@
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
+#include "Game/effects/Splash.h"
 #include "Game/effects/Streamer.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
@@ -42,6 +43,7 @@ using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Footprint;
 using namespace TEN::Effects::Ripple;
+using namespace TEN::Effects::Splash;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Traps;
@@ -51,7 +53,6 @@ extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
-extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern std::array<DebrisFragment, MAX_DEBRIS> DebrisFragments;
 
 namespace TEN::Renderer 
@@ -533,24 +534,22 @@ namespace TEN::Renderer
 
 	void Renderer::PrepareSplashes(RenderView& view) 
 	{
-		constexpr size_t NUM_POINTS = 9;
+		constexpr auto POINT_COUNT = 9;
+		constexpr auto ALPHA	   = 360 / POINT_COUNT;
 
-		for (int i = 0; i < MAX_SPLASHES; i++) 
+		for (const auto& splash : SplashEffects) 
 		{
-			auto& splash = Splashes[i];
-
 			if (!splash.isActive)
 				continue;
 
 			if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Splashes rendering"))
 				return;
 
-			constexpr float alpha = 360 / NUM_POINTS;
 			byte color = (splash.life >= 32 ? 128 : (byte)((splash.life / 32.0f) * 128));
 
 			if (!splash.isRipple) 
 			{
-				if (splash.heightSpeed < 0 && splash.height < 1024) 
+				if (splash.HeightSpeed < 0 && splash.height < 1024) 
 				{
 					float multiplier = splash.height / 1024.0f;
 					color = (float)color * multiplier;
@@ -578,33 +577,34 @@ namespace TEN::Renderer
 			float z2Inner;
 			float x2Outer;
 			float z2Outer;
-			float yInner = splash.y;
-			float yOuter = splash.y - splash.height;
+			float yInner = splash.Position.y;
+			float yOuter = splash.Position.y - splash.height;
 
-			float innerRadius = Lerp(splash.PrevInnerRad, splash.innerRad, GetInterpolationFactor());
-			float outerRadius = Lerp(splash.PrevOuterRad, splash.outerRad, GetInterpolationFactor());
+			float innerRadius = Lerp(splash.PrevInnerRadius, splash.InnerRadius, GetInterpolationFactor());
+			float outerRadius = Lerp(splash.PrevOuterRadius, splash.OuterRadius, GetInterpolationFactor());
 
-			for (int i = 0; i < NUM_POINTS; i++) 
+			for (int i = 0; i < POINT_COUNT; i++) 
 			{
-				xInner = innerRadius * sin(alpha * i * PI / 180);
-				zInner = innerRadius * cos(alpha * i * PI / 180);
-				xOuter = outerRadius * sin(alpha * i * PI / 180);
-				zOuter = outerRadius * cos(alpha * i * PI / 180);
-				xInner += splash.x;
-				zInner += splash.z;
-				xOuter += splash.x;
-				zOuter += splash.z;
-				int j = (i + 1) % NUM_POINTS;
-				x2Inner = innerRadius * sin(alpha * j * PI / 180);
-				x2Inner += splash.x;
-				z2Inner = innerRadius * cos(alpha * j * PI / 180);
-				z2Inner += splash.z;
-				x2Outer = outerRadius * sin(alpha * j * PI / 180);
-				x2Outer += splash.x;
-				z2Outer = outerRadius * cos(alpha * j * PI / 180);
-				z2Outer += splash.z;
+				xInner = innerRadius * sin(ALPHA * i * PI / 180);
+				zInner = innerRadius * cos(ALPHA * i * PI / 180);
+				xOuter = outerRadius * sin(ALPHA * i * PI / 180);
+				zOuter = outerRadius * cos(ALPHA * i * PI / 180);
+				xInner += splash.Position.x;
+				zInner += splash.Position.z;
+				xOuter += splash.Position.x;
+				zOuter += splash.Position.z;
+				int j = (i + 1) % POINT_COUNT;
+				x2Inner = innerRadius * sin(ALPHA * j * PI / 180);
+				x2Inner += splash.Position.x;
+				z2Inner = innerRadius * cos(ALPHA * j * PI / 180);
+				z2Inner += splash.Position.z;
+				x2Outer = outerRadius * sin(ALPHA * j * PI / 180);
+				x2Outer += splash.Position.x;
+				z2Outer = outerRadius * cos(ALPHA * j * PI / 180);
+				z2Outer += splash.Position.z;
 
-				AddQuad(&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase],
+				AddQuad(
+					&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.SpriteSeqStart + (int)splash.AnimPhase],
 					Vector3(xOuter, yOuter, zOuter),
 					Vector3(x2Outer, yOuter, z2Outer),
 					Vector3(x2Inner, yInner, z2Inner),
