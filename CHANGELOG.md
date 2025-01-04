@@ -17,6 +17,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed endless explosion effect for Puna.
 * Fixed diary pick-up item inventory state not preserved in the savegame.
 * Fixed gravity being applied underwater when exiting the fly cheat.
+* Fixed gravity being applied when vaulting on the same frame as the player lands.
 
 ### New Features
 * Added realtime shader reloading in debug mode by pressing F9 key.
