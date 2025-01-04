@@ -157,10 +157,10 @@ EventSequence.Create =function (name, loop, timerFormat, ...)
 	local tfa = thisES.timesFuncsAndArgs
 
 	for i = 1, #tfa, 2 do
-		local timer = tfa[i]
+		local time = tfa[i]
 		local funcAndArgs = tfa[i+1]
 		local error = false
-		if not Type.IsNumber(timer) then
+		if not Type.IsNumber(time) or time < 0 then
 			TEN.Util.PrintLog("Error in EventSequence.Create(): wrong value for seconds, '".. name .."' sequence was not created", TEN.Util.LogLevel.ERROR)
 			error = true
 		end
@@ -192,7 +192,7 @@ EventSequence.Create =function (name, loop, timerFormat, ...)
 			args = {}
 		end
 		Timer.Create(timerName,
-				timer,
+				time,
 				false,
 				thisES.timerFormat,
 				LevelFuncs.Engine.EventSequence.CallNext,
