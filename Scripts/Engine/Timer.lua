@@ -69,9 +69,9 @@ LevelVars.Engine.Timer = {timers = {}}
 -- @tparam float totalTime Duration of the timer, in seconds.
 --
 -- Values with only 1 tenth of a second (0.1) are accepted, example: 1.5 - 6.0 - 9.9 - 123.6. No negative values allowed!
--- @tparam[opt] bool loop if true, the timer will start again immediately after the time has elapsed. __Default: false__
+-- @tparam[opt] bool loop If true, the timer will start again immediately after the time has elapsed. __Default: false__
 -- @tparam[opt] ?table|bool timerFormat If a table is given, the remaining time will be shown as a string, formatted according to the values in the table. If true, the remaining seconds, rounded up, will show at the bottom of the screen. If false, the remaining time will not be shown on screen. __Default: false__
--- @tparam[opt] LevelFunc func function defined in the *LevelFuncs* table to call when the time is up
+-- @tparam[opt] LevelFunc func The function defined in the *LevelFuncs* table to call when the time is up
 -- @tparam[opt] any ... a variable number of arguments with which the above function will be called
 -- @treturn Timer The timer in its paused state
 --
@@ -202,7 +202,7 @@ end
 
 
 --- Begin or unpause a timer. If showing the remaining time on-screen, its default color will be set to white.
--- @tparam[opt] bool reset if true, the timer will restart from the beginning (total time)
+-- @tparam[opt] bool reset If true, the timer will restart from the beginning (total time)
 -- @usage
 --  local TimeFormat = {minutes = true, seconds = true, deciseconds = true}
 --  Timer.Create("my_timer", 6.1, false, TimerFormat)
@@ -248,7 +248,7 @@ function Timer:Stop()
 end
 
 --- Pause or unpause the timer. If showing the remaining time on-screen, its default color will be set to yellow (paused) or white (unpaused).
--- @tparam bool p if true, the timer will be paused; if false, it would be unpaused
+-- @tparam bool p If true, the timer will be paused; if false, it would be unpaused
 -- @usage
 --  local TimeFormat = {minutes = true, seconds = true, deciseconds = true}
 --  Timer.Create("my_timer", 6.1, false, TimerFormat)
@@ -269,7 +269,7 @@ function Timer:SetPaused(p)
 end
 
 --- Get the remaining time of a timer in game frames.
--- @treturn ?Time|nil the remaining time in game frames on the clock or nil if timer does not exist
+-- @treturn ?Time|nil The remaining time in *game frames* of timer or *nil* if timer does not exist
 --
 -- __Please note:__ It's recommended to check that GetRemainingTime() doesn't have a null value
 -- @usage
@@ -291,7 +291,7 @@ function Timer:GetRemainingTime()
 end
 
 --- Get the remaining time of a timer in seconds.
--- @treturn ?float|nil the time in seconds remaining on the clock or nil if timer does not exist.
+-- @treturn ?float|nil The remaining time in *seconds* of timer or *nil* if timer does not exist.
 --
 -- Seconds have an accuracy of 0.1 tenths. Example: 1.5 - 6.0 - 9.9 - 123.6
 --
@@ -315,7 +315,7 @@ end
 
 --- Get the formatted remaining time of a timer.
 -- @tparam ?table|bool timerFormat If a table is given, the time will be shown as a string, formatted according to the values in the table. If true, only seconds will be displayed.
--- @treturn ?string|nil the formatted remaining time or nil if timer does not exist
+-- @treturn ?string|nil The *formatted remaining time* or *nil* if timer does not exist
 --
 -- __Please note:__ It's recommended to check that GetRemainingTimeFormatted() doesn't have a null value
 -- @usage
@@ -338,7 +338,7 @@ function Timer:GetRemainingTimeFormatted(timerFormat)
 end
 
 --- Set the remaining time of a timer.
--- @tparam float remainingTime the new time remaining for the timer
+-- @tparam float remainingTime The new time remaining for the timer
 --
 -- Values with only 1 tenth of a second (0.1) are accepted, example: 1.5 - 6.0 - 9.9 - 123.6. No negative values allowed!
 -- @usage
@@ -359,7 +359,7 @@ end
 --- Compares the remaining time with a value (in seconds). 
 --
 -- It's recommended to use the *IfRemainingTimeIs()* method to have error-free comparisons
--- @tparam int operator the type of comparison
+-- @tparam int operator The type of comparison
 --
 -- 0 : If the remaining time is equal to the value
 --
@@ -372,7 +372,7 @@ end
 -- 4 : If the remaining time is greater the value
 --
 -- 5 : If the remaining time is greater or equal to the value
--- @tparam float seconds the value in seconds to compare.
+-- @tparam float seconds The value in seconds to compare.
 --
 -- Values with only 1 tenth of a second (0.1) are accepted, example: 1.5 - 6.0 - 9.9 - 123.6. No negative values allowed!
 -- @treturn bool *true* if comparison is true, *false* if comparison is false or timer does not exist
@@ -402,7 +402,7 @@ end
 
 --- Get the total time of a timer in game frames.
 -- This is the amount of time the timer will start with, as well as when starting a new loop.
--- @treturn ?Time|nil the timer's total time in game frames or nil if timer does not exist
+-- @treturn ?Time|nil The timer's total time in *game frames* or *nil* if timer does not exist
 --
 -- __Please note:__ It's recommended to check that GetTotalTime() doesn't have a null value
 -- @usage
@@ -422,7 +422,7 @@ end
 
 --- Get the total time of a timer in seconds.
 -- This is the amount of time the timer will start with, as well as when starting a new loop
--- @treturn ?float|nil the timer's total time in seconds or nil if timer does not exist
+-- @treturn ?float|nil The timer's total time in *seconds* or *nil* if timer does not exist
 --
 -- Seconds have an accuracy of 0.1 tenths. Example: 1.5 - 6.0 - 9.9 - 123.6
 --
@@ -447,7 +447,7 @@ end
 --- Get the formatted total time of a timer.
 -- This is the amount of time the timer will start with, as well as when starting a new loop
 -- @tparam ?table|bool timerFormat If a table is given, the time will be shown as a string, formatted according to the values in the table. If true, only seconds will be displayed. If false, the time will not be displayed on the screen.
--- @treturn ?string|nil the formatted total time or nil if timer does not exist
+-- @treturn ?string|nil The *formatted total time* or *nil* if timer does not exist
 --
 -- __Please note:__ It's recommended to check that GetTotalTimeFormatted() doesn't have a null value
 -- @usage
@@ -470,7 +470,7 @@ end
 
 --- Set the total time for a timer
 -- The total time is changed only if the timer loops
--- @tparam float totalTime timer's new total time
+-- @tparam float totalTime Timer's new total time
 --
 -- Values with only 1 tenth of a second (0.1) are accepted, example: 1.5 - 6.0 - 9.9 - 123.6. No negative values allowed!
 -- @usage
@@ -490,7 +490,7 @@ end
 --- Compares the total time with a value (in seconds).
 --
 -- It's recommended to use the *IfTotalTimeIs()* method to have error-free comparisons
--- @tparam int operator the type of comparison
+-- @tparam int operator The type of comparison
 --
 -- 0 : If the total time is equal to the value
 --
@@ -528,7 +528,7 @@ function Timer:IfTotalTimeIs(operator, seconds)
 end
 
 --- Set whether or not the timer loops
--- @tparam bool looping whether or not the timer loops
+-- @tparam bool looping Whether or not the timer loops
 -- @usage
 --  -- Example:
 --  Timer.Get("my_timer"):SetLooping(true)
@@ -543,8 +543,8 @@ function Timer:SetLooping(looping)
 end
 
 --- Give the timer a new function and args
--- @tparam LevelFunc func The *LevelFunc* member to call when the time is up
--- @tparam[opt] any ... a variable number of arguments with which the above function will be called
+-- @tparam LevelFunc func The function defined in the *LevelFuncs* table to call when the time is up
+-- @tparam[opt] any ... A variable number of arguments with which the above function will be called
 -- @usage
 --  -- Example:
 --  -- This function kills Lara when the timer runs out
@@ -570,8 +570,8 @@ end
 -- The coordinate (0,0) is in the upper left-hand corner.
 --
 -- Default position of the timer is (50,90)
--- @tparam float x the x-coordinate in percent
--- @tparam float y the y-coordinate in percent
+-- @tparam float x The x-coordinate in percent
+-- @tparam float y The y-coordinate in percent
 -- @usage
 --  -- Example:
 --  Timer.Get("my_timer"):SetPosition(10.0,10.0)
@@ -588,7 +588,7 @@ function Timer:SetPosition(x,y)
 end
 
 --- Set the scale of the displayed timer when it is active.
--- @tparam float scale new scale value
+-- @tparam float scale The new scale value
 --
 --  The default scale of the timer is 1.0
 -- @usage
@@ -605,7 +605,7 @@ function Timer:SetScale(scale)
 end
 
 --- Set the paused color of the displayed timer when it is active.
--- @tparam Color color timer's new paused color
+-- @tparam Color color Timer's new paused color
 --
 --  Default paused color of the timer is yellow: TEN.Color(255, 255, 0, 255)
 -- @usage
@@ -622,7 +622,7 @@ function Timer:SetPausedColor(color)
 end
 
 --- Set the color of the displayed timer when it is active.
--- @tparam Color color timer's new color
+-- @tparam Color color Timer's new color
 --
 --  Default color of the timer is white: TEN.Color(255, 255, 255, 255)
 -- @usage
@@ -639,7 +639,7 @@ function Timer:SetUnpausedColor(color)
 end
 
 --- Set text options for a timer
--- @tparam table _table table containing timer's new text options. See @{Strings.DisplayStringOption}
+-- @tparam table _table Table containing timer's new text options. See @{Strings.DisplayStringOption}
 --
 -- Default options: {TEN.Strings.DisplayStringOption.CENTER, TEN.Strings.DisplayStringOption.SHADOW}
 --
@@ -677,7 +677,7 @@ function Timer:SetTextOption(_table)
 end
 
 --- Get whether or not the timer is paused
--- @treturn bool true if the timer is paused, false if it is not paused or timer does not exist
+-- @treturn bool *true* if the timer is paused, *false* if it is not paused or timer does not exist
 -- @usage
 --  -- Example:
 --  local pauseState = Timer.Get("my_timer"):IsPaused()
@@ -690,7 +690,7 @@ function Timer:IsPaused()
 end
 
 --- Get whether or not the timer is active
--- @treturn bool true if the timer is active, false if it is not active or timer does not exist
+-- @treturn bool *true* if the timer is active, *false* if it is not active or timer does not exist
 -- @usage
 --  -- Example:
 --  local state = Timer.Get("my_timer"):IsActive()
