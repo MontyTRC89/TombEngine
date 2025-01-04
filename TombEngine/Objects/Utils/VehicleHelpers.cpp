@@ -5,6 +5,7 @@
 #include "Game/collision/Point.h"
 #include "Game/collision/Sphere.h"
 #include "Game/effects/simple_particle.h"
+#include "Game/effects/Splash.h"
 #include "Game/effects/Streamer.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/Hud/Hud.h"
@@ -18,6 +19,7 @@
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Collision::Sphere;
+using namespace TEN::Effects::Splash;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Hud;
 using namespace TEN::Input;
