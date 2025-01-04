@@ -79,8 +79,8 @@ end
 --
 -- @tparam string name A label to give the sequence; used to retrieve the timer later as well as internally by TEN.
 -- @tparam bool loop if true, the sequence will start again from its first timer once its final function has been called
--- @tparam ?table|bool timerFormat same as in @{Timer.Create}. This is mainly for debugging. __This will not work properly if another sequence or timer is showing a countdown.__
--- @tparam ?float|table|LevelFuncs ... a variable number of pairs of arguments, each pair consisting of:
+-- @tparam ?table|bool timerFormat Same as in @{Timer.Create}. This is mainly for debugging. __This will not work properly if another sequence or timer is showing a countdown.__
+-- @tparam ?float|table|LevelFuncs ... A variable number of pairs of arguments, each pair consisting of:
 --
 -- a time in seconds (positive values are accepted and with only 1 tenth of a second [__0.1__]),
 --
@@ -283,7 +283,7 @@ function EventSequence:Start()
 end
 
 --- Pause or unpause the sequence. If showing the remaining time on-screen, its color will be set to yellow (paused) or white (unpaused).
--- @tparam bool p if true, the sequence will be paused; if false, it will be unpaused
+-- @tparam bool p If true, the sequence will be paused; if false, it will be unpaused
 -- @usage
 --	-- Example 1: Pause the sequence
 --	EventSequence.Get("my_seq"):SetPaused(true)
@@ -317,7 +317,7 @@ function EventSequence:Stop()
 end
 
 --- Get whether or not the sequence is paused
--- @treturn bool true if the timer is paused, false if otherwise
+-- @treturn bool true If the timer is paused, false if otherwise
 -- @usage
 --	-- Example 1: paused sequence
 --	if not EventSequence.Get("my_seq"):IsPaused() then
@@ -338,7 +338,7 @@ function EventSequence:IsPaused()
 end
 
 --- Get whether or not the sequence is active
--- @treturn bool true if the sequence is active, false if otherwise
+-- @treturn bool true If the sequence is active, false if otherwise
 -- @usage
 --	-- Example:
 --	if not EventSequence.Get("my_seq"):IsActive() then
