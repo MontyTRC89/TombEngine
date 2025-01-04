@@ -90,7 +90,7 @@ Timer.Create = function (name, totalTime, loop, timerFormat, func, ...)
 		TEN.Util.PrintLog("Error in Timer.Create(): invalid name, '" .. tostring(name) .."' timer was not created", TEN.Util.LogLevel.ERROR)
 		return
 	end
-	if not Type.IsNumber(totalTime) then
+	if not Type.IsNumber(totalTime) or totalTime < 0 then
 		TEN.Util.PrintLog("Error in Timer.Create(): wrong value for totalTime, '".. name .."' timer was not created", TEN.Util.LogLevel.ERROR)
 		return
 	end
