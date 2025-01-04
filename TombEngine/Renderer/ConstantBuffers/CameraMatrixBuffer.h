@@ -44,7 +44,8 @@ namespace TEN::Renderer::ConstantBuffers
 		//--
 		int RefreshRate;
 		int NumFogBulbs;
-		Vector2 Padding2;
+		float WaterHeight;
+		int WaterReflections;
 		//--
 		ShaderFogBulb FogBulbs[MAX_FOG_BULBS_DRAW];
 	};
