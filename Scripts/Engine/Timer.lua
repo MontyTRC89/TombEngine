@@ -390,7 +390,7 @@ function Timer:IfRemainingTimeIs(operator, seconds)
 	elseif not Type.IsNumber(operator) or operator < 0 or operator > 5 then
 		TEN.Util.PrintLog("Error in Timer:IfRemainingTimeIs(): invalid operator for '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 		return false
-	elseif not Type.IsNumber(seconds) then
+	elseif not Type.IsNumber(seconds) or seconds < 0 then
 		TEN.Util.PrintLog("Error in Timer:IfRemainingTimeIs(): wrong value for seconds in '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 		return false
 	end
@@ -517,7 +517,7 @@ function Timer:IfTotalTimeIs(operator, seconds)
 	elseif not Type.IsNumber(operator) or operator < 0 or operator > 5 then
 		TEN.Util.PrintLog("Error in Timer:IfTotalTimeIs(): invalid operator for '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 		return false
-	elseif not Type.IsNumber(seconds) then
+	elseif not Type.IsNumber(seconds) or seconds < 0 then
 		TEN.Util.PrintLog("Error in Timer:IfTotalTimeIs(): wrong value for seconds in '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 		return false
 	end
