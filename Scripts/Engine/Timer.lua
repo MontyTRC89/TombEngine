@@ -42,7 +42,7 @@ LevelVars.Engine.Timer = {timers = {}}
 
 --- Create (but do not start) a new timer.
 --
--- You have the option of displaying the remaining time on the clock. Timer format details:
+-- You have the option of displaying the remaining time of timer. Timer format details:
 --
 --@advancedDesc
 --	-- deciseconds are 1/10th of a second
