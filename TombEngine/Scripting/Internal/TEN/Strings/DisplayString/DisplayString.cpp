@@ -104,10 +104,10 @@ sol::object DisplayStringWrapper(const std::string& key, sol::object unkArg0, so
 								 TypeOrNil<bool> isTranslated, TypeOrNil<sol::table> flags, sol::this_state state)
 {
 	// Regular constructor.
-	if (unkArg0.is<Vec2>() && unkArg1.is<float>())
+	if (unkArg0.is<Vec2>() && (unkArg1.is<float>() || unkArg1 == sol::nil))
 	{
 		auto pos = (Vec2)unkArg0.as<Vec2>();
-		float scale = unkArg1.as<float>();
+		float scale = unkArg1 == sol::nil ? 1.0f : unkArg1.as<float>();
 
 		auto displayString = CreateString(key, pos, scale, color, isTranslated, flags, state);
 		return sol::make_object(state, displayString.release());

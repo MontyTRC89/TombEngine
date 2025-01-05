@@ -17,9 +17,8 @@ constexpr auto SD_UWEXPLOSION = 2;
 
 constexpr auto MAX_NODE		= 23;
 constexpr auto MAX_DYNAMICS = 64;
-constexpr auto MAX_SPLASHES = 8;
 
-constexpr auto MAX_PARTICLES		 = 1024;
+constexpr auto MAX_PARTICLES		 = 4096;
 constexpr auto MAX_PARTICLE_DYNAMICS = 8;
 
 extern int Wibble;
@@ -108,16 +107,6 @@ struct NODEOFFSET_INFO
 	unsigned char gotIt;
 };
 
-struct SPLASH_SETUP
-{
-	float x;
-	float y;
-	float z;
-	float splashPower;
-	float innerRadius;
-	int room;
-};
-
 struct Particle
 {
 	int x;
@@ -180,46 +169,6 @@ struct Particle
 	}
 };
 
-struct SPLASH_STRUCT
-{
-	float x;
-	float y;
-	float z;
-	float innerRad;
-	float innerRadVel;
-	float heightVel;
-	float heightSpeed;
-	float height;
-	float outerRad;
-	float outerRadVel;
-	float animationSpeed;
-	float animationPhase;
-	short spriteSequenceStart;
-	short spriteSequenceEnd;
-	unsigned short life;
-	bool isRipple;
-	bool isActive;
-
-	Vector3 PrevPosition	= Vector3::Zero;
-	float	PrevInnerRad	= 0.0f;
-	float	PrevOuterRad	= 0.0f;
-	float	PrevHeight		= 0.0f;
-	float	PrevHeightSpeed = 0.0f;
-	float	PrevAnimPhase	= 0.0f;
-	unsigned short PrevLife = 0;
-
-	void StoreInterpolationData()
-	{
-		PrevPosition = Vector3(x, y, z);
-		PrevInnerRad = innerRad;
-		PrevOuterRad = outerRad;
-		PrevHeight = height;
-		PrevHeightSpeed = heightSpeed;
-		PrevAnimPhase = animationPhase;
-		PrevLife = life;
-	}
-};
-
 struct ParticleDynamic
 {
 	byte On;
@@ -236,9 +185,6 @@ extern GameBoundingBox DeadlyBounds;
 // New particle class
 extern Particle Particles[MAX_PARTICLES];
 extern ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
-
-extern SPLASH_SETUP SplashSetup;
-extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 
 extern Vector3i NodeVectors[ParticleNodeOffsetIDs::NodeMax];
 extern NODEOFFSET_INFO NodeOffsets[ParticleNodeOffsetIDs::NodeMax];
@@ -295,8 +241,6 @@ void TriggerExplosionSmokeEnd(int x, int y, int z, int uw);
 void TriggerExplosionSmoke(int x, int y, int z, int uw);
 void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1 = Vector3::Zero, const Vector3& color2 = Vector3::Zero);
 void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly);
-void SetupSplash(const SPLASH_SETUP* const setup, int room);
-void UpdateSplashes();
 void TriggerLaraBlood();
 short DoBloodSplat(int x, int y, int z, short speed, short yRot, short roomNumber);
 void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count);
@@ -309,10 +253,10 @@ void TriggerFlashSmoke(int x, int y, int z, short roomNumber);
 void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, const Vector3& color, int additional);
 void SpawnCorpseEffect(const Vector3& pos);
 void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int scale);
-void SpawnPlayerWaterSurfaceEffects(const ItemInfo& item, int waterHeight, int waterDepth);
-void Splash(ItemInfo* item);
 void TriggerRocketFire(int x, int y, int z);
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber);
 void Ricochet(Pose& pos);
 void ProcessEffects(ItemInfo* item);
 void UpdateWibble();
+
+void SpawnPlayerWaterSurfaceEffects(const ItemInfo& item, int waterHeight, int waterDepth);
