@@ -5,8 +5,10 @@
 #include "Renderer/Structures/RendererShader.h"
 #include "Specific/configuration.h"
 #include "Specific/trutils.h"
+#include "Version.h"
 
 using namespace TEN::Renderer::Structures;
+using namespace TEN::Utils;
 
 namespace TEN::Renderer::Utils
 {
@@ -167,8 +169,8 @@ namespace TEN::Renderer::Utils
 
 		// Define paths for native (uncompiled) shaders and compiled shaders.
 		auto shaderPath = GetAssetPath(L"Shaders\\");
-		auto compiledShaderPath = shaderPath + L"Bin\\";
-		auto wideFileName = TEN::Utils::ToWString(fileName);
+		auto compiledShaderPath = shaderPath + L"Bin\\" + ToWString(TEN_VERSION_STRING) + L"\\";
+		auto wideFileName = ToWString(fileName);
 
 		// Ensure the /Bin subdirectory exists.
 		std::filesystem::create_directories(compiledShaderPath);
@@ -189,7 +191,7 @@ namespace TEN::Renderer::Utils
 				srcFileNameWithExtension = srcFileName + L".fx";
 				if (!std::filesystem::exists(srcFileNameWithExtension))
 				{
-					TENLog("Shader source file not found: " + TEN::Utils::ToString(srcFileNameWithExtension), LogLevel::Error);
+					TENLog("Shader source file not found: " + ToString(srcFileNameWithExtension), LogLevel::Error);
 					throw std::runtime_error("Shader source file not found.");
 				}
 			}
