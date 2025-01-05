@@ -2,7 +2,7 @@
 
 #define TE_MAJOR_VERSION   1
 #define TE_MINOR_VERSION   7
-#define TE_BUILD_NUMBER    4
+#define TE_BUILD_NUMBER    5
 #define TE_REVISION_NUMBER 0
 
 #define TEN_MAJOR_VERSION   1
