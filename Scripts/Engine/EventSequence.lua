@@ -80,7 +80,7 @@ end
 -- @tparam string name A label to give the sequence; used to retrieve the timer later as well as internally by TEN.
 -- @tparam bool loop if true, the sequence will start again from its first timer once its final function has been called
 -- @tparam ?table|bool timerFormat Same as in @{Timer.Create}. This is mainly for debugging. __This will not work properly if another sequence or timer is showing a countdown.__
--- @tparam ?float|table|LevelFuncs ... A variable number of pairs of arguments, each pair consisting of:
+-- @tparam ?float|LevelFuncs|table ... A variable number of pairs of arguments, each pair consisting of:
 --
 -- a time in seconds (positive values are accepted and with only 1 tenth of a second [__0.1__]),
 --
@@ -113,22 +113,22 @@ end
 --	    LevelFuncs.Func)
 --
 --	-- Example 2 function with arguments:
---	-- This creates a sequence that calls LevelFuncs.Func("1") after 2 seconds
---	-- then LevelFuncs.Func("2") after 3 seconds
---	-- and finally LevelFuncs.Func("3") after 4 seconds
---	LevelFuncs.Func = function (text)
---		local pos = TEN.Vec2(TEN.Util.PercentToScreen(50, 10))
+--	-- This creates a sequence that calls LevelFuncs.Func2("1", 5, 10) after 2.3 seconds
+--	-- then LevelFuncs.Func2("2", 5, 15) after 3.1 seconds
+--	-- and finally LevelFuncs.Func2("3", 5, 20) after 4.8 seconds
+--	LevelFuncs.Func2 = function (text, x, y)
+--		local pos = TEN.Vec2(TEN.Util.PercentToScreen(x, y))
 --		local str = TEN.Strings.DisplayString("Function " .. text .. "!", pos, 1)
 --		TEN.Strings.ShowString(str, 1)
 --	end
 --	EventSequence.Create(
---	    "test2",true,TimerFormat,
+--	    "test2",true,false,
 --	    2.3,
---	    {LevelFuncs.Func, "1"},
+--	    {LevelFuncs.Func2, "1", 5, 10},
 --	    3.1,
---	    {LevelFuncs.Func, "2"},
+--	    {LevelFuncs.Func2, "2", 5, 15},
 --	    4.8,
---	    {LevelFuncs.Func, "3"})
+--	    {LevelFuncs.Func2, "3", 5, 20})
 EventSequence.Create =function (name, loop, timerFormat, ...)
 	if not Type.IsString(name) then
 		TEN.Util.PrintLog("Error in EventSequence.Create(): invalid name, sequence was not created", TEN.Util.LogLevel.ERROR)
@@ -136,7 +136,7 @@ EventSequence.Create =function (name, loop, timerFormat, ...)
 	end
 	local self = {name = name}
 	if LevelVars.Engine.EventSequence.sequences[name] then
-		TEN.Util.PrintLog("Warning in EventSequence.Create(): an EventSequence with name " .. name .. " already exists; overwriting it with a new one...", TEN.Util.LogLevel.WARNING)
+		TEN.Util.PrintLog("Warning in EventSequence.Create(): an EventSequence with name '" .. name .. "' already exists; overwriting it with a new one...", TEN.Util.LogLevel.WARNING)
 	end
 	LevelVars.Engine.EventSequence.sequences[name] = {}
 	local thisES = LevelVars.Engine.EventSequence.sequences[name]

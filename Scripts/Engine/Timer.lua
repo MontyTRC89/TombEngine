@@ -101,7 +101,7 @@ Timer.Create = function (name, totalTime, loop, timerFormat, func, ...)
 
 	local self = {name = name}
 	if LevelVars.Engine.Timer.timers[name] then
-		TEN.Util.PrintLog("Warning in Timer.Create(): a timer with name " .. name .. " already exists; overwriting it with a new one...", TEN.Util.LogLevel.WARNING)
+		TEN.Util.PrintLog("Warning in Timer.Create(): a timer with name '" .. name .. "' already exists; overwriting it with a new one...", TEN.Util.LogLevel.WARNING)
 	end
 	LevelVars.Engine.Timer.timers[name] = {}
 	local thisTimer = LevelVars.Engine.Timer.timers[name]
@@ -144,7 +144,7 @@ Timer.Delete = function (name)
 	elseif LevelVars.Engine.Timer.timers[name] then
 		LevelVars.Engine.Timer.timers[name] = nil
 	else
-		TEN.Util.PrintLog("Warning in Timer.Delete(): " .. name .. " timer does not exist and can't be deleted.", TEN.Util.LogLevel.WARNING)
+		TEN.Util.PrintLog("Warning in Timer.Delete(): '" .. name .. "' timer does not exist and can't be deleted.", TEN.Util.LogLevel.WARNING)
 	end
 end
 
@@ -662,13 +662,13 @@ end
 function Timer:SetTextOption(_table)
 	_table = _table or {}
 	if self.errorName then
-		TEN.Util.PrintLog("Error in SetTextOption(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
+		TEN.Util.PrintLog("Error in Timer:SetTextOption(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
 	elseif type(_table) ~= "table" then
-		TEN.Util.PrintLog("Error in SetTextOption(): options is not a table for '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
+		TEN.Util.PrintLog("Error in Timer:SetTextOption(): options is not a table for '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 	else
 		for _, v in pairs(_table) do
 			if not Type.IsNumber(v) or v < 0 or v > 3 then
-				TEN.Util.PrintLog("Error in SetTextOption(): invalid value in options for '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
+				TEN.Util.PrintLog("Error in Timer:SetTextOption(): invalid value in options for '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 				return
 			end
 		end
@@ -696,7 +696,7 @@ end
 --  local state = Timer.Get("my_timer"):IsActive()
 function Timer:IsActive()
 	if self.errorName then
-		TEN.Util.PrintLog("Error in IsActive(): '".. self.errorName .."' timer does not exist", TEN.Util.LogLevel.ERROR)
+		TEN.Util.PrintLog("Error in Timer:IsActive(): '".. self.errorName .."' timer does not exist", TEN.Util.LogLevel.ERROR)
 		return false
 	end
 	return LevelVars.Engine.Timer.timers[self.name].active
