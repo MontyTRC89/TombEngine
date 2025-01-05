@@ -11,8 +11,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### New Features
 
 
-### Lua API changes 
-
+### Lua API changes
 
 ## [Version 1.7.1] (https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.4) - 2025-04-01
 
