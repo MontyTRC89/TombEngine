@@ -643,7 +643,7 @@ end
 --
 -- Default options: {TEN.Strings.DisplayStringOption.CENTER, TEN.Strings.DisplayStringOption.SHADOW}
 --
--- __Please note:__ the new table overwrites the existing options
+-- __Please note:__ the new table overwrites the existing table options
 -- @usage
 --  -- Example 1
 --  -- right alignment
