@@ -12,6 +12,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### Lua API changes
 
 ### Lua Modules changes
+* Refactoring Timer and EventSequence modules
 * Timer module uses the Time class for greater precision
 * Timer module contains new methods
 
