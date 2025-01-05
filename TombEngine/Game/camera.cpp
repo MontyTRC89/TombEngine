@@ -12,7 +12,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/Lara/lara_optics.h"
+#include "Game/Lara/Optics.h"
 #include "Game/room.h"
 #include "Game/savegame.h"
 #include "Game/Setup.h"
@@ -423,7 +423,7 @@ void ObjCamera(ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int tar
 
 	//get mesh 0 coordinates.	
 	auto pos = GetJointPosition(camSlotId, 0, Vector3i::Zero);
-	auto dest = Vector3(pos.x, pos.y, pos.z) + camSlotId->Pose.Position.ToVector3();
+	auto dest = Vector3(pos.x, pos.y, pos.z);
 
 	GameVector from = GameVector(dest, camSlotId->RoomNumber);
 	Camera.fixedCamera = true;

@@ -38,7 +38,7 @@ namespace TEN::Entities::Player
 		}
 
 		if (IsHeld(In::Action))
-			TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 31, 150, 150, 150);
+			SpawnDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, 31, 150, 150, 150);
 
 		if (IsHeld(In::Jump))
 		{

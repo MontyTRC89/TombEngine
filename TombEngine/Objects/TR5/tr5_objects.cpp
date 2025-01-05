@@ -1042,6 +1042,10 @@ static void StartPickup(ObjectInfo *obj)
 	InitPickup(obj, ID_WATERSKIN2_EMPTY);
 	InitPickup(obj, ID_GOLDROSE_ITEM);
 	InitPickup(obj, ID_DIARY_ITEM);
+	InitPickup(obj, ID_PC_LOAD_INV_ITEM);
+	InitPickup(obj, ID_PC_SAVE_INV_ITEM);
+	InitPickup(obj, ID_STOPWATCH_ITEM);
+	InitPickup(obj, ID_COMPASS_ITEM);
 }
 
 void InitializeTR5Objects()
