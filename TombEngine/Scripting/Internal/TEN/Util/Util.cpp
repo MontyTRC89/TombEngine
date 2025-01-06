@@ -58,9 +58,11 @@ namespace TEN::Scripting::Util
 	//		
 	//		local laraPos = Lara:GetPosition()
 	//		local shivaPos = shiva:GetPosition()
+	//
+	//		local requiredDistance = 50.0
 	//		
 	//		local distance = CalculateDistance(laraPos, shivaPos)
-	//		if distance < 50.0 then
+	//		if distance < requiredDistance then
 	//			print("Lara and Shiva are very close")
 	//		else
 	//			print("Lara and Shiva are far from each other")
@@ -81,9 +83,11 @@ namespace TEN::Scripting::Util
 	//		
 	//		local laraPos = Lara:GetPosition()
 	//		local shivaPos = shiva:GetPosition()
-	//		
-	//		local hDistance = CalculateHorizontalDistance(laraPos, shivaPos)
-	//		if Hdistance < 50.0 then
+	//
+	//		local requiredDistance = 50.0
+	//		local horizontalDistance = CalculateHorizontalDistance(laraPos, shivaPos)
+	//
+	//		if horizontalDistance < requiredDistance then
 	//			print("Lara and Shiva are very close, horizontally.")
 	//		else
 	//			print("Lara and Shiva are far from each other, horizontally.")
