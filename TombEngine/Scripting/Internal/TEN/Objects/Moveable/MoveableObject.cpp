@@ -247,7 +247,7 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 //		end
 // end
 // 
-// levelFuncs.hasEffect == function()
+// levelFuncs.hasEffect = function()
 //		checkOnFire()
 // end
 	ScriptReserved_GetEffect, &Moveable::GetEffect,
