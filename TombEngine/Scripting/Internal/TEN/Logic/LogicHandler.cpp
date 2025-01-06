@@ -1174,12 +1174,12 @@ __The order of loading is as follows:__
 4. If loading from a save, `OnLoaded` will be called. Otherwise, `OnStart` will be called.
 5. The control loop, in which `OnLoop` will be called once per frame, begins.
 
-@tfield function OnStart Will be called when a level is entered by completing a previous level or by selecting it in the menu. Will not be called when loaded from a saved game.
-@tfield function OnLoad Will be called when a saved game is loaded, just *after* data is loaded
-@tfield function(float) OnLoop Will be called during the game's update loop,
+@tfield Function OnStart will be called when a level is entered by completing a previous level or by selecting it in the menu. Will not be called when loaded from a saved game.
+@tfield Function OnLoad will be called when a saved game is loaded, just *after* data is loaded
+@tfield Function(float) OnLoop will be called during the game's update loop,
 and provides the delta time (a float representing game time since last call) via its argument.
-@tfield function OnSave Will be called when the player saves the game, just *before* data is saved
-@tfield function OnEnd(EndReason) Will be called when leaving a level. This includes finishing it, exiting to the menu, or loading a save in a different level. It can take an `EndReason` arg:
+@tfield Function OnSave will be called when the player saves the game, just *before* data is saved
+@tfield Function OnEnd(EndReason) will be called when leaving a level. This includes finishing it, exiting to the menu, or loading a save in a different level. It can take an `EndReason` arg:
 
 	EXITTOTITLE
 	LEVELCOMPLETE
@@ -1193,11 +1193,23 @@ For example:
 			print("death")
 		end
 	end
-@tfield function OnUseItem Will be called when using an item from inventory.
-@tfield function OnFreeze Will be called when any of the Freeze modes are activated. 
-Note: Freeze mode is handled separately so creating stuff in normal game loop then triggering OnFreeze will not work.
+@tfield Function OnUseItem will be called when using an item from inventory.
+@tfield Function OnFreeze will be called when any of the Freeze modes are activated. 
+Note: Freeze mode is handled separately so having code working in normal game loop then triggering OnFreeze will not work.
 For example, if you want strings to display on freeze mode, you must:
 	- instantiate string using DisplayString() and use ShowString(), both in LevelFuncs.OnFreeze function.
+ 
+Correct: 
+
+ LevelFuncs.OnFreeze = function()
+ 	local string = DisplayString(...)
+  	ShowString(string)
+
+Incorrect:
+
+local string = DisplayString(...)
+LevelFuncs.OnFreeze = function()
+  	ShowString(string)
 
 @table LevelFuncs
 */
