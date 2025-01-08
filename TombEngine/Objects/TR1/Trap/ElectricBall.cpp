@@ -266,7 +266,7 @@ namespace TEN::Entities::Traps
 				short green = blue >> 2;
 				short red = 0;
 
-				TriggerDynamicLight(pos1.x, pos1.y, pos1.z, (item.ItemFlags[4] +8) / 5, red, green, blue);
+				SpawnDynamicLight(pos1.x, pos1.y, pos1.z, (item.ItemFlags[4] +8) / 5, red, green, blue);
 				item.ItemFlags[3]--;				
 			}		
 		}
