@@ -132,7 +132,8 @@ namespace TEN::Effects::Spark
 			sptr.rotAdd = GenerateAngle(0, 63) + 64;
 
 		sptr.scalar = 3;
-		sptr.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 12;
+		sptr.SpriteSeqID = ID_DEFAULT_SPRITES;
+		sptr.SpriteID = SPR_BULLETIMPACT;
 		sptr.size = GenerateInt(6, 12);
 		sptr.sSize = sptr.size;
 		sptr.dSize = 1;
