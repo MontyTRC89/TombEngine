@@ -10,11 +10,13 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
 #include "Game/items.h"
+#include "Game/effects/Splash.h"
 #include "Game/effects/tomb4fx.h"
 #include "Math/Random.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 using namespace TEN::Collision::Point;
+using namespace TEN::Effects::Splash;
 using namespace TEN::Math::Random;
 
 constexpr int BODY_PART_LIFE = 64;
@@ -212,11 +214,9 @@ void ControlBodyPart(short fxNumber)
 		{
 			int waterHeight = GetPointCollision(fx->pos.Position, pointColl.GetRoomNumber()).GetWaterTopHeight();
 
-			SplashSetup.y = waterHeight - 1;
-			SplashSetup.x = fx->pos.Position.x;
-			SplashSetup.z = fx->pos.Position.z;
-			SplashSetup.splashPower = fx->fallspeed;
-			SplashSetup.innerRadius = 48;
+			SplashSetup.Position = Vector3(fx->pos.Position.x, waterHeight - 1, fx->pos.Position.z);
+			SplashSetup.SplashPower = fx->fallspeed;
+			SplashSetup.InnerRadius = 48;
 			SetupSplash(&SplashSetup, pointColl.GetRoomNumber());
 
 			// Remove if touched water.

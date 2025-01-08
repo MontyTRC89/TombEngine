@@ -182,7 +182,7 @@ namespace TEN::Effects::Smoke
 		}
 		else
 		{
-			float size = (float)((GetRandomControl() & 0x0F) + 48); // -TriggerGunSmoke_SubFunction(weaponType);
+			float size = (float)((GetRandomControl() & 0x0F) + 48);
 
 			if (weaponType == LaraWeaponType::RocketLauncher)
 				s.sourceColor = { 0.75, 0.75, 1, 1 };
