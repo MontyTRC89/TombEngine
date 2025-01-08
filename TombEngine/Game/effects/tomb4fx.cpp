@@ -12,6 +12,7 @@
 #include "Game/effects/Drip.h"
 #include "Game/effects/Ripple.h"
 #include "Game/effects/smoke.h"
+#include "Game/effects/Splash.h"
 #include "Game/effects/weather.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -27,6 +28,7 @@ using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
+using namespace TEN::Effects::Splash;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
 using namespace TEN::Math;
@@ -1132,11 +1134,9 @@ void TriggerUnderwaterExplosion(ItemInfo* item, int flag)
 			int dy = item->Pose.Position.y - waterHeight;
 			if (dy < 2048)
 			{
-				SplashSetup.y = waterHeight;
-				SplashSetup.x = item->Pose.Position.x;
-				SplashSetup.z = item->Pose.Position.z;
-				SplashSetup.innerRadius = 160;
-				SplashSetup.splashPower = 2048 - dy;
+				SplashSetup.Position = Vector3(item->Pose.Position.x, waterHeight, item->Pose.Position.z);
+				SplashSetup.InnerRadius = 160;
+				SplashSetup.SplashPower = 2048 - dy;
 
 				SetupSplash(&SplashSetup, item->RoomNumber);
 			}
