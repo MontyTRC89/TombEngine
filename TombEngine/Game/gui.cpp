@@ -12,7 +12,6 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/Lara/Optics.h"
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/Lara/lara_two_guns.h"
 #include "Game/pickup/pickup.h"
@@ -65,6 +64,7 @@ namespace TEN::Gui
 		STRING_VIEW,
 		STRING_CHOOSE_WEAPON,
 		""
+	//	STRING_READ_DIARY
 	};
 
 	std::vector<std::string> GeneralActionStrings =
@@ -620,10 +620,6 @@ namespace TEN::Gui
 				CurrentSettings.Configuration.ScreenWidth = screenResolution.x;
 				CurrentSettings.Configuration.ScreenHeight = screenResolution.y;
 
-				// Determine whether we should update AA shaders.
-				bool shouldRecompileAAShaders = g_Configuration.AntialiasingMode != CurrentSettings.Configuration.AntialiasingMode &&
-												CurrentSettings.Configuration.AntialiasingMode != AntialiasingMode::Low;
-
 				g_Configuration = CurrentSettings.Configuration;
 				SaveConfiguration();
 
@@ -631,7 +627,6 @@ namespace TEN::Gui
 				g_Renderer.ChangeScreenResolution(CurrentSettings.Configuration.ScreenWidth, CurrentSettings.Configuration.ScreenHeight,
 					CurrentSettings.Configuration.EnableWindowedMode);
 
-				g_Renderer.ReloadShaders(shouldRecompileAAShaders);
 				g_Renderer.SetGraphicsSettingsChanged();
 
 				MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
@@ -712,9 +707,11 @@ namespace TEN::Gui
 					}
 					else
 					{
-						g_Renderer.PrepareScene(); // Just for updating blink time.
-						UpdateInputActions(item);
+						// Just for updating blink time
+						g_Renderer.PrepareScene();
 					}
+
+					UpdateInputActions(item);
 
 					if (CurrentSettings.IgnoreInput)
 					{
@@ -1691,8 +1688,7 @@ namespace TEN::Gui
 		if (player.Inventory.TotalFlares)
 			InsertObjectIntoList(INV_OBJECT_FLARES);
 
-		if (player.Inventory.HasStopwatch)
-			InsertObjectIntoList(INV_OBJECT_STOPWATCH);
+		InsertObjectIntoList(INV_OBJECT_TIMEX);//every level has the timex? what's a good way to check?!
 
 		if (player.Inventory.TotalSmallMedipacks)
 			InsertObjectIntoList(INV_OBJECT_SMALL_MEDIPACK);
@@ -1769,15 +1765,13 @@ namespace TEN::Gui
 				InsertObjectIntoList(INV_OBJECT_EXAMINE1_COMBO1 + i);
 		}
 
-		if (player.Inventory.HasDiary)
+		if (player.Inventory.Diary.Present)
 			InsertObjectIntoList(INV_OBJECT_DIARY);
 
 		if (g_GameFlow->IsLoadSaveEnabled())
 		{
-			if (player.Inventory.HasLoad)
-				InsertObjectIntoList(INV_OBJECT_LOAD_FLOPPY);
-			if (player.Inventory.HasSave)
-				InsertObjectIntoList(INV_OBJECT_SAVE_FLOPPY);
+			InsertObjectIntoList(INV_OBJECT_LOAD_FLOPPY);
+			InsertObjectIntoList(INV_OBJECT_SAVE_FLOPPY);
 		}
 
 		Rings[(int)RingTypes::Inventory].ObjectListMovement = 0;
@@ -2063,6 +2057,8 @@ namespace TEN::Gui
 
 		auto& player = GetLaraInfo(item);
 
+		short prevOpticRange = player.Control.Look.OpticRange;
+		player.Control.Look.OpticRange = 0;
 		player.Inventory.OldBusy = false;
 		item.MeshBits = ALL_JOINT_BITS;
 
@@ -2205,11 +2201,26 @@ namespace TEN::Gui
 				(player.Control.IsLow && !IsHeld(In::Crouch))) &&
 				!UseSpotCam && !TrackCameraInit)
 			{
-				SetScreenFadeIn(OPTICS_FADE_SPEED);
-				BinocularOldCamera = Camera.oldType;
-				player.Control.Look.OpticRange = OPTICS_RANGE_DEFAULT;
+				Camera.DisableInterpolation = true;
+				player.Control.Look.OpticRange = ANGLE(0.7f);
 				player.Control.Look.IsUsingBinoculars = true;
 				player.Inventory.OldBusy = true;
+
+				// TODO: To prevent Lara from crouching or performing other actions, the inherent state of
+				// LA_BINOCULARS_IDLE must be changed to LS_IDLE. @Sezz 2022.05.19
+				//SetAnimation(item, LA_BINOCULARS_IDLE);
+
+				if (player.Control.HandStatus != HandStatus::Free)
+					player.Control.HandStatus = HandStatus::WeaponUndraw;
+			}
+
+			if (prevOpticRange != ANGLE(0.0f))
+			{
+				player.Control.Look.OpticRange = prevOpticRange;
+			}
+			else
+			{
+				BinocularOldCamera = Camera.oldType;
 			}
 
 			InventoryItemChosen = NO_VALUE;
@@ -2440,6 +2451,13 @@ namespace TEN::Gui
 					CurrentOptions[n].Text = g_GameFlow->GetString(OptionStrings[3].c_str());
 					n++;
 				}
+
+				if (options & OPT_DIARY)
+				{
+					CurrentOptions[n].Type = MenuType::Diary;
+					CurrentOptions[n].Text = g_GameFlow->GetString(OptionStrings[11].c_str());
+					n++;
+				}
 			}
 			else
 			{
@@ -2569,6 +2587,11 @@ namespace TEN::Gui
 					case MenuType::Use:
 						MenuActive = false;
 						ItemUsed = true;
+						break;
+
+					case MenuType::Diary:
+						SetInventoryMode(InventoryMode::Diary);
+						player.Inventory.Diary.CurrentPage = 1;
 						break;
 					}
 				}
@@ -3280,7 +3303,6 @@ namespace TEN::Gui
 			while (g_Synchronizer.Synced())
 			{
 				TimeInMenu++;
-				GlobalCounter++;
 				SaveGame::Statistics.Game.TimeTaken++;
 				SaveGame::Statistics.Level.TimeTaken++;
 
@@ -3306,6 +3328,10 @@ namespace TEN::Gui
 
 				case InventoryMode::Examine:
 					DoExamineMode();
+					break;
+
+				case InventoryMode::Diary:
+					DoDiary(item);
 					break;
 
 				case InventoryMode::Load:
@@ -3418,9 +3444,6 @@ namespace TEN::Gui
 
 	void GuiController::DrawCompass(ItemInfo* item)
 	{
-		if (!Lara.Inventory.HasCompass)
-			return;
-
 		constexpr auto POS_2D	  = Vector2(130.0f, 450.0f);
 		constexpr auto LERP_ALPHA = 0.1f;
 
@@ -3428,11 +3451,38 @@ namespace TEN::Gui
 		needleOrient.Lerp(EulerAngles(0, item->Pose.Orientation.y, 0), LERP_ALPHA);
 
 		float wibble = std::sin((float(GlobalCounter & 0x3F) / (float)0x3F) * PI_MUL_2);
-		CompassNeedleAngle = needleOrient.y + ANGLE(wibble);
+		CompassNeedleAngle = needleOrient.y + ANGLE(wibble / 2);
 
 		// HACK: Needle is rotated in the draw function.
 		const auto& invObject = InventoryObjectTable[INV_OBJECT_COMPASS];
 		g_Renderer.DrawObjectIn2DSpace(ID_COMPASS_ITEM, POS_2D, EulerAngles::Identity, invObject.Scale1 * 1.5f);
+	}
+
+	void GuiController::DoDiary(ItemInfo* item)
+	{
+		auto& player = GetLaraInfo(*item);
+
+		SetInventoryMode(InventoryMode::Diary);
+
+		if (GuiIsPulsed(In::Right) &&
+			player.Inventory.Diary.CurrentPage < player.Inventory.Diary.NumPages)
+		{
+			player.Inventory.Diary.CurrentPage++;
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+		}
+
+		if (GuiIsPulsed(In::Left) &&
+			player.Inventory.Diary.CurrentPage > 1)
+		{
+			player.Inventory.Diary.CurrentPage--;
+			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
+		}
+
+		if (GuiIsDeselected())
+		{
+			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+			SetInventoryMode(InventoryMode::None);
+		}
 	}
 
 	int GuiController::GetLoadSaveSelection()

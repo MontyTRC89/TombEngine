@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.7.2 (Developer) Lua API</title>
+    <title>TombEngine 1.6 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -171,24 +171,12 @@ pickups, and Lara herself (see also <a href="../2 classes/Objects.LaraObject.htm
 	<td class="summary">Retrieve the index of the current animation.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetAnim">Moveable:SetAnim(index[, slot])</a></td>
+	<td class="name" ><a href="#Moveable:SetAnim">Moveable:SetAnim(index)</a></td>
 	<td class="summary">Set the object's animation to the one specified by the given index.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:GetAnimSlot">Moveable:GetAnimSlot()</a></td>
-	<td class="summary">Retrieve the slot ID of the animation.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetFrame">Moveable:GetFrame()</a></td>
 	<td class="summary">Retrieve frame number.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SetFrame">Moveable:SetFrame(frame)</a></td>
-	<td class="summary">Set frame number.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:GetEndFrame">Moveable:GetEndFrame()</a></td>
-	<td class="summary">Get the end frame number of the moveable's active animation.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:SetVelocity">Moveable:SetVelocity(velocity)</a></td>
@@ -197,6 +185,10 @@ pickups, and Lara herself (see also <a href="../2 classes/Objects.LaraObject.htm
 	<tr>
 	<td class="name" ><a href="#Moveable:GetVelocity">Moveable:GetVelocity()</a></td>
 	<td class="summary">Get the object's velocity.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetFrame">Moveable:SetFrame(frame)</a></td>
+	<td class="summary">Set frame number.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetHP">Moveable:GetHP()</a></td>
@@ -332,6 +324,10 @@ pickups, and Lara herself (see also <a href="../2 classes/Objects.LaraObject.htm
 	<td class="summary">Set AIBits of object
  Use this to force a moveable into a certain AI mode or modes, as if a certain nullmesh
  (or more than one) had suddenly spawned beneath their feet.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetEndFrame">Moveable:GetEndFrame()</a></td>
+	<td class="summary">Get the end frame number of the moveable's active animation.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetRoom">Moveable:GetRoom()</a></td>
@@ -781,7 +777,7 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 </dd>
     <dt>
     <a name = "Moveable:SetAnim"></a>
-    <strong>Moveable:SetAnim(index[, slot])</strong>
+    <strong>Moveable:SetAnim(index)</strong>
     </dt>
     <dd>
     Set the object's animation to the one specified by the given index.
@@ -796,36 +792,8 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
             <span class="types"><span class="type">int</span></span>
          the index of the desired anim
         </li>
-        <li><span class="parameter">slot</span>
-            <span class="types"><span class="type">int</span></span>
-         slot ID of the desired anim (if omitted, moveable's own slot ID is used)
-         (<em>optional</em>)
-        </li>
     </ul>
 
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:GetAnimSlot"></a>
-    <strong>Moveable:GetAnimSlot()</strong>
-    </dt>
-    <dd>
-    Retrieve the slot ID of the animation.
- In certain cases, moveable may play animations from another object slot. Use this
- function when you need to identify such cases.
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">int</span></span>
-        animation slot ID
-    </ol>
 
 
 
@@ -847,54 +815,6 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 
            <span class="types"><span class="type">int</span></span>
         the current frame of the active animation
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:SetFrame"></a>
-    <strong>Moveable:SetFrame(frame)</strong>
-    </dt>
-    <dd>
-    Set frame number.
- This will move the animation to the given frame.
- The number of frames in an animation can be seen under the heading "End frame" in
- the WadTool animation editor. If the animation has no frames, the only valid argument
- is -1.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">frame</span>
-            <span class="types"><span class="type">int</span></span>
-         the new frame number
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:GetEndFrame"></a>
-    <strong>Moveable:GetEndFrame()</strong>
-    </dt>
-    <dd>
-    Get the end frame number of the moveable's active animation.
- This is the "End Frame" set in WADTool for the animation.()
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">int</span></span>
-        End frame number of the active animation.
     </ol>
 
 
@@ -943,6 +863,32 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
         current object velocity
     </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetFrame"></a>
+    <strong>Moveable:SetFrame(frame)</strong>
+    </dt>
+    <dd>
+    Set frame number.
+ This will move the animation to the given frame.
+ The number of frames in an animation can be seen under the heading "End frame" in
+ the WadTool animation editor. If the animation has no frames, the only valid argument
+ is -1.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">frame</span>
+            <span class="types"><span class="type">int</span></span>
+         the new frame number
+        </li>
+    </ul>
+
 
 
 
@@ -1714,6 +1660,28 @@ baddy:SetOnKilled(LevelFuncs.baddyKilled)</pre>
         <pre class="example"><span class="keyword">local</span> sas = TEN.Objects.GetMoveableByName(<span class="string">"sas_enemy"</span>)
 sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>})</pre>
     </ul>
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetEndFrame"></a>
+    <strong>Moveable:GetEndFrame()</strong>
+    </dt>
+    <dd>
+    Get the end frame number of the moveable's active animation.
+ This is the "End Frame" set in WADTool for the animation.()
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        End frame number of the active animation.
+    </ol>
+
+
+
 
 </dd>
     <dt>

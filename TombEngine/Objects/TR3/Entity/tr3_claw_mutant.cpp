@@ -201,7 +201,7 @@ namespace TEN::Entities::Creatures::TR3
 			r = (r * bright) / 16;
 			g = (g * bright) / 16;
 			b = (b * bright) / 16;
-			SpawnDynamicLight(pos.x, pos.y, pos.z, bright, r, g, b);
+			TriggerDynamicLight(pos.x, pos.y, pos.z, bright, r, g, b);
 		}
 	}
 

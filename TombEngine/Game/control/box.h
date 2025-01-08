@@ -103,7 +103,7 @@ void CreatureFloat(short itemNumber);
 void CreatureJoint(ItemInfo* item, short joint, short required, short maxAngle = ANGLE(70.0f));
 void CreatureTilt(ItemInfo* item, short angle);
 short CreatureTurn(ItemInfo* item, short maxTurn);
-void CreatureDie(int itemNumber, bool doExplosion, bool forceExplosion = false);
+void CreatureDie(int itemNumber, bool doExplosion);
 void CreatureDie(int itemNumber, bool doExplosion, int flags);
 bool BadFloor(int x, int y, int z, int boxHeight, int nextHeight, short roomNumber, LOTInfo* LOT);
 int CreatureCreature(short itemNumber);

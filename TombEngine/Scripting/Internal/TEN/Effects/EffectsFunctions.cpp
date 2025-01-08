@@ -269,7 +269,7 @@ namespace TEN::Scripting::Effects
 	{
 		auto color = USE_IF_HAVE(ScriptColor, col, ScriptColor(255, 255, 255));
 		int rad = (float)(USE_IF_HAVE(int, radius, 20) * BLOCK(0.25f));
-		SpawnDynamicPointLight(pos.ToVector3(), color, rad, USE_IF_HAVE(bool, castShadows, false), GetHash(USE_IF_HAVE(std::string, name, std::string())));
+		TriggerDynamicPointLight(pos.ToVector3(), color, rad, USE_IF_HAVE(bool, castShadows, false), GetHash(USE_IF_HAVE(std::string, name, std::string())));
 	}
 
 /***Emit dynamic directional spotlight that lasts for a single frame.
@@ -290,7 +290,7 @@ namespace TEN::Scripting::Effects
 		int rad =	  (float)(USE_IF_HAVE(int, radius,   10) * BLOCK(0.25f));
 		int fallOff = (float)(USE_IF_HAVE(int, falloff,   5) * BLOCK(0.25f));
 		int dist =	  (float)(USE_IF_HAVE(int, distance, 20) * BLOCK(0.25f));
-		SpawnDynamicSpotLight(pos.ToVector3(), dir.ToVector3(), color, rad, fallOff, dist, USE_IF_HAVE(bool, castShadows, false), GetHash(USE_IF_HAVE(std::string, name, std::string())));
+		TriggerDynamicSpotLight(pos.ToVector3(), dir.ToVector3(), color, rad, fallOff, dist, USE_IF_HAVE(bool, castShadows, false), GetHash(USE_IF_HAVE(std::string, name, std::string())));
 	}
 
 /***Emit blood.

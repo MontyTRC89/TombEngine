@@ -475,7 +475,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		if (LightIntensityTable[fx.flag1])
 		{
-			SpawnDynamicLight(
+			TriggerDynamicLight(
 				fx.pos.Position.x, fx.pos.Position.y, fx.pos.Position.z,
 				LightIntensityTable[fx.flag1],
 				31 - ((GetRandomControl() / 16) & 3),
@@ -657,14 +657,14 @@ namespace TEN::Entities::Creatures::TR3
 
 			auto handPos = GetJointPosition(item, TonyLeftHandBite);
 			TriggerTonyFlame(itemNumber, 13);
-			SpawnDynamicLight(handPos.x, handPos.y, handPos.z, 12, r, g, b);
+			TriggerDynamicLight(handPos.x, handPos.y, handPos.z, 12, r, g, b);
 
 			if (item->Animation.ActiveState == TONY_STATE_SHOOT_CEILING ||
 				item->Animation.ActiveState == TONY_STATE_FLIPMAP)
 			{
 				handPos = GetJointPosition(item, TonyRightHandBite);
 				TriggerTonyFlame(itemNumber, 14);
-				SpawnDynamicLight(handPos.x, handPos.y, handPos.z, 12, r, g, b);
+				TriggerDynamicLight(handPos.x, handPos.y, handPos.z, 12, r, g, b);
 			}
 		}
 

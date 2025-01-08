@@ -58,7 +58,7 @@ namespace TEN::Scripting
 	// @treturn Time A new Time object initialized with the given frame count.
 	Time::Time(int gameFrames)
 	{
-		_frameCount = std::clamp(gameFrames, 0, INT_MAX);
+		_frameCount = gameFrames;
 	}
 
 	/// Create a Time object from a formatted string.
@@ -194,18 +194,18 @@ namespace TEN::Scripting
 
 	Time& Time::operator -=(const Time& time)
 	{
-		_frameCount = std::clamp(_frameCount - time._frameCount, 0, INT_MAX);
+		_frameCount -= time._frameCount;
 		return *this;
 	}
 
 	Time Time::operator +(int frameCount) const
 	{
-		return Time(_frameCount + frameCount);
+		return Time(frameCount + _frameCount);
 	}
 
 	Time Time::operator -(int frameCount) const
 	{
-		return Time(std::clamp(_frameCount - frameCount, 0, INT_MAX));
+		return Time(frameCount - _frameCount);
 	}
 
 	Time Time::operator +(const Time& time) const
@@ -215,17 +215,17 @@ namespace TEN::Scripting
 
 	Time Time::operator -(const Time& time) const
 	{
-		return Time(std::clamp(_frameCount - time._frameCount, 0, INT_MAX));
+		return Time(_frameCount - time._frameCount);
 	}
 
-	bool Time::operator <(const Time& time) const
+	Time Time::operator <(const Time& time) const
 	{
-		return _frameCount < time._frameCount;
+		return Time(_frameCount < time._frameCount);
 	}
 
-	bool Time::operator <=(const Time& time) const
+	Time Time::operator <=(const Time& time) const
 	{
-		return _frameCount <= time._frameCount;
+		return Time(_frameCount <= time._frameCount);
 	}
 
 	bool Time::operator ==(const Time& time) const

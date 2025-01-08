@@ -680,8 +680,8 @@ namespace TEN::Entities::Vehicles
 				lara->RightArm.Orientation.y + laraItem->Pose.Orientation.y,
 				0);
 
-			FireWeapon(LaraWeaponType::Snowmobile, lara->TargetEntity, *laraItem, angles);
-			FireWeapon(LaraWeaponType::Snowmobile, lara->TargetEntity, *laraItem, angles);
+			FireWeapon(LaraWeaponType::Snowmobile, *lara->TargetEntity, *laraItem, angles);
+			FireWeapon(LaraWeaponType::Snowmobile, *lara->TargetEntity, *laraItem, angles);
 			SoundEffect(weapon.SampleNum, &laraItem->Pose);
 			skidooItem->ItemFlags[0] = 4;
 		}

@@ -94,7 +94,6 @@ PixelShaderOutput PS(PixelShaderInput input)
 		StaticLight(input.Color.xyz, tex.xyz, input.FogBulbs.w);
 
 	color = DoShadow(input.WorldPosition, normal, color, -0.5f);
-	color = DoBlobShadows(input.WorldPosition, color);
 
 	output.Color = float4(color, tex.w);
 	output.Color = DoFogBulbsForPixel(output.Color, float4(input.FogBulbs.xyz, 1.0f));

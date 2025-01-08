@@ -171,16 +171,16 @@ namespace TEN::Hud
 
 	void TargetHighlighterController::Update(const ItemInfo& playerItem)
 	{
-		const auto& player = GetLaraInfo(playerItem);
-
-		// Check if target highlighter is enabled or lasersight is active.
-		if (!g_Configuration.EnableTargetHighlighter || player.Control.Look.IsUsingBinoculars)
+		// Check if target highlighter is enabled.
+		if (!g_Configuration.EnableTargetHighlighter)
 		{
 			if (!_crosshairs.empty())
 				_crosshairs.clear();
 
 			return;
 		}
+
+		const auto& player = GetLaraInfo(playerItem);
 
 		// Loop over player targets.
 		auto itemNumbers = std::vector<int>{};

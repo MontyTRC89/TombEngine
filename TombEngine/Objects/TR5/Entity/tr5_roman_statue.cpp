@@ -439,9 +439,9 @@ namespace TEN::Entities::Creatures::TR5
 					color = (deltaFrame2 * ((GetRandomControl() & 0x3F) + 128)) / 16;
 
 					if (item->TriggerFlags)
-						SpawnDynamicLight(pos2.x, pos2.y, pos2.z, 16, 0, color, color / 2);
+						TriggerDynamicLight(pos2.x, pos2.y, pos2.z, 16, 0, color, color / 2);
 					else
-						SpawnDynamicLight(pos2.x, pos2.y, pos2.z, 16, 0, color / 2, color);
+						TriggerDynamicLight(pos2.x, pos2.y, pos2.z, 16, 0, color / 2, color);
 
 					for (int i = 0; i < 2; i++)
 					{
@@ -599,7 +599,7 @@ namespace TEN::Entities::Creatures::TR5
 							TriggerShockwave(&Pose(pos1), 16, 160, 64, 0, color / 2, color, 48, EulerAngles::Identity, 1, true, false, true, (int)ShockwaveStyle::Normal);
 							
 							auto lightColor = Color(0.4f, 0.3f, 0.0f);
-							SpawnDynamicPointLight(pos.ToVector3(), lightColor, BLOCK(2.5f));
+							TriggerDynamicPointLight(pos.ToVector3(), lightColor, BLOCK(2.5f));
 						}
 
 						deltaFrame = item->Animation.FrameNumber - GetAnimData(item).frameBase;
@@ -614,11 +614,11 @@ namespace TEN::Entities::Creatures::TR5
 
 							if (item->ItemFlags[3])
 							{
-								SpawnDynamicLight(pos1.x, pos1.y, pos1.z, 8, 0, color / 4, color / 2);
+								TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 8, 0, color / 4, color / 2);
 							}
 							else
 							{
-								SpawnDynamicLight(pos1.x, pos1.y - 64, pos1.z, 18, 0, color / 4, color / 2);
+								TriggerDynamicLight(pos1.x, pos1.y - 64, pos1.z, 18, 0, color / 4, color / 2);
 							}
 						}
 						else
@@ -628,7 +628,7 @@ namespace TEN::Entities::Creatures::TR5
 							if (item->ItemFlags[3])
 							{
 								auto lightColor = Color(0.0f, 0.4f, 1.0f);
-								SpawnDynamicPointLight(pos.ToVector3(), lightColor, BLOCK(4));
+								TriggerDynamicPointLight(pos.ToVector3(), lightColor, BLOCK(4));
 							}
 						}
 					}
@@ -710,7 +710,7 @@ namespace TEN::Entities::Creatures::TR5
 				{
 					RomanStatueData.Count--;
 					color = (RomanStatueData.Count * ((GetRandomControl() & 0x3F) + 128)) / 16;
-					SpawnDynamicLight(RomanStatueData.Position.x, RomanStatueData.Position.y, RomanStatueData.Position.z, 16, 0, color, color / 2);
+					TriggerDynamicLight(RomanStatueData.Position.x, RomanStatueData.Position.y, RomanStatueData.Position.z, 16, 0, color, color / 2);
 				}
 
 				deltaFrame = item->Animation.FrameNumber - GetAnimData(item).frameBase;
@@ -762,7 +762,7 @@ namespace TEN::Entities::Creatures::TR5
 
 						if (i == 0)
 						{
-							SpawnDynamicLight(
+							TriggerDynamicLight(
 								pos2.x, pos2.y, pos2.z,
 								8,
 								0,

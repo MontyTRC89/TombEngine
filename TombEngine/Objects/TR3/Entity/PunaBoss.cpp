@@ -228,7 +228,7 @@ namespace TEN::Entities::Creatures::TR3
 			SpawnElectricity(origin.ToVector3(), target.ToVector3(), Random::GenerateInt(25, 50), 100, 200, 200, 30, (int)(int)(int)ElectricityFlags::ThinIn | (int)(int)ElectricityFlags::ThinOut, 4, 12);
 			SpawnElectricity(origin.ToVector3(), target.ToVector3(), Random::GenerateInt(25, 50), 100, 250, 255, 30, (int)(int)(int)ElectricityFlags::ThinIn | (int)(int)ElectricityFlags::ThinOut, 2, 12);
 
-			SpawnDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 0);
+			TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 0);
 			SpawnLizard(item);
 		}
 		else
@@ -256,7 +256,7 @@ namespace TEN::Entities::Creatures::TR3
 			SpawnElectricity(origin.ToVector3(), target.ToVector3(), 1, 20, 160, 160, 30, (int)(int)(int)ElectricityFlags::ThinIn | (int)ElectricityFlags::Spline | (int)ElectricityFlags::MoveEnd, 12, 12);
 			SpawnElectricity(origin.ToVector3(), target.ToVector3(), 1, 80, 160, 160, 30, (int)(int)(int)ElectricityFlags::ThinIn | (int)ElectricityFlags::Spline | (int)ElectricityFlags::MoveEnd, 5, 12);
 
-			SpawnDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 255);
+			TriggerDynamicLight(origin.x, origin.y, origin.z, 20, 0, 255, 255);
 
 			auto hitPos = Vector3i::Zero;
 			if (ObjectOnLOS2(&origin, &target, &hitPos, nullptr, ID_LARA) == creature.Enemy->Index)
@@ -325,27 +325,27 @@ namespace TEN::Entities::Creatures::TR3
 				creature.MaxTurn = 0;
 			}
 
-			auto deathCount = item.GetFlagField((int)BossItemFlags::DeathCount);
-			item.Pose.Orientation.z = (Random::GenerateInt() % deathCount) - (item.ItemFlags[(int)BossItemFlags::DeathCount] >> 1);
-
-			if (deathCount < 2048)
-				item.ItemFlags[(int)BossItemFlags::DeathCount] += 32;
-
 			int frameEnd =  GetAnimData(object, PUNA_ANIM_DEATH).frameEnd;
 			if (item.Animation.FrameNumber >= frameEnd)
 			{
 				// Avoid having the object stop working.
 				item.Animation.FrameNumber = frameEnd;
+				item.MeshBits.ClearAll();
 
 				if (item.GetFlagField((int)BossItemFlags::ExplodeCount) < PUNA_EXPLOSION_NUM_MAX)
 					item.ItemFlags[(int)BossItemFlags::ExplodeCount]++;
 
-				if (item.ItemFlags[7] < PUNA_EXPLOSION_NUM_MAX)
-					item.ItemFlags[7]++;
-
 				// Do explosion effect.
 				ExplodeBoss(itemNumber, item, PUNA_EXPLOSION_NUM_MAX, PUNA_EFFECT_COLOR, PUNA_EXPLOSION_MAIN_COLOR, PUNA_EXPLOSION_SECOND_COLOR);
 				return;
+			}
+			else
+			{
+				auto deathCount = item.GetFlagField((int)BossItemFlags::DeathCount);
+				item.Pose.Orientation.z = (Random::GenerateInt() % deathCount) - (item.ItemFlags[(int)BossItemFlags::DeathCount] >> 1);
+
+				if (deathCount < 2048)
+					item.ItemFlags[(int)BossItemFlags::DeathCount] += 32;
 			}
 		}
 		else

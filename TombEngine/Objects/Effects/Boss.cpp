@@ -259,7 +259,7 @@ namespace TEN::Effects::Boss
 			SoundEffect(SFX_TR3_BLAST_CIRCLE, &shockwavePos);
 		}
 
-		SpawnDynamicLight(
+		TriggerDynamicLight(
 			item.Pose.Position.x,
 			item.Pose.Position.y - CLICK(2),
 			item.Pose.Position.z,
@@ -268,9 +268,9 @@ namespace TEN::Effects::Boss
 
 		if (counter >= countUntilDeath)
 		{
-			if (allowExplosion)
-				CreatureDie(itemNumber, allowExplosion, true);
-			else
+			CreatureDie(itemNumber, allowExplosion);
+
+			if (!allowExplosion)
 				KillItem(itemNumber);
 		}
 	}

@@ -324,7 +324,7 @@ namespace TEN::Entities::Vehicles
 		int random = (motorbike->LightPower * 2) - (GetRandomControl() & 0xF);
 
 		// TODO: Use target as direction vector for spotlight.
-		SpawnDynamicLight(origin.x, origin.y, origin.z, 8, random, random / 2, 0);
+		TriggerDynamicLight(origin.x, origin.y, origin.z, 8, random, random / 2, 0);
 	}
 
 	static void TriggerMotorbikeExhaustSmoke(int x, int y, int z, short angle, short speed, bool moving)
@@ -1040,7 +1040,7 @@ namespace TEN::Entities::Vehicles
 			if (IsHeld(In::Brake))
 			{
 				auto pos = GetJointPosition(motorbikeItem, 0, Vector3i(0, -144, -1024));
-				SpawnDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
+				TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
 
 				motorbikeItem->MeshBits.Set(MotorbikeBrakeLightJoints);
 			}

@@ -49,70 +49,6 @@ bool ArgEquals(wchar_t* incomingArg, std::string name)
 	return (lowerArg == "-" + name) || (lowerArg == "/" + name);
 }
 
-void CheckIfRedistInstalled()
-{
-	// Before doing any actions, check if VC redist is installed, because otherwise it can
-	// silently crash at any moment. Still allows to run the game in any case, even if user
-	// decides not to install redistributables.
-
-	const char* redistKey =
-#ifdef _WIN64
-		R"(SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64)";
-#else
-		R"(SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x86)";
-#endif
-
-	HKEY hKey;
-	LSTATUS result = RegOpenKeyExA(HKEY_LOCAL_MACHINE, redistKey, 0, KEY_READ, &hKey);
-	if (result == ERROR_SUCCESS)
-	{
-		DWORD majorVersion = 0;
-		DWORD minorVersion = 0;
-		DWORD dataSize = sizeof(DWORD);
-
-		if (RegQueryValueExA(hKey, "Major", NULL, NULL, (LPBYTE)&majorVersion, &dataSize) == ERROR_SUCCESS &&
-			RegQueryValueExA(hKey, "Minor", NULL, NULL, (LPBYTE)&minorVersion, &dataSize) == ERROR_SUCCESS)
-		{
-			RegCloseKey(hKey);
-
-			if (majorVersion >= 14 && minorVersion >= 40)
-			{
-				HMODULE hModule = LoadLibraryW(L"vcruntime140.dll");
-				if (hModule != NULL)
-				{
-					FreeLibrary(hModule);
-					return;
-				}
-			}
-		}
-		else
-		{
-			RegCloseKey(hKey);
-		}
-	}
-
-	const char* redistUrl =
-#ifdef _WIN64
-		R"(https://aka.ms/vs/17/release/vc_redist.x64.exe)";
-#else
-		R"(https://aka.ms/vs/17/release/vc_redist.x86.exe)";
-#endif
-
-	const char* message = "TombEngine requires Visual C++ 2015-2022 Redistributable to be installed. Would you like to download it now?";
-	int msgBoxResult = MessageBoxA(NULL, message, "Missing libraries", MB_ICONWARNING | MB_OKCANCEL);
-
-	if (msgBoxResult == IDOK)
-	{
-		HINSTANCE hResult = ShellExecuteA(NULL, "open", redistUrl, NULL, NULL, SW_SHOWNORMAL);
-
-		if ((intptr_t)hResult <= 32)
-		{
-			MessageBoxA(NULL, (LPCSTR)("Failed to start browser to download runtimes. Error code: " +
-				std::to_string((long)(intptr_t)hResult)).c_str(), "Error", MB_ICONERROR | MB_OK);
-		}
-	}
-}
-
 Vector2i GetScreenResolution()
 {
 	RECT desktop;
@@ -362,8 +298,6 @@ int main()
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
-	CheckIfRedistInstalled();
-
 	// Process command line arguments.
 	bool setup = false;
 	std::string levelFile = {};
@@ -413,26 +347,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Initialize logging.
 	InitTENLog(gameDir);
 
-	auto windowName = std::string("Starting TombEngine");
-
 	// Indicate version.
 	auto ver = GetProductOrFileVersion(false);
-
-	if (ver.size() == 4)
-	{
-		windowName = windowName + " version " +
-					 std::to_string(ver[0]) + "." +
-					 std::to_string(ver[1]) + "." +
-					 std::to_string(ver[2]) + "." +
-					 std::to_string(ver[3]);
-	}
-
+	auto windowName = (std::string("Starting TombEngine version ") +
+					   std::to_string(ver[0]) + "." +
+					   std::to_string(ver[1]) + "." +
+					   std::to_string(ver[2]) + "." +
+					   std::to_string(ver[3]) + " " +
 #ifdef _WIN64
-	windowName = windowName + " (64-bit)";
+					   "(64-bit)"
 #else
-	windowName = windowName + " (32-bit)";
+					   "(32-bit)"
 #endif
-
+					   );
 	TENLog(windowName, LogLevel::Info);
 
 	// Initialize savegame and scripting systems.
@@ -605,8 +532,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	while (DoTheGame);
 
-	TENLog("Cleaning up and exiting...", LogLevel::Info);
-
 	WinClose();
 	exit(EXIT_SUCCESS);
 }
@@ -619,6 +544,8 @@ void WinClose()
 
 	Sound_DeInit();
 	DeinitializeInput();
+
+	TENLog("Cleaning up and exiting...", LogLevel::Info);
 	
 	delete g_GameScript;
 	g_GameScript = nullptr;

@@ -12,7 +12,6 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_helpers.h"
-#include "Game/Lara/Optics.h"
 #include "Game/room.h"
 #include "Game/savegame.h"
 #include "Game/Setup.h"
@@ -51,7 +50,6 @@ struct OLD_CAMERA
 };
 
 bool ItemCameraOn;
-GameVector LastPosition;
 GameVector LastTarget;
 GameVector LastIdeal;
 GameVector Ideals[5];
@@ -60,6 +58,7 @@ int CameraSnaps = 0;
 int TargetSnaps = 0;
 GameVector LookCamPosition;
 GameVector LookCamTarget;
+Vector3i CamOldPos;
 CAMERA_INFO Camera;
 GameVector ForcedFixedCamera;
 int UseForcedFixedCamera;
@@ -423,7 +422,7 @@ void ObjCamera(ItemInfo* camSlotId, int camMeshId, ItemInfo* targetItem, int tar
 
 	//get mesh 0 coordinates.	
 	auto pos = GetJointPosition(camSlotId, 0, Vector3i::Zero);
-	auto dest = Vector3(pos.x, pos.y, pos.z);
+	auto dest = Vector3(pos.x, pos.y, pos.z) + camSlotId->Pose.Position.ToVector3();
 
 	GameVector from = GameVector(dest, camSlotId->RoomNumber);
 	Camera.fixedCamera = true;
@@ -946,13 +945,50 @@ void BinocularCamera(ItemInfo* item)
 {
 	auto& player = GetLaraInfo(*item);
 
+	if (!player.Control.Look.IsUsingLasersight)
+	{
+		if (IsClicked(In::Deselect) ||
+			IsClicked(In::Draw) ||
+			IsClicked(In::Look) ||
+			IsHeld(In::Flare))
+		{
+			ResetPlayerFlex(item);
+			player.Control.Look.OpticRange = 0;
+			player.Control.Look.IsUsingBinoculars = false;
+			player.Inventory.IsBusy = false;
+
+			Camera.type = BinocularOldCamera;
+			Camera.DisableInterpolation = true;
+			Camera.target = LastTarget;
+			AlterFOV(LastFOV);
+			return;
+		}
+
+		if (IsHeld(In::Action))
+		{
+			ClearAction(In::Action);
+
+			auto origin = Camera.pos.ToVector3i();
+			auto target = Camera.target.ToVector3i();
+			LaraTorch(&origin, &target);
+		}
+	}
+
 	AlterFOV(7 * (ANGLE(11.5f) - player.Control.Look.OpticRange), false);
 
 	int x = item->Pose.Position.x;
-	int y = item->Pose.Position.y + GameBoundingBox(item).Y1;
+	int y = item->Pose.Position.y - CLICK(2);
 	int z = item->Pose.Position.z;
 
 	auto pointColl = GetPointCollision(Vector3i(x, y, z), item->RoomNumber);
+	if (pointColl.GetCeilingHeight() <= (y - CLICK(1)))
+	{
+		y -= CLICK(1);
+	}
+	else
+	{
+		y = pointColl.GetCeilingHeight() + CLICK(0.25f);
+	}
 
 	Camera.pos.x = x;
 	Camera.pos.y = y;
@@ -1047,24 +1083,18 @@ static bool CalculateDeathCamera(const ItemInfo& item)
 
 void CalculateCamera(const CollisionInfo& coll)
 {
-	if (ItemCameraOn)
-		return;
-
-	if (!HandlePlayerOptics(*LaraItem))
-	{
-		Camera.pos = LastPosition;
-		Camera.target = LastTarget;
-	}
+	CamOldPos.x = Camera.pos.x;
+	CamOldPos.y = Camera.pos.y;
+	CamOldPos.z = Camera.pos.z;
 
 	if (Lara.Control.Look.IsUsingBinoculars)
 	{
 		BinocularCamera(LaraItem);
 		return;
 	}
-	else
-	{
-		LastPosition = Camera.pos;
-	}
+
+	if (ItemCameraOn)
+		return;
 
 	if (UseForcedFixedCamera != 0)
 	{
@@ -1356,7 +1386,7 @@ void ItemPushCamera(GameBoundingBox* bounds, Pose* pos, short radius)
 
 	auto pointColl = GetPointCollision(Camera.pos.ToVector3i(), Camera.pos.RoomNumber);
 	if (pointColl.GetFloorHeight() == NO_HEIGHT || Camera.pos.y > pointColl.GetFloorHeight() || Camera.pos.y < pointColl.GetCeilingHeight())
-		Camera.pos = GameVector(LastPosition.ToVector3i(), pointColl.GetRoomNumber());
+		Camera.pos = GameVector(CamOldPos, pointColl.GetRoomNumber());
 }
 
 bool CheckItemCollideCamera(ItemInfo* item)

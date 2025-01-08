@@ -20,7 +20,6 @@
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
-#include "Specific/trutils.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Entities::Effects;
@@ -497,7 +496,7 @@ bool DoFlareLight(ItemInfo& item, const Vector3i& pos, int flareLife)
 	auto color = (flareColor * intensity * std::clamp(mult, 0.0f, 1.0f));
 
 	// Spawn dynamic light.
-	SpawnDynamicPointLight(lightPos, Color(color), falloff, false, GetHash(item.Name));
+	TriggerDynamicPointLight(lightPos, Color(color), falloff, false);
 
 	// Spawn lensflare if brightness is not 0.
 	if (settings.LensflareBrightness > EPSILON)

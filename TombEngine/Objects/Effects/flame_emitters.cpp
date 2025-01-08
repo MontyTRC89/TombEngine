@@ -94,7 +94,7 @@ namespace TEN::Entities::Effects
 					// Constant flames.
 					SoundEffect(SFX_TR4_FLAME_EMITTER, &item->Pose);
 					TriggerSuperJetFlame(item, -256 - (3072 * GlobalCounter & 0x1C00), GlobalCounter & 1);
-					SpawnDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
+					TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
 						(GetRandomControl() & 3) + 20,
 						(GetRandomControl() & 0x3F) + 192,
 						(GetRandomControl() & 0x1F) + 96, 0);
@@ -163,14 +163,14 @@ namespace TEN::Entities::Effects
 							TriggerSuperJetFlame(item, jetFlameVel, GlobalCounter & 1);
 						}
 
-						SpawnDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
+						TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
 							(-jetFlameVel >> 10) - (GetRandomControl() & 1) + 16,
 							(GetRandomControl() & 0x3F) + 192,
 							(GetRandomControl() & 0x1F) + 96, 0);
 					}
 					else
 					{
-						SpawnDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
+						TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
 							10 - (GetRandomControl() & 1),
 							(GetRandomControl() & 0x3F) + 192,
 							(GetRandomControl() & 0x1F) + 96, 0);
@@ -184,7 +184,7 @@ namespace TEN::Entities::Effects
 				// Normal flames.
 				AddFire(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, item->RoomNumber, 2.0f);
 
-				SpawnDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
+				TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
 					16 - (GetRandomControl() & 1),
 					(GetRandomControl() & 0x3F) + 192,
 					(GetRandomControl() & 0x1F) + 96, 0);
@@ -241,7 +241,7 @@ namespace TEN::Entities::Effects
 				{
 					if (item->ItemFlags[3])
 					{
-						SpawnDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
+						TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
 							10,
 							(((GetRandomControl() & 0x3F) + 192) * item->ItemFlags[3]) >> 8,
 							((GetRandomControl() & 0x1F) + 96 * item->ItemFlags[3]) >> 8,
@@ -249,7 +249,7 @@ namespace TEN::Entities::Effects
 					}
 					else
 					{
-						SpawnDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
+						TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z,
 							10,
 							(GetRandomControl() & 0x3F) + 192,
 							(GetRandomControl() & 0x1F) + 96,
@@ -488,7 +488,7 @@ namespace TEN::Entities::Effects
 				}
 
 				SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
-				SpawnDynamicLight(x, item->Pose.Position.y, z, 12, (GetRandomControl() & 0x3F) + 192, ((GetRandomControl() >> 4) & 0x1F) + 96, 0);
+				TriggerDynamicLight(x, item->Pose.Position.y, z, 12, (GetRandomControl() & 0x3F) + 192, ((GetRandomControl() >> 4) & 0x1F) + 96, 0);
 
 				auto pos = item->Pose.Position;
 				if (ItemNearLara(pos, FLAME_BIG_RADIUS))

@@ -81,7 +81,7 @@ namespace TEN::Entities::TR4
 			if (flashDuration)
 			{
 				auto pos = GetJointPosition(item, SentryGunBite);
-				SpawnDynamicLight(pos.x, pos.y, pos.z, 4 * flashDuration + 12, 24, 16, 4);
+				TriggerDynamicLight(pos.x, pos.y, pos.z, 4 * flashDuration + 12, 24, 16, 4);
 				flashDuration--;
 			}
 

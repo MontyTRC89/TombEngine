@@ -333,7 +333,7 @@ namespace TEN::Entities::Vehicles
 			else
 				origin = GameVector(pos, UPVItem->RoomNumber);
 
-			SpawnDynamicLight(pos.x, pos.y, pos.z, 16 + (lp << 3), random, random, random);
+			TriggerDynamicLight(pos.x, pos.y, pos.z, 16 + (lp << 3), random, random, random);
 		}
 
 		if (UPV->HarpoonTimer)

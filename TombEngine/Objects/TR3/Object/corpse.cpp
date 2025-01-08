@@ -11,7 +11,6 @@
 #include "Game/collision/floordata.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Ripple.h"
-#include "Game/effects/Splash.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
@@ -23,7 +22,6 @@
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Ripple;
-using namespace TEN::Effects::Splash;
 using namespace TEN::Math;
 
 namespace TEN::Entities::TR3
@@ -83,9 +81,11 @@ namespace TEN::Entities::TR3
 					!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item.RoomNumber))
 				{
 					int waterHeight = pointColl.GetWaterTopHeight();
-					SplashSetup.Position = Vector3(item.Pose.Position.x, waterHeight - 1, item.Pose.Position.z);
-					SplashSetup.SplashPower = item.Animation.Velocity.y * 4;
-					SplashSetup.InnerRadius = 160.0f;
+					SplashSetup.y = waterHeight - 1;
+					SplashSetup.x = item.Pose.Position.x;
+					SplashSetup.z = item.Pose.Position.z;
+					SplashSetup.splashPower = item.Animation.Velocity.y * 4;
+					SplashSetup.innerRadius = 160.0f;
 
 					SetupSplash(&SplashSetup, pointColl.GetRoomNumber());
 					item.Animation.Velocity.y = 0.0f;

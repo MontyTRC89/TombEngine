@@ -1193,8 +1193,6 @@ For example:
 			print("death")
 		end
 	end
-@tfield function OnUseItem Will be called when using an item from inventory.
-@tfield function OnFreeze Will be called when any of the Freeze modes are activated.
 @table LevelFuncs
 */
 

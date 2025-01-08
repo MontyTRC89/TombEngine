@@ -8,7 +8,6 @@
 #include "Game/collision/Sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
-#include "Game/effects/Splash.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
@@ -18,9 +17,9 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-using namespace TEN::Collision::Sphere;
 using namespace TEN::Collision::Point;
-using namespace TEN::Effects::Splash;
+
+using namespace TEN::Collision::Sphere;
 
 constexpr auto ROLLING_BALL_MAX_VELOCITY = BLOCK(3);
 
@@ -278,9 +277,11 @@ void RollingBallControl(short itemNumber)
 			!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber))
 		{
 			int waterHeight = pointColl.GetWaterTopHeight();
-			SplashSetup.Position = Vector3(item->Pose.Position.x, waterHeight - 1, item->Pose.Position.z);
-			SplashSetup.SplashPower = item->Animation.Velocity.y * 4;
-			SplashSetup.InnerRadius = 160;
+			SplashSetup.y = waterHeight - 1;
+			SplashSetup.x = item->Pose.Position.x;
+			SplashSetup.z = item->Pose.Position.z;
+			SplashSetup.splashPower = item->Animation.Velocity.y * 4;
+			SplashSetup.innerRadius = 160;
 			SetupSplash(&SplashSetup, pointColl.GetRoomNumber());
 		}
 

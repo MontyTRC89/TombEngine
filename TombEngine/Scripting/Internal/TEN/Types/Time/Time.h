@@ -42,13 +42,13 @@ namespace TEN::Scripting
 
 		// Operators
 
-		bool  operator <(const Time& time) const;
-		bool  operator <=(const Time& time) const;
-		bool  operator ==(const Time& time) const;
 		Time  operator +(int frameCount) const;
 		Time  operator -(int frameCount) const;
 		Time  operator +(const Time& time) const;
 		Time  operator -(const Time& time) const;
+		Time  operator <(const Time& time) const;
+		Time  operator <=(const Time& time) const;
+		bool  operator ==(const Time& time) const;
 		Time& operator +=(const Time& time);
 		Time& operator -=(const Time& time);
 		Time& Time::operator ++();

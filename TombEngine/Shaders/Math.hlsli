@@ -17,8 +17,6 @@
 #define LT_MASK_SPOT	(1 << (31 - LT_SPOT))
 #define LT_MASK_SHADOW	(1 << (31 - LT_SHADOW))
 
-#define SHADOWABLE_MASK (1 << 16)
-
 #define MAX_LIGHTS_PER_ROOM	48
 #define MAX_LIGHTS_PER_ITEM	8
 #define MAX_FOG_BULBS	32

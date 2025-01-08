@@ -43,13 +43,6 @@ void HighFramerateSynchronizer::Sync()
 		_lastTime = _currentTime;
 		_controlDelay += _frameTime;
 	}
-
-	_locked = true;
-}
-
-bool HighFramerateSynchronizer::Locked()
-{
-	return _locked;
 }
 
 bool HighFramerateSynchronizer::Synced()
@@ -62,13 +55,6 @@ bool HighFramerateSynchronizer::Synced()
 		return false;
 	}
 #endif
-
-	// If frameskip is in action, lock flag will remain set until synchronizer is 
-	// about to break out from it. This flag is later reused in input polling to
-	// prevent engine from de-registering input events prematurely.
-
-	if (_controlDelay > CONTROL_FRAME_TIME && _controlDelay <= CONTROL_FRAME_TIME * 2)
-		_locked = false;
 
 	return (_controlDelay >= CONTROL_FRAME_TIME);
 }

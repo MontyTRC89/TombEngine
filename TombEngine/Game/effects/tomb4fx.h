@@ -52,19 +52,19 @@ struct SMOKE_SPARKS
 	byte fxObj;
 	byte nodeNumber;
 
-	Vector3i PrevPosition = Vector3i::Zero;
-	byte	 PrevShade	  = 0;
-	byte	 PrevSize	  = 0;
-	byte	 PrevScalar	  = 0;
-	short	 PrevRotAng	  = 0;
+	Vector3i oldPosition;
+	byte oldShade;
+	byte oldSize;
+	byte oldScalar;
+	short oldRotAng;
 
 	void StoreInterpolationData()
 	{
-		PrevPosition = position;
-		PrevShade = shade;
-		PrevSize = size;
-		PrevScalar = scalar;
-		PrevRotAng = rotAng;
+		oldPosition = position;
+		oldShade = shade;
+		oldSize = size;
+		oldScalar = scalar;
+		oldRotAng = rotAng;
 	}
 };
 
@@ -95,19 +95,19 @@ struct SHOCKWAVE_STRUCT
 	bool fadeIn = false;
 	bool HasLight = false;
 
-	short PrevInnerRad = 0;
-	short PrevOuterRad = 0;
-	byte  PrevR		   = 0;
-	byte  PrevG		   = 0;
-	byte  PrevB		   = 0;
+	short oldInnerRad;
+	short oldOuterRad;
+	byte oldR;
+	byte oldG;
+	byte oldB;
 
 	void StoreInterpolationData()
 	{
-		PrevInnerRad = innerRad;
-		PrevOuterRad = outerRad;
-		PrevR = r;
-		PrevG = g;
-		PrevB = b;
+		oldInnerRad = innerRad;
+		oldOuterRad = outerRad;
+		oldR = r;
+		oldG = g;
+		oldB = b;
 	}
 };
 
@@ -121,11 +121,11 @@ struct GUNSHELL_STRUCT
 	short dirXrot;
 	short objectNumber;
 
-	Pose PrevPose = Pose::Zero;
+	Pose oldPos;
 
 	void StoreInterpolationData()
 	{
-		PrevPose = pos;
+		oldPos = pos;
 	}
 };
 
@@ -145,21 +145,21 @@ struct DRIP_STRUCT
 	byte outside;
 	byte pad;
 
-	int  PrevX = 0;
-	int  PrevY = 0;
-	int  PrevZ = 0;
-	byte PrevR = 0;
-	byte PrevG = 0;
-	byte PrevB = 0;
+	int oldX;
+	int oldY;
+	int oldZ;
+	byte oldR;
+	byte oldG;
+	byte oldB;
 
 	void StoreInterpolationData()
 	{
-		PrevX = x;
-		PrevY = y;
-		PrevZ = z;
-		PrevR = r;
-		PrevG = g;
-		PrevB = b;
+		oldX = x;
+		oldY = y;
+		oldZ = z;
+		oldR = r;
+		oldG = g;
+		oldB = b;
 	}
 };
 
@@ -170,15 +170,15 @@ struct FIRE_LIST
 	float size;
 	short roomNumber;
 	
-	Vector3i PrevPosition = Vector3i::Zero;
-	float	 PrevSize	  = 0.0f;
-	byte	 PrevFade	  = 0;
+	Vector3i oldPosition;
+	float oldSize;
+	byte oldFade;
 
 	void StoreInterpolationData()
 	{
-		PrevPosition = position;
-		PrevSize = size;
-		PrevFade = fade;
+		oldPosition = position;
+		oldSize = size;
+		oldFade = fade;
 	}
 };
 
@@ -210,19 +210,19 @@ struct FIRE_SPARKS
 	unsigned char sLife;
 	unsigned char life;
 
-	Vector3i	  PrevPosition = Vector3i::Zero;
-	Vector3i	  PrevColor	   = Vector3i::Zero;
-	unsigned char PrevScalar   = 0;
-	unsigned char PrevSize	   = 0;
-	short		  PrevRotAng   = 0;
+	Vector3i oldPosition;
+	Vector3i oldColor;
+	unsigned char oldScalar;
+	unsigned char oldSize;
+	short oldRotAng;
 
 	void StoreInterpolationData()
 	{
-		PrevPosition = position;
-		PrevColor = color;
-		PrevScalar = scalar;
-		PrevSize = size;
-		PrevRotAng = rotAng;
+		oldPosition = position;
+		oldColor = color;
+		oldScalar = scalar;
+		oldSize = size;
+		oldRotAng = rotAng;
 	}
 };
 
@@ -251,19 +251,21 @@ struct BLOOD_STRUCT
 	byte life;
 	byte pad;
 
-	Vector3i PrevPosition = Vector3i::Zero;
-	short	 PrevRotAng	  = 0;
-	byte	 PrevShade	  = 0;
-	byte	 PrevSize	  = 0;
+	int oldX;
+	int oldY;
+	int oldZ;
+	short oldRotAng;
+	byte oldShade;
+	byte oldSize;
 
 	void StoreInterpolationData()
 	{
-		PrevPosition.x = x;
-		PrevPosition.y = y;
-		PrevPosition.z = z;
-		PrevRotAng = rotAng;
-		PrevShade = shade;
-		PrevSize = size;
+		oldX = x;
+		oldY = y;
+		oldZ = z;
+		oldRotAng = rotAng;
+		oldShade = shade;
+		oldSize = size;
 	}
 };
 
@@ -316,6 +318,7 @@ void AddFire(int x, int y, int z, short roomNum, float size, short fade = 1);
 void UpdateFireSparks();
 int GetFreeSmokeSpark();
 void UpdateSmoke();
+byte TriggerGunSmoke_SubFunction(LaraWeaponType weaponType);
 void TriggerGunSmoke(int x, int y, int z, short xv, short yv, short zv, byte initial, LaraWeaponType weaponType, byte count);
 void TriggerShatterSmoke(int x, int y, int z);
 int GetFreeBlood();

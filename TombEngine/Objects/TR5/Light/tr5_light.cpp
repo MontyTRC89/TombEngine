@@ -31,7 +31,7 @@ void PulseLightControl(short itemNumber)
 		if (pulse > 255)
 			pulse = 255;
 
-		SpawnDynamicLight(
+		TriggerDynamicLight(
 			item->Pose.Position.x,
 			item->Pose.Position.y,
 			item->Pose.Position.z,
@@ -50,7 +50,7 @@ void TriggerAlertLight(int x, int y, int z, int r, int g, int b, short angle, sh
 	auto target =  GameVector(Geometry::TranslatePoint(origin.ToVector3(), angle * 16, BLOCK(16)));
 
 	if (!LOS(&origin, &target))
-		SpawnDynamicLight(target.x, target.y, target.z, falloff, r, g, b);
+		TriggerDynamicLight(target.x, target.y, target.z, falloff, r, g, b);
 }
 
 void StrobeLightControl(short itemNumber)
@@ -74,7 +74,7 @@ void StrobeLightControl(short itemNumber)
 			item->RoomNumber,
 			12);
 
-		SpawnDynamicLight(
+		TriggerDynamicLight(
 			item->Pose.Position.x + 256 * phd_sin(item->Pose.Orientation.y + 22528),
 			item->Pose.Position.y - 768,
 			item->Pose.Position.z + 256 * phd_cos(item->Pose.Orientation.y + 22528),
@@ -89,7 +89,7 @@ void ColorLightControl(short itemNumber)
 
 	if (TriggerActive(item))
 	{
-		SpawnDynamicLight(
+		TriggerDynamicLight(
 			item->Pose.Position.x,
 			item->Pose.Position.y,
 			item->Pose.Position.z,
@@ -192,7 +192,7 @@ void ElectricalLightControl(short itemNumber)
 		}
 	}
 
-	SpawnDynamicLight(
+	TriggerDynamicLight(
 		item->Pose.Position.x,
 		item->Pose.Position.y,
 		item->Pose.Position.z,
@@ -225,7 +225,7 @@ void BlinkingLightControl(short itemNumber)
 		{
 			auto pos = GetJointPosition(item, 0);
 
-			SpawnDynamicLight(
+			TriggerDynamicLight(
 				pos.x, pos.y, pos.z,
 				16,
 				item->Model.Color.x * SCHAR_MAX,

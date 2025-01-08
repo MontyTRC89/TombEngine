@@ -57,7 +57,7 @@ test = Level.new()
 test.nameKey = "level_test"
 test.scriptFile = "Scripts\\Levels\\New_Level.lua"
 test.ambientTrack = "108"
-test.levelFile = "Data\\Tut1_water.ten"
+test.levelFile = "Data\\TestLevel.ten"
 test.loadScreenFile = "Screens\\rome.jpg"
 
 -- 0 is no weather, 1 is rain, 2 is snow.

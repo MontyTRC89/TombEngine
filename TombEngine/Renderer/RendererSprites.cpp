@@ -243,6 +243,7 @@ namespace TEN::Renderer
 				object.Centre = rDrawSprite.pos;
 				object.Distance = distance;
 				object.Sprite = &rDrawSprite;
+				object.World = GetWorldMatrixForSprite(&rDrawSprite, view);
 
 				view.TransparentObjectsToDraw.push_back(object);
 			}
@@ -279,7 +280,8 @@ namespace TEN::Renderer
 				SetDepthState(DepthState::Read);
 				SetCullMode(CullMode::None);
 
-				_shaders.Bind(Shader::InstancedSprites);
+				_context->VSSetShader(_vsInstancedSprites.Get(), nullptr, 0);
+				_context->PSSetShader(_psInstancedSprites.Get(), nullptr, 0);
 
 				// Set up vertex buffer and parameters.
 				unsigned int stride = sizeof(Vertex);
@@ -340,7 +342,8 @@ namespace TEN::Renderer
 				SetDepthState(DepthState::Read);
 				SetCullMode(CullMode::None);
 
-				_shaders.Bind(Shader::Sprites);
+				_context->VSSetShader(_vsSprites.Get(), nullptr, 0);
+				_context->PSSetShader(_psSprites.Get(), nullptr, 0);
 
 				wasGPUSet = true;
 			}
@@ -360,28 +363,20 @@ namespace TEN::Renderer
 				vertex0.UV = rDrawSprite.Sprite->UV[0];
 				vertex0.Color = rDrawSprite.c1;
 
-				ReflectVectorOptionally(vertex0.Position);
-
 				auto vertex1 = Vertex{};
 				vertex1.Position = rDrawSprite.vtx2;
 				vertex1.UV = rDrawSprite.Sprite->UV[1];
 				vertex1.Color = rDrawSprite.c2;
-
-				ReflectVectorOptionally(vertex1.Position);
 
 				auto vertex2 = Vertex{};
 				vertex2.Position = rDrawSprite.vtx3;
 				vertex2.UV = rDrawSprite.Sprite->UV[2];
 				vertex2.Color = rDrawSprite.c3;
 
-				ReflectVectorOptionally(vertex2.Position);
-
 				auto vertex3 = Vertex{};
 				vertex3.Position = rDrawSprite.vtx4;
 				vertex3.UV = rDrawSprite.Sprite->UV[3];
 				vertex3.Color = rDrawSprite.c4;
-
-				ReflectVectorOptionally(vertex3.Position);
 
 				_primitiveBatch->DrawTriangle(vertex0, vertex1, vertex3);
 				_primitiveBatch->DrawTriangle(vertex1, vertex2, vertex3);
@@ -411,7 +406,8 @@ namespace TEN::Renderer
 			SetBlendMode(object->Sprite->BlendMode);
 			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
-			_shaders.Bind(Shader::InstancedSprites);
+			_context->VSSetShader(_vsInstancedSprites.Get(), nullptr, 0);
+			_context->PSSetShader(_psInstancedSprites.Get(), nullptr, 0);
 
 			// Set up vertex buffer and parameters.
 			UINT stride = sizeof(Vertex);
@@ -456,7 +452,8 @@ namespace TEN::Renderer
 			SetBlendMode(object->Sprite->BlendMode);
 			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
-			_shaders.Bind(Shader::Sprites);
+			_context->VSSetShader(_vsSprites.Get(), nullptr, 0);
+			_context->PSSetShader(_psSprites.Get(), nullptr, 0);
 
 			_stSprite.IsSoftParticle = object->Sprite->SoftParticle ? 1 : 0;
 			_stSprite.RenderType = (int)object->Sprite->renderType;
@@ -498,10 +495,11 @@ namespace TEN::Renderer
 
 	void Renderer::DrawSpriteSorted(RendererSortableObject* objectInfo, RendererObjectType lastObjectType, RenderView& view)
 	{
-		unsigned int stride = sizeof(Vertex);
-		unsigned int offset = 0;
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
 
-		_shaders.Bind(Shader::Sprites);
+		_context->VSSetShader(_vsSprites.Get(), nullptr, 0);
+		_context->PSSetShader(_psSprites.Get(), nullptr, 0);
 
 		_sortedPolygonsVertexBuffer.Update(_context.Get(), _sortedPolygonsVertices.data(), 0, (int)_sortedPolygonsVertices.size());
 
@@ -527,3 +525,4 @@ namespace TEN::Renderer
 		_numSortedTriangles += (int)_sortedPolygonsVertices.size() / 3;
 	}
 }
+
