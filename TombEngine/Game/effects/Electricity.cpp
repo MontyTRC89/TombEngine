@@ -161,7 +161,7 @@ namespace TEN::Effects::Electricity
 			SpawnElectricityGlow(pos2, 28, 32, 32, 64);
 
 			SpawnCyborgSpark(pos2);
-			TriggerDynamicLight(pos2.x, pos2.y, pos2.z, Random::GenerateInt(4, 8), 31, 63, 127);
+			SpawnDynamicLight(pos2.x, pos2.y, pos2.z, Random::GenerateInt(4, 8), 31, 63, 127);
 
 			sphere = BoundingSphere(pos1, beamOriginRadius);
 			auto sphere1 = BoundingSphere(pos1, beamTargetRadius);
