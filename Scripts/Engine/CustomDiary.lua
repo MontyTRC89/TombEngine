@@ -26,8 +26,7 @@ LevelFuncs.Engine.Diaries = {}
 GameVars.Engine.Diaries = GameVars.Engine.Diaries or {}
 GameVars.Engine.LastUsedDiary = GameVars.Engine.LastUsedDiary or nil
 
----
--- Imports diary from an external file.
+--- Imports diary from an external file.
 -- @tparam string fileName Name of file in the script folder without extension to import the diary from.
 function CustomDiary.ImportDiary(fileName)
 
@@ -45,12 +44,12 @@ function CustomDiary.ImportDiary(fileName)
     for _, entry in ipairs(diaryData) do
         if entry.type == "diary" then
 
-            if (entry.object < 596 or entry.object > 611) and entry.object ~= 986 then
+            if not Type.IsNumber(entry.object) or ((entry.object < 596 or entry.object > 611) and entry.object ~= 986) then
                 TEN.Util.PrintLog("Invalid object slot. Please use a pickup object slot in the range PICKUP_ITEM1 (596) to PICKUP_ITEM 16 (611) or DIARY_ITEM (986). Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
-            if entry.objectIdBg < 1353 or entry.objectIdBg > 1400 then
+            if not Type.IsNumber(entry.objectIdBg) or entry.objectIdBg < 1353 or entry.objectIdBg > 1400 then
                 TEN.Util.PrintLog("Invalid objectIdBg slot. Please use a sprite slot. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
@@ -80,17 +79,17 @@ function CustomDiary.ImportDiary(fileName)
                 return
             end
 
-            if  not (entry.alignMode ~= nil and entry.alignMode >= 0 and entry.alignMode <= 8) then
+            if not Type.IsNumber(entry.alignMode) or entry.alignMode < 0 or entry.alignMode > 8 then
                 TEN.Util.PrintLog("'alignMode' is not a valid View.AlignMode type. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
-            if  not (entry.blendMode ~= nil and entry.blendMode >= 0 and entry.blendMode <= 11) then
+            if not Type.IsNumber(entry.blendMode) or entry.blendMode < 0 or entry.blendMode > 11 then
                 TEN.Util.PrintLog("'blendMode' is not a valid Effects.BlendID type. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
-            if  not (entry.scaleMode ~= nil and entry.scaleMode >= 0 and entry.scaleMode <= 2) then
+            if not Type.IsNumber(entry.scaleMode) and entry.scaleMode < 0 or entry.scaleMode > 2 then
                 TEN.Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type. Error in template data for diary entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
@@ -143,7 +142,7 @@ function CustomDiary.ImportDiary(fileName)
     for _, entry in ipairs(diaryData) do
         if entry.type == "background" then
 
-            if entry.objectIdBg < 1353 or entry.objectIdBg > 1400 then
+            if not Type.IsNumber(entry.objectIdBg) or entry.objectIdBg < 1353 or entry.objectIdBg > 1400 then
                 TEN.Util.PrintLog("Invalid objectIdBg slot. Please use a sprite slot. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
@@ -173,17 +172,17 @@ function CustomDiary.ImportDiary(fileName)
                 return
             end
 
-            if  not (entry.alignMode ~= nil and entry.alignMode >= 0 and entry.alignMode <= 8) then
+            if not Type.IsNumber(entry.alignMode) or entry.alignMode < 0 or entry.alignMode > 8 then
                 TEN.Util.PrintLog("'alignMode' is not a valid View.AlignMode type. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
-            if  not (entry.blendMode ~= nil and entry.blendMode >= 0 and entry.blendMode <= 11) then
+            if not Type.IsNumber(entry.blendMode) or entry.blendMode < 0 or entry.blendMode > 11 then
                 TEN.Util.PrintLog("'blendMode' is not a valid Effects.BlendID type. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
-            if  not (entry.scaleMode ~= nil and entry.scaleMode >= 0 and entry.scaleMode <= 2) then
+            if not Type.IsNumber(entry.scaleMode) and entry.scaleMode < 0 or entry.scaleMode > 2 then
                 TEN.Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type. Error in template data for background entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
@@ -193,7 +192,7 @@ function CustomDiary.ImportDiary(fileName)
                 return
             end
 
-            importDiary:addBackground(
+            importDiary:AddBackground(
                 entry.objectIdBg,
                 entry.spriteIdBg,
                 entry.colorBg,
@@ -249,7 +248,7 @@ function CustomDiary.ImportDiary(fileName)
                 return
             end
 
-            importDiary:customizePageNumbers(
+            importDiary:CustomizePageNumbers(
                 entry.pageNoType,
                 entry.prefix,
                 entry.separator,
@@ -306,12 +305,12 @@ function CustomDiary.ImportDiary(fileName)
                 return
             end
 
-            importDiary:customizeControls(
+            importDiary:CustomizeControls(
                 entry.textPos,
                 entry.textOptions,
                 entry.textScale,
                 entry.textColor)
-            importDiary:customizeControlsText(
+            importDiary:CustomizeControlsText(
                 entry.string1,
                 entry.string2,
                 entry.string3,
@@ -323,7 +322,7 @@ function CustomDiary.ImportDiary(fileName)
                 return
             end
 
-            if entry.objectId < 1353 or entry.objectId > 1400 then
+            if not Type.IsNumber(entry.objectId) or entry.objectId < 1353 or entry.objectId > 1400 then
                 TEN.Util.PrintLog("Invalid objectId slot. Please use a sprite slot. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
@@ -353,17 +352,17 @@ function CustomDiary.ImportDiary(fileName)
                 return
             end
 
-            if  not (entry.alignMode ~= nil and entry.alignMode >= 0 and entry.alignMode <= 8) then
+            if not Type.IsNumber(entry.alignMode) or entry.alignMode < 0 or entry.alignMode > 8 then
                 TEN.Util.PrintLog("'alignMode' is not a valid View.AlignMode type. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
-            if  not (entry.blendMode ~= nil and entry.blendMode >= 0 and entry.blendMode <= 11) then
+            if not Type.IsNumber(entry.blendMode) or entry.blendMode < 0 or entry.blendMode > 11 then
                 TEN.Util.PrintLog("'blendMode' is not a valid Effects.BlendID type. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
-            if  not (entry.scaleMode ~= nil and entry.scaleMode >= 0 and entry.scaleMode <= 2) then
+            if not Type.IsNumber(entry.scaleMode) and entry.scaleMode < 0 or entry.scaleMode > 2 then
                 TEN.Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type. Error in template data for notification entry. Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
@@ -373,7 +372,7 @@ function CustomDiary.ImportDiary(fileName)
                 return
             end
 
-            importDiary:customizeNotification(
+            importDiary:CustomizeNotification(
                 entry.notificationTime,
                 entry.objectId,
                 entry.spriteId,
@@ -393,7 +392,7 @@ function CustomDiary.ImportDiary(fileName)
                 return
             end
 
-            if entry.objectId < 1353 or entry.objectId > 1400 then
+            if not Type.IsNumber(entry.objectId) or entry.objectId < 1353 or entry.objectId > 1400 then
                 TEN.Util.PrintLog("Invalid objectId slot. Please use a sprite slot. Error in template data for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
@@ -423,22 +422,22 @@ function CustomDiary.ImportDiary(fileName)
                 return
             end
 
-            if  not (entry.alignMode ~= nil and entry.alignMode >= 0 and entry.alignMode <= 8) then
+            if not Type.IsNumber(entry.alignMode) or entry.alignMode < 0 or entry.alignMode > 8 then
                 TEN.Util.PrintLog("'alignMode' is not a valid View.AlignMode type for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
-            if  not (entry.blendMode ~= nil and entry.blendMode >= 0 and entry.blendMode <= 11) then
+            if not Type.IsNumber(entry.blendMode) or entry.blendMode < 0 or entry.blendMode > 11 then
                 TEN.Util.PrintLog("'blendMode' is not a valid Effects.BlendID type for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
-            if  not (entry.scaleMode ~= nil and entry.scaleMode >= 0 and entry.scaleMode <= 2) then
+            if not Type.IsNumber(entry.scaleMode) and entry.scaleMode < 0 or entry.scaleMode > 2 then
                 TEN.Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type for image entry for page: "..tostring(entry.pageIndex)..". Import Stopped for file: "..tostring(fileName), Util.LogLevel.WARNING)
                 return
             end
 
-            importDiary:addImageEntry(
+            importDiary:AddImageEntry(
                 entry.pageIndex,
                 entry.objectId,
                 entry.spriteId,
@@ -489,7 +488,7 @@ function CustomDiary.ImportDiary(fileName)
                 return
             end
 
-            importDiary:addTextEntry(
+            importDiary:AddTextEntry(
                 entry.pageIndex,
                 entry.text,
                 entry.textPos,
@@ -509,7 +508,7 @@ function CustomDiary.ImportDiary(fileName)
                 return
             end
 
-            importDiary:addNarration(
+            importDiary:AddNarration(
                 entry.pageIndex,
                 entry.trackName
             )
@@ -521,12 +520,11 @@ function CustomDiary.ImportDiary(fileName)
     end
     
     --Unlock the pages as per the template
-    importDiary:unlockPages(unlockCount, false)
+    importDiary:UnlockPages(unlockCount, false)
     print("External diary from file: "..tostring(fileName).." imported")
 end
 
----
--- Creates a diary with extensive configuration options.
+--- Creates a diary with extensive configuration options.
 -- Parameters:
 -- @tparam Objects.ObjID object The pickup object that will be used to create the diary. The diary can be created using PICKUP_ITEMX (596-611) or DIARY_ITEM (986). Access the diary by selecting the item in the inventory. 
 -- @tparam Objects.ObjID objectIdBg Object ID for the diary's sprite.
@@ -544,7 +542,7 @@ end
 -- @treturn CustomDiary
 CustomDiary.Create = function(object, objectIdBg, spriteIdBg, colorBg, pos, rot, scale, alignMode, scaleMode, blendMode, alpha, pageSound, exitSound)
 
-    if (object < 596 or object > 611) and object ~= 986 then
+    if not Type.IsNumber(object) or ((object < 596 or object > 611) and object ~= 986) then
         TEN.Util.PrintLog("Error: Invalid object slot for diary creation. Please use a pickup object slot PICKUP_ITEM1 (596) to PICKUP_ITEM 16 (611) or DIARY_ITEM (986).", Util.LogLevel.WARNING)
         return
     end
@@ -559,89 +557,78 @@ CustomDiary.Create = function(object, objectIdBg, spriteIdBg, colorBg, pos, rot,
 
 	GameVars.Engine.Diaries[dataName]				        = {}
 
-    if objectIdBg >= 1353 and objectIdBg <= 1400 then
-        GameVars.Engine.Diaries[dataName].ObjectIdBg	        = objectIdBg
-    else
+    if not Type.IsNumber(objectIdBg) or objectIdBg < 1353 or objectIdBg > 1400 then
         TEN.Util.PrintLog("Invalid objectIdBg slot. Please use a sprite slot. Expected a sprite slot in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
+    GameVars.Engine.Diaries[dataName].ObjectIdBg	        = objectIdBg
 
-    if Type.IsNumber(spriteIdBg) then
-        GameVars.Engine.Diaries[dataName].SpriteIdBg	        = spriteIdBg
-    else
+    if not Type.IsNumber(spriteIdBg) then
         TEN.Util.PrintLog("'spriteIdBg' is in an incorrect format. Expected a number type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
+    GameVars.Engine.Diaries[dataName].SpriteIdBg	        = spriteIdBg
 
-    if Type.IsColor(colorBg) then
-        GameVars.Engine.Diaries[dataName].ColorBg		        = colorBg
-    else
+    if not Type.IsColor(colorBg) then
         TEN.Util.PrintLog("'colorBg' is in an incorrect format. Expected a Color type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
+    GameVars.Engine.Diaries[dataName].ColorBg		        = colorBg
 
-    if Type.IsVec2(pos) then
-        GameVars.Engine.Diaries[dataName].Pos			        = pos
-    else
+    if not Type.IsVec2(pos) then
         TEN.Util.PrintLog("'posBg' is in an incorrect format. Expected a Vec2 type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
+    GameVars.Engine.Diaries[dataName].Pos			        = pos
 
-    if Type.IsNumber(rot) then
-        GameVars.Engine.Diaries[dataName].Rot			        = rot
-    else
+    if not Type.IsNumber(rot) then
         TEN.Util.PrintLog("'rot' is in an incorrect format. Expected a number type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
+    GameVars.Engine.Diaries[dataName].Rot			        = rot
 
-    if Type.IsVec2(scale) then
-        GameVars.Engine.Diaries[dataName].Scale 		        = scale
-    else
+
+    if not Type.IsVec2(scale) then
         TEN.Util.PrintLog("'scale' is in an incorrect format. Expected a Vec2 type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
+    GameVars.Engine.Diaries[dataName].Scale 		        = scale
 
-    if  (alignMode ~= nil and alignMode >= 0 and alignMode <= 8) then
-        GameVars.Engine.Diaries[dataName].AlignMode            = alignMode
-    else
+    if not Type.IsNumber(alignMode) or alignMode < 0 or alignMode > 8 then
         TEN.Util.PrintLog("'alignMode' is not a valid View.AlignMode type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
+    GameVars.Engine.Diaries[dataName].AlignMode            = alignMode
 
-    if  (blendMode ~= nil and blendMode >= 0 and blendMode <= 11) then
-        GameVars.Engine.Diaries[dataName].BlendMode	        = blendMode
-    else
+    if not Type.IsNumber(blendMode) or blendMode < 0 or blendMode > 11 then
         TEN.Util.PrintLog("'blendMode' is not a valid Effects.BlendID type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
+    GameVars.Engine.Diaries[dataName].BlendMode	        = blendMode
 
-    if  (scaleMode ~= nil and scaleMode >= 0 and scaleMode <= 2) then
-        GameVars.Engine.Diaries[dataName].ScaleMode            = scaleMode
-    else
+    if not Type.IsNumber(scaleMode) and scaleMode < 0 or scaleMode > 2 then
         TEN.Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
+    GameVars.Engine.Diaries[dataName].ScaleMode            = scaleMode
 
-    if Type.IsNumber(alpha) and alpha>=0 and alpha <= 255 then
-        GameVars.Engine.Diaries[dataName].Alpha     	        = alpha
-    else
+    if not Type.IsNumber(alpha) or alpha < 0 or alpha > 255 then
         TEN.Util.PrintLog("'alpha is in an incorrect format. Expected a number (0-255) type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
+    GameVars.Engine.Diaries[dataName].Alpha     	        = alpha
 
-    if Type.IsNumber(pageSound) and pageSound > 0 then
-        GameVars.Engine.Diaries[dataName].PageSound	        = pageSound
-    else
+    if not Type.IsNumber(pageSound) or pageSound <=0 then
         TEN.Util.PrintLog("'pageSound' is in an incorrect format. Expected a number type in function 'CustomDiary.Create' for the diary system.", Util.LogLevel.WARNING)
         return
     end
+    GameVars.Engine.Diaries[dataName].PageSound	        = pageSound
 
-    if Type.IsNumber(exitSound) and exitSound > 0 then
-        GameVars.Engine.Diaries[dataName].ExitSound            = exitSound
-    else
+    if not Type.IsNumber(exitSound) or exitSound <=0 then
         TEN.Util.PrintLog("'exitSound' is in an incorrect format. Expected a number type in function 'CustomDiary.Create' for the diary system:.", Util.LogLevel.WARNING)
         return
     end
+    GameVars.Engine.Diaries[dataName].ExitSound            = exitSound
 
     GameVars.Engine.Diaries[dataName].Name			        = dataName
 	GameVars.Engine.Diaries[dataName].CurrentPageIndex     = 1
@@ -664,8 +651,7 @@ CustomDiary.Create = function(object, objectIdBg, spriteIdBg, colorBg, pos, rot,
     return setmetatable(self, CustomDiary)
 end
 
----
--- The function retrieves a diary by its unique object. This function is useful when you need to access or manipulate a diary that has already been created .
+--- The function retrieves a diary by its unique object. This function is useful when you need to access or manipulate a diary that has already been created .
 -- @tparam Objects.ObjID object The pickup object that was used to create the diary (596-611,986).
 -- @treturn CustomDiary The diary created using the object.
 CustomDiary.Get = function(object)
@@ -678,8 +664,7 @@ CustomDiary.Get = function(object)
     end
 end
 
----
--- The function removes a custom diary and its associated data from the system. It ensures that the diary is no longer tracked or accessible in the LevelVars.Engine.Diaries. 
+--- The function removes a custom diary and its associated data from the system. It ensures that the diary is no longer tracked or accessible in the LevelVars.Engine.Diaries. 
 -- Please call this once a diary has served its purpose. It helps reduce the savegame size.
 -- @tparam Objects.ObjID object The pickup object that was used to create the diary (596-611,986).
 CustomDiary.Delete = function (object)
@@ -689,8 +674,7 @@ CustomDiary.Delete = function (object)
 	end
 end
 
---- 
--- The function adds the callback to enable diaries in levels. This needs to be added to every level preferably in the LevelFuncs.OnStart.
+--- The function adds the callback to enable diaries in levels. This needs to be added to every level preferably in the LevelFuncs.OnStart.
 -- 	@bool value True enables the diaries to be activated. False would disable the diaries.
 CustomDiary.Status = function(value)
 
@@ -698,10 +682,10 @@ CustomDiary.Status = function(value)
         if GameVars.Engine.Diaries then
             if value == true then
                 TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.POSTUSEITEM, LevelFuncs.Engine.Diaries.ActivateDiary)
-                TEN.Util.PrintLog("Diary system started.", Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("Diary system started.", Util.LogLevel.INFO)
             elseif value == false then
                 TEN.Logic.RemoveCallback(TEN.Logic.CallbackPoint.POSTUSEITEM, LevelFuncs.Engine.Diaries.ActivateDiary)
-                TEN.Util.PrintLog("Diary system stopped.", Util.LogLevel.WARNING)
+                TEN.Util.PrintLog("Diary system stopped.", Util.LogLevel.INFO)
             end
         end
     else
@@ -709,8 +693,7 @@ CustomDiary.Status = function(value)
     end
 end
 
----
--- The function checks whether the specified diary is currently visible.
+--- The function checks whether the specified diary is currently visible.
 -- @treturn bool true if the diary is visible and false if it is not.
 function CustomDiary:IsVisible()
 
@@ -719,10 +702,9 @@ function CustomDiary:IsVisible()
 	end
 end
 
---- 
--- The function displays the specified diary. Can be used to call the diary directly using volume or classic triggers.
+--- The function displays the specified diary. Can be used to call the diary directly using volume or classic triggers.
 -- @tparam int pageIndex The page number at which diary should be opened.
-function CustomDiary:showDiary(pageIndex)
+function CustomDiary:ShowDiary(pageIndex)
 
 	if GameVars.Engine.Diaries[self.Name] then
 
@@ -741,23 +723,21 @@ function CustomDiary:showDiary(pageIndex)
 	end
 end
 
---- 
--- The function returns the number of unlocked pages in the diary.
+--- The function returns the number of unlocked pages in the diary.
 -- @treturn int total number of unlocked pages in the diary.
-function CustomDiary:getUnlockedPageCount()
+function CustomDiary:GetUnlockedPageCount()
 
 	if GameVars.Engine.Diaries[self.Name] then
 		return GameVars.Engine.Diaries[self.Name].UnlockedPages
 	end
 end
 
----
--- The function unlocks the specified diary up to the given page number. 
+--- The function unlocks the specified diary up to the given page number. 
 -- This value can be overridden to lock or unlock pages as needed.
 -- A lower number can be set to restrict access to previously unlocked pages.
 -- @tparam int pageIndex The page number up to which the diary should be unlocked.
 -- @tparam bool notification If true, and notification has been defined, a notification icon and sound will be played.
-function CustomDiary:unlockPages(pageIndex, notification)
+function CustomDiary:UnlockPages(pageIndex, notification)
     if GameVars.Engine.Diaries[self.Name] then
 
         if not Type.IsNumber(pageIndex) or pageIndex > #GameVars.Engine.Diaries[self.Name].Pages or pageIndex <= 0 then
@@ -786,10 +766,9 @@ function CustomDiary:unlockPages(pageIndex, notification)
     end
 end
 
----
--- The function clears the page for the diary.
+--- The function clears the page for the diary.
 -- @tparam int pageIndex The page number to be cleared.
-function CustomDiary:clearPage(pageIndex)
+function CustomDiary:ClearPage(pageIndex)
 
     if not Type.IsNumber(pageIndex) or pageIndex > #GameVars.Engine.Diaries[self.Name].Pages or pageIndex <=0 then
         TEN.Util.PrintLog("'pageIndex' is in an incorrect format or not a valid page number. Expected a number type in function 'clearPage' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
@@ -802,57 +781,51 @@ function CustomDiary:clearPage(pageIndex)
     end
 end
 
----
--- Adds a text entry to the specified page for the diary.
+--- Adds a text entry to the specified page for the diary.
 -- @tparam int pageIndex page number to add the text entry to.
 -- @tparam string text Text entry to be added to the page.
 -- @tparam Vec2 textPos X,Y position of the text.
 -- @tparam Strings.DisplayStringOption textOptions alignment and effects for the text. Default: None. Please note text is automatically aligned to the LEFT
 -- @tparam number textScale Scale factor for the text.
 -- @tparam Color textColor Color of the text.
-function CustomDiary:addTextEntry(pageIndex, text, textPos, textOptions, textScale, textColor)
+function CustomDiary:AddTextEntry(pageIndex, text, textPos, textOptions, textScale, textColor)
     local textEntry = {}
 
-    if Type.IsString(text) then
-        textEntry.text = text
-    else
+    if not Type.IsString(text) then
         TEN.Util.PrintLog("'text' is in an incorrect format. Expected a string type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
+    textEntry.text = text
 
-    if Type.IsVec2(textPos) then
-        textEntry.textPos = textPos
-    else
+    if not Type.IsVec2(textPos) then
         TEN.Util.PrintLog("'textPos' is in an incorrect format. Expected a Vec2 type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
+    textEntry.textPos = textPos
 
     if not Type.IsTable(textOptions) then
         TEN.Util.PrintLog("'textOptions' is in an incorrect format. Expected a table type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
-    else
-        for _, data in pairs(textOptions) do
-            if type(data) ~= "number" or data < 0 or data > 3 then
-                TEN.Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
-                return
-            end
-        end
-        textEntry.textOptions = textOptions
     end
+    for _, data in pairs(textOptions) do
+        if type(data) ~= "number" or data < 0 or data > 3 then
+            TEN.Util.PrintLog("Data in 'textOptions' table is not a valid Strings.DisplayStringOption type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+            return
+        end
+    end
+    textEntry.textOptions = textOptions
 
-    if Type.IsNumber(textScale) then
-        textEntry.textScale = textScale
-    else
+    if not Type.IsNumber(textScale) then
         TEN.Util.PrintLog("'textScale' is in an incorrect format. Expected a number type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
+    textEntry.textScale = textScale
 
-    if Type.IsColor(textColor) then
-        textEntry.textColor = textColor
-    else
+    if not Type.IsColor(textColor) then
         TEN.Util.PrintLog("'textColor' is in an incorrect format. Expected a Color type in function 'addTextEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
+    textEntry.textColor = textColor
 
     if Type.IsNumber(pageIndex) and pageIndex > 0 then
         if not GameVars.Engine.Diaries[self.Name].Pages[pageIndex] then
@@ -865,8 +838,7 @@ function CustomDiary:addTextEntry(pageIndex, text, textPos, textOptions, textSca
     end
 end
 
----
--- Adds an image entry to the specified page for the diary.
+--- Adds an image entry to the specified page for the diary.
 -- @tparam int pageIndex page number to add the image entry to.
 -- @tparam Objects.ObjID objectId Object ID for the image entry sprite.
 -- @tparam number spriteId SpriteID from the specified object for the image entry.
@@ -877,73 +849,64 @@ end
 -- @tparam View.AlignMode alignMode Alignment for the image entry.
 -- @tparam View.ScaleMode scaleMode Scaling for the image entry.
 -- @tparam Effects.BlendID blendMode Blending modes for the image entry.
-function CustomDiary:addImageEntry(pageIndex, objectId, spriteId, color, pos, rot, scale, alignMode, scaleMode, blendMode)
+function CustomDiary:AddImageEntry(pageIndex, objectId, spriteId, color, pos, rot, scale, alignMode, scaleMode, blendMode)
 
     local imageEntry = {}
 
-    if objectId >= 1353 and objectId <= 1400 then
-        imageEntry.objectId     = objectId
-    else
+    if not Type.IsNumber(objectId) or objectId < 1353 and objectId > 1400 then
         TEN.Util.PrintLog("Invalid objectId slot. Please use a sprite slot. Expected a sprite slot in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
+    imageEntry.objectId     = objectId
 
-    if Type.IsNumber(spriteId) then
-        imageEntry.spriteId     = spriteId
-    else
+    if not Type.IsNumber(spriteId) then
         TEN.Util.PrintLog("'spriteId' is in an incorrect format. Expected a number type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
+    imageEntry.spriteId     = spriteId
 
-    if Type.IsColor(color) then
-        imageEntry.color        = color
-    else
+    if not Type.IsColor(color) then
         TEN.Util.PrintLog("'color' is in an incorrect format. Expected a Color type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
+    imageEntry.color        = color
 
-    if Type.IsVec2(pos) then
-        imageEntry.pos          = pos
-    else
+    if not Type.IsVec2(pos) then
         TEN.Util.PrintLog("'pos' is in an incorrect format. Expected a Vec2 type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
+    imageEntry.pos          = pos
 
-    if Type.IsNumber(rot) then
-        imageEntry.rot          = rot
-    else
+    if not Type.IsNumber(rot) then
         TEN.Util.PrintLog("'rot' is in an incorrect format. Expected a number type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
+    imageEntry.rot          = rot
 
-    if Type.IsVec2(scale) then
-        imageEntry.scale        = scale
-    else
+    if not Type.IsVec2(scale) then
         TEN.Util.PrintLog("'scale' is in an incorrect format. Expected a Vec2 type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
-    
-    if  (alignMode ~= nil and alignMode >= 0 and alignMode <= 8) then
-        imageEntry.alignMode    = alignMode
-    else
+    imageEntry.scale        = scale
+
+    if not Type.IsNumber(alignMode) or alignMode < 0 or alignMode > 8 then
         TEN.Util.PrintLog("'alignMode' is not a valid View.AlignMode type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
+    imageEntry.alignMode    = alignMode
 
-    if  (scaleMode ~= nil and scaleMode >= 0 and scaleMode <= 2) then
-        imageEntry.scaleMode    = scaleMode
-    else
+    if not Type.IsNumber(scaleMode) and scaleMode < 0 or scaleMode > 2 then
         TEN.Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
+    imageEntry.scaleMode    = scaleMode
 
-    if  (blendMode ~= nil and blendMode >= 0 and blendMode <= 11) then
-        imageEntry.blendMode    = blendMode
-    else
+    if not Type.IsNumber(blendMode) or blendMode < 0 or blendMode > 11 then
         TEN.Util.PrintLog("'blendMode' is not a valid Effects.BlendID type in function 'addImageEntry' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
         return
     end
-   
+    imageEntry.blendMode    = blendMode
+
     if Type.IsNumber(pageIndex) and pageIndex > 0 then
         if not GameVars.Engine.Diaries[self.Name].Pages[pageIndex] then
             GameVars.Engine.Diaries[self.Name].Pages[pageIndex] = {NarrationTrack=nil, TextEntries = {}, ImageEntries = {}}
@@ -955,11 +918,10 @@ function CustomDiary:addImageEntry(pageIndex, objectId, spriteId, color, pos, ro
     end
 end
 
----
--- Add a narration track in the voice channel to the page. Track is played with the draw button.
+--- Add a narration track in the voice channel to the page. Track is played with the draw button.
 -- @tparam int pageIndex page number to add the narration track to.
 -- @tparam string trackName of track (without file extension) to play.
-function CustomDiary:addNarration(pageIndex, trackName)
+function CustomDiary:AddNarration(pageIndex, trackName)
 
     if Type.IsNumber(pageIndex) and pageIndex > 0 then
         if not GameVars.Engine.Diaries[self.Name].Pages[pageIndex] then
@@ -980,10 +942,9 @@ function CustomDiary:addNarration(pageIndex, trackName)
 
 end
 
----
--- Remove the narration track from the page of the specified diary.
+--- Remove the narration track from the page of the specified diary.
 -- @tparam int pageIndex page number to remove the narration track from.
-function CustomDiary:removeNarration(pageIndex)
+function CustomDiary:RemoveNarration(pageIndex)
 
     if not Type.IsNumber(pageIndex) or pageIndex > #GameVars.Engine.Diaries[self.Name].Pages or pageIndex <=0 then
         TEN.Util.PrintLog("'pageIndex' is in an incorrect format or not a valid page number. Expected a number type in function 'removeNarration' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
@@ -996,8 +957,7 @@ function CustomDiary:removeNarration(pageIndex)
         print("Narration removed from the page: ".. tostring(pageIndex).." for the diary system: "..tostring(self.Name))
  end
 
----
--- Add a background image for the diary.
+--- Add a background image for the diary.
 -- @tparam Objects.ObjID objectId Object ID for the diary's background.
 -- @tparam number spriteId SpriteID from the specified object for the diary's background.
 -- @tparam Color color Color of diary's background.
@@ -1008,86 +968,75 @@ function CustomDiary:removeNarration(pageIndex)
 -- @tparam View.ScaleMode scaleMode Scaling for the diary's background.
 -- @tparam Effects.BlendID blendMode Blending modes for the diary's background.
 -- @tparam number alpha alpha value for the diary's background (0-255).
-function CustomDiary:addBackground(objectId, spriteId, color, pos, rot, scale, alignMode, scaleMode, blendMode, alpha)
+function CustomDiary:AddBackground(objectId, spriteId, color, pos, rot, scale, alignMode, scaleMode, blendMode, alpha)
     if GameVars.Engine.Diaries[self.Name] then
 
-        if objectId >= 1353 and objectId <= 1400 then
-            GameVars.Engine.Diaries[self.Name].Background.ObjectIdBg	    = objectId
-        else
-            TEN.Util.PrintLog("Invalid objectId slot. Please use a sprite slot. Expected a sprite slot in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        if not Type.IsNumber(objectId) or objectId < 1353 and objectId > 1400 then
+            TEN.Util.PrintLog("Invalid objectId slot. Please use a sprite slot. Expected a sprite slot in function 'AddBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Background.ObjectIdBg	    = objectId
 
-        if Type.IsNumber(spriteId) then
-            GameVars.Engine.Diaries[self.Name].Background.SpriteIdBg	    = spriteId
-        else
-            TEN.Util.PrintLog("'spriteId' is in an incorrect format. Expected a number type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        if not Type.IsNumber(spriteId) then
+            TEN.Util.PrintLog("'spriteId' is in an incorrect format. Expected a number type in function 'AddBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Background.SpriteIdBg	    = spriteId
 
-        if Type.IsColor(color) then
-            GameVars.Engine.Diaries[self.Name].Background.ColorBg		    = color
-        else
-            TEN.Util.PrintLog("'color' is in an incorrect format. Expected a Color type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        if not Type.IsColor(color) then
+            TEN.Util.PrintLog("'color' is in an incorrect format. Expected a Color type in function 'AddBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Background.ColorBg		    = color
 
-        if Type.IsVec2(pos) then
-            GameVars.Engine.Diaries[self.Name].Background.Pos			    = pos
-        else
-            TEN.Util.PrintLog("'pos' is in an incorrect format. Expected a Vec2 type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        if not Type.IsVec2(pos) then
+            TEN.Util.PrintLog("'pos' is in an incorrect format. Expected a Vec2 type in function 'AddBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Background.Pos			    = pos
 
-        if Type.IsNumber(rot) then
-            GameVars.Engine.Diaries[self.Name].Background.Rot			    = rot
-        else
-            TEN.Util.PrintLog("'rot' is in an incorrect format. Expected a number type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        if not Type.IsNumber(rot) then
+            TEN.Util.PrintLog("'rot' is in an incorrect format. Expected a number type in function 'AddBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Background.Rot			    = rot
 
-        if Type.IsVec2(scale) then
-            GameVars.Engine.Diaries[self.Name].Background.Scale            = scale
-        else
-            TEN.Util.PrintLog("'scale' is in an incorrect format. Expected a Vec2 type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        if not Type.IsVec2(scale) then
+            TEN.Util.PrintLog("'scale' is in an incorrect format. Expected a Vec2 type in function 'AddBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Background.Scale            = scale
 
-        if  (alignMode ~= nil and alignMode >= 0 and alignMode <= 8) then
-            GameVars.Engine.Diaries[self.Name].Background.AlignMode        = alignMode
-        else
-            TEN.Util.PrintLog("'alignMode' is not a valid View.AlignMode type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        if not Type.IsNumber(alignMode) or alignMode < 0 or alignMode > 8 then
+            TEN.Util.PrintLog("'alignMode' is not a valid View.AlignMode type in function 'AddBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Background.AlignMode        = alignMode
 
-        if  (scaleMode ~= nil and scaleMode >= 0 and scaleMode <= 2) then
-            GameVars.Engine.Diaries[self.Name].Background.ScaleMode        = scaleMode
-        else
-            TEN.Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
+        if not Type.IsNumber(scaleMode) and scaleMode < 0 or scaleMode > 2 then
+            TEN.Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type in function 'AddBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Background.ScaleMode        = scaleMode
 
-        if  (blendMode ~= nil and blendMode >= 0 and blendMode <= 11) then
-            GameVars.Engine.Diaries[self.Name].Background.BlendMode 	    = blendMode
-        else
+        if not Type.IsNumber(blendMode) or blendMode < 0 or blendMode > 11 then
             TEN.Util.PrintLog("'blendMode' is not a valid Effects.BlendID type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
-        
-        if Type.IsNumber(alpha) and alpha>=0 and alpha <= 255 then
-            GameVars.Engine.Diaries[self.Name].Background.Alpha		        = alpha
-        else
+        GameVars.Engine.Diaries[self.Name].Background.BlendMode 	    = blendMode
+
+        if not Type.IsNumber(alpha) or alpha < 0 or alpha > 255 then
             TEN.Util.PrintLog("'alpha is in an incorrect format. Expected a number (0-255) type in function 'addBackground' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Background.Alpha		        = alpha
 
         print("Background added for the diary system: "..tostring(self.Name))
     end
 end
 
----
--- Clears settings for the background for the specified diary.
-function CustomDiary:clearBackground()
+--- Clears settings for the background for the specified diary.
+function CustomDiary:ClearBackground()
     if GameVars.Engine.Diaries[self.Name] then
         GameVars.Engine.Diaries[self.Name].Background = {}
 
@@ -1095,8 +1044,7 @@ function CustomDiary:clearBackground()
     end
 end
 
----
--- Customizes the notification icon and sound for the diary.
+--- Customizes the notification icon and sound for the diary.
 -- @tparam number notificationTime Time in seconds the notification icon will show on screen.
 -- @tparam Objects.ObjID objectId Object ID for the notification icon.
 -- @tparam number spriteId SpriteID from the specified object for the notification icon.
@@ -1108,7 +1056,7 @@ end
 -- @tparam View.ScaleMode scaleMode Scaling for the notification icon.
 -- @tparam Effects.BlendID blendMode Blending modes for the notification icon.
 -- @tparam Sound notificationSound Sound to play with notification icon.
-function CustomDiary:customizeNotification(notificationTime, objectId, spriteId, color, pos, rot, scale, alignMode, scaleMode, blendMode, notificationSound)
+function CustomDiary:CustomizeNotification(notificationTime, objectId, spriteId, color, pos, rot, scale, alignMode, scaleMode, blendMode, notificationSound)
     if GameVars.Engine.Diaries[self.Name] then
 
         if Type.IsNumber(notificationTime) and notificationTime > 0 then
@@ -1118,75 +1066,65 @@ function CustomDiary:customizeNotification(notificationTime, objectId, spriteId,
             return
         end
 
-        if objectId >= 1353 and objectId <= 1400 then
-            GameVars.Engine.Diaries[self.Name].Notification.ObjectID           = objectId
-        else
+        if not Type.IsNumber(objectId) or objectId < 1353 and objectId > 1400 then
             TEN.Util.PrintLog("Invalid objectId slot. Please use a sprite slot. Expected a sprite slot in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Notification.ObjectID           = objectId
 
-        if Type.IsNumber(spriteId) then
-            GameVars.Engine.Diaries[self.Name].Notification.SpriteID	        = spriteId
-        else
+        if not Type.IsNumber(spriteId) then
             TEN.Util.PrintLog("'spriteId' is in an incorrect format. Expected a number type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Notification.SpriteID	        = spriteId
 
-        if Type.IsColor(color) then
-            GameVars.Engine.Diaries[self.Name].Notification.Color		        = color
-        else
+        if not Type.IsColor(color) then
             TEN.Util.PrintLog("'color' is in an incorrect format. Expected a Color type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Notification.Color		        = color
 
-        if Type.IsVec2(pos) then
-            GameVars.Engine.Diaries[self.Name].Notification.Pos			    = pos
-        else
+        if not Type.IsVec2(pos) then
             TEN.Util.PrintLog("'pos' is in an incorrect format. Expected a Vec2 type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Notification.Pos			    = pos
 
-        if Type.IsNumber(rot) then
-            GameVars.Engine.Diaries[self.Name].Notification.Rot			    = rot
-        else
+        if not Type.IsNumber(rot) then
             TEN.Util.PrintLog("'rot' is in an incorrect format. Expected a number type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Notification.Rot			    = rot
 
-        if Type.IsVec2(scale) then
-            GameVars.Engine.Diaries[self.Name].Notification.Scale		        = scale
-        else
+        if not Type.IsVec2(scale) then
             TEN.Util.PrintLog("'scale' is in an incorrect format. Expected a Vec2 type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Notification.Scale		        = scale
 
-        if  (alignMode ~= nil and alignMode >= 0 and alignMode <= 8) then
-            GameVars.Engine.Diaries[self.Name].Notification.AlignMode		    = alignMode
-        else
+        if not Type.IsNumber(alignMode) or alignMode < 0 or alignMode > 8 then
             TEN.Util.PrintLog("'alignMode' is not a valid View.AlignMode type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Notification.AlignMode		    = alignMode
                 
-        if  (scaleMode ~= nil and scaleMode >= 0 and scaleMode <= 2) then
-            GameVars.Engine.Diaries[self.Name].Notification.ScaleMode		    = scaleMode
-        else
+        if not Type.IsNumber(scaleMode) and scaleMode < 0 or scaleMode > 2 then
             TEN.Util.PrintLog("'scaleMode' is not a valid View.ScaleMode type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Notification.ScaleMode		    = scaleMode
         
-        if  (blendMode ~= nil and blendMode >= 0 and blendMode <= 11) then
-            GameVars.Engine.Diaries[self.Name].Notification.BlendMode		    = blendMode
-        else
+        if not Type.IsNumber(blendMode) or blendMode < 0 or blendMode > 11 then
             TEN.Util.PrintLog("'blendMode' is not a valid Effects.BlendID type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Notification.BlendMode		    = blendMode
 
-        if Type.IsNumber(notificationSound) and notificationSound > 0 then
-            GameVars.Engine.Diaries[self.Name].Notification.NotificationSound	= notificationSound
-        else
+        if not Type.IsNumber(notificationSound) and notificationSound < 0 then
             TEN.Util.PrintLog("'notificationSound' is in an incorrect format. Expected a number type in function 'customizeNotification' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Notification.NotificationSound	= notificationSound
 
         GameVars.Engine.Diaries[self.Name].Notification.ElapsedTime         = 0
 
@@ -1194,9 +1132,8 @@ function CustomDiary:customizeNotification(notificationTime, objectId, spriteId,
     end
 end
 
----
--- Clears settings for the notification system for the specified diary.
-function CustomDiary:clearNotification()
+--- Clears settings for the notification system for the specified diary.
+function CustomDiary:ClearNotification()
     if GameVars.Engine.Diaries[self.Name] then
         GameVars.Engine.Diaries[self.Name].Notification = {}
 
@@ -1204,8 +1141,7 @@ function CustomDiary:clearNotification()
     end
 end
 
----
--- Customizes the page numbers for the diary.
+--- Customizes the page numbers for the diary.
 -- @tparam int pageNoType Specifies the format for page numbers (1 or 2). 1: Displays only the current page number. 2: Formats the page number as: [Prefix][CurrentPage][Separator][UnlockedPages].
 -- @tparam string prefix Prefix to be added for type 2 of page numbers.
 -- @tparam string separator Separator to be added for type 2 of page numbers.
@@ -1213,7 +1149,7 @@ end
 -- @tparam Strings.DisplayStringOption textOptions alignment and effects for the text. Default: None. Please note text is automatically aligned to the LEFT
 -- @tparam number textScale Scale factor for the page numbers.
 -- @tparam Color textColor Color of the page numbers.
-function CustomDiary:customizePageNumbers(pageNoType, prefix, separator, textPos, textOptions, textScale, textColor)
+function CustomDiary:CustomizePageNumbers(pageNoType, prefix, separator, textPos, textOptions, textScale, textColor)
 
     if Type.IsNumber(pageNoType) then
         if GameVars.Engine.Diaries[self.Name] and pageNoType >0 and pageNoType <=2 then
@@ -1276,22 +1212,20 @@ function CustomDiary:customizePageNumbers(pageNoType, prefix, separator, textPos
 end
 
 
----
--- Clears settings for the page numbers for the specified diary.
-function CustomDiary:clearPageNumbers()
+--- Clears settings for the page numbers for the specified diary.
+function CustomDiary:ClearPageNumbers()
     if GameVars.Engine.Diaries[self.Name] then
         GameVars.Engine.Diaries[self.Name].PageNumbers = nil
 		print("Page Numbers cleared for the diary system: "..tostring(self.Name))
     end
 end
 
----
--- Customizes the controls text for the diary.
+--- Customizes the controls text for the diary.
 -- @tparam Vec2 textPos X,Y position of the controls text.
 -- @tparam Strings.DisplayStringOption textOptions alignment and effects for the text. Default: None. Please note text is automatically aligned to the LEFT.
 -- @tparam number textScale Scale factor for the controls.
 -- @tparam Color textColor Color of the page controls.
-function CustomDiary:customizeControls(textPos, textOptions, textScale, textColor)
+function CustomDiary:CustomizeControls(textPos, textOptions, textScale, textColor)
     if GameVars.Engine.Diaries[self.Name] then
         if Type.IsVec2(textPos) then
             GameVars.Engine.Diaries[self.Name].Controls.textPos         = textPos
@@ -1335,58 +1269,51 @@ function CustomDiary:customizeControls(textPos, textOptions, textScale, textColo
     end
 end
 
----
--- Customizes the display text for controls for specified diary.
+--- Customizes the display text for controls for specified diary.
 -- @tparam string string1 Text for Space key controls text.
 -- @tparam string string2 Text for Left key controls text.
 -- @tparam string string3 Text for Right key controls text.
 -- @tparam string string4 Text for Esc key controls text.
 -- @tparam string separator Text for separator between controls text.
-function CustomDiary:customizeControlsText(string1, string2, string3, string4, separator)
+function CustomDiary:CustomizeControlsText(string1, string2, string3, string4, separator)
     if GameVars.Engine.Diaries[self.Name] then
 
-        if Type.IsString(string1) then
-            GameVars.Engine.Diaries[self.Name].Controls.text1           = string1
-        else
+        if not Type.IsString(string1) then
             TEN.Util.PrintLog("'string1' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Controls.text1           = string1
 
-        if Type.IsString(string2) then
-            GameVars.Engine.Diaries[self.Name].Controls.text2           = string2
-        else
+        if not Type.IsString(string2) then
             TEN.Util.PrintLog("'string2' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Controls.text2           = string2
 
-        if Type.IsString(string3) then
-            GameVars.Engine.Diaries[self.Name].Controls.text3           = string3
-        else
+        if not Type.IsString(string3) then
             TEN.Util.PrintLog("'string3' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Controls.text3           = string3
 
-        if Type.IsString(string4) then
-            GameVars.Engine.Diaries[self.Name].Controls.text4           = string4
-        else
+        if not Type.IsString(string4) then
             TEN.Util.PrintLog("'string4' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Controls.text4           = string4
 
-        if Type.IsString(separator) then
-            GameVars.Engine.Diaries[self.Name].Controls.separator       = separator
-            print("Controls text updated for the diary system: "..tostring(self.Name))
-        else
+        if not Type.IsString(separator) then
             TEN.Util.PrintLog("'separator' is in an incorrect format. Expected a string type in function 'customizeControlsText' for the diary system: "..tostring(self.Name), Util.LogLevel.WARNING)
             return
         end
+        GameVars.Engine.Diaries[self.Name].Controls.separator       = separator
+        print("Controls text updated for the diary system: "..tostring(self.Name))
     end
 end
 
 
----
--- Clears settings for the specified diary's controls text.
-function CustomDiary:clearControls()
+--- Clears settings for the specified diary's controls text.
+function CustomDiary:ClearControls()
     if GameVars.Engine.Diaries[self.Name] then
         GameVars.Engine.Diaries[self.Name].Controls ={}
 
