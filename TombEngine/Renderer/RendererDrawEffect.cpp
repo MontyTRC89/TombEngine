@@ -498,7 +498,8 @@ namespace TEN::Renderer
 				}
 
 				// Disallow sprites out of bounds.
-				int spriteIndex = std::clamp((int)particle.spriteIndex, 0, (int)_sprites.size());
+				int spriteIndex = Objects[particle.SpriteSeqID].meshIndex + particle.SpriteID;
+				spriteIndex = std::clamp(spriteIndex, 0, (int)_sprites.size());
 
 				AddSpriteBillboard(
 					&_sprites[spriteIndex],
