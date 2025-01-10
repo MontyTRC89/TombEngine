@@ -49,9 +49,6 @@ namespace TEN::Effects::WaterfallEmitter
         item.ItemFlags[WaterfallItemFlags::Density] = 120;
 
         // Customize waterfallmist sprite scale.
-        item.ItemFlags[WaterfallItemFlags::MistSpriteScale] = 4;
-
-        // Customize waterfallmist sprite scale.
         item.ItemFlags[WaterfallItemFlags::MistSpriteScale] = 3;
 
         // Customize waterfall sound.   0 = ON, 1 = OFF.
@@ -153,8 +150,16 @@ namespace TEN::Effects::WaterfallEmitter
 
                 else if (!LOS(&originPoint, &target))
                 {
-                    targetPos.y -= (yVel / 2.7f);
-                    break;
+					if (pointColl.GetRoomNumber() == NO_VALUE || pointColl.GetSector().IsWall(targetPos.x, targetPos.z))
+					{
+                        targetPos.y -= (yVel / 2.7f);
+						break;
+					}
+                    else
+                    {
+                        targetPos.y = pointColl.GetFloorHeight();                      
+                        break;
+                    }
                 }
             }
 
