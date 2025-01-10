@@ -4,6 +4,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
+#include "Game/control/los.h"
 #include "Game/effects/effects.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
@@ -92,7 +93,7 @@ namespace TEN::Effects::WaterfallEmitter
             auto offset = Vector3::Transform(relOffset, rotMatrix);
             auto pos = item.Pose.Position.ToVector3() + offset;
             auto orient2 = EulerAngles(item.Pose.Orientation.x, item.Pose.Orientation.y, item.Pose.Orientation.z);
-            auto origin2 = Geometry::TranslatePoint(Vector3(pos.x, pos.y, pos.z), orient2, BLOCK(customVel));
+            auto origin2 = Geometry::TranslatePoint(Vector3(pos.x, pos.y, pos.z), orient2, BLOCK(0));
 
             vel.y = Random::GenerateFloat(0.0f, 16.0f);
 
@@ -108,36 +109,57 @@ namespace TEN::Effects::WaterfallEmitter
             part.zVel = vel.z;
             part.friction = -2;
             part.fxObj = itemNumber;
+            part.gravity = 120;
 
-            auto pointColl = GetPointCollision(origin2, item.RoomNumber, item.Pose.Orientation.y, BLOCK(customVel));
+            // Calculate target position.
+            Vector3 targetPos = pos;
+            Vector3 velocity = vel;
+            int gravity = 240;
+            int maxYvel = 0;
+            int friction = part.friction;
+            int yVel = velocity.y;
+            const int stepSize = 20;
 
-            int relFloorHeight = pointColl.GetFloorHeight() - part.y;
-            part.targetPos = Vector3(origin2.x, origin2.y + relFloorHeight, origin2.z);
-
-            //If targetpos is in a wall, calculate targetpos from the main item coordinates so the particles still spawn.
-            if (pointColl.GetSector().IsWall(part.targetPos.x, part.targetPos.z))
+            while (true)
             {
-                pointColl = GetPointCollision(origin2, item.RoomNumber, item.Pose.Orientation.y, BLOCK(0.0f));
-                relFloorHeight = pointColl.GetFloorHeight() - part.y;
-                origin2 = Geometry::TranslatePoint(Vector3(pos.x, pos.y, pos.z), orient2, BLOCK(0.0f));
+                yVel += gravity;
+                if (maxYvel && yVel > maxYvel)
+                    yVel = maxYvel;
 
-                //Set the right height.
-                part.targetPos = Vector3(origin2.x, origin2.y + relFloorHeight, origin2.z);
-
-                //Stop spawning particles if there is a wall directly at the spawnpoint
-                if (pointColl.GetSector().IsWall(pos.x, pos.z))
+                if (friction & 0xF)
                 {
-                    part.on = false;
-                    continue;
+                    velocity.x -= static_cast<int>(velocity.x) >> (friction & 0xF);
+                    velocity.z -= static_cast<int>(velocity.z) >> (friction & 0xF);
+                }
+
+                if (friction & 0xF0)
+                    yVel -= yVel >> (friction >> 4);
+
+                targetPos.x += velocity.x / (84 / stepSize);
+                targetPos.y += yVel;
+                targetPos.z += velocity.z / (84/ stepSize);
+
+                auto pointColl = GetPointCollision(targetPos, item.RoomNumber);
+                
+                auto originPoint = GameVector(origin2, item.RoomNumber);
+                auto target = GameVector(targetPos, pointColl.GetRoomNumber());
+                             
+                if (TestEnvironment(ENV_FLAG_WATER, Vector3i(targetPos.x, targetPos.y, targetPos.z), part.roomNumber) ||
+                    TestEnvironment(ENV_FLAG_SWAMP, Vector3i(targetPos.x, targetPos.y, targetPos.z), part.roomNumber))
+                {
+                    targetPos.y = GetPointCollision(Vector3i(targetPos.x, targetPos.y, targetPos.z), part.roomNumber).GetWaterSurfaceHeight();
+                    break;
+                }
+
+                else if (!LOS(&originPoint, &target))
+                {
+                    targetPos.y -= (yVel / 2.7f);
+                    break;
                 }
             }
 
-            if (TestEnvironment(ENV_FLAG_WATER, Vector3i(part.targetPos.x, part.targetPos.y, part.targetPos.z), part.roomNumber) ||
-                TestEnvironment(ENV_FLAG_SWAMP, Vector3i(part.targetPos.x, part.targetPos.y, part.targetPos.z), part.roomNumber))
-            {
-                part.targetPos.y = pointColl.GetWaterSurfaceHeight();
-            }
-
+            part.targetPos = targetPos;
+ 
             char colorOffset = Random::GenerateInt(-8, 8);
 
             part.sR = std::clamp((int)startColor.x + colorOffset, 0, UCHAR_MAX);
@@ -146,10 +168,10 @@ namespace TEN::Effects::WaterfallEmitter
             part.dR = std::clamp((int)endColor.x + colorOffset, 0, UCHAR_MAX);
             part.dG = std::clamp((int)endColor.y + colorOffset, 0, UCHAR_MAX);
             part.dB = std::clamp((int)endColor.z + colorOffset, 0, UCHAR_MAX);
-            part.roomNumber = pointColl.GetRoomNumber();
+
+            part.roomNumber = part.roomNumber;
             part.colFadeSpeed = 2;
             part.blendMode = BlendMode::Additive;
-            part.gravity = 120;
             part.life = part.sLife = WATERFALL_LIFE_MAX;
             part.fadeToBlack = 0;
             part.rotAng = Random::GenerateAngle();
@@ -161,7 +183,7 @@ namespace TEN::Effects::WaterfallEmitter
             part.flags = SP_SCALE | SP_DEF | SP_ROTATE;
         }
     }
-
+  
 	void SpawnWaterfallMist(const Vector3& pos, int roomNumber, float scalar, float size, const Color& color)
 	{
 		auto& part = *GetFreeParticle();
@@ -171,17 +193,22 @@ namespace TEN::Effects::WaterfallEmitter
 		auto startColor = (Vector3i(color.x, color.y, color.z) + colorOffset);
 		auto endColor = (Vector3i(color.x, color.y, color.z) + colorOffset);
 
+        part.on = true;
+
 		part.SpriteSeqID = ID_WATERFALL_SPRITES;
 		part.SpriteID = Random::TestProbability(1 / 2.0f) ? WATERFALL_STREAM_2_SPRITE_ID : WATERFALL_STREAM_1_SPRITE_ID;
 
-		part.on = true;
+        part.StoreInterpolationData();
 
         part.PrevX = pos.x;
         part.PrevY = pos.y;
         part.PrevZ = pos.z;
+        part.PrevScalar = scalar;
+
 		part.x = pos.x;
 		part.y = Random::GenerateInt(-16, 0) + pos.y;
 		part.z = pos.z;
+
         part.roomNumber = roomNumber;
 
 		int colorVariation = (Random::GenerateInt(-8, 8)); 
@@ -224,6 +251,9 @@ namespace TEN::Effects::WaterfallEmitter
 		if (particle.SpriteSeqID != ID_WATERFALL_SPRITES)
 			return false;
 			
+        if (particle.targetPos == Vector3::Zero)
+            return false;
+
 		if (particle.y < particle.targetPos.y)
 			return false;
 
