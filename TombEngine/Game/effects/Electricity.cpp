@@ -2,20 +2,22 @@
 #include "Game/effects/Electricity.h"
 
 #include "Game/effects/effects.h"
+#include "Game/effects/spark.h"
 #include "Game/people.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
 
 using namespace TEN::Math;
+using namespace TEN::Effects::Spark;
 
 namespace TEN::Effects::Electricity
 {
 	constexpr auto HELICAL_LASER_LIFE_MAX = 18.0f;
 
 	std::vector<Electricity>  ElectricityArcs = {};
-	std::vector<HelicalLaser> HelicalLasers	  = {};
+	std::vector<HelicalLaser> HelicalLasers = {};
 
-	std::array<Vector3, ELECTRICITY_KNOTS_SIZE>	 ElectricityKnots  = {};
+	std::array<Vector3, ELECTRICITY_KNOTS_SIZE>	 ElectricityKnots = {};
 	std::array<Vector3, ELECTRICITY_BUFFER_SIZE> ElectricityBuffer = {};
 
 	// BIG TODO: Make a family of Bezier, B-Spline, and Catmull-Rom curve classes.
@@ -30,8 +32,8 @@ namespace TEN::Effects::Electricity
 		auto point4 = knots[3];
 
 		auto spline = ((point2 * 2) + (point3 - point1) * alpha) +
-					  (((point1 * 2) - (point2 * 5) + (point3 * 4) - point4) * SQUARE(alpha)) +
-					  (((point1 * -1) + (point2 * 3) - (point3 * 3) + point4) * CUBE(alpha));
+			(((point1 * 2) - (point2 * 5) + (point3 * 4) - point4) * SQUARE(alpha)) +
+			(((point1 * -1) + (point2 * 3) - (point3 * 3) + point4) * CUBE(alpha));
 		return spline;
 	}
 
@@ -83,7 +85,7 @@ namespace TEN::Effects::Electricity
 					fmod(Random::GenerateInt(), amplitude),
 					fmod(Random::GenerateInt(), amplitude),
 					fmod(Random::GenerateInt(), amplitude)) -
-					Vector3(amplitude/ 2);
+					Vector3(amplitude / 2);
 			}
 			else
 			{
@@ -130,17 +132,53 @@ namespace TEN::Effects::Electricity
 		spark.maxYvel = 0;
 		spark.gravity = 0;
 		spark.sSize =
-		spark.dSize =
-		spark.size = scale + Random::GenerateInt(0, 4);
+			spark.dSize =
+			spark.size = scale + Random::GenerateInt(0, 4);
 		spark.flags = SP_DEF | SP_SCALE;
 	}
 
+	void SpawnElectricEffect(const ItemInfo& item, int jointNumber, const Vector3i& offset, const float spawnRadius, float beamOriginRadius, float beamTargetRadius, int frequency, const Vector3& pos)
+	{
+		//TODO: Make electric effect correctly spawn random on any mesh bounds surface. On water surface too.
+		
+		int randomIndex = Random::GenerateInt(0, 100);
+		Vector3 pos1 = Vector3::Zero;
+
+		if (randomIndex < frequency)
+		{
+			if (pos != Vector3::Zero)
+			{
+
+				pos1 = pos + offset.ToVector3();		
+			}
+			else
+			{
+				pos1 = GetJointPosition(item, jointNumber, offset).ToVector3();
+			}
+
+			auto sphere = BoundingSphere(pos1, spawnRadius);
+			auto pos2 = Random::GeneratePointOnSphere(sphere);
+
+			SpawnElectricityGlow(pos2, 28, 32, 32, 64);
+
+			SpawnCyborgSpark(pos2);
+			SpawnDynamicLight(pos2.x, pos2.y, pos2.z, Random::GenerateInt(4, 8), 31, 63, 127);
+
+			sphere = BoundingSphere(pos1, beamOriginRadius);
+			auto sphere1 = BoundingSphere(pos1, beamTargetRadius);
+			pos1 = Random::GeneratePointOnSphere(sphere);
+			pos2 = Random::GeneratePointOnSphere(sphere1);
+
+			SpawnElectricity(pos1, pos2, Random::GenerateInt(8, 16), 32, 64, 128, 24, (int)ElectricityFlags::Spline | (int)ElectricityFlags::ThinOut | (int)ElectricityFlags::ThinIn, 6, 8);
+		}
+	}
+
 	void SpawnHelicalLaser(const Vector3& origin, const Vector3& target)
-	 {
+	{
 		constexpr auto SEGMENTS_NUM_MAX = 128;
-		constexpr auto COLOR			= Vector4(0.0f, 0.375f, 1.0f, 1.0f);
-		constexpr auto LENGTH_MAX		= BLOCK(4);
-		constexpr auto ROTATION			= ANGLE(-10.0f);
+		constexpr auto COLOR = Vector4(0.0f, 0.375f, 1.0f, 1.0f);
+		constexpr auto LENGTH_MAX = BLOCK(4);
+		constexpr auto ROTATION = ANGLE(-10.0f);
 
 		constexpr auto ELECTRICITY_FLAGS = (int)ElectricityFlags::ThinIn | (int)ElectricityFlags::ThinOut;
 
@@ -164,7 +202,7 @@ namespace TEN::Effects::Electricity
 		SpawnElectricity(origin, target, 1, 0, laser.Color.x * UCHAR_MAX, laser.Color.z * UCHAR_MAX, 20, ELECTRICITY_FLAGS, 19, 5);
 		SpawnElectricity(origin, target, 1, 110, 255, 250, 20, ELECTRICITY_FLAGS, 4, 5);
 		SpawnElectricityGlow(laser.LightPosition, 0, 0, (laser.Color.x / 2) * UCHAR_MAX, (laser.Color.z / 2) * UCHAR_MAX);
-	 }
+	}
 
 	void UpdateHelicalLasers()
 	{
@@ -273,7 +311,7 @@ namespace TEN::Effects::Electricity
 		else
 		{
 			int numSegments = (arc.segments * 3) - 1;
-			
+
 			auto deltaPos = (knots[knots.size() - 1] - knots[0]) / numSegments;
 			auto pos = knots[0] + deltaPos + Vector3(
 				fmod(Random::GenerateInt(), arc.amplitude * 2),
