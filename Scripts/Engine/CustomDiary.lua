@@ -26,8 +26,10 @@ LevelFuncs.Engine.Diaries = {}
 GameVars.Engine.Diaries = GameVars.Engine.Diaries or {}
 GameVars.Engine.LastUsedDiary = GameVars.Engine.LastUsedDiary or nil
 
---- Imports diary from an external file.
+--- Imports diary from an external file. There are different types that must be defined. (diary, background, controls, pageNumbers, notification, image, text, narration). Each of the section's arguements are the same as the functions described in this documentation.
+-- Refer to DiarySetup.lua file for a sample script. 
 -- @tparam string fileName Name of file in the script folder without extension to import the diary from.
+
 function CustomDiary.ImportDiary(fileName)
 
     if not Type.IsString(fileName) then
