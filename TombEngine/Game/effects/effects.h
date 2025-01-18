@@ -18,7 +18,8 @@ constexpr auto SD_UWEXPLOSION = 2;
 constexpr auto MAX_NODE		= 23;
 constexpr auto MAX_DYNAMICS = 64;
 
-constexpr auto MAX_PARTICLES		 = 4096;
+constexpr auto MAX_PARTICLES		 = 8192;
+
 constexpr auto MAX_PARTICLE_DYNAMICS = 8;
 
 extern int Wibble;
@@ -109,42 +110,55 @@ struct NODEOFFSET_INFO
 
 struct Particle
 {
+	bool on;
+
+	GAME_OBJECT_ID SpriteSeqID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
+	int	SpriteID = 0;
+	int	fxObj;
+
 	int x;
 	int y;
 	int z;
+	int roomNumber;
+	Vector3 targetPos;
+
 	short xVel;
 	short yVel;
 	short zVel;
-	short gravity;
+
 	short rotAng;
+	short rotAdd;
+
+	short gravity;
 	unsigned short flags; // SP_enum
+
 	float sSize;
 	float dSize;
 	float size;
-	unsigned char friction;
-	unsigned char scalar;
-	unsigned char spriteIndex;
-	signed char rotAdd;
-	signed char maxYvel;
-	bool on;
+
+	unsigned int friction;
+	unsigned int scalar;
+	int maxYvel;
+
+	unsigned char r;
+	unsigned char g;
+	unsigned char b;
 	unsigned char sR;
 	unsigned char sG;
 	unsigned char sB;
 	unsigned char dR;
 	unsigned char dG;
 	unsigned char dB;
-	unsigned char r;
-	unsigned char g;
-	unsigned char b;
+
 	unsigned char colFadeSpeed;
 	unsigned char fadeToBlack;
+
 	int sLife;
 	int life;
+
 	BlendMode blendMode;
 	unsigned char extras;
 	signed char dynamic;
-	int fxObj;
-	int roomNumber;
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
 
 	int PrevX;

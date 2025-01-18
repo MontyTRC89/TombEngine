@@ -604,6 +604,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClInclude Include="Objects\TR1\Entity\tr1_wolf.h" />
     <ClInclude Include="Objects\TR1\Entity\WingedMutant.h" />
     <ClInclude Include="Objects\TR1\Trap\DamoclesSword.h" />
+    <ClInclude Include="Objects\TR1\Trap\ElectricBall.h" />
     <ClInclude Include="Objects\TR1\Trap\SlammingDoors.h" />
     <ClInclude Include="Objects\TR1\tr1_objects.h" />
     <ClInclude Include="Objects\TR1\Trap\SwingingBlade.h" />
@@ -744,6 +745,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClInclude Include="Objects\TR5\Emitter\tr5_bats_emitter.h" />
     <ClInclude Include="Objects\TR5\Emitter\tr5_rats_emitter.h" />
     <ClInclude Include="Objects\TR5\Emitter\tr5_spider_emitter.h" />
+    <ClInclude Include="Objects\TR5\Emitter\Waterfall.h" />
     <ClInclude Include="Objects\TR5\Entity\AutoGun.h" />
     <ClInclude Include="Objects\TR5\Entity\HeavyGuard.h" />
     <ClInclude Include="Objects\TR5\Entity\tr5_brownbeast.h" />
@@ -1129,6 +1131,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClCompile Include="Objects\TR1\Entity\WingedMutant.cpp" />
     <ClCompile Include="Objects\TR1\tr1_objects.cpp" />
     <ClCompile Include="Objects\TR1\Trap\DamoclesSword.cpp" />
+    <ClCompile Include="Objects\TR1\Trap\ElectricBall.cpp" />
     <ClCompile Include="Objects\TR1\Trap\SlammingDoors.cpp" />
     <ClCompile Include="Objects\TR1\Trap\SwingingBlade.cpp" />
     <ClCompile Include="Objects\TR2\Entity\Bartoli.cpp" />
@@ -1257,6 +1260,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClCompile Include="Objects\TR5\Emitter\tr5_bats_emitter.cpp" />
     <ClCompile Include="Objects\TR5\Emitter\tr5_rats_emitter.cpp" />
     <ClCompile Include="Objects\TR5\Emitter\tr5_spider_emitter.cpp" />
+    <ClCompile Include="Objects\TR5\Emitter\Waterfall.cpp" />
     <ClCompile Include="Objects\TR5\Entity\AutoGun.cpp" />
     <ClCompile Include="Objects\TR5\Entity\HeavyGuard.cpp" />
     <ClCompile Include="Objects\TR5\Entity\tr5_brownbeast.cpp" />
