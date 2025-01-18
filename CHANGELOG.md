@@ -6,7 +6,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ## [Version 1.7.X] (link to release) - yyyy-mm-dd
 
 ### Bug fixes
-
+* Fixed two block platform room portal traversal failing in some cases.
 
 ### New Features
 

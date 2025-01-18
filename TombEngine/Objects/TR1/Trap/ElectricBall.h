@@ -1,14 +1,14 @@
 #pragma once
 
-struct ItemInfo;
-class Vector3i;
 struct CreatureBiteInfo;
+struct ItemInfo;
 
 namespace TEN::Entities::Traps
 {
 	void InitializeElectricBall(short itemNumber);
-	void SpawnElectricBallLightning(ItemInfo& item, const Vector3& pos, const CreatureBiteInfo& bite);
 	void ControlElectricBall(short itemNumber);
 	void InitializeElectricBallImpactPoint(short itemNumber);
-	void TriggerElectricBallShockwaveAttackSparks(int x, int y, int z, byte r, byte g, byte b, byte size);	
+
+	void SpawnElectricBallLightning(ItemInfo& item, const Vector3& pos, const CreatureBiteInfo& bite);
+	void SpawnElectricBallShockwaveAttackSparks(int x, int y, int z, byte r, byte g, byte b, byte size);	
 }

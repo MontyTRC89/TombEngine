@@ -132,23 +132,22 @@ namespace TEN::Effects::Electricity
 		spark.maxYvel = 0;
 		spark.gravity = 0;
 		spark.sSize =
-			spark.dSize =
-			spark.size = scale + Random::GenerateInt(0, 4);
+		spark.dSize =
+		spark.size = scale + Random::GenerateInt(0, 4);
 		spark.flags = SP_DEF | SP_SCALE;
 	}
 
 	void SpawnElectricEffect(const ItemInfo& item, int jointNumber, const Vector3i& offset, const float spawnRadius, float beamOriginRadius, float beamTargetRadius, int frequency, const Vector3& pos)
 	{
-		//TODO: Make electric effect correctly spawn random on any mesh bounds surface. On water surface too.
+		// TODO: Make electric effect correctly spawn randomly on any mesh bounds surface and water surfaces. -- Tomo
 		
 		int randomIndex = Random::GenerateInt(0, 100);
-		Vector3 pos1 = Vector3::Zero;
+		auto pos1 = Vector3::Zero;
 
 		if (randomIndex < frequency)
 		{
 			if (pos != Vector3::Zero)
 			{
-
 				pos1 = pos + offset.ToVector3();		
 			}
 			else
@@ -175,16 +174,15 @@ namespace TEN::Effects::Electricity
 
 	void SpawnHelicalLaser(const Vector3& origin, const Vector3& target)
 	{
-		constexpr auto SEGMENTS_NUM_MAX = 128;
-		constexpr auto COLOR = Vector4(0.0f, 0.375f, 1.0f, 1.0f);
-		constexpr auto LENGTH_MAX = BLOCK(4);
-		constexpr auto ROTATION = ANGLE(-10.0f);
-
+		constexpr auto SEGMENT_COUNT_MAX = 128;
+		constexpr auto COLOR			 = Vector4(0.0f, 0.375f, 1.0f, 1.0f);
+		constexpr auto LENGTH_MAX		 = BLOCK(4);
+		constexpr auto ROT				 = ANGLE(-10.0f);
 		constexpr auto ELECTRICITY_FLAGS = (int)ElectricityFlags::ThinIn | (int)ElectricityFlags::ThinOut;
 
 		auto laser = HelicalLaser();
 
-		laser.NumSegments = SEGMENTS_NUM_MAX;
+		laser.NumSegments = SEGMENT_COUNT_MAX;
 		laser.Origin = origin;
 		laser.Target = target;
 		laser.Orientation2D = Random::GenerateAngle();
@@ -195,7 +193,7 @@ namespace TEN::Effects::Electricity
 		laser.Length = LENGTH_MAX / 2;
 		laser.LengthEnd = LENGTH_MAX;
 		laser.Opacity = 1.0f;
-		laser.Rotation = ROTATION;
+		laser.Rotation = ROT;
 
 		HelicalLasers.push_back(laser);
 
