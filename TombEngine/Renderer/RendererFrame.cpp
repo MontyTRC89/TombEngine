@@ -589,6 +589,13 @@ namespace TEN::Renderer
 			float attenuation = 1.0f - distance / light.Out;
 			float intensity = attenuation * light.Intensity * light.Luma;
 
+			// If collecting shadows, try collecting shadow-casting light.
+			if (prioritizeShadowLight && light.CastShadows && intensity >= brightest)
+			{
+				brightest = intensity;
+				brightestLight = &light;
+			}
+
 			RendererLightNode node = { &light, intensity, distance, 1 };
 			tempLights.push_back(node);
 		}
@@ -635,13 +642,10 @@ namespace TEN::Renderer
 						intensity = attenuation * light.Intensity * Luma(light.Color);
 
 						// If collecting shadows, try collecting shadow-casting light.
-						if (light.CastShadows && prioritizeShadowLight && light.Type == LightType::Point)
+						if (prioritizeShadowLight && light.CastShadows && light.Type == LightType::Point && intensity >= brightest)
 						{
-							if (intensity >= brightest)
-							{
-								brightest = intensity;
-								brightestLight = &light;
-							}
+							brightest = intensity;
+							brightestLight = &light;
 						}
 					}
 					else if (light.Type == LightType::Spot)
@@ -660,14 +664,11 @@ namespace TEN::Renderer
 						float attenuation = 1.0f - dist / light.Out;
 						intensity = attenuation * light.Intensity * light.Luma;
 
-						// If shadow pointer provided, try collecting shadow-casting light.
-						if (light.CastShadows && prioritizeShadowLight)
+						// If collecting shadows, try collecting shadow-casting light.
+						if (prioritizeShadowLight && light.CastShadows && intensity >= brightest)
 						{
-							if (intensity >= brightest)
-							{
-								brightest = intensity;
-								brightestLight = &light;
-							}
+							brightest = intensity;
+							brightestLight = &light;
 						}
 					}
 					else
