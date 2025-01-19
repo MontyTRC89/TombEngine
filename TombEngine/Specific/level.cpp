@@ -814,6 +814,7 @@ void LoadStaticRoomData()
 			bucket.texture = ReadInt32();
 			bucket.blendMode = (BlendMode)ReadUInt8();
 			bucket.animated = ReadBool();
+			bucket.waterPlaneIndex = ReadInt32();
 			bucket.numQuads = 0;
 			bucket.numTriangles = 0;
 
@@ -1010,6 +1011,7 @@ void FreeLevel(bool partial)
 	g_Level.Frames.resize(0);
 	g_Level.Sprites.resize(0);
 	g_Level.Mirrors.resize(0);
+	g_Level.WaterPlanes.resize(0);
 	g_Level.SoundDetails.resize(0);
 	g_Level.SoundMap.resize(0);
 	g_Level.FloorData.resize(0);
@@ -1361,10 +1363,11 @@ bool LoadLevel(const std::string& path, bool partial)
 
 			LoadObjects();
 			UpdateProgress(60);
-
+			 
 			LoadSprites();
 			LoadBoxes();
 			LoadMirrors();
+			LoadWaterPlanes();
 			LoadAnimatedTextures();
 			UpdateProgress(70);
 
@@ -1543,6 +1546,24 @@ void LoadMirrors()
 		mirror.Enabled = true;
 
 		mirror.ReflectionMatrix = Matrix::CreateReflection(mirror.Plane);
+	}
+}
+
+void LoadWaterPlanes()
+{
+	int waterPlanesCount = ReadCount();
+	TENLog("Water planes count: " + std::to_string(waterPlanesCount), LogLevel::Info);
+	g_Level.WaterPlanes.reserve(waterPlanesCount);
+
+	for (int i = 0; i < waterPlanesCount; i++)
+	{
+		auto& waterPlane = g_Level.WaterPlanes.emplace_back();
+
+		waterPlane.Y = ReadInt32();
+		waterPlane.XMin = ReadInt32();
+		waterPlane.XMax = ReadInt32();
+		waterPlane.ZMin = ReadInt32();
+		waterPlane.ZMax = ReadInt32();
 	}
 }
 

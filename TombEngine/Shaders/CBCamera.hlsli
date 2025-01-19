@@ -7,9 +7,11 @@ cbuffer CBCamera : register(b0)
 {
 	float4x4 ViewProjection;
 	float4x4 View;
-	float4x4 Projection;
-	float4x4 InverseProjection;
-	float4x4 DualParaboloidView;
+    float4x4 Projection;
+    float4x4 InverseProjection;
+    float4x4 InverseView;
+    float4x4 DualParaboloidView;
+    float4x4 WaterReflectionView;
 	float4 CamPositionWS;
 	float4 CamDirectionWS;
 	//--

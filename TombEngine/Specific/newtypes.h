@@ -22,5 +22,6 @@ struct BUCKET
 	bool animated;
 	int numQuads;
 	int numTriangles;
+	int waterPlaneIndex;
 	std::vector<POLYGON> polygons;
 };

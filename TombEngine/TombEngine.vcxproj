@@ -818,6 +818,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClInclude Include="Renderer\Graphics\Texture2D.h" />
     <ClInclude Include="Renderer\Graphics\Texture2DArray.h" />
     <ClInclude Include="Renderer\Graphics\TextureBase.h" />
+    <ClInclude Include="Renderer\Graphics\UAVRenderTarget2D.h" />
     <ClInclude Include="Renderer\Graphics\VertexBuffer.h" />
     <ClInclude Include="Renderer\Graphics\Vertices\PostProcessVertex.h" />
     <ClInclude Include="Renderer\Graphics\Vertices\SpriteVertex.h" />
@@ -1650,6 +1651,11 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\Ten.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\Water.fx">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

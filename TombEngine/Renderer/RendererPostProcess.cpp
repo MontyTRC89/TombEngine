@@ -52,7 +52,7 @@ namespace TEN::Renderer
 		unsigned int offset = 0;
 
 		_context->IASetVertexBuffers(0, 1, _fullscreenTriangleVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-
+		 
 		// Copy render target to post process render target.
 		float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 		_context->ClearRenderTargetView(_postProcessRenderTarget[0].RenderTargetView.Get(), clearColor);

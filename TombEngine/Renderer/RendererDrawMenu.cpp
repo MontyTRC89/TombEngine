@@ -1305,6 +1305,14 @@ namespace TEN::Renderer
 			_spriteBatch->Draw(_roomAmbientMapBack.ShaderResourceView.Get(), rect);
 			thumbY += thumbWidth;
 
+			rect.left = _screenWidth - thumbWidth;
+			rect.top = thumbY;
+			rect.right = rect.left + thumbWidth;
+			rect.bottom = rect.top + thumbWidth / aspectRatio;
+
+			_spriteBatch->Draw(_waterRenderTargets[0].ShaderResourceView.Get(), rect);
+			thumbY += thumbWidth / aspectRatio;
+
 			_spriteBatch->End();
 
 			break;

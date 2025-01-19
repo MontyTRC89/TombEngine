@@ -1795,13 +1795,21 @@ namespace TEN::Renderer
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		// TODO: Needs improvements before enabling it.
-		// RenderSimpleSceneToParaboloid(&_roomAmbientMapFront, LaraItem->Pose.Position.ToVector3(), 1);
-		// RenderSimpleSceneToParaboloid(&_roomAmbientMapBack, LaraItem->Pose.Position.ToVector3(), -1);
+		 //RenderSimpleSceneToParaboloid(&_roomAmbientMapFront, LaraItem->Pose.Position.ToVector3(), 1);
+		 //RenderSimpleSceneToParaboloid(&_roomAmbientMapBack, LaraItem->Pose.Position.ToVector3(), -1);
+		 
+		for (auto& waterPlane : g_Level.WaterPlanes)
+		{
+			if (waterPlane.Y == 0)
+			{
+				RenderSimpleSceneForWaterReflections(&_waterRenderTargets[0], waterPlane, view);
+			}
+		}
 
 		// Bind and clear render target.
 		_context->ClearRenderTargetView(_renderTarget.RenderTargetView.Get(), _debugPage == RendererDebugPage::WireframeMode ? Colors::DimGray : Colors::Black);
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
+		 
 		// Reset viewport and scissor.
 		_context->RSSetViewports(1, &view.Viewport);
 		ResetScissor();
@@ -1813,7 +1821,10 @@ namespace TEN::Renderer
 		cameraConstantBuffer.RefreshRate = _refreshRate;
 		cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
 		cameraConstantBuffer.DualParaboloidView = Matrix::CreateLookAt(LaraItem->Pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3() + Vector3(0, 0, 1024), -Vector3::UnitY);
-
+		cameraConstantBuffer.WaterReflections = 0;
+		cameraConstantBuffer.WaterReflectionView = _waterMatrix;
+		cameraConstantBuffer.InverseView = cameraConstantBuffer.View.Invert();
+		 
 		if (level.GetFogEnabled())
 		{
 			auto fogColor = level.GetFogColor();
@@ -1882,8 +1893,16 @@ namespace TEN::Renderer
 		SortTransparentFaces(view);
 
 		DoRenderPass(RendererPass::Transparent, view, true);
+		//DoRenderPass(RendererPass::DynamicWaterSurfaces, view, false);
 		DoRenderPass(RendererPass::GunFlashes, view, true); // HACK: Gunflashes are drawn after everything because they are near camera.
 		
+
+		cameraConstantBuffer.WaterHeight = 0;
+		_cbCameraMatrices.UpdateData(cameraConstantBuffer, _context.Get());
+
+		CalculateSSR(&_postProcessRenderTarget[0], view);
+		_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), _renderTarget.DepthStencilView.Get());
+
 		// Draw 3D debug lines and triangles.
 		DrawLines3D(view);
 		DrawTriangles3D(view);
@@ -2191,6 +2210,11 @@ namespace TEN::Renderer
 		// Draw room geometry first if applicable for a given pass.
 		if (pass != RendererPass::Transparent && pass != RendererPass::GunFlashes)
 			DrawRooms(view, pass);
+
+		if (pass == RendererPass::DynamicWaterSurfaces)
+		{
+			return;
+		}
 
 		// Draw all objects.
 		DrawObjects(pass, view, true, true, true, true);
@@ -2716,11 +2740,16 @@ namespace TEN::Renderer
 				}
 
 				_cbShadowMap.UpdateData(_stShadowMap, _context.Get());
-			}
 
-			if (g_Configuration.EnableAmbientOcclusion && rendererPass != RendererPass::GBuffer)
-			{
-				BindRenderTargetAsTexture(TextureRegister::SSAO, &_SSAOBlurredRenderTarget, SamplerStateRegister::PointWrap);
+				if (rendererPass == RendererPass::DynamicWaterSurfaces)
+				{
+					BindRenderTargetAsTexture(TextureRegister::WaterReflectionMap, &_waterRenderTargets[0], SamplerStateRegister::LinearWrap);
+				}
+
+				if (g_Configuration.EnableAmbientOcclusion)
+				{
+					BindRenderTargetAsTexture(TextureRegister::SSAO, &_SSAOBlurredRenderTarget, SamplerStateRegister::PointWrap);
+				}
 			}
 
 			for (int i = (int)view.RoomsToDraw.size() - 1; i >= 0; i--)
@@ -3264,6 +3293,16 @@ namespace TEN::Renderer
 			SetAlphaTest(AlphaTestMode::None, 1.0f);
 			break;
 
+		case RendererPass::DynamicWaterSurfaces:
+			if (blendMode != BlendMode::DynamicWaterSurface)
+			{
+				return false;
+			}
+
+			SetBlendMode(BlendMode::DynamicWaterSurface, true);
+			SetAlphaTest(AlphaTestMode::None, 1.0f);
+			break;
+
 		default:
 			return false;
 
@@ -3782,7 +3821,7 @@ namespace TEN::Renderer
 		_gameCamera.Camera.FarPlane = _currentGameCamera.Camera.FarPlane;
 	}
 
-	void Renderer::RenderSimpleSceneForWaterReflections(RenderTarget2D* renderTarget, float waterHeight)
+	void Renderer::RenderSimpleSceneForWaterReflections(RenderTarget2D* renderTarget, WaterPlane& waterPlane, RenderView& view)
 	{
 		// Reset GPU state
 		SetBlendMode(BlendMode::Opaque);
@@ -3796,8 +3835,8 @@ namespace TEN::Renderer
 		D3D11_VIEWPORT viewport;
 		viewport.TopLeftX = 0;
 		viewport.TopLeftY = 0;
-		viewport.Width = _screenWidth / 4.0f;
-		viewport.Height = _screenHeight / 4.0f;
+		viewport.Width = _screenWidth ;
+		viewport.Height = _screenHeight;
 		viewport.MinDepth = 0;
 		viewport.MaxDepth = 1;
 
@@ -3815,28 +3854,50 @@ namespace TEN::Renderer
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
 
-		CAMERA_INFO reflectionCamera;
-		memcpy(&reflectionCamera, &Camera, sizeof(CAMERA_INFO));
-		reflectionCamera.pos.y = waterHeight - reflectionCamera.pos.y;
+		/*CAMERA_INFO reflectionCamera;
+		memcpy(&reflectionCamera, &view.Camera.Di, sizeof(CAMERA_INFO));
+		reflectionCamera.pos.y = waterPlane.Y - reflectionCamera.pos.y;
+		reflectionCamera.target.y = waterPlane.Y - reflectionCamera.target.y;*/
 
-		auto view = RenderView(&reflectionCamera, 0, PI / 2.0f, 32, DEFAULT_FAR_VIEW, viewport.Width, viewport.Height);
+		Vector3 cameraWorldPosition = view.Camera.WorldPosition;
+		cameraWorldPosition.y = waterPlane.Y - cameraWorldPosition.y;
+
+		//Vector3 cameraTarget = reflectionCamera.target.ToVector3();
+		Vector3 direction = view.Camera.WorldDirection;
+		direction.y = waterPlane.Y - direction.y;
+		direction.Normalize();
+
+		Vector3 up = Vector3::UnitY;
+		float roll = 0;
+
+		Matrix upRotation = Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, roll);
+		up = Vector3::Transform(up, upRotation);
+		up.Normalize();
 
 		CCameraMatrixBuffer cameraConstantBuffer;
-		cameraConstantBuffer.WaterHeight = waterHeight;
+		cameraConstantBuffer.WaterHeight = waterPlane.Y;
 		cameraConstantBuffer.WaterReflections = 1;
 		cameraConstantBuffer.Frame = GlobalCounter;
 		cameraConstantBuffer.RefreshRate = _refreshRate;
-		view.FillConstantBuffer(cameraConstantBuffer);
+
+		cameraConstantBuffer.View = Matrix::CreateLookAt(cameraWorldPosition, cameraWorldPosition + 1024*direction, up);
+		cameraConstantBuffer.Projection = view.Camera.Projection;
+		cameraConstantBuffer.InverseProjection = cameraConstantBuffer.Projection.Invert();
+		cameraConstantBuffer.ViewProjection = cameraConstantBuffer.View * cameraConstantBuffer.Projection;
+		cameraConstantBuffer.ViewSize = { (float)viewport.Width, (float)viewport.Height };
+		cameraConstantBuffer.InvViewSize = { 1.0f / viewport.Width, 1.0f / viewport.Height };
+		cameraConstantBuffer.CamDirectionWS = Vector4(direction.x, direction.y, direction.z, 0);
+		cameraConstantBuffer.CamPositionWS = Vector4(cameraWorldPosition.x, cameraWorldPosition.y, cameraWorldPosition.z, 0);
 		_cbCameraMatrices.UpdateData(cameraConstantBuffer, _context.Get());
+
+		_waterMatrix = cameraConstantBuffer.View;
 
 		// Draw horizon and the sky
 		auto* levelPtr = g_GameFlow->GetLevel(CurrentLevel);
 
-		//_context->PSSetShader(_psSky.Get(), nullptr, 0);
-
 		if (levelPtr->Horizon)
 		{
-			//_context->VSSetShader(_vsSky.Get(), nullptr, 0);
+			_shaders.Bind(Shader::Sky);
 
 			if (Lara.Control.Look.OpticRange != 0)
 				AlterFOV(ANGLE(DEFAULT_FOV) - Lara.Control.Look.OpticRange, false);
@@ -3860,8 +3921,8 @@ namespace TEN::Renderer
 				{
 					auto weather = TEN::Effects::Environment::Weather;
 
-					auto translation = Matrix::CreateTranslation(reflectionCamera.pos.x + weather.SkyPosition(s) - i * SKY_SIZE,
-						reflectionCamera.pos.y - 1536.0f, reflectionCamera.pos.z);
+					auto translation = Matrix::CreateTranslation(cameraWorldPosition.x + weather.SkyPosition(s) - i * SKY_SIZE,
+						cameraWorldPosition.y - 1536.0f, cameraWorldPosition.z);
 					auto world = rotation * translation;
 
 					_stStatic.World = (rotation * translation);
@@ -3883,7 +3944,7 @@ namespace TEN::Renderer
 
 				auto& moveableObj = *_moveableObjects[ID_HORIZON];
 
-				_stStatic.World = Matrix::CreateTranslation(reflectionCamera.pos.ToVector3());
+				_stStatic.World = Matrix::CreateTranslation(cameraWorldPosition);
 				_stStatic.Color = Vector4::One;
 				_stStatic.ApplyFogBulbs = 1;
 				_cbStatic.UpdateData(_stStatic, _context.Get());
@@ -3957,6 +4018,13 @@ namespace TEN::Renderer
 				{
 					continue;
 				}
+
+				if (bucket.BlendMode == BlendMode::DynamicWaterSurface)
+				{
+					continue;
+				}
+
+				_shaders.Bind(Shader::RoomsWaterReflection); 
 
 				SetBlendMode(bucket.BlendMode);
 				SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
@@ -4033,5 +4101,66 @@ namespace TEN::Renderer
 		SetCullMode(CullMode::CounterClockwise, true);
 		SetDepthState(DepthState::Write, true);
 		SetBlendMode(BlendMode::Opaque, true);*/
+	}
+
+	void Renderer::CalculateSSR(RenderTarget2D* renderTarget, RenderView& view)
+	{
+		_doingFullscreenPass = true;
+
+		SetBlendMode(BlendMode::Opaque);
+		SetCullMode(CullMode::CounterClockwise);
+		SetDepthState(DepthState::Write);
+		_context->RSSetViewports(1, &view.Viewport);
+		ResetScissor();
+
+		_stPostProcessBuffer.ViewportWidth = _screenWidth;
+		_stPostProcessBuffer.ViewportHeight = _screenHeight;
+		_cbPostProcessBuffer.UpdateData(_stPostProcessBuffer, _context.Get());
+
+		_shaders.Bind(Shader::SSR);
+		_shaders.Bind(Shader::SSRProjectHash);
+
+		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		_context->IASetInputLayout(_fullscreenTriangleInputLayout.Get());
+
+		unsigned int stride = sizeof(PostProcessVertex);
+		unsigned int offset = 0;
+
+		_context->IASetVertexBuffers(0, 1, _fullscreenTriangleVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+
+		// Copy render target to post process render target.
+		UINT values[4] = { 0,0,0,0 };
+		_context->ClearUnorderedAccessViewUint(_SSRHashBuffer.UnorderedAccessView.Get(), values);
+		_context->OMSetRenderTargetsAndUnorderedAccessViews(0, nullptr, nullptr, 1, 1, _SSRHashBuffer.UnorderedAccessView.GetAddressOf(), 0);
+
+		BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::PointWrap);
+		
+		DrawTriangles(3, 0);
+
+		_shaders.Bind(Shader::SSRResolveHash);
+
+		// Copy render target to post process render target.
+		float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		_context->ClearRenderTargetView(renderTarget->RenderTargetView.Get(), clearColor);
+
+		ID3D11RenderTargetView* nullRTV[1] = { nullptr };
+		ID3D11UnorderedAccessView* nullUAV[1] = { nullptr };
+		_context->OMSetRenderTargetsAndUnorderedAccessViews(
+			1,          // Number of render targets
+			nullRTV,    // Null out render target views
+			nullptr,    // Null depth stencil view
+			1,          // UAV start slot
+			1,          // Number of UAVs
+			nullUAV,    // Null out UAVs
+			nullptr     // Null UAV initial counts
+		);
+		_context->OMSetRenderTargets(1, renderTarget->RenderTargetView.GetAddressOf(), nullptr);
+
+		BindRenderTargetAsTexture(TextureRegister::ColorMap, &_renderTarget, SamplerStateRegister::PointWrap);
+		BindUAVRenderTargetAsTexture(TextureRegister::SSRHashBuffer, &_SSRHashBuffer);
+		
+		DrawTriangles(3, 0);
+
+		_doingFullscreenPass = false;
 	}
 }

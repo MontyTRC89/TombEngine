@@ -25,6 +25,7 @@ struct PixelShaderInput
 {
 	float4 Position: SV_POSITION;
 	float3 WorldPosition: POSITION0;
+    float4 ReflectionPosition : POSITION1;
 	float3 Normal: NORMAL;
 	float2 UV: TEXCOORD0;
 	float4 Color: COLOR;
@@ -47,6 +48,9 @@ SamplerState CausticsTextureSampler : register(s2);
 
 Texture2D SSAOTexture : register(t9);
 SamplerState SSAOSampler : register(s9);
+
+Texture2D WaterReflectionTexture : register(t10);
+SamplerState WaterReflectionSampler : register(s10);
 
 struct PixelShaderOutput
 {
@@ -78,6 +82,9 @@ PixelShaderInput VS(VertexShaderInput input)
 		screenPos.x += xOffset * weight;
 		screenPos.y += yOffset * weight;
 	}
+	
+    float4x4 waterMatrix = mul(WaterReflectionView, Projection);
+    output.ReflectionPosition = mul(float4(pos, 1.0f), waterMatrix);
 	
 	output.Position = screenPos;
 	output.Normal = input.Normal;
@@ -121,6 +128,11 @@ float3 PackNormal(float3 n)
 PixelShaderOutput PS(PixelShaderInput input)
 {
 	PixelShaderOutput output;
+	
+	if (WaterReflections)
+    {
+        clip(WaterHeight - input.WorldPosition.y);
+    }
 
 	output.Color = Texture.Sample(Sampler, input.UV);
 
@@ -200,6 +212,19 @@ PixelShaderOutput PS(PixelShaderInput input)
 
 	output.Color = DoFogBulbsForPixel(output.Color, float4(input.FogBulbs.xyz, 1.0f));
 	output.Color = DoDistanceFogForPixel(output.Color, FogColor, input.DistanceFog);
+	
+    if (BlendMode == BLENDMODE_DYNAMIC_WATER_SURFACE)
+    {
+        float2 ProjectedTexCoords;
+        ProjectedTexCoords.x = input.ReflectionPosition.x / input.ReflectionPosition.w / 2.0f + 0.5f;
+        ProjectedTexCoords.y = -input.ReflectionPosition.y / input.ReflectionPosition.w / 2.0f + 0.5f;
+
+    // Campionamento della texture con il colore riflesso
+        float4 reflectedColor = WaterReflectionTexture.Sample(WaterReflectionSampler, ProjectedTexCoords);
+		
+        output.Color.xyz = lerp(output.Color.xyz, reflectedColor.xyz, 0.3f);
+
+    }
 
 	return output;
 }

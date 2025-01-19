@@ -52,6 +52,7 @@
 #include "Renderer/Graphics/RenderTargetCube.h"
 #include "Renderer/Graphics/Texture2DArray.h"
 #include "Renderer/Graphics/VertexBuffer.h"
+#include "Renderer/Graphics/UAVRenderTarget2D.h"
 #include "Renderer/Graphics/Vertices/PostProcessVertex.h"
 #include "Renderer/ShaderManager/ShaderManager.h"
 #include "Renderer/Structures/RendererItem.h"
@@ -124,6 +125,8 @@ namespace TEN::Renderer
 		RenderTarget2D _tempRoomAmbientRenderTarget3;
 		RenderTarget2D _tempRoomAmbientRenderTarget4;
 		Texture2DArray _shadowMap;
+		RenderTarget2D _waterRenderTargets[2];
+		UAVRenderTarget2D _SSRHashBuffer;
 
 		// Constant buffers
 
@@ -315,6 +318,7 @@ namespace TEN::Renderer
 		RenderTarget2D _SMAAEdgesRenderTarget;
 		RenderTarget2D _SMAABlendRenderTarget;
 
+		Matrix _waterMatrix;
 		// Post-process
 
 		PostProcessMode _postProcessMode = PostProcessMode::None;
@@ -359,6 +363,7 @@ namespace TEN::Renderer
 
 		ShaderManager _shaders;
 
+		void CalculateSSR(RenderTarget2D* renderTarget, RenderView& view);
 		void ApplySMAA(RenderTarget2D* renderTarget, RenderView& view);
 		void ApplyFXAA(RenderTarget2D* renderTarget, RenderView& view);
 		void BindTexture(TextureRegister registerType, TextureBase* texture, SamplerStateRegister samplerType);
@@ -368,6 +373,7 @@ namespace TEN::Renderer
 		void BindInstancedStaticLights(std::vector<RendererLight*>& lights, int instanceID);
 		void BindMoveableLights(std::vector<RendererLight*>& lights, int roomNumber, int prevRoomNumber, float fade, bool shadow);
 		void BindRenderTargetAsTexture(TextureRegister registerType, RenderTarget2D* target, SamplerStateRegister samplerType);
+		void BindUAVRenderTargetAsTexture(TextureRegister registerType, UAVRenderTarget2D* target);
 		void BindConstantBufferVS(ConstantBufferRegister constantBufferType, ID3D11Buffer** buffer);
 		void BindConstantBufferPS(ConstantBufferRegister constantBufferType, ID3D11Buffer** buffer);
 		void BuildHierarchy(RendererObject* obj);
@@ -488,7 +494,7 @@ namespace TEN::Renderer
 		float CalculateFrameRate();
 		void InterpolateCamera(float interpFactor);
 		void CopyRenderTarget(RenderTarget2D* source, RenderTarget2D* dest, RenderView& view);
-		void RenderSimpleSceneForWaterReflections(RenderTarget2D* renderTarget, float waterHeight);
+		void RenderSimpleSceneForWaterReflections(RenderTarget2D* renderTarget, WaterPlane& waterPlane, RenderView& view);
 
 		void AddSpriteBillboard(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D, float scale,
 					 Vector2 size, BlendMode blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);
@@ -583,6 +589,7 @@ namespace TEN::Renderer
 			return !(blendMode == BlendMode::Opaque ||
 				blendMode == BlendMode::AlphaTest ||
 				blendMode == BlendMode::Additive ||
+				blendMode == BlendMode::DynamicWaterSurface ||
 				blendMode == BlendMode::FastAlphaBlend);
 		}
 

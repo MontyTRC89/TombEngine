@@ -139,6 +139,16 @@ namespace TEN::Renderer::Utils
 		LoadAAShaders(width, height, recompileAAShaders); 
 		LoadCommonShaders();
 		LoadPostprocessShaders();
+		LoadWaterShaders();
+	}
+
+	void ShaderManager::LoadWaterShaders()
+	{
+		Load(Shader::RoomsWaterReflection, "RoomAmbient", "WaterReflections", ShaderType::PixelAndVertex);
+		
+		Load(Shader::SSR, "Water", "SSR", ShaderType::Vertex);
+		Load(Shader::SSRProjectHash, "Water", "SSRProjectHash", ShaderType::Pixel);
+		Load(Shader::SSRResolveHash, "Water", "SSRResolveHash", ShaderType::Pixel);
 	}
 
 	void ShaderManager::Bind(Shader shader, bool forceNull)

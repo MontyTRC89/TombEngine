@@ -89,7 +89,8 @@ enum class BlendMode
 	Screen = 9,
 	Lighten = 10,
 	AlphaBlend = 11,
-	FastAlphaBlend = 12
+	FastAlphaBlend = 12,
+	DynamicWaterSurface = 13
 };
 
 enum class CullMode
@@ -172,7 +173,9 @@ enum class TextureRegister
 	DepthMap = 6,
 	EnvironmentMapFront = 7,
 	EnvironmentMapBack = 8,
-	SSAO = 9
+	SSAO = 9,
+	WaterReflectionMap = 10,
+	SSRHashBuffer = 11
 };
 
 enum class SamplerStateRegister
@@ -227,7 +230,8 @@ enum class RendererPass
 	Additive,
 	GBuffer,
 	GunFlashes,
-	RoomAmbient
+	RoomAmbient,
+	DynamicWaterSurfaces
 };
 
 enum class SceneRenderMode

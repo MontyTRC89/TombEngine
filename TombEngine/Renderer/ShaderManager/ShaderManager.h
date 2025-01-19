@@ -67,6 +67,12 @@ namespace TEN::Renderer::Utils
 		Ssao,
 		SsaoBlur,
 
+		// Water reflections
+		RoomsWaterReflection,
+		SSR,
+		SSRProjectHash,
+		SSRResolveHash,
+
 		Count
 	};
 
@@ -93,6 +99,7 @@ namespace TEN::Renderer::Utils
 		void LoadCommonShaders();
 		void LoadPostprocessShaders();
 		void LoadAAShaders(int width, int height, bool recompile);
+		void LoadWaterShaders();
 
 		RendererShader LoadOrCompile(const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines, bool forceRecompile);
 		void		   Load(Shader shader, const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines = nullptr, bool forceRecompile = false);

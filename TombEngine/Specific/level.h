@@ -99,6 +99,15 @@ struct MirrorData
 	bool ReflectSprites	  = false;
 };
 
+struct WaterPlane
+{
+	int Y;
+	int XMin;
+	int XMax;
+	int ZMin;
+	int ZMax;
+};
+
 // LevelData
 struct LEVEL
 {
@@ -138,6 +147,7 @@ struct LEVEL
 	std::vector<AI_OBJECT>		 AIObjects = {};
 	std::vector<SPRITE>			 Sprites   = {};
 	std::vector<MirrorData>		 Mirrors = {};
+	std::vector<WaterPlane>		 WaterPlanes = {};
 
 	// Texture data
 	TEXTURE				 SkyTexture		   = {};
@@ -180,6 +190,7 @@ void LoadAnimatedTextures();
 void LoadEventSets();
 void LoadAIObjects();
 void LoadMirrors();
+void LoadWaterPlanes();
 
 void LoadPortal(ROOM_INFO& room);
 

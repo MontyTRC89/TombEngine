@@ -62,6 +62,18 @@ PixelShaderInput VS(VertexShaderInput input)
 	return output;
 }
 
+PixelShaderInput VSWaterReflections(VertexShaderInput input)
+{
+    PixelShaderInput output;
+
+	// Transform vertex to DP-space
+    output.Position = mul(float4(input.Position, 1.0f), ViewProjection);
+	output.UV = input.UV;
+    output.Color = input.Color;
+
+    return output;
+}
+
 PixelShaderInput VSSky(VertexShaderInput input)
 {
 	PixelShaderInput output;
@@ -94,13 +106,24 @@ PixelShaderInput VSSky(VertexShaderInput input)
 
 float4 PS(PixelShaderInput input) : SV_TARGET0
 {
-	float4 output = Texture.Sample(Sampler, input.UV);
+    float4 output = Texture.Sample(Sampler, input.UV);
 
-	clip(input.ClipDepth);
+    clip(input.ClipDepth);
 
-	DoAlphaTest(output);
+    DoAlphaTest(output);
 
-	output.xyz *= input.Color.xyz;
+    output.xyz *= input.Color.xyz;
 
-	return output;
+    return output;
+}
+
+float4 PSWaterReflections(PixelShaderInput input) : SV_TARGET0
+{
+    float4 output = Texture.Sample(Sampler, input.UV);
+
+    DoAlphaTest(output);
+
+    output.xyz *= input.Color.xyz;
+
+    return output;
 }

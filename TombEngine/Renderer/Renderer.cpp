@@ -175,6 +175,11 @@ namespace TEN::Renderer
 		_context->PSSetSamplers((UINT)registerType, 1, &samplerState);
 	}
 
+	void Renderer::BindUAVRenderTargetAsTexture(TextureRegister registerType, UAVRenderTarget2D* target)
+	{
+		_context->PSSetShaderResources((UINT)registerType, 1, target->ShaderResourceView.GetAddressOf());
+	}
+
 	void Renderer::BindRenderTargetAsTexture(TextureRegister registerType, RenderTarget2D* target, SamplerStateRegister samplerType)
 	{
 		_context->PSSetShaderResources((UINT)registerType, 1, target->ShaderResourceView.GetAddressOf());
@@ -335,7 +340,7 @@ namespace TEN::Renderer
 
 			case BlendMode::Additive:
 				_context->OMSetBlendState(_renderStates->Additive(), nullptr, 0xFFFFFFFF);
-				break;
+				break; 
 
 			case BlendMode::Screen:
 				_context->OMSetBlendState(_screenBlendState.Get(), nullptr, 0xFFFFFFFF);
@@ -348,8 +353,12 @@ namespace TEN::Renderer
 			case BlendMode::Exclude:
 				_context->OMSetBlendState(_excludeBlendState.Get(), nullptr, 0xFFFFFFFF);
 				break;
-			}
 
+			case BlendMode::DynamicWaterSurface:
+				_context->OMSetBlendState(_renderStates->Additive(), nullptr, 0xFFFFFFFF);
+				break;
+			}
+			 
 			_stBlending.BlendMode = static_cast<unsigned int>(blendMode);
 			_cbBlending.UpdateData(_stBlending, _context.Get());
 			

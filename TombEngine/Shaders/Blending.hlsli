@@ -17,6 +17,7 @@
 #define BLENDMODE_SCREEN	  9
 #define BLENDMODE_LIGHTEN	  10
 #define BLENDMODE_ALPHABLEND  11
+#define BLENDMODE_DYNAMIC_WATER_SURFACE	13
 
 #define ZERO	   float3(0.0f, 0.0f, 0.0f)
 #define EIGHT_FIVE float3( 0.85f, 0.85f, 0.85f)
