@@ -8,6 +8,9 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### Bug fixes
 * Fixed two block platform room portal traversal failing in some cases.
 * Fixed dynamic light shadows not being handled correctly.
+* Fixed ricochet flashes after using explosive weapons.
+* Fixed incorrect flare draw in crawl state.
+* Fixed starfield remaining active in the next level, if next level does not have starfield specified.
 
 ### New Features
 * Added a particle based waterfall emitter object and associated sprite slots.
