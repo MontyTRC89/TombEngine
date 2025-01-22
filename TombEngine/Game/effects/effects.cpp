@@ -343,6 +343,11 @@ void UpdateSparks()
 			if (spark->flags & SP_EXPLOSION)
 				SetSpriteSequence(*spark, ID_EXPLOSION_SPRITES);
 
+			if (spark->flags & SP_ANIMATED)
+			{
+				SetSpriteSequence(*spark, spark->spriteObj);
+			}
+
 			if ((spark->flags & SP_FIRE && LaraItem->Effect.Type == EffectType::None) ||
 				(spark->flags & SP_DAMAGE) || 
 				(spark->flags & SP_POISON))

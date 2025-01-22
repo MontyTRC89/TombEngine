@@ -135,7 +135,7 @@ namespace TEN::Scripting::Effects
 	static void EmitParticle(Vec3 pos, Vec3 velocity, int spriteIndex, TypeOrNil<int> gravity, TypeOrNil<float> rot, 
 							TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<BlendMode> blendMode, 
 							TypeOrNil<int> startSize, TypeOrNil<int> endSize, TypeOrNil<float> lifetime, 
-							TypeOrNil<bool> damage, TypeOrNil<bool> poison, TypeOrNil<GAME_OBJECT_ID> objectID, TypeOrNil<float> startRot)
+							TypeOrNil<bool> damage, TypeOrNil<bool> poison, TypeOrNil<GAME_OBJECT_ID> objectID, TypeOrNil<float> startRot, TypeOrNil<bool> animated)
 	{
 		// Ensure objectID is valid 
 		GAME_OBJECT_ID effectiveObjectID = USE_IF_HAVE(GAME_OBJECT_ID, objectID, ID_DEFAULT_SPRITES); 
@@ -199,6 +199,7 @@ namespace TEN::Scripting::Effects
 
 		bool applyPoison = USE_IF_HAVE(bool, poison, false);
 		bool applyDamage = USE_IF_HAVE(bool, damage, false);
+		bool animatedSpr = USE_IF_HAVE(bool, animated, false);
 
 		if (applyPoison)
 			s->flags |= SP_POISON;
@@ -206,6 +207,11 @@ namespace TEN::Scripting::Effects
 		if (applyDamage)
 			s->flags |= SP_DAMAGE;
 
+		if (animatedSpr)
+		{
+			s->flags |= SP_ANIMATED;
+			s->spriteObj = effectiveObjectID;
+		}
 		//todo add option to turn off wind?
 		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WIND, s->roomNumber))
 			s->flags |= SP_WIND;

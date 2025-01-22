@@ -42,6 +42,7 @@ enum SpriteEnumFlag
 	SP_PLASMAEXP  = (1 << 13),
 	SP_POISON	  = (1 << 14),
 	SP_COLOR	  = (1 << 15),
+	SP_ANIMATED	  = (1 << 16),
 };
 
 // Used by Particle.nodeNumber.
@@ -117,7 +118,7 @@ struct Particle
 	short zVel;
 	short gravity;
 	short rotAng;
-	unsigned short flags; // SP_enum
+	unsigned int flags; // SP_enum
 	float sSize;
 	float dSize;
 	float size;
@@ -146,6 +147,7 @@ struct Particle
 	int fxObj;
 	int roomNumber;
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
+	GAME_OBJECT_ID spriteObj;
 
 	int PrevX;
 	int PrevY;
