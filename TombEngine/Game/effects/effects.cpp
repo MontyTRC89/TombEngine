@@ -345,7 +345,8 @@ void UpdateSparks()
 
 			if (spark->flags & SP_ANIMATED)
 			{
-				SetSpriteSequence(*spark, spark->spriteObj);
+				GAME_OBJECT_ID spriteObject = static_cast<GAME_OBJECT_ID>(spark->spriteObj);
+				SetSpriteSequence(*spark, spriteObject);
 			}
 
 			if ((spark->flags & SP_FIRE && LaraItem->Effect.Type == EffectType::None) ||

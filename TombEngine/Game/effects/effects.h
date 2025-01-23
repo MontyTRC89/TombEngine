@@ -147,7 +147,7 @@ struct Particle
 	int fxObj;
 	int roomNumber;
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
-	GAME_OBJECT_ID spriteObj;
+	int spriteObj;
 
 	int PrevX;
 	int PrevY;

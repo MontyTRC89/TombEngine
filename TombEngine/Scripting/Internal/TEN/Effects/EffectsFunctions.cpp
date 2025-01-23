@@ -209,8 +209,9 @@ namespace TEN::Scripting::Effects
 
 		if (animatedSpr)
 		{
+			int spriteObj = static_cast<int>(effectiveObjectID);
 			s->flags |= SP_ANIMATED;
-			s->spriteObj = effectiveObjectID;
+			s->spriteObj = spriteObj;
 		}
 		//todo add option to turn off wind?
 		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WIND, s->roomNumber))
