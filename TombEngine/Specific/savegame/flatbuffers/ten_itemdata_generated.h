@@ -16,6 +16,32 @@ static_assert(FLATBUFFERS_VERSION_MAJOR == 24 &&
 namespace TEN {
 namespace Save {
 
+struct Short;
+struct ShortBuilder;
+struct ShortT;
+
+struct Int;
+struct IntBuilder;
+struct IntT;
+
+struct Float;
+struct FloatBuilder;
+struct FloatT;
+
+struct ShortArray;
+struct ShortArrayBuilder;
+struct ShortArrayT;
+
+struct EulerAngles;
+
+struct Vector2;
+
+struct Vector3;
+
+struct Vector4;
+
+struct GameVector;
+
 struct Pose;
 
 struct CreatureTarget;
@@ -89,32 +115,6 @@ struct LaraInfoT;
 struct ItemNumber;
 struct ItemNumberBuilder;
 struct ItemNumberT;
-
-struct Short;
-struct ShortBuilder;
-struct ShortT;
-
-struct Int;
-struct IntBuilder;
-struct IntT;
-
-struct Float;
-struct FloatBuilder;
-struct FloatT;
-
-struct ShortArray;
-struct ShortArrayBuilder;
-struct ShortArrayT;
-
-struct EulerAngles;
-
-struct Vector2;
-
-struct Vector3;
-
-struct Vector4;
-
-struct GameVector;
 
 enum class ItemData : uint8_t {
   NONE = 0,
@@ -585,58 +585,6 @@ struct ItemDataUnion {
 bool VerifyItemData(::flatbuffers::Verifier &verifier, const void *obj, ItemData type);
 bool VerifyItemDataVector(::flatbuffers::Verifier &verifier, const ::flatbuffers::Vector<::flatbuffers::Offset<void>> *values, const ::flatbuffers::Vector<ItemData> *types);
 
-FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Pose FLATBUFFERS_FINAL_CLASS {
- private:
-  int32_t x_pos_;
-  int32_t y_pos_;
-  int32_t z_pos_;
-  int32_t x_rot_;
-  int32_t y_rot_;
-  int32_t z_rot_;
-
- public:
-  struct Traits;
-  Pose()
-      : x_pos_(0),
-        y_pos_(0),
-        z_pos_(0),
-        x_rot_(0),
-        y_rot_(0),
-        z_rot_(0) {
-  }
-  Pose(int32_t _x_pos, int32_t _y_pos, int32_t _z_pos, int32_t _x_rot, int32_t _y_rot, int32_t _z_rot)
-      : x_pos_(::flatbuffers::EndianScalar(_x_pos)),
-        y_pos_(::flatbuffers::EndianScalar(_y_pos)),
-        z_pos_(::flatbuffers::EndianScalar(_z_pos)),
-        x_rot_(::flatbuffers::EndianScalar(_x_rot)),
-        y_rot_(::flatbuffers::EndianScalar(_y_rot)),
-        z_rot_(::flatbuffers::EndianScalar(_z_rot)) {
-  }
-  int32_t x_pos() const {
-    return ::flatbuffers::EndianScalar(x_pos_);
-  }
-  int32_t y_pos() const {
-    return ::flatbuffers::EndianScalar(y_pos_);
-  }
-  int32_t z_pos() const {
-    return ::flatbuffers::EndianScalar(z_pos_);
-  }
-  int32_t x_rot() const {
-    return ::flatbuffers::EndianScalar(x_rot_);
-  }
-  int32_t y_rot() const {
-    return ::flatbuffers::EndianScalar(y_rot_);
-  }
-  int32_t z_rot() const {
-    return ::flatbuffers::EndianScalar(z_rot_);
-  }
-};
-FLATBUFFERS_STRUCT_END(Pose, 24);
-
-struct Pose::Traits {
-  using type = Pose;
-};
-
 FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(2) EulerAngles FLATBUFFERS_FINAL_CLASS {
  private:
   int16_t x_;
@@ -813,7 +761,288 @@ struct GameVector::Traits {
   using type = GameVector;
 };
 
-struct CreatureTargetT : public ::flatbuffers::NativeTable {
+FLATBUFFERS_MANUALLY_ALIGNED_STRUCT(4) Pose FLATBUFFERS_FINAL_CLASS {
+ private:
+  TEN::Save::Vector3 position_;
+  TEN::Save::EulerAngles orientation_;
+  int16_t padding0__;
+  TEN::Save::Vector3 scale_;
+
+ public:
+  struct Traits;
+  Pose()
+      : position_(),
+        orientation_(),
+        padding0__(0),
+        scale_() {
+    (void)padding0__;
+  }
+  Pose(const TEN::Save::Vector3 &_position, const TEN::Save::EulerAngles &_orientation, const TEN::Save::Vector3 &_scale)
+      : position_(_position),
+        orientation_(_orientation),
+        padding0__(0),
+        scale_(_scale) {
+    (void)padding0__;
+  }
+  const TEN::Save::Vector3 &position() const {
+    return position_;
+  }
+  const TEN::Save::EulerAngles &orientation() const {
+    return orientation_;
+  }
+  const TEN::Save::Vector3 &scale() const {
+    return scale_;
+  }
+};
+FLATBUFFERS_STRUCT_END(Pose, 32);
+
+struct Pose::Traits {
+  using type = Pose;
+};
+
+struct ShortT : public flatbuffers::NativeTable {
+  typedef Short TableType;
+  int16_t scalar = 0;
+};
+
+struct Short FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ShortT NativeTableType;
+  typedef ShortBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_SCALAR = 4
+  };
+  int16_t scalar() const {
+    return GetField<int16_t>(VT_SCALAR, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int16_t>(verifier, VT_SCALAR) &&
+           verifier.EndTable();
+  }
+  ShortT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(ShortT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<Short> Pack(flatbuffers::FlatBufferBuilder &_fbb, const ShortT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct ShortBuilder {
+  typedef Short Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_scalar(int16_t scalar) {
+    fbb_.AddElement<int16_t>(Short::VT_SCALAR, scalar, 0);
+  }
+  explicit ShortBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<Short> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<Short>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Short> CreateShort(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int16_t scalar = 0) {
+  ShortBuilder builder_(_fbb);
+  builder_.add_scalar(scalar);
+  return builder_.Finish();
+}
+
+struct Short::Traits {
+  using type = Short;
+  static auto constexpr Create = CreateShort;
+};
+
+flatbuffers::Offset<Short> CreateShort(flatbuffers::FlatBufferBuilder &_fbb, const ShortT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct IntT : public flatbuffers::NativeTable {
+  typedef Int TableType;
+  int32_t scalar = 0;
+};
+
+struct Int FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef IntT NativeTableType;
+  typedef IntBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_SCALAR = 4
+  };
+  int32_t scalar() const {
+    return GetField<int32_t>(VT_SCALAR, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_SCALAR) &&
+           verifier.EndTable();
+  }
+  IntT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(IntT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<Int> Pack(flatbuffers::FlatBufferBuilder &_fbb, const IntT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct IntBuilder {
+  typedef Int Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_scalar(int32_t scalar) {
+    fbb_.AddElement<int32_t>(Int::VT_SCALAR, scalar, 0);
+  }
+  explicit IntBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<Int> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<Int>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Int> CreateInt(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t scalar = 0) {
+  IntBuilder builder_(_fbb);
+  builder_.add_scalar(scalar);
+  return builder_.Finish();
+}
+
+struct Int::Traits {
+  using type = Int;
+  static auto constexpr Create = CreateInt;
+};
+
+flatbuffers::Offset<Int> CreateInt(flatbuffers::FlatBufferBuilder &_fbb, const IntT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct FloatT : public flatbuffers::NativeTable {
+  typedef Float TableType;
+  double scalar = 0.0;
+};
+
+struct Float FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef FloatT NativeTableType;
+  typedef FloatBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_SCALAR = 4
+  };
+  double scalar() const {
+    return GetField<double>(VT_SCALAR, 0.0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<double>(verifier, VT_SCALAR) &&
+           verifier.EndTable();
+  }
+  FloatT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(FloatT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<Float> Pack(flatbuffers::FlatBufferBuilder &_fbb, const FloatT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct FloatBuilder {
+  typedef Float Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_scalar(double scalar) {
+    fbb_.AddElement<double>(Float::VT_SCALAR, scalar, 0.0);
+  }
+  explicit FloatBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<Float> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<Float>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<Float> CreateFloat(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    double scalar = 0.0) {
+  FloatBuilder builder_(_fbb);
+  builder_.add_scalar(scalar);
+  return builder_.Finish();
+}
+
+struct Float::Traits {
+  using type = Float;
+  static auto constexpr Create = CreateFloat;
+};
+
+flatbuffers::Offset<Float> CreateFloat(flatbuffers::FlatBufferBuilder &_fbb, const FloatT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct ShortArrayT : public flatbuffers::NativeTable {
+  typedef ShortArray TableType;
+  std::vector<int16_t> arr{};
+};
+
+struct ShortArray FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef ShortArrayT NativeTableType;
+  typedef ShortArrayBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_ARR = 4
+  };
+  const flatbuffers::Vector<int16_t> *arr() const {
+    return GetPointer<const flatbuffers::Vector<int16_t> *>(VT_ARR);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyOffset(verifier, VT_ARR) &&
+           verifier.VerifyVector(arr()) &&
+           verifier.EndTable();
+  }
+  ShortArrayT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(ShortArrayT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<ShortArray> Pack(flatbuffers::FlatBufferBuilder &_fbb, const ShortArrayT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct ShortArrayBuilder {
+  typedef ShortArray Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_arr(flatbuffers::Offset<flatbuffers::Vector<int16_t>> arr) {
+    fbb_.AddOffset(ShortArray::VT_ARR, arr);
+  }
+  explicit ShortArrayBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<ShortArray> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<ShortArray>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<ShortArray> CreateShortArray(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    flatbuffers::Offset<flatbuffers::Vector<int16_t>> arr = 0) {
+  ShortArrayBuilder builder_(_fbb);
+  builder_.add_arr(arr);
+  return builder_.Finish();
+}
+
+struct ShortArray::Traits {
+  using type = ShortArray;
+  static auto constexpr Create = CreateShortArray;
+};
+
+inline flatbuffers::Offset<ShortArray> CreateShortArrayDirect(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    const std::vector<int16_t> *arr = nullptr) {
+  auto arr__ = arr ? _fbb.CreateVector<int16_t>(*arr) : 0;
+  return TEN::Save::CreateShortArray(
+      _fbb,
+      arr__);
+}
+
+flatbuffers::Offset<ShortArray> CreateShortArray(flatbuffers::FlatBufferBuilder &_fbb, const ShortArrayT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct CreatureTargetT : public flatbuffers::NativeTable {
   typedef CreatureTarget TableType;
   int32_t object_number = 0;
   int32_t room_number = 0;
@@ -2805,268 +3034,111 @@ struct ItemNumber::Traits {
 
 ::flatbuffers::Offset<ItemNumber> CreateItemNumber(::flatbuffers::FlatBufferBuilder &_fbb, const ItemNumberT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
-struct ShortT : public ::flatbuffers::NativeTable {
-  typedef Short TableType;
-  int16_t scalar = 0;
-};
-
-struct Short FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef ShortT NativeTableType;
-  typedef ShortBuilder Builder;
-  struct Traits;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_SCALAR = 4
-  };
-  int16_t scalar() const {
-    return GetField<int16_t>(VT_SCALAR, 0);
-  }
-  bool Verify(::flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<int16_t>(verifier, VT_SCALAR, 2) &&
-           verifier.EndTable();
-  }
-  ShortT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(ShortT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static ::flatbuffers::Offset<Short> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const ShortT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
-};
-
-struct ShortBuilder {
-  typedef Short Table;
-  ::flatbuffers::FlatBufferBuilder &fbb_;
-  ::flatbuffers::uoffset_t start_;
-  void add_scalar(int16_t scalar) {
-    fbb_.AddElement<int16_t>(Short::VT_SCALAR, scalar, 0);
-  }
-  explicit ShortBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  ::flatbuffers::Offset<Short> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<Short>(end);
-    return o;
-  }
-};
-
-inline ::flatbuffers::Offset<Short> CreateShort(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    int16_t scalar = 0) {
-  ShortBuilder builder_(_fbb);
-  builder_.add_scalar(scalar);
-  return builder_.Finish();
+inline ShortT *Short::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<ShortT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
 }
 
-struct Short::Traits {
-  using type = Short;
-  static auto constexpr Create = CreateShort;
-};
-
-::flatbuffers::Offset<Short> CreateShort(::flatbuffers::FlatBufferBuilder &_fbb, const ShortT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
-
-struct IntT : public ::flatbuffers::NativeTable {
-  typedef Int TableType;
-  int32_t scalar = 0;
-};
-
-struct Int FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef IntT NativeTableType;
-  typedef IntBuilder Builder;
-  struct Traits;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_SCALAR = 4
-  };
-  int32_t scalar() const {
-    return GetField<int32_t>(VT_SCALAR, 0);
-  }
-  bool Verify(::flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<int32_t>(verifier, VT_SCALAR, 4) &&
-           verifier.EndTable();
-  }
-  IntT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(IntT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static ::flatbuffers::Offset<Int> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const IntT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
-};
-
-struct IntBuilder {
-  typedef Int Table;
-  ::flatbuffers::FlatBufferBuilder &fbb_;
-  ::flatbuffers::uoffset_t start_;
-  void add_scalar(int32_t scalar) {
-    fbb_.AddElement<int32_t>(Int::VT_SCALAR, scalar, 0);
-  }
-  explicit IntBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  ::flatbuffers::Offset<Int> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<Int>(end);
-    return o;
-  }
-};
-
-inline ::flatbuffers::Offset<Int> CreateInt(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    int32_t scalar = 0) {
-  IntBuilder builder_(_fbb);
-  builder_.add_scalar(scalar);
-  return builder_.Finish();
+inline void Short::UnPackTo(ShortT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = scalar(); _o->scalar = _e; }
 }
 
-struct Int::Traits {
-  using type = Int;
-  static auto constexpr Create = CreateInt;
-};
-
-::flatbuffers::Offset<Int> CreateInt(::flatbuffers::FlatBufferBuilder &_fbb, const IntT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
-
-struct FloatT : public ::flatbuffers::NativeTable {
-  typedef Float TableType;
-  double scalar = 0.0;
-};
-
-struct Float FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef FloatT NativeTableType;
-  typedef FloatBuilder Builder;
-  struct Traits;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_SCALAR = 4
-  };
-  double scalar() const {
-    return GetField<double>(VT_SCALAR, 0.0);
-  }
-  bool Verify(::flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyField<double>(verifier, VT_SCALAR, 8) &&
-           verifier.EndTable();
-  }
-  FloatT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(FloatT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static ::flatbuffers::Offset<Float> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const FloatT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
-};
-
-struct FloatBuilder {
-  typedef Float Table;
-  ::flatbuffers::FlatBufferBuilder &fbb_;
-  ::flatbuffers::uoffset_t start_;
-  void add_scalar(double scalar) {
-    fbb_.AddElement<double>(Float::VT_SCALAR, scalar, 0.0);
-  }
-  explicit FloatBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  ::flatbuffers::Offset<Float> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<Float>(end);
-    return o;
-  }
-};
-
-inline ::flatbuffers::Offset<Float> CreateFloat(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    double scalar = 0.0) {
-  FloatBuilder builder_(_fbb);
-  builder_.add_scalar(scalar);
-  return builder_.Finish();
+inline flatbuffers::Offset<Short> Short::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ShortT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateShort(_fbb, _o, _rehasher);
 }
 
-struct Float::Traits {
-  using type = Float;
-  static auto constexpr Create = CreateFloat;
-};
-
-::flatbuffers::Offset<Float> CreateFloat(::flatbuffers::FlatBufferBuilder &_fbb, const FloatT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
-
-struct ShortArrayT : public ::flatbuffers::NativeTable {
-  typedef ShortArray TableType;
-  std::vector<int16_t> arr{};
-};
-
-struct ShortArray FLATBUFFERS_FINAL_CLASS : private ::flatbuffers::Table {
-  typedef ShortArrayT NativeTableType;
-  typedef ShortArrayBuilder Builder;
-  struct Traits;
-  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
-    VT_ARR = 4
-  };
-  const ::flatbuffers::Vector<int16_t> *arr() const {
-    return GetPointer<const ::flatbuffers::Vector<int16_t> *>(VT_ARR);
-  }
-  bool Verify(::flatbuffers::Verifier &verifier) const {
-    return VerifyTableStart(verifier) &&
-           VerifyOffset(verifier, VT_ARR) &&
-           verifier.VerifyVector(arr()) &&
-           verifier.EndTable();
-  }
-  ShortArrayT *UnPack(const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  void UnPackTo(ShortArrayT *_o, const ::flatbuffers::resolver_function_t *_resolver = nullptr) const;
-  static ::flatbuffers::Offset<ShortArray> Pack(::flatbuffers::FlatBufferBuilder &_fbb, const ShortArrayT* _o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
-};
-
-struct ShortArrayBuilder {
-  typedef ShortArray Table;
-  ::flatbuffers::FlatBufferBuilder &fbb_;
-  ::flatbuffers::uoffset_t start_;
-  void add_arr(::flatbuffers::Offset<::flatbuffers::Vector<int16_t>> arr) {
-    fbb_.AddOffset(ShortArray::VT_ARR, arr);
-  }
-  explicit ShortArrayBuilder(::flatbuffers::FlatBufferBuilder &_fbb)
-        : fbb_(_fbb) {
-    start_ = fbb_.StartTable();
-  }
-  ::flatbuffers::Offset<ShortArray> Finish() {
-    const auto end = fbb_.EndTable(start_);
-    auto o = ::flatbuffers::Offset<ShortArray>(end);
-    return o;
-  }
-};
-
-inline ::flatbuffers::Offset<ShortArray> CreateShortArray(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    ::flatbuffers::Offset<::flatbuffers::Vector<int16_t>> arr = 0) {
-  ShortArrayBuilder builder_(_fbb);
-  builder_.add_arr(arr);
-  return builder_.Finish();
+inline flatbuffers::Offset<Short> CreateShort(flatbuffers::FlatBufferBuilder &_fbb, const ShortT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const ShortT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _scalar = _o->scalar;
+  return TEN::Save::CreateShort(
+      _fbb,
+      _scalar);
 }
 
-struct ShortArray::Traits {
-  using type = ShortArray;
-  static auto constexpr Create = CreateShortArray;
-};
+inline IntT *Int::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<IntT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
 
-inline ::flatbuffers::Offset<ShortArray> CreateShortArrayDirect(
-    ::flatbuffers::FlatBufferBuilder &_fbb,
-    const std::vector<int16_t> *arr = nullptr) {
-  auto arr__ = arr ? _fbb.CreateVector<int16_t>(*arr) : 0;
+inline void Int::UnPackTo(IntT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = scalar(); _o->scalar = _e; }
+}
+
+inline flatbuffers::Offset<Int> Int::Pack(flatbuffers::FlatBufferBuilder &_fbb, const IntT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateInt(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<Int> CreateInt(flatbuffers::FlatBufferBuilder &_fbb, const IntT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const IntT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _scalar = _o->scalar;
+  return TEN::Save::CreateInt(
+      _fbb,
+      _scalar);
+}
+
+inline FloatT *Float::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<FloatT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void Float::UnPackTo(FloatT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = scalar(); _o->scalar = _e; }
+}
+
+inline flatbuffers::Offset<Float> Float::Pack(flatbuffers::FlatBufferBuilder &_fbb, const FloatT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateFloat(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<Float> CreateFloat(flatbuffers::FlatBufferBuilder &_fbb, const FloatT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const FloatT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _scalar = _o->scalar;
+  return TEN::Save::CreateFloat(
+      _fbb,
+      _scalar);
+}
+
+inline ShortArrayT *ShortArray::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<ShortArrayT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void ShortArray::UnPackTo(ShortArrayT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = arr(); if (_e) { _o->arr.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->arr[_i] = _e->Get(_i); } } }
+}
+
+inline flatbuffers::Offset<ShortArray> ShortArray::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ShortArrayT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateShortArray(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<ShortArray> CreateShortArray(flatbuffers::FlatBufferBuilder &_fbb, const ShortArrayT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const ShortArrayT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _arr = _fbb.CreateVector(_o->arr);
   return TEN::Save::CreateShortArray(
       _fbb,
-      arr__);
+      _arr);
 }
 
-::flatbuffers::Offset<ShortArray> CreateShortArray(::flatbuffers::FlatBufferBuilder &_fbb, const ShortArrayT *_o, const ::flatbuffers::rehasher_function_t *_rehasher = nullptr);
-
-inline CreatureTargetT::CreatureTargetT(const CreatureTargetT &o)
-      : object_number(o.object_number),
-        room_number(o.room_number),
-        box_number(o.box_number),
-        flags(o.flags),
-        trigger_flags(o.trigger_flags),
-        position((o.position) ? new TEN::Save::Pose(*o.position) : nullptr) {
-}
-
-inline CreatureTargetT &CreatureTargetT::operator=(CreatureTargetT o) FLATBUFFERS_NOEXCEPT {
-  std::swap(object_number, o.object_number);
-  std::swap(room_number, o.room_number);
-  std::swap(box_number, o.box_number);
-  std::swap(flags, o.flags);
-  std::swap(trigger_flags, o.trigger_flags);
-  std::swap(position, o.position);
-  return *this;
-}
-
-inline CreatureTargetT *CreatureTarget::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
+inline CreatureTargetT *CreatureTarget::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<CreatureTargetT>();
   UnPackTo(_o.get(), _resolver);
   return _o.release();
@@ -3811,111 +3883,7 @@ inline ::flatbuffers::Offset<ItemNumber> CreateItemNumber(::flatbuffers::FlatBuf
       _num);
 }
 
-inline ShortT *Short::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::make_unique<ShortT>();
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void Short::UnPackTo(ShortT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-  { auto _e = scalar(); _o->scalar = _e; }
-}
-
-inline ::flatbuffers::Offset<Short> Short::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const ShortT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateShort(_fbb, _o, _rehasher);
-}
-
-inline ::flatbuffers::Offset<Short> CreateShort(::flatbuffers::FlatBufferBuilder &_fbb, const ShortT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const ShortT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _scalar = _o->scalar;
-  return TEN::Save::CreateShort(
-      _fbb,
-      _scalar);
-}
-
-inline IntT *Int::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::make_unique<IntT>();
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void Int::UnPackTo(IntT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-  { auto _e = scalar(); _o->scalar = _e; }
-}
-
-inline ::flatbuffers::Offset<Int> Int::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const IntT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateInt(_fbb, _o, _rehasher);
-}
-
-inline ::flatbuffers::Offset<Int> CreateInt(::flatbuffers::FlatBufferBuilder &_fbb, const IntT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const IntT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _scalar = _o->scalar;
-  return TEN::Save::CreateInt(
-      _fbb,
-      _scalar);
-}
-
-inline FloatT *Float::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::make_unique<FloatT>();
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void Float::UnPackTo(FloatT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-  { auto _e = scalar(); _o->scalar = _e; }
-}
-
-inline ::flatbuffers::Offset<Float> Float::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const FloatT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateFloat(_fbb, _o, _rehasher);
-}
-
-inline ::flatbuffers::Offset<Float> CreateFloat(::flatbuffers::FlatBufferBuilder &_fbb, const FloatT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const FloatT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _scalar = _o->scalar;
-  return TEN::Save::CreateFloat(
-      _fbb,
-      _scalar);
-}
-
-inline ShortArrayT *ShortArray::UnPack(const ::flatbuffers::resolver_function_t *_resolver) const {
-  auto _o = std::make_unique<ShortArrayT>();
-  UnPackTo(_o.get(), _resolver);
-  return _o.release();
-}
-
-inline void ShortArray::UnPackTo(ShortArrayT *_o, const ::flatbuffers::resolver_function_t *_resolver) const {
-  (void)_o;
-  (void)_resolver;
-  { auto _e = arr(); if (_e) { _o->arr.resize(_e->size()); for (::flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->arr[_i] = _e->Get(_i); } } else { _o->arr.resize(0); } }
-}
-
-inline ::flatbuffers::Offset<ShortArray> ShortArray::Pack(::flatbuffers::FlatBufferBuilder &_fbb, const ShortArrayT* _o, const ::flatbuffers::rehasher_function_t *_rehasher) {
-  return CreateShortArray(_fbb, _o, _rehasher);
-}
-
-inline ::flatbuffers::Offset<ShortArray> CreateShortArray(::flatbuffers::FlatBufferBuilder &_fbb, const ShortArrayT *_o, const ::flatbuffers::rehasher_function_t *_rehasher) {
-  (void)_rehasher;
-  (void)_o;
-  struct _VectorArgs { ::flatbuffers::FlatBufferBuilder *__fbb; const ShortArrayT* __o; const ::flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
-  auto _arr = _fbb.CreateVector(_o->arr);
-  return TEN::Save::CreateShortArray(
-      _fbb,
-      _arr);
-}
-
-inline bool VerifyItemData(::flatbuffers::Verifier &verifier, const void *obj, ItemData type) {
+inline bool VerifyItemData(flatbuffers::Verifier &verifier, const void *obj, ItemData type) {
   switch (type) {
     case ItemData::NONE: {
       return true;

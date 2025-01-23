@@ -24,7 +24,8 @@ void Level::Register(sol::table& parent)
 		sol::constructors<Level()>(),
 		sol::call_constructor, sol::constructors<Level()>(),
 
-		// Corresponds to an entry in strings.lua.
+/// (string) string key for the level's (localised) name.
+// Corresponds to an entry in strings.lua.
 //@mem nameKey
 		"nameKey", &Level::NameStringKey,
 
@@ -56,12 +57,12 @@ void Level::Register(sol::table& parent)
 //@mem layer2
 		"layer2", &Level::Layer2,
 
-		/// (@{Flow.Starfield}) Starfield.
-		// @mem starfield
+/// (@{Flow.Starfield}) Starfield.
+// @mem starfield
 		"starfield", &Level::Starfield,
 
-		/// (@{Flow.LensFlare}) Global lens flare .
-		// @mem lensFlare
+/// (@{Flow.LensFlare}) Global lens flare .
+// @mem lensFlare
 		"lensFlare", &Level::LensFlare,
 
 /// (@{Flow.Fog}) omni fog RGB color and distance.
@@ -112,12 +113,6 @@ e.g. `myLevel.laraType = LaraType.Divesuit`
 // As seen in TRC's Sinking Submarine.
 //@mem rumble
 		"rumble", &Level::Rumble,
-
-/// (@{Flow.Mirror}) Location and size of the level's mirror, if present.
-//
-// __(not yet implemented)__
-//@mem mirror
-		"mirror", &Level::Mirror,
 
 		"farView", sol::property(&Level::SetLevelFarView),
 
@@ -242,11 +237,6 @@ float Level::GetWeatherStrength() const
 WeatherType Level::GetWeatherType() const
 {
 	return Weather;
-}
-
-short Level::GetMirrorRoom() const
-{
-	return Mirror.Room;
 }
 
 bool Level::GetFogEnabled() const

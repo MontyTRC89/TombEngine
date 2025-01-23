@@ -344,6 +344,6 @@ void VoidEffect(ItemInfo* item)
 
 void DoFlipEffect(int number, ItemInfo* item)
 {
-	if (number != -1 && number < NUM_FLIPEFFECTS && effect_routines[number] != nullptr)
+	if (number != NO_VALUE && number < NUM_FLIPEFFECTS && effect_routines[number] != nullptr)
 		effect_routines[number](item);
 }

@@ -320,6 +320,18 @@ void InitializeLaraDefaultInventory(ItemInfo& item)
 	if (Objects[ID_BINOCULARS_ITEM].loaded)
 		player.Inventory.HasBinoculars = true;
 
+	if (Objects[ID_STOPWATCH_ITEM].loaded)
+		player.Inventory.HasStopwatch = true;
+		
+	if (Objects[ID_PC_LOAD_INV_ITEM].loaded)
+		player.Inventory.HasLoad = true;
+
+	if (Objects[ID_PC_SAVE_INV_ITEM].loaded)
+		player.Inventory.HasSave = true;
+
+	if (Objects[ID_COMPASS_ITEM].loaded)
+		player.Inventory.HasCompass = true;
+
 	player.Inventory.BeetleLife = DEFAULT_BEETLE_LIFE;
 
 	auto weaponType = LaraWeaponType::None;

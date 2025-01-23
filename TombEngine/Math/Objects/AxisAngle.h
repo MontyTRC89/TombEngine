@@ -7,7 +7,7 @@ namespace TEN::Math
 	class AxisAngle 
 	{
 	private:
-		// Members
+		// Fields
 
 		Vector3 _axis  = Vector3::Backward;
 		short	_angle = 0;

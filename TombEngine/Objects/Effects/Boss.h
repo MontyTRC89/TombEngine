@@ -21,7 +21,7 @@ namespace TEN::Effects::Boss
 	{
 		ShockwaveExplosion = (1 << 0),
 		Shield             = (1 << 1),
-		Lizard             = (1 << 2)
+		Lizard			   = (1 << 2)
 	};
 
 	void ShieldControl(int itemNumber);

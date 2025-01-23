@@ -829,7 +829,7 @@ void lara_as_sclimbend(ItemInfo* item, CollisionInfo* coll)
 // Extends LS_HANG (10)
 void SlopeHangExtra(ItemInfo* item, CollisionInfo* coll)
 {
-	if (!g_GameFlow->HasOverhangClimb())
+	if (!g_GameFlow->GetSettings()->Animations.OverhangClimb)
 		return;
 
 	auto slopeData = GetSlopeData(item);
@@ -874,7 +874,7 @@ void SlopeHangExtra(ItemInfo* item, CollisionInfo* coll)
 // Extends LS_REACH (11)
 void SlopeReachExtra(ItemInfo* item, CollisionInfo* coll)
 {
-	if (!g_GameFlow->HasOverhangClimb())
+	if (!g_GameFlow->GetSettings()->Animations.OverhangClimb)
 		return;
 
 	auto slopeData = GetSlopeData(item);
@@ -908,7 +908,7 @@ void SlopeReachExtra(ItemInfo* item, CollisionInfo* coll)
 // Extends LS_CLIMB_IDLE (56)
 void SlopeClimbExtra(ItemInfo* item, CollisionInfo* coll)
 {
-	if (!g_GameFlow->HasOverhangClimb())
+	if (!g_GameFlow->GetSettings()->Animations.OverhangClimb)
 		return;
 
 	auto slopeData = GetSlopeData(item);
@@ -984,7 +984,7 @@ bool LadderMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 // Extends LS_LADDER_DOWN (61)
 void SlopeClimbDownExtra(ItemInfo* item, CollisionInfo* coll)
 {
-	if (!g_GameFlow->HasOverhangClimb())
+	if (!g_GameFlow->GetSettings()->Animations.OverhangClimb)
 		return;
 
 	auto slopeData = GetSlopeData(item);
@@ -1046,7 +1046,7 @@ void SlopeMonkeyExtra(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
 
-	if (!g_GameFlow->HasOverhangClimb())
+	if (!g_GameFlow->GetSettings()->Animations.OverhangClimb)
 		return;
 
 	auto slopeData = GetSlopeData(item);

@@ -23,6 +23,7 @@
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
+#include "Scripting/Internal/TEN/Objects/Lara/WeaponTypes.h"
 #include "Sound/sound.h"
 #include "Specific/configuration.h"
 #include "Specific/Input/Input.h"
@@ -144,7 +145,7 @@ WeaponInfo Weapons[(int)LaraWeaponType::NumWeapons] =
 		std::pair(EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0)),
 		std::pair(EulerAngles(ANGLE(-70.0f), ANGLE(-80.0f), 0), EulerAngles(ANGLE(65.0f), ANGLE(80.0f), 0)),
 		ANGLE(10.0f),
-		0,
+		ANGLE(10.0f),
 		500,
 		BLOCK(8),
 		3,
@@ -299,6 +300,26 @@ const WeaponInfo& GetWeaponInfo(LaraWeaponType weaponType)
 		return Weapons[0];
 
 	return (Weapons[(int)weaponType]);
+}
+
+void InitializeWeaponInfo(const Settings& settings)
+{
+	for (const auto& [name, weaponType] : WEAPON_TYPES)
+	{
+		if ((int)weaponType <= 0 || (int)weaponType >= (int)LaraWeaponType::NumWeapons)
+			continue;
+
+		auto& weapon = Weapons[(int)weaponType];
+		const auto& weaponSettings = settings.Weapons[(int)weaponType - 1]; // Lua counts from 1.
+
+		weapon.Damage = weaponSettings.Damage;
+		weapon.AlternateDamage = weaponSettings.AlternateDamage;
+		weapon.FlashTime = weaponSettings.FlashDuration;
+		weapon.GunHeight = weaponSettings.WaterLevel;
+		weapon.ShotAccuracy = ANGLE(weaponSettings.Accuracy);
+		weapon.TargetDist = weaponSettings.Distance;
+		weapon.RecoilFrame = weaponSettings.Interval;
+	}
 }
 
 void InitializeNewWeapon(ItemInfo& laraItem)
@@ -536,7 +557,7 @@ void HandleWeapon(ItemInfo& laraItem)
 				player.Control.Weapon.RequestGunType = player.Control.Weapon.LastGunType;
 		}
 		// Draw flare.
-		else if (IsHeld(In::Flare) && (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() != LaraType::Young))
+		else if (IsHeld(In::Flare))
 		{
 			if (player.Control.Weapon.GunType == LaraWeaponType::Flare)
 			{
@@ -548,9 +569,9 @@ void HandleWeapon(ItemInfo& laraItem)
 					player.Control.HandStatus = HandStatus::WeaponUndraw;
 				}
 			}
-			else if (player.Inventory.TotalFlares)
+			else if (player.Inventory.TotalFlares && !player.Control.Look.IsUsingBinoculars)
 			{
-				if (player.Inventory.TotalFlares != -1)
+				if (player.Inventory.TotalFlares != NO_VALUE)
 					player.Inventory.TotalFlares--;
 
 				player.Control.Weapon.RequestGunType = LaraWeaponType::Flare;
@@ -624,7 +645,13 @@ void HandleWeapon(ItemInfo& laraItem)
 		laraItem.Animation.ActiveState == LS_CRAWL_IDLE &&
 		laraItem.Animation.AnimNumber == LA_CRAWL_IDLE)
 	{
-		player.Control.Weapon.RequestGunType = LaraWeaponType::Flare;
+			if (player.Inventory.TotalFlares)
+			{
+				if (player.Inventory.TotalFlares != NO_VALUE)
+					player.Inventory.TotalFlares--;
+
+				player.Control.Weapon.RequestGunType = LaraWeaponType::Flare;
+			}
 	}
 
 	switch (player.Control.HandStatus)
@@ -813,7 +840,7 @@ void AimWeapon(ItemInfo& laraItem, ArmInfo& arm, const WeaponInfo& weaponInfo)
 }
 
 // TODO: Include snowmobile gun in GetAmmo(), otherwise the player won't be able to shoot while controlling it. -- TokyoSU 2023.04.21
-FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, ItemInfo& laraItem, const EulerAngles& armOrient)
+FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo* targetEntity, ItemInfo& laraItem, const EulerAngles& armOrient)
 {
 	auto& player = *GetLaraInfo(&laraItem);
 	auto& ammo = GetAmmo(player, weaponType);
@@ -848,14 +875,14 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 	GetFloor(pos.x, pos.y, pos.z, &roomNumber);
 	vOrigin.RoomNumber = roomNumber;
 
-	if (&targetEntity == nullptr)
+	if (targetEntity == nullptr)
 	{
 		auto vTarget = GameVector(target);
 		GetTargetOnLOS(&vOrigin, &vTarget, false, true);
 		return FireWeaponType::Miss;
 	}
 
-	auto spheres = targetEntity.GetSpheres();
+	auto spheres = targetEntity->GetSpheres();
 	int closestJointIndex = NO_VALUE;
 	float closestDist = INFINITY;
 	for (int i = 0; i < spheres.size(); i++)
@@ -871,7 +898,7 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 		}
 	}
 	
-	if (closestJointIndex < 0)
+	if (closestJointIndex == NO_VALUE)
 	{
 		auto vTarget = GameVector(target);
 		GetTargetOnLOS(&vOrigin, &vTarget, false, true);
@@ -879,14 +906,13 @@ FireWeaponType FireWeapon(LaraWeaponType weaponType, ItemInfo& targetEntity, Ite
 	}
 	else
 	{
-		SaveGame::Statistics.Game.AmmoHits++;
 		target = origin + (directionNorm * closestDist);
 		auto vTarget = GameVector(target);
 
 		// NOTE: It seems that entities hit by the player in the normal way must have GetTargetOnLOS return false.
 		// It's strange, but this replicates original behaviour until we fully understand what is happening.
 		if (!GetTargetOnLOS(&vOrigin, &vTarget, false, true))
-			HitTarget(&laraItem, &targetEntity, &vTarget, weapon.Damage, false, closestJointIndex);
+			HitTarget(&laraItem, targetEntity, &vTarget, weapon.Damage, false, closestJointIndex);
 
 		return FireWeaponType::PossibleHit;
 	}
@@ -1105,6 +1131,9 @@ void HitTarget(ItemInfo* laraItem, ItemInfo* targetEntity, GameVector* hitPos, i
 	targetEntity->HitStatus = true;
 	if (targetEntity->IsCreature())
 		GetCreatureInfo(targetEntity)->HurtByLara = true;
+
+	if (object.HitRoutine == nullptr)
+		return;
 
 	if (hitPos != nullptr)
 	{

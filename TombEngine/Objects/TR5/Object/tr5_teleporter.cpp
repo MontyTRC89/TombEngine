@@ -82,7 +82,7 @@ void ControlTeleporter(short itemNumber)
 					BYTE1(v21) |= 0x80u;
 					TriggerLightningGlow(src.x, src.y, src.z, (item->itemFlags[0] >> 3) | ((v20 | (v21 << 8)) << 7));
 					v22 = GetRandomControl();
-					TriggerDynamicLight(src.x, src.y, src.z, (v22 & 3) + (item->itemFlags[0] >> 5) + 8, v12, v16, v13);
+					SpawnDynamicLight(src.x, src.y, src.z, (v22 & 3) + (item->itemFlags[0] >> 5) + 8, v12, v16, v13);
 				}
 				LOBYTE(v3) = GetRandomControl();
 				if (v3 & 1)

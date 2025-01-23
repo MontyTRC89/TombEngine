@@ -11,7 +11,7 @@ namespace TEN::Math
 	class GameBoundingBox
 	{
 	public:
-		// Members
+		// Fields
 
 		int X1 = 0;
 		int X2 = 0;
@@ -45,8 +45,10 @@ namespace TEN::Math
 
 		// Converters
 
+		BoundingSphere		ToLocalBoundingSphere() const;
+		BoundingBox			ToConservativeBoundingBox(const Pose& pose) const; // TODO: item.GetAabb() method.
 		BoundingOrientedBox ToBoundingOrientedBox(const Pose& pose) const;
-		BoundingOrientedBox ToBoundingOrientedBox(const Vector3& pos, const Quaternion& orient) const;
+		BoundingOrientedBox ToBoundingOrientedBox(const Vector3& pos, const Quaternion& orient) const; // TODO: item.GetObb() method.
 
 		// Operators
 

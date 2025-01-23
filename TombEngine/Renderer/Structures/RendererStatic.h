@@ -16,19 +16,17 @@ namespace TEN::Renderer::Structures
 		std::vector<RendererLight*> LightsToDraw;
 		std::vector<RendererLightNode> CachedRoomLights;
 		bool CacheLights;
-		GameBoundingBox OriginalVisibilityBox;
-		BoundingOrientedBox VisibilityBox;
+		BoundingSphere OriginalSphere;
+		BoundingSphere Sphere;
 		float Scale;
-		float VisibilitySphereRadius;
 
 		void Update()
 		{
 			World = (Pose.Orientation.ToRotationMatrix() *
 				Matrix::CreateScale(Scale) *
 				Matrix::CreateTranslation(Pose.Position.x, Pose.Position.y, Pose.Position.z));
+			Sphere = BoundingSphere(Vector3::Transform(OriginalSphere.Center, World), OriginalSphere.Radius * Scale);
 			CacheLights = true;
-			VisibilityBox = OriginalVisibilityBox.ToBoundingOrientedBox(Pose);
-			VisibilitySphereRadius = Vector3(VisibilityBox.Extents).Length() * Scale;
 		}
 	};
 }

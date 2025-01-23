@@ -26,7 +26,7 @@ namespace TEN::Hud
 	class StatusBarsController
 	{
 	private:
-		// Members
+		// Fields
 
 		StatusBar _airBar	   = {};
 		StatusBar _exposureBar = {};

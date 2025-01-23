@@ -7,6 +7,7 @@
 #include "Game/effects/effects.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Point;
@@ -51,7 +52,7 @@ namespace TEN::Entities::Traps
 			item.Pose.Orientation.y += item.ItemFlags[0];
 
 			// Calculate vertical velocity.
-			item.Animation.Velocity.y += (item.Animation.Velocity.y < DAMOCLES_SWORD_VELOCITY_MAX) ? GRAVITY : 1.0f;
+			item.Animation.Velocity.y += (item.Animation.Velocity.y < DAMOCLES_SWORD_VELOCITY_MAX) ? g_GameFlow->GetSettings()->Physics.Gravity : 1.0f;
 
 			// Translate sword.
 			short headingAngle = Geometry::GetOrientToPoint(item.Pose.Position.ToVector3(), laraItem.Pose.Position.ToVector3()).y;

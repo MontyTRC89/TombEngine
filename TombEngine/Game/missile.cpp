@@ -7,6 +7,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/explosion.h"
+#include "Game/effects/Light.h"
 #include "Game/effects/Bubble.h"
 #include "Game/Lara/lara.h"
 #include "Game/items.h"
@@ -14,9 +15,10 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
-using namespace TEN::Collision::Point;;
+using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Explosion;
+using namespace TEN::Effects::Light;
 
 constexpr auto MUTANT_SHARD_DAMAGE	= 30;
 constexpr auto MUTANT_BOMB_DAMAGE	= 100;
@@ -47,7 +49,7 @@ void ControlMissile(short fxNumber)
 	auto& fx = EffectList[fxNumber];
 
 	auto isUnderwater = TestEnvironment(ENV_FLAG_WATER, fx.roomNumber);
-	auto soundFXType = isUnderwater ? SoundEnvironment::ShallowWater : SoundEnvironment::Land;
+	auto soundFXType = isUnderwater ? SoundEnvironment::Underwater : SoundEnvironment::Land;
 
 	if (fx.objectNumber == ID_SCUBA_HARPOON && isUnderwater &&
 		fx.pos.Orientation.x > ANGLE(-67.5f))
@@ -127,7 +129,7 @@ void ControlMissile(short fxNumber)
 		break;
 
 	case ID_PROJ_BOMB:
-		TriggerDynamicLight(fx.pos.Position.x, fx.pos.Position.y, fx.pos.Position.z, 14, 180, 100, 0);
+		SpawnDynamicLight(fx.pos.Position.x, fx.pos.Position.y, fx.pos.Position.z, 14, 180, 100, 0);
 		break;
 	}
 }

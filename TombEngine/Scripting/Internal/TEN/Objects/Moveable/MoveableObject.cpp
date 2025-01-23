@@ -13,11 +13,11 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
-#include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Logic/LevelFunc.h"
 #include "Scripting/Internal/TEN/Objects/ObjectsHandler.h"
-#include "Scripting/Internal/TEN/Rotation/Rotation.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Types/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Floordata;
@@ -127,7 +127,7 @@ static std::unique_ptr<Moveable> Create(
 
 		if (std::holds_alternative<int>(animNumber))
 		{
-			ptr->SetAnimNumber(std::get<int>(animNumber));
+			ptr->SetAnimNumber(std::get<int>(animNumber), objID);
 			ptr->SetFrameNumber(USE_IF_HAVE(int, frameNumber, 0));
 		}
 
@@ -164,6 +164,9 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 	ScriptReserved_MakeInvisible, &Moveable::MakeInvisible,
 
 	ScriptReserved_SetVisible, &Moveable::SetVisible,
+
+	ScriptReserved_SetCollidable, & Moveable::SetCollidable,
+	ScriptReserved_GetCollidable, & Moveable::GetCollidable,
 
 /// Explode item. This also kills and disables item.
 // @function Moveable:Explode
@@ -244,7 +247,15 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 // object may end up in corrupted animation state.*
 // @function Moveable:SetAnim
 // @tparam int index the index of the desired anim 
+// @tparam[opt] int slot slot ID of the desired anim (if omitted, moveable's own slot ID is used)
 	ScriptReserved_SetAnimNumber, &Moveable::SetAnimNumber,
+
+/// Retrieve the slot ID of the animation.
+// In certain cases, moveable may play animations from another object slot. Use this
+// function when you need to identify such cases.
+// @function Moveable:GetAnimSlot
+// @treturn int animation slot ID
+	ScriptReserved_GetAnimSlot, &Moveable::GetAnimSlot,
 
 /// Retrieve frame number.
 // This is the current frame of the object's active animation.
@@ -252,6 +263,20 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 // @treturn int the current frame of the active animation
 	ScriptReserved_GetFrameNumber, &Moveable::GetFrameNumber,
 
+/// Set frame number.
+// This will move the animation to the given frame.
+// The number of frames in an animation can be seen under the heading "End frame" in
+// the WadTool animation editor. If the animation has no frames, the only valid argument
+// is -1.
+// @function Moveable:SetFrame
+// @tparam int frame the new frame number
+	ScriptReserved_SetFrameNumber, &Moveable::SetFrameNumber,
+	
+
+/// Get the end frame number of the moveable's active animation.
+// This is the "End Frame" set in WADTool for the animation.
+// @function Moveable:GetEndFrame()
+// @treturn int End frame number of the active animation.
 	ScriptReserved_GetEndFrame, &Moveable::GetEndFrame,
 
 /// Set the object's velocity to specified value.
@@ -267,15 +292,6 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 // @function Moveable:GetVelocity
 // @treturn Vec3 current object velocity
 	ScriptReserved_GetVelocity, &Moveable::GetVelocity,
-
-/// Set frame number.
-// This will move the animation to the given frame.
-// The number of frames in an animation can be seen under the heading "End frame" in
-// the WadTool animation editor. If the animation has no frames, the only valid argument
-// is -1.
-// @function Moveable:SetFrame
-// @tparam int frame the new frame number
-	ScriptReserved_SetFrameNumber, &Moveable::SetFrameNumber,
 
 /// Get current HP (hit points/health points)
 // @function Moveable:GetHP
@@ -631,7 +647,20 @@ Vec3 Moveable::GetJointPos(int jointIndex, sol::optional<Vec3> offset) const
 
 Rotation Moveable::GetJointRot(int jointIndex) const
 {
-	return GetBoneOrientation(*m_item, jointIndex);
+	auto point1 = GetJointPosition(m_item, jointIndex);
+	auto point2 = GetJointPosition(m_item, jointIndex, Vector3::Forward * BLOCK(1));
+
+	auto normal = (point1 - point2).ToVector3();
+	normal.Normalize();
+
+	auto eulers = EulerAngles(normal);
+
+	return
+	{
+		TO_DEGREES(eulers.x),
+		TO_DEGREES(eulers.y),
+		TO_DEGREES(eulers.z)
+	};
 }
 
 // This does not guarantee that the returned value will be identical
@@ -859,14 +888,19 @@ void Moveable::SetStateNumber(int stateNumber)
 	m_item->Animation.TargetState = stateNumber;
 }
 
-int Moveable::GetAnimNumber() const
+int Moveable::GetAnimSlot() const
 {
-	return m_item->Animation.AnimNumber - Objects[m_item->ObjectNumber].animIndex;
+	return m_item->Animation.AnimObjectID;
 }
 
-void Moveable::SetAnimNumber(int animNumber)
+int Moveable::GetAnimNumber() const
 {
-	SetAnimation(m_item, animNumber);
+	return m_item->Animation.AnimNumber - Objects[m_item->Animation.AnimObjectID].animIndex;
+}
+
+void Moveable::SetAnimNumber(int animNumber, sol::optional<int> slotIndex)
+{
+	SetAnimation(*m_item, (GAME_OBJECT_ID)slotIndex.value_or(m_item->ObjectNumber), animNumber);
 }
 
 int Moveable::GetFrameNumber() const
@@ -908,10 +942,6 @@ void Moveable::SetFrameNumber(int frameNumber)
 	}
 }
 
-/// Get the end frame number of the moveable's active animation.
-// This is the "End Frame" set in WADTool for the animation.
-// @function Moveable:GetEndFrame()
-// @treturn int End frame number of the active animation.	
 int Moveable::GetEndFrame() const
 {
 	const auto& anim = GetAnimData(*m_item);
@@ -1163,6 +1193,22 @@ void Moveable::Shatter()
 	KillItem(m_num);
 }
 
+/// Get the item's collision state.
+// @treturn bool item's collision state
+// @function Moveable:GetCollidable
+bool Moveable::GetCollidable()
+{
+	return m_item->Collidable;
+}
+
+/// Set the item's collision.
+// @bool collidable true if the caller should be collidable, false if no collision should occur.
+// @function Moveable:SetCollidable
+void Moveable::SetCollidable(bool isCollidable)
+{
+	m_item->Collidable = isCollidable;
+}
+
 /// Make the item invisible. Alias for `Moveable:SetVisible(false)`.
 // @function Moveable:MakeInvisible
 void Moveable::MakeInvisible()
@@ -1228,7 +1274,7 @@ bool Moveable::GetValid() const
 
 void Moveable::Destroy()
 {
-	if (m_num > NO_VALUE) 
+	if (m_num > NO_VALUE)
 	{
 		dynamic_cast<ObjectsHandler*>(g_GameScriptEntities)->RemoveMoveableFromMap(m_item, this);
 		s_callbackRemoveName(m_item->Name);

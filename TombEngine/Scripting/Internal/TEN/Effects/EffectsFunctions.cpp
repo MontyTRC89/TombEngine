@@ -9,18 +9,20 @@
 #include "Game/effects/explosion.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/tomb4fx.h"
+#include "Game/effects/weather.h"
 #include "Game/Setup.h"
 #include "Objects/Utils/object_helper.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptUtil.h"
-#include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Effects/BlendIDs.h"
 #include "Scripting/Internal/TEN/Effects/EffectIDs.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
-#include "Scripting/Internal/TEN/Vec2/Vec2.h"
+#include "Scripting/Internal/TEN/Types/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
+#include "Specific/trutils.h"
 
 /***
 Functions to generate effects.
@@ -30,6 +32,7 @@ Functions to generate effects.
 
 using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Electricity;
+using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
 
@@ -98,7 +101,7 @@ namespace TEN::Scripting::Effects
 	@function EmitParticle
 	@tparam Vec3 pos
 	@tparam Vec3 velocity
-	@tparam int spriteIndex an index of a sprite in DEFAULT_SPRITES object.
+	@tparam int spriteID ID of the sprite in the DEFAULT_SPRITES sprite sequence object.
 	@tparam int gravity (default 0) Specifies whether particle will fall (positive values) or ascend (negative values) over time. Clamped to [-32768, 32767], but values between -1000 and 1000 are recommended; values too high or too low (e.g. under -2000 or above 2000) will cause the velocity of the particle to "wrap around" and switch directions.
 	@tparam float rot (default 0) specifies a speed with which it will rotate (0 = no rotation, negative = anticlockwise rotation, positive = clockwise rotation).
 	@tparam Color startColor (default Color(255, 255, 255)) color at start of life
@@ -113,7 +116,7 @@ namespace TEN::Scripting::Effects
 	EmitParticle(
 		yourPositionVarHere,
 		Vec3(math.random(), math.random(), math.random()),
-		22, -- spriteIndex
+		22, -- spriteID
 		0, -- gravity
 		-2, -- rot
 		Color(255, 0, 0), -- startColor
@@ -126,7 +129,7 @@ namespace TEN::Scripting::Effects
 		true -- poison
 		)
 	*/
-	static void EmitParticle(Vec3 pos, Vec3 velocity, int spriteIndex, TypeOrNil<int> gravity, TypeOrNil<float> rot, 
+	static void EmitParticle(Vec3 pos, Vec3 velocity, int spriteID, TypeOrNil<int> gravity, TypeOrNil<float> rot, 
 							TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<BlendMode> blendMode, 
 							TypeOrNil<int> startSize, TypeOrNil<int> endSize, TypeOrNil<float> lifetime, 
 							TypeOrNil<bool> damage, TypeOrNil<bool> poison)
@@ -142,7 +145,8 @@ namespace TEN::Scripting::Effects
 
 		s->on = true;
 
-		s->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + spriteIndex;
+		s->SpriteSeqID = ID_DEFAULT_SPRITES;
+		s->SpriteID = spriteID;
 
 		ScriptColor colorStart = USE_IF_HAVE(ScriptColor, startColor, ScriptColor( 255, 255, 255 ));
 		ScriptColor colorEnd = USE_IF_HAVE(ScriptColor, endColor, ScriptColor( 255, 255, 255 ));
@@ -255,15 +259,38 @@ namespace TEN::Scripting::Effects
 /***Emit dynamic light that lasts for a single frame.
  * If you want a light that sticks around, you must call this each frame.
 @function EmitLight
-@tparam Vec3 pos
-@tparam Color color (default Color(255, 255, 255))
-@tparam int radius (default 20) corresponds loosely to both intensity and range
+@tparam Vec3 pos position of the light
+@tparam[opt] Color color light color (default Color(255, 255, 255))
+@tparam[opt] int radius measured in "clicks" or 256 world units (default 20)
+@tparam[opt] bool shadows determines whether light should generate dynamic shadows for applicable moveables (default is false)
+@tparam[opt] string name if provided, engine will interpolate this light for high framerate mode (be careful not to use same name for different lights)
 */
-	static void EmitLight(Vec3 pos, TypeOrNil<ScriptColor> col, TypeOrNil<int> radius)
+	static void EmitLight(Vec3 pos, TypeOrNil<ScriptColor> col, TypeOrNil<int> radius, TypeOrNil<bool> castShadows, TypeOrNil<std::string> name)
 	{
 		auto color = USE_IF_HAVE(ScriptColor, col, ScriptColor(255, 255, 255));
-		int rad = USE_IF_HAVE(int, radius, 20);
-		TriggerDynamicLight(pos.x, pos.y, pos.z, rad, color.GetR(), color.GetG(), color.GetB());
+		int rad = (float)(USE_IF_HAVE(int, radius, 20) * BLOCK(0.25f));
+		SpawnDynamicPointLight(pos.ToVector3(), color, rad, USE_IF_HAVE(bool, castShadows, false), GetHash(USE_IF_HAVE(std::string, name, std::string())));
+	}
+
+/***Emit dynamic directional spotlight that lasts for a single frame.
+* If you want a light that sticks around, you must call this each frame.
+@function EmitSpotLight
+@tparam Vec3 pos position of the light
+@tparam Vec3 dir direction, or a point to which spotlight should be directed to
+@tparam[opt] Color color (default Color(255, 255, 255))
+@tparam[opt] int radius overall radius at the endpoint of a light cone, measured in "clicks" or 256 world units (default 10)
+@tparam[opt] int falloff radius, at which light starts to fade out, measured in "clicks" (default 5)
+@tparam[opt] int distance distance, at which light cone fades out, measured in "clicks" (default 20)
+@tparam[opt] bool shadows determines whether light should generate dynamic shadows for applicable moveables (default is false)
+@tparam[opt] string name if provided, engine will interpolate this light for high framerate mode (be careful not to use same name for different lights)
+*/
+	static void EmitSpotLight(Vec3 pos, Vec3 dir, TypeOrNil<ScriptColor> col, TypeOrNil<int> radius, TypeOrNil<int> falloff, TypeOrNil<int> distance, TypeOrNil<bool> castShadows, TypeOrNil<std::string> name)
+	{
+		auto color = USE_IF_HAVE(ScriptColor, col, ScriptColor(255, 255, 255));
+		int rad =	  (float)(USE_IF_HAVE(int, radius,   10) * BLOCK(0.25f));
+		int fallOff = (float)(USE_IF_HAVE(int, falloff,   5) * BLOCK(0.25f));
+		int dist =	  (float)(USE_IF_HAVE(int, distance, 20) * BLOCK(0.25f));
+		SpawnDynamicSpotLight(pos.ToVector3(), dir.ToVector3(), color, rad, fallOff, dist, USE_IF_HAVE(bool, castShadows, false), GetHash(USE_IF_HAVE(std::string, name, std::string())));
 	}
 
 /***Emit blood.
@@ -307,6 +334,15 @@ namespace TEN::Scripting::Effects
 		Camera.bounce = -str;
 	}
 
+	/// Get the wind vector for the current game frame.
+	// This represents the 3D displacement applied by the engine on things like particles affected by wind.
+	// @function GetWind()
+	// @treturn Vec3 Wind vector.
+	static Vec3 GetWind()
+	{
+		return Vec3(Weather.Wind());
+	}
+
 	void Register(sol::state* state, sol::table& parent) 
 	{
 		auto tableEffects = sol::table(state->lua_state(), sol::create);
@@ -316,10 +352,12 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_EmitParticle, &EmitParticle);
 		tableEffects.set_function(ScriptReserved_EmitShockwave, &EmitShockwave);
 		tableEffects.set_function(ScriptReserved_EmitLight, &EmitLight);
+		tableEffects.set_function(ScriptReserved_EmitSpotLight, &EmitSpotLight);
 		tableEffects.set_function(ScriptReserved_EmitBlood, &EmitBlood);
 		tableEffects.set_function(ScriptReserved_MakeExplosion, &MakeExplosion);
 		tableEffects.set_function(ScriptReserved_EmitFire, &EmitFire);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
+		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
 
 		auto handler = LuaHandler{ state };
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_BlendID, BLEND_IDS);

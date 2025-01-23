@@ -96,7 +96,6 @@ namespace TEN::Input
 	void DefaultConflict();
 	void UpdateInputActions(ItemInfo* item, bool applyQueue = false);
 	void ApplyActionQueue();
-	void ClearActionQueue();
 	void ClearAllActions();
 	void Rumble(float power, float delayInSec = 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();

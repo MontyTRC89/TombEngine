@@ -396,6 +396,6 @@ namespace TEN::Entities::Effects
 		}
 
 		if (fx.flag1 == (int)MissileType::ClawMutantPlasma)
-			TriggerDynamicLight(fx.pos.Position.x, fx.pos.Position.y, fx.pos.Position.z, 8, 0, 64, 128);
+			SpawnDynamicLight(fx.pos.Position.x, fx.pos.Position.y, fx.pos.Position.z, 8, 0, 64, 128);
 	}
 }

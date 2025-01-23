@@ -17,6 +17,7 @@
 #include "Game/Setup.h"
 #include "Objects/TR3/Vehicles/quad_bike_info.h"
 #include "Objects/Utils/VehicleHelpers.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/Input/Input.h"
@@ -447,7 +448,9 @@ namespace TEN::Entities::Vehicles
 				verticalVelocity = 0;
 			}
 			else
-				verticalVelocity += 6;
+			{
+				verticalVelocity += g_GameFlow->GetSettings()->Physics.Gravity;
+			}
 		}
 		else
 		{
@@ -1069,7 +1072,8 @@ namespace TEN::Entities::Vehicles
 		else
 			spark->flags = SP_SCALE | SP_DEF | SP_EXPDEF;
 
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+		spark->SpriteSeqID = ID_DEFAULT_SPRITES;
+		spark->SpriteID = 0;
 		spark->scalar = 2;
 		spark->gravity = -(GetRandomControl() & 3) - 4;
 		spark->maxYvel = -(GetRandomControl() & 7) - 8;

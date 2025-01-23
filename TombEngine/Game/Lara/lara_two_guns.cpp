@@ -151,7 +151,7 @@ static void AnimateWeapon(ItemInfo& laraItem, LaraWeaponType weaponType, bool& h
 							arm.Orientation.y + laraItem.Pose.Orientation.y,
 							0);
 
-					if (FireWeapon(weaponType, *player.TargetEntity, laraItem, armOrient) != FireWeaponType::NoAmmo)
+					if (FireWeapon(weaponType, player.TargetEntity, laraItem, armOrient) != FireWeaponType::NoAmmo)
 					{
 						arm.GunSmoke = 28;
 						TriggerGunShell(isRightWeapon ? true : false, ID_GUNSHELL, weaponType);
@@ -168,6 +168,7 @@ static void AnimateWeapon(ItemInfo& laraItem, LaraWeaponType weaponType, bool& h
 						}
 
 						SaveGame::Statistics.Game.AmmoUsed++;
+						SaveGame::Statistics.Level.AmmoUsed++;
 					}
 				}
 
@@ -307,14 +308,17 @@ void HandlePistols(ItemInfo& laraItem, LaraWeaponType weaponType)
 
 	if (lara.LeftArm.GunFlash || lara.RightArm.GunFlash)
 	{
+		const auto& settings = g_GameFlow->GetSettings()->Weapons[(int)weaponType - 1];
+
+		auto color = Color(settings.FlashColor);
+		color += Color(Random::GenerateFloat(-0.2f, 0.2f));
+
 		auto basePos = GetJointPosition(&laraItem, (lara.LeftArm.GunFlash != 0) ? LM_LHAND : LM_RHAND).ToVector3();
 		auto sphere = BoundingSphere(basePos, BLOCK(1 / 8.0f));
 		auto lightPos = Random::GeneratePointInSphere(sphere);
-
-		TriggerDynamicLight(
-			lightPos.x, lightPos.y, lightPos.z,
-			Random::GenerateFloat(8.0f, 11.0f),
-			(GetRandomControl() & 0x3F) + 192, (GetRandomControl() & 0x1F) + 128, GetRandomControl() & 0x3F);
+		
+		int range = abs(Random::GenerateInt(settings.FlashRange - 2, settings.FlashRange + 2));
+		SpawnDynamicPointLight(lightPos, color, CLICK(range));
 	}
 }
 

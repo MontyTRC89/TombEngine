@@ -3,7 +3,7 @@
 /*** Describes a layer of moving clouds.
 As seen in TR4's City of the Dead.
 
-@tenclass Flow.SkyLayer
+@tenprimitive Flow.SkyLayer
 @pragma nostrip
 */
 

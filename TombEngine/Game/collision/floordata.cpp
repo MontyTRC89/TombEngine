@@ -37,10 +37,17 @@ int FloorInfo::GetSurfaceTriangleID(int x, int z, bool isFloor) const
 {
 	constexpr auto TRI_ID_0 = 0;
 	constexpr auto TRI_ID_1 = 1;
+
+	static const auto ROT_MATRIX_0 = Matrix::CreateRotationZ(TO_RAD(SectorSurfaceData::SPLIT_ANGLE_0));
+	static const auto ROT_MATRIX_1 = Matrix::CreateRotationZ(TO_RAD(SectorSurfaceData::SPLIT_ANGLE_1));
 	
+	// Get matrix.
+	const auto& rotMatrix = isFloor ?
+		((FloorSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0) ? ROT_MATRIX_0 : ROT_MATRIX_1) :
+		((CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0) ? ROT_MATRIX_0 : ROT_MATRIX_1);
+
 	// Calculate bias.
 	auto sectorPoint = GetSectorPoint(x, z).ToVector2();
-	auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(isFloor ? FloorSurface.SplitAngle : CeilingSurface.SplitAngle));
 	float bias = Vector2::Transform(sectorPoint, rotMatrix).x;
 
 	// Return triangle ID according to bias.
@@ -73,7 +80,7 @@ Vector3 FloorInfo::GetSurfaceNormal(int x, int z, bool isFloor) const
 	return GetSurfaceNormal(triID, isFloor);
 }
 
-short FloorInfo::GetSurfaceIllegalSlopeAngle(int x, int z, bool isFloor) const
+short FloorInfo::GetSurfaceSteepSlopeAngle(int x, int z, bool isFloor) const
 {
 	const auto& tri = GetSurfaceTriangle(x, z, isFloor);
 	return tri.SteepSlopeAngle;
@@ -220,7 +227,7 @@ int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 		auto bridgeCeilingHeight = bridge.GetCeilingHeight(bridgeItem, pos);
 
 		// 2.1) Get bridge surface height.
-		auto bridgeSurfaceHeight = isFloor ? bridge.GetFloorHeight(bridgeItem, pos) : bridge.GetCeilingHeight(bridgeItem, pos);
+		auto bridgeSurfaceHeight = isFloor ? bridgeFloorHeight : bridgeCeilingHeight;
 
 		if (!bridgeSurfaceHeight.has_value())
 			continue;
@@ -228,13 +235,22 @@ int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 		// Use bridge midpoint to decide whether to return bridge height or room height, in case probe point
 		// is located within the bridge. Without it, dynamic bridges may fail while Lara is standing on them.
 		int thickness = bridge.GetCeilingBorder(bridgeItem) - bridge.GetFloorBorder(bridgeItem);
-		int midpoint  = bridgeItem.Pose.Position.y + thickness / 2;
+		int midpoint = bridgeItem.Pose.Position.y + thickness / 2;
+
+		// Decide whether to override midpoint with surface height, if bridge type is tilt.
+		// It is needed to prevent submerging into tilted bridges, as their surface height does not correspond
+		// to their height function.
+		if (bridgeItem.ObjectNumber >= GAME_OBJECT_ID::ID_BRIDGE_TILT1 &&
+			bridgeItem.ObjectNumber <= GAME_OBJECT_ID::ID_BRIDGE_TILT4)
+		{
+			midpoint = *bridgeSurfaceHeight;
+		}
 
 		// 2.2) Track closest floor or ceiling height.
 		if (isFloor)
 		{
 			// Test if bridge floor height is closer.
-			if (midpoint >= pos.y &&					// Bridge midpoint is below position.
+			if (midpoint >= pos.y &&				// Bridge midpoint is below position.
 				*bridgeSurfaceHeight < floorHeight &&   // Bridge floor height is above current closest floor height.
 				*bridgeSurfaceHeight >= ceilingHeight)  // Bridge ceiling height is below sector ceiling height.
 			{
@@ -244,7 +260,7 @@ int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 		else
 		{
 			// Test if bridge ceiling height is closer.
-			if (midpoint <= pos.y &&					// Bridge midpoint is above position.
+			if (midpoint <= pos.y &&			// Bridge midpoint is above position.
 				*bridgeSurfaceHeight > ceilingHeight && // Bridge ceiling height is below current closest ceiling height.
 				*bridgeSurfaceHeight <= floorHeight)	// Bridge floor height is above sector floor height.
 			{
@@ -376,8 +392,8 @@ namespace TEN::Collision::Floordata
 		// Calculate and return tilt.
 		auto sign = isFloor ? 1 : -1;
 		return Vector2i(
-			round(scaledNormal.x * 4),
-			round(scaledNormal.z * 4)) * sign;
+			(round(scaledNormal.x) * 4),
+			(round(scaledNormal.z) * 4)) * sign;
 	}
 
 	Vector2i GetSectorPoint(int x, int z)
@@ -524,8 +540,14 @@ namespace TEN::Collision::Floordata
 		auto* sector = &currentSector;
 		do
 		{
+			// For bridges with zero thickness (which is incorrect setup, but still possible), break out of
+			// infinite loop caused by infinite traversal over the same height value.
+			int nextPos = sector->GetBridgeSurfaceHeight(pos, !isBottom);
+			if (nextPos == pos.y)
+				nextPos += (isBottom ? 1 : -1);
+
 			// Set vertical position to lowest bridge ceiling height or highest bridge floor height.
-			pos.y = sector->GetBridgeSurfaceHeight(pos, !isBottom);
+			pos.y = nextPos;
 
 			// Find sector at lowest bridge floor height or highest bridge ceiling height.
 			while (isBottom ?
@@ -876,7 +898,7 @@ namespace TEN::Collision::Floordata
 	}
 
 	// Updates BridgeItem for all blocks which are enclosed by bridge bounds.
-	void UpdateBridgeItem(const ItemInfo& item, bool forceRemoval)
+	void UpdateBridgeItem(const ItemInfo& item, BridgeUpdateType updateType)
 	{
 		constexpr auto SECTOR_EXTENTS = Vector3(BLOCK(0.5f));
 
@@ -888,7 +910,7 @@ namespace TEN::Collision::Floordata
 
 		// Force removal if item was killed.
 		if (item.Flags & IFLAG_KILLED)
-			forceRemoval = true;
+			updateType = BridgeUpdateType::Remove;
 
 		// Get bridge OBB.
 		auto bridgeBox = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
@@ -916,10 +938,11 @@ namespace TEN::Collision::Floordata
 				float offZ = pZ - item.Pose.Position.z;
 
 				// Clean previous bridge state.
-				RemoveBridge(item.Index, offX, offZ);
+				if (updateType != BridgeUpdateType::Initialize)
+					RemoveBridge(item.Index, offX, offZ);
 
-				// In sweep mode; don't try readding to sector.
-				if (forceRemoval)
+				// In removal mode; don't try re-adding to sector.
+				if (updateType == BridgeUpdateType::Remove)
 					continue;
 
 				// Sector is outside enclosed AABB space; ignore precise check.

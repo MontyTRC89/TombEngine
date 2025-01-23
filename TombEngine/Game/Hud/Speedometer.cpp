@@ -1,8 +1,9 @@
 #include "Game/Hud/Speedometer.h"
 
 #include "Game/effects/DisplaySprite.h"
-#include "Specific/clock.h"
 #include "Renderer/Renderer.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Specific/clock.h"
 
 using namespace TEN::Effects::DisplaySprite;
 
@@ -54,6 +55,9 @@ namespace TEN::Hud
 		constexpr auto POINTER_PRIORITY			 = 1;
 
 		//DrawDebug();
+
+		if (!g_GameFlow->GetSettings()->Hud.Speedometer)
+			return;
 
 		if (_life <= 0.0f)
 			return;

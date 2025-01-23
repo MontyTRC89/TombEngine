@@ -67,8 +67,8 @@ namespace TEN::Entities::Player
 		PlayerBehaviorStateRoutines[LS_ONWATER_IDLE] = std::pair(lara_as_surface_idle, lara_col_surface_idle);
 		PlayerBehaviorStateRoutines[LS_ONWATER_FORWARD] = std::pair(lara_as_surface_swim_forward, lara_col_surface_swim_forward);
 		PlayerBehaviorStateRoutines[LS_ONWATER_DIVE] = std::pair(lara_as_surface_dive, lara_col_surface_dive);
-		PlayerBehaviorStateRoutines[LS_PUSHABLE_PUSH] = std::pair(lara_as_pushable_push, lara_default_col);
-		PlayerBehaviorStateRoutines[LS_PUSHABLE_PULL] = std::pair(lara_as_pushable_pull, lara_default_col);
+		PlayerBehaviorStateRoutines[LS_PUSHABLE_PUSH] = std::pair(lara_as_pushable_push, lara_void_func);
+		PlayerBehaviorStateRoutines[LS_PUSHABLE_PULL] = std::pair(lara_as_pushable_pull, lara_void_func);
 		PlayerBehaviorStateRoutines[LS_PUSHABLE_GRAB] = std::pair(lara_as_pushable_grab, lara_default_col);
 		PlayerBehaviorStateRoutines[LS_PICKUP] = std::pair(lara_as_pickup, lara_col_pickup);
 		PlayerBehaviorStateRoutines[LS_SWITCH_DOWN] = std::pair(lara_as_switch_on, lara_default_col);

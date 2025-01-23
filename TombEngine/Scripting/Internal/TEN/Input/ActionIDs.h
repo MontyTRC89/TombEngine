@@ -10,9 +10,8 @@ Constants for action key IDs.
 @pragma nostrip
 */
 
-/*** Input.ActionID constants.
-
-The following constants are inside ActionID.
+/*** Table of Input.ActionID constants.
+To be used with @{Input.KeyIsHit}, @{Input.KeyIsHeld}, and similar functions.
 
 	FORWARD
 	BACK
@@ -59,11 +58,7 @@ The following constants are inside ActionID.
 	SAVE
 	LOAD
 
-@section Input.ActionID
-*/
-
-/*** Table of action ID constants (for use with KeyIsHeld / KeyIsHit / etc commands).
-@table CONSTANT_STRING_HERE
+@table Input.ActionID
 */
 
 static const std::unordered_map<std::string, ActionID> ACTION_IDS

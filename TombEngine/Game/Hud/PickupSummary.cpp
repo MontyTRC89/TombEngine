@@ -4,6 +4,7 @@
 #include "Game/pickup/pickup_ammo.h"
 #include "Game/pickup/pickup_consumable.h"
 #include "Renderer/Renderer.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/clock.h"
 
 using TEN::Renderer::g_Renderer;
@@ -170,6 +171,9 @@ namespace TEN::Hud
 	void PickupSummaryController::Draw() const
 	{
 		//DrawDebug();
+
+		if (!g_GameFlow->GetSettings()->Hud.PickupNotifier)
+			return;
 
 		if (_displayPickups.empty())
 			return;

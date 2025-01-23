@@ -64,7 +64,7 @@ namespace TEN::Renderer
 		{
 			texture = Texture2D(_device.Get(), path);
 		}
-		else
+		else if (!path.empty()) // Loading default texture without path may be intentional.
 		{
 			// Convert std::wstring to std::string (UTF-8).
 			int size = WideCharToMultiByte(CP_UTF8, 0, path.c_str(), -1, nullptr, 0, nullptr, nullptr);

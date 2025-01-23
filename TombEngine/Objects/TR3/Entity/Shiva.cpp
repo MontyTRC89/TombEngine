@@ -534,7 +534,7 @@ namespace TEN::Entities::Creatures::TR3
 			if (target.ItemFlags[1] != 0)
 			{
 				SoundEffect(SFX_TR4_WEAPON_RICOCHET, &target.Pose);
-				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, false);
 				return;
 			}
 
@@ -543,7 +543,7 @@ namespace TEN::Entities::Creatures::TR3
 				target.Animation.ActiveState == SHIVA_STATE_GUARD_IDLE)
 			{
 				SoundEffect(SFX_TR4_BADDY_SWORD_RICOCHET, &target.Pose);
-				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, 3, 0);
+				TriggerRicochetSpark(*pos, source.Pose.Orientation.y, false);
 				return;
 			}
 		}

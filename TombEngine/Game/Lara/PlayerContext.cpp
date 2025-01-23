@@ -94,7 +94,7 @@ namespace TEN::Entities::Player
 		const auto& player = GetLaraInfo(item);
 
 		// 1) Check if AFK posing is enabled.
-		if (!g_GameFlow->HasAFKPose())
+		if (!g_GameFlow->GetSettings()->Animations.PoseTimeout)
 			return false;
 
 		// 2) Test player hand and water status.
@@ -416,7 +416,7 @@ namespace TEN::Entities::Player
 
 	bool CanSteerOnSlide(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		return g_GameFlow->HasSlideExtended();
+		return g_GameFlow->GetSettings()->Animations.SlideExtended;
 	}
 
 	bool IsInLowSpace(const ItemInfo& item, const CollisionInfo& coll)
@@ -518,7 +518,7 @@ namespace TEN::Entities::Player
 		const auto& player = GetLaraInfo(item);
 
 		// 1) Check if crouch roll is enabled.
-		if (!g_GameFlow->HasCrouchRoll())
+		if (!g_GameFlow->GetSettings()->Animations.CrouchRoll)
 			return false;
 
 		// 2) Test water depth.
@@ -608,7 +608,7 @@ namespace TEN::Entities::Player
 		auto pointColl = GetPointCollision(item);
 
 		// 2) Test for slippery ceiling slope and check if overhang climb is disabled.
-		if (pointColl.IsSteepCeiling() && !g_GameFlow->HasOverhangClimb())
+		if (pointColl.IsSteepCeiling() && !g_GameFlow->GetSettings()->Animations.OverhangClimb)
 			return true;
 
 		// 3) Assess point collision.
@@ -962,7 +962,7 @@ namespace TEN::Entities::Player
 		const auto& player = GetLaraInfo(item);
 
 		// 1) Check if sprint jump is enabled.
-		if (!g_GameFlow->HasSprintJump())
+		if (!g_GameFlow->GetSettings()->Animations.SprintJump)
 			return false;
 
 		// 2) Check for jump state dispatch.
@@ -989,7 +989,7 @@ namespace TEN::Entities::Player
 		return true;
 
 		// Check whether extended slide mechanics are enabled.
-		if (!g_GameFlow->HasSlideExtended())
+		if (!g_GameFlow->GetSettings()->Animations.SlideExtended)
 			return true;
 
 		// TODO: Broken on diagonal slides?
@@ -1012,7 +1012,7 @@ namespace TEN::Entities::Player
 		constexpr auto LEDGE_HEIGHT_MIN = CLICK(2);
 
 		// 1) Check if ledge jumps are enabled.
-		if (!g_GameFlow->HasLedgeJumps())
+		if (!g_GameFlow->GetSettings()->Animations.LedgeJumps)
 			return false;
 
 		// Ray collision setup at minimum ledge height.

@@ -8,24 +8,19 @@ Constants for effect IDs.
 @pragma nostrip
 */
 
-/*** Effects.EffectID constants.
+/*** Table of Effects.EffectID constants.
+To be used with @{Objects.Moveable.SetEffect} and @{Objects.Moveable.GetEffect} functions.
 
-The following constants are inside EffectID.
+ - `NONE`
+ - `FIRE`
+ - `SPARKS`
+ - `SMOKE`
+ - `ELECTRICIGNITE`
+ - `REDIGNITE`
+ - `CADAVER`
+ - `CUSTOM`
 
-	NONE
-	FIRE
-	SPARKS
-	SMOKE
-	ELECTRICIGNITE
-	REDIGNITE
-	CADAVER
-	CUSTOM
-
-@section Effects.EffectID
-*/
-
-/*** Table of effect ID constants (for use Moveable:SetEffect / Moveable:GetEffect functions).
-@table CONSTANT_STRING_HERE
+@table Effects.EffectID
 */
 
 static const std::unordered_map<std::string, EffectType> EFFECT_IDS

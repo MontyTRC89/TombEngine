@@ -7,13 +7,12 @@ namespace TEN::Math
 	class GameVector
 	{
 	public:
-		// Members
+		// Fields
 
 		int	  x			 = 0;
 		int	  y			 = 0;
 		int	  z			 = 0;
 		short RoomNumber = 0;
-		int	  BoxNumber	 = 0; // Unused.
 
 		// Constants
 

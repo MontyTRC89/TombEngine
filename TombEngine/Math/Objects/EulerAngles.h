@@ -9,7 +9,7 @@ namespace TEN::Math
 	class EulerAngles
 	{
 	public:
-		// Members (CONVENTION: X = Pitch, Y = Yaw, Z = Roll)
+		// Fields (CONVENTION: X = Pitch, Y = Yaw, Z = Roll)
 
 		short x = 0;
 		short y = 0;

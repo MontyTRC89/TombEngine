@@ -7,7 +7,7 @@ using namespace TEN::Effects::Environment;
 
 /// Represents a starfield.
 //
-// @tenclass Flow.Starfield
+// @tenprimitive Flow.Starfield
 // @pragma nostrip
 
 namespace TEN::Scripting

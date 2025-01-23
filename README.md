@@ -33,5 +33,5 @@ Steps:
 11) In the case Windows warns about missing DLLs, (bass.dll, etc.) copy the missing DLL files found inside the Libs folder to your main TEN directory (vcpkg copy them auto).
 
 # Disclaimer
-This is a community project which is not affiliated with Core Design, Eidos Interactive, or Square Enix. Tomb Raider is a registered trademark of Square Enix; TombEngine is not be sold. The code is open-source to encourage contributions and to be used for study purposes. We are not responsible for illegal uses of this source code. This source code is released as-is and continues to be maintained by non-paid contributors in their free time.
+This is a community project which is not affiliated with Core Design, Eidos Interactive, or Embracer Group AB. Tomb Raider is a registered trademark of Embracer Group AB. TombEngine is not be sold. The code is open-source to encourage contributions and to be used for study purposes. We are not responsible for illegal uses of this source code. This source code is released as-is and continues to be maintained by non-paid contributors in their free time.
 

@@ -5,7 +5,7 @@ namespace TEN::Math
 	class Vector3i
 	{
 	public:
-		// Members
+		// Fields
 
 		int x = 0;
 		int y = 0;

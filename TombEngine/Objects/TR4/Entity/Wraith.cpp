@@ -627,7 +627,7 @@ namespace TEN::Entities::TR4
 			b = wraithPtr[1].b;
 		}
 
-		TriggerDynamicLight(
+		SpawnDynamicLight(
 			wraithPtr[0].Position.x,
 			wraithPtr[0].Position.y,
 			wraithPtr[0].Position.z,

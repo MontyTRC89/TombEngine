@@ -15,13 +15,15 @@ namespace sol
 enum ItemStatus;
 enum GAME_OBJECT_ID : short;
 enum class EffectType;
-class Rotation;
 class ScriptColor;
 class Vec3;
 struct ItemInfo;
+namespace TEN::Scripting { class Rotation; };
+
+using namespace TEN::Scripting;
 
 using aiBitsArray = std::array<int, 6>;
-using aiBitsType = sol::as_table_t<aiBitsArray>;
+using aiBitsType  = sol::as_table_t<aiBitsArray>;
 
 class Moveable : public NamedBase<Moveable, short>
 {
@@ -60,7 +62,8 @@ public:
 	void SetStateNumber(int stateNumber);
 
 	[[nodiscard]] int GetAnimNumber() const;
-	void SetAnimNumber(int animNumber);
+	[[nodiscard]] int GetAnimSlot() const;
+	void SetAnimNumber(int animNumber, sol::optional<int> slotIndex);
 
 	[[nodiscard]] int GetFrameNumber() const;
 	[[nodiscard]] int GetEndFrame() const;
@@ -118,6 +121,8 @@ public:
 	void DisableItem();
 	void MakeInvisible();
 	void SetVisible(bool isVisible);
+	[[nodiscard]] bool GetCollidable();
+	void SetCollidable(bool isCollidable);
 	void Explode();
 	void Shatter();
 

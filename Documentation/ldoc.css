@@ -141,9 +141,9 @@ table.index td { text-align: left; vertical-align: top; }
 }
 
 #content {
-    margin-left: 16em;
-    padding: 1em;
-    width: 700px;
+    margin-left: 18em;
+    padding: 2em;
+    width: 900px;
     border-left: 2px solid #cccccc;
     border-right: 2px solid #cccccc;
     background-color: #ffffff;
@@ -220,7 +220,6 @@ table.function_list td.name { background-color: #f0f0f0; min-width: 250px; }
 table.function_list td.summary { width: 100%; }
 
 ul.nowrap {
-    overflow:auto;
     white-space:nowrap;
 }
 

@@ -15,9 +15,10 @@
 #include "Game/Lara/lara_one_gun.h"
 #include "Game/Setup.h"
 #include "Objects/TR2/Vehicles/skidoo_info.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
-#include "Sound/sound.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Input;
@@ -676,8 +677,8 @@ namespace TEN::Entities::Vehicles
 				lara->RightArm.Orientation.y + laraItem->Pose.Orientation.y,
 				0);
 
-			FireWeapon(LaraWeaponType::Snowmobile, *lara->TargetEntity, *laraItem, angles);
-			FireWeapon(LaraWeaponType::Snowmobile, *lara->TargetEntity, *laraItem, angles);
+			FireWeapon(LaraWeaponType::Snowmobile, lara->TargetEntity, *laraItem, angles);
+			FireWeapon(LaraWeaponType::Snowmobile, lara->TargetEntity, *laraItem, angles);
 			SoundEffect(weapon.SampleNum, &laraItem->Pose);
 			skidooItem->ItemFlags[0] = 4;
 		}
@@ -708,7 +709,9 @@ namespace TEN::Entities::Vehicles
 				verticalVelocity = 0;
 			}
 			else
-				verticalVelocity += GRAVITY;
+			{
+				verticalVelocity += g_GameFlow->GetSettings()->Physics.Gravity;
+			}
 		}
 		// Airborne.
 		else

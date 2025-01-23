@@ -366,12 +366,12 @@ namespace TEN::Entities::Creatures::TR5
 								{
 									SpawnGuardianSparks(origin1.ToVector3(), colorSparks, 3);
 									SpawnElectricityGlow(origin1.ToVector3(), (GetRandomControl() & 3) + 32, color.x, color.y, color.z);
-									TriggerDynamicLight(origin1.x, origin1.y, origin1.z, (GetRandomControl() & 3) + 16, color.x, color.y, color.z);
+									SpawnDynamicLight(origin1.x, origin1.y, origin1.z, (GetRandomControl() & 3) + 16, color.x, color.y, color.z);
 
 									if (!guardian->LOS[i] && guardian->fireArcs[i] != nullptr)
 									{
 										SpawnElectricityGlow(guardian->fireArcs[i]->pos4, (GetRandomControl() & 3) + 16, color.x, color.y, color.z);
-										TriggerDynamicLight(guardian->fireArcs[i]->pos4.x, guardian->fireArcs[i]->pos4.y, guardian->fireArcs[i]->pos4.z, (GetRandomControl() & 3) + 6, color.x, color.y, color.z);
+										SpawnDynamicLight(guardian->fireArcs[i]->pos4.x, guardian->fireArcs[i]->pos4.y, guardian->fireArcs[i]->pos4.z, (GetRandomControl() & 3) + 6, color.x, color.y, color.z);
 										SpawnGuardianSparks(guardian->fireArcs[i]->pos4, colorSparks, 3);
 									}
 								}
@@ -576,7 +576,7 @@ namespace TEN::Entities::Creatures::TR5
 			}
 
 			SpawnElectricityGlow(target, (GetRandomControl() & 3) + size + 8, color.x, color.y, color.z);
-			TriggerDynamicLight(target.x, target.y, target.z, (GetRandomControl() & 3) + 16, color.x, color.y, color.z);
+			SpawnDynamicLight(target.x, target.y, target.z, (GetRandomControl() & 3) + 16, color.x, color.y, color.z);
 		}
 
 		if (!(GlobalCounter & 3))

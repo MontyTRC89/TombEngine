@@ -25,11 +25,12 @@ enum class GameStatus
 	LevelComplete
 };
 
-enum class LevelLoadType
+enum class FreezeMode
 {
-	New,
-	Hub,
-	Load
+	None,
+	Full,
+	Spectator,
+	Player
 };
 
 enum CardinalDirection
@@ -51,7 +52,6 @@ constexpr int MAX_ROOMS = 1024;
 
 constexpr auto LOOP_FRAME_COUNT = 2;
 
-extern int GameTimer;
 extern int RumbleTimer;
 extern int GlobalCounter;
 
@@ -63,7 +63,6 @@ extern bool ThreadEnded;
 extern int RequiredStartPos;
 extern int CurrentLevel;
 extern int NextLevel;
-extern int SystemNameHash;
 
 extern bool  InItemControlLoop;
 extern short ItemNewRoomNo;
@@ -98,8 +97,8 @@ void UpdateShatters();
 void CleanUp();
 
 void InitializeOrLoadGame(bool loadGame);
-void InitializeScripting(int levelIndex, LevelLoadType type);
-void DeInitializeScripting(int levelIndex);
+void InitializeScripting(int levelIndex, bool loadGame);
+void DeInitializeScripting(int levelIndex, GameStatus reason);
 
 void SetupInterpolation();
 

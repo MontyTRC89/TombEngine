@@ -14,8 +14,8 @@
 #include "Renderer/Structures/RendererSortableObject.h"
 #include "Renderer/Structures/RendererSprite2D.h"
 #include "Renderer/Structures/RendererSpriteToDraw.h"
-#include "Renderer/Structures/RendererStatic.h"
-#include "Specific/memory/LinearArrayBuffer.h"
+#include "Renderer/Structures/RendererLensFlare.h"
+#include "Renderer/Structures/RendererMirror.h"
 
 namespace TEN::Renderer 
 {
@@ -46,14 +46,15 @@ namespace TEN::Renderer
 		RenderViewCamera Camera;
 		D3D11_VIEWPORT	 Viewport;
 
-		std::vector<RendererRoom*>					RoomsToDraw			 = {};
-		std::vector<RendererLight*>					LightsToDraw		 = {};
-		std::vector<RendererFogBulb>				FogBulbsToDraw		 = {};
-		std::vector<RendererSpriteToDraw>			SpritesToDraw		 = {};
-		std::vector<RendererDisplaySpriteToDraw>	DisplaySpritesToDraw = {};
-		std::map<int, std::vector<RendererStatic*>> SortedStaticsToDraw	 = {};
+		std::vector<RendererRoom*>					RoomsToDraw				 = {};
+		std::vector<RendererLight*>					LightsToDraw			 = {};
+		std::vector<RendererFogBulb>				FogBulbsToDraw			 = {};
+		std::vector<RendererSpriteToDraw>			SpritesToDraw			 = {};
+		std::vector<RendererDisplaySpriteToDraw>	DisplaySpritesToDraw	 = {};
+		std::map<int, std::vector<RendererStatic*>> SortedStaticsToDraw		 = {};
 		std::vector<RendererSortableObject>			TransparentObjectsToDraw = {};
-		std::vector<RendererLensFlare>				LensFlaresToDraw = {};
+		std::vector<RendererLensFlare>				LensFlaresToDraw		 = {};
+		std::vector<RendererMirror>					Mirrors					 = {};
 
 		RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h);
 		RenderView(const Vector3& pos, const Vector3& dir, const Vector3& up, int w, int h, int room, float nearPlane, float farPlane, float fov);
