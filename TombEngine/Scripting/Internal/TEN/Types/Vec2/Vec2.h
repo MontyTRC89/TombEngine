@@ -8,7 +8,7 @@ class Vec2
 public:
 	static void Register(sol::table& parent);
 
-	// Members
+	// Fields
 
 	float x = 0;
 	float y = 0;
@@ -21,6 +21,7 @@ public:
 	//Vec2(const Vector2i& vector);
 
 	// Utilities
+
 	Vec2  Normalize() const;
 	Vec2  Rotate(float rot) const;
 	Vec2  Lerp(const Vec2& vector, float alpha) const;

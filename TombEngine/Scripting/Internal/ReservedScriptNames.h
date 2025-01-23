@@ -24,7 +24,6 @@ static constexpr char ScriptReserved_AIObject[]			= "AIObject";
 static constexpr char ScriptReserved_Volume[]			= "Volume";
 static constexpr char ScriptReserved_Color[]			= "Color";
 static constexpr char ScriptReserved_DisplayString[]	= "DisplayString";
-static constexpr char ScriptReserved_Rotation[]			= "Rotation";
 static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
 static constexpr char ScriptReserved_Statistics[]		= "Statistics";
 
@@ -438,6 +437,7 @@ constexpr char ScriptReserved_Vec3Lerp[]			= "Lerp";
 constexpr char ScriptReserved_Vec3Normalize[]		= "Normalize";
 constexpr char ScriptReserved_Vec3Rotate[]			= "Rotate";
 
-// Rotation
+// Rotation object
 
+constexpr char ScriptReserved_Rotation[]			= "Rotation";
 constexpr char ScriptReserved_RotationDirection[]	= "Direction";
