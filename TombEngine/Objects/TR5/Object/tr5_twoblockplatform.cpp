@@ -70,12 +70,12 @@ namespace TEN::Entities::Generic
 		{
 			if (item->TriggerFlags)
 			{
-				int goalHeight = (item->ItemFlags[0] - 16 * (int)(item->TriggerFlags & 0xFFFFFFF0));
-				int speed = item->TriggerFlags & 0xF;
+				int targetHeight = (item->ItemFlags[0] - 16 * int(item->TriggerFlags & 0xFFFFFFF0));
+				int vel = item->TriggerFlags & 0xF;
 
-				if (item->Pose.Position.y > goalHeight)
+				if (item->Pose.Position.y > targetHeight)
 				{
-					item->Pose.Position.y -= speed;
+					item->Pose.Position.y -= vel;
 				}
 				else
 				{
@@ -87,7 +87,9 @@ namespace TEN::Entities::Generic
 				if (distToPortal <= speed)
 					bridge.Update(*item);
 
-				auto pointColl = GetPointCollision(*item);
+				// HACK: Must probe slightly higher to avoid strange bug where the room number sometimes isn't
+				// updated when the platform crosses room boundaries. -- Sezz 2025.01.18
+				auto pointColl = GetPointCollision(*item, 0, 0, -CLICK(0.5f));
 
 				item->Floor = pointColl.GetFloorHeight();
 
