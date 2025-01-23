@@ -1458,6 +1458,7 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, const VaultTestResult& va
 	auto& player = GetLaraInfo(*item);
 
 	ResetPlayerTurnRateY(*item);
+	item->Animation.IsAirborne = false;
 	player.Context.ProjectedFloorHeight = vaultResult.Height;
 
 	if (vaultResult.SetBusyHands)
@@ -1486,7 +1487,8 @@ void SetLaraLand(ItemInfo* item, CollisionInfo* coll)
 	if (item->Animation.TargetState != LS_RUN_FORWARD)
 		item->Animation.Velocity.z = 0.0f;
 
-	//item->IsAirborne = false; // TODO: Removing this avoids an unusual landing bug. I hope to find a proper solution later. -- Sezz 2022.02.18
+	// TODO: Commenting this avoids an unusual bug where if the player hits a ceiling, they won't land. I hope to find a proper solution later. -- Sezz 2022.02.18
+	//item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0.0f;
 	LaraSnapToHeight(item, coll);
 }

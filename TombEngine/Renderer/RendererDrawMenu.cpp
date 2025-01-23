@@ -830,7 +830,7 @@ namespace TEN::Renderer
 		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// Set shaders.
-		BindShader(_sInventory);
+		_shaders.Bind(Shader::Inventory);
 
 		// Set matrices.
 		CCameraMatrixBuffer hudCamera;
@@ -968,29 +968,6 @@ namespace TEN::Renderer
 		object.Scale1 = savedScale;
 	}
 
-	void Renderer::DrawDiary()
-	{
-		constexpr auto SCREEN_POS = Vector2(400.0f, 300.0f);
-
-		const auto& object = InventoryObjectTable[INV_OBJECT_OPEN_DIARY];
-		unsigned int currentPage = Lara.Inventory.Diary.CurrentPage;
-
-		DrawObjectIn2DSpace(g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), SCREEN_POS, object.Orientation, object.Scale1);
-
-		for (int i = 0; i < MAX_DIARY_STRINGS_PER_PAGE; i++)
-		{
-			if (!Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.CurrentPage].Strings[i].Position.x && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.CurrentPage].
-				Strings[i].Position.y && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.CurrentPage].Strings[i].StringID)
-			{
-				break;
-			}
-
-			//AddString(Lara.Diary.Pages[currentPage].Strings[i].x, Lara.Diary.Pages[currentPage].Strings[i].y, g_GameFlow->GetString(Lara.Diary.Pages[currentPage].Strings[i].stringID), PRINTSTRING_COLOR_WHITE, 0);
-		}
-
-		DrawAllStrings();
-	}
-
 	void Renderer::RenderInventoryScene(RenderTarget2D* renderTarget, TextureBase* background, float backgroundFade)
 	{
 		// Set basic render states
@@ -1007,23 +984,21 @@ namespace TEN::Renderer
 		_context->ClearRenderTargetView(_renderTarget.RenderTargetView.Get(), Colors::Black);
 
 		if (background != nullptr)
-		{
 			DrawFullScreenImage(background->ShaderResourceView.Get(), backgroundFade, _renderTarget.RenderTargetView.Get(), _renderTarget.DepthStencilView.Get());
-		}
 
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
+		unsigned int stride = sizeof(Vertex);
+		unsigned int offset = 0;
 
-		// Set vertex buffer
+		// Set vertex buffer.
 		_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetInputLayout(_inputLayout.Get());
 		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		// Set shaders
-		BindShader(_sInventory);
+		// Set shaders.
+		_shaders.Bind(Shader::Inventory);
 
 		if (CurrentLevel == 0)
 		{
@@ -1084,10 +1059,6 @@ namespace TEN::Renderer
 
 			case InventoryMode::Pause:
 				RenderPauseMenu(g_Gui.GetMenuToDisplay());
-				break;
-
-			case InventoryMode::Diary:
-				DrawDiary();
 				break;
 			}
 		}
@@ -1355,6 +1326,7 @@ namespace TEN::Renderer
 			PrintDebugMessage("DIMENSION STATS");
 			PrintDebugMessage("Position: %d, %d, %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
 			PrintDebugMessage("Orientation: %d, %d, %d", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
+			PrintDebugMessage("Scale: %.3f, %.3f, %.3f", LaraItem->Pose.Scale.x, LaraItem->Pose.Scale.y, LaraItem->Pose.Scale.z);
 			PrintDebugMessage("RoomNumber: %d", LaraItem->RoomNumber);
 			PrintDebugMessage("PathfindingBoxID: %d", LaraItem->BoxNumber);
 			PrintDebugMessage((Lara.Context.WaterSurfaceDist == -NO_HEIGHT ? "WaterSurfaceDist: N/A" : "WaterSurfaceDist: %d"), Lara.Context.WaterSurfaceDist);

@@ -591,6 +591,12 @@ namespace TEN::Input
 		if ((KeyMap[KC_F10] || KeyMap[KC_F11]) && dbDebugPage)
 			g_Renderer.SwitchDebugPage(KeyMap[KC_F10]);
 		dbDebugPage = !(KeyMap[KC_F10] || KeyMap[KC_F11]);
+
+		// Reload shaders.
+		static bool dbReloadShaders = true;
+		if (KeyMap[KC_F9] && dbReloadShaders)
+			g_Renderer.ReloadShaders();
+		dbReloadShaders = !KeyMap[KC_F9];
 	}
 
 	static void UpdateRumble()
@@ -643,11 +649,16 @@ namespace TEN::Input
 
 	void UpdateInputActions(ItemInfo* item, bool applyQueue)
 	{
-		ClearInputData();
-		UpdateRumble();
-		ReadKeyboard();
-		ReadMouse();
-		ReadGameController();
+		// Don't update input data during frameskip.
+		if (!g_Synchronizer.Locked())
+		{
+			ClearInputData();
+			UpdateRumble();
+			ReadKeyboard();
+			ReadMouse();
+			ReadGameController();
+		}
+
 		DefaultConflict();
 
 		// Update action map.

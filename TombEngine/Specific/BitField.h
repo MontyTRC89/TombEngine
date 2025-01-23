@@ -7,7 +7,11 @@ namespace TEN::Utils
 	class BitField
 	{
 	private:
+		// Constants
+
 		static constexpr auto SIZE_DEFAULT = 32;
+
+		// Fields
 
 		std::vector<bool> _bits = {};
 

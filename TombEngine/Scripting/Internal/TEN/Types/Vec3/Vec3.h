@@ -13,7 +13,7 @@ class Vec3
 public:
 	static void Register(sol::table& parent);
 
-	// Members
+	// Fields
 
 	float x = 0;
 	float y = 0;
@@ -21,7 +21,7 @@ public:
 
 	// Constructors
 
-	Vec3() {};
+	Vec3() = default;
 	Vec3(float x, float y, float z);
 	Vec3(float value);
 	Vec3(const Vector3& vector);
