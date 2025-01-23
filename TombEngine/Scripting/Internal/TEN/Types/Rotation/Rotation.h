@@ -2,9 +2,6 @@
 
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 
-class EulerAngles;
-class Pose;
-
 namespace sol { class state; }
 
 namespace TEN::Scripting

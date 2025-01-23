@@ -1,5 +1,8 @@
 #pragma once
 
+#include "Game/effects/Light.h"
+#include "Game/items.h"
+#include "Objects/game_object_ids.h"
 #include "Renderer/RendererEnums.h"
 
 using namespace TEN::Effects::Light;

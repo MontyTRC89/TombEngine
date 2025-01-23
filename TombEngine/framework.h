@@ -3,6 +3,15 @@
 // Disable Unicode for FMT and spdlog to prevent errors when compiling.
 #define FMT_UNICODE 0
 
+// Target Windows 10
+#define WINVER 0x0A00
+#define _WIN32_WINNT 0x0A00
+
+// Include Windows headers
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used Windows features
+#include <Windows.h>
+#include <CommCtrl.h>
+
 // =========
 // LIBRARIES
 // =========

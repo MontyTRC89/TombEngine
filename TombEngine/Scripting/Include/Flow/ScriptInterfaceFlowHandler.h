@@ -3,6 +3,8 @@
 #include "Game/control/control.h"
 #include "Scripting/Internal/TEN/Flow/Settings/Settings.h"
 
+using namespace TEN::Scripting;
+
 class ScriptInterfaceLevel;
 
 class ScriptInterfaceFlowHandler
