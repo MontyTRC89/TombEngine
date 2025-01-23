@@ -140,8 +140,8 @@
 	<td class="summary">Emit blood.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#EmitAirBubble">EmitAirBubble(position, roomNumber, size, amplitude)</a></td>
-	<td class="summary">Emit Air bubble in a water room.</td>
+	<td class="name" ><a href="#EmitAirBubble">EmitAirBubble(pos[, size][, amplitude])</a></td>
+	<td class="summary">Emit air bubble in a water room.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#EmitFire">EmitFire(pos, size)</a></td>
@@ -502,30 +502,28 @@
 </dd>
     <dt>
     <a name = "EmitAirBubble"></a>
-    <strong>EmitAirBubble(position, roomNumber, size, amplitude)</strong>
+    <strong>EmitAirBubble(pos[, size][, amplitude])</strong>
     </dt>
     <dd>
-    Emit Air bubble in a water room.
+    Emit air bubble in a water room.
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">position</span>
+        <li><span class="parameter">pos</span>
             <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-         The position where the air bubble will be spawned.
-        </li>
-        <li><span class="parameter">roomNumber</span>
-            <span class="types"><span class="type">int</span></span>
-         The room number where the air bubble will be generated.
+         The position where the air bubble will be spawned. Needs to be in a water room.
         </li>
         <li><span class="parameter">size</span>
             <span class="types"><span class="type">float</span></span>
          The size of the air bubble.
+         (<em>optional</em>)
         </li>
         <li><span class="parameter">amplitude</span>
             <span class="types"><span class="type">float</span></span>
          The oscillation amplitude of the air bubble.
+         (<em>optional</em>)
         </li>
     </ul>
 
@@ -539,7 +537,7 @@
     <strong>EmitFire(pos, size)</strong>
     </dt>
     <dd>
-    Emit fire for one frame.  Will not hurt Lara. Call this each frame if you want a continuous fire.
+    Emit fire for one frame.  Will not hurt player. Call this each frame if you want a continuous fire.
 
 
 

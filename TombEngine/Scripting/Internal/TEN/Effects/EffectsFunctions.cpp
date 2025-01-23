@@ -308,13 +308,16 @@ namespace TEN::Scripting::Effects
 /***Emit air bubble in a water room.
 @function EmitAirBubble
 @tparam Vec3 pos The position where the air bubble will be spawned. Needs to be in a water room.
-@tparam float size The size of the air bubble.
-@tparam float amplitude The oscillation amplitude of the air bubble.
+@tparam[opt] float size The size of the air bubble.
+@tparam[opt] float amplitude The oscillation amplitude of the air bubble.
 */
-	static void EmitAirBubble(Vec3 pos, float size, float amplitude)
+	static void EmitAirBubble(Vec3 pos, TypeOrNil<float> size, TypeOrNil<float> amplitude)
 	{
 		int roomNumber = FindRoomNumber(Vector3i(pos.x, pos.y, pos.z));
-		SpawnBubble(pos, roomNumber, size, amplitude);
+		float sizeBubble = USE_IF_HAVE(float, size, 128);
+		float amp = USE_IF_HAVE(float, amplitude, 32);
+
+		SpawnBubble(pos, roomNumber, sizeBubble, amp);
 	}
 
 /***Emit fire for one frame. Will not hurt player. Call this each frame if you want a continuous fire.
