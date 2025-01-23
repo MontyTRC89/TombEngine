@@ -15,6 +15,7 @@ public:
 
 	// Constructors
 
+	Vec2() = default;
 	Vec2(float x, float y);
 	Vec2(float value);
 	Vec2(const Vector2& vector);
