@@ -57,7 +57,7 @@ namespace TEN::Entities::TR4
 		auto* player = GetLaraInfo(laraItem);
 
 		short* triggerIndexPtr = GetTriggerIndex(keyHoleItem);
-		short y_rot = keyHoleItem->Pose.Orientation.y;
+		short y_rot;
 
 		GAME_OBJECT_ID keyItem;
 
@@ -65,7 +65,7 @@ namespace TEN::Entities::TR4
 		if (keyHoleItem->TriggerFlags < 17 && keyHoleItem->TriggerFlags > 0)
 		{
 			keyItem = GAME_OBJECT_ID(keyHoleItem->TriggerFlags + ID_PUZZLE_ITEM1 - 1);
-			
+
 		}
 		else
 		{
@@ -80,14 +80,109 @@ namespace TEN::Entities::TR4
 		bool isActionReady = (IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() != NO_VALUE);
 
 		bool isPlayerAvailable = (player->Control.Look.OpticRange == 0 &&
-								 laraItem->Animation.ActiveState == LS_IDLE &&
-								 laraItem->Animation.AnimNumber == LA_STAND_IDLE);
+			laraItem->Animation.ActiveState == LS_IDLE &&
+			laraItem->Animation.AnimNumber == LA_STAND_IDLE);
 
-		bool actionActive = player->Control.IsMoving && player->Context.InteractedItem == itemNumber;
+		//bool actionActive = player->Control.IsMoving && player->Context.InteractedItem == itemNumber;
 
-		if (actionActive || (isActionReady && isPlayerAvailable))
-		{	
-			
+		if (isActionReady && isPlayerAvailable && !keyHoleItem->ItemFlags[0])
+		{
+			if (!keyHoleItem->ItemFlags[1])
+			{
+				//bounds = GetBoundsAccurate(item);
+				//StatuePlinthBounds[0] = bounds[0];
+				//StatuePlinthBounds[1] = bounds[1];
+				//StatuePlinthBounds[4] = bounds[4] - 200;
+				//StatuePlinthBounds[5] = bounds[4] + 200;
+				y_rot = keyHoleItem->Pose.Orientation.y;
+
+				int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
+				keyHoleItem->DisableInterpolation = true;
+				switch (quadrant)
+				{
+				case NORTH:
+					keyHoleItem->Pose.Orientation.y = ANGLE(0.0f);
+					break;
+
+				case EAST:
+					keyHoleItem->Pose.Orientation.y = ANGLE(90.0f);
+					break;
+
+				case SOUTH:
+					keyHoleItem->Pose.Orientation.y = ANGLE(180.0f);
+					break;
+
+				case WEST:
+					keyHoleItem->Pose.Orientation.y = ANGLE(270.0f);
+					break;
+
+				default:
+					break;
+				}
+
+				//item->pos.y_rot = l->pos.y_rot;
+
+				if (TestLaraPosition(KeyHoleBounds, keyHoleItem, laraItem))
+				{
+					if (g_Gui.IsObjectInInventory(keyItem))
+					{
+						g_Gui.SetEnterInventory(keyItem);
+						keyHoleItem->ItemFlags[1] = 1;
+					}
+				}
+
+				keyHoleItem->Pose.Orientation.y = y_rot;
+				return;
+			}
+
+			if (g_Gui.GetInventoryItemChosen() == keyItem)
+			{
+				laraItem->Animation.AnimNumber = LA_PICKUP_PEDESTAL_HIGH;
+				laraItem->Animation.FrameNumber = GetAnimData(LA_PICKUP_PEDESTAL_HIGH).frameBase;
+				laraItem->Animation.ActiveState = LS_INSERT_KEY;
+				ResetPlayerFlex(laraItem);
+				player->Control.HandStatus = HandStatus::Busy;
+				g_Gui.SetInventoryItemChosen(NO_VALUE);
+				return;
+			}
+		}
+		else if (keyHoleItem->ItemFlags[1])
+		{
+			if (g_Gui.GetInventoryItemChosen() == keyItem)
+			{
+				laraItem->Animation.AnimNumber = LA_PICKUP_PEDESTAL_HIGH;
+				laraItem->Animation.FrameNumber = GetAnimData(LA_PICKUP_PEDESTAL_HIGH).frameBase;
+				laraItem->Animation.ActiveState = LS_INSERT_KEY;
+				ResetPlayerFlex(laraItem);
+				player->Control.HandStatus = HandStatus::Busy;
+				g_Gui.SetInventoryItemChosen(NO_VALUE);
+				return;
+			}
+		}
+
+		if (laraItem->Animation.AnimNumber == LA_PICKUP_PEDESTAL_HIGH && laraItem->Animation.FrameNumber == GetAnimData(LA_PICKUP_PEDESTAL_HIGH).frameBase + 45)
+		{
+			//room_number = item->room_number;
+			//floor = GetFloor(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, &room_number);
+			//GetHeight(floor, item->pos.x_pos, item->pos.y_pos, item->pos.z_pos);
+			TestTriggers(keyHoleItem, true, keyHoleItem->Flags & 0x3E00);
+			keyHoleItem->Flags |= TRIGGERED;
+			keyHoleItem->Status = ITEM_ACTIVE;
+			keyHoleItem->MeshBits = 255;
+			keyHoleItem->ItemFlags[0] = 1;
+			RemoveObjectFromInventory(keyItem, 1);
+		}
+		else
+		{
+			keyHoleItem->ItemFlags[1] = 0;
+			ObjectCollision(itemNumber, laraItem, coll);
+		}
+	}
+}
+		/*
+		if (actionActive || (isActionReady && isPlayerAvailable ))
+		{
+
 			int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
 			keyHoleItem->DisableInterpolation = true;
 			switch (quadrant)
@@ -111,13 +206,13 @@ namespace TEN::Entities::TR4
 			default:
 				break;
 			}
-			
+
 			if (TestLaraPosition(KeyHoleBounds, keyHoleItem, laraItem))
 			{
 				//TENLog("TestLara complete", LogLevel::Error, LogConfig::All, false);
 				if (!player->Control.IsMoving)
 				{
-					if (keyHoleItem->Status != ITEM_NOT_ACTIVE && triggerType != TRIGGER_TYPES::SWITCH)
+					if (keyHoleItem->Status != ITEM_NOT_ACTIVE)// && triggerType != TRIGGER_TYPES::SWITCH)
 					{
 						keyHoleItem->Pose.Orientation.y = y_rot;
 						return;
@@ -126,8 +221,10 @@ namespace TEN::Entities::TR4
 					if (g_Gui.GetInventoryItemChosen() == NO_VALUE)
 					{
 						if (g_Gui.IsObjectInInventory(keyItem))
+						{
 							g_Gui.SetEnterInventory(keyItem);
-
+							keyHoleItem->Pose.Orientation.y = y_rot;
+						}
 						return;
 					}
 
@@ -144,8 +241,8 @@ namespace TEN::Entities::TR4
 				{
 					keyHoleItem->Pose.Orientation.y = y_rot;
 
-					if (triggerType = TRIGGER_TYPES::SWITCH)
-						keyHoleItem->ItemFlags[1] = true;
+					//if (triggerType = TRIGGER_TYPES::SWITCH)
+					//	keyHoleItem->ItemFlags[1] = true;
 
 					//int animNumber = abs(keyHoleItem->TriggerFlags);
 					//if (keyHoleItem->TriggerFlags <= 0)
@@ -177,9 +274,9 @@ namespace TEN::Entities::TR4
 				return;
 			}
 			//laraItem->Animation.AnimNumber == LA_PICKUP_PEDESTAL_HIGH && laraItem->Animation.FrameNumber == GetAnimData(laraItem).frameBase + 45
+			//player->Control.IsMoving && player->Context.InteractedItem == itemNumber
 			if (player->Control.IsMoving && player->Context.InteractedItem == itemNumber)
 			{
-					
 					player->Control.IsMoving = false;
 					player->Control.HandStatus = HandStatus::Free;
 			}
@@ -188,11 +285,11 @@ namespace TEN::Entities::TR4
 		{
 			ObjectCollision(itemNumber, laraItem, coll);
 		}
-		
+
 		keyHoleItem->Pose.Orientation.y = y_rot;
 		return;
 	}
-}
+	}*/
 /*
 void StatuePlinthCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 {
