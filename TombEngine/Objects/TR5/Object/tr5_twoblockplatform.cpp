@@ -84,7 +84,7 @@ namespace TEN::Entities::Generic
 
 				// @BRIDGEME
 				int distToPortal = *&g_Level.Rooms[item->RoomNumber].TopHeight - item->Pose.Position.y;
-				if (distToPortal <= speed)
+				if (distToPortal <= vel)
 					bridge.Update(*item);
 
 				// HACK: Must probe slightly higher to avoid strange bug where the room number sometimes isn't

@@ -1317,7 +1317,7 @@ namespace TEN::Renderer
 			PrintDebugMessage("DIMENSION STATS");
 			PrintDebugMessage("Position: %d, %d, %d", playerItem.Pose.Position.x, playerItem.Pose.Position.y, playerItem.Pose.Position.z);
 			PrintDebugMessage("Orientation: %d, %d, %d", playerItem.Pose.Orientation.x, playerItem.Pose.Orientation.y, playerItem.Pose.Orientation.z);
-			PrintDebugMessage("Scale: %.3f, %.3f, %.3f", playerItem.Pose.Pose.Scale.x, playerItem.Pose.Pose.Scale.y, playerItem.Pose.Pose.Scale.z);
+			PrintDebugMessage("Scale: %.3f, %.3f, %.3f", playerItem.Pose.Scale.x, playerItem.Pose.Scale.y, playerItem.Pose.Scale.z);
 			PrintDebugMessage("Room number: %d", playerItem.RoomNumber);
 			PrintDebugMessage("PathfindingBoxID: %d", playerItem.BoxNumber);
 			PrintDebugMessage((player.Context.WaterSurfaceDist == -NO_HEIGHT ? "WaterSurfaceDist: N/A" : "WaterSurfaceDist: %d"), player.Context.WaterSurfaceDist);
