@@ -10,10 +10,7 @@
 #include "Game/misc.h"
 #include "Game/people.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/Effects/enemy_missile.h"
-
-using namespace TEN::Math;
 
 // NOTES:
 // ItemFlags[0]: Sprite ID for poison effect.

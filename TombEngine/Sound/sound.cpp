@@ -6,14 +6,12 @@
 #include "Game/Lara/lara.h"
 #include "Game/room.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
 using namespace TEN::Gui;
-using namespace TEN::Math;
 
 enum SoundSourceFlags
 {

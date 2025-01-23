@@ -6,7 +6,6 @@
 #include "Specific/level.h"
 #include "Renderer/Renderer.h"
 
-using namespace TEN::Math;
 using namespace TEN::Renderer;
 
 namespace TEN::Collision::Sphere

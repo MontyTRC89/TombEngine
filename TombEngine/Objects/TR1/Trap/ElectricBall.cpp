@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Objects/TR1/Trap/ElectricBall.h"
 
 #include "Game/control/los.h"
@@ -9,14 +8,12 @@
 #include "Game/Lara/lara.h"
 #include "Game/misc.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/Effects/Boss.h"
 
 using namespace TEN::Effects::Boss;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Spark;
-using namespace TEN::Math;
 
 namespace TEN::Entities::Traps
 {

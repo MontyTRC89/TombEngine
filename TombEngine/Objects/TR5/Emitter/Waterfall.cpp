@@ -7,12 +7,10 @@
 #include "Game/control/los.h"
 #include "Game/effects/effects.h"
 #include "Game/Setup.h"
-#include "Math/Math.h"
 #include "Objects/Utils/object_helper.h"
 #include "Specific/clock.h"
 
 using namespace TEN::Collision::Point;
-using namespace TEN::Math;
 
 constexpr int WATERFALL_SPRITE_SIZE = 62;
 

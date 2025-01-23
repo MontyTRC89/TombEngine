@@ -1,6 +1,5 @@
 #pragma once
 
-#include "framework.h"
 #include "Scripting/Internal/TEN/Objects/AIObject/AIObject.h"
 
 #include "Scripting/Internal/ReservedScriptNames.h"

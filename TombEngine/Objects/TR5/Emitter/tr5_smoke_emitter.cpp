@@ -12,7 +12,6 @@
 #include "Specific/level.h"
 
 using namespace TEN::Effects::Bubble;
-using namespace TEN::Math;
 
 // NOTES:
 // OCB 0:	 Default smoke behaviour.

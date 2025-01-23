@@ -1,10 +1,6 @@
-#include "framework.h"
 #include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
 
-#include "Math/Math.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
-
-using namespace TEN::Math;
 
 namespace TEN::Scripting
 {

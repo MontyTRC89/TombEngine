@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/Lara/Optics.h"
 
 #include "Game/camera.h"

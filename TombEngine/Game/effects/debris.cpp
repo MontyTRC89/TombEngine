@@ -8,7 +8,6 @@
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Sphere;
-using namespace TEN::Math;
 using namespace TEN::Renderer;
 
 ShatterImpactInfo ShatterImpactData;

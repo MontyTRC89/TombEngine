@@ -1,4 +1,3 @@
-#include "framework.h"
 #include "Game/effects/Light.h"
 
 #include "Renderer/Renderer.h"
