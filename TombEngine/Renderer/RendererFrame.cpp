@@ -440,10 +440,10 @@ namespace TEN::Renderer
 			newItem.ObjectID = item.ObjectNumber;
 			newItem.Color = item.Model.Color;
 			newItem.Position = item.Pose.Position.ToVector3();
-			newItem.Translation = Matrix::CreateTranslation(newItem.Position.x, newItem.Position.y, newItem.Position.z);
+			newItem.Translation = Matrix::CreateTranslation(newItem.Position);
 			newItem.Rotation = item.Pose.Orientation.ToRotationMatrix();
-			newItem.Scale = Matrix::CreateScale(1.0f);
-			newItem.World = newItem.Rotation * newItem.Translation;
+			newItem.Scale = Matrix::CreateScale(item.Pose.Scale);
+			newItem.World = newItem.Scale * newItem.Rotation * newItem.Translation;
 
 			// Disable interpolation either when renderer slot or item slot has flag. 
 			// Renderer slot has no interpolation flag set in case it is fetched for first time (e.g. item first time in frustum).
@@ -455,6 +455,7 @@ namespace TEN::Renderer
 				newItem.PrevPosition = newItem.Position;
 				newItem.PrevTranslation = newItem.Translation;
 				newItem.PrevRotation = newItem.Rotation;
+				newItem.PrevScale = newItem.Scale;
 				newItem.PrevWorld = newItem.World;
 
 				// Otherwise all frames until next ControlPhase will not be interpolated.
@@ -470,6 +471,7 @@ namespace TEN::Renderer
 			newItem.InterpolatedPosition = Vector3::Lerp(newItem.PrevPosition, newItem.Position, GetInterpolationFactor(forceValue));
 			newItem.InterpolatedTranslation = Matrix::Lerp(newItem.PrevTranslation, newItem.Translation, GetInterpolationFactor(forceValue));
 			newItem.InterpolatedRotation = Matrix::Lerp(newItem.InterpolatedRotation, newItem.Rotation, GetInterpolationFactor(forceValue));
+			newItem.InterpolatedScale = Matrix::Lerp(newItem.InterpolatedScale, newItem.Scale, GetInterpolationFactor(forceValue));
 			newItem.InterpolatedWorld = Matrix::Lerp(newItem.PrevWorld, newItem.World, GetInterpolationFactor(forceValue));
 			
 			for (int j = 0; j < MAX_BONES; j++)
