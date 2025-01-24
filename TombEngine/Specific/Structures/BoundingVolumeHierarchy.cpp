@@ -179,15 +179,13 @@ namespace TEN::Structures
 		if (_nodes.empty())
 			return objectIds;
 
-		// Initialize stack.
-		auto stack = std::stack<int>{};
-		stack.push(_rootID);
-
 		// Traverse tree.
-		while (!stack.empty())
+		auto nodeIds = std::stack<int>{};
+		nodeIds.push(_rootID);
+		while (!nodeIds.empty())
 		{
-			int nodeID = stack.top();
-			stack.pop();
+			int nodeID = nodeIds.top();
+			nodeIds.pop();
 
 			// Invalid node; continue.
 			if (nodeID == NO_VALUE)
@@ -208,10 +206,10 @@ namespace TEN::Structures
 			else
 			{
 				if (node.LeftChildID != NO_VALUE)
-					stack.push(node.LeftChildID);
+					nodeIds.push(node.LeftChildID);
 
 				if (node.RightChildID != NO_VALUE)
-					stack.push(node.RightChildID);
+					nodeIds.push(node.RightChildID);
 			}
 		}
 
@@ -225,8 +223,8 @@ namespace TEN::Structures
 		// Allocate and get new empty node ID.
 		if (_freeNodeIds.empty())
 		{
-			nodeID = (int)_nodes.size();
 			_nodes.emplace_back();
+			nodeID = (int)_nodes.size() - 1;
 		}
 		// Get existing empty node ID.
 		else

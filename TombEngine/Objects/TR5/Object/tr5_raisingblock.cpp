@@ -71,9 +71,8 @@ namespace TEN::Entities::Generic
 		if (floor->PathfindingBoxID != NO_VALUE)
 			g_Level.PathfindingBoxes[floor->PathfindingBoxID].flags &= ~BLOCKED;
 
-		// Set mutator Y scale to 0 by default.
-		for (auto& mutator : item->Model.Mutators)
-			mutator.Scale.y = 0.0f;
+		// Set Y scale to 0 by default.
+		item->Pose.Scale.y = 0.0f;
 
 		if (item->TriggerFlags < 0)
 		{
@@ -99,9 +98,13 @@ namespace TEN::Entities::Generic
 		if ((item->Pose.Position.ToVector3() - Camera.pos.ToVector3()).Length() < BLOCK(10))
 		{
 			if (item->ItemFlags[1] == 64 || item->ItemFlags[1] == 4096)
+			{
 				Camera.bounce = -32;
+			}
 			else
+			{
 				Camera.bounce = -16;
+			}
 		}
 	}
 
@@ -113,9 +116,7 @@ namespace TEN::Entities::Generic
 		if (TriggerActive(item))
 		{
 			if (!item->ItemFlags[2])
-			{
 				item->ItemFlags[2] = 1;
-			}
 
 			if (item->TriggerFlags < 0)
 			{
@@ -156,10 +157,7 @@ namespace TEN::Entities::Generic
 
 		// Update bone mutators.
 		if (item->TriggerFlags > -1)
-		{
-			for (auto& mutator : item->Model.Mutators)
-				mutator.Scale = Vector3(1.0f, item->ItemFlags[1] / BLOCK(4.0f), 1.0f);
-		}
+			item->Pose.Scale.y = (float)item->ItemFlags[1] / (float)BLOCK(4);
 
 		bridge.Update(*item);
 	}

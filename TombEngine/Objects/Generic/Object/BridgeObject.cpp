@@ -47,7 +47,6 @@ namespace TEN::Entities::Generic
 
 		// Store previous parameters.
 		_prevPose = item.Pose;
-		_prevScale = item.Model.Mutators.front().Scale;
 		_prevRoomNumber = item.RoomNumber;
 		_prevAabb = item.GetAabb();
 		_prevObb = item.GetObb();
@@ -64,33 +63,30 @@ namespace TEN::Entities::Generic
 			return;
 		}
 
-		if (item.Pose == _prevPose && item.Model.Mutators.front().Scale == _prevScale &&
-			item.RoomNumber == _prevRoomNumber)
-		{
+		if (item.Pose == _prevPose && item.RoomNumber == _prevRoomNumber)
 			return;
-		}
 
 		UpdateCollisionMesh(item);
 		UpdateAttractor(item);
 		UpdateSectorAssignments(item);
 
-		auto& room = g_Level.Rooms[item.RoomNumber];
-		auto& prevRoom = g_Level.Rooms[_prevRoomNumber];
-
 		// Update room bridge trees.
 		if (item.Pose != _prevPose && item.RoomNumber == _prevRoomNumber)
 		{
+			auto& room = g_Level.Rooms[item.RoomNumber];
 			room.Bridges.Move(item.Index, item.GetAabb());
 		}
 		else if (item.RoomNumber != _prevRoomNumber)
 		{
+			auto& room = g_Level.Rooms[item.RoomNumber];
+			auto& prevRoom = g_Level.Rooms[_prevRoomNumber];
+
 			room.Bridges.Insert(item.Index, item.GetAabb());
 			prevRoom.Bridges.Remove(item.Index);
 		}
 
 		// Store previous parameters.
 		_prevPose = item.Pose;
-		_prevScale = item.Model.Mutators.front().Scale;
 		_prevRoomNumber = item.RoomNumber;
 		_prevAabb = item.GetAabb();
 		_prevObb = item.GetObb();
@@ -110,7 +106,6 @@ namespace TEN::Entities::Generic
 
 		// Store previous parameters.
 		_prevPose = item.Pose;
-		_prevScale = item.Model.Mutators.front().Scale;
 		_prevRoomNumber = item.RoomNumber;
 		_prevAabb = item.GetAabb();
 		_prevObb = item.GetObb();
@@ -154,12 +149,9 @@ namespace TEN::Entities::Generic
 			break;
 		}
 
-		// Get scale.
-		auto scale = item.Model.Mutators.front().Scale;
-
 		// Get local AABB corners.
 		const auto& bounds = GetAnimFrame(item, 0, 0).BoundingBox;
-		auto aabb = BoundingBox(bounds.GetCenter() - (bounds.GetExtents() * (scale - Vector3::One)), bounds.GetExtents() * scale);
+		auto aabb = BoundingBox(bounds.GetCenter() - (bounds.GetExtents() * (item.Pose.Scale - Vector3::One)), bounds.GetExtents() * item.Pose.Scale);
 		auto corners = std::array<Vector3, BoundingBox::CORNER_COUNT>{};
 		aabb.GetCorners(corners.data());
 
@@ -195,8 +187,7 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::UpdateCollisionMesh(const ItemInfo& item)
 	{
-		auto scale = item.Model.Mutators.front().Scale;
-		if (scale != _prevScale)
+		if (item.Pose.Scale != _prevPose.Scale)
 		{
 			InitializeCollisionMesh(item);
 		}
@@ -227,7 +218,7 @@ namespace TEN::Entities::Generic
 		auto obb = item.GetObb();
 
 		// Assign to sectors.
-		int searchDepth = (int)ceil(std::max(std::max(obb.Extents.x, obb.Extents.y), obb.Extents.z) / BLOCK(1));
+		unsigned int searchDepth = (unsigned int)ceil(std::max({ obb.Extents.x, obb.Extents.y, obb.Extents.z }) / BLOCK(1));
 		auto sectors = GetNeighborSectors(item.Pose.Position, item.RoomNumber, searchDepth);
 		for (auto* sector : sectors)
 		{
@@ -246,8 +237,8 @@ namespace TEN::Entities::Generic
 	void BridgeObject::DeassignSectors(const ItemInfo& item) const
 	{
 		// Deassign from sectors.
-		unsigned int sectorSearchDepth = (unsigned int)ceil(std::max(std::max(_prevAabb.Extents.x, _prevAabb.Extents.y), _prevAabb.Extents.z) / BLOCK(1));
-		auto sectors = GetNeighborSectors(_prevPose.Position, _prevRoomNumber, sectorSearchDepth);
+		unsigned int searchDepth = (unsigned int)ceil(std::max({ _prevAabb.Extents.x, _prevAabb.Extents.y, _prevAabb.Extents.z }) / BLOCK(1));
+		auto sectors = GetNeighborSectors(_prevPose.Position, _prevRoomNumber, searchDepth);
 		for (auto* sector : sectors)
 		{
 			// Test if previous AABB intersects sector.

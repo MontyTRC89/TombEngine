@@ -17,7 +17,7 @@ namespace TEN::Structures
 			Cell(const BoundingBox& aabb);
 		};
 
-		// Members
+		// Fields
 
 		std::unordered_map<Vector3i, Cell> _cellMap = {}; // Key = position, value = cell.
 

@@ -89,6 +89,7 @@ namespace TEN::Entities::Generic
 
 				// HACK: Must probe slightly higher to avoid strange bug where the room number sometimes isn't
 				// updated when the platform crosses room boundaries. -- Sezz 2025.01.18
+				// TODO: Maybe not necessary anymore after bridge refactors.
 				auto pointColl = GetPointCollision(*item, 0, 0, -CLICK(0.5f));
 
 				item->Floor = pointColl.GetFloorHeight();

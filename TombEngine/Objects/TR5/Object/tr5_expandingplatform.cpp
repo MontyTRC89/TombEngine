@@ -22,34 +22,11 @@ using namespace TEN::Math;
 
 namespace TEN::Entities::Generic
 {
-	static void UpdateExpandingPlatformMutators(short itemNumber)
+	static void UpdateExpandingPlatformScale(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 
-		auto bounds = GameBoundingBox(&item);
-		float normalizedThickness = item.ItemFlags[1] / BLOCK(4.0f);
-		int width = abs(bounds.Z2 - bounds.Z1) / 2;
-		float offset = width * normalizedThickness;
-
-		// Update bone mutators.
-		float zTranslate = 0.0f;
-		if (item.Pose.Orientation.y == 0)
-			zTranslate = width - offset;
-
-		if (item.Pose.Orientation.y == ANGLE(90.0f))
-			zTranslate = -offset + width;
-
-		if (item.Pose.Orientation.y == ANGLE(180.0f))
-			zTranslate = -offset + width;
-
-		if (item.Pose.Orientation.y == ANGLE(270.0f))
-			zTranslate = width - offset;
-
-		for (auto& mutator : item.Model.Mutators)
-		{
-			mutator.Offset = Vector3(0.0f, 0.0f, zTranslate);
-			mutator.Scale = Vector3(1.0f, 1.0f, item.ItemFlags[1] / BLOCK(4.0f));
-		}
+		item.Pose.Scale.z = (float)item.ItemFlags[1] / (float)BLOCK(4);
 	}
 
 	static bool IsOnExpandingPlatform(const ItemInfo& item, const Vector3i& pos)
@@ -127,8 +104,8 @@ namespace TEN::Entities::Generic
 
 		g_Level.PathfindingBoxes[GetPointCollision(item).GetSector().PathfindingBoxID].flags &= ~BLOCKED;
 
-		// Set mutators to default.
-		UpdateExpandingPlatformMutators(itemNumber);
+		// Set scale to default.
+		UpdateExpandingPlatformScale(itemNumber);
 
 		if (item.TriggerFlags < 0)
 		{
@@ -209,7 +186,7 @@ namespace TEN::Entities::Generic
 		if (IsOnExpandingPlatform(item, LaraItem->Pose.Position))
 		{
 			// Slide player if on top of platform.
-			if (LaraItem->Pose.Position.y < (height - 32) || LaraItem->Pose.Position.y >(height + 32))
+			if (LaraItem->Pose.Position.y < (height - CLICK(1 / 8.0f)) || LaraItem->Pose.Position.y > (height + CLICK(1 / 8.0f)))
 				return;
 
 			if (angle == 0)
@@ -229,8 +206,7 @@ namespace TEN::Entities::Generic
 				xShift = isExpanding ? 16 : -16;
 			}
 		}
-		else if (isExpanding &&
-			IsInFrontOfExpandingPlatform(item, LaraItem->Pose.Position, LaraCollision.Setup.Radius))
+		else if (isExpanding && IsInFrontOfExpandingPlatform(item, LaraItem->Pose.Position, LaraCollision.Setup.Radius))
 		{
 			// Push player if in front of expanding platform.
 			if (angle == 0)
@@ -293,9 +269,13 @@ namespace TEN::Entities::Generic
 						abs(item.Pose.Position.x - Camera.pos.x) < 10240)
 					{
 						if (item.ItemFlags[1] == 64 || item.ItemFlags[1] == 4096)
+						{
 							Camera.bounce = -32;
+						}
 						else
+						{
 							Camera.bounce = -16;
+						}
 					}
 				}
 			}
@@ -333,6 +313,6 @@ namespace TEN::Entities::Generic
 			ShiftPlayerOnPlatform(item, false);
 		}
 
-		UpdateExpandingPlatformMutators(itemNumber);
+		UpdateExpandingPlatformScale(itemNumber);
 	}
 }
