@@ -11,6 +11,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed ricochet flashes after using explosive weapons.
 * Fixed incorrect flare draw in crawl state.
 * Fixed starfield remaining active in the next level, if next level does not have starfield specified.
+* Fixed HK ammo not being visible in the inventory.
+* Fixed flickering rat emitter.
 
 ### New Features
 * Added a particle based waterfall emitter object and associated sprite slots.
