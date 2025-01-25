@@ -13,6 +13,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed starfield remaining active in the next level, if next level does not have starfield specified.
 * Fixed HK ammo not being visible in the inventory.
 * Fixed flickering rat emitter.
+* Fixed player model submerging into the floor while swimming underwater.
 
 ### New Features
 * Added a particle based waterfall emitter object and associated sprite slots.
