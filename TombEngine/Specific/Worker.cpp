@@ -48,6 +48,11 @@ namespace TEN::Utils
 		return std::max(std::thread::hardware_concurrency(), 1u);
 	}
 
+	std::future<void> WorkerManager::AddTask(const WorkerTask& task)
+	{
+		return AddTasks(WorkerTaskGroup{ task });
+	}
+
 	std::future<void> WorkerManager::AddTasks(const WorkerTaskGroup& tasks)
 	{
 		// TODO: Maybe store internally instead of using shared pointers.

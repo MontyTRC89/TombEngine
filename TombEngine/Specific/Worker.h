@@ -29,6 +29,7 @@ namespace TEN::Utils
 
 		// Utilities
 
+		std::future<void> AddTask(const WorkerTask& task);
 		std::future<void> AddTasks(const WorkerTaskGroup& tasks);
 
 		template<typename T>
