@@ -19,8 +19,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added a particle based waterfall emitter object and associated sprite slots.
 - You must use this version: https://github.com/TombEngine/Resources/raw/refs/heads/main/Wad2%20Objects/Interactables/TEN_Waterfall_Emitter.wad2
 
-
 ### Lua API changes
+* Add more example scripts to some of the TombEngine Lua functions.
 
 ## [Version 1.7.1] (https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.4) - 2025-04-01
 

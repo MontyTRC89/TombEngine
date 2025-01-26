@@ -19,6 +19,7 @@ constexpr auto MAX_NODE		= 23;
 constexpr auto MAX_DYNAMICS = 64;
 
 constexpr auto MAX_PARTICLES		 = 8192;
+
 constexpr auto MAX_PARTICLE_DYNAMICS = 8;
 
 extern int Wibble;
