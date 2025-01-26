@@ -5,7 +5,7 @@ namespace TEN::Utils
 	using WorkerTask	  = std::function<void()>;
 	using WorkerTaskGroup = std::vector<WorkerTask>;
 
-	class WorkerManager
+	class WorkerController
 	{
 	private:
 		// Fields
@@ -16,13 +16,16 @@ namespace TEN::Utils
 		std::condition_variable	 _taskCond	   = {};
 		bool					 _deinitialize = false;
 
-	public:
 		// Constructors and destructors
 
-		WorkerManager();
-		~WorkerManager();
+		WorkerController();
+		WorkerController(const WorkerController& worker) = delete;
+		~WorkerController();
 
+	public:
 		// Getters
+
+		static WorkerController& Get();
 
 		unsigned int GetThreadCount() const;
 		unsigned int GetCoreCount() const;
@@ -71,7 +74,11 @@ namespace TEN::Utils
 		void Worker();
 		void AddTask(const WorkerTask& task, std::shared_ptr<std::atomic<int>> counter, std::shared_ptr<std::promise<void>> promise);
 		void HandleTask(const WorkerTask& task, std::atomic<int>& counter, std::promise<void>& promise);
+
+		// Operators
+
+		WorkerController& operator =(const WorkerController& worker) = delete;
 	};
 
-	extern WorkerManager g_Worker;
+	extern WorkerController& g_Worker;
 }

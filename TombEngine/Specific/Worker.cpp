@@ -3,9 +3,9 @@
 
 namespace TEN::Utils
 {
-	WorkerManager g_Worker = WorkerManager();
+	WorkerController& g_Worker = WorkerController::Get();
 
-	WorkerManager::WorkerManager()
+	WorkerController::WorkerController()
 	{
 		// Reserve threads.
 		unsigned int threadCount = GetCoreCount() * 2;
@@ -13,12 +13,12 @@ namespace TEN::Utils
 
 		// Create threads.
 		for (int i = 0; i < threadCount; i++)
-			_threads.push_back(std::thread(&WorkerManager::Worker, this));
+			_threads.push_back(std::thread(&WorkerController::Worker, this));
 
 		_deinitialize = false;
 	}
 
-	WorkerManager::~WorkerManager()
+	WorkerController::~WorkerController()
 	{
 		// LOCK: Restrict shutdown flag access.
 		{
@@ -38,24 +38,30 @@ namespace TEN::Utils
 		}
 	}
 
-	unsigned int WorkerManager::GetThreadCount() const
+	WorkerController& WorkerController::Get()
+	{
+		static auto instance = WorkerController();
+		return instance;
+	}
+
+	unsigned int WorkerController::GetThreadCount() const
 	{
 		return (unsigned int)_threads.size();
 	}
 
-	unsigned int WorkerManager::GetCoreCount() const
+	unsigned int WorkerController::GetCoreCount() const
 	{
 		return std::max(std::thread::hardware_concurrency(), 1u);
 	}
 
-	std::future<void> WorkerManager::AddTask(const WorkerTask& task)
+	std::future<void> WorkerController::AddTask(const WorkerTask& task)
 	{
 		return AddTasks(WorkerTaskGroup{ task });
 	}
 
-	std::future<void> WorkerManager::AddTasks(const WorkerTaskGroup& tasks)
+	std::future<void> WorkerController::AddTasks(const WorkerTaskGroup& tasks)
 	{
-		// TODO: Maybe store internally instead of using shared pointers.
+		// HEAP ALLOC: Create counter and promise.
 		auto counter = std::make_shared<std::atomic<int>>();
 		auto promise = std::make_shared<std::promise<void>>();
 
@@ -72,7 +78,7 @@ namespace TEN::Utils
 		return promise->get_future();
 	}
 
-	void WorkerManager::Worker()
+	void WorkerController::Worker()
 	{
 		while (true)
 		{
@@ -98,7 +104,7 @@ namespace TEN::Utils
 		}
 	}
 
-	void WorkerManager::AddTask(const WorkerTask& task, std::shared_ptr<std::atomic<int>> counter, std::shared_ptr<std::promise<void>> promise)
+	void WorkerController::AddTask(const WorkerTask& task, std::shared_ptr<std::atomic<int>> counter, std::shared_ptr<std::promise<void>> promise)
 	{
 		// Increment counter for task group.
 		counter->fetch_add(1, std::memory_order_relaxed);
@@ -107,7 +113,7 @@ namespace TEN::Utils
 		_tasks.push([this, task, counter, promise]() { HandleTask(task, *counter, *promise); });
 	}
 
-	void WorkerManager::HandleTask(const WorkerTask& task, std::atomic<int>& counter, std::promise<void>& promise)
+	void WorkerController::HandleTask(const WorkerTask& task, std::atomic<int>& counter, std::promise<void>& promise)
 	{
 		// Execute task.
 		if (task)
