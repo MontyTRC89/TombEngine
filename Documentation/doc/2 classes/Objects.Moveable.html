@@ -107,9 +107,11 @@
 <div id="content">
 
 <h1>Class <code>Objects.Moveable</code></h1>
-<p>Represents any object inside the game world.</p>
-<p>Examples include traps, enemies, doors,
-pickups, and Lara herself (see also <a href="../2 classes/Objects.LaraObject.html#">Objects.LaraObject</a> for Lara-specific features).</p>
+<p>Represents a mopveable object in the game world.</p>
+<p> Examples include traps, enemies, doors,
+ pickups, and the player (see also <a href="../2 classes/Objects.LaraObject.html#">Objects.LaraObject</a> for Lara-specific features).</p>
+
+<p> pragma nostrip</p>
 
 
 <h2><a href="#Functions">Functions</a></h2>
@@ -244,8 +246,8 @@ pickups, and Lara herself (see also <a href="../2 classes/Objects.LaraObject.htm
 	<td class="summary">Determine whether the moveable is active or not</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:GetJointPosition">Moveable:GetJointPosition(index[, offset])</a></td>
-	<td class="summary">Get the object's joint position</td>
+	<td class="name" ><a href="#Moveable:GetJointPosition">Moveable:GetJointPosition(jointID[, offset])</a></td>
+	<td class="summary">Get the moveable's joint position with an optional offset relative to its current rotation.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetJointRotation">Moveable:GetJointRotation(index)</a></td>
@@ -1197,22 +1199,22 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
 </dd>
     <dt>
     <a name = "Moveable:GetJointPosition"></a>
-    <strong>Moveable:GetJointPosition(index[, offset])</strong>
+    <strong>Moveable:GetJointPosition(jointID[, offset])</strong>
     </dt>
     <dd>
-    Get the object's joint position
+    Get the moveable's joint position with an optional offset relative to its current rotation.
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">index</span>
+        <li><span class="parameter">jointID</span>
             <span class="types"><span class="type">int</span></span>
-         of a joint to get position
+         Joint ID.
         </li>
         <li><span class="parameter">offset</span>
             <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-         a pre-rotation offset to the joint
+         Relative offset.
          (<em>optional</em>)
         </li>
     </ul>
@@ -1221,7 +1223,7 @@ shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)</pre>
     <ol>
 
            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-        a copy of the moveable's joint position
+        pos World position.
     </ol>
 
 

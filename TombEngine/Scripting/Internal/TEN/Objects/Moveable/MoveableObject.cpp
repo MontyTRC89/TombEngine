@@ -25,14 +25,13 @@ using namespace TEN::Collision::Floordata;
 using namespace TEN::Effects::Items;
 using namespace TEN::Math;
 
-/***
-Represents any object inside the game world.
-Examples include traps, enemies, doors,
-pickups, and Lara herself (see also @{Objects.LaraObject} for Lara-specific features).
 
-@tenclass Objects.Moveable
-@pragma nostrip
-*/
+/// Represents a mopveable object in the game world.
+// Examples include traps, enemies, doors,
+// pickups, and the player (see also @{Objects.LaraObject} for Lara-specific features).
+//
+// @tenclass Objects.Moveable
+// pragma nostrip
 
 constexpr auto LUA_CLASS_NAME{ ScriptReserved_Moveable };
 
@@ -382,22 +381,22 @@ ScriptReserved_GetSlotHP, & Moveable::GetSlotHP,
 
 	ScriptReserved_SetRoomNumber, &Moveable::SetRoomNumber,
 
-	ScriptReserved_GetPosition, & Moveable::GetPos,
+	ScriptReserved_GetPosition, &Moveable::GetPos,
 
-/// Get the object's joint position
-// @function Moveable:GetJointPosition
-// @tparam int index of a joint to get position
-// @tparam[opt] Vec3 offset a pre-rotation offset to the joint
-// @treturn Vec3 a copy of the moveable's joint position
-	ScriptReserved_GetJointPosition, & Moveable::GetJointPos,
+	/// Get the moveable's joint position with an optional offset relative to its current rotation.
+	// @function Moveable:GetJointPosition
+	// @tparam int jointID Joint ID.
+	// @tparam[opt] Vec3 offset Relative offset.
+	// @treturn Vec3 pos World position.
+	ScriptReserved_GetJointPosition, &Moveable::GetJointPos,
 
 /// Get the object's joint rotation
 // @function Moveable:GetJointRotation
 // @tparam int index of a joint to get rotation
 // @treturn Rotation a calculated copy of the moveable's joint rotation
-	ScriptReserved_GetJointRotation, & Moveable::GetJointRot,
+	ScriptReserved_GetJointRotation, &Moveable::GetJointRot,
 
-	ScriptReserved_SetPosition, & Moveable::SetPos,
+	ScriptReserved_SetPosition, &Moveable::SetPos,
 
 /// Get the moveable's rotation
 // @function Moveable:GetRotation
@@ -641,11 +640,10 @@ void Moveable::SetPos(const Vec3& pos, sol::optional<bool> updateRoom)
 		m_item->DisableInterpolation = true;
 }
 
-Vec3 Moveable::GetJointPos(int jointIndex, sol::optional<Vec3> offset) const
+Vec3 Moveable::GetJointPos(int jointID, sol::optional<Vec3> offset) const
 {
-	Vector3i vec = offset.has_value() ? offset->ToVector3i() : Vector3i(0, 0, 0);
-	auto result = GetJointPosition(m_item, jointIndex, vec);
-	return Vec3(result.x, result.y, result.z);
+	auto convertedOffset = offset.has_value() ? offset->ToVector3i() : Vector3i::Zero;
+	return Vec3(GetJointPosition(m_item, jointID, convertedOffset));
 }
 
 Rotation Moveable::GetJointRot(int jointIndex) const
