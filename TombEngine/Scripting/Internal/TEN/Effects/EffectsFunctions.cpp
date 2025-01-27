@@ -97,6 +97,8 @@ namespace TEN::Scripting::Effects
 		SpawnElectricity(p1, p2, byteAmplitude, col.GetR(), col.GetG(), col.GetB(), byteLife, flags, width, segs);
 	}
 
+	// Add fire, particle pop, pop animation, expose all parameters, wind, damage, poison, light
+
 	/*** Emit a particle.
 	 See the sprite editor in WadTool for DEFAULT_SPRITES to see a list of sprite indices.
 	@function EmitParticle
@@ -135,7 +137,7 @@ namespace TEN::Scripting::Effects
 	static void EmitParticle(Vec3 pos, Vec3 velocity, int spriteIndex, TypeOrNil<int> gravity, TypeOrNil<float> rot, 
 							TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<BlendMode> blendMode, 
 							TypeOrNil<int> startSize, TypeOrNil<int> endSize, TypeOrNil<float> lifetime, 
-							TypeOrNil<bool> damage, TypeOrNil<bool> poison, TypeOrNil<GAME_OBJECT_ID> objectID, TypeOrNil<float> startRot, TypeOrNil<bool> animated)
+							TypeOrNil<bool> damage, TypeOrNil<bool> poison, TypeOrNil<GAME_OBJECT_ID> objectID, TypeOrNil<float> startRot, TypeOrNil<bool> animated, TypeOrNil<float> frameRate, TypeOrNil<int> animationType)
 	{
 		// Ensure objectID is valid 
 		GAME_OBJECT_ID effectiveObjectID = USE_IF_HAVE(GAME_OBJECT_ID, objectID, ID_DEFAULT_SPRITES); 
@@ -209,9 +211,14 @@ namespace TEN::Scripting::Effects
 
 		if (animatedSpr)
 		{
+			float applyAnimation = USE_IF_HAVE(int, animationType, 1);
+			float applyFramerate = USE_IF_HAVE(float, frameRate, 1.0f);
 			int spriteObj = static_cast<int>(effectiveObjectID);
 			s->flags |= SP_ANIMATED;
 			s->spriteObj = spriteObj;
+			s->framerate = applyFramerate;
+			s->animationType = applyAnimation;
+
 		}
 		//todo add option to turn off wind?
 		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WIND, s->roomNumber))

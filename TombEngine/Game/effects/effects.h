@@ -148,6 +148,8 @@ struct Particle
 	int roomNumber;
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
 	int spriteObj;
+	float framerate;
+	int animationType;
 
 	int PrevX;
 	int PrevY;
@@ -180,6 +182,14 @@ struct ParticleDynamic
 	byte B;
 	byte Flags;
 	byte Pad[2];
+};
+
+enum class ParticleAnimationMode
+{
+	SequentialLoop,      // Frames loop sequentially
+	OneTimePlay,         // Frames play once, then freeze on the last frame
+	BackAndForth,        // Frames go forward, then backward
+	SpreadOverLifetime   // Frames are evenly distributed over the particle's lifetime
 };
 
 extern GameBoundingBox DeadlyBounds;
@@ -233,6 +243,7 @@ void ClearInactiveEffects(std::vector<TEffect>& effects)
 Particle* GetFreeParticle();
 
 void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID);
+void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID, ParticleAnimationMode animationType, float frameRate);
 
 void DetatchSpark(int num, SpriteEnumFlag type);
 void UpdateSparks();

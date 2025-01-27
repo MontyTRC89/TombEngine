@@ -182,6 +182,76 @@ void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID)
 	particle.spriteIndex = Objects[objectID].meshIndex + (int)round(Lerp(0.0f, numSprites, normalizedAge));
 }
 
+void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	ParticleAnimationMode animationType, float frameRate)
+{
+	// Ensure valid lifespan
+	if (particle.life <= 0)
+	{
+		particle.on = false;
+		ParticleDynamics[particle.dynamic].On = false;
+		return;
+	}
+
+	// Calculate particle's age and normalized progress
+	float particleAge = particle.sLife - particle.life;  // Elapsed time since spawn
+	float normalizedAge = particleAge / particle.sLife;  // Progress as a fraction [0.0, 1.0]
+
+	// Retrieve sprite sequence information
+	int firstFrame = Objects[objectID].meshIndex;          // Starting sprite index
+	int totalFrames = -Objects[objectID].nmeshes;          // Total frames (assuming nmeshes is negative)
+	if (totalFrames <= 0)
+	{
+		particle.spriteIndex = firstFrame;  // Default to the first frame if no valid frames exist
+		return;
+	}
+
+	// Handle animation modes
+	switch (animationType)
+	{
+	case ParticleAnimationMode::SequentialLoop:  // Frames loop sequentially
+	{
+		float frameDuration = frameRate > 0 ? 1.0f / frameRate : 1.0f / totalFrames;  // Duration per frame
+		int currentFrame = static_cast<int>(particleAge / frameDuration) % totalFrames;  // Wrap frames
+		particle.spriteIndex = firstFrame + currentFrame;
+		break;
+	}
+
+	case ParticleAnimationMode::OneTimePlay:  // Frames play once, then freeze on the last frame
+	{
+		float totalDuration = frameRate > 0 ? totalFrames / frameRate : particle.sLife;
+		int currentFrame = static_cast<int>(particleAge / (totalDuration / totalFrames));
+		if (currentFrame >= totalFrames)
+			currentFrame = totalFrames - 1;  // Clamp to the last frame
+		particle.spriteIndex = firstFrame + currentFrame;
+		break;
+	}
+
+	case ParticleAnimationMode::BackAndForth:  // Frames go forward and then backward
+	{
+		float frameDuration = frameRate > 0 ? 1.0f / frameRate : 1.0f / totalFrames;
+		int totalFrameSteps = totalFrames * 2 - 2;  // Forward and backward frames (avoiding double-count of last frame)
+		int step = static_cast<int>(particleAge / frameDuration) % totalFrameSteps;
+		int currentFrame = step < totalFrames ? step : totalFrames - (step - totalFrames) - 1;
+		particle.spriteIndex = firstFrame + currentFrame;
+		break;
+	}
+
+	case ParticleAnimationMode::SpreadOverLifetime:  // Distribute all frames evenly over lifetime
+	{
+		int currentFrame = static_cast<int>(normalizedAge * totalFrames);
+		if (currentFrame >= totalFrames)
+			currentFrame = totalFrames - 1;  // Clamp to the last frame
+		particle.spriteIndex = firstFrame + currentFrame;
+		break;
+	}
+
+	default:  // Default behavior: keep the first frame
+		particle.spriteIndex = firstFrame;
+		break;
+	}
+}
+
+
 void UpdateWibble()
 {
 	// Update oscillator seed.
@@ -345,8 +415,9 @@ void UpdateSparks()
 
 			if (spark->flags & SP_ANIMATED)
 			{
+				ParticleAnimationMode animationType = static_cast<ParticleAnimationMode>(spark->animationType);
 				GAME_OBJECT_ID spriteObject = static_cast<GAME_OBJECT_ID>(spark->spriteObj);
-				SetSpriteSequence(*spark, spriteObject);
+				SetAdvancedSpriteSequence(*spark, spriteObject,  animationType, spark->framerate);
 			}
 
 			if ((spark->flags & SP_FIRE && LaraItem->Effect.Type == EffectType::None) ||
