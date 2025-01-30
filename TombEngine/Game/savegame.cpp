@@ -329,12 +329,12 @@ const std::vector<byte> SaveGame::Build()
 
 	std::vector<float> bubbleNodes;
 	for (int i = 0; i < Lara.Effect.BubbleNodes.size(); i++)
-		bubbleNodes.push_back(Lara.Effect.BubbleNodes[i] == 1);
+		bubbleNodes.push_back(Lara.Effect.BubbleNodes[i]);
 	auto bubbleNodesOffset = fbb.CreateVector(bubbleNodes);
 	
 	std::vector<float> dripNodes;
 	for (int i = 0; i < Lara.Effect.DripNodes.size(); i++)
-		dripNodes.push_back(Lara.Effect.DripNodes[i] == 1);
+		dripNodes.push_back(Lara.Effect.DripNodes[i]);
 	auto dripNodesOffset = fbb.CreateVector(dripNodes);
 
 	std::vector<int> subsuitVelocity{};
