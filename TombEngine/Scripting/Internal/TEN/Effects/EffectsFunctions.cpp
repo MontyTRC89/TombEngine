@@ -300,24 +300,25 @@ namespace TEN::Scripting::Effects
 @tparam Vec3 pos
 @tparam int count (default 1) "amount" of blood. Higher numbers won't add more blood but will make it more "flickery", with higher numbers turning it into a kind of red orb.
 */
-	static void EmitBlood(Vec3 pos, TypeOrNil<int> num)
+	static void EmitBlood(const Vec3& pos, TypeOrNil<int> count)
 	{
-		TriggerBlood(pos.x, pos.y, pos.z, -1, USE_IF_HAVE(int, num, 1));
+		TriggerBlood(pos.x, pos.y, pos.z, -1, USE_IF_HAVE(int, count, 1));
 	}
 
-/***Emit air bubble in a water room.
-@function EmitAirBubble
-@tparam Vec3 pos The position where the air bubble will be spawned. Needs to be in a water room.
-@tparam[opt] float size The size of the air bubble.
-@tparam[opt] float amplitude The oscillation amplitude of the air bubble.
-*/
-	static void EmitAirBubble(Vec3 pos, TypeOrNil<float> size, TypeOrNil<float> amplitude)
+	/// Emit air bubble in a water room.
+	// @function EmitAirBubble
+	// @tparam Vec3 pos World position where the effect will be spawned. Must be in a water room.
+	// @tparam[opt] float size Sprite size. __Default: 32__
+	// @tparam[opt] float amp Oscillation amplitude. __Default: 32__
+	static void EmitAirBubble(const Vec3& pos, TypeOrNil<float> size, TypeOrNil<float> amp)
 	{
-		int roomNumber = FindRoomNumber(Vector3i(pos.x, pos.y, pos.z));
-		float sizeBubble = USE_IF_HAVE(float, size, 128);
-		float amp = USE_IF_HAVE(float, amplitude, 32);
+		constexpr auto DEFAULT_SIZE = 128.0f;
+		constexpr auto DEFAULT_AMP	= 32.0f;
 
-		SpawnBubble(pos, roomNumber, sizeBubble, amp);
+		int roomNumber = FindRoomNumber(pos.ToVector3i());
+		float convertedSize = USE_IF_HAVE(float, size, DEFAULT_SIZE);
+		float convertedAmp = USE_IF_HAVE(float, amp, DEFAULT_AMP);
+		SpawnBubble(pos.ToVector3(), roomNumber, convertedSize, convertedAmp);
 	}
 
 /***Emit fire for one frame. Will not hurt player. Call this each frame if you want a continuous fire.
@@ -325,7 +326,7 @@ namespace TEN::Scripting::Effects
 @tparam Vec3 pos
 @tparam float size (default 1.0)
 */
-	static void EmitFire(Vec3 pos, TypeOrNil<float> size)
+	static void EmitFire(const Vec3& pos, TypeOrNil<float> size)
 	{
 		AddFire(pos.x, pos.y, pos.z, FindRoomNumber(Vector3i(pos.x, pos.y, pos.z)), USE_IF_HAVE(float, size, 1));
 	}
