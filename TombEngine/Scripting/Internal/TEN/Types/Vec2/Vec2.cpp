@@ -31,6 +31,10 @@ void Vec2::Register(sol::table& parent)
 		sol::meta_function::equal_to, &Vec2::IsEqualTo,
 
 		ScriptReserved_Vec2Normalize, &Vec2::Normalize,
+		ScriptReserved_Vec2Translate, sol::overload(
+			(Vec2(Vec2::*)(const Vec2&, float))(&Vec2::Translate),
+			(Vec2(Vec2::*)(float, float))(&Vec2::Translate),
+			(Vec2(Vec2::*)(float, const Vec2&))(&Vec2::Translate)),
 		ScriptReserved_Vec2Rotate, &Vec2::Rotate,
 		ScriptReserved_Vec2Lerp, &Vec2::Lerp,
 		ScriptReserved_Vec2Cross, &Vec2::Cross,
@@ -74,11 +78,11 @@ Vec2::Vec2(const Vector2& vector)
 	y = vector.y;
 }
 
-//Vec2::Vec2(const Vector2i& vector)
-//{
-//	x = vector.x;
-//	y = vector.y;
-//}
+/*Vec2::Vec2(const Vector2i& vector)
+{
+	x = vector.x;
+	y = vector.y;
+}*/
 
 /// Metafunction. Use tostring(vector).
 // @tparam Vec2 This Vec2.
@@ -98,6 +102,36 @@ Vec2 Vec2::Normalize() const
 	vector.Normalize();
 
 	return vector;
+}
+
+/// Get a copy of this Vec2 translated in the input Vec2 direction by the input distance.
+// @function Translate
+// @tparam Vec2 dir Direction vector. Normalized automatically to length 1.
+// @tparam float dist Distance.
+// @treturn Vec2 Translated vector.
+Vec2 Vec2::Translate(const Vec2& dir, float dist)
+{
+	return Geometry::TranslatePoint(ToVector2(), dir, dist);
+}
+
+/// Get a copy of this Vec2 translated in the direction of the input rotation in degrees by the input distance.
+// @function Translate
+// @tparam Rotation rot Rotation in degrees defining the direction.
+// @tparam float dist Distance.
+// @treturn Vec2 Translated vector.
+Vec2 Vec2::Translate(float rot, float dist)
+{
+	return Geometry::TranslatePoint(ToVector2(), ANGLE(rot), dist);
+}
+
+/// Get a copy of this Vec2 translated by an offset, where the input relative offset Vec2 is rotated according to the input rotation in degrees.
+// @function Translate
+// @tparam float rot Rotation in degrees rotating the input relative offset vector.
+// @tparam Vec2 relOffset Relative offset vector before rotation.
+// @treturn Vec2 Translated vector.
+Vec2 Vec2::Translate(float rot, const Vec2& relOffset)
+{
+	return Geometry::TranslatePoint(ToVector2(), rot, relOffset);
 }
 
 /// Get a copy of this Vec2 rotated by the input rotation in degrees.
@@ -218,10 +252,10 @@ Vector2 Vec2::ToVector2() const
 	return Vector2(x, y);
 }
 
-//Vector2i Vec2::ToVector2i() const
-//{
-//	return Vector2i(x, y);
-//}
+/*Vector2i Vec2::ToVector2i() const
+{
+	return Vector2i(x, y);
+}*/
 
 Vec2::operator Vector2() const
 {

@@ -7,16 +7,17 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### Bug fixes
 * Fixed two block platform room portal traversal failing in some cases.
-* Fixed dynamic light shadows not being handled correctly.
+* Fixed incorrect handling of dynamic light shadows.
 * Fixed ricochet flashes after using explosive weapons.
 * Fixed incorrect flare draw in crawl state.
-* Fixed starfield remaining active in the next level, if next level does not have starfield specified.
-* Fixed wetness player attribute not being preserved in a savegame.
-* Fixed HK ammo not being visible in the inventory.
+* Fixed starfield remaining active in the next level if next level does not have a starfield specified.
+* Fixed wetness player attribute not being preserved in savegames.
+* Fixed invisible HK ammo in the inventory.
 * Fixed flickering rat emitter.
 * Fixed player model submerging into the floor while swimming underwater.
 
 ### New Features
+* Added various Translate() methods to Vec2 and Vec3 script objects.
 * Added a particle based waterfall emitter object and associated sprite slots.
 - You must use this version: https://github.com/TombEngine/Resources/raw/refs/heads/main/Wad2%20Objects/Interactables/TEN_Waterfall_Emitter.wad2
 
