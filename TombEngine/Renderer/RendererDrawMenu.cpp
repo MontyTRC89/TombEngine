@@ -758,7 +758,7 @@ namespace TEN::Renderer
 		if (pickup.Count != 1)
 		{
 			auto countString = (pickup.Count != NO_VALUE) ? std::to_string(pickup.Count) : COUNT_STRING_INF;
-			auto countStringPos = pickup.Position + COUNT_STRING_OFFSET;
+			auto countStringPos = pos + COUNT_STRING_OFFSET;
 
 			AddString(countString, countStringPos, Color(PRINTSTRING_COLOR_WHITE), pickup.StringScale, SF());
 		}

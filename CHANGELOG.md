@@ -6,6 +6,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ## [Version 1.7.X] (link to release) - yyyy-mm-dd
 
 ### Bug fixes
+* Fixed display pickup numeric string not being interpolated in 60FPS mode.
 * Fixed two block platform room portal traversal failing in some cases.
 * Fixed incorrect handling of dynamic light shadows.
 * Fixed ricochet flashes after using explosive weapons.
