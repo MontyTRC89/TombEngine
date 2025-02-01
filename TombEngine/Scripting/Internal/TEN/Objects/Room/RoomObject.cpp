@@ -89,9 +89,9 @@
 			return;
 
 		// Remove previous name if it already exists.
-		if (s_callbackSetName(name, _room))
+		if (_callbackSetName(name, _room))
 		{
-			s_callbackRemoveName(_room.Name);
+			_callbackRemoveName(_room.Name);
 			_room.Name = name;
 		}
 		else

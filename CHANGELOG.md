@@ -6,9 +6,19 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ## [Version 1.7.X] (link to release) - yyyy-mm-dd
 
 ### Bug fixes
-
+* Fixed two block platform room portal traversal failing in some cases.
+* Fixed dynamic light shadows not being handled correctly.
+* Fixed ricochet flashes after using explosive weapons.
+* Fixed incorrect flare draw in crawl state.
+* Fixed starfield remaining active in the next level, if next level does not have starfield specified.
+* Fixed wetness player attribute not being preserved in a savegame.
+* Fixed HK ammo not being visible in the inventory.
+* Fixed flickering rat emitter.
+* Fixed player model submerging into the floor while swimming underwater.
 
 ### New Features
+* Added a particle based waterfall emitter object and associated sprite slots.
+- You must use this version: https://github.com/TombEngine/Resources/raw/refs/heads/main/Wad2%20Objects/Interactables/TEN_Waterfall_Emitter.wad2
 
 
 ### Lua API changes

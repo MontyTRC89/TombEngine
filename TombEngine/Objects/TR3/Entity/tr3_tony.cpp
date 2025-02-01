@@ -157,7 +157,8 @@ namespace TEN::Entities::Creatures::TR3
 		flame.maxYvel = Random::GenerateInt(-24, -16);
 		flame.fxObj = itemNumber;
 		flame.nodeNumber = hand;
-		flame.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
+		flame.SpriteSeqID = ID_DEFAULT_SPRITES;
+		flame.SpriteID = 0;
 		flame.scalar = 1;
 
 		flame.size =
@@ -202,7 +203,8 @@ namespace TEN::Entities::Creatures::TR3
 		}
 
 		flame.fxObj = (unsigned char)fxNumber;
-		flame.spriteIndex = (unsigned char)Objects[ID_DEFAULT_SPRITES].meshIndex;
+		flame.SpriteSeqID = ID_DEFAULT_SPRITES;
+		flame.SpriteID = 0;
 		float size = Random::GenerateInt(64.0f, 96.0f);
 		flame.size =
 		flame.sSize = size;

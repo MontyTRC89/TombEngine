@@ -112,7 +112,7 @@ namespace TEN::Scripting::Effects
 	// @tparam float life (default 2) Lifespan in seconds.
 	// @tparam bool applyDamage (default false) Specifies if the particle will harm the player on collision.
 	// @tparam bool applyPoison (default false) Specifies if the particle will poison the player on collision.
-	// @tparam Objects.ObjID spriteSeqID ID of the sprite sequence object.
+	// @tparam Objects.ObjID spriteSeqID (default Objects.ObjID.DEFAULT_SPRITES) ID of the sprite sequence object.
 	// @tparam float startRot (default random) Rotation at start of life.
 	// @usage
 	// EmitParticle(
@@ -127,8 +127,8 @@ namespace TEN::Scripting::Effects
 	// 	15, -- startSize
 	// 	50, -- endSize
 	// 	20, -- life
-	// 	false, -- damage
-	// 	true, -- poison
+	// 	false, -- applyDamage
+	// 	true, -- applyPoison
 	//  Objects.ObjID.DEFAULT_SPRITES, -- spriteSeqID
 	//  180 -- startRot
 	//  )
@@ -137,8 +137,8 @@ namespace TEN::Scripting::Effects
 							 TypeOrNil<float> startSize, TypeOrNil<float> endSize, TypeOrNil<float> life,
 							 TypeOrNil<bool> applyDamage, TypeOrNil<bool> applyPoison, TypeOrNil<GAME_OBJECT_ID> spriteSeqID, TypeOrNil<float> startRot)
 	{
-		constexpr auto DEFAULT_LIFE		  = 2.0f;
 		constexpr auto DEFAULT_START_SIZE = 10.0f;
+		constexpr auto DEFAULT_LIFE		  = 2.0f;
 		constexpr auto SECS_PER_FRAME	  = 1.0f / (float)FPS;
 
 		static const auto DEFAULT_COLOR = ScriptColor(255, 255, 255);
@@ -150,7 +150,8 @@ namespace TEN::Scripting::Effects
 		auto& part = *GetFreeParticle();
 
 		part.on = true;
-		part.spriteIndex = Objects[convertedSpriteSeqID].meshIndex + spriteID;
+		part.SpriteSeqID = convertedSpriteSeqID;
+		part.SpriteID = spriteID;
 
 		auto convertedBlendMode = USE_IF_HAVE(BlendMode, blendMode, BlendMode::AlphaBlend);
 		part.blendMode = BlendMode(std::clamp((int)convertedBlendMode, (int)BlendMode::Opaque, (int)BlendMode::AlphaBlend));
