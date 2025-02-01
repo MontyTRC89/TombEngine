@@ -14,7 +14,7 @@ namespace TEN::Utils
 		static constexpr auto DEFAULT_SIZE = 32;
 		static constexpr auto CHUNK_SIZE   = std::numeric_limits<ChunkType>::digits;
 
-		// Members
+		// Fields
 
 		unsigned int		   _size   = 0;
 		std::vector<ChunkType> _chunks = {};

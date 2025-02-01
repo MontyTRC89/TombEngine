@@ -32,7 +32,7 @@ using namespace TEN::Entities::Generic;
 // Lara:SetPoison(10)
 void LaraObject::SetPoison(sol::optional<int> potency)
 {
-	auto* lara = GetLaraInfo(m_item);
+	auto* lara = GetLaraInfo(_moveable);
 
 	if (potency.has_value())
 		lara->Status.Poison = std::clamp(potency.value(), 0, (int)LARA_POISON_MAX);
@@ -47,7 +47,7 @@ void LaraObject::SetPoison(sol::optional<int> potency)
 // local poisonPotency = Lara:GetPoison()
 int LaraObject::GetPoison() const
 {
-	auto* lara = GetLaraInfo(m_item);
+	auto* lara = GetLaraInfo(_moveable);
 	return lara->Status.Poison;
 }
 
@@ -58,7 +58,7 @@ int LaraObject::GetPoison() const
 // Lara:SetAir(100)
 void LaraObject::SetAir(sol::optional<int> air)
 {
-	auto* lara = GetLaraInfo(m_item);
+	auto* lara = GetLaraInfo(_moveable);
 
 	if (air.has_value())
 		lara->Status.Air = std::clamp(air.value(), 0, (int)LARA_AIR_MAX);
@@ -73,7 +73,7 @@ void LaraObject::SetAir(sol::optional<int> air)
 // local currentAir = Lara:GetAir()
 int LaraObject::GetAir() const
 {
-	auto* lara = GetLaraInfo(m_item);
+	auto* lara = GetLaraInfo(_moveable);
 	return lara->Status.Air;
 }
 
@@ -84,7 +84,7 @@ int LaraObject::GetAir() const
 // Lara:SetWet(100)
 void LaraObject::SetWet(sol::optional<int> wetness)
 {
-	auto* lara = GetLaraInfo(m_item);
+	auto* lara = GetLaraInfo(_moveable);
 
 	float value = wetness.has_value() ? (float)wetness.value() : PLAYER_DRIP_NODE_MAX;
 	for (float& i : lara->Effect.DripNodes)
@@ -98,7 +98,7 @@ void LaraObject::SetWet(sol::optional<int> wetness)
 // local dripAmount = Lara:GetWet()
 int LaraObject::GetWet() const
 {
-	auto* lara = GetLaraInfo(m_item);
+	auto* lara = GetLaraInfo(_moveable);
 	return lara->Effect.DripNodes[0];
 }
 
@@ -109,7 +109,7 @@ int LaraObject::GetWet() const
 // Lara:SetStamina(120)
 void LaraObject::SetStamina(sol::optional<int> value)
 {
-	auto* lara = GetLaraInfo(m_item);
+	auto* lara = GetLaraInfo(_moveable);
 
 	if (value.has_value())
 		lara->Status.Stamina = std::clamp(value.value(), 0, (int)LARA_STAMINA_MAX);
@@ -124,7 +124,7 @@ void LaraObject::SetStamina(sol::optional<int> value)
 // local sprintEnergy = Lara:GetStamina()
 int LaraObject::GetStamina() const
 {
-	auto* lara = GetLaraInfo(m_item);
+	auto* lara = GetLaraInfo(_moveable);
 	return lara->Status.Stamina;
 }
 
@@ -133,7 +133,7 @@ int LaraObject::GetStamina() const
 // @treturn (bool) true if Lara state must react to aerial forces.
 bool LaraObject::GetAirborne() const
 {
-	return m_item->Animation.IsAirborne;
+	return _moveable->Animation.IsAirborne;
 }
 
 /// Set the moveable's airborne status
@@ -141,7 +141,7 @@ bool LaraObject::GetAirborne() const
 // @tparam (bool) New airborn status for Lara.
 void LaraObject::SetAirborne(bool newAirborne)
 {
-	m_item->Animation.IsAirborne = newAirborne;
+	_moveable->Animation.IsAirborne = newAirborne;
 }
 
 /// Lara will undraw her weapon if it is drawn and throw away a flare if she is currently holding one.
@@ -150,7 +150,7 @@ void LaraObject::SetAirborne(bool newAirborne)
 // Lara:UndrawWeapon()
 void LaraObject::UndrawWeapon()
 {
-	auto* lara = GetLaraInfo(m_item);
+	auto* lara = GetLaraInfo(_moveable);
 
 	if (lara->Control.HandStatus != HandStatus::Free ||
 		lara->Control.Weapon.GunType == LaraWeaponType::Flare)
@@ -165,7 +165,7 @@ void LaraObject::UndrawWeapon()
 // Lara:ThrowAwayTorch()
 void LaraObject::ThrowAwayTorch()
 {
-	auto* lara = GetLaraInfo(m_item);
+	auto* lara = GetLaraInfo(_moveable);
 
 	if (lara->Control.Weapon.GunType == LaraWeaponType::Torch)
 	{
@@ -182,7 +182,7 @@ void LaraObject::ThrowAwayTorch()
 // @treturn int hand status 0=HandsFree, 1=Busy(climbing,etc), 2=WeaponDraw, 3=WeaponUndraw, 4=WeaponInHand.
 HandStatus LaraObject::GetHandStatus() const
 {
-	auto* lara = GetLaraInfo(m_item);
+	auto* lara = GetLaraInfo(_moveable);
 	return  HandStatus{ lara->Control.HandStatus };
 }
 
@@ -193,7 +193,7 @@ HandStatus LaraObject::GetHandStatus() const
 // @treturn Flow.WeaponType current weapon type.
 LaraWeaponType LaraObject::GetWeaponType() const
 {
-	auto* lara = GetLaraInfo(m_item);
+	auto* lara = GetLaraInfo(_moveable);
 	return LaraWeaponType{ lara->Control.Weapon.GunType };
 }
 
@@ -205,7 +205,7 @@ LaraWeaponType LaraObject::GetWeaponType() const
 // @tparam bool activate if `true`, also draw the weapons or set torch lit. If `false`, keep weapons holstered or leave torch unlit.
 void LaraObject::SetWeaponType(LaraWeaponType weaponType, bool activate)
 {
-	auto* lara = GetLaraInfo(m_item);
+	auto* lara = GetLaraInfo(_moveable);
 
 	switch (weaponType)
 	{
@@ -235,7 +235,7 @@ void LaraObject::SetWeaponType(LaraWeaponType weaponType, bool activate)
 // local CurrentAmmoType = Lara:GetAmmoType()
 int LaraObject::GetAmmoType() const
 {
-	const auto& player = GetLaraInfo(*m_item);
+	const auto& player = GetLaraInfo(*_moveable);
 
 	auto ammoType = std::optional<PlayerAmmoType>(std::nullopt);
 	switch (player.Control.Weapon.GunType)
@@ -328,7 +328,7 @@ int LaraObject::GetAmmoType() const
 // local equippedWeaponAmmoLeft = Lara:GetAmmoCount()
 int LaraObject::GetAmmoCount() const
 {
-	auto* lara = GetLaraInfo(m_item);
+	auto* lara = GetLaraInfo(_moveable);
 	auto& ammo = GetAmmo(Lara, Lara.Control.Weapon.GunType);
 	return (ammo.HasInfinite()) ? -1 : (int)ammo.GetCount();
 }
@@ -340,7 +340,7 @@ int LaraObject::GetAmmoCount() const
 // local vehicle = Lara:GetVehicle()
 std::unique_ptr<Moveable> LaraObject::GetVehicle() const
 {
-	auto* lara = GetLaraInfo(m_item);
+	auto* lara = GetLaraInfo(_moveable);
 
 	if (lara->Context.Vehicle == NO_VALUE)
 		return nullptr;
@@ -355,7 +355,7 @@ std::unique_ptr<Moveable> LaraObject::GetVehicle() const
 // local target = Lara:GetTarget()
 std::unique_ptr<Moveable> LaraObject::GetTarget() const
 {
-	const auto& player = GetLaraInfo(*m_item);
+	const auto& player = GetLaraInfo(*_moveable);
 
 	if (player.TargetEntity == nullptr)
 		return nullptr;
@@ -370,7 +370,7 @@ std::unique_ptr<Moveable> LaraObject::GetTarget() const
 // local interactedMoveable = Lara:GetInteractedMoveable()
 std::unique_ptr<Moveable> LaraObject::GetPlayerInteractedMoveable() const
 {
-	const auto& player = GetLaraInfo(*m_item);
+	const auto& player = GetLaraInfo(*_moveable);
 
 	if (player.Context.InteractedItem == NO_VALUE)
 		return nullptr;
@@ -385,7 +385,7 @@ std::unique_ptr<Moveable> LaraObject::GetPlayerInteractedMoveable() const
 // local torchIsLit = Lara:TorchIsLit()
 bool LaraObject::TorchIsLit() const
 {
-	auto* lara = GetLaraInfo(m_item);
+	auto* lara = GetLaraInfo(_moveable);
 	return lara->Torch.IsLit;
 }
 

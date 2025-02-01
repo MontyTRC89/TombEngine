@@ -154,7 +154,7 @@ static void AnimateWeapon(ItemInfo& laraItem, LaraWeaponType weaponType, bool& h
 							arm.Orientation.y + laraItem.Pose.Orientation.y,
 							0);
 
-					if (FireWeapon(weaponType, *player.TargetEntity, laraItem, armOrient) != FireWeaponType::NoAmmo)
+					if (FireWeapon(weaponType, player.TargetEntity, laraItem, armOrient) != FireWeaponType::NoAmmo)
 					{
 						arm.GunSmoke = 28;
 						TriggerGunShell(isRightWeapon ? true : false, ID_GUNSHELL, weaponType);
@@ -321,7 +321,7 @@ void HandlePistols(ItemInfo& laraItem, LaraWeaponType weaponType)
 		auto lightPos = Random::GeneratePointInSphere(sphere);
 		
 		int range = abs(Random::GenerateInt(settings.FlashRange - 2, settings.FlashRange + 2));
-		TriggerDynamicPointLight(lightPos, color, CLICK(range));
+		SpawnDynamicPointLight(lightPos, color, CLICK(range));
 	}
 }
 

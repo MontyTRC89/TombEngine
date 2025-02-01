@@ -102,7 +102,7 @@ namespace TEN::Scripting::Effects
 	@function EmitParticle
 	@tparam Vec3 pos
 	@tparam Vec3 velocity
-	@tparam int spriteIndex an index of a sprite in DEFAULT_SPRITES object.
+	@tparam int spriteID ID of the sprite in the DEFAULT_SPRITES sprite sequence object.
 	@tparam int gravity (default 0) Specifies whether particle will fall (positive values) or ascend (negative values) over time. Clamped to [-32768, 32767], but values between -1000 and 1000 are recommended; values too high or too low (e.g. under -2000 or above 2000) will cause the velocity of the particle to "wrap around" and switch directions.
 	@tparam float rot (default 0) specifies a speed with which it will rotate (0 = no rotation, negative = anticlockwise rotation, positive = clockwise rotation).
 	@tparam Color startColor (default Color(255, 255, 255)) color at start of life
@@ -117,7 +117,7 @@ namespace TEN::Scripting::Effects
 	EmitParticle(
 		yourPositionVarHere,
 		Vec3(math.random(), math.random(), math.random()),
-		22, -- spriteIndex
+		22, -- spriteID
 		0, -- gravity
 		-2, -- rot
 		Color(255, 0, 0), -- startColor
@@ -130,7 +130,7 @@ namespace TEN::Scripting::Effects
 		true -- poison
 		)
 	*/
-	static void EmitParticle(Vec3 pos, Vec3 velocity, int spriteIndex, TypeOrNil<int> gravity, TypeOrNil<float> rot, 
+	static void EmitParticle(Vec3 pos, Vec3 velocity, int spriteID, TypeOrNil<int> gravity, TypeOrNil<float> rot, 
 							TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<BlendMode> blendMode, 
 							TypeOrNil<int> startSize, TypeOrNil<int> endSize, TypeOrNil<float> lifetime, 
 							TypeOrNil<bool> damage, TypeOrNil<bool> poison)
@@ -146,7 +146,8 @@ namespace TEN::Scripting::Effects
 
 		s->on = true;
 
-		s->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + spriteIndex;
+		s->SpriteSeqID = ID_DEFAULT_SPRITES;
+		s->SpriteID = spriteID;
 
 		ScriptColor colorStart = USE_IF_HAVE(ScriptColor, startColor, ScriptColor( 255, 255, 255 ));
 		ScriptColor colorEnd = USE_IF_HAVE(ScriptColor, endColor, ScriptColor( 255, 255, 255 ));
@@ -269,7 +270,7 @@ namespace TEN::Scripting::Effects
 	{
 		auto color = USE_IF_HAVE(ScriptColor, col, ScriptColor(255, 255, 255));
 		int rad = (float)(USE_IF_HAVE(int, radius, 20) * BLOCK(0.25f));
-		TriggerDynamicPointLight(pos.ToVector3(), color, rad, USE_IF_HAVE(bool, castShadows, false), GetHash(USE_IF_HAVE(std::string, name, std::string())));
+		SpawnDynamicPointLight(pos.ToVector3(), color, rad, USE_IF_HAVE(bool, castShadows, false), GetHash(USE_IF_HAVE(std::string, name, std::string())));
 	}
 
 /***Emit dynamic directional spotlight that lasts for a single frame.
@@ -290,7 +291,7 @@ namespace TEN::Scripting::Effects
 		int rad =	  (float)(USE_IF_HAVE(int, radius,   10) * BLOCK(0.25f));
 		int fallOff = (float)(USE_IF_HAVE(int, falloff,   5) * BLOCK(0.25f));
 		int dist =	  (float)(USE_IF_HAVE(int, distance, 20) * BLOCK(0.25f));
-		TriggerDynamicSpotLight(pos.ToVector3(), dir.ToVector3(), color, rad, fallOff, dist, USE_IF_HAVE(bool, castShadows, false), GetHash(USE_IF_HAVE(std::string, name, std::string())));
+		SpawnDynamicSpotLight(pos.ToVector3(), dir.ToVector3(), color, rad, fallOff, dist, USE_IF_HAVE(bool, castShadows, false), GetHash(USE_IF_HAVE(std::string, name, std::string())));
 	}
 
 /***Emit blood.

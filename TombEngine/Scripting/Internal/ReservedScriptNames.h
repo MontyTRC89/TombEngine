@@ -24,7 +24,6 @@ static constexpr char ScriptReserved_AIObject[]			= "AIObject";
 static constexpr char ScriptReserved_Volume[]			= "Volume";
 static constexpr char ScriptReserved_Color[]			= "Color";
 static constexpr char ScriptReserved_DisplayString[]	= "DisplayString";
-static constexpr char ScriptReserved_Rotation[]			= "Rotation";
 static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
 static constexpr char ScriptReserved_Statistics[]		= "Statistics";
 
@@ -166,6 +165,7 @@ static constexpr char ScriptReserved_SetVelocity[]			= "SetVelocity";
 static constexpr char ScriptReserved_GetFrameNumber[]		= "GetFrame";
 static constexpr char ScriptReserved_GetEndFrame[]			= "GetEndFrame";
 static constexpr char ScriptReserved_SetFrameNumber[]		= "SetFrame";
+static constexpr char ScriptReserved_GetAnimSlot[]			= "GetAnimSlot";
 static constexpr char ScriptReserved_GetAnimNumber[]		= "GetAnim";
 static constexpr char ScriptReserved_SetAnimNumber[]		= "SetAnim";
 static constexpr char ScriptReserved_GetStateNumber[]		= "GetState";
@@ -223,7 +223,6 @@ static constexpr char ScriptReserved_IsTagPresent[]			= "IsTagPresent";
 static constexpr char ScriptReserved_AddLevel[]					= "AddLevel";
 static constexpr char ScriptReserved_GetLevel[]					= "GetLevel";
 static constexpr char ScriptReserved_GetCurrentLevel[]			= "GetCurrentLevel";
-static constexpr char ScriptReserved_GetNextLevel[]				= "GetNextLevel";
 static constexpr char ScriptReserved_SetIntroImagePath[]		= "SetIntroImagePath";
 static constexpr char ScriptReserved_SetTitleScreenImagePath[]	= "SetTitleScreenImagePath";
 static constexpr char ScriptReserved_SetFarView[]				= "SetFarView";
@@ -426,6 +425,7 @@ constexpr char ScriptReserved_Vec2Lerp[]			= "Lerp";
 constexpr char ScriptReserved_Vec2SetLength[]		= "ToLength";
 constexpr char ScriptReserved_Vec2Normalize[]		= "Normalize";
 constexpr char ScriptReserved_Vec2Rotate[]			= "Rotate";
+constexpr char ScriptReserved_Vec2Translate[]		= "Translate";
 
 // Vec3
 
@@ -437,7 +437,9 @@ constexpr char ScriptReserved_Vec3Length[]			= "Length";
 constexpr char ScriptReserved_Vec3Lerp[]			= "Lerp";
 constexpr char ScriptReserved_Vec3Normalize[]		= "Normalize";
 constexpr char ScriptReserved_Vec3Rotate[]			= "Rotate";
+constexpr char ScriptReserved_Vec3Translate[]		= "Translate";
 
-// Rotation
+// Rotation object
 
+constexpr char ScriptReserved_Rotation[]			= "Rotation";
 constexpr char ScriptReserved_RotationDirection[]	= "Direction";
