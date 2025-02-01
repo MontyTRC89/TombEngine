@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.7 Lua API</title>
+    <title>TombEngine 1.7.2 (Developer) Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -141,6 +141,18 @@
 	<tr>
 	<td class="name" ><a href="#Vec3:Normalize">Vec3:Normalize()</a></td>
 	<td class="summary">Get a copy of this Vec3 normalized to length 1.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Translate">Translate(dir, dist)</a></td>
+	<td class="summary">Get a copy of this Vec3 translated in the input Vec3 direction by the input distance.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Translate">Translate(rot, dist)</a></td>
+	<td class="summary">Get a copy of this Vec3 translated in the direction of the input Rotation object by the input distance.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Translate">Translate(rot, relOffset)</a></td>
+	<td class="summary">Get a copy of this Vec3 translated by an offset, where the input relative offset Vec3 is rotated according to the input Rotation object.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Vec3:Rotate">Vec3:Rotate(rot)</a></td>
@@ -307,6 +319,102 @@
 
            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
         Normalized vector.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Translate"></a>
+    <strong>Translate(dir, dist)</strong>
+    </dt>
+    <dd>
+    Get a copy of this Vec3 translated in the input Vec3 direction by the input distance.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">dir</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         Direction vector. Normalized automatically to length 1.
+        </li>
+        <li><span class="parameter">dist</span>
+            <span class="types"><span class="type">float</span></span>
+         Distance.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+        Translated vector.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Translate"></a>
+    <strong>Translate(rot, dist)</strong>
+    </dt>
+    <dd>
+    Get a copy of this Vec3 translated in the direction of the input Rotation object by the input distance.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">rot</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
+         Rotation object defining the direction.
+        </li>
+        <li><span class="parameter">dist</span>
+            <span class="types"><span class="type">float</span></span>
+         Distance.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+        Translated vector.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Translate"></a>
+    <strong>Translate(rot, relOffset)</strong>
+    </dt>
+    <dd>
+    Get a copy of this Vec3 translated by an offset, where the input relative offset Vec3 is rotated according to the input Rotation object.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">rot</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
+         Rotation object rotating the input relative offset vector.
+        </li>
+        <li><span class="parameter">relOffset</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         Relative offset vector before rotation.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+        Translated vector.
     </ol>
 
 

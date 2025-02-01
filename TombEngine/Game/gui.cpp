@@ -65,7 +65,6 @@ namespace TEN::Gui
 		STRING_VIEW,
 		STRING_CHOOSE_WEAPON,
 		""
-	//	STRING_READ_DIARY
 	};
 
 	std::vector<std::string> GeneralActionStrings =
@@ -713,11 +712,9 @@ namespace TEN::Gui
 					}
 					else
 					{
-						// Just for updating blink time
-						g_Renderer.PrepareScene();
+						g_Renderer.PrepareScene(); // Just for updating blink time.
+						UpdateInputActions(item);
 					}
-
-					UpdateInputActions(item);
 
 					if (CurrentSettings.IgnoreInput)
 					{
@@ -1694,7 +1691,8 @@ namespace TEN::Gui
 		if (player.Inventory.TotalFlares)
 			InsertObjectIntoList(INV_OBJECT_FLARES);
 
-		InsertObjectIntoList(INV_OBJECT_TIMEX);//every level has the timex? what's a good way to check?!
+		if (player.Inventory.HasStopwatch)
+			InsertObjectIntoList(INV_OBJECT_STOPWATCH);
 
 		if (player.Inventory.TotalSmallMedipacks)
 			InsertObjectIntoList(INV_OBJECT_SMALL_MEDIPACK);
@@ -1771,13 +1769,15 @@ namespace TEN::Gui
 				InsertObjectIntoList(INV_OBJECT_EXAMINE1_COMBO1 + i);
 		}
 
-		if (player.Inventory.Diary.Present)
+		if (player.Inventory.HasDiary)
 			InsertObjectIntoList(INV_OBJECT_DIARY);
 
 		if (g_GameFlow->IsLoadSaveEnabled())
 		{
-			InsertObjectIntoList(INV_OBJECT_LOAD_FLOPPY);
-			InsertObjectIntoList(INV_OBJECT_SAVE_FLOPPY);
+			if (player.Inventory.HasLoad)
+				InsertObjectIntoList(INV_OBJECT_LOAD_FLOPPY);
+			if (player.Inventory.HasSave)
+				InsertObjectIntoList(INV_OBJECT_SAVE_FLOPPY);
 		}
 
 		Rings[(int)RingTypes::Inventory].ObjectListMovement = 0;
@@ -2440,13 +2440,6 @@ namespace TEN::Gui
 					CurrentOptions[n].Text = g_GameFlow->GetString(OptionStrings[3].c_str());
 					n++;
 				}
-
-				if (options & OPT_DIARY)
-				{
-					CurrentOptions[n].Type = MenuType::Diary;
-					CurrentOptions[n].Text = g_GameFlow->GetString(OptionStrings[11].c_str());
-					n++;
-				}
 			}
 			else
 			{
@@ -2576,11 +2569,6 @@ namespace TEN::Gui
 					case MenuType::Use:
 						MenuActive = false;
 						ItemUsed = true;
-						break;
-
-					case MenuType::Diary:
-						SetInventoryMode(InventoryMode::Diary);
-						player.Inventory.Diary.CurrentPage = 1;
 						break;
 					}
 				}
@@ -3320,10 +3308,6 @@ namespace TEN::Gui
 					DoExamineMode();
 					break;
 
-				case InventoryMode::Diary:
-					DoDiary(item);
-					break;
-
 				case InventoryMode::Load:
 					switch (DoLoad())
 					{
@@ -3434,6 +3418,9 @@ namespace TEN::Gui
 
 	void GuiController::DrawCompass(ItemInfo* item)
 	{
+		if (!Lara.Inventory.HasCompass)
+			return;
+
 		constexpr auto POS_2D	  = Vector2(130.0f, 450.0f);
 		constexpr auto LERP_ALPHA = 0.1f;
 
@@ -3446,33 +3433,6 @@ namespace TEN::Gui
 		// HACK: Needle is rotated in the draw function.
 		const auto& invObject = InventoryObjectTable[INV_OBJECT_COMPASS];
 		g_Renderer.DrawObjectIn2DSpace(ID_COMPASS_ITEM, POS_2D, EulerAngles::Identity, invObject.Scale1 * 1.5f);
-	}
-
-	void GuiController::DoDiary(ItemInfo* item)
-	{
-		auto& player = GetLaraInfo(*item);
-
-		SetInventoryMode(InventoryMode::Diary);
-
-		if (GuiIsPulsed(In::Right) &&
-			player.Inventory.Diary.CurrentPage < player.Inventory.Diary.NumPages)
-		{
-			player.Inventory.Diary.CurrentPage++;
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-		}
-
-		if (GuiIsPulsed(In::Left) &&
-			player.Inventory.Diary.CurrentPage > 1)
-		{
-			player.Inventory.Diary.CurrentPage--;
-			SoundEffect(SFX_TR4_MENU_CHOOSE, nullptr, SoundEnvironment::Always);
-		}
-
-		if (GuiIsDeselected())
-		{
-			SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-			SetInventoryMode(InventoryMode::None);
-		}
 	}
 
 	int GuiController::GetLoadSaveSelection()

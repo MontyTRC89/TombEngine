@@ -615,6 +615,7 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 
 		ResetPlayerFlex(item);
 		InitializeLaraMeshes(item);
+		item->Animation.IsAirborne = false;
 		item->HitPoints = LARA_HEALTH_MAX;
 		player.Control.HandStatus = HandStatus::Free;
 	}

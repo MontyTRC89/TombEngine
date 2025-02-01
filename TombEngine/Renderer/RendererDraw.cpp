@@ -268,10 +268,10 @@ namespace TEN::Renderer
 			auto worldMatrix = rotMatrix * translation;
 
 			auto prevTranslation = Matrix::CreateTranslation(
-				gunshell->oldPos.Position.x,
-				gunshell->oldPos.Position.y,
-				gunshell->oldPos.Position.z);
-			auto prevRotMatrix = gunshell->oldPos.Orientation.ToRotationMatrix();
+				gunshell->PrevPose.Position.x,
+				gunshell->PrevPose.Position.y,
+				gunshell->PrevPose.Position.z);
+			auto prevRotMatrix = gunshell->PrevPose.Orientation.ToRotationMatrix();
 			auto prevWorldMatrix = prevRotMatrix * prevTranslation;
 
 			worldMatrix = Matrix::Lerp(prevWorldMatrix, worldMatrix, GetInterpolationFactor());
@@ -485,7 +485,8 @@ namespace TEN::Renderer
 
 				if (rat->On)
 				{
-					RendererMesh* mesh = GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
+					int index = (GlobalCounter + i) % Objects[ID_RATS_EMITTER].nmeshes;
+					auto* mesh = GetMesh(Objects[ID_RATS_EMITTER].meshIndex + index);
 
 					for (int j = 0; j < mesh->Buckets.size(); j++)
 					{
@@ -561,7 +562,8 @@ namespace TEN::Renderer
 
 					if (rat->On)
 					{
-						const auto& mesh = *GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
+						int index = (GlobalCounter + i) % Objects[ID_RATS_EMITTER].nmeshes;
+						const auto& mesh = *GetMesh(Objects[ID_RATS_EMITTER].meshIndex + index);
 
 						auto world = rat->Transform;
 						ReflectMatrixOptionally(world);

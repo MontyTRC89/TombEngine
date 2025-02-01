@@ -268,9 +268,9 @@ namespace TEN::Effects::Boss
 
 		if (counter >= countUntilDeath)
 		{
-			CreatureDie(itemNumber, allowExplosion);
-
-			if (!allowExplosion)
+			if (allowExplosion)
+				CreatureDie(itemNumber, allowExplosion, true);
+			else
 				KillItem(itemNumber);
 		}
 	}

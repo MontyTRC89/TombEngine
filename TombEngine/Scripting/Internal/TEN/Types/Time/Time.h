@@ -4,14 +4,15 @@ namespace TEN::Scripting
 {
 	class Time
 	{
+	public:
+		static void Register(sol::table& parent);
+
 	private:
-		// Members
+		// Fields
 
 		int _frameCount = 0;
 
 	public:
-		static void Register(sol::table& parent);
-
 		// Constructors
 
 		Time() = default;
