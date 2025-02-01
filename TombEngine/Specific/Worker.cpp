@@ -8,7 +8,7 @@ namespace TEN::Utils
 	WorkerController::WorkerController()
 	{
 		// Reserve threads.
-		unsigned int threadCount = GetCoreCount() * 2;
+		unsigned int threadCount = g_GameFlow->GetSettings()->System.Multithreaded ? (GetCoreCount() * 2) : 1;
 		_threads.reserve(threadCount);
 
 		// Create threads.
