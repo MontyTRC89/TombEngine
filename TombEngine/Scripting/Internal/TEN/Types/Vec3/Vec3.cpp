@@ -32,11 +32,11 @@ void Vec3::Register(sol::table& parent)
 		sol::meta_function::equal_to, &Vec3::IsEqualTo,
 
 		ScriptReserved_Vec3Normalize, &Vec3::Normalize,
-		ScriptReserved_Vec3Rotate, &Vec3::Rotate,
 		ScriptReserved_Vec3Translate, sol::overload(
 			(Vec3(Vec3::*)(const Vec3&, float))(&Vec3::Translate),
 			(Vec3(Vec3::*)(const Rotation&, float))(&Vec3::Translate),
 			(Vec3(Vec3::*)(const Rotation&, const Vec3&))(&Vec3::Translate)),
+		ScriptReserved_Vec3Rotate, &Vec3::Rotate,
 		ScriptReserved_Vec3Lerp, &Vec3::Lerp,
 		ScriptReserved_Vec3Cross, &Vec3::Cross,
 		ScriptReserved_Vec3Dot, &Vec3::Dot,
