@@ -23,6 +23,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 
 ### Lua API changes
+* Added Effects.EmitAirBubble() function to spawn air bubbles.
 
 * Added additional arguments for Sprite object slot and starting rotation value for EmitParticle function.
   

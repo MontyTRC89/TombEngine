@@ -4,6 +4,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/los.h"
+#include "Game/effects/Bubble.h"
 #include "Game/effects/DisplaySprite.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Electricity.h"
@@ -30,6 +31,7 @@
 // @tentable Effects 
 // @pragma nostrip
 
+using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
@@ -292,17 +294,33 @@ namespace TEN::Scripting::Effects
 @tparam Vec3 pos
 @tparam int count (default 1) "amount" of blood. Higher numbers won't add more blood but will make it more "flickery", with higher numbers turning it into a kind of red orb.
 */
-	static void EmitBlood(Vec3 pos, TypeOrNil<int> num)
+	static void EmitBlood(const Vec3& pos, TypeOrNil<int> count)
 	{
-		TriggerBlood(pos.x, pos.y, pos.z, -1, USE_IF_HAVE(int, num, 1));
+		TriggerBlood(pos.x, pos.y, pos.z, -1, USE_IF_HAVE(int, count, 1));
 	}
 
-/***Emit fire for one frame. Will not hurt Lara. Call this each frame if you want a continuous fire.
+	/// Emit air bubble in a water room.
+	// @function EmitAirBubble
+	// @tparam Vec3 pos World position where the effect will be spawned. Must be in a water room.
+	// @tparam[opt] float size Sprite size. __Default: 32__
+	// @tparam[opt] float amp Oscillation amplitude. __Default: 32__
+	static void EmitAirBubble(const Vec3& pos, TypeOrNil<float> size, TypeOrNil<float> amp)
+	{
+		constexpr auto DEFAULT_SIZE = 128.0f;
+		constexpr auto DEFAULT_AMP	= 32.0f;
+
+		int roomNumber = FindRoomNumber(pos.ToVector3i());
+		float convertedSize = USE_IF_HAVE(float, size, DEFAULT_SIZE);
+		float convertedAmp = USE_IF_HAVE(float, amp, DEFAULT_AMP);
+		SpawnBubble(pos.ToVector3(), roomNumber, convertedSize, convertedAmp);
+	}
+
+/***Emit fire for one frame. Will not hurt player. Call this each frame if you want a continuous fire.
 @function EmitFire
 @tparam Vec3 pos
 @tparam float size (default 1.0)
 */
-	static void EmitFire(Vec3 pos, TypeOrNil<float> size)
+	static void EmitFire(const Vec3& pos, TypeOrNil<float> size)
 	{
 		AddFire(pos.x, pos.y, pos.z, FindRoomNumber(Vector3i(pos.x, pos.y, pos.z)), USE_IF_HAVE(float, size, 1));
 	}
@@ -348,6 +366,7 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_EmitLight, &EmitLight);
 		tableEffects.set_function(ScriptReserved_EmitSpotLight, &EmitSpotLight);
 		tableEffects.set_function(ScriptReserved_EmitBlood, &EmitBlood);
+		tableEffects.set_function(ScriptReserved_EmitAirBubble, &EmitAirBubble);
 		tableEffects.set_function(ScriptReserved_MakeExplosion, &MakeExplosion);
 		tableEffects.set_function(ScriptReserved_EmitFire, &EmitFire);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);

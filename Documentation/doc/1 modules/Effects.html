@@ -140,6 +140,10 @@
 	<td class="summary">Emit blood.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#EmitAirBubble">EmitAirBubble(pos[, size][, amplitude])</a></td>
+	<td class="summary">Emit air bubble in a water room.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#EmitFire">EmitFire(pos, size)</a></td>
 	<td class="summary">Emit fire for one frame.</td>
 	</tr>
@@ -499,11 +503,43 @@
 
 </dd>
     <dt>
+    <a name = "EmitAirBubble"></a>
+    <strong>EmitAirBubble(pos[, size][, amplitude])</strong>
+    </dt>
+    <dd>
+    Emit air bubble in a water room.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pos</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         The position where the air bubble will be spawned. Needs to be in a water room.
+        </li>
+        <li><span class="parameter">size</span>
+            <span class="types"><span class="type">float</span></span>
+         The size of the air bubble.
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">amplitude</span>
+            <span class="types"><span class="type">float</span></span>
+         The oscillation amplitude of the air bubble.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
     <a name = "EmitFire"></a>
     <strong>EmitFire(pos, size)</strong>
     </dt>
     <dd>
-    Emit fire for one frame.  Will not hurt Lara. Call this each frame if you want a continuous fire.
+    Emit fire for one frame.  Will not hurt player. Call this each frame if you want a continuous fire.
 
 
 
