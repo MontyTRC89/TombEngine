@@ -36,40 +36,7 @@ namespace TEN::Utils
 
 		std::future<void> AddTask(const WorkerTask& task);
 		std::future<void> AddTasks(const WorkerTaskGroup& tasks);
-
-		template<typename T>
-		std::future<void> AddTasks(const std::vector<T>& vector, const std::function<void(int, int)>& task)
-		{
-			constexpr auto SERIAL_UNIT_COUNT_MAX = 32;
-
-			int itemCount = (int)vector.size();
-			auto tasks = WorkerTaskGroup{};
-
-			// Process in parallel.
-			if (g_GameFlow->GetSettings()->System.MultiThreaded &&
-				itemCount > SERIAL_UNIT_COUNT_MAX)
-			{
-				int threadCount = GetCoreCount();
-				int chunkSize = ((itemCount + threadCount) - 1) / threadCount;
-
-				// Collect group tasks.
-				tasks.reserve(threadCount);
-				for (int i = 0; i < threadCount; i++)
-				{
-					int start = i * chunkSize;
-					int end = std::min(start + chunkSize, itemCount);
-					tasks.push_back([&task, start, end]() { task(start, end); });
-				}
-			}
-			// Process linearly.
-			else
-			{
-				tasks.push_back([&task, itemCount]() { task(0, itemCount); });
-			}
-
-			// Add task group and return future to wait on completion if needed.
-			return AddTasks(tasks);
-		}
+		std::future<void> AddTasks(unsigned int itemCount, const std::function<void(unsigned int, unsigned int)>& splitTask);
 
 	private:
 		// Helpers

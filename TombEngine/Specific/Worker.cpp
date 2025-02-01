@@ -78,6 +78,38 @@ namespace TEN::Utils
 		return promise->get_future();
 	}
 
+	std::future<void> WorkerController::AddTasks(unsigned int itemCount, const std::function<void(unsigned int, unsigned int)>& splitTask)
+	{
+		constexpr auto SERIAL_UNIT_COUNT_MAX = 32;
+
+		auto tasks = WorkerTaskGroup{};
+
+		// Process in parallel.
+		if (g_GameFlow->GetSettings()->System.MultiThreaded &&
+			itemCount > SERIAL_UNIT_COUNT_MAX)
+		{
+			unsigned int threadCount = GetCoreCount();
+			unsigned int chunkSize = ((itemCount + threadCount) - 1) / threadCount;
+
+			// Collect group tasks.
+			tasks.reserve(threadCount);
+			for (int i = 0; i < threadCount; i++)
+			{
+				unsigned int start = i * chunkSize;
+				unsigned int end = std::min(start + chunkSize, itemCount);
+				tasks.push_back([&splitTask, start, end]() { splitTask(start, end); });
+			}
+		}
+		// Process linearly.
+		else
+		{
+			tasks.push_back([&splitTask, itemCount]() { splitTask(0, itemCount); });
+		}
+
+		// Add task group and return future to wait on completion if needed.
+		return AddTasks(tasks);
+	}
+
 	void WorkerController::Worker()
 	{
 		while (true)

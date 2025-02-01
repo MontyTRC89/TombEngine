@@ -292,7 +292,7 @@ namespace TEN::Renderer
 			}
 
 			// Define sprite preparation logic.
-			auto prepareSprites = [&](int start, int end)
+			auto prepareSprites = [&](unsigned int start, unsigned int end)
 			{
 				for (int i = start; i < end; i++)
 				{
@@ -314,7 +314,7 @@ namespace TEN::Renderer
 					_stInstancedSpriteBuffer.Sprites[i].UV[1].w = spriteToDraw.Sprite->UV[3].y;
 				}
 			};
-			g_Worker.AddTasks(spriteBucket.SpritesToDraw, prepareSprites).wait();
+			g_Worker.AddTasks((unsigned int)spriteBucket.SpritesToDraw.size(), prepareSprites).wait();
 
 			BindTexture(TextureRegister::ColorMap, spriteBucket.Sprite->Texture, SamplerStateRegister::LinearClamp);
 			_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
