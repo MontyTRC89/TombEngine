@@ -33,8 +33,17 @@ namespace TEN::Utils
 		// Join all threads.
 		for (auto& thread : _threads)
 		{
-			if (thread.joinable())
+			if (!thread.joinable())
+				continue;
+
+			try
+			{
 				thread.join();
+			}
+			catch (const std::exception& ex)
+			{
+				TENLog("Error joining thread: " + std::string(ex.what()), LogLevel::Error);
+			}
 		}
 	}
 
@@ -80,6 +89,7 @@ namespace TEN::Utils
 
 	std::future<void> WorkerController::AddTasks(unsigned int itemCount, const std::function<void(unsigned int, unsigned int)>& splitTask)
 	{
+		// TODO: Make this a configuration option?
 		constexpr auto SERIAL_UNIT_COUNT_MAX = 32;
 
 		auto tasks = WorkerTaskGroup{};
