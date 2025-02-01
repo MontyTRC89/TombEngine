@@ -12,6 +12,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/Setup.h"
+#include "Math/Math.h"
 #include "Objects/Utils/object_helper.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
@@ -25,17 +26,16 @@
 #include "Specific/clock.h"
 #include "Specific/trutils.h"
 
-/***
-Functions to generate effects.
-@tentable Effects 
-@pragma nostrip
-*/
+/// Functions to generate effects.
+// @tentable Effects 
+// @pragma nostrip
 
 using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
+using namespace TEN::Math;
 
 namespace TEN::Scripting::Effects
 {
@@ -97,128 +97,115 @@ namespace TEN::Scripting::Effects
 		SpawnElectricity(p1, p2, byteAmplitude, col.GetR(), col.GetG(), col.GetB(), byteLife, flags, width, segs);
 	}
 
-	/*** Emit a particle.
-	 See the sprite editor in WadTool for DEFAULT_SPRITES to see a list of sprite indices.
-	@function EmitParticle
-	@tparam Vec3 pos
-	@tparam Vec3 velocity
-	@tparam int spriteIndex an index of a sprite in DEFAULT_SPRITES object.
-	@tparam int gravity (default 0) Specifies whether particle will fall (positive values) or ascend (negative values) over time. Clamped to [-32768, 32767], but values between -1000 and 1000 are recommended; values too high or too low (e.g. under -2000 or above 2000) will cause the velocity of the particle to "wrap around" and switch directions.
-	@tparam float rot (default 0) specifies a speed with which it will rotate (0 = no rotation, negative = anticlockwise rotation, positive = clockwise rotation).
-	@tparam Color startColor (default Color(255, 255, 255)) color at start of life
-	@tparam Color endColor (default Color(255, 255, 255)) color to fade to - at the time of writing this fade will finish long before the end of the particle's life due to internal maths
-	@tparam Effects.BlendID blendMode (default TEN.Effects.BlendID.ALPHABLEND) How will we blend this with its surroundings?
-	@tparam int startSize (default 10) Size on spawn. A value of 15 is approximately the size of Lara's head.
-	@tparam int endSize (default 0) Size on death - the particle will linearly shrink or grow to this size during its lifespan
-	@tparam float lifetime (default 2) Lifespan in seconds 
-	@tparam bool damage (default false) specifies whether particle can damage Lara (does a very small amount of damage, like the small lava emitters in TR1)
-	@tparam bool poison (default false) specifies whether particle can poison Lara
-	@tparam Objects.ObjID ID of the sprite object.
-	@tparam float startRot (default random) specifies the starting rotation value of the particle.
-	@usage
-	EmitParticle(
-		yourPositionVarHere,
-		Vec3(math.random(), math.random(), math.random()),
-		22, -- spriteIndex
-		0, -- gravity
-		-2, -- rot
-		Color(255, 0, 0), -- startColor
-		Color(0,  255, 0), -- endColor
-		TEN.Effects.BlendID.ADDITIVE, -- blendMode
-		15, -- startSize
-		50, -- endSize
-		20, -- lifetime
-		false, -- damage
-		true -- poison
-		)
-	*/
-	static void EmitParticle(Vec3 pos, Vec3 velocity, int spriteIndex, TypeOrNil<int> gravity, TypeOrNil<float> rot, 
-							TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<BlendMode> blendMode, 
-							TypeOrNil<int> startSize, TypeOrNil<int> endSize, TypeOrNil<float> lifetime, 
-							TypeOrNil<bool> damage, TypeOrNil<bool> poison, TypeOrNil<GAME_OBJECT_ID> objectID, TypeOrNil<float> startRot)
+	/// Emit a particle.
+	// @function EmitParticle
+	// @tparam Vec3 pos World position.
+	// @tparam Vec3 vel Velocity.
+	// @tparam int spriteID ID of the sprite in the sprite sequence object.
+	// @tparam float gravity (default 0) Specifies if the particle will fall over time. Positive values ascend, negative values descend. Recommended range: [-1000 and 1000].
+	// @tparam float rotVel (default 0) Rotational velocity in degrees.
+	// @tparam Color startColor (default Color(255, 255, 255)) Color at start of life.
+	// @tparam Color endColor (default Color(255, 255, 255)) Color to fade toward. This will finish long before the end of the particle's life due to internal math.
+	// @tparam Effects.BlendID blendMode (default TEN.Effects.BlendID.ALPHABLEND) Render blend mode.
+	// @tparam float startSize (default 10) Size at start of life.
+	// @tparam float endSize (default 0) Size at end of life. The particle will linearly shrink or grow toward this size over its lifespan.
+	// @tparam float life (default 2) Lifespan in seconds.
+	// @tparam bool applyDamage (default false) Specifies if the particle will harm the player on collision.
+	// @tparam bool applyPoison (default false) Specifies if the particle will poison the player on collision.
+	// @tparam Objects.ObjID spriteSeqID ID of the sprite sequence object.
+	// @tparam float startRot (default random) Rotation at start of life.
+	// @usage
+	// EmitParticle(
+	// 	pos,
+	// 	Vec3(math.random(), math.random(), math.random()),
+	// 	22, -- spriteID
+	// 	0, -- gravity
+	// 	-2, -- rotVel
+	// 	Color(255, 0, 0), -- startColor
+	// 	Color(0,  255, 0), -- endColor
+	// 	TEN.Effects.BlendID.ADDITIVE, -- blendMode
+	// 	15, -- startSize
+	// 	50, -- endSize
+	// 	20, -- life
+	// 	false, -- damage
+	// 	true, -- poison
+	//  Objects.ObjID.DEFAULT_SPRITES, -- spriteSeqID
+	//  180 -- startRot
+	//  )
+	static void EmitParticle(const Vec3& pos, const Vec3& vel, int spriteID, TypeOrNil<float> gravity, TypeOrNil<float> rotVel,
+							 TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<BlendMode> blendMode, 
+							 TypeOrNil<float> startSize, TypeOrNil<float> endSize, TypeOrNil<float> life,
+							 TypeOrNil<bool> applyDamage, TypeOrNil<bool> applyPoison, TypeOrNil<GAME_OBJECT_ID> spriteSeqID, TypeOrNil<float> startRot)
 	{
-		// Ensure objectID is valid 
-		GAME_OBJECT_ID effectiveObjectID = USE_IF_HAVE(GAME_OBJECT_ID, objectID, ID_DEFAULT_SPRITES); 
+		constexpr auto DEFAULT_LIFE		  = 2.0f;
+		constexpr auto DEFAULT_START_SIZE = 10.0f;
+		constexpr auto SECS_PER_FRAME	  = 1.0f / (float)FPS;
+
+		static const auto DEFAULT_COLOR = ScriptColor(255, 255, 255);
+
+		auto convertedSpriteSeqID = USE_IF_HAVE(GAME_OBJECT_ID, spriteSeqID, ID_DEFAULT_SPRITES); 
+		if (!CheckIfSlotExists(convertedSpriteSeqID, "EmitParticle() script function."))
+			return;
+
+		auto& part = *GetFreeParticle();
+
+		part.on = true;
+		part.spriteIndex = Objects[convertedSpriteSeqID].meshIndex + spriteID;
+
+		auto convertedBlendMode = USE_IF_HAVE(BlendMode, blendMode, BlendMode::AlphaBlend);
+		part.blendMode = BlendMode(std::clamp((int)convertedBlendMode, (int)BlendMode::Opaque, (int)BlendMode::AlphaBlend));
+
+		part.x = pos.x;
+		part.y = pos.y;
+		part.z = pos.z;
+		part.roomNumber = FindRoomNumber(Vector3i(pos.x, pos.y, pos.z));
+
+		part.xVel = short(vel.x * 32);
+		part.yVel = short(vel.y * 32);
+		part.zVel = short(vel.z * 32);
+
+		float rotAdd = USE_IF_HAVE(float, rotVel, 0.0f);
+		part.rotAng = USE_IF_HAVE(float, startRot, TO_DEGREES(Random::GenerateAngle()));
+		part.rotAdd = byte(ANGLE(rotAdd) >> 4);
 		
-		// Validate the effective object ID 
-		if (!CheckIfSlotExists(effectiveObjectID, "Particle spawn script function"))
-		return;
+		part.sSize =
+		part.size = USE_IF_HAVE(float, startSize, DEFAULT_START_SIZE);
+		part.dSize = USE_IF_HAVE(float, endSize, 0.0f);
+		part.scalar = 2;
 
-		int grav = USE_IF_HAVE(int, gravity, 0);
+		part.gravity = (short)std::clamp(USE_IF_HAVE(float, gravity, 0.0f), (float)SHRT_MIN, (float)SHRT_MAX);
+		part.friction = 0;
+		part.maxYvel = 0;
 
-		grav = std::clamp(grav, -32768, 32767);
+		auto convertedStartColor = USE_IF_HAVE(ScriptColor, startColor, DEFAULT_COLOR);
+		part.sR = convertedStartColor.GetR();
+		part.sG = convertedStartColor.GetG();
+		part.sB = convertedStartColor.GetB();
 
-		auto* s = GetFreeParticle();
+		auto convertedEndColor = USE_IF_HAVE(ScriptColor, endColor, DEFAULT_COLOR);
+		part.dR = convertedEndColor.GetR();
+		part.dG = convertedEndColor.GetG();
+		part.dB = convertedEndColor.GetB();
 
-		s->on = true;
+		float convertedLife = std::max(0.1f, USE_IF_HAVE(float, life, DEFAULT_LIFE));
+		part.life =
+		part.sLife = (int)round(convertedLife / SECS_PER_FRAME);
+		part.colFadeSpeed = part.life / 2;
+		part.fadeToBlack = part.life / 3;
 
-		s->spriteIndex = Objects[effectiveObjectID].meshIndex + spriteIndex;
+		part.flags = SP_SCALE | SP_ROTATE | SP_DEF | SP_EXPDEF;
 
-		ScriptColor colorStart = USE_IF_HAVE(ScriptColor, startColor, ScriptColor( 255, 255, 255 ));
-		ScriptColor colorEnd = USE_IF_HAVE(ScriptColor, endColor, ScriptColor( 255, 255, 255 ));
+		bool convertedApplyPoison = USE_IF_HAVE(bool, applyPoison, false);
+		if (convertedApplyPoison)
+			part.flags |= SP_POISON;
 
-		s->sR = colorStart.GetR();
-		s->sG = colorStart.GetG();
-		s->sB = colorStart.GetB();
+		bool convertedApplyDamage = USE_IF_HAVE(bool, applyDamage, false);
+		if (convertedApplyDamage)
+			part.flags |= SP_DAMAGE;
 
-		s->dR = colorEnd.GetR();
-		s->dG = colorEnd.GetG();
-		s->dB = colorEnd.GetB();
-
-		//there is no blend mode 7
-		BlendMode bMode = USE_IF_HAVE(BlendMode, blendMode, BlendMode::AlphaBlend);
-		s->blendMode = BlendMode(std::clamp(int(bMode), int(BlendMode::Opaque), int(BlendMode::AlphaBlend)));
-
-		s->x = pos.x;
-		s->y = pos.y;
-		s->z = pos.z;
-		s->roomNumber = FindRoomNumber(Vector3i(pos.x, pos.y, pos.z));
-		constexpr float secsPerFrame = 1.0f / (float)FPS;
-
-		float life = USE_IF_HAVE(float, lifetime, 2.0f);
-		life = std::max(0.1f, life);
-		int lifeInFrames = (int)round(life / secsPerFrame);
-
-		s->life = s->sLife = lifeInFrames;
-		s->colFadeSpeed = lifeInFrames / 2;
-		s->fadeToBlack = lifeInFrames / 3;
-
-		s->xVel = short(velocity.x * 32);
-		s->yVel = short(velocity.y * 32);
-		s->zVel = short(velocity.z * 32);
-
-		int sSize = USE_IF_HAVE(int, startSize, 10);
-		int eSize = USE_IF_HAVE(int, endSize, 0);
-
-		s->sSize = s->size = float(sSize);
-		s->dSize = float(eSize);
-
-		s->scalar = 2;
-
-		s->flags = SP_SCALE | SP_ROTATE | SP_DEF | SP_EXPDEF;
-
-		bool applyPoison = USE_IF_HAVE(bool, poison, false);
-		bool applyDamage = USE_IF_HAVE(bool, damage, false);
-
-		if (applyPoison)
-			s->flags |= SP_POISON;
-
-		if (applyDamage)
-			s->flags |= SP_DAMAGE;
-
-		//todo add option to turn off wind?
-		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WIND, s->roomNumber))
-			s->flags |= SP_WIND;
-
-		float rotAdd = USE_IF_HAVE(float, rot, 0.0f);
-
-		s->rotAng = USE_IF_HAVE(float, startRot, (GetRandomControl() & 0x0FFF));
-		s->rotAdd = byte(ANGLE(rotAdd) >> 4);
-
-		s->friction = 0;
-		s->maxYvel  = 0;
-
-		s->gravity  = grav;
+		// TODO: Add option to turn off wind.
+		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WIND, part.roomNumber))
+			part.flags |= SP_WIND;
 	}
 	
 /***Emit a shockwave, similar to that seen when a harpy projectile hits something.
