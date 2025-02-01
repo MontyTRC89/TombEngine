@@ -102,18 +102,18 @@ namespace TEN::Scripting::Effects
 	// @tparam Vec3 pos World position.
 	// @tparam Vec3 vel Velocity.
 	// @tparam int spriteID ID of the sprite in the sprite sequence object.
-	// @tparam float gravity (default 0) Specifies if the particle will fall over time. Positive values ascend, negative values descend. Recommended range: [-1000 and 1000].
-	// @tparam float rotVel (default 0) Rotational velocity in degrees.
-	// @tparam Color startColor (default Color(255, 255, 255)) Color at start of life.
-	// @tparam Color endColor (default Color(255, 255, 255)) Color to fade toward. This will finish long before the end of the particle's life due to internal math.
-	// @tparam Effects.BlendID blendMode (default TEN.Effects.BlendID.ALPHABLEND) Render blend mode.
-	// @tparam float startSize (default 10) Size at start of life.
-	// @tparam float endSize (default 0) Size at end of life. The particle will linearly shrink or grow toward this size over its lifespan.
-	// @tparam float life (default 2) Lifespan in seconds.
-	// @tparam bool applyDamage (default false) Specifies if the particle will harm the player on collision.
-	// @tparam bool applyPoison (default false) Specifies if the particle will poison the player on collision.
-	// @tparam Objects.ObjID spriteSeqID (default Objects.ObjID.DEFAULT_SPRITES) ID of the sprite sequence object.
-	// @tparam float startRot (default random) Rotation at start of life.
+	// @tparam float gravity Specifies if the particle will fall over time. Positive values ascend, negative values descend. Recommended range: [-1000 and 1000]. __Default: 0__
+	// @tparam float rotVel Rotational velocity in degrees. __Default: 0__
+	// @tparam Color startColor Color at start of life. __Default: Color(255, 255, 255)__
+	// @tparam Color endColor Color to fade toward. This will finish long before the end of the particle's life due to internal math. __Default: Color(255, 255, 255)__
+	// @tparam Effects.BlendID blendMode Render blend mode. __TEN.Effects.BlendID.ALPHABLEND__
+	// @tparam float startSize Size at start of life. __Default: 10__
+	// @tparam float endSize Size at end of life. The particle will linearly shrink or grow toward this size over its lifespan. __Default: 0__
+	// @tparam float life Lifespan in seconds. __Default: 2__
+	// @tparam bool applyDamage Specify if the particle will harm the player on collision. __Default: false__
+	// @tparam bool applyPoison Specify if the particle will poison the player on collision. __Default: false__
+	// @tparam Objects.ObjID spriteSeqID ID of the sprite sequence object. __Default: Objects.ObjID.DEFAULT_SPRITES__
+	// @tparam float startRot Rotation at start of life. __Default: random__
 	// @usage
 	// EmitParticle(
 	// 	pos,
