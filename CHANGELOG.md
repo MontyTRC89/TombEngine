@@ -11,6 +11,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 
 ### New Features
+* Added multithreading setting to flow system settings.
 * Added realtime shader reloading in debug mode by pressing F9 key.
 
 ### Lua API changes
