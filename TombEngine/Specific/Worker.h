@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
-
 namespace TEN::Utils
 {
 	using WorkerTask	  = std::function<void()>;
@@ -33,6 +31,8 @@ namespace TEN::Utils
 		unsigned int GetCoreCount() const;
 
 		// Utilities
+
+		void Initialize();
 
 		std::future<void> AddTask(const WorkerTask& task);
 		std::future<void> AddTasks(const WorkerTaskGroup& tasks);

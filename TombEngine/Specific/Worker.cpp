@@ -1,20 +1,14 @@
 #include "framework.h"
 #include "Specific/Worker.h"
 
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+
 namespace TEN::Utils
 {
 	WorkerController& g_Worker = WorkerController::Get();
 
 	WorkerController::WorkerController()
 	{
-		// Reserve threads.
-		unsigned int threadCount = g_GameFlow->GetSettings()->System.Multithreaded ? (GetCoreCount() * 2) : 1;
-		_threads.reserve(threadCount);
-
-		// Create threads.
-		for (int i = 0; i < threadCount; i++)
-			_threads.push_back(std::thread(&WorkerController::Worker, this));
-
 		_deinitialize = false;
 	}
 
@@ -61,6 +55,17 @@ namespace TEN::Utils
 	unsigned int WorkerController::GetCoreCount() const
 	{
 		return std::max(std::thread::hardware_concurrency(), 1u);
+	}
+
+	void WorkerController::Initialize()
+	{
+		// Reserve threads.
+		unsigned int threadCount = g_GameFlow->GetSettings()->System.Multithreaded ? (GetCoreCount() * 2) : 1;
+		_threads.reserve(threadCount);
+
+		// Create threads.
+		for (int i = 0; i < threadCount; i++)
+			_threads.push_back(std::thread(&WorkerController::Worker, this));
 	}
 
 	std::future<void> WorkerController::AddTask(const WorkerTask& task)

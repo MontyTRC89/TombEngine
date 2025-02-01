@@ -19,6 +19,7 @@
 #include "Scripting/Internal/LanguageScript.h"
 #include "Scripting/Include/ScriptInterfaceState.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
+#include "Specific/Worker.h"
 
 using namespace TEN::Renderer;
 using namespace TEN::Input;
@@ -520,6 +521,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	DoTheGame = true;
 
+	g_Worker.Initialize();
 	ThreadEnded = false;
 	ThreadHandle = BeginThread(GameMain, ThreadID);
 
