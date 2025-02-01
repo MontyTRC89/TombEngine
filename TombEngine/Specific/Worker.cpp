@@ -95,7 +95,7 @@ namespace TEN::Utils
 		auto tasks = WorkerTaskGroup{};
 
 		// Process in parallel.
-		if (g_GameFlow->GetSettings()->System.MultiThreaded &&
+		if (g_GameFlow->GetSettings()->System.Multithreaded &&
 			itemCount > SERIAL_UNIT_COUNT_MAX)
 		{
 			unsigned int threadCount = GetCoreCount();
