@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+
 namespace TEN::Utils
 {
 	using WorkerTask	  = std::function<void()>;
@@ -36,36 +38,37 @@ namespace TEN::Utils
 		std::future<void> AddTasks(const WorkerTaskGroup& tasks);
 
 		template<typename T>
-		std::future<void> AddVectorTasks(std::vector<T>& vector, const std::function<void(int, int)>& task, bool multiThreaded)
+		std::future<void> AddTasks(const std::vector<T>& vector, const std::function<void(int, int)>& task)
 		{
 			constexpr auto SERIAL_UNIT_COUNT_MAX = 32;
 
-			// TODO: Allow linera processing while still returning a valid std::future.
+			int itemCount = (int)vector.size();
+			auto tasks = WorkerTaskGroup{};
 
 			// Process in parallel.
-			//if (multiThreaded)
+			if (g_GameFlow->GetSettings()->System.MultiThreaded &&
+				itemCount > SERIAL_UNIT_COUNT_MAX)
 			{
-				int threadCount = ((int)vector.size() > SERIAL_UNIT_COUNT_MAX) ? GetCoreCount() : 1;
-				int chunkSize = (((int)vector.size() + threadCount) - 1) / threadCount;
+				int threadCount = GetCoreCount();
+				int chunkSize = ((itemCount + threadCount) - 1) / threadCount;
 
 				// Collect group tasks.
-				auto tasks = WorkerTaskGroup{};
 				tasks.reserve(threadCount);
-				for (int i = 0; i < threadCount; ++i)
+				for (int i = 0; i < threadCount; i++)
 				{
 					int start = i * chunkSize;
-					int end = std::min(start + chunkSize, (int)vector.size());
+					int end = std::min(start + chunkSize, itemCount);
 					tasks.push_back([&task, start, end]() { task(start, end); });
 				}
-
-				// Return future to wait on task group completion if needed.
-				return AddTasks(tasks);
 			}
 			// Process linearly.
-			/*else
+			else
 			{
-				task(0, (int)vector.size());
-			}*/
+				tasks.push_back([&task, itemCount]() { task(0, itemCount); });
+			}
+
+			// Add task group and return future to wait on completion if needed.
+			return AddTasks(tasks);
 		}
 
 	private:
