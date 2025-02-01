@@ -112,7 +112,7 @@ Vec3 Vec3::Normalize() const
 // @treturn Vec3 Translated vector.
 Vec3 Vec3::Translate(const Vec3& dir, float dist)
 {
-	return Geometry::TranslatePoint(ToVector3(), dir, dist);
+	return Geometry::TranslatePoint(ToVector3(), dir.ToVector3(), dist);
 }
 
 /// Get a copy of this Vec3 translated in the direction of the input Rotation object by the input distance.
@@ -132,7 +132,7 @@ Vec3 Vec3::Translate(const Rotation& rot, float dist)
 // @treturn Vec3 Translated vector.
 Vec3 Vec3::Translate(const Rotation& rot, const Vec3& relOffset)
 {
-	return Geometry::TranslatePoint(ToVector3(), rot.ToEulerAngles(), relOffset);
+	return Geometry::TranslatePoint(ToVector3(), rot.ToEulerAngles(), relOffset.ToVector3());
 }
 
 /// Get a copy of this Vec3 rotated by the input Rotation object.

@@ -111,7 +111,7 @@ Vec2 Vec2::Normalize() const
 // @treturn Vec2 Translated vector.
 Vec2 Vec2::Translate(const Vec2& dir, float dist)
 {
-	return Geometry::TranslatePoint(ToVector2(), dir, dist);
+	return Geometry::TranslatePoint(ToVector2(), dir.ToVector2(), dist);
 }
 
 /// Get a copy of this Vec2 translated in the direction of the input rotation in degrees by the input distance.
@@ -131,7 +131,7 @@ Vec2 Vec2::Translate(float rot, float dist)
 // @treturn Vec2 Translated vector.
 Vec2 Vec2::Translate(float rot, const Vec2& relOffset)
 {
-	return Geometry::TranslatePoint(ToVector2(), rot, relOffset);
+	return Geometry::TranslatePoint(ToVector2(), rot, relOffset.ToVector2());
 }
 
 /// Get a copy of this Vec2 rotated by the input rotation in degrees.
