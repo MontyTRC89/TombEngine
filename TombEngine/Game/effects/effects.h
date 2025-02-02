@@ -1,6 +1,11 @@
 #pragma once
+
+#include "Game/Items.h"
+#include "Game/effects/Light.h"
 #include "Math/Math.h"
 #include "Renderer/RendererEnums.h"
+
+using namespace TEN::Effects::Light;
 
 enum class LaraWeaponType;
 enum GAME_OBJECT_ID : short;
@@ -12,11 +17,11 @@ constexpr auto SD_UWEXPLOSION = 2;
 
 constexpr auto MAX_NODE		= 23;
 constexpr auto MAX_DYNAMICS = 64;
-constexpr auto MAX_SPLASHES = 8;
-constexpr auto NUM_EFFECTS	= 256;
 
-constexpr auto MAX_PARTICLES		 = 1024;
+constexpr auto MAX_PARTICLES		 = 8192;
 constexpr auto MAX_PARTICLE_DYNAMICS = 8;
+
+extern int Wibble;
 
 enum SpriteEnumFlag
 {
@@ -89,6 +94,8 @@ struct FX_INFO
 	Vector4 color;
 	short flag1;
 	short flag2;
+
+	bool DisableInterpolation;
 };
 
 struct NODEOFFSET_INFO
@@ -100,87 +107,79 @@ struct NODEOFFSET_INFO
 	unsigned char gotIt;
 };
 
-struct SPLASH_SETUP
-{
-	float x;
-	float y;
-	float z;
-	float splashPower;
-	float innerRadius;
-	int room;
-};
-
-struct RIPPLE_STRUCT
-{
-	int x;
-	int y;
-	int z;
-	char flags;
-	unsigned char life;
-	unsigned char size;
-	unsigned char init;
-};
-
 struct Particle
 {
+	bool on;
+
+	GAME_OBJECT_ID SpriteSeqID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
+	int	SpriteID = 0;
+	int	fxObj;
+
 	int x;
 	int y;
 	int z;
+	int roomNumber;
+	Vector3 targetPos;
+
 	short xVel;
 	short yVel;
 	short zVel;
-	short gravity;
+
 	short rotAng;
+	short rotAdd;
+
+	short gravity;
 	unsigned short flags; // SP_enum
+
 	float sSize;
 	float dSize;
 	float size;
-	unsigned char friction;
-	unsigned char scalar;
-	unsigned char spriteIndex;
-	signed char rotAdd;
-	signed char maxYvel;
-	bool on;
+
+	unsigned int friction;
+	unsigned int scalar;
+	int maxYvel;
+
+	unsigned char r;
+	unsigned char g;
+	unsigned char b;
 	unsigned char sR;
 	unsigned char sG;
 	unsigned char sB;
 	unsigned char dR;
 	unsigned char dG;
 	unsigned char dB;
-	unsigned char r;
-	unsigned char g;
-	unsigned char b;
+
 	unsigned char colFadeSpeed;
 	unsigned char fadeToBlack;
+
 	int sLife;
 	int life;
+
 	BlendMode blendMode;
 	unsigned char extras;
 	signed char dynamic;
-	int fxObj;
-	int roomNumber;
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
-};
 
-struct SPLASH_STRUCT
-{
-	float x;
-	float y;
-	float z;
-	float innerRad;
-	float innerRadVel;
-	float heightVel;
-	float heightSpeed;
-	float height;
-	float outerRad;
-	float outerRadVel;
-	float animationSpeed;
-	float animationPhase;
-	short spriteSequenceStart;
-	short spriteSequenceEnd;
-	unsigned short life;
-	bool isRipple;
-	bool isActive;
+	int PrevX;
+	int PrevY;
+	int PrevZ;
+	short PrevRotAng;
+	byte PrevR;
+	byte PrevG; 
+	byte PrevB;
+	byte PrevScalar;
+
+	void StoreInterpolationData()
+	{
+		PrevX = x;
+		PrevY = y;
+		PrevZ = z;
+		PrevRotAng = rotAng;
+		PrevR = r;
+		PrevG = g;
+		PrevB = b;
+		PrevScalar = scalar;
+	}
 };
 
 struct ParticleDynamic
@@ -200,13 +199,10 @@ extern GameBoundingBox DeadlyBounds;
 extern Particle Particles[MAX_PARTICLES];
 extern ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
 
-extern SPLASH_SETUP SplashSetup;
-extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
-
 extern Vector3i NodeVectors[ParticleNodeOffsetIDs::NodeMax];
 extern NODEOFFSET_INFO NodeOffsets[ParticleNodeOffsetIDs::NodeMax];
 
-extern FX_INFO EffectList[NUM_EFFECTS];
+extern FX_INFO EffectList[MAX_SPAWNED_ITEM_COUNT];
 
 template <typename TEffect>
 TEffect& GetNewEffect(std::vector<TEffect>& effects, unsigned int countMax)
@@ -251,33 +247,29 @@ void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID);
 
 void DetatchSpark(int num, SpriteEnumFlag type);
 void UpdateSparks();
-void TriggerRicochetSpark(const GameVector& pos, short angle, int count, int unk);
+void TriggerRicochetSpark(const GameVector& pos, short angle, bool sound = true);
 void TriggerCyborgSpark(int x, int y, int z, short xv, short yv, short zv);
 void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int uw, int roomNumber, const Vector3& mainColor = Vector3::Zero, const Vector3& secondColor = Vector3::Zero);
 void TriggerExplosionSmokeEnd(int x, int y, int z, int uw);
 void TriggerExplosionSmoke(int x, int y, int z, int uw);
 void TriggerFireFlame(int x, int y, int z, FlameType type, const Vector3& color1 = Vector3::Zero, const Vector3& color2 = Vector3::Zero);
 void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly);
-void SetupSplash(const SPLASH_SETUP* const setup, int room);
-void UpdateSplashes();
 void TriggerLaraBlood();
 short DoBloodSplat(int x, int y, int z, short speed, short yRot, short roomNumber);
 void DoLotsOfBlood(int x, int y, int z, int speed, short direction, short roomNumber, int count);
 void ControlWaterfallMist(short itemNumber);
 void TriggerWaterfallMist(const ItemInfo& item);
 void KillAllCurrentItems(short itemNumber);
-void TriggerDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
 void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber);
 void TriggerRocketSmoke(int x, int y, int z);
 void TriggerFlashSmoke(int x, int y, int z, short roomNumber);
 void TriggerMetalSparks(int x, int y, int z, int xv, int yv, int zv, const Vector3& color, int additional);
 void SpawnCorpseEffect(const Vector3& pos);
 void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int scale);
-void SpawnPlayerWaterSurfaceEffects(const ItemInfo& item, int waterHeight, int waterDepth);
-void Splash(ItemInfo* item);
 void TriggerRocketFire(int x, int y, int z);
 void TriggerExplosionBubbles(int x, int y, int z, short roomNumber);
 void Ricochet(Pose& pos);
 void ProcessEffects(ItemInfo* item);
+void UpdateWibble();
 
-void TriggerDynamicLight(const Vector3& pos, const Color& color, float falloff);
+void SpawnPlayerWaterSurfaceEffects(const ItemInfo& item, int waterHeight, int waterDepth);

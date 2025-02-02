@@ -56,9 +56,8 @@ void HandleLaraMovementParameters(ItemInfo* item, CollisionInfo* coll)
 	auto* lara = GetLaraInfo(item);
 
 	// Update AFK pose timer.
-	if (lara->Control.Count.Pose < PLAYER_POSE_TIME && 
-		!(IsHeld(In::Look) || IsOpticActionHeld()) &&
-		g_GameFlow->HasAFKPose())
+	if (lara->Control.Count.Pose < (g_GameFlow->GetSettings()->Animations.PoseTimeout * FPS) &&
+		!(IsHeld(In::Look) || IsOpticActionHeld()))
 	{
 		lara->Control.Count.Pose++;
 	}
@@ -113,7 +112,7 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 			player.Status.Poison = LARA_POISON_MAX;
 
 		if (!(Wibble & 0xFF))
-			item.HitPoints -= player.Status.Poison;
+			DoDamage(&item, player.Status.Poison, true);
 	}
 
 	// Update stamina status.
@@ -135,7 +134,7 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 				if (player.Status.Air < 0)
 				{
 					player.Status.Air = -1;
-					item.HitPoints -= 10;
+					DoDamage(&item, 10, true);
 				}
 			}
 		}
@@ -169,7 +168,7 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 							if (player.Status.Exposure <= 0)
 							{
 								player.Status.Exposure = 0;
-								item.HitPoints -= 10;
+								DoDamage(&item, 10, true);
 							}
 						}
 					}
@@ -189,7 +188,7 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 					if (player.Status.Exposure <= 0)
 					{
 						player.Status.Exposure = 0;
-						item.HitPoints -= 10;
+						DoDamage(&item, 10, true);
 					}
 				}
 				else
@@ -212,8 +211,8 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 
 			if (player.Status.Air < 0)
 			{
-				item.HitPoints -= 5;
 				player.Status.Air = -1;
+				DoDamage(&item, 5, true);
 			}
 
 			if (water.IsCold)
@@ -222,7 +221,7 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 				if (player.Status.Exposure <= 0)
 				{
 					player.Status.Exposure = 0;
-					item.HitPoints -= 10;
+					DoDamage(&item, 10, true);
 				}
 			}
 			else
@@ -248,7 +247,7 @@ void HandlePlayerStatusEffects(ItemInfo& item, WaterStatus waterStatus, PlayerWa
 				if (player.Status.Exposure <= 0)
 				{
 					player.Status.Exposure = 0;
-					item.HitPoints -= 10;
+					DoDamage(&item, 10, true);
 				}
 			}
 		}
@@ -341,6 +340,10 @@ void HandlePlayerQuickActions(ItemInfo& item)
 	{
 		g_Gui.UseItem(item, GAME_OBJECT_ID::ID_BIGMEDI_ITEM);
 	}
+
+	// Don't process weapon hotkeys in optics mode.
+	if (player.Control.Look.IsUsingBinoculars)
+		return;
 
 	// Handle weapon scroll request.
 	if (IsClicked(In::PreviousWeapon) || IsClicked(In::NextWeapon))
@@ -445,68 +448,6 @@ static void ClearPlayerLookAroundActions(const ItemInfo& item)
 	}
 }
 
-static void SetPlayerOptics(ItemInfo* item)
-{
-	constexpr auto OPTIC_RANGE_DEFAULT = ANGLE(0.7f);
-
-	auto& player = GetLaraInfo(*item);
-
-	bool breakOptics = true;
-
-	// Standing; can use optics.
-	if (item->Animation.ActiveState == LS_IDLE || item->Animation.AnimNumber == LA_STAND_IDLE)
-		breakOptics = false;
-
-	// Crouching; can use optics.
-	if ((player.Control.IsLow || !IsHeld(In::Crouch)) &&
-		(item->Animation.TargetState == LS_CROUCH_IDLE || item->Animation.AnimNumber == LA_CROUCH_IDLE))
-	{
-		breakOptics = false;
-	}
-
-	// If lasersight and Look is not held, exit optics.
-	if (player.Control.Look.IsUsingLasersight && !IsHeld(In::Look))
-		breakOptics = true;
-
-	// If lasersight and weapon is holstered, exit optics.
-	if (player.Control.Look.IsUsingLasersight && IsHeld(In::Draw))
-		breakOptics = true;
-
-	// Engage lasersight if available.
-	if (!player.Control.Look.IsUsingLasersight && !breakOptics && IsHeld(In::Look))
-	{
-		if (player.Control.HandStatus == HandStatus::WeaponReady &&
-			((player.Control.Weapon.GunType == LaraWeaponType::HK && player.Weapons[(int)LaraWeaponType::HK].HasLasersight) ||
-				(player.Control.Weapon.GunType == LaraWeaponType::Revolver && player.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
-				(player.Control.Weapon.GunType == LaraWeaponType::Crossbow && player.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
-		{
-			player.Control.Look.OpticRange = OPTIC_RANGE_DEFAULT;
-			player.Control.Look.IsUsingBinoculars = true;
-			player.Control.Look.IsUsingLasersight = true;
-			player.Inventory.IsBusy = true;
-
-			BinocularOldCamera = Camera.oldType;
-			return;
-		}
-	}
-
-	if (!breakOptics)
-		return;
-
-	// Not using optics; return early.
-	if (!player.Control.Look.IsUsingBinoculars && !player.Control.Look.IsUsingLasersight)
-		return;
-
-	player.Control.Look.OpticRange = 0;
-	player.Control.Look.IsUsingBinoculars = false;
-	player.Control.Look.IsUsingLasersight = false;
-	player.Inventory.IsBusy = false;
-
-	Camera.type = BinocularOldCamera;
-	Camera.bounce = 0;
-	AlterFOV(LastFOV);
-}
-
 static short NormalizeLookAroundTurnRate(short turnRate, short opticRange)
 {
 	constexpr auto ZOOM_LEVEL_MAX = ANGLE(10.0f);
@@ -520,54 +461,15 @@ static short NormalizeLookAroundTurnRate(short turnRate, short opticRange)
 
 void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 {
-	constexpr auto OPTIC_RANGE_MAX	= ANGLE(8.5f);
-	constexpr auto OPTIC_RANGE_MIN	= ANGLE(0.7f);
-	constexpr auto OPTIC_RANGE_RATE = ANGLE(0.35f);
-	constexpr auto TURN_RATE_MAX	= ANGLE(4.0f);
-	constexpr auto TURN_RATE_ACCEL	= ANGLE(0.75f);
+	constexpr auto TURN_RATE_MAX   = ANGLE(4.0f);
+	constexpr auto TURN_RATE_ACCEL = ANGLE(0.75f);
 
 	auto& player = GetLaraInfo(item);
 
 	// Set optics.
 	Camera.type = CameraType::Look;
-	SetPlayerOptics(LaraItem);
 
 	bool isSlow = IsHeld(In::Walk);
-
-	// Zoom optics.
-	if (player.Control.Look.IsUsingBinoculars || player.Control.Look.IsUsingLasersight)
-	{
-		short rangeRate = isSlow ? (OPTIC_RANGE_RATE / 2) : OPTIC_RANGE_RATE;
-
-		// NOTE: Zooming allowed with either StepLeft/StepRight or Walk/Sprint.
-		if ((IsHeld(In::StepLeft) && !IsHeld(In::StepRight)) ||
-			(IsHeld(In::Walk) && !IsHeld(In::Sprint)))
-		{
-			player.Control.Look.OpticRange -= rangeRate;
-			if (player.Control.Look.OpticRange < OPTIC_RANGE_MIN)
-			{
-				player.Control.Look.OpticRange = OPTIC_RANGE_MIN;
-			}
-			else
-			{
-				SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 0.9f);
-			}
-		}
-		else if ((IsHeld(In::StepRight) && !IsHeld(In::StepLeft)) ||
-			(IsHeld(In::Sprint) && !IsHeld(In::Walk)))
-		{
-			player.Control.Look.OpticRange += rangeRate;
-			if (player.Control.Look.OpticRange > OPTIC_RANGE_MAX)
-			{
-				player.Control.Look.OpticRange = OPTIC_RANGE_MAX;
-			}
-			else
-			{
-				SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 1.0f);
-			}
-		}
-	}
-
 	auto axisCoeff = Vector2::Zero;
 
 	// Determine X axis coefficient.
@@ -726,7 +628,7 @@ static void GivePlayerItemsCheat(ItemInfo& item)
 			player.Inventory.Puzzles[i] = true;
 
 		player.Inventory.PuzzlesCombo[2 * i] = false;
-		player.Inventory.PuzzlesCombo[(92 * i) + 1] = false;
+		player.Inventory.PuzzlesCombo[(2 * i) + 1] = false;
 	}
 
 	for (int i = 0; i < 8; ++i)
@@ -888,14 +790,18 @@ void HandlePlayerFlyCheat(ItemInfo& item)
 	{
 		if (player.Context.Vehicle == NO_VALUE)
 		{
-			GivePlayerItemsCheat(item);
+			if (KeyMap[OIS::KeyCode::KC_LSHIFT] || KeyMap[OIS::KeyCode::KC_RSHIFT])
+				GivePlayerItemsCheat(item);
+
 			GivePlayerWeaponsCheat(item);
 
 			if (player.Control.WaterStatus != WaterStatus::FlyCheat)
 			{
 				SetAnimation(item, LA_FLY_CHEAT);
 				ResetPlayerFlex(&item);
-				item.Animation.IsAirborne = false;
+				item.Animation.Velocity = Vector3::Zero;
+				item.Animation.IsAirborne = true;
+				item.Pose.Position.y -= CLICK(0.5f);
 				item.HitPoints = LARA_HEALTH_MAX;
 
 				player.Control.WaterStatus = WaterStatus::FlyCheat;
@@ -953,7 +859,7 @@ void HandlePlayerWetnessDrips(ItemInfo& item)
 
 void HandlePlayerDiveBubbles(ItemInfo& item)
 {
-	constexpr auto BUBBLE_COUNT_MULT = 6;
+	constexpr auto BUBBLE_COUNT_MULT = 3;
 
 	auto& player = *GetLaraInfo(&item);
 
@@ -990,7 +896,7 @@ void HandlePlayerAirBubbles(ItemInfo* item)
 {
 	constexpr auto BUBBLE_COUNT_MAX = 3;
 
-	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, SoundEnvironment::ShallowWater);
+	SoundEffect(SFX_TR4_LARA_BUBBLES, &item->Pose, SoundEnvironment::Underwater);
 
 	const auto& level = *g_GameFlow->GetLevel(CurrentLevel);
 
@@ -1018,7 +924,7 @@ void EasePlayerElevation(ItemInfo* item, int relHeight)
 	// Handle swamp case.
 	if (TestEnvironment(ENV_FLAG_SWAMP, item) && relHeight > 0)
 	{
-		item->Pose.Position.y += SWAMP_GRAVITY;
+		item->Pose.Position.y += g_GameFlow->GetSettings()->Physics.Gravity / SWAMP_GRAVITY_COEFF;
 		return;
 	}
 
@@ -1044,6 +950,8 @@ void HandlePlayerElevationChange(ItemInfo* item, CollisionInfo* coll)
 		if (CanStepUp(*item, *coll))
 		{
 			item->Animation.TargetState = LS_STEP_UP;
+			item->DisableInterpolation = true;
+
 			if (GetStateDispatch(item, GetAnimData(*item)))
 			{
 				item->Pose.Position.y += coll->Middle.Floor;
@@ -1160,7 +1068,7 @@ void DoLaraFallDamage(ItemInfo* item)
 		else
 		{
 			float base = item->Animation.Velocity.y - (LARA_DAMAGE_VELOCITY - 1.0f);
-			item->HitPoints -= LARA_HEALTH_MAX * (SQUARE(base) / 196.0f);
+			DoDamage(item, LARA_HEALTH_MAX * (SQUARE(base) / 196.0f));
 		}
 
 		float rumblePower = (item->Animation.Velocity.y / LARA_DEATH_VELOCITY) * RUMBLE_POWER_COEFF;
@@ -1284,7 +1192,7 @@ short GetPlayerSlideHeadingAngle(ItemInfo* item, CollisionInfo* coll)
 		return coll->Setup.ForwardAngle;
 
 	// Return slide heading angle.
-	if (g_GameFlow->HasSlideExtended())
+	if (g_GameFlow->GetSettings()->Animations.SlideExtended)
 	{
 		return Geometry::GetSurfaceAspectAngle(pointColl.GetFloorNormal());
 	}
@@ -1465,7 +1373,7 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 		auto mul1 = (float)abs(lara->Control.Subsuit.Velocity[0]) / BLOCK(8);
 		auto mul2 = (float)abs(lara->Control.Subsuit.Velocity[1]) / BLOCK(8);
 		auto vol = ((mul1 + mul2) * 5.0f) + 0.5f;
-		SoundEffect(SFX_TR5_VEHICLE_DIVESUIT_ENGINE, &item->Pose, SoundEnvironment::ShallowWater, 1.0f + (mul1 + mul2), vol);
+		SoundEffect(SFX_TR5_VEHICLE_DIVESUIT_ENGINE, &item->Pose, SoundEnvironment::Underwater, 1.0f + (mul1 + mul2), vol);
 	}
 }
 
@@ -1477,7 +1385,7 @@ void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 	constexpr int minVelocity = 50;
 	constexpr int maxVelocity = LARA_TERMINAL_VELOCITY;
 
-	if (g_GameFlow->HasSlideExtended())
+	if (g_GameFlow->GetSettings()->Animations.SlideExtended)
 	{
 		auto probe = GetPointCollision(*item);
 		short minSlideAngle = ANGLE(33.75f);
@@ -1513,6 +1421,7 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, const VaultTestResult& va
 	auto& player = GetLaraInfo(*item);
 
 	ResetPlayerTurnRateY(*item);
+	item->Animation.IsAirborne = false;
 	player.Context.ProjectedFloorHeight = vaultResult.Height;
 
 	if (vaultResult.SetBusyHands)
@@ -1541,7 +1450,8 @@ void SetLaraLand(ItemInfo* item, CollisionInfo* coll)
 	if (item->Animation.TargetState != LS_RUN_FORWARD)
 		item->Animation.Velocity.z = 0.0f;
 
-	//item->IsAirborne = false; // TODO: Removing this avoids an unusual landing bug. I hope to find a proper solution later. -- Sezz 2022.02.18
+	// TODO: Commenting this avoids an unusual bug where if the player hits a ceiling, they won't land. I hope to find a proper solution later. -- Sezz 2022.02.18
+	//item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0.0f;
 	LaraSnapToHeight(item, coll);
 }
@@ -1627,7 +1537,7 @@ void newSetLaraSlideAnimation(ItemInfo* item, CollisionInfo* coll)
 	short headinAngle = GetPlayerSlideHeadingAngle(item, coll);
 	short deltaAngle = headinAngle - item->Pose.Orientation.y;
 
-	if (!g_GameFlow->HasSlideExtended())
+	if (!g_GameFlow->GetSettings()->Animations.SlideExtended)
 		item->Pose.Orientation.y = headinAngle;
 
 	// Snap to height upon slide entrance.
@@ -1690,7 +1600,7 @@ void SetLaraSwimDiveAnimation(ItemInfo* item)
 
 	SetAnimation(item, LA_ONWATER_DIVE);
 	item->Animation.TargetState = LS_UNDERWATER_SWIM_FORWARD;
-	item->Animation.Velocity.y = LARA_SWIM_VELOCITY_MAX * 0.4f;
+	item->Animation.Velocity.y = g_GameFlow->GetSettings()->Physics.SwimVelocity * 0.4f;
 	item->Pose.Orientation.x = -ANGLE(45.0f);
 	lara->Control.WaterStatus = WaterStatus::Underwater;
 }

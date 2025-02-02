@@ -19,14 +19,38 @@ using namespace TEN::Math;
 using namespace TEN::Utils;
 using namespace TEN::Renderer;
 
+constexpr auto BRIDGE_CACHE_SIZE = 20;
+
+struct BridgeCacheEntry
+{
+	int	 BridgeItemNumber = 0;
+	Pose BridgePose		  = Pose::Zero;
+
+	bool			   UseBottomHeight = false;
+	Vector3i		   Position		   = Vector3i::Zero;
+	std::optional<int> Height		   = std::nullopt;
+};
+
+// NOTE: Caching most recent bridge data saves up to 30% CPU time spent in GetBridgeItemIntersect(),
+// as player collision checks tend to repeat probing in same places multiple times.
+auto BridgeCache	   = std::array<BridgeCacheEntry, BRIDGE_CACHE_SIZE>{};
+int	 BridgeCacheSlotID = 0;
+
 int FloorInfo::GetSurfaceTriangleID(int x, int z, bool isFloor) const
 {
 	constexpr auto TRI_ID_0 = 0;
 	constexpr auto TRI_ID_1 = 1;
+
+	static const auto ROT_MATRIX_0 = Matrix::CreateRotationZ(TO_RAD(SectorSurfaceData::SPLIT_ANGLE_0));
+	static const auto ROT_MATRIX_1 = Matrix::CreateRotationZ(TO_RAD(SectorSurfaceData::SPLIT_ANGLE_1));
 	
+	// Get matrix.
+	const auto& rotMatrix = isFloor ?
+		((FloorSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0) ? ROT_MATRIX_0 : ROT_MATRIX_1) :
+		((CeilingSurface.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0) ? ROT_MATRIX_0 : ROT_MATRIX_1);
+
 	// Calculate bias.
 	auto sectorPoint = GetSectorPoint(x, z).ToVector2();
-	auto rotMatrix = Matrix::CreateRotationZ(TO_RAD(isFloor ? FloorSurface.SplitAngle : CeilingSurface.SplitAngle));
 	float bias = Vector2::Transform(sectorPoint, rotMatrix).x;
 
 	// Return triangle ID according to bias.
@@ -59,7 +83,7 @@ Vector3 FloorInfo::GetSurfaceNormal(int x, int z, bool isFloor) const
 	return GetSurfaceNormal(triID, isFloor);
 }
 
-short FloorInfo::GetSurfaceIllegalSlopeAngle(int x, int z, bool isFloor) const
+short FloorInfo::GetSurfaceSteepSlopeAngle(int x, int z, bool isFloor) const
 {
 	const auto& tri = GetSurfaceTriangle(x, z, isFloor);
 	return tri.SteepSlopeAngle;
@@ -182,6 +206,10 @@ int FloorInfo::GetSurfaceHeight(int x, int z, bool isFloor) const
 	auto normal = tri.Plane.Normal();
 	float relPlaneHeight = -((normal.x * sectorPoint.x) + (normal.z * sectorPoint.y)) / normal.y;
 
+	// Due to precision loss, we can't recover NO_HEIGHT constant from the plane, and must return original integer constant.
+	if (tri.Plane.D() == (float)NO_HEIGHT)
+		return NO_HEIGHT;
+
 	// Return sector floor or ceiling height. NOTE: Bridges ignored.
 	return (tri.Plane.D() + relPlaneHeight);
 }
@@ -198,18 +226,36 @@ int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 		const auto& bridgeItem = g_Level.Items[itemNumber];
 		const auto& bridge = GetBridgeObject(bridgeItem);
 
+		auto bridgeFloorHeight   = bridge.GetFloorHeight(bridgeItem, pos);
+		auto bridgeCeilingHeight = bridge.GetCeilingHeight(bridgeItem, pos);
+
 		// 2.1) Get bridge surface height.
-		auto bridgeSurfaceHeight = isFloor ? bridge.GetFloorHeight(bridgeItem, pos) : bridge.GetCeilingHeight(bridgeItem, pos);
+		auto bridgeSurfaceHeight = isFloor ? bridgeFloorHeight : bridgeCeilingHeight;
+
 		if (!bridgeSurfaceHeight.has_value())
 			continue;
+
+		// Use bridge midpoint to decide whether to return bridge height or room height, in case probe point
+		// is located within the bridge. Without it, dynamic bridges may fail while Lara is standing on them.
+		int thickness = bridge.GetCeilingBorder(bridgeItem) - bridge.GetFloorBorder(bridgeItem);
+		int midpoint = bridgeItem.Pose.Position.y + thickness / 2;
+
+		// Decide whether to override midpoint with surface height, if bridge type is tilt.
+		// It is needed to prevent submerging into tilted bridges, as their surface height does not correspond
+		// to their height function.
+		if (bridgeItem.ObjectNumber >= GAME_OBJECT_ID::ID_BRIDGE_TILT1 &&
+			bridgeItem.ObjectNumber <= GAME_OBJECT_ID::ID_BRIDGE_TILT4)
+		{
+			midpoint = *bridgeSurfaceHeight;
+		}
 
 		// 2.2) Track closest floor or ceiling height.
 		if (isFloor)
 		{
 			// Test if bridge floor height is closer.
-			if (*bridgeSurfaceHeight >= pos.y &&	   // Bridge floor height is below position.
-				*bridgeSurfaceHeight < floorHeight &&  // Bridge floor height is above current closest floor height.
-				*bridgeSurfaceHeight >= ceilingHeight) // Bridge ceiling height is below sector ceiling height.
+			if (midpoint >= pos.y &&				// Bridge midpoint is below position.
+				*bridgeSurfaceHeight < floorHeight &&   // Bridge floor height is above current closest floor height.
+				*bridgeSurfaceHeight >= ceilingHeight)  // Bridge ceiling height is below sector ceiling height.
 			{
 				floorHeight = *bridgeSurfaceHeight;
 			}
@@ -217,7 +263,7 @@ int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 		else
 		{
 			// Test if bridge ceiling height is closer.
-			if (*bridgeSurfaceHeight <= pos.y &&		// Bridge ceiling height is above position.
+			if (midpoint <= pos.y &&			// Bridge midpoint is above position.
 				*bridgeSurfaceHeight > ceilingHeight && // Bridge ceiling height is below current closest ceiling height.
 				*bridgeSurfaceHeight <= floorHeight)	// Bridge floor height is above sector floor height.
 			{
@@ -349,8 +395,8 @@ namespace TEN::Collision::Floordata
 		// Calculate and return tilt.
 		auto sign = isFloor ? 1 : -1;
 		return Vector2i(
-			round(scaledNormal.x * 4),
-			round(scaledNormal.z * 4)) * sign;
+			(round(scaledNormal.x) * 4),
+			(round(scaledNormal.z) * 4)) * sign;
 	}
 
 	Vector2i GetSectorPoint(int x, int z)
@@ -368,17 +414,17 @@ namespace TEN::Collision::Floordata
 		const auto& room = g_Level.Rooms[roomNumber];
 
 		// Calculate room grid coord.
-		auto roomGridCoord = Vector2i((x - room.x) / BLOCK(1), (z - room.z) / BLOCK(1));
-		if (x < room.x)
+		auto roomGridCoord = Vector2i((x - room.Position.x) / BLOCK(1), (z - room.Position.z) / BLOCK(1));
+		if (x < room.Position.x)
 			roomGridCoord.x -= 1;
-		if (z < room.z)
+		if (z < room.Position.z)
 			roomGridCoord.y -= 1;
 
 		// Clamp room grid coord to room bounds (if applicable).
 		if (clampToBounds)
 		{
-			roomGridCoord.x = std::clamp(roomGridCoord.x, 0, room.xSize - 1);
-			roomGridCoord.y = std::clamp(roomGridCoord.y, 0, room.zSize - 1);
+			roomGridCoord.x = std::clamp(roomGridCoord.x, 0, room.XSize - 1);
+			roomGridCoord.y = std::clamp(roomGridCoord.y, 0, room.ZSize - 1);
 		}
 
 		return roomGridCoord;
@@ -397,8 +443,8 @@ namespace TEN::Collision::Floordata
 		const auto& room = g_Level.Rooms[roomNumber];
 
 		// Search area out of range; return empty vector.
-		if (xMax <= 0 || xMin >= (room.xSize - 1) ||
-			xMax <= 0 || xMin >= (room.xSize - 1))
+		if (xMax <= 0 || xMin >= (room.XSize - 1) ||
+			xMax <= 0 || xMin >= (room.XSize - 1))
 		{
 			return {};
 		}
@@ -408,13 +454,13 @@ namespace TEN::Collision::Floordata
 		for (int x = xMin; x <= xMax; x++)
 		{
 			// Test if out of room X range.
-			if (x <= 0 || x >= (room.xSize - 1))
+			if (x <= 0 || x >= (room.XSize - 1))
 				continue;
 
 			for (int z = zMin; z <= zMax; z++)
 			{
 				// Test if out of room Z range.
-				if (z <= 0 || z >= (room.zSize - 1))
+				if (z <= 0 || z >= (room.ZSize - 1))
 					continue;
 
 				roomGridCoords.push_back(Vector2i(x, z));
@@ -430,7 +476,7 @@ namespace TEN::Collision::Floordata
 
 		// Run through neighbor rooms.
 		auto& room = g_Level.Rooms[roomNumber];
-		for (int neighborRoomNumber : room.neighbors)
+		for (int neighborRoomNumber : room.NeighborRoomNumbers)
 		{
 			// Collect neighbor sectors.
 			auto roomGridCoords = GetNeighborRoomGridCoords(pos, neighborRoomNumber, searchDepth);
@@ -446,8 +492,8 @@ namespace TEN::Collision::Floordata
 	{
 		auto& room = g_Level.Rooms[roomNumber];
 
-		int sectorID = (room.zSize * roomGridCoord.x) + roomGridCoord.y;
-		return room.floor[sectorID];
+		int sectorID = (room.ZSize * roomGridCoord.x) + roomGridCoord.y;
+		return room.Sectors[sectorID];
 	}
 
 	FloorInfo& GetFloor(int roomNumber, int x, int z)
@@ -497,8 +543,14 @@ namespace TEN::Collision::Floordata
 		auto* sector = &currentSector;
 		do
 		{
+			// For bridges with zero thickness (which is incorrect setup, but still possible), break out of
+			// infinite loop caused by infinite traversal over the same height value.
+			int nextPos = sector->GetBridgeSurfaceHeight(pos, !isBottom);
+			if (nextPos == pos.y)
+				nextPos += (isBottom ? 1 : -1);
+
 			// Set vertical position to lowest bridge ceiling height or highest bridge floor height.
-			pos.y = sector->GetBridgeSurfaceHeight(pos, !isBottom);
+			pos.y = nextPos;
 
 			// Find sector at lowest bridge floor height or highest bridge ceiling height.
 			while (isBottom ?
@@ -778,6 +830,7 @@ namespace TEN::Collision::Floordata
 		}
 	}
 
+	// TODO: Load anim frame AABBs as DX BoundingBox objects and do regular ray test for gain of 3-5 frames. -- Sezz 2024.11.07
 	// Get precise floor/ceiling height from object's bounding box.
 	// Animated objects are also supported, although horizontal collision shifting is unstable.
 	// Method: get accurate bounds in world transform by converting to OBB, then do a ray test
@@ -786,17 +839,58 @@ namespace TEN::Collision::Floordata
 	{
 		constexpr auto VERTICAL_MARGIN = 4;
 
-		auto box = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
-		
-		auto origin = Vector3(pos.x, pos.y + (useBottomHeight ? VERTICAL_MARGIN : -VERTICAL_MARGIN), pos.z);
-		auto dir = useBottomHeight ? -Vector3::UnitY : Vector3::UnitY;
+		// Check bridge cache for existing entry.
+		for (const auto& entry : BridgeCache) 
+		{
+			if (entry.BridgeItemNumber == item.Index && entry.BridgePose == item.Pose && 
+				entry.UseBottomHeight == useBottomHeight && entry.Position == pos)
+			{
+				return entry.Height;
+			}
+		}
 
-		// Ray intersects box; return bridge box height.
-		float dist = 0.0f;
-		if (box.Intersects(origin, dir, dist))
-			return Geometry::TranslatePoint(origin, dir, dist).y;
+		auto box = GameBoundingBox(&item);
+		auto extents = box.GetExtents();
 
-		return std::nullopt;
+		// Test rough circle intersection to discard bridges not intersecting on XZ plane.
+		auto circle1 = Vector3(pos.x, pos.z, BLOCK(1));
+		auto circle2 = Vector3(item.Pose.Position.x, item.Pose.Position.z, std::hypot(extents.x, extents.z));
+
+		auto height = std::optional<int>();
+		if (Geometry::CircleIntersects(circle1, circle2))
+		{
+			auto origin = Vector3i(pos.x, pos.y + (useBottomHeight ? VERTICAL_MARGIN : -VERTICAL_MARGIN), pos.z) - item.Pose.Position;
+
+			float sinAngle = phd_sin(-item.Pose.Orientation.y);
+			float cosAngle = phd_cos(-item.Pose.Orientation.y);
+
+			auto localOrigin = Vector3i(
+				(origin.x * cosAngle) - (origin.z * sinAngle),
+				origin.y,
+				(origin.x * sinAngle) + (origin.z * cosAngle));
+
+			// Calculate intersection distance.
+			auto direction = useBottomHeight ? -Vector3::UnitY : Vector3::UnitY;
+			float targetY = useBottomHeight ? box.Y2 : box.Y1;
+			float dist = (targetY - localOrigin.y) / direction.y;
+
+			// Compute intersection point.
+			auto intersectionPoint = Geometry::TranslatePoint(localOrigin, direction, dist);
+
+			// Check if intersection point is within bounding box's X and Z extents.
+			if (intersectionPoint.x >= box.X1 && intersectionPoint.x <= box.X2 &&
+				intersectionPoint.z >= box.Z1 && intersectionPoint.z <= box.Z2)
+			{
+				// Transform intersection point back to world coordinates.
+				height = item.Pose.Position.y + intersectionPoint.y;
+			}
+		}
+
+		// Cache bridge data.
+		BridgeCache[BridgeCacheSlotID] = BridgeCacheEntry{ item.Index, item.Pose, useBottomHeight, pos, height };
+		BridgeCacheSlotID = (BridgeCacheSlotID + 1) % BRIDGE_CACHE_SIZE; // Wrap to next slot ID.
+
+		return height;
 	}
 
 	// Gets bridge min or max height regardless of actual X/Z world position.
@@ -807,7 +901,7 @@ namespace TEN::Collision::Floordata
 	}
 
 	// Updates BridgeItem for all blocks which are enclosed by bridge bounds.
-	void UpdateBridgeItem(const ItemInfo& item, bool forceRemoval)
+	void UpdateBridgeItem(const ItemInfo& item, BridgeUpdateType updateType)
 	{
 		constexpr auto SECTOR_EXTENTS = Vector3(BLOCK(0.5f));
 
@@ -819,7 +913,7 @@ namespace TEN::Collision::Floordata
 
 		// Force removal if item was killed.
 		if (item.Flags & IFLAG_KILLED)
-			forceRemoval = true;
+			updateType = BridgeUpdateType::Remove;
 
 		// Get bridge OBB.
 		auto bridgeBox = GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
@@ -831,26 +925,27 @@ namespace TEN::Collision::Floordata
 		const auto& room = g_Level.Rooms[item.RoomNumber];
 
 		// Get projected AABB min and max of bridge OBB.
-		float xMin = floor((std::min(std::min(std::min(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room.x) / BLOCK(1));
-		float zMin = floor((std::min(std::min(std::min(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room.z) / BLOCK(1));
-		float xMax =  ceil((std::max(std::max(std::max(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room.x) / BLOCK(1));
-		float zMax =  ceil((std::max(std::max(std::max(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room.z) / BLOCK(1));
+		float xMin = floor((std::min(std::min(std::min(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room.Position.x) / BLOCK(1));
+		float zMin = floor((std::min(std::min(std::min(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room.Position.z) / BLOCK(1));
+		float xMax =  ceil((std::max(std::max(std::max(corners[0].x, corners[1].x), corners[4].x), corners[5].x) - room.Position.x) / BLOCK(1));
+		float zMax =  ceil((std::max(std::max(std::max(corners[0].z, corners[1].z), corners[4].z), corners[5].z) - room.Position.z) / BLOCK(1));
 
 		// Run through sectors enclosed in projected bridge AABB.
-		for (int x = 0; x < room.xSize; x++)
+		for (int x = 0; x < room.XSize; x++)
 		{
-			for (int z = 0; z < room.zSize; z++)
+			for (int z = 0; z < room.ZSize; z++)
 			{
-				float pX = (room.x + BLOCK(x)) + BLOCK(0.5f);
-				float pZ = (room.z + BLOCK(z)) + BLOCK(0.5f);
+				float pX = (room.Position.x + BLOCK(x)) + BLOCK(0.5f);
+				float pZ = (room.Position.z + BLOCK(z)) + BLOCK(0.5f);
 				float offX = pX - item.Pose.Position.x;
 				float offZ = pZ - item.Pose.Position.z;
 
 				// Clean previous bridge state.
-				RemoveBridge(item.Index, offX, offZ);
+				if (updateType != BridgeUpdateType::Initialize)
+					RemoveBridge(item.Index, offX, offZ);
 
-				// In sweep mode; don't try readding to sector.
-				if (forceRemoval)
+				// In removal mode; don't try re-adding to sector.
+				if (updateType == BridgeUpdateType::Remove)
 					continue;
 
 				// Sector is outside enclosed AABB space; ignore precise check.
@@ -889,7 +984,7 @@ namespace TEN::Collision::Floordata
 		if (labelPos2D.has_value())
 		{
 			*labelPos2D += Vector2(0.0f, verticalOffset);
-			g_Renderer.AddDebugString(string, *labelPos2D, color, LABEL_SCALE, 0, RendererDebugPage::CollisionStats);
+			DrawDebugString(string, *labelPos2D, color, LABEL_SCALE, RendererDebugPage::CollisionStats);
 		}
 	}
 
@@ -905,13 +1000,16 @@ namespace TEN::Collision::Floordata
 		constexpr auto ACTIVATOR_MINECART_LEFT_COLOR = Vector4(1.0f, 0.4f, 1.0f, 1.0f);
 		constexpr auto MINECART_STOP_COLOR			 = Vector4(0.4f, 1.0f, 1.0f, 1.0f);
 
+		if (g_Renderer.GetCurrentDebugPage() != RendererDebugPage::CollisionStats)
+			return;
+
 		// Get point collision.
 		auto pointColl = GetPointCollision(item);
 		auto pos = item.Pose.Position.ToVector3();
 
 		// Run through neighboring rooms.
 		const auto& room = g_Level.Rooms[item.RoomNumber];
-		for (int neighborRoomNumber : room.neighbors)
+		for (int neighborRoomNumber : room.NeighborRoomNumbers)
 		{
 			const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
 
@@ -919,8 +1017,8 @@ namespace TEN::Collision::Floordata
 			auto roomGridCoords = GetNeighborRoomGridCoords(item.Pose.Position, neighborRoomNumber, SECTOR_SEARCH_DEPTH);
 			for (const auto& roomGridCoord : roomGridCoords)
 			{
-				pos.x = BLOCK(roomGridCoord.x) + neighborRoom.x;
-				pos.z = BLOCK(roomGridCoord.y) + neighborRoom.z;
+				pos.x = BLOCK(roomGridCoord.x) + neighborRoom.Position.x;
+				pos.z = BLOCK(roomGridCoord.y) + neighborRoom.Position.z;
 
 				pointColl = GetPointCollision(pos, neighborRoomNumber);
 				pos.y = pointColl.GetFloorHeight();

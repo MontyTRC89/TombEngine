@@ -186,7 +186,7 @@ namespace TEN::Entities::TR4
 				auto pos = GetJointPosition(item, LM_LINARM);
 				
 				auto& room = g_Level.Rooms[item->RoomNumber];
-				auto& currentFloor = room.floor[(pos.z - room.z) / BLOCK(1) + (pos.x - room.x) / BLOCK(1) * room.zSize];
+				auto& currentFloor = room.Sectors[(pos.z - room.Position.z) / BLOCK(1) + (pos.x - room.Position.x) / BLOCK(1) * room.ZSize];
 
 				if (currentFloor.Stopper)
 				{
@@ -194,7 +194,7 @@ namespace TEN::Entities::TR4
 					{
 						if (abs(pos.x - mesh.pos.Position.x) < BLOCK(1) &&
 							abs(pos.z - mesh.pos.Position.z) < BLOCK(1) &&
-							StaticObjects[mesh.staticNumber].shatterType == ShatterType::None)
+							Statics[mesh.staticNumber].shatterType == ShatterType::None)
 						{
 							ShatterObject(nullptr, &mesh, -64, LaraItem->RoomNumber, 0);
 							SoundEffect(SFX_TR4_SMASH_ROCK, &item->Pose);

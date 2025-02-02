@@ -87,11 +87,11 @@ namespace TEN::Control::Volumes
 
 	bool HandleEvent(Event& event, Activator& activator)
 	{
-		if (event.Function.empty() || event.CallCounter == 0 || event.CallCounter < NO_CALL_COUNTER)
+		if (!event.Enabled || event.CallCounter == 0 || event.Function.empty())
 			return false;
 
 		g_GameScript->ExecuteFunction(event.Function, activator, event.Data);
-		if (event.CallCounter != NO_CALL_COUNTER)
+		if (event.CallCounter != NO_VALUE)
 			event.CallCounter--;
 
 		return true;
@@ -124,29 +124,27 @@ namespace TEN::Control::Volumes
 		if (eventSet == nullptr)
 			return false;
 
-		auto& event = eventSet->Events[(int)eventType];
-		bool disabled = eventSet->Events[(int)eventType].CallCounter < NO_CALL_COUNTER;
-
-		// Flip the call counter to indicate that it is currently disabled.
-		if ((enabled && disabled) || (!enabled && !disabled))
-			eventSet->Events[(int)eventType].CallCounter += enabled ? EVENT_STATE_MASK : -EVENT_STATE_MASK;
+		eventSet->Events[(int)eventType].Enabled = enabled;
 
 		return true;
 	}
 
 	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, ActivatorFlags activatorFlag, Activator activator)
 	{
+		if (g_GameFlow->CurrentFreezeMode != FreezeMode::None)
+			return;
+	
 		if (roomNumber == NO_VALUE)
 			return;
 
-		for (int currentRoomIndex : g_Level.Rooms[roomNumber].neighbors)
+		for (int currentRoomIndex : g_Level.Rooms[roomNumber].NeighborRoomNumbers)
 		{
 			auto& room = g_Level.Rooms[currentRoomIndex];
 
 			if (!room.Active())
 				continue;
 
-			for (auto& volume : room.triggerVolumes)
+			for (auto& volume : room.TriggerVolumes)
 			{
 				if (!volume.Enabled)
 					continue;
@@ -170,7 +168,7 @@ namespace TEN::Control::Volumes
 
 					if (candidate.Status == VolumeStateStatus::Leaving)
 					{
-						if ((GameTimer - candidate.Timestamp) > VOLUME_BUSY_TIMEOUT)
+						if ((SaveGame::Statistics.Level.TimeTaken - candidate.Timestamp) > VOLUME_BUSY_TIMEOUT)
 							candidate.Status = VolumeStateStatus::Outside;
 					}
 					else if (candidate.Status != VolumeStateStatus::Outside)
@@ -193,7 +191,7 @@ namespace TEN::Control::Volumes
 							{
 								VolumeStateStatus::Entering,
 								activator,
-								GameTimer
+								SaveGame::Statistics.Level.TimeTaken
 							});
 
 						HandleEvent(set.Events[(int)EventType::Enter], activator);
@@ -201,7 +199,7 @@ namespace TEN::Control::Volumes
 					else
 					{
 						entryPtr->Status = VolumeStateStatus::Inside;
-						entryPtr->Timestamp = GameTimer;
+						entryPtr->Timestamp = SaveGame::Statistics.Level.TimeTaken;
 
 						HandleEvent(set.Events[(int)EventType::Inside], activator);
 					}
@@ -211,10 +209,10 @@ namespace TEN::Control::Volumes
 					// Only fire leave event when a certain timeout has passed.
 					// This helps to filter out borderline cases when moving around volumes.
 
-					if ((GameTimer - entryPtr->Timestamp) > VOLUME_LEAVE_TIMEOUT)
+					if ((SaveGame::Statistics.Level.TimeTaken - entryPtr->Timestamp) > VOLUME_LEAVE_TIMEOUT)
 					{
 						entryPtr->Status = VolumeStateStatus::Leaving;
-						entryPtr->Timestamp = GameTimer;
+						entryPtr->Timestamp = SaveGame::Statistics.Level.TimeTaken;
 
 						HandleEvent(set.Events[(int)EventType::Leave], activator);
 					}

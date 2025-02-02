@@ -17,6 +17,7 @@
 #include "Objects/Generic/Object/BridgeObject.h"
 #include "Objects/Generic/Object/Pushable/PushableInfo.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Internal/TEN/Objects/ObjectIDs.h"
@@ -35,6 +36,7 @@ using namespace TEN::Entities::Generic;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Utils;
+using TEN::Renderer::g_Renderer;
 
 constexpr auto ITEM_DEATH_TIMEOUT = 4 * FPS;
 
@@ -182,6 +184,11 @@ bool ItemInfo::IsBridge() const
 	return Contains(BRIDGE_OBJECT_IDS, ObjectNumber);
 }
 
+std::vector<BoundingSphere> ItemInfo::GetSpheres() const
+{
+	return g_Renderer.GetSpheres(Index);
+}
+
 bool TestState(int refState, const std::vector<int>& stateList)
 {
 	return TEN::Utils::Contains(stateList, refState);
@@ -263,7 +270,7 @@ void KillItem(short const itemNumber)
 		// AI target generation uses a hack with making a dummy item without ObjectNumber.
 		// Therefore, a check should be done here to prevent access violation.
 		if (item->ObjectNumber != GAME_OBJECT_ID::ID_NO_OBJECT && item->IsBridge())
-			UpdateBridgeItem(*item, true);
+			UpdateBridgeItem(*item, BridgeUpdateType::Remove);
 
 		GameScriptHandleKilled(itemNumber, true);
 
@@ -466,13 +473,13 @@ void InitializeFXArray()
 	NextFxActive = NO_VALUE;
 	NextFxFree = 0;
 
-	for (int i = 0; i < NUM_EFFECTS; i++)
+	for (int i = 0; i < MAX_SPAWNED_ITEM_COUNT; i++)
 	{
 		auto* fx = &EffectList[i];
 		fx->nextFx = i + 1;
 	}
 
-	EffectList[NUM_EFFECTS - 1].nextFx = NO_VALUE;
+	EffectList[MAX_SPAWNED_ITEM_COUNT - 1].nextFx = NO_VALUE;
 }
 
 void RemoveDrawnItem(short itemNumber) 
@@ -578,7 +585,7 @@ void InitializeItem(short itemNumber)
 	item->NextItem = room->itemNumber;
 	room->itemNumber = itemNumber;
 
-	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->x, item->Pose.Position.z - room->z);
+	FloorInfo* floor = GetSector(room, item->Pose.Position.x - room->Position.x, item->Pose.Position.z - room->Position.z);
 	item->Floor = floor->GetSurfaceHeight(item->Pose.Position.x, item->Pose.Position.z, true);
 	item->BoxNumber = floor->PathfindingBoxID;
 
@@ -596,6 +603,8 @@ short CreateItem()
 	short itemNumber = NextItemFree;
 	g_Level.Items[NextItemFree].Flags = 0;
 	NextItemFree = g_Level.Items[NextItemFree].NextItem;
+
+	g_Level.Items[itemNumber].DisableInterpolation = true;
 
 	return itemNumber;
 }
@@ -748,28 +757,30 @@ void UpdateAllItems()
 	while (itemNumber != NO_VALUE)
 	{
 		auto* item = &g_Level.Items[itemNumber];
-		short nextItem = item->NextActive;
+		itemNumber = item->NextActive;
 
 		if (!Objects.CheckID(item->ObjectNumber))
+			continue;
+
+		if (g_GameFlow->LastFreezeMode != FreezeMode::None && !Objects[item->ObjectNumber].AlwaysActive)
 			continue;
 
 		if (item->AfterDeath <= ITEM_DEATH_TIMEOUT)
 		{
 			if (Objects[item->ObjectNumber].control)
-				Objects[item->ObjectNumber].control(itemNumber);
+				Objects[item->ObjectNumber].control(item->Index);
 
-			TestVolumes(itemNumber);
+			TestVolumes(item->Index);
 			ProcessEffects(item);
 
 			if (item->AfterDeath > 0 && item->AfterDeath < ITEM_DEATH_TIMEOUT && !(Wibble & 3))
 				item->AfterDeath++;
 			if (item->AfterDeath == ITEM_DEATH_TIMEOUT)
-				KillItem(itemNumber);
+				KillItem(item->Index);
 		}
 		else
-			KillItem(itemNumber);
+			KillItem(item->Index);
 
-		itemNumber = nextItem;
 	}
 
 	InItemControlLoop = false;
@@ -812,7 +823,7 @@ bool UpdateItemRoom(short itemNumber)
 	return false;
 }
 
-void DoDamage(ItemInfo* item, int damage)
+void DoDamage(ItemInfo* item, int damage, bool silent)
 {
 	static int lastHurtTime = 0;
 
@@ -820,20 +831,34 @@ void DoDamage(ItemInfo* item, int damage)
 		return;
 
 	item->HitStatus = true;
-
 	item->HitPoints -= damage;
-	if (item->HitPoints < 0)
+
+	if (item->HitPoints <= 0)
+	{
 		item->HitPoints = 0;
+
+		if (!item->IsLara())
+		{
+			SaveGame::Statistics.Level.Kills++;
+			SaveGame::Statistics.Game.Kills++;
+		}
+	}
 
 	if (item->IsLara())
 	{
 		if (damage > 0)
 		{
-			float power = item->HitPoints ? Random::GenerateFloat(0.1f, 0.4f) : 0.5f;
-			Rumble(power, 0.15f);
+			if (!silent)
+			{
+				float power = item->HitPoints ? Random::GenerateFloat(0.1f, 0.4f) : 0.5f;
+				Rumble(power, 0.15f);
+			}
+
+			SaveGame::Statistics.Game.DamageTaken += damage;
+			SaveGame::Statistics.Level.DamageTaken += damage;
 		}
 
-		if ((GlobalCounter - lastHurtTime) > (FPS * 2 + Random::GenerateInt(0, FPS)))
+		if (!silent && (GlobalCounter - lastHurtTime) > (FPS * 2 + Random::GenerateInt(0, FPS)))
 		{
 			SoundEffect(SFX_TR4_LARA_INJURY, &LaraItem->Pose);
 			lastHurtTime = GlobalCounter;
@@ -850,6 +875,7 @@ void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn)
 	{
 		if (target->HitPoints > 0)
 		{
+			SaveGame::Statistics.Game.AmmoHits++;
 			SaveGame::Statistics.Level.AmmoHits++;
 			DoDamage(target, damage);
 		}
@@ -878,7 +904,7 @@ void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector
 			break;
 
 		case HitEffect::Richochet:
-			TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y, 3, 0);
+			TriggerRicochetSpark(pos.value(), source.Pose.Orientation.y);
 			break;
 
 		case HitEffect::Smoke:

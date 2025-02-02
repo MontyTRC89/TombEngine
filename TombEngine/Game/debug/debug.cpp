@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Game/Debug/Debug.h"
 
+#include <chrono>
 #include <spdlog.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
@@ -12,6 +13,8 @@ using TEN::Renderer::g_Renderer;
 
 namespace TEN::Debug
 {
+	static auto StartTime = std::chrono::high_resolution_clock::time_point{};
+
 	void InitTENLog(const std::string& logDirContainingDir)
 	{
 		// "true" means create new log file each time game is run.
@@ -41,7 +44,7 @@ namespace TEN::Debug
 		if (prevString == msg && !allowSpam)
 			return;
 
-		if constexpr (!DebugBuild)
+		if constexpr (!DEBUG_BUILD)
 		{
 			if (config == LogConfig::Debug)
 				return;
@@ -68,12 +71,30 @@ namespace TEN::Debug
 		prevString = std::string(msg);
 	}
 
+	void StartDebugTimer()
+	{
+		StartTime = std::chrono::high_resolution_clock::now();
+	}
+
+	void EndDebugTimer()
+	{
+		auto endTime = std::chrono::high_resolution_clock::now();
+		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(endTime - StartTime);
+		
+		PrintDebugMessage("Execution (microseconds): %d", duration);
+	}
+
 	void PrintDebugMessage(LPCSTR msg, ...)
 	{
 		auto args = va_list{};
 		va_start(args, msg);
 		g_Renderer.PrintDebugMessage(msg, args);
 		va_end(args);
+	}
+	
+	void DrawDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, RendererDebugPage page)
+	{
+		g_Renderer.AddDebugString(string, pos, color, scale, page);
 	}
 
 	void DrawDebug2DLine(const Vector2& origin, const Vector2& target, const Color& color, RendererDebugPage page)

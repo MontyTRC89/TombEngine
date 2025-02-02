@@ -5,7 +5,6 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/collision/Point.h"
-#include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/tomb4fx.h"
@@ -20,6 +19,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Math/Math.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 
 using namespace TEN::Collision::Point;
@@ -680,8 +680,8 @@ namespace TEN::Entities::Vehicles
 				lara->RightArm.Orientation.y + laraItem->Pose.Orientation.y,
 				0);
 
-			FireWeapon(LaraWeaponType::Snowmobile, *lara->TargetEntity, *laraItem, angles);
-			FireWeapon(LaraWeaponType::Snowmobile, *lara->TargetEntity, *laraItem, angles);
+			FireWeapon(LaraWeaponType::Snowmobile, lara->TargetEntity, *laraItem, angles);
+			FireWeapon(LaraWeaponType::Snowmobile, lara->TargetEntity, *laraItem, angles);
 			SoundEffect(weapon.SampleNum, &laraItem->Pose);
 			skidooItem->ItemFlags[0] = 4;
 		}
@@ -712,7 +712,9 @@ namespace TEN::Entities::Vehicles
 				verticalVelocity = 0;
 			}
 			else
-				verticalVelocity += GRAVITY;
+			{
+				verticalVelocity += g_GameFlow->GetSettings()->Physics.Gravity;
+			}
 		}
 		// Airborne.
 		else

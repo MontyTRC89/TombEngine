@@ -2,19 +2,22 @@
 
 namespace TEN::Utils
 {
-	// TODO: Switch to std::span container type as parameter whenever we update to C++20.
-	// TODO: When all conversions are complete, remove the size cap and use unsigned long long for packedBits input.
-
 	class BitField
 	{
 	private:
+		// Aliases
+
+		using ChunkType = unsigned int;
+
 		// Constants
 
-		static constexpr auto SIZE_DEFAULT = 32;
+		static constexpr auto DEFAULT_SIZE = 32;
+		static constexpr auto CHUNK_SIZE   = std::numeric_limits<ChunkType>::digits;
 
-		// Members
+		// Fields
 
-		std::vector<bool> _bits = {};
+		unsigned int		   _size   = 0;
+		std::vector<ChunkType> _chunks = {};
 
 	public:
 		// Presets
@@ -26,39 +29,60 @@ namespace TEN::Utils
 
 		BitField();
 		BitField(unsigned int size);
-		BitField(unsigned int size, unsigned int packedBits);
+		BitField(const std::initializer_list<bool>& bits);
+		BitField(const std::vector<ChunkType>& bitChunks, unsigned int size);
 		BitField(const std::string& bitString);
 		
 		// Getters
 
-		unsigned int GetSize() const;
-		unsigned int GetCount() const;
+		unsigned int				  GetSize() const;
+		unsigned int				  GetCount() const;
+		const std::vector<ChunkType>& GetChunks() const;
 
 		// Setters
-		void Set(const std::vector<unsigned int>& indices);
-		void Set(unsigned int index);
+
+		void Set(unsigned int bitID);
+		void Set(const std::vector<unsigned int>& bitIds);
 		void SetAll();
-		void Clear(const std::vector<unsigned int>& indices);
-		void Clear(unsigned int index);
+		void Clear(unsigned int bitID);
+		void Clear(const std::vector<unsigned int>& bitIds);
 		void ClearAll();
-		void Flip(const std::vector<unsigned int>& indices);
-		void Flip(unsigned int index);
+		void Flip(unsigned int bitID);
+		void Flip(const std::vector<unsigned int>& bitIds);
 		void FlipAll();
 
 		// Inquirers
 
-		bool Test(const std::vector<unsigned int>& indices, bool testAny = true) const;
-		bool Test(unsigned int index) const;
+		bool IsEmpty() const;
+
+		bool Test(const std::vector<unsigned int>& bitIds, bool testAny = true) const;
+		bool Test(unsigned int bitID) const;
 		bool TestAny() const;
 		bool TestAll() const;
 
+		// Utilities
+
+		void Resize(unsigned int size);
+
 		// Converters
 
-		unsigned int ToPackedBits() const;
-		std::string	 ToString() const;
+		std::string ToString() const;
+		ChunkType	ToPackedBits() const; // For compatibility.
 
 		// Operators
-		// NOTE: packedBits will not be assessed in full if the size of the given BitField object is less than SIZE_DEFAULT.
+
+		bool	  operator ==(const BitField& bitField) const;
+		bool	  operator !=(const BitField& bitField) const;
+		BitField& operator =(const BitField& bitField) = default;
+		BitField& operator &=(const BitField& bitField);
+		BitField& operator |=(const BitField& bitField);
+		BitField& operator ^=(const BitField& bitField);
+		BitField  operator &(const BitField& bitField) const;
+		BitField  operator |(const BitField& bitField) const;
+		BitField  operator ^(const BitField& bitField) const;
+		BitField  operator ~() const;
+
+		// Compatibility operators
 
 		bool		 operator ==(unsigned int packedBits) const;
 		bool		 operator !=(unsigned int packedBits) const;
@@ -72,5 +96,6 @@ namespace TEN::Utils
 		// Helpers
 
 		void Fill(bool value);
+		bool IsBitIDCorrect(unsigned int bitID) const;
 	};
 }

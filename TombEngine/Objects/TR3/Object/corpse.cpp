@@ -9,19 +9,21 @@
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
 #include "Game/collision/floordata.h"
-#include "Game/collision/sphere.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Ripple.h"
+#include "Game/effects/Splash.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Ripple;
+using namespace TEN::Effects::Splash;
 using namespace TEN::Math;
 
 namespace TEN::Entities::TR3
@@ -74,27 +76,25 @@ namespace TEN::Entities::TR3
 			bool isWater = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item.RoomNumber);
 			float verticalVelCoeff = isWater ? 81.0f : 1.0f;
 			
-			int roomNumber = GetPointCollision(item).GetRoomNumber();
-			if (item.RoomNumber != roomNumber)
+			auto pointColl = GetPointCollision(item);
+			if (item.RoomNumber != pointColl.GetRoomNumber())
 			{
-				if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, roomNumber) &&
+				if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, pointColl.GetRoomNumber()) &&
 					!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item.RoomNumber))
 				{
-					int waterHeight = GetWaterHeight(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, roomNumber);
-					SplashSetup.y = waterHeight - 1;
-					SplashSetup.x = item.Pose.Position.x;
-					SplashSetup.z = item.Pose.Position.z;
-					SplashSetup.splashPower = item.Animation.Velocity.y * 4;
-					SplashSetup.innerRadius = 160.0f;
+					int waterHeight = pointColl.GetWaterTopHeight();
+					SplashSetup.Position = Vector3(item.Pose.Position.x, waterHeight - 1, item.Pose.Position.z);
+					SplashSetup.SplashPower = item.Animation.Velocity.y * 4;
+					SplashSetup.InnerRadius = 160.0f;
 
-					SetupSplash(&SplashSetup, roomNumber);
+					SetupSplash(&SplashSetup, pointColl.GetRoomNumber());
 					item.Animation.Velocity.y = 0.0f;
 				}
 
-				ItemNewRoom(itemNumber, roomNumber);
+				ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 			}
 
-			auto pointColl = GetPointCollision(item);
+			pointColl = GetPointCollision(item);
 			item.Animation.IsAirborne = true;
 
 			if (pointColl.GetFloorHeight() < item.Pose.Position.y)
@@ -126,7 +126,7 @@ namespace TEN::Entities::TR3
 				}
 				else
 				{
-					item.Animation.Velocity.y += GRAVITY;
+					item.Animation.Velocity.y += g_GameFlow->GetSettings()->Physics.Gravity;
 				}
 			}
 		}

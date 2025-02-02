@@ -2,14 +2,18 @@
 #include "Renderer/Renderer.h"
 
 #include "Specific/trutils.h"
+#include "Specific/winmain.h"
 
 namespace TEN::Renderer
 {
-	void Renderer::AddDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags, RendererDebugPage page)
+	void Renderer::AddDebugString(const std::string& string, const Vector2& pos, const Color& color, float scale, RendererDebugPage page)
 	{
 		constexpr auto FLAGS = (int)PrintStringFlags::Outline | (int)PrintStringFlags::Center;
 
-		if (_debugPage != page)
+		if (_isLocked)
+			return;
+
+		if (!DebugMode || (_debugPage != page && page != RendererDebugPage::None))
 			return;
 
 		AddString(string, pos, color, scale, FLAGS);
@@ -22,10 +26,6 @@ namespace TEN::Renderer
 
 	void Renderer::AddString(const std::string& string, const Vector2& pos, const Color& color, float scale, int flags)
 	{
-		constexpr auto BLINK_VALUE_MAX = 1.0f;
-		constexpr auto BLINK_VALUE_MIN = 0.1f;
-		constexpr auto BLINK_TIME_STEP = 0.2f;
-
 		if (_isLocked)
 			return;
 
@@ -40,21 +40,22 @@ namespace TEN::Renderer
 			float fontSpacing = _gameFont->GetLineSpacing();
 			float fontScale = REFERENCE_FONT_SIZE / fontSpacing;
 
-			auto stringLines = SplitString(string);
+			auto stringLines = SplitString(TEN::Utils::ToWString(string));
 			float yOffset = 0.0f;
 			for (const auto& line : stringLines)
 			{
 				// Prepare structure for renderer.
 				RendererStringToDraw rString;
-				rString.String = TEN::Utils::ToWString(line);
+				rString.String = line;
 				rString.Flags = flags;
 				rString.X = 0;
 				rString.Y = 0;
-				rString.Color = color.ToVector3();
+				rString.Color = color;
 				rString.Scale = (uiScale * fontScale) * scale;
 
 				// Measure string.
-				auto size = Vector2(_gameFont->MeasureString(rString.String.c_str())) * rString.Scale;
+				auto size = line.empty() ? Vector2(0, fontSpacing * rString.Scale) : Vector2(_gameFont->MeasureString(line.c_str())) * rString.Scale;
+
 				if (flags & (int)PrintStringFlags::Center)
 				{
 					rString.X = (pos.x * factor.x) - (size.x / 2.0f);
@@ -66,7 +67,7 @@ namespace TEN::Renderer
 				else
 				{
 					// Calculate indentation to account for string scaling.
-					auto indent = _gameFont->FindGlyph(line.at(0))->XAdvance * rString.Scale;
+					auto indent = line.empty() ? 0 : _gameFont->FindGlyph(line.at(0))->XAdvance * rString.Scale;
 					rString.X = pos.x * factor.x + indent;
 				}
 
@@ -75,19 +76,6 @@ namespace TEN::Renderer
 				if (flags & (int)PrintStringFlags::Blink)
 				{
 					rString.Color *= _blinkColorValue;
-
-					if (!_isBlinkUpdated)
-					{
-						// Calculate blink increment based on sine wave.
-						_blinkColorValue = ((sin(_blinkTime) + BLINK_VALUE_MAX) * 0.5f) + BLINK_VALUE_MIN;
-
-						// Update blink time.
-						_blinkTime += BLINK_TIME_STEP;
-						if (_blinkTime > PI_MUL_2)
-							_blinkTime -= PI_MUL_2;
-
-						_isBlinkUpdated = true;
-					}
 				}
 
 				yOffset += size.y;
@@ -102,8 +90,12 @@ namespace TEN::Renderer
 
 	void Renderer::DrawAllStrings()
 	{
-		float shadowOffset = 1.5f / (REFERENCE_FONT_SIZE / _gameFont->GetLineSpacing());
+		if (_stringsToDraw.empty())
+			return;
 
+		SetBlendMode(BlendMode::AlphaBlend);
+
+		float shadowOffset = 1.5f / (REFERENCE_FONT_SIZE / _gameFont->GetLineSpacing());
 		_spriteBatch->Begin();
 
 		for (const auto& rString : _stringsToDraw)
@@ -114,7 +106,7 @@ namespace TEN::Renderer
 				_gameFont->DrawString(
 					_spriteBatch.get(), rString.String.c_str(),
 					Vector2(rString.X + shadowOffset * rString.Scale, rString.Y + shadowOffset * rString.Scale),
-					Vector4(0.0f, 0.0f, 0.0f, 1.0f) * ScreenFadeCurrent,
+					Vector4(0.0f, 0.0f, 0.0f, rString.Color.w) * ScreenFadeCurrent,
 					0.0f, Vector4::Zero, rString.Scale);
 			}
 
@@ -122,13 +114,10 @@ namespace TEN::Renderer
 			_gameFont->DrawString(
 				_spriteBatch.get(), rString.String.c_str(),
 				Vector2(rString.X, rString.Y),
-				Vector4(rString.Color.x, rString.Color.y, rString.Color.z, 1.0f) * ScreenFadeCurrent,
+				(rString.Color * rString.Color.w) * ScreenFadeCurrent,
 				0.0f, Vector4::Zero, rString.Scale);
 		}
 
 		_spriteBatch->End();
-
-		_isBlinkUpdated = false;
-		_stringsToDraw.clear();
 	}
 }

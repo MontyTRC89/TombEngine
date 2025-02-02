@@ -147,7 +147,7 @@ namespace TEN::Entities::Creatures::TR3
 			float closestDist = INFINITY;
 			for (auto& targetItem : g_Level.Items)
 			{
-				if (!Objects.CheckID(targetItem.ObjectNumber) || targetItem.Index == itemNumber || targetItem.RoomNumber == NO_VALUE)
+				if (!Objects.CheckID(targetItem.ObjectNumber, true) || targetItem.Index == itemNumber || targetItem.RoomNumber == NO_VALUE)
 					continue;
 
 				if (SameZone(&creature, &targetItem) && item.TriggerFlags < 0)
@@ -221,7 +221,6 @@ namespace TEN::Entities::Creatures::TR3
 
 		// Get point collision.
 		auto pointColl = GetPointCollision(pos, item.RoomNumber);
-		int waterHeight = GetWaterHeight(pointColl.GetPosition().x, pointColl.GetPosition().y, pointColl.GetPosition().z, pointColl.GetRoomNumber());
 
 		// 1) Test for water room.
 		if (!TestEnvironment(ENV_FLAG_WATER, pointColl.GetRoomNumber()))
@@ -229,7 +228,7 @@ namespace TEN::Entities::Creatures::TR3
 
 		// 2) Assess point collision.
 		if (pos.y >= (pointColl.GetFloorHeight() - BUFFER) ||
-			pos.y <= (waterHeight + BUFFER) ||
+			pos.y <= (pointColl.GetWaterTopHeight() + BUFFER) ||
 			pointColl.GetSector().IsWall(item.Pose.Position.x + BUFFER, item.Pose.Position.z + BUFFER) ||
 			pointColl.GetSector().IsWall(item.Pose.Position.x - BUFFER, item.Pose.Position.z - BUFFER))
 		{
@@ -261,6 +260,8 @@ namespace TEN::Entities::Creatures::TR3
 		{
 			if (fish.Life <= 0.0f)
 				continue;
+
+			fish.StoreInterpolationData();
 
 			// Increase separation distance for each fish.
 			float separationDist = FISH_BASE_SEPARATION_DISTANCE + (fishID * 3);
@@ -380,7 +381,7 @@ namespace TEN::Entities::Creatures::TR3
 			}
 
 			// Clamp position to slightly below water surface.
-			int waterHeight = GetWaterHeight(fish.Position.x, fish.Position.y, fish.Position.z, fish.RoomNumber);
+			int waterHeight = pointColl.GetWaterTopHeight();
 			if (fish.Position.y < (waterHeight + WATER_SURFACE_OFFSET))
 				fish.Position.y = waterHeight + WATER_SURFACE_OFFSET;
 			
@@ -417,6 +418,8 @@ namespace TEN::Entities::Creatures::TR3
 			fish.Undulation += std::clamp(movementValue / 2, 0.3f, 1.0f);
 			if (fish.Undulation > PI_MUL_2)
 				fish.Undulation -= PI_MUL_2;
+
+			fish.Transform = fish.Orientation.ToRotationMatrix() * Matrix::CreateTranslation(fish.Position);
 		}
 	}
 

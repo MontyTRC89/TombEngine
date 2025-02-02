@@ -6,6 +6,7 @@
 #include <tuple>
 
 #include "Game/control/control.h"
+#include "Game/effects/Hair.h"
 #include "Game/Lara/lara_struct.h"
 #include "Game/savegame.h"
 #include "Game/Setup.h"
@@ -14,6 +15,7 @@
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Specific/level.h"
 
+using namespace TEN::Effects::Hair;
 using namespace TEN::Renderer::Graphics;
 
 namespace TEN::Renderer
@@ -22,16 +24,29 @@ namespace TEN::Renderer
 
 	bool Renderer::PrepareDataForTheRenderer()
 	{
+		TENLog("Preparing renderer...", LogLevel::Info);
+
 		_lastBlendMode = BlendMode::Unknown;
 		_lastCullMode = CullMode::Unknown;
 		_lastDepthState = DepthState::Unknown;
 
 		_moveableObjects.resize(ID_NUMBER_OBJECTS);
 		_spriteSequences.resize(ID_NUMBER_OBJECTS);
-		_staticObjects.resize(MAX_STATICS);
 		_rooms.resize(g_Level.Rooms.size());
 
 		_meshes.clear();
+
+		_dynamicLightList = 0;
+		for (auto& dynamicLightList : _dynamicLights)
+			dynamicLightList.clear();
+
+		int allocatedItemSize = (int)g_Level.Items.size() + MAX_SPAWNED_ITEM_COUNT;
+
+		auto item = RendererItem();
+		_items = std::vector<RendererItem>(allocatedItemSize, item);
+
+		auto effect = RendererEffect();
+		_effects = std::vector<RendererEffect>(allocatedItemSize, effect);
 
 		TENLog("Allocated renderer object memory.", LogLevel::Info);
 
@@ -212,14 +227,14 @@ namespace TEN::Renderer
 			r->ItemsToDraw.reserve(MAX_ITEMS_DRAW);
 			r->EffectsToDraw.reserve(MAX_ITEMS_DRAW);
 
-			Vector3 boxMin = Vector3(room.x + BLOCK(1), room.maxceiling - CLICK(1), room.z + BLOCK(1));
-			Vector3 boxMax = Vector3(room.x + (room.xSize - 1) * BLOCK(1), room.minfloor + CLICK(1), room.z + (room.zSize - 1) * BLOCK(1));
+			Vector3 boxMin = Vector3(room.Position.x + BLOCK(1), room.TopHeight - CLICK(1), room.Position.z + BLOCK(1));
+			Vector3 boxMax = Vector3(room.Position.x + (room.XSize - 1) * BLOCK(1), room.BottomHeight + CLICK(1), room.Position.z + (room.ZSize - 1) * BLOCK(1));
 			Vector3 center = (boxMin + boxMax) / 2.0f;
 			Vector3 extents = boxMax - center;
 			r->BoundingBox = BoundingBox(center, extents);
 
 			r->Neighbors.clear();
-			for (int j : room.neighbors)
+			for (int j : room.NeighborRoomNumbers)
 				if (g_Level.Rooms[j].Active())
 					r->Neighbors.push_back(j);
 
@@ -238,9 +253,9 @@ namespace TEN::Renderer
 					for (int k = 0; k < 4; k++)
 					{
 						door->AbsoluteVertices[k] = Vector4(
-							room.x + oldDoor->vertices[k].x,
-							room.y + oldDoor->vertices[k].y,
-							room.z + oldDoor->vertices[k].z,
+							room.Position.x + oldDoor->vertices[k].x,
+							room.Position.y + oldDoor->vertices[k].y,
+							room.Position.z + oldDoor->vertices[k].z,
 							1.0f);
 					}
 				}
@@ -263,7 +278,7 @@ namespace TEN::Renderer
 					staticInfo->AmbientLight = r->AmbientLight;
 					staticInfo->Pose = oldMesh->pos;
 					staticInfo->Scale = oldMesh->scale;
-					staticInfo->OriginalVisibilityBox = StaticObjects[staticInfo->ObjectNumber].visibilityBox;
+					staticInfo->OriginalSphere = Statics[staticInfo->ObjectNumber].visibilityBox.ToLocalBoundingSphere();
 					staticInfo->IndexInRoom = l;
 
 					staticInfo->Update();
@@ -312,9 +327,9 @@ namespace TEN::Renderer
 						Vertex* vertex = &_roomsVertices[lastVertex];
 						int index = poly.indices[k];
 
-						vertex->Position.x = room.x + room.positions[index].x;
-						vertex->Position.y = room.y + room.positions[index].y;
-						vertex->Position.z = room.z + room.positions[index].z;
+						vertex->Position.x = room.Position.x + room.positions[index].x;
+						vertex->Position.y = room.Position.y + room.positions[index].y;
+						vertex->Position.z = room.Position.z + room.positions[index].z;
 
 						bucket.Centre += vertex->Position;
 
@@ -516,7 +531,7 @@ namespace TEN::Renderer
 						&moveable,
 						&g_Level.Meshes[obj->meshIndex + j],
 						j, MoveablesIds[i] == ID_LARA_SKIN_JOINTS,
-						MoveablesIds[i] == ID_HAIR, &lastVertex, &lastIndex);
+						MoveablesIds[i] == ID_HAIR_PRIMARY || MoveablesIds[i] == ID_HAIR_SECONDARY, &lastVertex, &lastIndex);
 
 					moveable.ObjectMeshes.push_back(mesh);
 					_meshes.push_back(mesh);
@@ -624,37 +639,39 @@ namespace TEN::Renderer
 						isSkinPresent = true;
 						int bonesToCheck[2] = { 0, 0 };
 
-						RendererObject& objSkin = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
+						const auto& objSkin = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
 
 						for (int j = 1; j < obj->nmeshes; j++)
 						{
-							RendererMesh *jointMesh = moveable.ObjectMeshes[j];
-							RendererBone *jointBone = moveable.LinearizedBones[j];
+							const auto* jointMesh = moveable.ObjectMeshes[j];
+							const auto* jointBone = moveable.LinearizedBones[j];
 
 							bonesToCheck[0] = jointBone->Parent->Index;
 							bonesToCheck[1] = j;
 
 							for (int b1 = 0; b1 < jointMesh->Buckets.size(); b1++)
 							{
-								RendererBucket *jointBucket = &jointMesh->Buckets[b1];
+								const auto* jointBucket = &jointMesh->Buckets[b1];
 
 								for (int v1 = 0; v1 < jointBucket->NumVertices; v1++)
 								{
-									Vertex *jointVertex = &_moveablesVertices[jointBucket->StartVertex + v1];
+									auto* jointVertex = &_moveablesVertices[jointBucket->StartVertex + v1];
 
 									bool isDone = false;
 
 									for (int k = 0; k < 2; k++)
 									{
-										RendererMesh *skinMesh = objSkin.ObjectMeshes[bonesToCheck[k]];
-										RendererBone *skinBone = objSkin.LinearizedBones[bonesToCheck[k]];
+										const auto* skinMesh = objSkin.ObjectMeshes[bonesToCheck[k]];
+										const auto* skinBone = objSkin.LinearizedBones[bonesToCheck[k]];
 
 										for (int b2 = 0; b2 < skinMesh->Buckets.size(); b2++)
 										{
-											RendererBucket *skinBucket = &skinMesh->Buckets[b2];
+											const auto* skinBucket = &skinMesh->Buckets[b2];
 											for (int v2 = 0; v2 < skinBucket->NumVertices; v2++)
 											{
-												Vertex *skinVertex = &_moveablesVertices[skinBucket->StartVertex + v2];
+												auto* skinVertex = &_moveablesVertices[skinBucket->StartVertex + v2];
+
+												// NOTE: Don't vectorize these coordinates, it breaks the connection in some cases. -- Lwmte, 21.12.24
 
 												int x1 = _moveablesVertices[jointBucket->StartVertex + v1].Position.x + jointBone->GlobalTranslation.x;
 												int y1 = _moveablesVertices[jointBucket->StartVertex + v1].Position.y + jointBone->GlobalTranslation.y;
@@ -663,7 +680,6 @@ namespace TEN::Renderer
 												int x2 = _moveablesVertices[skinBucket->StartVertex + v2].Position.x + skinBone->GlobalTranslation.x;
 												int y2 = _moveablesVertices[skinBucket->StartVertex + v2].Position.y + skinBone->GlobalTranslation.y;
 												int z2 = _moveablesVertices[skinBucket->StartVertex + v2].Position.z + skinBone->GlobalTranslation.z;
-
 
 												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
 												{
@@ -687,12 +703,17 @@ namespace TEN::Renderer
 							}
 						}
 					}
-					else if (MoveablesIds[i] == ID_HAIR && isSkinPresent)
+					else if ((MoveablesIds[i] == ID_HAIR_PRIMARY || MoveablesIds[i] == ID_HAIR_SECONDARY) && isSkinPresent)
 					{
+						bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
+						bool isSecond = isYoung && MoveablesIds[i] == ID_HAIR_SECONDARY;
+						const auto& skinObj = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
+						const auto& settings = g_GameFlow->GetSettings()->Hair;
+
 						for (int j = 0; j < obj->nmeshes; j++)
 						{
-							auto* currentMesh = moveable.ObjectMeshes[j];
-							auto* currentBone = moveable.LinearizedBones[j];
+							const auto* currentMesh = moveable.ObjectMeshes[j];
+							const auto* currentBone = moveable.LinearizedBones[j];
 
 							for (const auto& currentBucket : currentMesh->Buckets)
 							{
@@ -701,49 +722,39 @@ namespace TEN::Renderer
 									auto* currentVertex = &_moveablesVertices[currentBucket.StartVertex + v1];
 									currentVertex->Bone = j + 1;
 
-									// Link mesh 0 to head.
+									// Link mesh 0 to root mesh.
 									if (j == 0)
 									{
-										bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
+										const auto& vertices0 = isYoung ? settings[(int)PlayerHairType::YoungLeft].Indices :
+																		  settings[(int)PlayerHairType::Normal].Indices;
 
-										// HACK: Hardcoded hair base parent vertices.
-										int parentVertices0[] = { 37, 39, 40, 38 }; // Single braid.
-										int parentVertices1[] = { 79, 78, 76, 77 }; // Left pigtail.
-										int parentVertices2[] = { 68, 69, 70, 71 }; // Right pigtail.
+										const auto& vertices1 = isYoung ? settings[(int)PlayerHairType::YoungRight].Indices :
+																		  settings[(int)PlayerHairType::Normal].Indices;
 
-										auto& skinObj = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
-										auto* parentMesh = skinObj.ObjectMeshes[LM_HEAD];
-										auto* parentBone = skinObj.LinearizedBones[LM_HEAD];
+										int rootMesh = HairUnit::GetRootMeshID(isSecond ? 1 : 0);
 
-										// Link first 4 vertices.
-										if (currentVertex->OriginalIndex < 4)
+										const auto* parentMesh = skinObj.ObjectMeshes[rootMesh];
+										const auto* parentBone = skinObj.LinearizedBones[rootMesh];
+
+										// Link listed vertices.
+										if ((!isSecond && currentVertex->OriginalIndex >= vertices0.size()) || 
+											 (isSecond && currentVertex->OriginalIndex >= vertices1.size()))
 										{
-											for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
+											continue;
+										}
+
+										for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
+										{
+											const auto* parentBucket = &parentMesh->Buckets[b2];
+											for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 											{
-												auto* parentBucket = &parentMesh->Buckets[b2];
-												for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
+												const auto* parentVertex = &_moveablesVertices[parentBucket->StartVertex + v2];
+												if ((parentVertex->OriginalIndex == vertices1[currentVertex->OriginalIndex] &&  isSecond) ||
+													(parentVertex->OriginalIndex == vertices0[currentVertex->OriginalIndex] && !isSecond))
 												{
-													auto* parentVertex = &_moveablesVertices[parentBucket->StartVertex + v2];
-													
-													// TODO
-													if (isYoung)
-													{
-														if (parentVertex->OriginalIndex == parentVertices1[currentVertex->OriginalIndex])
-														{
-															currentVertex->Bone = 0;
-															currentVertex->Position = parentVertex->Position;
-															currentVertex->Normal = parentVertex->Normal;
-														}
-													}
-													else
-													{
-														if (parentVertex->OriginalIndex == parentVertices0[currentVertex->OriginalIndex])
-														{
-															currentVertex->Bone = 0;
-															currentVertex->Position = parentVertex->Position;
-															currentVertex->Normal = parentVertex->Normal;
-														}
-													}
+													currentVertex->Bone = 0;
+													currentVertex->Position = parentVertex->Position;
+													currentVertex->Normal = parentVertex->Normal;
 												}
 											}
 										}
@@ -751,12 +762,12 @@ namespace TEN::Renderer
 									// Link meshes > 0 to parent meshes.
 									else
 									{
-										auto* parentMesh = moveable.ObjectMeshes[j - 1];
-										auto* parentBone = moveable.LinearizedBones[j - 1];
+										const auto* parentMesh = moveable.ObjectMeshes[j - 1];
+										const auto* parentBone = moveable.LinearizedBones[j - 1];
 
 										for (int b2 = 0; b2 < parentMesh->Buckets.size(); b2++)
 										{
-											auto* parentBucket = &parentMesh->Buckets[b2];
+											const auto* parentBucket = &parentMesh->Buckets[b2];
 											for (int v2 = 0; v2 < parentBucket->NumVertices; v2++)
 											{
 												auto* parentVertex = &_moveablesVertices[parentBucket->StartVertex + v2];
@@ -769,13 +780,13 @@ namespace TEN::Renderer
 												int y2 = _moveablesVertices[parentBucket->StartVertex + v2].Position.y + parentBone->GlobalTranslation.y;
 												int z2 = _moveablesVertices[parentBucket->StartVertex + v2].Position.z + parentBone->GlobalTranslation.z;
 
-												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
+												// FIXME: If a tolerance is used, a strange bug occurs where certain vertices don't connect. -- Lwmte, 14.12.2024
+
+												if (abs(x1 - x2) == 0 && abs(y1 - y2) == 0 && abs(z1 - z2) == 0)
 												{
 													currentVertex->Bone = j;
 													currentVertex->Position = parentVertex->Position;
 													currentVertex->Normal = parentVertex->Normal;
-													currentVertex->AnimationFrameOffset = parentVertex->AnimationFrameOffset;
-													currentVertex->Tangent = parentVertex->Tangent;
 													break;
 												}
 											}
@@ -796,16 +807,13 @@ namespace TEN::Renderer
 
 		totalVertices = 0;
 		totalIndices = 0;
-		for (int i = 0; i < StaticObjectsIds.size(); i++)
+		for (const auto& staticObj : Statics)
 		{
-			int objNum = StaticObjectsIds[i];
-			StaticInfo* obj = &StaticObjects[objNum];
-			MESH* mesh = &g_Level.Meshes[obj->meshNumber];
-
-			for (auto& bucket : mesh->buckets)
+			const auto& mesh = g_Level.Meshes[staticObj.meshNumber];
+			for (const auto& bucket : mesh.buckets)
 			{
-				totalVertices += bucket.numQuads * 4 + bucket.numTriangles * 3;
-				totalIndices += bucket.numQuads * 6 + bucket.numTriangles * 3;
+				totalVertices += (bucket.numQuads * 4) + (bucket.numTriangles * 3);
+				totalIndices += (bucket.numQuads * 6) + (bucket.numTriangles * 3);
 			}
 		}
 
@@ -814,20 +822,18 @@ namespace TEN::Renderer
 
 		lastVertex = 0;
 		lastIndex = 0;
-		for (int i = 0; i < StaticObjectsIds.size(); i++)
+		for (const auto& staticObj : Statics)
 		{
-			StaticInfo*obj = &StaticObjects[StaticObjectsIds[i]];
-			_staticObjects[StaticObjectsIds[i]] = RendererObject();
-			RendererObject &staticObject = *_staticObjects[StaticObjectsIds[i]];
-			staticObject.Type = 1;
-			staticObject.Id = StaticObjectsIds[i];
+			auto newStaticObj = RendererObject();
+			newStaticObj.Type = 1;
+			newStaticObj.Id = staticObj.ObjectNumber;
 
-			RendererMesh *mesh = GetRendererMeshFromTrMesh(&staticObject, &g_Level.Meshes[obj->meshNumber], 0, false, false, &lastVertex, &lastIndex);
+			auto& mesh = *GetRendererMeshFromTrMesh(&newStaticObj, &g_Level.Meshes[staticObj.meshNumber], 0, false, false, &lastVertex, &lastIndex);
 
-			staticObject.ObjectMeshes.push_back(mesh);
-			_meshes.push_back(mesh);
+			newStaticObj.ObjectMeshes.push_back(&mesh);
+			_meshes.push_back(&mesh);
 
-			_staticObjects[StaticObjectsIds[i]] = staticObject;
+			_staticObjects.push_back(newStaticObj);
 		}
 
 		_staticsVertexBuffer = VertexBuffer<Vertex>(_device.Get(), (int)_staticsVertices.size(), _staticsVertices.data());

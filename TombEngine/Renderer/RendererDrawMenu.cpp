@@ -15,6 +15,7 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
+#include "Version.h"
 
 using namespace TEN::Gui;
 using namespace TEN::Hud;
@@ -33,12 +34,13 @@ namespace TEN::Renderer
 
 	constexpr auto MenuLoadNumberLeftSide = 80;
 	constexpr auto MenuLoadNameLeftSide   = 150;
+	constexpr auto MenuLoadTimestampRightSide = 600;
 
 	// Vertical spacing templates
 	constexpr auto MenuVerticalLineSpacing = 30;
 	constexpr auto MenuVerticalNarrowLineSpacing = 24;
 	constexpr auto MenuVerticalBlockSpacing = 50;
-	
+
 	// Vertical menu positioning templates
 	constexpr auto MenuVerticalControls = 30;
 	constexpr auto MenuVerticalDisplaySettings = 160;
@@ -65,10 +67,25 @@ namespace TEN::Renderer
 	// Helper functions to construct string flags
 	inline int SF(bool selected = false) { return (int)PrintStringFlags::Outline | (selected ? (int)PrintStringFlags::Blink : 0); }
 	inline int SF_Center(bool selected = false) { return (int)PrintStringFlags::Outline | (int)PrintStringFlags::Center | (selected ? (int)PrintStringFlags::Blink : 0); }
-	
+
 	// Helper functions to get specific generic strings
-	inline const char* Str_Enabled(bool enabled = false) { return g_GameFlow->GetString(enabled ? STRING_ENABLED : STRING_DISABLED); }
-	inline const char* Str_LoadSave(bool save = false) { return g_GameFlow->GetString(save ? STRING_SAVE_GAME : STRING_LOAD_GAME); }
+	inline const std::string Str_Enabled(bool enabled = false) { return g_GameFlow->GetString(enabled ? STRING_ENABLED : STRING_DISABLED); }
+	inline const std::string Str_LoadSave(bool save = false) { return g_GameFlow->GetString(save ? STRING_SAVE_GAME : STRING_LOAD_GAME); }
+	inline const std::string Str_MenuOptionLoopingMode(MenuOptionLoopingMode loopingMode)
+	{
+		switch (loopingMode)
+		{
+		default:
+			case MenuOptionLoopingMode::AllMenus:
+				return g_GameFlow->GetString(STRING_MENU_OPT_LOOP_ALL_MENUS);
+
+			case MenuOptionLoopingMode::SaveLoadOnly:
+				return g_GameFlow->GetString(STRING_MENU_OPT_LOOP_SAVE_LOAD_ONLY);
+
+			case MenuOptionLoopingMode::Disabled:
+				return g_GameFlow->GetString(STRING_MENU_OPT_LOOP_DISABLED);
+		}
+	}
 
 	// These bars are only used in menus.
 	TEN::Renderer::RendererHudBar* g_MusicVolumeBar = nullptr;
@@ -189,14 +206,19 @@ namespace TEN::Renderer
 			// Enable SSAO
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AMBIENT_OCCLUSION), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 5));
 			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableAmbientOcclusion), PRINTSTRING_COLOR_WHITE, SF(titleOption == 5));
+			GetNextLinePosition(&y);
+
+			// Enable high framerate
+			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_HIGH_FRAMERATE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 6));
+			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableHighFramerate), PRINTSTRING_COLOR_WHITE, SF(titleOption == 6));
 			GetNextBlockPosition(&y);
 
 			// Apply
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 6));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 7));
 			GetNextLinePosition(&y);
 
 			// Cancel
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 7));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 8));
 			break;
 
 		case Menu::OtherSettings:
@@ -235,7 +257,7 @@ namespace TEN::Renderer
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTO_MONKEY_SWING_JUMP), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 4));
 			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableAutoMonkeySwingJump), PRINTSTRING_COLOR_WHITE, SF(titleOption == 4));
 			GetNextLinePosition(&y);
-			
+
 			// Auto targeting
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_AUTO_TARGETING), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 5));
 			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableAutoTargeting), PRINTSTRING_COLOR_WHITE, SF(titleOption == 5));
@@ -245,7 +267,7 @@ namespace TEN::Renderer
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_TARGET_HIGHLIGHTER), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 6));
 			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableTargetHighlighter), PRINTSTRING_COLOR_WHITE, SF(titleOption == 6));
 			GetNextLinePosition(&y);
-			
+
 			// Vibration
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_RUMBLE), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 7));
 			AddString(MenuRightSideEntry, y, Str_Enabled(g_Gui.GetCurrentSettings().Configuration.EnableRumble), PRINTSTRING_COLOR_WHITE, SF(titleOption == 7));
@@ -261,17 +283,12 @@ namespace TEN::Renderer
 			AddString(MenuRightSideEntry, y, std::to_string(g_Gui.GetCurrentSettings().Configuration.MouseSensitivity).c_str(), PRINTSTRING_COLOR_WHITE, SF(titleOption == 9));
 			GetNextLinePosition(&y);
 
-			// Mouse smoothing
-			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_MOUSE_SMOOTHING), PRINTSTRING_COLOR_ORANGE, SF(titleOption == 10));
-			AddString(MenuRightSideEntry, y, std::to_string(g_Gui.GetCurrentSettings().Configuration.MouseSmoothing).c_str(), PRINTSTRING_COLOR_WHITE, SF(titleOption == 10));
-			GetNextBlockPosition(&y);
-
 			// Apply
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 11));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_APPLY), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 10));
 			GetNextLinePosition(&y);
 
 			// Cancel
-			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 12));
+			AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_CANCEL), PRINTSTRING_COLOR_ORANGE, SF_Center(titleOption == 11));
 			break;
 
 		case Menu::GeneralActions:
@@ -493,6 +510,14 @@ namespace TEN::Renderer
 			GetNextLinePosition(&y);
 			selectedOption++;
 
+			// Home Level
+			if (g_GameFlow->IsHomeLevelEnabled())
+			{
+				AddString(MenuCenterEntry, y, g_GameFlow->GetString(STRING_HOME_LEVEL), PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == selectedOption));
+				GetNextLinePosition(&y);
+				selectedOption++;
+			}
+
 			// Load game
 			if (g_GameFlow->IsLoadSaveEnabled())
 			{
@@ -523,13 +548,15 @@ namespace TEN::Renderer
 			AddString(MenuCenterEntry, 26, g_GameFlow->GetString(STRING_SELECT_LEVEL), PRINTSTRING_COLOR_ORANGE, SF_Center());
 			GetNextBlockPosition(&y);
 
-			// Level listing (starts with 1 because 0 is always title)
-			for (int i = 1; i < g_GameFlow->GetNumLevels(); i++, selectedOption++)
+			// Level 0 is always Title Level and level 1 might be Home Level.
+			for (int i = (g_GameFlow->IsHomeLevelEnabled() ? 2 : 1); i < g_GameFlow->GetNumLevels(); i++, selectedOption++)
 			{
-				AddString(MenuCenterEntry, y, g_GameFlow->GetString(g_GameFlow->GetLevel(i)->NameStringKey.c_str()),
+				AddString(
+					MenuCenterEntry, y, g_GameFlow->GetString(g_GameFlow->GetLevel(i)->NameStringKey.c_str()),
 					PRINTSTRING_COLOR_WHITE, SF_Center(titleOption == selectedOption));
 				GetNextNarrowLinePosition(&y);
 			}
+
 			break;
 
 		case Menu::Options:
@@ -542,6 +569,8 @@ namespace TEN::Renderer
 			RenderOptionsMenu(menu, MenuVerticalOptionsTitle);
 			break;
 		}
+
+		DrawAllStrings();
 	}
 
 	void Renderer::RenderPauseMenu(Menu menu)
@@ -605,7 +634,7 @@ namespace TEN::Renderer
 		char stringBuffer[255];
 
 		// Title
-		AddString(MenuCenterEntry, MenuVerticalNarrowLineSpacing, Str_LoadSave(g_Gui.GetInventoryMode() == InventoryMode::Save), 
+		AddString(MenuCenterEntry, MenuVerticalNarrowLineSpacing, Str_LoadSave(g_Gui.GetInventoryMode() == InventoryMode::Save),
 			PRINTSTRING_COLOR_ORANGE, SF_Center());
 		GetNextBlockPosition(&y);
 
@@ -628,8 +657,8 @@ namespace TEN::Renderer
 				AddString(MenuLoadNameLeftSide, y, (char*)save.LevelName.c_str(), PRINTSTRING_COLOR_WHITE, SF(selection == n));
 
 				// Timestamp
-				sprintf(stringBuffer, g_GameFlow->GetString(STRING_SAVEGAME_TIMESTAMP), save.Days, save.Hours, save.Minutes, save.Seconds);
-				AddString(MenuRightSideEntry, y, stringBuffer, PRINTSTRING_COLOR_WHITE, SF(selection == n));
+				sprintf(stringBuffer, g_GameFlow->GetString(STRING_SAVEGAME_TIMESTAMP), save.Hours, save.Minutes, save.Seconds);
+				AddString(MenuLoadTimestampRightSide, y, stringBuffer, PRINTSTRING_COLOR_WHITE, SF(selection == n));
 			}
 
 			GetNextLinePosition(&y);
@@ -654,8 +683,8 @@ namespace TEN::Renderer
 		GetNextBlockPosition(&y);
 
 		// Time taken
-		auto gameTime = GetGameTime(GameTimer);
-		sprintf(buffer, "%02d:%02d:%02d", (gameTime.Days * DAY_UNIT) + gameTime.Hours, gameTime.Minutes, gameTime.Seconds);
+		auto& gameTime = SaveGame::Statistics.Game.TimeTaken;
+		sprintf(buffer, "%02d:%02d:%02d", gameTime.GetHours(), gameTime.GetMinutes(), gameTime.GetSeconds());
 		AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
 		AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_TIME_TAKEN), PRINTSTRING_COLOR_WHITE, SF());
 		GetNextLinePosition(&y);
@@ -681,8 +710,7 @@ namespace TEN::Renderer
 		// Secrets found in Level
 		if (g_GameFlow->GetLevel(CurrentLevel)->GetSecrets() > 0)
 		{
-			std::bitset<32> levelSecretBitSet(SaveGame::Statistics.Level.Secrets);
-			sprintf(buffer, "%d / %d", (int)levelSecretBitSet.count(), g_GameFlow->GetLevel(CurrentLevel)->GetSecrets());
+			sprintf(buffer, "%d / %d", SaveGame::Statistics.Level.Secrets, g_GameFlow->GetLevel(CurrentLevel)->GetSecrets());
 			AddString(MenuRightSideEntry, y, buffer, PRINTSTRING_COLOR_WHITE, SF());
 			AddString(MenuLeftSideEntry, y, g_GameFlow->GetString(STRING_LEVEL_SECRETS_FOUND), PRINTSTRING_COLOR_WHITE, SF());
 			GetNextLinePosition(&y);
@@ -718,14 +746,19 @@ namespace TEN::Renderer
 		constexpr auto COUNT_STRING_INF	   = "Inf";
 		constexpr auto COUNT_STRING_OFFSET = Vector2(DISPLAY_SPACE_RES.x / 40, 0.0f);
 
+		auto pos = Vector2::Lerp(pickup.PrevPosition, pickup.Position, GetInterpolationFactor());
+		auto orient = EulerAngles::Lerp(pickup.PrevOrientation, pickup.Orientation, GetInterpolationFactor());
+		float scale = Lerp(pickup.PrevScale, pickup.Scale, GetInterpolationFactor());
+		float opacity = Lerp(pickup.PrevOpacity, pickup.Opacity, GetInterpolationFactor());
+
 		// Draw display pickup.
-		DrawObjectIn2DSpace(pickup.ObjectID, pickup.Position, pickup.Orientation, pickup.Scale);
+		DrawObjectIn2DSpace(pickup.ObjectID, pos, orient, scale);
 
 		// Draw count string.
 		if (pickup.Count != 1)
 		{
-			auto countString = (pickup.Count != -1) ? std::to_string(pickup.Count) : COUNT_STRING_INF;
-			auto countStringPos = pickup.Position + COUNT_STRING_OFFSET;
+			auto countString = (pickup.Count != NO_VALUE) ? std::to_string(pickup.Count) : COUNT_STRING_INF;
+			auto countStringPos = pos + COUNT_STRING_OFFSET;
 
 			AddString(countString, countStringPos, Color(PRINTSTRING_COLOR_WHITE), pickup.StringScale, SF());
 		}
@@ -736,8 +769,8 @@ namespace TEN::Renderer
 	{
 		constexpr auto AMBIENT_LIGHT_COLOR = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
+		unsigned int stride = sizeof(Vertex);
+		unsigned int offset = 0;
 
 		auto screenRes = GetScreenResolution();
 		auto factor = Vector2(
@@ -747,10 +780,10 @@ namespace TEN::Renderer
 		pos2D *= factor;
 		scale *= (factor.x > factor.y) ? factor.y : factor.x;
 
-		int index = g_Gui.ConvertObjectToInventoryItem(objectNumber);
-		if (index != -1)
+		int invObjectID = g_Gui.ConvertObjectToInventoryItem(objectNumber);
+		if (invObjectID != NO_VALUE)
 		{
-			const auto& invObject = InventoryObjectTable[index];
+			const auto& invObject = InventoryObjectTable[invObjectID];
 
 			pos2D.y += invObject.YOffset;
 			orient += invObject.Orientation;
@@ -760,7 +793,7 @@ namespace TEN::Renderer
 		auto projMatrix = Matrix::CreateOrthographic(_screenWidth, _screenHeight, -BLOCK(1), BLOCK(1));
 
 		auto& moveableObject = _moveableObjects[objectNumber];
-		if (!moveableObject)
+		if (!moveableObject.has_value())
 			return;
 
 		const auto& object = Objects[objectNumber];
@@ -772,7 +805,7 @@ namespace TEN::Renderer
 				&g_Level.Frames[GetAnimData(object.animIndex).FramePtr],
 				0.0f
 			};
-			UpdateAnimation(nullptr, *moveableObject, frameData, 0xFFFFFFFF);
+			UpdateAnimation(nullptr, *moveableObject, frameData, UINT_MAX);
 		}
 
 		auto pos = _viewportToolkit.Unproject(Vector3(pos2D.x, pos2D.y, 1.0f), projMatrix, viewMatrix, Matrix::Identity);
@@ -784,47 +817,49 @@ namespace TEN::Renderer
 		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		// Set shaders.
-		_context->VSSetShader(_vsInventory.Get(), nullptr, 0);
-		_context->PSSetShader(_psInventory.Get(), nullptr, 0);
+		_shaders.Bind(Shader::Inventory);
 
 		// Set matrices.
-		CCameraMatrixBuffer hudCamera;
+		auto hudCamera = CCameraMatrixBuffer{};
 		hudCamera.CamDirectionWS = -Vector4::UnitZ;
 		hudCamera.ViewProjection = viewMatrix * projMatrix;
 		_cbCameraMatrices.UpdateData(hudCamera, _context.Get());
 		BindConstantBufferVS(ConstantBufferRegister::Camera, _cbCameraMatrices.get());
 
-		for (int n = 0; n < (*moveableObject).ObjectMeshes.size(); n++)
+		for (int i = 0; i < moveableObject->ObjectMeshes.size(); i++)
 		{
-			if (meshBits && !(meshBits & (1 << n)))
+			if (meshBits && !(meshBits & (1 << i)))
 				continue;
-			
-			auto* mesh = (*moveableObject).ObjectMeshes[n];
 
 			// HACK: Rotate compass needle.
-			if (objectNumber == ID_COMPASS_ITEM && n == 1)
-				(*moveableObject).LinearizedBones[n]->ExtraRotation = EulerAngles(0, g_Gui.CompassNeedleAngle - ANGLE(180.0f), 0).ToQuaternion();
+			if (objectNumber == ID_COMPASS_ITEM && i == 1)
+				moveableObject->LinearizedBones[i]->ExtraRotation = EulerAngles(0, g_Gui.CompassNeedleAngle - ANGLE(180.0f), 0).ToQuaternion();
 
 			// Construct world matrix.
-			auto tMatrix = Matrix::CreateTranslation(pos.x, pos.y, pos.z + BLOCK(1));
+			auto translationMatrix = Matrix::CreateTranslation(pos.x, pos.y, pos.z + BLOCK(1));
 			auto rotMatrix = orient.ToRotationMatrix();
 			auto scaleMatrix = Matrix::CreateScale(scale);
-			auto worldMatrix = scaleMatrix * rotMatrix * tMatrix;
+			auto worldMatrix = scaleMatrix * rotMatrix * translationMatrix;
 
-			if (object.animIndex != -1)
-				_stItem.World = (*moveableObject).AnimationTransforms[n] * worldMatrix;
+			if (object.animIndex != NO_VALUE)
+			{
+				_stItem.World = moveableObject->AnimationTransforms[i] * worldMatrix;
+			}
 			else
-				_stItem.World = (*moveableObject).BindPoseTransforms[n] * worldMatrix;
+			{
+				_stItem.World = moveableObject->BindPoseTransforms[i] * worldMatrix;
+			}
 
-			_stItem.BoneLightModes[n] = (int)LightMode::Dynamic;
+			_stItem.BoneLightModes[i] = (int)LightMode::Dynamic;
 			_stItem.Color = Vector4::One;
 			_stItem.AmbientLight = AMBIENT_LIGHT_COLOR;
 
 			_cbItem.UpdateData(_stItem, _context.Get());
 			BindConstantBufferVS(ConstantBufferRegister::Item, _cbItem.get());
 			BindConstantBufferPS(ConstantBufferRegister::Item, _cbItem.get());
-			
-			for (const auto& bucket : mesh->Buckets)
+
+			const auto& mesh = *moveableObject->ObjectMeshes[i];
+			for (const auto& bucket : mesh.Buckets)
 			{
 				if (bucket.NumVertices == 0)
 					continue;
@@ -835,13 +870,11 @@ namespace TEN::Renderer
 
 				BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 				BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
-				
+
 				 if (bucket.BlendMode != BlendMode::Opaque)
-					Renderer::SetBlendMode(bucket.BlendMode, true);
-				
-				SetAlphaTest(
-					(bucket.BlendMode == BlendMode::AlphaTest) ? AlphaTestMode::GreatherThan : AlphaTestMode::None,
-					ALPHA_TEST_THRESHOLD);
+					SetBlendMode(bucket.BlendMode, true);
+
+				SetAlphaTest((bucket.BlendMode == BlendMode::AlphaTest) ? AlphaTestMode::GreatherThan : AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 				_numMoveablesDrawCalls++;
@@ -852,12 +885,12 @@ namespace TEN::Renderer
 	void Renderer::RenderTitleImage()
 	{
 		Texture2D texture;
-		SetTextureOrDefault(texture, TEN::Utils::ToWString(g_GameFlow->IntroImagePath.c_str()));
+		SetTextureOrDefault(texture, TEN::Utils::ToWString(g_GameFlow->GetGameDir() + g_GameFlow->IntroImagePath.c_str()));
 
 		if (!texture.Texture)
 			return;
 
-		int timeout = 20;
+		int timeout = 10;
 		float currentFade = FADE_FACTOR;
 
 		while (timeout || currentFade > 0.0f)
@@ -876,7 +909,7 @@ namespace TEN::Renderer
 
 			DrawFullScreenImage(texture.ShaderResourceView.Get(), Smoothstep(currentFade), _backBuffer.RenderTargetView.Get(), _backBuffer.DepthStencilView.Get());
 			Synchronize();
-			_swapChain->Present(0, 0);
+			_swapChain->Present(1, 0);
 			_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		}
 	}
@@ -887,28 +920,29 @@ namespace TEN::Renderer
 
 		static EulerAngles orient = EulerAngles::Identity;
 		static float scaler = 1.2f;
+		float multiplier = g_Renderer.GetFramerateMultiplier();
 
 		short invItem = g_Gui.GetRing(RingTypes::Inventory).CurrentObjectList[g_Gui.GetRing(RingTypes::Inventory).CurrentObjectInList].InventoryItem;
 
 		auto& object = InventoryObjectTable[invItem];
 
 		if (IsHeld(In::Forward))
-			orient.x += ANGLE(3.0f);
+			orient.x += ANGLE(3.0f / multiplier);
 
 		if (IsHeld(In::Back))
-			orient.x -= ANGLE(3.0f);
+			orient.x -= ANGLE(3.0f / multiplier);
 
 		if (IsHeld(In::Left))
-			orient.y += ANGLE(3.0f);
+			orient.y += ANGLE(3.0f / multiplier);
 
 		if (IsHeld(In::Right))
-			orient.y -= ANGLE(3.0f);
+			orient.y -= ANGLE(3.0f / multiplier);
 
 		if (IsHeld(In::Sprint))
-			scaler += 0.03f;
+			scaler += 0.03f / multiplier;
 
 		if (IsHeld(In::Crouch))
-			scaler -= 0.03f;
+			scaler -= 0.03f / multiplier;
 
 		if (scaler > 1.6f)
 			scaler = 1.6f;
@@ -920,29 +954,6 @@ namespace TEN::Renderer
 		object.Scale1 = scaler;
 		DrawObjectIn2DSpace(g_Gui.ConvertInventoryItemToObject(invItem), SCREEN_POS, orient, object.Scale1);
 		object.Scale1 = savedScale;
-	}
-
-	void Renderer::DrawDiary()
-	{
-		constexpr auto SCREEN_POS = Vector2(400.0f, 300.0f);
-
-		const auto& object = InventoryObjectTable[INV_OBJECT_OPEN_DIARY];
-		unsigned int currentPage = Lara.Inventory.Diary.CurrentPage;
-
-		DrawObjectIn2DSpace(g_Gui.ConvertInventoryItemToObject(INV_OBJECT_OPEN_DIARY), SCREEN_POS, object.Orientation, object.Scale1);
-
-		for (int i = 0; i < MAX_DIARY_STRINGS_PER_PAGE; i++)
-		{
-			if (!Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.CurrentPage].Strings[i].Position.x && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.CurrentPage].
-				Strings[i].Position.y && !Lara.Inventory.Diary.Pages[Lara.Inventory.Diary.CurrentPage].Strings[i].StringID)
-			{
-				break;
-			}
-
-			//AddString(Lara.Diary.Pages[currentPage].Strings[i].x, Lara.Diary.Pages[currentPage].Strings[i].y, g_GameFlow->GetString(Lara.Diary.Pages[currentPage].Strings[i].stringID), PRINTSTRING_COLOR_WHITE, 0);
-		}
-
-		DrawAllStrings();
 	}
 
 	void Renderer::RenderInventoryScene(RenderTarget2D* renderTarget, TextureBase* background, float backgroundFade)
@@ -957,29 +968,25 @@ namespace TEN::Renderer
 		_context->RSSetViewports(1, &_viewport);
 		ResetScissor();
 
+		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
+		_context->ClearRenderTargetView(_renderTarget.RenderTargetView.Get(), Colors::Black);
+
 		if (background != nullptr)
-		{
 			DrawFullScreenImage(background->ShaderResourceView.Get(), backgroundFade, _renderTarget.RenderTargetView.Get(), _renderTarget.DepthStencilView.Get());
-		}
 
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
+		unsigned int stride = sizeof(Vertex);
+		unsigned int offset = 0;
 
-		// Set vertex buffer
+		// Set vertex buffer.
 		_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetInputLayout(_inputLayout.Get());
 		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		// Set shaders
-		_context->VSSetShader(_vsInventory.Get(), nullptr, 0);
-		_context->PSSetShader(_psInventory.Get(), nullptr, 0);
-
-		// Set texture
-		BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
-		BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
+		// Set shaders.
+		_shaders.Bind(Shader::Inventory);
 
 		if (CurrentLevel == 0)
 		{
@@ -1011,6 +1018,14 @@ namespace TEN::Renderer
 		}
 		else
 		{
+			if (g_Gui.GetInventoryMode() == InventoryMode::InGame ||
+				g_Gui.GetInventoryMode() == InventoryMode::Examine)
+			{
+				// Set texture.
+				BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
+				BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[0]), SamplerStateRegister::AnisotropicClamp);
+			}
+
 			switch (g_Gui.GetInventoryMode())
 			{
 			case InventoryMode::Load:
@@ -1032,10 +1047,6 @@ namespace TEN::Renderer
 
 			case InventoryMode::Pause:
 				RenderPauseMenu(g_Gui.GetMenuToDisplay());
-				break;
-
-			case InventoryMode::Diary:
-				DrawDiary();
 				break;
 			}
 		}
@@ -1065,33 +1076,77 @@ namespace TEN::Renderer
 		SetTextureOrDefault(_loadingScreenTexture, fileName);
 	}
 
+	void Renderer::RenderFreezeMode(float interpFactor, bool staticBackground)
+	{
+		if (staticBackground)
+		{	
+			// Set basic render states.
+			SetBlendMode(BlendMode::Opaque);
+			SetCullMode(CullMode::CounterClockwise);
+
+			// Clear screen
+			_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
+			_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+			// Bind back buffer.
+			_context->OMSetRenderTargets(1, _backBuffer.RenderTargetView.GetAddressOf(), _backBuffer.DepthStencilView.Get());
+			_context->RSSetViewports(1, &_viewport);
+			ResetScissor();
+
+			// Draw full screen background.
+			DrawFullScreenQuad(_dumpScreenRenderTarget.ShaderResourceView.Get(), Vector3::One);
+		}
+		else
+		{
+			InterpolateCamera(interpFactor);
+			RenderScene(&_backBuffer, _gameCamera, SceneRenderMode::NoHud);
+		}
+
+		// TODO: Put 3D object drawing management here (don't forget about interpolation!)
+		// Draw3DObjectsIn2DSpace(_gameCamera);
+
+		// Draw display sprites sorted by priority.
+		CollectDisplaySprites(_gameCamera);
+		DrawDisplaySprites(_gameCamera);
+		DrawAllStrings();
+
+		ClearScene();
+
+		_context->ClearState();
+		_swapChain->Present(1, 0);
+	}
+
 	void Renderer::RenderLoadingScreen(float percentage)
 	{
-		// Set basic render states
+		// Set basic render states.
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
 
 		do
 		{
-			// Clear screen
+			// Clear screen.
 			_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
 			_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
-			// Bind the back buffer
+			// Bind back buffer.
 			_context->OMSetRenderTargets(1, _backBuffer.RenderTargetView.GetAddressOf(), _backBuffer.DepthStencilView.Get());
 			_context->RSSetViewports(1, &_viewport);
 			ResetScissor();
 
-			// Draw the full screen background
+			// Draw fullscreen background. If unavailable, draw last dumped game scene.
 			if (_loadingScreenTexture.Texture)
-				DrawFullScreenQuad(
-					_loadingScreenTexture.ShaderResourceView.Get(),
-					Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent));
+			{
+				DrawFullScreenQuad(_loadingScreenTexture.ShaderResourceView.Get(), Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent));
+			}
+			else if (_dumpScreenRenderTarget.Texture)
+			{
+				DrawFullScreenQuad(_dumpScreenRenderTarget.ShaderResourceView.Get(), Vector3(ScreenFadeCurrent, ScreenFadeCurrent, ScreenFadeCurrent));
+			}
 
 			if (ScreenFadeCurrent && percentage > 0.0f && percentage < 100.0f)
 				DrawLoadingBar(percentage);
 
-			_swapChain->Present(0, 0);
+			_swapChain->Present(1, 0);
 			_context->ClearState();
 
 			Synchronize();
@@ -1102,30 +1157,56 @@ namespace TEN::Renderer
 
 	void Renderer::RenderInventory()
 	{
+		if (_graphicsSettingsChanged)
+		{
+			UpdateCameraMatrices(&Camera, BLOCK(g_GameFlow->GetLevel(CurrentLevel)->GetFarView()));
+			Camera.DisableInterpolation = true;
+			DumpGameScene();
+			_graphicsSettingsChanged = false;
+		}
+
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 		_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
-		
+
+		// Reset GPU state.
+		SetBlendMode(BlendMode::Opaque, true);
+		SetDepthState(DepthState::Write, true);
+		SetCullMode(CullMode::CounterClockwise, true);
+
 		RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget, 0.5f);
-		
-		_swapChain->Present(0, 0);
+
+		_swapChain->Present(1, 0);
 	}
 
-	void Renderer::RenderTitle()
+	void Renderer::RenderTitle(float interpFactor)
 	{
-		RenderScene(&_dumpScreenRenderTarget, false, _gameCamera);
+		_stringsToDraw.clear();
+		_isLocked = false;
+
+		InterpolateCamera(interpFactor);
+		DumpGameScene();
 
 		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_STENCIL | D3D11_CLEAR_DEPTH, 1.0f, 0);
 		_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
 
 		RenderInventoryScene(&_backBuffer, &_dumpScreenRenderTarget, 1.0f);
-		DrawAllStrings();
+		
+		_swapChain->Present(1, 0);
 
-		_swapChain->Present(0, 0);
+		_isLocked = true;
 	}
 
 	void Renderer::DrawDebugInfo(RenderView& view)
 	{
+#if TEST_BUILD
 		if (CurrentLevel == 0)
+		{
+			AddString("TombEngine " + std::string(TEN_VERSION_STRING) + " test build - not for distribution",
+				Vector2(20, 560), Vector4(1.0f, 0, 0, 0.5f), 0.7f, 0);
+		}
+#endif
+
+		if (!DebugMode || CurrentLevel == 0)
 			return;
 
 		_currentLineHeight = DISPLAY_SPACE_RES.y / 30;
@@ -1133,7 +1214,7 @@ namespace TEN::Renderer
 		const auto& room = g_Level.Rooms[LaraItem->RoomNumber];
 
 		float aspectRatio = _screenWidth / (float)_screenHeight;
-		int thumbWidth = _screenWidth / 6;
+		int thumbWidth = _screenWidth / 8;
 		auto rect = RECT{};
 		int thumbY = 0;
 
@@ -1150,7 +1231,6 @@ namespace TEN::Renderer
 			PrintDebugMessage("Update time: %d", _timeUpdate);
 			PrintDebugMessage("Frame time: %d", _timeFrame);
 			PrintDebugMessage("ControlPhase() time: %d", ControlPhaseTime);
-			PrintDebugMessage("Room collector time: %d", _timeRoomsCollector);
 			PrintDebugMessage("TOTAL draw calls: %d", _numDrawCalls);
 			PrintDebugMessage("    Rooms: %d", _numRoomsDrawCalls);
 			PrintDebugMessage("    Movables: %d", _numMoveablesDrawCalls);
@@ -1167,18 +1247,14 @@ namespace TEN::Renderer
 			PrintDebugMessage("    Sprites: %d", _numSortedSpritesDrawCalls);
 			PrintDebugMessage("SHADOW MAP draw calls: %d", _numShadowMapDrawCalls);
 			PrintDebugMessage("DEBRIS draw calls: %d", _numDebrisDrawCalls);
-			PrintDebugMessage("Rooms: %d", view.RoomsToDraw.size());
-			PrintDebugMessage("    CheckPortal() calls: %d", _numCheckPortalCalls);
-			PrintDebugMessage("    GetVisibleRooms() calls: %d", _numGetVisibleRoomsCalls);
-			PrintDebugMessage("    Dot products: %d", _numDotProducts);
-				 
-			_spriteBatch->Begin(SpriteSortMode_Deferred, _renderStates->Opaque()); 
+
+			_spriteBatch->Begin(SpriteSortMode_Deferred, _renderStates->Opaque());
 
 			rect.left = _screenWidth - thumbWidth;
 			rect.top = thumbY;
 			rect.right = rect.left+ thumbWidth;
 			rect.bottom = rect.top+thumbWidth / aspectRatio;
-				  
+
 			_spriteBatch->Draw(_normalsRenderTarget.ShaderResourceView.Get(), rect);
 			thumbY += thumbWidth / aspectRatio;
 
@@ -1194,7 +1270,7 @@ namespace TEN::Renderer
 
 			_spriteBatch->Draw(_SSAOBlurredRenderTarget.ShaderResourceView.Get(), rect);
 			thumbY += thumbWidth / aspectRatio;
-				  
+
 			if (g_Configuration.AntialiasingMode > AntialiasingMode::Low)
 			{
 				rect.left = _screenWidth - thumbWidth;
@@ -1214,6 +1290,22 @@ namespace TEN::Renderer
 				thumbY += thumbWidth / aspectRatio;
 			}
 
+			rect.left = _screenWidth - thumbWidth;
+			rect.top = thumbY;
+			rect.right = rect.left + thumbWidth;
+			rect.bottom = rect.top + thumbWidth;
+
+			_spriteBatch->Draw(_roomAmbientMapFront.ShaderResourceView.Get(), rect);
+			thumbY += thumbWidth;
+
+			rect.left = _screenWidth - thumbWidth;
+			rect.top = thumbY;
+			rect.right = rect.left + thumbWidth;
+			rect.bottom = rect.top + thumbWidth;
+
+			_spriteBatch->Draw(_roomAmbientMapBack.ShaderResourceView.Get(), rect);
+			thumbY += thumbWidth;
+
 			_spriteBatch->End();
 
 			break;
@@ -1222,11 +1314,12 @@ namespace TEN::Renderer
 			PrintDebugMessage("DIMENSION STATS");
 			PrintDebugMessage("Position: %d, %d, %d", LaraItem->Pose.Position.x, LaraItem->Pose.Position.y, LaraItem->Pose.Position.z);
 			PrintDebugMessage("Orientation: %d, %d, %d", LaraItem->Pose.Orientation.x, LaraItem->Pose.Orientation.y, LaraItem->Pose.Orientation.z);
+			PrintDebugMessage("Scale: %.3f, %.3f, %.3f", LaraItem->Pose.Scale.x, LaraItem->Pose.Scale.y, LaraItem->Pose.Scale.z);
 			PrintDebugMessage("RoomNumber: %d", LaraItem->RoomNumber);
 			PrintDebugMessage("PathfindingBoxID: %d", LaraItem->BoxNumber);
-			PrintDebugMessage("WaterSurfaceDist: %d", Lara.Context.WaterSurfaceDist);
-			PrintDebugMessage("Room Position: %d, %d, %d, %d", room.x, room.z, room.x + BLOCK(room.xSize), room.z + BLOCK(room.zSize));
-			PrintDebugMessage("Room.y, minFloor, maxCeiling: %d, %d, %d ", room.y, room.minfloor, room.maxceiling);
+			PrintDebugMessage((Lara.Context.WaterSurfaceDist == -NO_HEIGHT ? "WaterSurfaceDist: N/A" : "WaterSurfaceDist: %d"), Lara.Context.WaterSurfaceDist);
+			PrintDebugMessage("Room Position: %d, %d, %d, %d", room.Position.z, room.Position.z, room.Position.z + BLOCK(room.XSize), room.Position.z + BLOCK(room.ZSize));
+			PrintDebugMessage("Room.y, minFloor, maxCeiling: %d, %d, %d ", room.Position.y, room.BottomHeight, room.TopHeight);
 			PrintDebugMessage("Camera Position: %d, %d, %d", Camera.pos.x, Camera.pos.y, Camera.pos.z);
 			PrintDebugMessage("Camera LookAt: %d, %d, %d", Camera.target.x, Camera.target.y, Camera.target.z);
 			PrintDebugMessage("Camera RoomNumber: %d", Camera.pos.RoomNumber);
@@ -1235,8 +1328,8 @@ namespace TEN::Renderer
 		case RendererDebugPage::PlayerStats:
 			PrintDebugMessage("PLAYER STATS");
 			PrintDebugMessage("AnimObjectID: %d", LaraItem->Animation.AnimObjectID);
-			PrintDebugMessage("AnimNumber: %d", LaraItem->Animation.AnimNumber);
-			PrintDebugMessage("FrameNumber: %d", LaraItem->Animation.FrameNumber);
+			PrintDebugMessage("AnimNumber: %d", LaraItem->Animation.AnimNumber - Objects[LaraItem->Animation.AnimObjectID].animIndex);
+			PrintDebugMessage("FrameNumber: %d", LaraItem->Animation.FrameNumber - GetAnimData(LaraItem).frameBase);
 			PrintDebugMessage("ActiveState: %d", LaraItem->Animation.ActiveState);
 			PrintDebugMessage("TargetState: %d", LaraItem->Animation.TargetState);
 			PrintDebugMessage("Velocity: %.3f, %.3f, %.3f", LaraItem->Animation.Velocity.z, LaraItem->Animation.Velocity.y, LaraItem->Animation.Velocity.x);
@@ -1265,7 +1358,7 @@ namespace TEN::Renderer
 				if (action.IsReleased())
 					releasedActions.Set((int)action.GetID());
 			}
-				
+
 			PrintDebugMessage("INPUT STATS");
 			PrintDebugMessage(("Clicked actions: " + clickedActions.ToString()).c_str());
 			PrintDebugMessage(("Held actions: " + heldActions.ToString()).c_str());
@@ -1288,19 +1381,34 @@ namespace TEN::Renderer
 			PrintDebugMessage("Front left ceil: %d", LaraCollision.FrontLeft.Ceiling);
 			PrintDebugMessage("Front right ceil: %d", LaraCollision.FrontRight.Ceiling);
 			break;
-				
+
 		case RendererDebugPage::PathfindingStats:
 			PrintDebugMessage("PATHFINDING STATS");
 			PrintDebugMessage("BoxNumber: %d", LaraItem->BoxNumber);
 			break;
-				
+
 		case RendererDebugPage::WireframeMode:
 			PrintDebugMessage("WIREFRAME MODE");
+			break;
+
+		case RendererDebugPage::PortalDebug:
+			PrintDebugMessage("PORTAL DEBUG");
+			PrintDebugMessage("Camera RoomNumber: %d", Camera.pos.RoomNumber);
+			PrintDebugMessage("Room collector time: %d", _timeRoomsCollector);
+			PrintDebugMessage("Rooms: %d", view.RoomsToDraw.size());
+			PrintDebugMessage("    CheckPortal() calls: %d", _numCheckPortalCalls);
+			PrintDebugMessage("    GetVisibleRooms() calls: %d", _numGetVisibleRoomsCalls);
+			PrintDebugMessage("    Dot products: %d", _numDotProducts);
 			break;
 
 		default:
 			break;
 		}
+	}
+
+	RendererDebugPage Renderer::GetCurrentDebugPage()
+	{
+		return _debugPage;
 	}
 
 	void Renderer::SwitchDebugPage(bool goBack)
@@ -1312,7 +1420,7 @@ namespace TEN::Renderer
 		{
 			page = (int)RendererDebugPage::Count - 1;
 		}
-		else if (page > (int)RendererDebugPage::WireframeMode)
+		else if (page >= (int)RendererDebugPage::Count)
 		{
 			page = (int)RendererDebugPage::None;
 		}

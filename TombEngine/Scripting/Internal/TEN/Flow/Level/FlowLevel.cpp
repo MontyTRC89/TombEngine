@@ -1,6 +1,9 @@
 #include "framework.h"
-#include "FlowLevel.h"
+#include "Scripting/Internal/TEN/Flow/Level/FlowLevel.h"
+
 #include "Scripting/Internal/ScriptAssert.h"
+
+using namespace TEN::Scripting;
 
 /***
 Stores level metadata.
@@ -15,10 +18,13 @@ These are things things which aren't present in the compiled level file itself.
 	@treturn Level a Level object
 	*/
 void Level::Register(sol::table& parent)
-{	
-	parent.new_usertype<Level>("Level",
+{
+	// Register type.
+	parent.new_usertype<Level>(
+		"Level",
 		sol::constructors<Level()>(),
 		sol::call_constructor, sol::constructors<Level()>(),
+
 /// (string) string key for the level's (localised) name.
 // Corresponds to an entry in strings.lua.
 //@mem nameKey
@@ -51,6 +57,14 @@ void Level::Register(sol::table& parent)
 /// (@{Flow.SkyLayer}) Secondary sky layer
 //@mem layer2
 		"layer2", &Level::Layer2,
+
+/// (@{Flow.Starfield}) Starfield.
+// @mem starfield
+		"starfield", &Level::Starfield,
+
+/// (@{Flow.LensFlare}) Global lens flare .
+// @mem lensFlare
+		"lensFlare", &Level::LensFlare,
 
 /// (@{Flow.Fog}) omni fog RGB color and distance.
 // As seen in TR4's Desert Railroad.
@@ -100,12 +114,6 @@ e.g. `myLevel.laraType = LaraType.Divesuit`
 // As seen in TRC's Sinking Submarine.
 //@mem rumble
 		"rumble", &Level::Rumble,
-
-/// (@{Flow.Mirror}) Location and size of the level's mirror, if present.
-//
-// __(not yet implemented)__
-//@mem mirror
-		"mirror", &Level::Mirror,
 
 		"farView", sol::property(&Level::SetLevelFarView),
 
@@ -232,16 +240,10 @@ WeatherType Level::GetWeatherType() const
 	return Weather;
 }
 
-short Level::GetMirrorRoom() const
-{
-	return Mirror.Room;
-}
-
 bool Level::GetFogEnabled() const
 {
 	return Fog.Enabled;
 }
-
 
 RGBAColor8Byte Level::GetFogColor() const
 {
@@ -276,4 +278,59 @@ int Level::GetSecrets() const
 std::string Level::GetAmbientTrack() const
 {
 	return AmbientTrack;
+}
+
+bool Level::GetLensFlareEnabled() const
+{
+	return LensFlare.GetEnabled();
+}
+
+int Level::GetLensFlareSunSpriteID() const
+{
+	return LensFlare.GetSunSpriteID();
+}
+
+short Level::GetLensFlarePitch() const
+{
+	return ANGLE(LensFlare.GetPitch());
+}
+
+short Level::GetLensFlareYaw() const
+{
+	return ANGLE(LensFlare.GetYaw());
+}
+
+Color Level::GetLensFlareColor() const
+{
+	return LensFlare.GetColor();
+}
+
+bool Level::GetStarfieldStarsEnabled() const
+{
+	return Starfield.GetStarsEnabled();
+}
+
+bool Level::GetStarfieldMeteorsEnabled() const
+{
+	return Starfield.GetMeteorsEnabled();
+}
+
+int Level::GetStarfieldStarCount() const
+{
+	return Starfield.GetStarCount();
+}
+
+int Level::GetStarfieldMeteorCount() const
+{
+	return Starfield.GetMeteorCount();
+}
+
+int Level::GetStarfieldMeteorSpawnDensity() const
+{
+	return Starfield.GetMeteorSpawnDensity();
+}
+
+float Level::GetStarfieldMeteorVelocity() const
+{
+	return Starfield.GetMeteorVelocity();
 }
