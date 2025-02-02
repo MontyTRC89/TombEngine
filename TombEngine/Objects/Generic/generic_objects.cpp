@@ -10,9 +10,10 @@
 #include "Game/Setup.h"
 
 // Objects
+#include "Objects/Generic/Object/burning_torch.h"
 #include "Objects/Generic/Object/generic_trapdoor.h"
 #include "Objects/Generic/Object/generic_bridge.h"
-#include "Objects/Generic/Object/burning_torch.h"
+#include "Objects/Generic/Object/HorizontalBar.h"
 #include "Objects/Generic/Object/polerope.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
 #include "Objects/Generic/Object/rope.h"

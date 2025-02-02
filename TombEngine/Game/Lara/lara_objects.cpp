@@ -285,6 +285,8 @@ void lara_as_horizontal_bar_swing(ItemInfo* item, CollisionInfo* coll)
 	auto& player = GetLaraInfo(*item);
 
 	player.Control.Look.Mode = LookMode::Horizontal;
+	//Camera.laraNode = LM_HEAD;
+	//Camera.targetAngle = ANGLE(0.0f);
 
 	if (IsHeld(In::Action))
 	{
