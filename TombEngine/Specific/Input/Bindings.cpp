@@ -64,23 +64,23 @@ namespace TEN::Input
 		{ In::Back, XK_AXIS_X_POS },
 		{ In::Left, XK_AXIS_Y_NEG },
 		{ In::Right, XK_AXIS_Y_POS },
-		{ In::StepLeft, XK_LSTICK },
-		{ In::StepRight, XK_RSTICK },
+		{ In::StepLeft, XK_L_STICK },
+		{ In::StepRight, XK_R_STICK },
 		{ In::Action, XK_A },
-		{ In::Walk, XK_RSHIFT },
-		{ In::Sprint, XK_AXIS_RTRIGGER_NEG },
-		{ In::Crouch, XK_AXIS_LTRIGGER_NEG },
+		{ In::Walk, XK_R_SHIFT },
+		{ In::Sprint, XK_AXIS_R_TRIGGER_NEG },
+		{ In::Crouch, XK_AXIS_L_TRIGGER_NEG },
 		{ In::Jump, XK_X },
 		{ In::Roll, XK_B },
 		{ In::Draw, XK_Y },
-		{ In::Look, XK_LSHIFT },
+		{ In::Look, XK_L_SHIFT },
 
 		{ In::Accelerate, XK_A },
 		{ In::Reverse, XK_AXIS_X_POS },
-		{ In::Faster, XK_AXIS_RTRIGGER_NEG },
-		{ In::Slower, XK_RSHIFT },
+		{ In::Faster, XK_AXIS_R_TRIGGER_NEG },
+		{ In::Slower, XK_R_SHIFT },
 		{ In::Brake, XK_X },
-		{ In::Fire, XK_AXIS_LTRIGGER_NEG },
+		{ In::Fire, XK_AXIS_L_TRIGGER_NEG },
 
 		{ In::Flare, XK_DPAD_DOWN },
 		{ In::SmallMedipack, KC_MINUS },
@@ -150,14 +150,14 @@ namespace TEN::Input
 			return KC_UNASSIGNED;
 
 		// Get and return key binding.
-		auto [inputActionID, key] = *keyIt;
-		return key;
+		auto [inputActionID, keyID] = *keyIt;
+		return keyID;
 	}
 
-	void BindingManager::SetKeyBinding(InputDeviceID deviceID, InputActionID actionID, int key)
+	void BindingManager::SetKeyBinding(InputDeviceID deviceID, InputActionID actionID, int keyID)
 	{
 		// Overwrite or add key binding.
-		_bindings[deviceID][actionID] = key;
+		_bindings[deviceID][actionID] = keyID;
 	}
 
 	void BindingManager::SetBindingProfile(InputDeviceID deviceID, const BindingProfile& bindingProfile)

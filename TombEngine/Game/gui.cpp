@@ -722,17 +722,17 @@ namespace TEN::Gui
 					}
 					else
 					{
-						int selectedKey = 0;
-						for (selectedKey = 0; selectedKey < KEY_SLOT_COUNT; selectedKey++)
+						int selectedKeyID = 0;
+						for (selectedKeyID = 0; selectedKeyID < KEY_COUNT; selectedKeyID++)
 						{
-							if (KeyMap[selectedKey])
+							if (KeyMap[selectedKeyID])
 								break;
 						}
 
-						if (selectedKey == KEY_SLOT_COUNT)
-							selectedKey = 0;
+						if (selectedKeyID == KEY_COUNT)
+							selectedKeyID = 0;
 
-						if (selectedKey && !GetKeyName(selectedKey).empty())
+						if (selectedKeyID && !GetKeyName(selectedKeyID).empty())
 						{
 							unsigned int baseIndex = 0;
 							switch (MenuToDisplay)
@@ -753,7 +753,7 @@ namespace TEN::Gui
 								break;
 							}
 
-							g_Bindings.SetKeyBinding(InputDeviceID::Custom, InputActionID(baseIndex + SelectedOption), selectedKey);
+							g_Bindings.SetKeyBinding(InputDeviceID::Custom, InputActionID(baseIndex + SelectedOption), selectedKeyID);
 							DefaultConflict();
 
 							CurrentSettings.NewKeyWaitTimer = 0.0f;

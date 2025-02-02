@@ -36,7 +36,7 @@ namespace TEN::Input
 	// Globals
 
 	RumbleData RumbleInfo = {};
-	std::unordered_map<int, float>						KeyMap;			// Key = device key ID, value = device key value.
+	std::unordered_map<int, float>						KeyMap;			// Key = key ID, value = key value.
 	std::unordered_map<InputAxisID, Vector2>			AxisMap;		// Key = Input axis ID, value = axis.
 	std::unordered_map<InputActionID, InputAction>		ActionMap;		// Key = Input action ID, value = input action.
 	std::unordered_map<InputActionID, ActionQueueState> ActionQueueMap; // Key = InputActionID, value = action queue state.
@@ -75,7 +75,7 @@ namespace TEN::Input
 		RumbleInfo = {};
 
 		// Initialize key map.
-		for (int i = 0; i < KEY_SLOT_COUNT; i++)
+		for (int i = 0; i < KEY_COUNT; i++)
 			KeyMap[i] = 0.0f;
 
 		// Initialize input axis map.
@@ -186,7 +186,7 @@ namespace TEN::Input
 
 	void ClearInputData()
 	{
-		for (auto& [key, value] : KeyMap)
+		for (auto& [keyID, value] : KeyMap)
 			value = 0.0f;
 
 		for (auto& [axisID, axis] : AxisMap)
@@ -218,7 +218,7 @@ namespace TEN::Input
 			queue = ActionQueueState::None;
 	}
 
-	static bool TestBoundKey(int key)
+	static bool TestBoundKey(int keyID)
 	{
 		for (int i = 1; i >= 0; i--)
 		{
@@ -341,10 +341,10 @@ namespace TEN::Input
 
 			// Poll mouse buttons.
 			for (int i = 0; i < MOUSE_BUTTON_COUNT; i++)
-				KeyMap[KEYBOARD_KEY_COUNT + i] = state.buttonDown((MouseButtonID)i) ? 1.0f : 0.0f;
+				KeyMap[KEY_OFFSET_MOUSE + i] = state.buttonDown((MouseButtonID)i) ? 1.0f : 0.0f;
 
 			// Register multiple directional keypresses mapped to mouse axes.
-			int baseIndex = KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT;
+			int baseIndex = KEY_OFFSET_MOUSE + MOUSE_BUTTON_COUNT;
 			for (int pass = 0; pass < (MOUSE_AXIS_COUNT * 2); pass++)
 			{
 				switch (pass)
@@ -423,8 +423,8 @@ namespace TEN::Input
 			const auto& state = OisGamepad->getJoyStickState();
 
 			// Poll buttons.
-			for (int key = 0; key < state.mButtons.size(); key++)
-				KeyMap[KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2) + key] = state.mButtons[key] ? 1.0f : 0.0f;
+			for (int keyID = 0; keyID < state.mButtons.size(); keyID++)
+				KeyMap[KEY_OFFSET_GAMEPAD + keyID] = state.mButtons[keyID] ? 1.0f : 0.0f;
 
 			// Poll axes.
 			for (int axis = 0; axis < state.mAxes.size(); axis++)
@@ -446,8 +446,8 @@ namespace TEN::Input
 				float scaledValue = (abs(normalizedValue) * AXIS_SCALE) + AXIS_OFFSET;
 
 				// Calculate and reset discrete input slots.
-				int negKey = KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2) + GAMEPAD_BUTTON_COUNT + (axis * 2);
-				int posKey = KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2) + GAMEPAD_BUTTON_COUNT + (axis * 2) + 1;
+				int negKey = (KEY_OFFSET_GAMEPAD + GAMEPAD_BUTTON_COUNT) + (axis * 2);
+				int posKey = (KEY_OFFSET_GAMEPAD + GAMEPAD_BUTTON_COUNT) + (axis * 2) + 1;
 				KeyMap[negKey] = (normalizedValue > 0) ? abs(normalizedValue) : 0.0f;
 				KeyMap[posKey] = (normalizedValue < 0) ? abs(normalizedValue) : 0.0f;
 
@@ -496,10 +496,10 @@ namespace TEN::Input
 					continue;
 
 				// Register multiple directional keypresses mapped to analog axes.
-				int baseIndex = KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2) + GAMEPAD_BUTTON_COUNT + (GAMEPAD_AXIS_COUNT * 2);
+				int baseIndex = (KEY_OFFSET_GAMEPAD + GAMEPAD_BUTTON_COUNT) + (GAMEPAD_AXIS_COUNT * 2);
 				for (int pass = 0; pass < GAMEPAD_POV_AXIS_COUNT; pass++)
 				{
-					unsigned int index = KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2) + GAMEPAD_BUTTON_COUNT + (GAMEPAD_AXIS_COUNT * 2);
+					unsigned int index = (KEY_OFFSET_GAMEPAD + GAMEPAD_BUTTON_COUNT) + (GAMEPAD_AXIS_COUNT * 2);
 
 					switch (pass)
 					{
@@ -549,9 +549,9 @@ namespace TEN::Input
 			if (deviceID == InputDeviceID::KeyboardMouse && g_Bindings.TestConflict(actionID))
 				continue;
 
-			int key = g_Bindings.GetBoundKey((InputDeviceID)i, actionID);
-			if (KeyMap[key] != 0.0f)
-				return KeyMap[key];
+			int keyID = g_Bindings.GetBoundKey((InputDeviceID)i, actionID);
+			if (KeyMap[keyID] != 0.0f)
+				return KeyMap[keyID];
 		}
 
 		return 0.0f;

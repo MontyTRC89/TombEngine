@@ -155,23 +155,26 @@ namespace TEN::Input
 		{ GK_AXIS_Z_POS, "Stick Z+" },
 		{ GK_AXIS_W_NEG, "Stick W-" },
 		{ GK_AXIS_W_POS, "Stick W+" },
-		{ GK_AXIS_LTRIGGER_1, "Left Trigger 1" },
-		{ GK_AXIS_LTRIGGER_2, "Left Trigger 2" },
-		{ GK_AXIS_RTRIGGER_1, "Right Trigger 1" },
-		{ GK_AXIS_RTRIGGER_2, "Right Trigger 2" },
+		{ GK_AXIS_L_TRIGGER_1, "Left Trigger 1" },
+		{ GK_AXIS_L_TRIGGER_2, "Left Trigger 2" },
+		{ GK_AXIS_R_TRIGGER_1, "Right Trigger 1" },
+		{ GK_AXIS_R_TRIGGER_2, "Right Trigger 2" },
 		{ GK_DPAD_UP, "D-Pad Up" },
 		{ GK_DPAD_DOWN, "D-Pad Down" },
 		{ GK_DPAD_LEFT, "D-Pad Left" },
 		{ GK_DPAD_RIGHT, "D-Pad Right" }
 	};
 
-	std::string GetKeyName(int key)
+	const std::string& GetKeyName(int keyID)
 	{
 		// Find and return key name.
-		auto it = KEY_NAME_MAP.find(key);
+		auto it = KEY_NAME_MAP.find(keyID);
 		if (it != KEY_NAME_MAP.end())
-			return it->second;
+		{
+			const auto& [keyID, name] = *it;
+			return name;
+		}
 
-		return {};
+		return KEY_NAME_MAP.at(KC_UNASSIGNED);
 	}
 }

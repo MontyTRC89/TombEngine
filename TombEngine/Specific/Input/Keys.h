@@ -8,17 +8,20 @@ namespace TEN::Input
 	constexpr auto GAMEPAD_BUTTON_COUNT	  = 16;
 	constexpr auto GAMEPAD_AXIS_COUNT	  = 6;
 	constexpr auto GAMEPAD_POV_AXIS_COUNT = 4;
+	
+	constexpr auto KEY_COUNT = KEYBOARD_KEY_COUNT +
+							   MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2) +
+							   GAMEPAD_BUTTON_COUNT + (GAMEPAD_AXIS_COUNT * 2) + GAMEPAD_POV_AXIS_COUNT;
 
-	constexpr auto KEY_SLOT_COUNT = KEYBOARD_KEY_COUNT +
-									MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2) +
-									GAMEPAD_BUTTON_COUNT + (GAMEPAD_AXIS_COUNT * 2) + GAMEPAD_POV_AXIS_COUNT;
+	constexpr auto KEY_OFFSET_MOUSE	  = KEYBOARD_KEY_COUNT;
+	constexpr auto KEY_OFFSET_GAMEPAD = KEY_OFFSET_MOUSE + (MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2));
 
 	// Mouse
 	// 8 buttons + (3 * 2) axes.
 	enum MouseKey
 	{
 		// Buttons
-		MK_LCLICK = KEYBOARD_KEY_COUNT,
+		MK_LCLICK = KEY_OFFSET_MOUSE,
 		MK_RCLICK,
 		MK_MCLICK,
 		MK_BUTTON_4,
@@ -41,7 +44,7 @@ namespace TEN::Input
 	enum GamepadKey
 	{
 		// Buttons
-		GK_BUTTON_1 = KEYBOARD_KEY_COUNT + MOUSE_BUTTON_COUNT + (MOUSE_AXIS_COUNT * 2),
+		GK_BUTTON_1 = KEY_OFFSET_GAMEPAD,
 		GK_BUTTON_2,
 		GK_BUTTON_3,
 		GK_BUTTON_4,
@@ -67,10 +70,10 @@ namespace TEN::Input
 		GK_AXIS_Z_POS,
 		GK_AXIS_W_NEG,
 		GK_AXIS_W_POS,
-		GK_AXIS_LTRIGGER_1,
-		GK_AXIS_LTRIGGER_2,
-		GK_AXIS_RTRIGGER_1,
-		GK_AXIS_RTRIGGER_2,
+		GK_AXIS_L_TRIGGER_1,
+		GK_AXIS_L_TRIGGER_2,
+		GK_AXIS_R_TRIGGER_1,
+		GK_AXIS_R_TRIGGER_2,
 
 		// POV axes
 		GK_DPAD_UP,
@@ -86,10 +89,10 @@ namespace TEN::Input
 		// Buttons
 		XK_START = GK_BUTTON_1,
 		XK_SELECT,
-		XK_LSTICK,
-		XK_RSTICK,
-		XK_LSHIFT,
-		XK_RSHIFT,
+		XK_L_STICK,
+		XK_R_STICK,
+		XK_L_SHIFT,
+		XK_R_SHIFT,
 		XK_UNUSED_1,
 		XK_UNUSED_2,
 		XK_A,
@@ -107,10 +110,10 @@ namespace TEN::Input
 		XK_AXIS_Z_NEG,
 		XK_AXIS_W_POS,
 		XK_AXIS_W_NEG,
-		XK_AXIS_LTRIGGER_NEG,
-		XK_AXIS_LTRIGGER_POS,
-		XK_AXIS_RTRIGGER_NEG,
-		XK_AXIS_RTRIGGER_POS,
+		XK_AXIS_L_TRIGGER_NEG,
+		XK_AXIS_L_TRIGGER_POS,
+		XK_AXIS_R_TRIGGER_NEG,
+		XK_AXIS_R_TRIGGER_POS,
 
 		// POV axes
 		XK_DPAD_UP,
@@ -119,5 +122,5 @@ namespace TEN::Input
 		XK_DPAD_RIGHT
 	};
 
-	std::string GetKeyName(int key);
+	const std::string& GetKeyName(int keyID);
 }

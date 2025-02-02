@@ -4,7 +4,7 @@ namespace TEN::Input
 {
 	enum class InputActionID;
 
-	using BindingProfile = std::unordered_map<InputActionID, int>; // Key = input action ID, value = device key ID.
+	using BindingProfile = std::unordered_map<InputActionID, int>; // Key = input action ID, value = key ID.
 
 	// TODO: These don't represent devices yet, it's still the legacy way (i.e. default binding + custom binding on top).
 	enum class InputDeviceID
@@ -45,7 +45,7 @@ namespace TEN::Input
 
 		// Setters
 
-		void SetKeyBinding(InputDeviceID deviceID, InputActionID actionID, int key);
+		void SetKeyBinding(InputDeviceID deviceID, InputActionID actionID, int keyID);
 		void SetBindingProfile(InputDeviceID deviceID, const BindingProfile& profile);
 		void SetDefaultBindingProfile(InputDeviceID deviceID);
 		void SetConflict(InputActionID actionID, bool value);
