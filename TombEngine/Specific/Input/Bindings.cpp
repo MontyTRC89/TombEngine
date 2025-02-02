@@ -108,39 +108,41 @@ namespace TEN::Input
 
 	BindingManager::BindingManager()
 	{
-		Bindings =
+		// Initialize default bindings.
+		_bindings =
 		{
 			{ InputDeviceID::KeyboardMouse, DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE },
 			{ InputDeviceID::Custom, DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE }
 		};
 
+		// Initialize conflicts.
 		for (int i = 0; i < (int)InputActionID::Count; i++)
 		{
 			auto actionID = (InputActionID)i;
-			Conflicts.insert({ actionID, false });
+			_conflicts.insert({ actionID, false });
 		}
 	}
 
 	const BindingProfile& BindingManager::GetBindingProfile(InputDeviceID deviceID)
 	{
 		// Find binding profile.
-		auto it = Bindings.find(deviceID);
-		TENAssert(it != Bindings.end(), ("Attempted to get missing binding profile " + std::to_string((int)deviceID)).c_str());
+		auto bindingProfileIt = _bindings.find(deviceID);
+		TENAssert(bindingProfileIt != _bindings.end(), "Attempted to get missing binding profile " + std::to_string((int)deviceID) + ".");
 
 		// Get and return binding profile.
-		const auto& bindingProfile = it->second;
+		const auto& [inputDeviceID, bindingProfile] = *bindingProfileIt;
 		return bindingProfile;
 	}
 
 	int BindingManager::GetBoundKey(InputDeviceID deviceID, InputActionID actionID)
 	{
 		// Find binding profile.
-		auto bindingProfileIt = Bindings.find(deviceID);
-		if (bindingProfileIt == Bindings.end())
+		auto bindingProfileIt = _bindings.find(deviceID);
+		if (bindingProfileIt == _bindings.end())
 			return KC_UNASSIGNED;
 
 		// Get binding profile.
-		const auto& bindingProfile = bindingProfileIt->second;
+		const auto& [inputDeviceID, bindingProfile] = *bindingProfileIt;
 
 		// Find key binding.
 		auto keyIt = bindingProfile.find(actionID);
@@ -148,20 +150,20 @@ namespace TEN::Input
 			return KC_UNASSIGNED;
 
 		// Get and return key binding.
-		int key = keyIt->second;
+		auto [inputActionID, key] = *keyIt;
 		return key;
 	}
 
 	void BindingManager::SetKeyBinding(InputDeviceID deviceID, InputActionID actionID, int key)
 	{
 		// Overwrite or add key binding.
-		Bindings[deviceID][actionID] = key;
+		_bindings[deviceID][actionID] = key;
 	}
 
 	void BindingManager::SetBindingProfile(InputDeviceID deviceID, const BindingProfile& bindingProfile)
 	{
 		// Overwrite or create binding profile.
-		Bindings[deviceID] = bindingProfile;
+		_bindings[deviceID] = bindingProfile;
 	}
 
 	void BindingManager::SetDefaultBindingProfile(InputDeviceID deviceID)
@@ -170,27 +172,27 @@ namespace TEN::Input
 		switch (deviceID)
 		{
 		case InputDeviceID::KeyboardMouse:
-			Bindings[deviceID] = DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
+			_bindings[deviceID] = DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
 			break;
 
 		case InputDeviceID::Custom:
-			Bindings[deviceID] = DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
+			_bindings[deviceID] = DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
 			break;
 
 		default:
-			TENLog("Cannot reset defaults for binding profile " + std::to_string((int)deviceID), LogLevel::Warning);
+			TENLog("Failed to reset defaults for binding profile " + std::to_string((int)deviceID) + ".", LogLevel::Warning);
 			return;
 		}
 	}
 
 	void BindingManager::SetConflict(InputActionID actionID, bool value)
 	{
-		Conflicts.insert({ actionID, value });
+		_conflicts.insert({ actionID, value });
 	}
 
 	bool BindingManager::TestConflict(InputActionID actionID)
 	{
-		return Conflicts.at(actionID);
+		return _conflicts.at(actionID);
 	}
 
 	BindingManager g_Bindings;

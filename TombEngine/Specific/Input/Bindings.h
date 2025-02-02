@@ -4,9 +4,9 @@ namespace TEN::Input
 {
 	enum class InputActionID;
 
-	using BindingProfile = std::unordered_map<InputActionID, int>;
+	using BindingProfile = std::unordered_map<InputActionID, int>; // Key = input action ID, value = device key ID.
 
-	// TODO: These don't represent devices yet, it's still the legacy way.
+	// TODO: These don't represent devices yet, it's still the legacy way (i.e. default binding + custom binding on top).
 	enum class InputDeviceID
 	{
 		KeyboardMouse,
@@ -23,10 +23,10 @@ namespace TEN::Input
 	class BindingManager
 	{
 	private:
-		// Members
+		// Fields
 
-		std::unordered_map<InputDeviceID, BindingProfile> Bindings	= {};
-		std::unordered_map<InputActionID, bool>			  Conflicts = {};
+		std::unordered_map<InputDeviceID, BindingProfile> _bindings	 = {}; // Key = input action ID, value = binding profile.
+		std::unordered_map<InputActionID, bool>			  _conflicts = {}; // Key = Input action ID, value = has conflict.
 
 	public:
 		// Constants

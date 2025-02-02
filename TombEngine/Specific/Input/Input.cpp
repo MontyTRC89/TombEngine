@@ -24,7 +24,7 @@ using namespace TEN::Gui;
 using namespace TEN::Math;
 using TEN::Renderer::g_Renderer;
 
-// Big TODO: Entire input system shouldn't be left exposed like this.
+// Big TODO: Make an Input class and handle everything inside it.
 
 namespace TEN::Input
 {
@@ -33,22 +33,22 @@ namespace TEN::Input
 	constexpr auto AXIS_OFFSET			 = 0.2f;
 	constexpr auto MOUSE_AXIS_CONSTRAINT = 100.0f;
 
-	// OIS interfaces
-
-	InputManager*  OisInputManager = nullptr;
-	Keyboard*	   OisKeyboard	   = nullptr;
-	Mouse*		   OisMouse		   = nullptr;
-	JoyStick*	   OisGamepad	   = nullptr;
-	ForceFeedback* OisRumble	   = nullptr;
-	Effect*		   OisEffect	   = nullptr;
-
 	// Globals
 
 	RumbleData RumbleInfo = {};
-	std::unordered_map<int, float>						KeyMap;
-	std::unordered_map<InputAxisID, Vector2>			AxisMap;
-	std::unordered_map<InputActionID, InputAction>		ActionMap;
-	std::unordered_map<InputActionID, ActionQueueState> ActionQueueMap;
+	std::unordered_map<int, float>						KeyMap;			// Key = device key ID, value = device key value.
+	std::unordered_map<InputAxisID, Vector2>			AxisMap;		// Key = Input axis ID, value = axis.
+	std::unordered_map<InputActionID, InputAction>		ActionMap;		// Key = Input action ID, value = input action.
+	std::unordered_map<InputActionID, ActionQueueState> ActionQueueMap; // Key = InputActionID, value = action queue state.
+
+	// OIS interfaces
+
+	static InputManager*  OisInputManager = nullptr;
+	static Keyboard*	  OisKeyboard	  = nullptr;
+	static Mouse*		  OisMouse		  = nullptr;
+	static JoyStick*	  OisGamepad	  = nullptr;
+	static ForceFeedback* OisRumble		  = nullptr;
+	static Effect*		  OisEffect		  = nullptr;
 
 	void InitializeEffect()
 	{
@@ -128,7 +128,7 @@ namespace TEN::Input
 		}
 		catch (OIS::Exception& ex)
 		{
-			TENLog("An exception occured during input system init: " + std::string(ex.eText), LogLevel::Error);
+			TENLog("Exception occured during input system initialization: " + std::string(ex.eText), LogLevel::Error);
 		}
 
 		int deviceCount = OisInputManager->getNumberOfDevices(OISJoyStick);
@@ -159,7 +159,7 @@ namespace TEN::Input
 			}
 			catch (OIS::Exception& ex)
 			{
-				TENLog("An exception occured during game controller init: " + std::string(ex.eText), LogLevel::Error);
+				TENLog("Exception occured during game controller initialization: " + std::string(ex.eText), LogLevel::Error);
 			}
 		}
 	}
@@ -235,7 +235,7 @@ namespace TEN::Input
 	}
 
 	// Merge right and left Ctrl, Shift, and Alt keys.
-	int WrapSimilarKeys(int source)
+	static int WrapSimilarKeys(int source)
 	{
 		switch (source)
 		{
