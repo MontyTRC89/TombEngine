@@ -20,11 +20,13 @@ namespace TEN::Input
 		return _value;
 	}
 
+	// Time in game frames.
 	unsigned long InputAction::GetTimeActive() const
 	{
 		return _timeActive;
 	}
 
+	// Time in game frames.
 	unsigned long InputAction::GetTimeInactive() const
 	{
 		return _timeInactive;
@@ -35,14 +37,14 @@ namespace TEN::Input
 		return (_value != 0.0f && _prevValue == 0.0f);
 	}
 
-	bool InputAction::IsHeld(float delayInSec) const
+	bool InputAction::IsHeld(float delaySecs) const
 	{
-		unsigned long delayInFrameTime = (delayInSec == 0.0f) ? 0 : (unsigned long)round(delayInSec / DELTA_TIME);
-		return (_value != 0.0f && _timeActive >= delayInFrameTime);
+		unsigned long delayGameFrames = (delaySecs == 0.0f) ? 0 : (unsigned long)round(delaySecs / DELTA_TIME);
+		return (_value != 0.0f && _timeActive >= delayGameFrames);
 	}
 
-	// NOTE: To avoid stutter on second pulse, ensure initialDelayInSec is multiple of delayInSec.
-	bool InputAction::IsPulsed(float delayInSec, float initialDelayInSec) const
+	// NOTE: To avoid stutter on second pulse, ensure initialDelaySecs is multiple of delaySecs.
+	bool InputAction::IsPulsed(float delaySecs, float initialDelaySecs) const
 	{
 		if (IsClicked())
 			return true;
@@ -50,19 +52,19 @@ namespace TEN::Input
 		if (!IsHeld() || _prevTimeActive == 0 || _timeActive == _prevTimeActive)
 			return false;
 
-		float activeDelayInSec = (_timeActive > (unsigned long)round(initialDelayInSec / DELTA_TIME)) ? delayInSec : initialDelayInSec;
-		unsigned long activeDelayInFrameTime = (unsigned long)round(activeDelayInSec / DELTA_TIME);
-		unsigned long delayInFrameTime = (unsigned long)std::floor(_timeActive / activeDelayInFrameTime) * activeDelayInFrameTime;
-		if (delayInFrameTime > ((unsigned long)std::floor(_prevTimeActive / activeDelayInFrameTime) * activeDelayInFrameTime))
+		float activeDelaySecs = (_timeActive > (unsigned long)round(initialDelaySecs / DELTA_TIME)) ? delaySecs : initialDelaySecs;
+		unsigned long activeDelayGameFrames = (unsigned long)round(activeDelaySecs / DELTA_TIME);
+		unsigned long delayGameFrames = (unsigned long)floor(_timeActive / activeDelayGameFrames) * activeDelayGameFrames;
+		if (delayGameFrames > ((unsigned long)floor(_prevTimeActive / activeDelayGameFrames) * activeDelayGameFrames))
 			return true;
 
 		return false;
 	}
 
-	bool InputAction::IsReleased(float delayInSecMax) const
+	bool InputAction::IsReleased(float delaySecsMax) const
 	{
-		unsigned long delayInFrameTimeMax = (delayInSecMax == INFINITY) ? ULONG_MAX : (unsigned long)round(delayInSecMax / DELTA_TIME);
-		return (_value == 0.0f && _prevValue != 0.0f && _timeActive <= delayInFrameTimeMax);
+		unsigned long delayGameFramesMax = (delaySecsMax == INFINITY) ? ULONG_MAX : (unsigned long)round(delaySecsMax / DELTA_TIME);
+		return (_value == 0.0f && _prevValue != 0.0f && _timeActive <= delayGameFramesMax);
 	}
 
 	void InputAction::Update(bool value)

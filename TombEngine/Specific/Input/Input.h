@@ -62,15 +62,15 @@ namespace TEN::Input
 	Vector2 GetMouse2DPosition();
 
 	// TODO: Move global query functions to player input object (not happening soon). -- Sezz 2023.08.07
-	void  ClearAction(InputActionID actionID);
-	bool  NoAction();
-	bool  IsClicked(InputActionID actionID);
-	bool  IsHeld(InputActionID actionID, float delayInSec = 0.0f);
-	bool  IsPulsed(InputActionID actionID, float delayInSec, float initialDelayInSec = 0.0f);
-	bool  IsReleased(InputActionID actionID, float maxDelayInSec = INFINITY);
-	float GetActionValue(InputActionID actionID);
-	float GetActionTimeActive(InputActionID actionID);
-	float GetActionTimeInactive(InputActionID actionID);
+	void		  ClearAction(InputActionID actionID);
+	bool		  NoAction();
+	bool		  IsClicked(InputActionID actionID);
+	bool		  IsHeld(InputActionID actionID, float delayInSec = 0.0f);
+	bool		  IsPulsed(InputActionID actionID, float delayInSec, float initialDelayInSec = 0.0f);
+	bool		  IsReleased(InputActionID actionID, float maxDelayInSec = INFINITY);
+	float		  GetActionValue(InputActionID actionID);
+	unsigned long GetActionTimeActive(InputActionID actionID);
+	unsigned long GetActionTimeInactive(InputActionID actionID);
 
 	bool IsDirectionalActionHeld();
 	bool IsWakeActionHeld();

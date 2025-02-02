@@ -238,7 +238,7 @@ namespace TEN::Gui
 	{
 		if (mode != InvMode)
 		{
-			TimeInMenu = 0.0f;
+			TimeInMenu = 0;
 			InvMode = mode;
 		}
 	}

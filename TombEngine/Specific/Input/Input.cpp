@@ -814,12 +814,14 @@ namespace TEN::Input
 		return ActionMap[actionID].GetValue();
 	}
 
-	float GetActionTimeActive(InputActionID actionID)
+	// Time in game frames.
+	unsigned long GetActionTimeActive(InputActionID actionID)
 	{
 		return ActionMap[actionID].GetTimeActive();
 	}
 
-	float GetActionTimeInactive(InputActionID actionID)
+	// Time in game frames.
+	unsigned long GetActionTimeInactive(InputActionID actionID)
 	{
 		return ActionMap[actionID].GetTimeInactive();
 	}

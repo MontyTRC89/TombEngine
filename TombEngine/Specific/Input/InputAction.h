@@ -88,9 +88,9 @@ namespace TEN::Input
 		// Inquirers
 
 		bool IsClicked() const;
-		bool IsHeld(float delayInSec = 0.0f) const;
-		bool IsPulsed(float delayInSec, float initialDelayInSec = 0.0f) const;
-		bool IsReleased(float delayInSecMax = INFINITY) const;
+		bool IsHeld(float delaySecs = 0.0f) const;
+		bool IsPulsed(float delaySecs, float initialDelaySecs = 0.0f) const;
+		bool IsReleased(float delaySecsMax = INFINITY) const;
 
 		// Utilities
 
