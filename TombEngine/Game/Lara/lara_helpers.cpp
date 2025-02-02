@@ -1377,43 +1377,6 @@ void UpdateLaraSubsuitAngles(ItemInfo* item)
 	}
 }
 
-void ModulateLaraLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short maxAngle)
-{
-	if (!item->Animation.Velocity.z)
-		return;
-
-	float axisCoeff = AxisMap[InputAxisID::Move].x;
-	int sign = copysign(1, axisCoeff);
-	short maxAngleNormalized = maxAngle * axisCoeff;
-
-	if (coll->CollisionType == CollisionType::Left || coll->CollisionType == CollisionType::Right)
-		maxAngleNormalized *= 0.6f;
-
-	item->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNormalized - item->Pose.Orientation.z) / 3) * sign;
-}
-
-void ModulateLaraCrawlFlex(ItemInfo* item, short baseRate, short maxAngle)
-{
-	auto* lara = GetLaraInfo(item);
-
-	if (!item->Animation.Velocity.z)
-		return;
-
-	float axisCoeff = AxisMap[InputAxisID::Move].x;
-	int sign = copysign(1, axisCoeff);
-	short maxAngleNormalized = maxAngle * axisCoeff;
-
-	if (abs(lara->ExtraTorsoRot.z) < LARA_CRAWL_FLEX_MAX)
-		lara->ExtraTorsoRot.z += std::min<short>(baseRate, abs(maxAngleNormalized - lara->ExtraTorsoRot.z) / 6) * sign;
-
-	if (!IsHeld(In::Look) &&
-		item->Animation.ActiveState != LS_CRAWL_BACK)
-	{
-		lara->ExtraHeadRot.z = lara->ExtraTorsoRot.z / 2;
-		lara->ExtraHeadRot.y = lara->ExtraHeadRot.z;
-	}
-}
-
 // TODO: Unused; I will pick this back up later. -- Sezz 2022.06.22
 void ModulateLaraSlideVelocity(ItemInfo* item, CollisionInfo* coll)
 {

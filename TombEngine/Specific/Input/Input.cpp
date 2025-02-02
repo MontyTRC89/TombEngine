@@ -22,6 +22,7 @@
 using namespace OIS;
 using namespace TEN::Gui;
 using namespace TEN::Math;
+using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
 
 // Big TODO: Make an Input class and handle everything inside it.
@@ -736,23 +737,23 @@ namespace TEN::Input
 		{
 			auto actionID = (InputActionID)i;
 
-			int defaultKey = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, actionID);
-			int userKey = g_Bindings.GetBoundKey(InputDeviceID::Custom, actionID);
+			int defaultKeyID = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, actionID);
+			int userKeyID = g_Bindings.GetBoundKey(InputDeviceID::Custom, actionID);
 
-			if (userKey != KC_UNASSIGNED &&
-				userKey != defaultKey)
+			if (userKeyID != KC_UNASSIGNED &&
+				userKeyID != defaultKeyID)
 			{
 				return false;
 			}
 		}
 
-		auto vendor = TEN::Utils::ToLower(OisGamepad->vendor());
+		auto vendor = ToLower(OisGamepad->vendor());
 		if (vendor.find("xbox") != std::string::npos || vendor.find("xinput") != std::string::npos)
 		{
 			ApplyBindings(BindingManager::DEFAULT_XBOX_CONTROLLER_BINDING_PROFILE);
 			g_Configuration.Bindings = g_Bindings.GetBindingProfile(InputDeviceID::Custom);
 
-			// Additionally turn on thumbstick camera and vibration.
+			// Additionally enable rumble and thumbstick camera.
 			g_Configuration.EnableRumble = true;
 			g_Configuration.EnableThumbstickCamera = true;
 

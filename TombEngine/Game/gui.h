@@ -132,7 +132,7 @@ namespace TEN::Gui
 		int OptionCount;
 		int SelectedSaveSlot;
 
-		long TimeInMenu = -1;
+		int TimeInMenu = NO_VALUE;
 		SettingsData CurrentSettings;
 
 		// Inventory variables

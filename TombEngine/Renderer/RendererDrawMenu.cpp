@@ -316,10 +316,10 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int defaultKey = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (InputActionID)k);
-						int userKey = g_Bindings.GetBoundKey(InputDeviceID::Custom, (InputActionID)k);
+						int defaultKeyID = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (InputActionID)k);
+						int userKeyID = g_Bindings.GetBoundKey(InputDeviceID::Custom, (InputActionID)k);
 
-						int key = userKey ? userKey : defaultKey;
+						int key = userKeyID ? userKeyID : defaultKeyID;
 						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
@@ -369,10 +369,10 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int defaultKey = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (InputActionID)(baseIndex + k));
-						int userKey = g_Bindings.GetBoundKey(InputDeviceID::Custom, (InputActionID)(baseIndex + k));
+						int defaultKeyID = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (InputActionID)(baseIndex + k));
+						int userKeyID = g_Bindings.GetBoundKey(InputDeviceID::Custom, (InputActionID)(baseIndex + k));
 
-						int key = userKey ? userKey : defaultKey;
+						int key = userKeyID ? userKeyID : defaultKeyID;
 						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
@@ -428,10 +428,10 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int defaultKey = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (InputActionID)(baseIndex + k));
-						int userKey = g_Bindings.GetBoundKey(InputDeviceID::Custom, (InputActionID)(baseIndex + k));
+						int defaultKeyID = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (InputActionID)(baseIndex + k));
+						int userKeyID = g_Bindings.GetBoundKey(InputDeviceID::Custom, (InputActionID)(baseIndex + k));
 
-						int key = userKey ? userKey : defaultKey;
+						int key = userKeyID ? userKeyID : defaultKeyID;
 						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
@@ -480,10 +480,10 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int defaultKey = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (InputActionID)(baseIndex + k));
-						int userKey = g_Bindings.GetBoundKey(InputDeviceID::Custom, (InputActionID)(baseIndex + k));
+						int defaultKeyID = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (InputActionID)(baseIndex + k));
+						int userKeyID = g_Bindings.GetBoundKey(InputDeviceID::Custom, (InputActionID)(baseIndex + k));
 
-						int key = userKey ? userKey : defaultKey;
+						int key = userKeyID ? userKeyID : defaultKeyID;
 						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 

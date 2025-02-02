@@ -68,9 +68,9 @@ namespace TEN::Input
 		InputActionID _id			  = In::Forward;
 		float		  _value		  = 0.0f;
 		float		  _prevValue	  = 0.0f;
-		unsigned long _timeActive	  = 0;
-		unsigned long _prevTimeActive = 0;
-		unsigned long _timeInactive	  = 0;
+		unsigned int  _timeActive	  = 0;
+		unsigned int  _prevTimeActive = 0;
+		unsigned int  _timeInactive	  = 0;
 
 	public:
 		// Constructors
@@ -82,8 +82,8 @@ namespace TEN::Input
 
 		InputActionID GetID() const;
 		float		  GetValue() const;
-		unsigned long GetTimeActive() const;
-		unsigned long GetTimeInactive() const;
+		unsigned int  GetTimeActive() const;
+		unsigned int  GetTimeInactive() const;
 		
 		// Inquirers
 

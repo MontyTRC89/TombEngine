@@ -21,13 +21,13 @@ namespace TEN::Input
 	}
 
 	// Time in game frames.
-	unsigned long InputAction::GetTimeActive() const
+	unsigned int InputAction::GetTimeActive() const
 	{
 		return _timeActive;
 	}
 
 	// Time in game frames.
-	unsigned long InputAction::GetTimeInactive() const
+	unsigned int InputAction::GetTimeInactive() const
 	{
 		return _timeInactive;
 	}
@@ -39,7 +39,7 @@ namespace TEN::Input
 
 	bool InputAction::IsHeld(float delaySecs) const
 	{
-		unsigned long delayGameFrames = (delaySecs == 0.0f) ? 0 : (unsigned long)round(delaySecs / DELTA_TIME);
+		unsigned int delayGameFrames = (delaySecs == 0.0f) ? 0 : (unsigned int)round(delaySecs / DELTA_TIME);
 		return (_value != 0.0f && _timeActive >= delayGameFrames);
 	}
 
@@ -52,10 +52,10 @@ namespace TEN::Input
 		if (!IsHeld() || _prevTimeActive == 0 || _timeActive == _prevTimeActive)
 			return false;
 
-		float activeDelaySecs = (_timeActive > (unsigned long)round(initialDelaySecs / DELTA_TIME)) ? delaySecs : initialDelaySecs;
-		unsigned long activeDelayGameFrames = (unsigned long)round(activeDelaySecs / DELTA_TIME);
-		unsigned long delayGameFrames = (unsigned long)floor(_timeActive / activeDelayGameFrames) * activeDelayGameFrames;
-		if (delayGameFrames > ((unsigned long)floor(_prevTimeActive / activeDelayGameFrames) * activeDelayGameFrames))
+		float activeDelaySecs = (_timeActive > (unsigned int)round(initialDelaySecs / DELTA_TIME)) ? delaySecs : initialDelaySecs;
+		unsigned int activeDelayGameFrames = (unsigned int)round(activeDelaySecs / DELTA_TIME);
+		unsigned int delayGameFrames = (unsigned int)floor(_timeActive / activeDelayGameFrames) * activeDelayGameFrames;
+		if (delayGameFrames > ((unsigned int)floor(_prevTimeActive / activeDelayGameFrames) * activeDelayGameFrames))
 			return true;
 
 		return false;
@@ -63,7 +63,7 @@ namespace TEN::Input
 
 	bool InputAction::IsReleased(float delaySecsMax) const
 	{
-		unsigned long delayGameFramesMax = (delaySecsMax == INFINITY) ? ULONG_MAX : (unsigned long)round(delaySecsMax / DELTA_TIME);
+		unsigned int delayGameFramesMax = (delaySecsMax == INFINITY) ? ULONG_MAX : (unsigned int)round(delaySecsMax / DELTA_TIME);
 		return (_value == 0.0f && _prevValue != 0.0f && _timeActive <= delayGameFramesMax);
 	}
 

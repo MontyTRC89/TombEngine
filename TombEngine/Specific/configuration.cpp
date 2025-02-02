@@ -467,14 +467,14 @@ bool LoadConfiguration()
 
 		for (int i = 0; i < (int)InputActionID::Count; i++)
 		{
-			DWORD tempKey = 0;
+			DWORD tempKeyID = 0;
 			char buffer[9];
 			sprintf(buffer, "Action%d", i);
 
 			auto actionID = (InputActionID)i;
-			int boundKey = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, actionID);
+			int boundKeyID = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, actionID);
 
-			if (GetDWORDRegKey(inputKey, buffer, &tempKey, boundKey) != ERROR_SUCCESS)
+			if (GetDWORDRegKey(inputKey, buffer, &tempKeyID, boundKeyID) != ERROR_SUCCESS)
 			{
 				RegCloseKey(rootKey);
 				RegCloseKey(graphicsKey);
@@ -484,8 +484,8 @@ bool LoadConfiguration()
 				return false;
 			}
 
-			g_Configuration.Bindings.insert({ (InputActionID)i, tempKey });
-			g_Bindings.SetKeyBinding(InputDeviceID::Custom, actionID, tempKey);
+			g_Configuration.Bindings.insert({ (InputActionID)i, tempKeyID });
+			g_Bindings.SetKeyBinding(InputDeviceID::Custom, actionID, tempKeyID);
 		}
 
 		RegCloseKey(inputKey);
