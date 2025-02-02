@@ -63,14 +63,14 @@ namespace TEN::Input
 	class InputAction
 	{
 	private:
-		// Members
+		// Fields
 
-		InputActionID ID			 = In::Forward;
-		float		  Value			 = 0.0f;
-		float		  PrevValue		 = 0.0f;
-		float		  TimeActive	 = 0.0f;
-		float		  PrevTimeActive = 0.0f;
-		float		  TimeInactive	 = 0.0f;
+		InputActionID _id			  = In::Forward;
+		float		  _value		  = 0.0f;
+		float		  _prevValue	  = 0.0f;
+		unsigned long _timeActive	  = 0;
+		unsigned long _prevTimeActive = 0;
+		unsigned long _timeInactive	  = 0;
 
 	public:
 		// Constructors
@@ -82,8 +82,8 @@ namespace TEN::Input
 
 		InputActionID GetID() const;
 		float		  GetValue() const;
-		float		  GetTimeActive() const;
-		float		  GetTimeInactive() const;
+		unsigned long GetTimeActive() const;
+		unsigned long GetTimeInactive() const;
 		
 		// Inquirers
 

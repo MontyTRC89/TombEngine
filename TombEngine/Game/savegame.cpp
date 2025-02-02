@@ -2369,7 +2369,7 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 	// Restore action queue.
 	for (int i = 0; i < s->action_queue()->size(); i++)
 	{
-		assertion(i < ActionQueueMap.size(), "Action queue size was changed.");
+		TENAssert(i < ActionQueueMap.size(), "Action queue size was changed.");
 		ActionQueueMap[(InputActionID)i] = (ActionQueueState)s->action_queue()->Get(i);
 	}
 

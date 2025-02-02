@@ -125,7 +125,7 @@ namespace TEN::Input
 	{
 		// Find binding profile.
 		auto it = Bindings.find(deviceID);
-		assertion(it != Bindings.end(), ("Attempted to get missing binding profile " + std::to_string((int)deviceID)).c_str());
+		TENAssert(it != Bindings.end(), ("Attempted to get missing binding profile " + std::to_string((int)deviceID)).c_str());
 
 		// Get and return binding profile.
 		const auto& bindingProfile = it->second;

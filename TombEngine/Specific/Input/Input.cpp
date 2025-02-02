@@ -34,6 +34,7 @@ namespace TEN::Input
 	constexpr auto MOUSE_AXIS_CONSTRAINT = 100.0f;
 
 	// OIS interfaces
+
 	InputManager*  OisInputManager = nullptr;
 	Keyboard*	   OisKeyboard	   = nullptr;
 	Mouse*		   OisMouse		   = nullptr;
@@ -42,6 +43,7 @@ namespace TEN::Input
 	Effect*		   OisEffect	   = nullptr;
 
 	// Globals
+
 	RumbleData RumbleInfo = {};
 	std::unordered_map<int, float>						KeyMap;
 	std::unordered_map<InputAxisID, Vector2>			AxisMap;

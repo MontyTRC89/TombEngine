@@ -1375,9 +1375,9 @@ namespace TEN::Renderer
 			PrintDebugMessage(("Clicked actions: " + clickedActions.ToString()).c_str());
 			PrintDebugMessage(("Held actions: " + heldActions.ToString()).c_str());
 			PrintDebugMessage(("Released actions: " + releasedActions.ToString()).c_str());
-			PrintDebugMessage("Move axes: %.3f, %.3f", AxisMap[(int)InputAxis::Move].x, AxisMap[(int)InputAxis::Move].y);
-			PrintDebugMessage("Camera axes: %.3f, %.3f", AxisMap[(int)InputAxis::Camera].x, AxisMap[(int)InputAxis::Camera].y);
-			PrintDebugMessage("Mouse axes: %.3f, %.3f", AxisMap[(int)InputAxis::Mouse].x, AxisMap[(int)InputAxis::Mouse].y);
+			PrintDebugMessage("Move axes: %.3f, %.3f", AxisMap[InputAxisID::Move].x, AxisMap[InputAxisID::Move].y);
+			PrintDebugMessage("Camera axes: %.3f, %.3f", AxisMap[InputAxisID::Camera].x, AxisMap[InputAxisID::Camera].y);
+			PrintDebugMessage("Mouse axes: %.3f, %.3f", AxisMap[InputAxisID::Mouse].x, AxisMap[InputAxisID::Mouse].y);
 			PrintDebugMessage("Cursor pos: %.3f, %.3f", GetMouse2DPosition().x, GetMouse2DPosition().y);
 		}
 			break;

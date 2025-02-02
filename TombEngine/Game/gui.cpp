@@ -723,23 +723,23 @@ namespace TEN::Gui
 					else
 					{
 						int selectedKey = 0;
-						for (selectedKey = 0; selectedKey < MAX_INPUT_SLOTS; selectedKey++)
+						for (selectedKey = 0; selectedKey < KEY_SLOT_COUNT; selectedKey++)
 						{
 							if (KeyMap[selectedKey])
 								break;
 						}
 
-					if (selectedKey == KEY_SLOT_COUNT)
-						selectedKey = 0;
+						if (selectedKey == KEY_SLOT_COUNT)
+							selectedKey = 0;
 
-					if (selectedKey && !GetKeyName(selectedKey).empty())
-					{
-						unsigned int baseIndex = 0;
-						switch (MenuToDisplay)
+						if (selectedKey && !GetKeyName(selectedKey).empty())
 						{
-						case Menu::VehicleActions:
-							baseIndex = (unsigned int)GeneralActionStrings.size();
-							break;
+							unsigned int baseIndex = 0;
+							switch (MenuToDisplay)
+							{
+							case Menu::VehicleActions:
+								baseIndex = (unsigned int)GeneralActionStrings.size();
+								break;
 
 							case Menu::QuickActions:
 								baseIndex = unsigned int(GeneralActionStrings.size() + VehicleActionStrings.size());
@@ -753,8 +753,8 @@ namespace TEN::Gui
 								break;
 							}
 
-						g_Bindings.SetKeyBinding(InputDeviceID::Custom, InputActionID(baseIndex + SelectedOption), selectedKey);
-						DefaultConflict();
+							g_Bindings.SetKeyBinding(InputDeviceID::Custom, InputActionID(baseIndex + SelectedOption), selectedKey);
+							DefaultConflict();
 
 							CurrentSettings.NewKeyWaitTimer = 0.0f;
 							CurrentSettings.IgnoreInput = true;
@@ -2103,25 +2103,11 @@ namespace TEN::Gui
 					return;
 			}
 
-		if (gameObject != ID_SHOTGUN_ITEM &&
-			gameObject != ID_REVOLVER_ITEM &&
-			gameObject != ID_HK_ITEM &&
-			gameObject != ID_CROSSBOW_ITEM &&
-			gameObject != ID_GRENADE_GUN_ITEM &&
-			gameObject != ID_ROCKET_LAUNCHER_ITEM &&
-			gameObject != ID_HARPOON_ITEM)
-		{
-			if (gameObject == ID_FLARE_INV_ITEM)
+			if (player.Control.HandStatus == HandStatus::Free &&
+				player.Control.Weapon.GunType == player.Control.Weapon.RequestGunType)
 			{
-				if (lara->Control.HandStatus == HandStatus::Free)
-				{
-					if (!TestState(item->Animation.ActiveState, CrawlStates))
-					{
-						if (lara->Control.Weapon.GunType != LaraWeaponType::Flare)
-						{
-							// HACK.
-							ClearAllActions();
-							ActionMap[In::Flare].Update(1.0f);
+				player.Control.HandStatus = HandStatus::WeaponDraw;
+			}
 
 			InventoryItemChosen = NO_VALUE;
 			return;
@@ -2203,7 +2189,7 @@ namespace TEN::Gui
 				{
 					// HACK.
 					ClearAllActions();
-					ActionMap[(int)In::Flare].Update(1.0f);
+					ActionMap[In::Flare].Update(1.0f);
 
 					HandleWeapon(item);
 					ClearAllActions();
