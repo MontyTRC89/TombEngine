@@ -90,9 +90,9 @@ void Volume::SetName(const std::string& name)
 		return;
 
 	// Remove previous name if it exists.
-	if (s_callbackSetName(name, _volume))
+	if (_callbackSetName(name, _volume))
 	{
-		s_callbackRemoveName(_volume.Name);
+		_callbackRemoveName(_volume.Name);
 		_volume.Name = name;
 	}
 	else

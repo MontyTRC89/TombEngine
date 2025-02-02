@@ -143,6 +143,18 @@
 	<td class="summary">Get a copy of this Vec2 normalized to length 1.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#Translate">Translate(dir, dist)</a></td>
+	<td class="summary">Get a copy of this Vec2 translated in the input Vec2 direction by the input distance.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Translate">Translate(rot, dist)</a></td>
+	<td class="summary">Get a copy of this Vec2 translated in the direction of the input rotation in degrees by the input distance.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Translate">Translate(rot, relOffset)</a></td>
+	<td class="summary">Get a copy of this Vec2 translated by an offset, where the input relative offset Vec2 is rotated according to the input rotation in degrees.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#Vec2:Rotate">Vec2:Rotate(rot)</a></td>
 	<td class="summary">Get a copy of this Vec2 rotated by the input rotation in degrees.</td>
 	</tr>
@@ -312,6 +324,102 @@
 
            <span class="types"><a class="type" href="../3 primitive classes/Vec2.html#">Vec2</a></span>
         Normalized vector.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Translate"></a>
+    <strong>Translate(dir, dist)</strong>
+    </dt>
+    <dd>
+    Get a copy of this Vec2 translated in the input Vec2 direction by the input distance.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">dir</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec2.html#">Vec2</a></span>
+         Direction vector. Normalized automatically to length 1.
+        </li>
+        <li><span class="parameter">dist</span>
+            <span class="types"><span class="type">float</span></span>
+         Distance.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec2.html#">Vec2</a></span>
+        Translated vector.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Translate"></a>
+    <strong>Translate(rot, dist)</strong>
+    </dt>
+    <dd>
+    Get a copy of this Vec2 translated in the direction of the input rotation in degrees by the input distance.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">rot</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
+         Rotation in degrees defining the direction.
+        </li>
+        <li><span class="parameter">dist</span>
+            <span class="types"><span class="type">float</span></span>
+         Distance.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec2.html#">Vec2</a></span>
+        Translated vector.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Translate"></a>
+    <strong>Translate(rot, relOffset)</strong>
+    </dt>
+    <dd>
+    Get a copy of this Vec2 translated by an offset, where the input relative offset Vec2 is rotated according to the input rotation in degrees.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">rot</span>
+            <span class="types"><span class="type">float</span></span>
+         Rotation in degrees rotating the input relative offset vector.
+        </li>
+        <li><span class="parameter">relOffset</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec2.html#">Vec2</a></span>
+         Relative offset vector before rotation.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec2.html#">Vec2</a></span>
+        Translated vector.
     </ol>
 
 

@@ -90,14 +90,12 @@ std::string CameraObject::GetName() const
 void CameraObject::SetName(std::string const & id) 
 {
 	if (!ScriptAssert(!id.empty(), "Name cannot be blank. Not setting name."))
-	{
 		return;
-	}
 
-	if (s_callbackSetName(id, m_camera))
+	if (_callbackSetName(id, m_camera))
 	{
-		// remove the old name if we have one
-		s_callbackRemoveName(m_camera.Name);
+		// Remove old name if it exists.
+		_callbackRemoveName(m_camera.Name);
 		m_camera.Name = id;
 	}
 	else
