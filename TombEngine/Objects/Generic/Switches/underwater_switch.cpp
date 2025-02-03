@@ -76,7 +76,7 @@ namespace TEN::Entities::Switches
 				{
 					if (MoveLaraPosition(UnderwaterSwitchPos, switchItem, laraItem))
 					{
-						SetAnimation(laraItem, LA_WATERLEVER_PULL);
+						SetAnimation(*laraItem, LA_WATERLEVER_PULL);
 						laraItem->Animation.Velocity.y = 0;
 						laraItem->Animation.TargetState = LS_UNDERWATER_IDLE;
 						

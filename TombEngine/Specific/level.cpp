@@ -429,10 +429,8 @@ void LoadObjects()
 			for (auto& dispatch : anim.Dispatches)
 			{
 				dispatch.StateID = ReadInt32();
-				dispatch.FrameNumberRange.first = ReadInt32();
-				dispatch.FrameNumberRange.second = ReadInt32();
-				//dispatch.FrameNumberLow = ReadInt32();
-				//dispatch.FrameNumberHigh = ReadInt32();
+				dispatch.FrameNumberRange.first = ReadInt32(); //dispatch.FrameNumberLow = ReadInt32();
+				dispatch.FrameNumberRange.second = ReadInt32(); //dispatch.FrameNumberHigh = ReadInt32();
 				dispatch.NextAnimNumber = ReadInt32();
 				dispatch.NextFrameNumber/*Low*/ = ReadInt32();
 				/*dispatch.NextFrameNumberHigh = */ReadInt32();
@@ -522,7 +520,7 @@ void LoadObjects()
 	InitializeObjects();
 
 	int staticCount = ReadCount();
-	TENLog("Statics: " + std::to_string(staticCount), LogLevel::Info);
+	TENLog("Static count: " + std::to_string(staticCount), LogLevel::Info);
 
 	for (int i = 0; i < staticCount; i++)
 	{

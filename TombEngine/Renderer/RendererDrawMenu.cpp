@@ -842,11 +842,11 @@ namespace TEN::Renderer
 
 			if (!object.Animations.empty())
 			{
-				_stItem.World = moveableObject->AnimationTransforms[n] * worldMatrix;
+				_stItem.World = moveableObject->AnimationTransforms[i] * worldMatrix;
 			}
 			else
 			{
-				_stItem.World = moveableObject->BindPoseTransforms[n] * worldMatrix;
+				_stItem.World = moveableObject->BindPoseTransforms[i] * worldMatrix;
 			}
 
 			_stItem.BoneLightModes[i] = (int)LightMode::Dynamic;
