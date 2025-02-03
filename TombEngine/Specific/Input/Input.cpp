@@ -724,7 +724,7 @@ namespace TEN::Input
 
 	void ApplyDefaultBindings()
 	{
-		ApplyBindings(BindingManager::DEFAULT_XBOX_CONTROLLER_BINDING_PROFILE);
+		ApplyBindings(BindingManager::DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE);
 		ApplyDefaultXInputBindings();
 	}
 

@@ -268,8 +268,10 @@ bool SaveConfiguration()
 		return false;
 	}
 
+	if (g_Configuration.Bindings.empty())
+		g_Configuration.Bindings = BindingManager::DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
+
 	// Set Input binding keys.
-	g_Configuration.Bindings = BindingManager::DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
 	for (int i = 0; i < (int)InputActionID::Count; i++)
 	{
 		char buffer[9];
@@ -490,7 +492,7 @@ bool LoadConfiguration()
 
 		RegCloseKey(inputKey);
 	}
-	// Input key does not exist; use default bindings.
+	// Input key doesn't exist; use default bindings.
 	else
 	{
 		g_Configuration.Bindings = g_Bindings.GetBindingProfile(InputDeviceID::KeyboardMouse);
@@ -505,10 +507,10 @@ bool LoadConfiguration()
 	g_Configuration.ScreenWidth = screenWidth;
 	g_Configuration.ScreenHeight = screenHeight;
 	g_Configuration.EnableWindowedMode = enableWindowedMode;
-	g_Configuration.ShadowType = ShadowMode(shadowMode);
+	g_Configuration.ShadowType = (ShadowMode)shadowMode;
 	g_Configuration.ShadowBlobsMax = shadowBlobsMax;
 	g_Configuration.EnableCaustics = enableCaustics;
-	g_Configuration.AntialiasingMode = AntialiasingMode(antialiasingMode);
+	g_Configuration.AntialiasingMode = (AntialiasingMode)antialiasingMode;
 	g_Configuration.ShadowMapSize = shadowMapSize;
 	g_Configuration.EnableAmbientOcclusion = enableAmbientOcclusion;
 	g_Configuration.EnableHighFramerate = enableHighFramerate;
