@@ -34,14 +34,28 @@ namespace TEN::Math
 namespace std
 {
 	template <>
+	struct hash<Plane>
+	{
+		size_t operator()(const Plane& plane) const
+		{
+			size_t seed = 0;
+			seed ^= hash<float>()(plane.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			seed ^= hash<float>()(plane.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			seed ^= hash<float>()(plane.z) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			seed ^= hash<float>()(plane.w) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			return seed;
+		}
+	};
+
+	template <>
 	struct hash<Vector3>
 	{
 		size_t operator ()(const Vector3& vector) const noexcept
 		{
 			size_t seed = 0;
-			seed ^= hash<int>()(vector.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-			seed ^= hash<int>()(vector.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-			seed ^= hash<int>()(vector.z) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			seed ^= hash<float>()(vector.x) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			seed ^= hash<float>()(vector.y) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+			seed ^= hash<float>()(vector.z) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 			return seed;
 		}
 	};

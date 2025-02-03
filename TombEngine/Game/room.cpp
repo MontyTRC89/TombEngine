@@ -140,6 +140,7 @@ void RoomData::GenerateCollisionMesh()
 	}
 
 	// Create collision mesh.
+	desc.Optimize();
 	CollisionMesh = TEN::Physics::CollisionMesh(Position.ToVector3(), Quaternion::Identity, desc);
 }
 

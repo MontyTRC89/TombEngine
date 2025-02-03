@@ -9,7 +9,7 @@ namespace TEN::Physics
 	class CollisionMeshDesc
 	{
 	private:
-		// Members
+		// Fields
 
 		std::vector<Vector3> _vertices = {};
 		std::vector<int>	 _ids	   = {};
@@ -30,6 +30,7 @@ namespace TEN::Physics
 		// Utilities
 
 		void InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2);
+		void Optimize();
 	};
 
 	class LocalCollisionTriangle
@@ -38,7 +39,7 @@ namespace TEN::Physics
 		static constexpr auto VERTEX_COUNT = 3;
 
 	private:
-		// Members
+		// Fields
 
 		std::array<int, VERTEX_COUNT> _vertexIds = {};
 
@@ -79,7 +80,7 @@ namespace TEN::Physics
 	class CollisionMesh
 	{
 	private:
-		// Members
+		// Fields
 
 		Vector3								_position	 = Vector3::Zero;
 		Quaternion							_orientation = Quaternion::Identity;

@@ -58,6 +58,103 @@ namespace TEN::Physics
 		_ids.push_back(vertex2ID);
 	}
 
+	// TODO
+	void CollisionMeshDesc::Optimize()
+	{
+		constexpr auto PLANE_HEIGHT_STEP = BLOCK(1 / 32.0f);
+
+		return;
+
+		// 1) Group triangles by their planes.
+		auto trisByPlane = std::unordered_map<Plane, std::vector<std::array<int, LocalCollisionTriangle::VERTEX_COUNT>>>{};
+		for (int i = 0; i < _ids.size(); i += LocalCollisionTriangle::VERTEX_COUNT)
+		{
+			// Get vertices.
+			const auto& vertex0 = _vertices[_ids[i]];
+			const auto& vertex1 = _vertices[_ids[i + 1]];
+			const auto& vertex2 = _vertices[_ids[i + 2]];
+
+			// Calculate edges.
+			auto edge0 = vertex1 - vertex0;
+			auto edge1 = vertex2 - vertex0;
+
+			// Calculate plane normal and distance.
+			auto normal = edge0.Cross(edge1);
+			normal.Normalize();
+			//normal = RoundNormal(normal, NORMAL_TOLERANCE);
+			float d = RoundToStep(normal.Dot(vertex0), PLANE_HEIGHT_STEP);
+
+			// Collect triangle by plane.
+			auto plane = Plane(normal, d);
+			trisByPlane[plane].push_back({ _ids[i], _ids[i + 1], _ids[i + 2] });
+		}
+
+		// Step 2: Merge coplanar triangles in each group
+		std::vector<int> optimizedIds;
+
+		for (const auto& [plane, tris] : trisByPlane)
+		{
+			// Build adjacency map for coplanar triangles
+			std::unordered_map<int, std::unordered_set<int>> adjacencyMap;
+
+			for (const auto& triangle : tris)
+			{
+				adjacencyMap[triangle[0]].insert(triangle[1]);
+				adjacencyMap[triangle[0]].insert(triangle[2]);
+				adjacencyMap[triangle[1]].insert(triangle[0]);
+				adjacencyMap[triangle[1]].insert(triangle[2]);
+				adjacencyMap[triangle[2]].insert(triangle[0]);
+				adjacencyMap[triangle[2]].insert(triangle[1]);
+			}
+
+			// Find connected components and merge
+			std::unordered_set<int> visited;
+			for (const auto& triangle : tris)
+			{
+				if (visited.count(triangle[0]) > 0)
+					continue;
+
+				std::vector<int> polygon;
+				int currentID = triangle[0];
+				do
+				{
+					polygon.push_back(currentID);
+					visited.insert(currentID);
+
+					// Find the next vertex in the loop
+					int nextID = -1;
+					for (int neighbor : adjacencyMap[currentID])
+					{
+						if (visited.count(neighbor) == 0) // Unvisited neighbor
+						{
+							nextID = neighbor;
+							break;
+						}
+					}
+
+					if (nextID == -1)
+					{
+						// If no valid next vertex, the loop is broken. Exit to prevent infinite loop.
+						break;
+					}
+
+					currentID = nextID;
+				} while (currentID != polygon[0]); // Back to starting vertex
+
+				// Triangulate the polygon (naive fan triangulation)
+				for (size_t i = 1; i < polygon.size() - 1; ++i)
+				{
+					optimizedIds.push_back(polygon[0]);
+					optimizedIds.push_back(polygon[i]);
+					optimizedIds.push_back(polygon[i + 1]);
+				}
+			}
+		}
+
+		// Step 3: Replace _ids with the optimized list
+		_ids = std::move(optimizedIds);
+	}
+
 	LocalCollisionTriangle::LocalCollisionTriangle(int vertex0ID, int vertex1ID, int vertex2ID)
 	{
 		_vertexIds[0] = vertex0ID;
