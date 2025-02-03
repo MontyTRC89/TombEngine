@@ -429,6 +429,10 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 	if (!data)
 		return;
 
+	// Don't process legacy triggers if trigger triggerer wasn't used
+	if (floor->Flags.MarkTriggerer && !floor->Flags.MarkTriggererActive)
+		return;
+
 	short triggerType = (*(data++) >> 8) & TRIGGER_BITS;
 	short flags = *(data++);
 	short timer = flags & TIMER_BITS;
@@ -841,6 +845,10 @@ void TestTriggers(ItemInfo* item, bool isHeavy, int heavyFlags)
 {
 	short roomNumber = item->RoomNumber;
 	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+
+	// Don't process legacy triggers if trigger triggerer wasn't used
+	if (floor->Flags.MarkTriggerer && !floor->Flags.MarkTriggererActive)
+		return;
 
 	TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, floor, (Activator)short(item->Index), isHeavy, heavyFlags);
 }
