@@ -87,7 +87,7 @@ static void StartEntity(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeLaraLoad;
-		obj->shadowType = ShadowMode::Lara;
+		obj->shadowType = ShadowMode::Player;
 		obj->HitPoints = 1000;
 		obj->usingDrawAnimatingItem = false;
 	}
