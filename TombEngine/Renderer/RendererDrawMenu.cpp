@@ -130,7 +130,7 @@ namespace TEN::Renderer
 		sprintf(stringBuffer, "%d x %d", screenResolution.x, screenResolution.y);
 
 		auto* shadowMode = g_Gui.GetCurrentSettings().Configuration.ShadowType != ShadowMode::None ?
-			(g_Gui.GetCurrentSettings().Configuration.ShadowType == ShadowMode::Lara ? STRING_SHADOWS_PLAYER : STRING_SHADOWS_ALL) : STRING_SHADOWS_NONE;
+			(g_Gui.GetCurrentSettings().Configuration.ShadowType == ShadowMode::Player ? STRING_SHADOWS_PLAYER : STRING_SHADOWS_ALL) : STRING_SHADOWS_NONE;
 
 		const char* antialiasMode;
 		switch (g_Gui.GetCurrentSettings().Configuration.AntialiasingMode)
