@@ -134,7 +134,7 @@ namespace TEN::Input
 		return bindingProfile;
 	}
 
-	int BindingManager::GetBoundKey(InputDeviceID deviceID, InputActionID actionID)
+	int BindingManager::GetBoundKeyID(InputDeviceID deviceID, InputActionID actionID)
 	{
 		// Find binding profile.
 		auto bindingProfileIt = _bindings.find(deviceID);

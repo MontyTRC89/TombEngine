@@ -227,7 +227,7 @@ namespace TEN::Input
 			for (int j = 0; j < (int)InputActionID::Count; j++)
 			{
 				auto actionID = (InputActionID)j;
-				if (g_Bindings.GetBoundKey(deviceID, actionID) != KC_UNASSIGNED)
+				if (g_Bindings.GetBoundKeyID(deviceID, actionID) != KC_UNASSIGNED)
 					return true;
 			}
 		}
@@ -261,10 +261,10 @@ namespace TEN::Input
 
 			g_Bindings.SetConflict(actionID, false);
 
-			int key = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, (InputActionID)i);
+			int key = g_Bindings.GetBoundKeyID(InputDeviceID::KeyboardMouse, (InputActionID)i);
 			for (int j = 0; j < (int)InputActionID::Count; j++)
 			{
-				if (key != g_Bindings.GetBoundKey(InputDeviceID::Custom, (InputActionID)j))
+				if (key != g_Bindings.GetBoundKeyID(InputDeviceID::Custom, (InputActionID)j))
 					continue;
 
 				g_Bindings.SetConflict(actionID, true);
@@ -278,19 +278,19 @@ namespace TEN::Input
 		for (int i = 0; i < (int)InputDeviceID::Count; i++)
 		{
 			auto deviceID = (InputDeviceID)i;
-			if (g_Bindings.GetBoundKey(deviceID, In::Forward) == keyID)
+			if (g_Bindings.GetBoundKeyID(deviceID, In::Forward) == keyID)
 			{
 				AxisMap[InputAxisID::Move].y = 1.0f;
 			}
-			else if (g_Bindings.GetBoundKey(deviceID, In::Back) == keyID)
+			else if (g_Bindings.GetBoundKeyID(deviceID, In::Back) == keyID)
 			{
 				AxisMap[InputAxisID::Move].y = -1.0f;
 			}
-			else if (g_Bindings.GetBoundKey(deviceID, In::Left) == keyID)
+			else if (g_Bindings.GetBoundKeyID(deviceID, In::Left) == keyID)
 			{
 				AxisMap[InputAxisID::Move].x = -1.0f;
 			}
-			else if (g_Bindings.GetBoundKey(deviceID, In::Right) == keyID)
+			else if (g_Bindings.GetBoundKeyID(deviceID, In::Right) == keyID)
 			{
 				AxisMap[InputAxisID::Move].x = 1.0f;
 			}
@@ -447,36 +447,36 @@ namespace TEN::Input
 				float scaledValue = (abs(normalizedValue) * AXIS_SCALE) + AXIS_OFFSET;
 
 				// Calculate and reset discrete input slots.
-				int negKey = (KEY_OFFSET_GAMEPAD + GAMEPAD_BUTTON_COUNT) + (axis * 2);
-				int posKey = (KEY_OFFSET_GAMEPAD + GAMEPAD_BUTTON_COUNT) + (axis * 2) + 1;
-				KeyMap[negKey] = (normalizedValue > 0) ? abs(normalizedValue) : 0.0f;
-				KeyMap[posKey] = (normalizedValue < 0) ? abs(normalizedValue) : 0.0f;
+				int negKeyID = (KEY_OFFSET_GAMEPAD + GAMEPAD_BUTTON_COUNT) + (axis * 2);
+				int posKeyID = (KEY_OFFSET_GAMEPAD + GAMEPAD_BUTTON_COUNT) + (axis * 2) + 1;
+				KeyMap[negKeyID] = (normalizedValue > 0) ? abs(normalizedValue) : 0.0f;
+				KeyMap[posKeyID] = (normalizedValue < 0) ? abs(normalizedValue) : 0.0f;
 
 				// Determine discrete input registering based on analog value.
-				int usedKey = (normalizedValue > 0) ? negKey : posKey;
+				int usedKeyID = (normalizedValue > 0) ? negKeyID : posKeyID;
 
 				// Register analog input in certain direction.
 				// If axis is bound as directional controls, register axis as directional input.
 				// Otherwise, register as camera movement input (for future).
 				// NOTE: abs() operations are needed to avoid issues with inverted axes on different controllers.
 
-				if (g_Bindings.GetBoundKey(InputDeviceID::Custom, In::Forward) == usedKey)
+				if (g_Bindings.GetBoundKeyID(InputDeviceID::Custom, In::Forward) == usedKeyID)
 				{
 					AxisMap[InputAxisID::Move].y = abs(scaledValue);
 				}
-				else if (g_Bindings.GetBoundKey(InputDeviceID::Custom, In::Back) == usedKey)
+				else if (g_Bindings.GetBoundKeyID(InputDeviceID::Custom, In::Back) == usedKeyID)
 				{
 					AxisMap[InputAxisID::Move].y = -abs(scaledValue);
 				}
-				else if (g_Bindings.GetBoundKey(InputDeviceID::Custom, In::Left)  == usedKey)
+				else if (g_Bindings.GetBoundKeyID(InputDeviceID::Custom, In::Left)  == usedKeyID)
 				{
 					AxisMap[InputAxisID::Move].x = -abs(scaledValue);
 				}
-				else if (g_Bindings.GetBoundKey(InputDeviceID::Custom, In::Right) == usedKey)
+				else if (g_Bindings.GetBoundKeyID(InputDeviceID::Custom, In::Right) == usedKeyID)
 				{
 					AxisMap[InputAxisID::Move].x = abs(scaledValue);
 				}
-				else if (!TestBoundKey(usedKey))
+				else if (!TestBoundKey(usedKeyID))
 				{
 					if ((axis % 2) == 0)
 					{
@@ -497,10 +497,10 @@ namespace TEN::Input
 					continue;
 
 				// Register multiple directional keypresses mapped to analog axes.
-				int baseIndex = (KEY_OFFSET_GAMEPAD + GAMEPAD_BUTTON_COUNT) + (GAMEPAD_AXIS_COUNT * 2);
+				int baseKeyID = (KEY_OFFSET_GAMEPAD + GAMEPAD_BUTTON_COUNT) + (GAMEPAD_AXIS_COUNT * 2);
 				for (int pass = 0; pass < GAMEPAD_POV_AXIS_COUNT; pass++)
 				{
-					unsigned int index = (KEY_OFFSET_GAMEPAD + GAMEPAD_BUTTON_COUNT) + (GAMEPAD_AXIS_COUNT * 2);
+					int keyID = (KEY_OFFSET_GAMEPAD + GAMEPAD_BUTTON_COUNT) + (GAMEPAD_AXIS_COUNT * 2);
 
 					switch (pass)
 					{
@@ -529,9 +529,9 @@ namespace TEN::Input
 						break;
 					}
 
-					index += pass;
-					KeyMap[index] = 1.0f;
-					SetDiscreteAxisValues(index);
+					keyID += pass;
+					KeyMap[keyID] = 1.0f;
+					SetDiscreteAxisValues(keyID);
 				}
 			}
 		}
@@ -550,7 +550,7 @@ namespace TEN::Input
 			if (deviceID == InputDeviceID::KeyboardMouse && g_Bindings.TestConflict(actionID))
 				continue;
 
-			int keyID = g_Bindings.GetBoundKey((InputDeviceID)i, actionID);
+			int keyID = g_Bindings.GetBoundKeyID((InputDeviceID)i, actionID);
 			if (KeyMap[keyID] != 0.0f)
 				return KeyMap[keyID];
 		}
@@ -737,8 +737,8 @@ namespace TEN::Input
 		{
 			auto actionID = (InputActionID)i;
 
-			int defaultKeyID = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, actionID);
-			int userKeyID = g_Bindings.GetBoundKey(InputDeviceID::Custom, actionID);
+			int defaultKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::KeyboardMouse, actionID);
+			int userKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Custom, actionID);
 
 			if (userKeyID != KC_UNASSIGNED &&
 				userKeyID != defaultKeyID)

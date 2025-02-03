@@ -474,7 +474,7 @@ bool LoadConfiguration()
 			sprintf(buffer, "Action%d", i);
 
 			auto actionID = (InputActionID)i;
-			int boundKeyID = g_Bindings.GetBoundKey(InputDeviceID::KeyboardMouse, actionID);
+			int boundKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::KeyboardMouse, actionID);
 
 			if (GetDWORDRegKey(inputKey, buffer, &tempKeyID, boundKeyID) != ERROR_SUCCESS)
 			{
@@ -586,7 +586,6 @@ LONG GetBoolRegKey(HKEY hKey, LPCSTR strValueName, bool* bValue, bool bDefaultVa
 
 	return nError;
 }
-
 
 LONG GetStringRegKey(HKEY hKey, LPCSTR strValueName, char** strValue, char* strDefaultValue)
 {

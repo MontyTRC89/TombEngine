@@ -40,7 +40,7 @@ namespace TEN::Input
 
 		// Getters
 
-		int					  GetBoundKey(InputDeviceID deviceID, InputActionID actionID);
+		int					  GetBoundKeyID(InputDeviceID deviceID, InputActionID actionID);
 		const BindingProfile& GetBindingProfile(InputDeviceID deviceID);
 
 		// Setters
