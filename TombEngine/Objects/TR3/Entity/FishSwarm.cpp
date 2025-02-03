@@ -147,7 +147,7 @@ namespace TEN::Entities::Creatures::TR3
 			float closestDist = INFINITY;
 			for (auto& targetItem : g_Level.Items)
 			{
-				if (!Objects.CheckID(targetItem.ObjectNumber) || targetItem.Index == itemNumber || targetItem.RoomNumber == NO_VALUE)
+				if (!Objects.CheckID(targetItem.ObjectNumber, true) || targetItem.Index == itemNumber || targetItem.RoomNumber == NO_VALUE)
 					continue;
 
 				if (SameZone(&creature, &targetItem) && item.TriggerFlags < 0)
@@ -184,7 +184,7 @@ namespace TEN::Entities::Creatures::TR3
 		// Follow path.
 		if (item.AIBits && !item.ItemFlags[4])
 		{
-			FindAITargetObject(item, ID_AI_FOLLOW, item.ItemFlags[3] + item.ItemFlags[2], false);
+			FindAITargetObject(&creature, ID_AI_FOLLOW, item.ItemFlags[3] + item.ItemFlags[2], false);
 
 			if (creature.AITarget->TriggerFlags == (item.ItemFlags[3] + item.ItemFlags[2]) &&
 				creature.AITarget->ObjectNumber == ID_AI_FOLLOW)

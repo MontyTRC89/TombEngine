@@ -58,15 +58,13 @@ constexpr auto SKY_INDICES_COUNT = 6 * SKY_TILES_COUNT * SKY_TILES_COUNT;
 constexpr auto SKY_TRIANGLES_COUNT = 2 * SKY_TILES_COUNT * SKY_TILES_COUNT;
 
 constexpr auto MAX_ROOMS_DRAW = 256;
-constexpr auto MAX_STATICS_DRAW = 128;
-constexpr auto MAX_EFFECTS_DRAW = 16;
 constexpr auto MAX_ITEMS_DRAW = 128;
 constexpr auto MAX_LIGHTS_DRAW = 48;
 constexpr auto MAX_FOG_BULBS_DRAW = 32;
 constexpr auto MAX_SPRITES_DRAW = 512;
 constexpr auto MAX_LENS_FLARES_DRAW = 8;
 
-constexpr auto ROOM_AMBIENT_MAP_SIZE = 32;
+constexpr auto ROOM_AMBIENT_MAP_SIZE = 64;
 constexpr auto MAX_ROOM_AMBIENT_MAPS = 10;
 
 enum class LightType
@@ -105,7 +103,7 @@ enum class CullMode
 enum class ShadowMode
 {
 	None,
-	Lara,
+	Player,
 	All
 };
 
@@ -228,7 +226,15 @@ enum class RendererPass
 	CollectTransparentFaces,
 	Additive,
 	GBuffer,
+	GunFlashes,
 	RoomAmbient
+};
+
+enum class SceneRenderMode
+{
+	Full,
+	NoHud,
+	NoPostprocess
 };
 
 enum class SpriteRenderType

@@ -8,18 +8,20 @@
 #include "Game/collision/Sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/Splash.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Setup.h"
 #include "Objects/Utils/VehicleHelpers.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
 using namespace TEN::Animation;
-using namespace TEN::Collision::Point;
-
 using namespace TEN::Collision::Sphere;
+using namespace TEN::Collision::Point;
+using namespace TEN::Effects::Splash;
 
 constexpr auto ROLLING_BALL_MAX_VELOCITY = BLOCK(3);
 
@@ -71,7 +73,7 @@ void RollingBallControl(short itemNumber)
 	int smallRadius = CLICK(0.5f);
 	int bigRadius   = CLICK(2) - 1;
 
-	item->Animation.Velocity.y += GRAVITY;
+	item->Animation.Velocity.y += g_GameFlow->GetSettings()->Physics.Gravity;
 	item->Pose.Position.x += item->ItemFlags[0] / hDivider;
 	item->Pose.Position.y += item->Animation.Velocity.y / vDivider;
 	item->Pose.Position.z += item->ItemFlags[1] / hDivider;
@@ -277,11 +279,9 @@ void RollingBallControl(short itemNumber)
 			!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item->RoomNumber))
 		{
 			int waterHeight = pointColl.GetWaterTopHeight();
-			SplashSetup.y = waterHeight - 1;
-			SplashSetup.x = item->Pose.Position.x;
-			SplashSetup.z = item->Pose.Position.z;
-			SplashSetup.splashPower = item->Animation.Velocity.y * 4;
-			SplashSetup.innerRadius = 160;
+			SplashSetup.Position = Vector3(item->Pose.Position.x, waterHeight - 1, item->Pose.Position.z);
+			SplashSetup.SplashPower = item->Animation.Velocity.y * 4;
+			SplashSetup.InnerRadius = 160;
 			SetupSplash(&SplashSetup, pointColl.GetRoomNumber());
 		}
 

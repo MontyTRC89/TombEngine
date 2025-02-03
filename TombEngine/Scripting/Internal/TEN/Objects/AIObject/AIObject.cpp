@@ -1,11 +1,12 @@
 #pragma once
-#include "framework.h"
 
-#include "AIObject.h"
-#include "Scripting/Internal/ScriptAssert.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
-#include "Scripting/Internal/ScriptUtil.h"
+#include "framework.h"
+#include "Scripting/Internal/TEN/Objects/AIObject/AIObject.h"
+
 #include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/ScriptAssert.h"
+#include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 /***
 AI object
 
@@ -131,17 +132,15 @@ std::string AIObject::GetName() const
 	return m_aiObject.Name;
 }
 
-void AIObject::SetName(std::string const & id) 
+void AIObject::SetName(const std::string& id)
 {
 	if (!ScriptAssert(!id.empty(), "Name cannot be blank. Not setting name."))
-	{
 		return;
-	}
 
-	if (s_callbackSetName(id, m_aiObject))
+	if (_callbackSetName(id, m_aiObject))
 	{
-		// remove the old name if we have one
-		s_callbackRemoveName(m_aiObject.Name);
+		// Remove old name if it exists.
+		_callbackRemoveName(m_aiObject.Name);
 		m_aiObject.Name = id;
 	}
 	else

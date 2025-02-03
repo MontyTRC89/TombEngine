@@ -24,8 +24,19 @@ static constexpr char ScriptReserved_AIObject[]			= "AIObject";
 static constexpr char ScriptReserved_Volume[]			= "Volume";
 static constexpr char ScriptReserved_Color[]			= "Color";
 static constexpr char ScriptReserved_DisplayString[]	= "DisplayString";
-static constexpr char ScriptReserved_Rotation[]			= "Rotation";
 static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
+static constexpr char ScriptReserved_Statistics[]		= "Statistics";
+
+// Settings sections
+static constexpr char ScriptReserved_Settings[]			= "Settings";
+static constexpr char ScriptReserved_SystemSettings[]	= "System";
+static constexpr char ScriptReserved_FlareSettings[]	= "Flare";
+static constexpr char ScriptReserved_CameraSettings[]	= "Camera";
+static constexpr char ScriptReserved_AnimSettings[]		= "Animations";
+static constexpr char ScriptReserved_HairSettings[]		= "Hair";
+static constexpr char ScriptReserved_HudSettings[]		= "Hud";
+static constexpr char ScriptReserved_PhysicsSettings[]	= "Physics";
+static constexpr char ScriptReserved_WeaponSettings[]	= "Weapons";
 
 // Moveable object
 static constexpr char ScriptReserved_Moveable[]			= "Moveable";
@@ -66,10 +77,14 @@ static constexpr char ScriptReserved_PreSave[]			= "PRESAVE";
 static constexpr char ScriptReserved_PostSave[]			= "POSTSAVE";
 static constexpr char ScriptReserved_PreLoad[]			= "PRELOAD";
 static constexpr char ScriptReserved_PostLoad[]			= "POSTLOAD";
+static constexpr char ScriptReserved_PreControlPhase[]	= "PRECONTROLPHASE";  // DEPRECATED
+static constexpr char ScriptReserved_PostControlPhase[]	= "POSTCONTROLPHASE"; // DEPRECATED
 static constexpr char ScriptReserved_PreLoop[]			= "PRELOOP";
 static constexpr char ScriptReserved_PostLoop[]			= "POSTLOOP";
-static constexpr char ScriptReserved_PreControlPhase[]	= "PRECONTROLPHASE";
-static constexpr char ScriptReserved_PostControlPhase[]	= "POSTCONTROLPHASE";
+static constexpr char ScriptReserved_PreUseItem[]		= "PREUSEITEM";
+static constexpr char ScriptReserved_PostUseItem[]		= "POSTUSEITEM";
+static constexpr char ScriptReserved_PreFreeze[]			= "PREFREEZE";
+static constexpr char ScriptReserved_PostFreeze[]		= "POSTFREEZE";
 
 // Built-in LevelFuncs
 static constexpr char ScriptReserved_OnStart[]			= "OnStart";
@@ -79,6 +94,7 @@ static constexpr char ScriptReserved_OnControlPhase[]	= "OnControlPhase"; // DEP
 static constexpr char ScriptReserved_OnSave[]			= "OnSave";
 static constexpr char ScriptReserved_OnEnd[]			= "OnEnd";
 static constexpr char ScriptReserved_OnUseItem[]		= "OnUseItem";
+static constexpr char ScriptReserved_OnFreeze[]			= "OnFreeze";
 
 // Event types (volume events + global events)
 static constexpr char ScriptReserved_EventOnEnter[]		= "ENTER";
@@ -90,12 +106,15 @@ static constexpr char ScriptReserved_EventOnLoop[]		= "LOOP";
 static constexpr char ScriptReserved_EventOnSave[]		= "SAVE";
 static constexpr char ScriptReserved_EventOnEnd[]		= "END";
 static constexpr char ScriptReserved_EventOnUseItem[]	= "USEITEM";
+static constexpr char ScriptReserved_EventOnFreeze[]	= "FREEZE";
 
 // Member functions
 static constexpr char ScriptReserved_New[]					= "New";
 static constexpr char ScriptReserved_Init[]					= "Init";
 static constexpr char ScriptReserved_Enable[]				= "Enable";
 static constexpr char ScriptReserved_Disable[]				= "Disable";
+static constexpr char ScriptReserved_GetCollidable[]		= "GetCollidable";
+static constexpr char ScriptReserved_SetCollidable[]		= "SetCollidable";
 static constexpr char ScriptReserved_MakeInvisible[]		= "MakeInvisible";
 static constexpr char ScriptReserved_SetVisible[]			= "SetVisible";
 static constexpr char ScriptReserved_Explode[]				= "Explode";
@@ -146,6 +165,7 @@ static constexpr char ScriptReserved_SetVelocity[]			= "SetVelocity";
 static constexpr char ScriptReserved_GetFrameNumber[]		= "GetFrame";
 static constexpr char ScriptReserved_GetEndFrame[]			= "GetEndFrame";
 static constexpr char ScriptReserved_SetFrameNumber[]		= "SetFrame";
+static constexpr char ScriptReserved_GetAnimSlot[]			= "GetAnimSlot";
 static constexpr char ScriptReserved_GetAnimNumber[]		= "GetAnim";
 static constexpr char ScriptReserved_SetAnimNumber[]		= "SetAnim";
 static constexpr char ScriptReserved_GetStateNumber[]		= "GetState";
@@ -206,10 +226,15 @@ static constexpr char ScriptReserved_GetCurrentLevel[]			= "GetCurrentLevel";
 static constexpr char ScriptReserved_SetIntroImagePath[]		= "SetIntroImagePath";
 static constexpr char ScriptReserved_SetTitleScreenImagePath[]	= "SetTitleScreenImagePath";
 static constexpr char ScriptReserved_SetFarView[]				= "SetFarView";
-static constexpr char ScriptReserved_SetSettings[]				= "SetSettings";
 static constexpr char ScriptReserved_SetAnimations[]			= "SetAnimations";
+static constexpr char ScriptReserved_GetSettings[]				= "GetSettings";
+static constexpr char ScriptReserved_SetSettings[]				= "SetSettings";
+static constexpr char ScriptReserved_GetStatistics[]			= "GetStatistics";
+static constexpr char ScriptReserved_SetStatistics[]			= "SetStatistics";
 static constexpr char ScriptReserved_EndLevel[]					= "EndLevel";
 static constexpr char ScriptReserved_GetGameStatus[]			= "GetGameStatus";
+static constexpr char ScriptReserved_SetFreezeMode[]			= "SetFreezeMode";
+static constexpr char ScriptReserved_GetFreezeMode[]			= "GetFreezeMode";
 static constexpr char ScriptReserved_SaveGame[]					= "SaveGame";
 static constexpr char ScriptReserved_LoadGame[]					= "LoadGame";
 static constexpr char ScriptReserved_DeleteSaveGame[]			= "DeleteSaveGame";
@@ -235,15 +260,16 @@ static constexpr char ScriptReserved_SetLanguageNames[]		= "SetLanguageNames";
 // Flow Tables
 static constexpr char ScriptReserved_WeatherType[]	  = "WeatherType";
 static constexpr char ScriptReserved_LaraType[]		  = "LaraType";
+static constexpr char ScriptReserved_WeaponType[]	  = "WeaponType";
+static constexpr char ScriptReserved_AmmoType[]		  = "AmmoType";
 static constexpr char ScriptReserved_RotationAxis[]	  = "RotationAxis";
 static constexpr char ScriptReserved_ItemAction[]	  = "ItemAction";
 static constexpr char ScriptReserved_ErrorMode[]	  = "ErrorMode";
 static constexpr char ScriptReserved_FastReload[]	  = "FastReload";
 static constexpr char ScriptReserved_InventoryItem[]  = "InventoryItem";
-static constexpr char ScriptReserved_LaraWeaponType[] = "LaraWeaponType";
-static constexpr char ScriptReserved_PlayerAmmoType[] = "PlayerAmmoType";
 static constexpr char ScriptReserved_HandStatus[]	  = "HandStatus";
 static constexpr char ScriptReserved_GameStatus[]	  = "GameStatus";
+static constexpr char ScriptReserved_FreezeMode[]	  = "FreezeMode";
 
 // Functions
 static constexpr char ScriptReserved_ShowString[]					= "ShowString";
@@ -294,10 +320,13 @@ static constexpr char ScriptReserved_EmitParticle[]					= "EmitParticle";
 static constexpr char ScriptReserved_EmitLightningArc[]				= "EmitLightningArc";
 static constexpr char ScriptReserved_EmitShockwave[]				= "EmitShockwave";
 static constexpr char ScriptReserved_EmitLight[]					= "EmitLight";
+static constexpr char ScriptReserved_EmitSpotLight[]				= "EmitSpotLight";
 static constexpr char ScriptReserved_EmitBlood[]					= "EmitBlood";
+static constexpr char ScriptReserved_EmitAirBubble[]				= "EmitAirBubble";
 static constexpr char ScriptReserved_EmitFire[]						= "EmitFire";
 static constexpr char ScriptReserved_MakeExplosion[]				= "MakeExplosion";
 static constexpr char ScriptReserved_MakeEarthquake[]				= "MakeEarthquake";
+static constexpr char ScriptReserved_GetWind[]		        		= "GetWind";
 static constexpr char ScriptReserved_Vibrate[]						= "Vibrate";
 static constexpr char ScriptReserved_FlashScreen[]					= "FlashScreen";
 static constexpr char ScriptReserved_FadeIn[]						= "FadeIn";
@@ -397,6 +426,7 @@ constexpr char ScriptReserved_Vec2Lerp[]			= "Lerp";
 constexpr char ScriptReserved_Vec2SetLength[]		= "ToLength";
 constexpr char ScriptReserved_Vec2Normalize[]		= "Normalize";
 constexpr char ScriptReserved_Vec2Rotate[]			= "Rotate";
+constexpr char ScriptReserved_Vec2Translate[]		= "Translate";
 
 // Vec3
 
@@ -408,3 +438,9 @@ constexpr char ScriptReserved_Vec3Length[]			= "Length";
 constexpr char ScriptReserved_Vec3Lerp[]			= "Lerp";
 constexpr char ScriptReserved_Vec3Normalize[]		= "Normalize";
 constexpr char ScriptReserved_Vec3Rotate[]			= "Rotate";
+constexpr char ScriptReserved_Vec3Translate[]		= "Translate";
+
+// Rotation object
+
+constexpr char ScriptReserved_Rotation[]			= "Rotation";
+constexpr char ScriptReserved_RotationDirection[]	= "Direction";

@@ -8,8 +8,8 @@ namespace TEN::Renderer::Structures
 {
 	struct RendererItem
 	{
-		int ItemNumber = 0;
-		int ObjectID   = 0;
+		int ItemNumber = NO_VALUE;
+		int ObjectID   = NO_VALUE;
 
 		Vector3 Position	= Vector3::Zero;
 		int		RoomNumber	= NO_VALUE;
@@ -17,7 +17,7 @@ namespace TEN::Renderer::Structures
 		Matrix	Translation = Matrix::Identity;
 		Matrix	Rotation	= Matrix::Identity;
 		Matrix	Scale		= Matrix::Identity;
-		Matrix	AnimationTransforms[BONE_COUNT] = {};
+		Matrix	AnimTransforms[BONE_COUNT] = {};
 
 		Quaternion BoneOrientations[BONE_COUNT] = {};
 

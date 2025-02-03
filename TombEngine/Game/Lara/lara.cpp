@@ -340,7 +340,9 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		break;
 	}
 
-	SaveGame::Statistics.Game.Distance += (int)round(Vector3i::Distance(prevPos, item->Pose.Position));
+	int deltaDist = (int)round(Vector3i::Distance(prevPos, item->Pose.Position));
+	SaveGame::Statistics.Game.Distance  += deltaDist;
+	SaveGame::Statistics.Level.Distance += deltaDist;
 
 	if (DebugMode)
 	{
@@ -622,6 +624,7 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 
 		ResetPlayerFlex(item);
 		InitializeLaraMeshes(item);
+		item->Animation.IsAirborne = false;
 		item->HitPoints = LARA_HEALTH_MAX;
 		player.Control.HandStatus = HandStatus::Free;
 	}

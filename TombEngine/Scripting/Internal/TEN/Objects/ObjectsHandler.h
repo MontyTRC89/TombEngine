@@ -131,7 +131,7 @@ private:
 		if (key.empty())
 			return false;
 
-		auto p = std::pair< const std::string&, VarMapVal>{ key, val };
+		auto p = std::pair<const std::string&, VarMapVal>(key, val);
 		return m_nameMap.insert(p).second;
 	}
 
@@ -143,5 +143,7 @@ private:
 	void FreeEntities() override
 	{
 		m_nameMap.clear();
+		m_collidingItemsToRemove.clear();
+		m_collidingItems.clear();
 	}
 };

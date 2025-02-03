@@ -71,7 +71,7 @@ static void RemoveRoomFlipItems(const ROOM_INFO& room)
 
 		// Clear bridge.
 		if (item.IsBridge())
-			UpdateBridgeItem(item, true);
+			UpdateBridgeItem(item, BridgeUpdateType::Remove);
 	}
 }
 
@@ -255,11 +255,11 @@ GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool getVisibilityBox)
 
 	if (getVisibilityBox)
 	{
-		bounds = StaticObjects[mesh.staticNumber].visibilityBox * mesh.scale;
+		bounds = Statics[mesh.staticNumber].visibilityBox * mesh.scale;
 	}
 	else
 	{
-		bounds = StaticObjects[mesh.staticNumber].collisionBox * mesh.scale;
+		bounds = Statics[mesh.staticNumber].collisionBox * mesh.scale;
 	}
 
 	return bounds;

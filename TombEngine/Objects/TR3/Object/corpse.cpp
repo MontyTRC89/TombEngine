@@ -11,17 +11,20 @@
 #include "Game/collision/floordata.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Ripple.h"
+#include "Game/effects/Splash.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
 using namespace TEN::Animation;
 using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Ripple;
+using namespace TEN::Effects::Splash;
 using namespace TEN::Math;
 
 namespace TEN::Entities::TR3
@@ -81,11 +84,9 @@ namespace TEN::Entities::TR3
 					!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item.RoomNumber))
 				{
 					int waterHeight = pointColl.GetWaterTopHeight();
-					SplashSetup.y = waterHeight - 1;
-					SplashSetup.x = item.Pose.Position.x;
-					SplashSetup.z = item.Pose.Position.z;
-					SplashSetup.splashPower = item.Animation.Velocity.y * 4;
-					SplashSetup.innerRadius = 160.0f;
+					SplashSetup.Position = Vector3(item.Pose.Position.x, waterHeight - 1, item.Pose.Position.z);
+					SplashSetup.SplashPower = item.Animation.Velocity.y * 4;
+					SplashSetup.InnerRadius = 160.0f;
 
 					SetupSplash(&SplashSetup, pointColl.GetRoomNumber());
 					item.Animation.Velocity.y = 0.0f;
@@ -126,7 +127,7 @@ namespace TEN::Entities::TR3
 				}
 				else
 				{
-					item.Animation.Velocity.y += GRAVITY;
+					item.Animation.Velocity.y += g_GameFlow->GetSettings()->Physics.Gravity;
 				}
 			}
 		}

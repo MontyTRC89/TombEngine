@@ -5,7 +5,7 @@
 #include "./VertexInput.hlsli"
 #include "./Blending.hlsli"
 #include "./AnimatedTextures.hlsli"
-//#include "./Shadows.hlsli"
+#include "./Shadows.hlsli"
 
 #define BONE_COUNT 32
 
@@ -154,6 +154,11 @@ PixelShaderOutput PS(PixelShaderInput input)
 			NumItemLights,
 			input.FogBulbs.w) :
 		StaticLight(input.Color.xyz, tex.xyz, input.FogBulbs.w);
+
+	float shadowable = step(0.5f, float((NumItemLights & SHADOWABLE_MASK) == SHADOWABLE_MASK));
+	float3 shadow = DoShadow(input.WorldPosition, normal, color, -0.5f);
+	shadow = DoBlobShadows(input.WorldPosition, shadow);
+	color = lerp(color, shadow, shadowable);
 
 	output.Color = saturate(float4(color * occlusion, tex.w));
 	output.Color = DoFogBulbsForPixel(output.Color, float4(input.FogBulbs.xyz, 1.0f));

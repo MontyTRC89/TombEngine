@@ -431,7 +431,7 @@ void LaraResetGravityStatus(ItemInfo* item, CollisionInfo* coll)
 void LaraSnapToHeight(ItemInfo* item, CollisionInfo* coll)
 {
 	if (TestEnvironment(ENV_FLAG_SWAMP, item) && coll->Middle.Floor > 0)
-		item->Pose.Position.y += SWAMP_GRAVITY;
+		item->Pose.Position.y += g_GameFlow->GetSettings()->Physics.Gravity / SWAMP_GRAVITY_COEFF;
 	else if (coll->Middle.Floor != NO_HEIGHT)
 		item->Pose.Position.y += coll->Middle.Floor;
 }
@@ -535,12 +535,8 @@ void LaraSwimCollision(ItemInfo* item, CollisionInfo* coll)
 		coll->Setup.ForwardAngle = item->Pose.Orientation.y;
 	}
 
-	int height = abs(LARA_HEIGHT * phd_sin(item->Pose.Orientation.x));
+	int height = std::max((int)abs(LARA_HEIGHT * phd_sin(item->Pose.Orientation.x)), LARA_HEIGHT_UNDERWATER);
 	auto offset = Vector3i(0, height / 2, 0);
-
-	auto level = g_GameFlow->GetLevel(CurrentLevel);
-	if (height < ((level->GetLaraType() == LaraType::Divesuit) << 6) + 200)
-		height = ((level->GetLaraType() == LaraType::Divesuit) << 6) + 200;
 
 	coll->Setup.UpperFloorBound = -CLICK(0.25f);
 	coll->Setup.Height = height;

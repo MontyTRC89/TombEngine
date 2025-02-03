@@ -5,8 +5,8 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
-#include "Scripting/Internal/TEN/Rotation/Rotation.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Specific/level.h"
 
 /***
@@ -90,9 +90,9 @@ void Volume::SetName(const std::string& name)
 		return;
 
 	// Remove previous name if it exists.
-	if (s_callbackSetName(name, _volume))
+	if (_callbackSetName(name, _volume))
 	{
-		s_callbackRemoveName(_volume.Name);
+		_callbackRemoveName(_volume.Name);
 		_volume.Name = name;
 	}
 	else

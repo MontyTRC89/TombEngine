@@ -5,9 +5,9 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Specific/LevelCameraInfo.h"
 #include "Specific/level.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
 
 /***
 Basic cameras that can point at Lara or at a CAMERA_TARGET.
@@ -90,14 +90,12 @@ std::string CameraObject::GetName() const
 void CameraObject::SetName(std::string const & id) 
 {
 	if (!ScriptAssert(!id.empty(), "Name cannot be blank. Not setting name."))
-	{
 		return;
-	}
 
-	if (s_callbackSetName(id, m_camera))
+	if (_callbackSetName(id, m_camera))
 	{
-		// remove the old name if we have one
-		s_callbackRemoveName(m_camera.Name);
+		// Remove old name if it exists.
+		_callbackRemoveName(m_camera.Name);
 		m_camera.Name = id;
 	}
 	else

@@ -17,6 +17,7 @@
 #include "Game/people.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 
@@ -66,7 +67,8 @@ namespace TEN::Entities::Creatures::TR5
 		spark->maxYvel = 0;
 		spark->gravity = 0;
 		spark->scalar = 1;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LENS_FLARE_LIGHT;
+		spark->SpriteSeqID = ID_DEFAULT_SPRITES;
+		spark->SpriteID = SPR_LENS_FLARE_LIGHT;
 		spark->dSize = spark->sSize = spark->size = (GetRandomControl() & 7) + 192;
 	}
 
@@ -92,7 +94,8 @@ namespace TEN::Entities::Creatures::TR5
 		spark->yVel = pos2->y + (GetRandomControl() & 0x7F) - pos1->y - 64;
 		spark->zVel = pos2->z + (GetRandomControl() & 0x7F) - pos1->z - 64;
 		spark->friction = 0;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLE_CLUSTER;
+		spark->SpriteSeqID = ID_DEFAULT_SPRITES;
+		spark->SpriteID = SPR_BUBBLE_CLUSTER;
 		spark->maxYvel = 0;
 		spark->gravity = -4 - (GetRandomControl() & 3);
 		spark->scalar = 1;
@@ -324,7 +327,7 @@ namespace TEN::Entities::Creatures::TR5
 			{
 				distance = BLOCK(16) - distance;
 				byte color = (GetRandomControl() & 0xF) + (distance / 128) + 64;
-				TriggerDynamicLight(target.x, target.y, target.z, (GetRandomControl() & 1) + (distance / 2048) + 12, color / 2, color, color / 2);
+				SpawnDynamicLight(target.x, target.y, target.z, (GetRandomControl() & 1) + (distance / 2048) + 12, color / 2, color, color / 2);
 			}
 		}
 
@@ -367,7 +370,9 @@ namespace TEN::Entities::Creatures::TR5
 			item->Animation.Velocity.z += (5.0f - item->Animation.Velocity.z) / 2.0f;
 		}
 		else
-			item->Animation.Velocity.y += GRAVITY;
+		{
+			item->Animation.Velocity.y += g_GameFlow->GetSettings()->Physics.Gravity;
+		}
 
 		item->Pose.Position.y += item->Animation.Velocity.y;
 

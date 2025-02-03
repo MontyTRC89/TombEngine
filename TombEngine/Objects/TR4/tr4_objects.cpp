@@ -11,7 +11,7 @@
 #include "Specific/level.h"
 
 // Creatures
-#include "Objects/TR4/Entity/Wraith.h"
+#include "Objects/TR4/Entity/Wraith.h" // OFF
 #include "Objects/TR4/Entity/tr4_enemy_jeep.h"
 #include "Objects/TR4/Entity/tr4_ahmet.h" // OK
 #include "Objects/TR4/Entity/tr4_baddy.h" // OK
@@ -626,7 +626,7 @@ namespace TEN::Entities
 		if (obj->loaded)
 		{
 			obj->Initialize = InitializeEnemyJeep;
-			obj->control = ControlEnemyJeep;
+			obj->control = EnemyJeepControl;
 			obj->collision = CreatureCollision;
 			obj->shadowType = ShadowMode::All;
 			obj->HitPoints = 40;
@@ -634,8 +634,8 @@ namespace TEN::Entities
 			obj->radius = 512;
 			obj->intelligent = true;
 			obj->damageType = DamageMode::None; // NOTE: Prevents enemy jeep from being killed with skidoo gun or something like that.
-			obj->LotType = LotType::EnemyJeep;
-			obj->SetBoneRotationFlags(8, ROT_X); // Wheel rotation.
+			obj->LotType = LotType::HumanPlusJumpAndMonkey;
+			obj->SetBoneRotationFlags(8, ROT_X);
 			obj->SetBoneRotationFlags(9, ROT_X);
 			obj->SetBoneRotationFlags(11, ROT_X);
 			obj->SetBoneRotationFlags(12, ROT_X);
@@ -962,7 +962,7 @@ namespace TEN::Entities
 		{
 			obj->Initialize = InitializeJeep;
 			obj->collision = JeepPlayerCollision;
-			obj->shadowType = ShadowMode::Lara;
+			obj->shadowType = ShadowMode::Player;
 			obj->SetHitEffect(true);
 		}
 
@@ -971,7 +971,7 @@ namespace TEN::Entities
 		{
 			obj->Initialize = InitializeMotorbike;
 			obj->collision = MotorbikePlayerCollision;
-			obj->shadowType = ShadowMode::Lara;
+			obj->shadowType = ShadowMode::Player;
 			obj->SetHitEffect(true);
 		}
 	}

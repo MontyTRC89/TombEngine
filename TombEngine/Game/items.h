@@ -12,7 +12,7 @@ using namespace TEN::Animation;
 using namespace TEN::Math;
 using namespace TEN::Utils;
 
-constexpr auto ITEM_COUNT_MAX  = 1024;
+constexpr auto MAX_SPAWNED_ITEM_COUNT = 256;
 constexpr auto ITEM_FLAG_COUNT = 8;
 
 constexpr auto NOT_TARGETABLE = SHRT_MIN / 2;
@@ -67,7 +67,7 @@ struct MoveableAnimBlendData
 	int			  FrameCount  = 0;
 	BezierCurve2D Curve		  = {};
 
-	Vector3							   RootPos			= Vector3::Zero;
+	Vector3							   RootPosition		= Vector3::Zero;
 	std::array<Quaternion, BONE_COUNT> BoneOrientations = {};
 
 	bool IsEnabled() const;
@@ -229,7 +229,7 @@ std::vector<int> FindAllItems(GAME_OBJECT_ID objectID);
 std::vector<int> FindCreatedItems(GAME_OBJECT_ID objectID);
 ItemInfo* FindItem(GAME_OBJECT_ID objectID);
 int FindItem(ItemInfo* item);
-void DoDamage(ItemInfo* item, int damage);
+void DoDamage(ItemInfo* item, int damage, bool silent = false);
 void DoItemHit(ItemInfo* target, int damage, bool isExplosive, bool allowBurn = true);
 void DefaultItemHit(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex);
 short SpawnItem(const ItemInfo& item, GAME_OBJECT_ID objectID);

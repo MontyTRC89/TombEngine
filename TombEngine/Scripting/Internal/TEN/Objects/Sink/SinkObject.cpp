@@ -5,7 +5,7 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 
 /***
 Sink
@@ -83,10 +83,10 @@ void Sink::SetName(const std::string& id)
 		return;
 	}
 
-	if (s_callbackSetName(id, m_sink))
+	if (_callbackSetName(id, m_sink))
 	{
 		// remove the old name if we have one
-		s_callbackRemoveName(m_sink.Name);
+		_callbackRemoveName(m_sink.Name);
 		m_sink.Name = id;
 	}
 	else

@@ -55,7 +55,7 @@ namespace TEN::Renderer
 		// Push skeleton.
 		bones[nextBoneID++] = rendererObject.Skeleton;
 
-		auto* transforms = (rendererItem == nullptr) ? rendererObject.AnimationTransforms.data() : &rendererItem->AnimationTransforms[0];
+		auto* transforms = (rendererItem == nullptr) ? rendererObject.AnimTransforms.data() : &rendererItem->AnimTransforms[0];
 
 		// Calculate blend alpha.
 		float blendAlpha = 0.0f;
@@ -96,7 +96,7 @@ namespace TEN::Renderer
 				// Apply blending.
 				if (blendData != nullptr)
 				{
-					rootPos = Vector3::Lerp(blendData->RootPos, rootPos, blendAlpha);
+					rootPos = Vector3::Lerp(blendData->RootPosition, rootPos, blendAlpha);
 
 					auto quat = Quaternion::Slerp(blendData->BoneOrientations[bone->Index], Quaternion::CreateFromRotationMatrix(rotMatrix), blendAlpha);
 					rotMatrix = Matrix::CreateFromQuaternion(quat);
@@ -313,9 +313,6 @@ namespace TEN::Renderer
 
 		const auto& frame = GetFrame(*nativeItem);
 		UpdateAnimation(itemToDraw, moveableObj, frame, UINT_MAX, false, nativeItem->Animation.Blend.IsEnabled() ? &nativeItem->Animation.Blend : nullptr);
-
-		for (int m = 0; m < obj->nmeshes; m++)
-			itemToDraw->InterpolatedAnimTransforms[m] = itemToDraw->InterpolatedAnimTransforms[m];
 	}
 
 	void Renderer::UpdateItemAnimations(RenderView& view)
@@ -461,7 +458,7 @@ namespace TEN::Renderer
 		if (itemNumber == LaraItem->Index)
 		{
 			auto& object = *_moveableObjects[ID_LARA];
-			*outMatrix = object.AnimationTransforms[jointIndex] * _laraWorldMatrix;
+			*outMatrix = object.AnimTransforms[jointIndex] * _playerWorldMatrix;
 		}
 		else
 		{
@@ -471,7 +468,7 @@ namespace TEN::Renderer
 			auto* nativeItem = &g_Level.Items[itemNumber];
 
 			auto& obj = *_moveableObjects[nativeItem->ObjectNumber];
-			*outMatrix = obj.AnimationTransforms[jointIndex] * rendererItem->World;
+			*outMatrix = obj.AnimTransforms[jointIndex] * rendererItem->World;
 		}
 	}
 
@@ -513,9 +510,9 @@ namespace TEN::Renderer
 		return g_Configuration.EnableHighFramerate ? (g_Renderer.GetScreenRefreshRate() / (float)FPS) : 1.0f;
 	}
 
-	float Renderer::GetInterpolationFactor() const
+	float Renderer::GetInterpolationFactor(bool forceRawValue) const
 	{
-		return _interpolationFactor;
+		return (forceRawValue || g_GameFlow->CurrentFreezeMode == FreezeMode::None) ? _interpolationFactor : 0.0f;
 	}
 
 	Vector2i Renderer::GetScreenResolution() const
@@ -601,6 +598,18 @@ namespace TEN::Renderer
 			boneID = 0;
 
 		return rendererItem->BoneOrientations[boneID];
+	}
+
+	bool Renderer::IsRoomReflected(RenderView& renderView, int roomNumber)
+	{
+		for (const auto& mirror : renderView.Mirrors)
+		{
+			// TODO: Avoid LaraItem global.
+			if (roomNumber == mirror.RoomNumber && (Camera.pos.RoomNumber == mirror.RoomNumber || LaraItem->RoomNumber == mirror.RoomNumber))
+				return true;
+		}
+
+		return false;
 	}
 
 	void Renderer::SaveScreenshot()
