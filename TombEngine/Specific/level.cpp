@@ -1074,6 +1074,7 @@ void FreeLevel(bool partial)
 	g_Level.PathfindingBoxes.resize(0);
 	g_Level.Overlaps.resize(0);
 	g_Level.Sprites.resize(0);
+	g_Level.Mirrors.resize(0);
 	g_Level.SoundDetails.resize(0);
 	g_Level.SoundMap.resize(0);
 	g_Level.FloorData.resize(0);
@@ -1126,7 +1127,7 @@ void LoadAnimatedTextures()
 		auto sequence = ANIMATED_TEXTURES_SEQUENCE{};
 		sequence.atlas = ReadInt32();
 		sequence.Fps = ReadInt32();
-		sequence.numFrames = ReadInt32();
+		sequence.numFrames = ReadCount();
 
 		for (int j = 0; j < sequence.numFrames; j++)
 		{
@@ -1428,6 +1429,7 @@ bool LoadLevel(const std::string& path, bool partial)
 
 			LoadSprites();
 			LoadBoxes();
+			LoadMirrors();
 			LoadAnimatedTextures();
 			UpdateProgress(70);
 
@@ -1579,6 +1581,33 @@ void LoadBoxes()
 	{
 		if (g_Level.PathfindingBoxes[i].flags & BLOCKABLE)
 			g_Level.PathfindingBoxes[i].flags |= BLOCKED;
+	}
+}
+
+void LoadMirrors()
+{
+	int mirrorCount = ReadCount();
+	TENLog("Mirror count: " + std::to_string(mirrorCount), LogLevel::Info);
+	g_Level.Mirrors.reserve(mirrorCount);
+
+	for (int i = 0; i < mirrorCount; i++)
+	{
+		auto& mirror = g_Level.Mirrors.emplace_back();
+
+		mirror.RoomNumber = ReadInt16(); // TODO: Write Int32 to level instead. Short isn't used for room numbers anymore.
+		mirror.Plane.x = ReadFloat();
+		mirror.Plane.y = ReadFloat();
+		mirror.Plane.z = ReadFloat();
+		mirror.Plane.w = ReadFloat();
+
+		mirror.ReflectPlayer = ReadBool();
+		mirror.ReflectMoveables = ReadBool();
+		mirror.ReflectStatics = ReadBool();
+		mirror.ReflectSprites = ReadBool();
+		mirror.ReflectLights = ReadBool();
+		mirror.Enabled = true;
+
+		mirror.ReflectionMatrix = Matrix::CreateReflection(mirror.Plane);
 	}
 }
 

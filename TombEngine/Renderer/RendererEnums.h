@@ -103,7 +103,7 @@ enum class CullMode
 enum class ShadowMode
 {
 	None,
-	Lara,
+	Player,
 	All
 };
 
@@ -226,6 +226,7 @@ enum class RendererPass
 	CollectTransparentFaces,
 	Additive,
 	GBuffer,
+	GunFlashes,
 	RoomAmbient
 };
 

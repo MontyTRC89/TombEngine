@@ -4,14 +4,15 @@ namespace TEN::Scripting
 {
 	class Time
 	{
+	public:
+		static void Register(sol::table& parent);
+
 	private:
-		// Members
+		// Fields
 
 		int _frameCount = 0;
 
 	public:
-		static void Register(sol::table& parent);
-
 		// Constructors
 
 		Time() = default;
@@ -42,13 +43,13 @@ namespace TEN::Scripting
 
 		// Operators
 
+		bool  operator <(const Time& time) const;
+		bool  operator <=(const Time& time) const;
+		bool  operator ==(const Time& time) const;
 		Time  operator +(int frameCount) const;
 		Time  operator -(int frameCount) const;
 		Time  operator +(const Time& time) const;
 		Time  operator -(const Time& time) const;
-		Time  operator <(const Time& time) const;
-		Time  operator <=(const Time& time) const;
-		bool  operator ==(const Time& time) const;
 		Time& operator +=(const Time& time);
 		Time& operator -=(const Time& time);
 		Time& Time::operator ++();

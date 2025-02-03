@@ -14,11 +14,13 @@
 #include "Renderer/RenderView.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Animation;
 using namespace TEN::Collision::Sphere;
 using namespace TEN::Entities::Effects;
 using namespace TEN::Math;
+using namespace TEN::Utils;
 
 namespace TEN::Renderer
 {
@@ -356,108 +358,136 @@ namespace TEN::Renderer
 		_visitedRoomsStack.pop_back();
 	}
 
+	void Renderer::CollectMirrors(RenderView& renderView)
+	{
+		// Collect mirrors first because they are needed while collecting moveables.
+		for (const auto& mirror : g_Level.Mirrors)
+		{
+			// TODO: Avoid LaraItem global.
+			if (mirror.RoomNumber != Camera.pos.RoomNumber && mirror.RoomNumber != LaraItem->RoomNumber)
+				continue;
+
+			if (!mirror.Enabled)
+				continue;
+
+			auto& rendererMirror = renderView.Mirrors.emplace_back();
+			rendererMirror.RoomNumber = mirror.RoomNumber;
+			rendererMirror.ReflectionMatrix = mirror.ReflectionMatrix;
+			rendererMirror.ReflectPlayer = mirror.ReflectPlayer;
+			rendererMirror.ReflectMoveables = mirror.ReflectMoveables;
+			rendererMirror.ReflectStatics = mirror.ReflectStatics;
+			rendererMirror.ReflectSprites = mirror.ReflectSprites;
+			rendererMirror.ReflectLights = mirror.ReflectLights;
+		}
+	}
+
 	void Renderer::CollectItems(short roomNumber, RenderView& renderView)
 	{
-		if (_rooms.size() < roomNumber)
+		if (_rooms.size() <= roomNumber)
 			return;
 
-		auto& room = _rooms[roomNumber];
-		auto* r = &g_Level.Rooms[room.RoomNumber];
+		auto& rendererRoom = _rooms[roomNumber];
+		const auto& room = g_Level.Rooms[rendererRoom.RoomNumber];
 
-		short itemNum = NO_VALUE;
-		for (itemNum = r->itemNumber; itemNum != NO_VALUE; itemNum = g_Level.Items[itemNum].NextItem)
+		bool isRoomReflected = IsRoomReflected(renderView, roomNumber);
+
+		short itemNumber = NO_VALUE;
+		for (itemNumber = room.itemNumber; itemNumber != NO_VALUE; itemNumber = g_Level.Items[itemNumber].NextItem)
 		{
-			auto* item = &g_Level.Items[itemNum];
+			const auto& item = g_Level.Items[itemNumber];
 
-			if (item->ObjectNumber == ID_LARA && itemNum == g_Level.Items[itemNum].NextItem)
+			if (item.ObjectNumber == ID_LARA && itemNumber == g_Level.Items[itemNumber].NextItem)
 				break;
 
-			if (item->Status == ITEM_INVISIBLE)
+			if (item.Status == ITEM_INVISIBLE)
 				continue;
 
-			if (item->ObjectNumber == ID_LARA && (Lara.Control.Look.OpticRange || SpotcamOverlay || SpotcamDontDrawLara))
+			if (item.ObjectNumber == ID_LARA && (SpotcamOverlay || SpotcamDontDrawLara))
 				continue;
 
-			if (item->ObjectNumber == ID_LARA && CurrentLevel == 0 && !g_GameFlow->IsLaraInTitleEnabled())
+			if (item.ObjectNumber == ID_LARA && CurrentLevel == 0 && !g_GameFlow->IsLaraInTitleEnabled())
 				continue;
 
-			if (!_moveableObjects[item->ObjectNumber].has_value())
+			if (!_moveableObjects[item.ObjectNumber].has_value())
 				continue;
 
-			auto& obj = _moveableObjects[item->ObjectNumber].value();
+			auto& obj = _moveableObjects[item.ObjectNumber].value();
 
 			if (obj.DoNotDraw)
 				continue;
 
-			// Clip object by frustum only if it doesn't cast shadows. Otherwise we may see
-			// disappearing shadows if object gets out of frustum.
-
-			if (obj.ShadowType == ShadowMode::None)
+			// Clip object by frustum only if it doesn't cast shadows and is not in mirror room,
+			// otherwise disappearing shadows or reflections may be seen if object gets out of frustum.
+			if (!isRoomReflected && obj.ShadowType == ShadowMode::None)
 			{
 				// Get all spheres and check if frustum intersects any of them.
-				auto spheres = GetSpheres(itemNum);
+				auto spheres = GetSpheres(itemNumber);
 
 				bool inFrustum = false;
 				for (int i = 0; !inFrustum, i < spheres.size(); i++)
+				{
 					// Blow up sphere radius by half for cases of too small calculated spheres.
 					if (renderView.Camera.Frustum.SphereInFrustum(spheres[i].Center, spheres[i].Radius * 1.5f))
 						inFrustum = true;
+				}
 
 				if (!inFrustum)
 					continue;
 			}
 
-			auto newItem = &_items[itemNum];
+			auto& newItem = _items[itemNumber];
 
-			newItem->ItemNumber = itemNum;
-			newItem->ObjectID = item->ObjectNumber;
-			newItem->Color = item->Model.Color;
-			newItem->Position = item->Pose.Position.ToVector3();
-			newItem->Translation = Matrix::CreateTranslation(newItem->Position.x, newItem->Position.y, newItem->Position.z);
-			newItem->Rotation = item->Pose.Orientation.ToRotationMatrix();
-			newItem->Scale = Matrix::CreateScale(1.0f);
-			newItem->World = newItem->Rotation * newItem->Translation;
+			newItem.ItemNumber = itemNumber;
+			newItem.ObjectID = item.ObjectNumber;
+			newItem.Color = item.Model.Color;
+			newItem.Position = item.Pose.Position.ToVector3();
+			newItem.Translation = Matrix::CreateTranslation(newItem.Position);
+			newItem.Rotation = item.Pose.Orientation.ToRotationMatrix();
+			newItem.Scale = Matrix::CreateScale(item.Pose.Scale);
+			newItem.World = newItem.Scale * newItem.Rotation * newItem.Translation;
 
 			// Disable interpolation either when renderer slot or item slot has flag. 
-			// Renderer slot has no interpolation flag set in case it is fetched for the first time (e.g. item first time in frustum).
-			newItem->DisableInterpolation = item->DisableInterpolation || newItem->DisableInterpolation;
+			// Renderer slot has no interpolation flag set in case it is fetched for first time (e.g. item first time in frustum).
+			newItem.DisableInterpolation = item.DisableInterpolation || newItem.DisableInterpolation;
 
-			if (newItem->DisableInterpolation)
+			if (newItem.DisableInterpolation)
 			{
-				// NOTE: Interpolation alwasy returns same result.
-				newItem->PrevPosition = newItem->Position;
-				newItem->PrevTranslation = newItem->Translation;
-				newItem->PrevRotation = newItem->Rotation;
-				newItem->PrevWorld = newItem->World;
+				// NOTE: Interpolation always returns same result.
+				newItem.PrevPosition = newItem.Position;
+				newItem.PrevTranslation = newItem.Translation;
+				newItem.PrevRotation = newItem.Rotation;
+				newItem.PrevScale = newItem.Scale;
+				newItem.PrevWorld = newItem.World;
 
-				// Otherwise all frames until the next ControlPhase will not be interpolated.
-				newItem->DisableInterpolation = false;
+				// Otherwise all frames until next ControlPhase will not be interpolated.
+				newItem.DisableInterpolation = false;
 				
 				for (int j = 0; j < MAX_BONES; j++)
-					newItem->PrevAnimTransforms[j] = newItem->AnimTransforms[j];
+					newItem.PrevAnimTransforms[j] = newItem.AnimTransforms[j];
 			}
 
-			// Force interpolation only for Lara in player freeze mode.
-			bool forceValue = g_GameFlow->CurrentFreezeMode == FreezeMode::Player && item->ObjectNumber == ID_LARA;
+			// Force interpolation only for player in player freeze mode.
+			bool forceValue = g_GameFlow->CurrentFreezeMode == FreezeMode::Player && item.ObjectNumber == ID_LARA;
 
-			newItem->InterpolatedPosition = Vector3::Lerp(newItem->PrevPosition, newItem->Position, GetInterpolationFactor(forceValue));
-			newItem->InterpolatedTranslation = Matrix::Lerp(newItem->PrevTranslation, newItem->Translation, GetInterpolationFactor(forceValue));
-			newItem->InterpolatedRotation = Matrix::Lerp(newItem->InterpolatedRotation, newItem->Rotation, GetInterpolationFactor(forceValue));
-			newItem->InterpolatedWorld = Matrix::Lerp(newItem->PrevWorld, newItem->World, GetInterpolationFactor(forceValue));
+			newItem.InterpolatedPosition = Vector3::Lerp(newItem.PrevPosition, newItem.Position, GetInterpolationFactor(forceValue));
+			newItem.InterpolatedTranslation = Matrix::Lerp(newItem.PrevTranslation, newItem.Translation, GetInterpolationFactor(forceValue));
+			newItem.InterpolatedRotation = Matrix::Lerp(newItem.InterpolatedRotation, newItem.Rotation, GetInterpolationFactor(forceValue));
+			newItem.InterpolatedScale = Matrix::Lerp(newItem.InterpolatedScale, newItem.Scale, GetInterpolationFactor(forceValue));
+			newItem.InterpolatedWorld = Matrix::Lerp(newItem.PrevWorld, newItem.World, GetInterpolationFactor(forceValue));
 			
 			for (int j = 0; j < MAX_BONES; j++)
-				newItem->InterpolatedAnimTransforms[j] = Matrix::Lerp(newItem->PrevAnimTransforms[j], newItem->AnimTransforms[j], GetInterpolationFactor(forceValue));
+				newItem.InterpolatedAnimTransforms[j] = Matrix::Lerp(newItem.PrevAnimTransforms[j], newItem.AnimTransforms[j], GetInterpolationFactor(forceValue));
 
-			CalculateLightFades(newItem);
-			CollectLightsForItem(newItem);
+			CalculateLightFades(&newItem);
+			CollectLightsForItem(&newItem);
 
-			room.ItemsToDraw.push_back(newItem);
+			rendererRoom.ItemsToDraw.push_back(&newItem);
 		}
 	}
 
 	void Renderer::CollectStatics(short roomNumber, RenderView& renderView)
 	{
-		if (_rooms.size() < roomNumber)
+		if (_rooms.size() <= roomNumber)
 			return;
 
 		auto& room = _rooms[roomNumber];
@@ -465,6 +495,8 @@ namespace TEN::Renderer
 
 		if (r->mesh.empty())
 			return;
+
+		bool isRoomReflected = IsRoomReflected(renderView, roomNumber);
 
 		for (int i = 0; i < room.Statics.size(); i++)
 		{
@@ -494,9 +526,9 @@ namespace TEN::Renderer
 			if (obj.ObjectMeshes.empty())
 				continue;
 
-			if (!renderView.Camera.Frustum.SphereInFrustum(mesh->Sphere.Center, mesh->Sphere.Radius))
+			if (!isRoomReflected && !renderView.Camera.Frustum.SphereInFrustum(mesh->Sphere.Center, mesh->Sphere.Radius))
 				continue;
-			 
+
 			// Collect the lights
 			std::vector<RendererLight*> lights;
 			std::vector<RendererLightNode> cachedRoomLights;
@@ -511,7 +543,7 @@ namespace TEN::Renderer
 				}
 				else
 				{
-					// Collecy only dynamic lights and use cached lights from rooms
+					// Collect only dynamic lights and use cached lights from rooms
 					CollectLights(mesh->Pose.Position.ToVector3(), 1024, room.RoomNumber, NO_VALUE, false, true, &mesh->CachedRoomLights, &lights);
 				}
 			}
@@ -537,45 +569,38 @@ namespace TEN::Renderer
 		// Now collect lights from dynamic list and from rooms
 		std::vector<RendererLightNode> tempLights;
 		tempLights.reserve(MAX_LIGHTS_DRAW);
-		
+
 		auto& room = _rooms[roomNumber];
 
 		RendererLight* brightestLight = nullptr;
-		float highestIntensity = 0.0f;
-
-		auto calculateIntensity = [](float distSqr, const RendererLight& light, float radius) -> std::optional<float>
-		{
-			if (distSqr >= SQUARE(BLOCK(20)) || distSqr > SQUARE(light.Out + radius))
-				return std::nullopt; // Light is too far.
-
-			float distance = sqrt(distSqr);
-			float attenuation = 1.0f - distance / light.Out;
-			return attenuation * light.Intensity * light.Luma;
-		};
-
-		auto processLight = [&](RendererLight& light, float distSqr, int dynamicFlag)
-		{
-			float distance = sqrt(distSqr);
-			float intensity = calculateIntensity(distSqr, light, radius).value_or(0.0f);
-
-			if (intensity <= EPSILON)
-				return;
-
-			if ((light.Type == LightType::Point || light.Type == LightType::Spot) &&
-				 light.CastShadows && prioritizeShadowLight && intensity >= highestIntensity)
-			{
-				highestIntensity = intensity;
-				brightestLight = &light;
-			}
-
-			tempLights.push_back({ &light, intensity, distance, dynamicFlag });
-		};
+		float brightest = 0.0f;
 
 		// Dynamic lights have the priority
 		for (auto& light : _dynamicLights[_dynamicLightList])
 		{
 			float distSqr = Vector3::DistanceSquared(pos, light.Position);
-			processLight(light, distSqr, 1);
+
+			// Collect only lights nearer than 20 sectors
+			if (distSqr >= SQUARE(BLOCK(20)))
+				continue;
+
+			// Check the out radius
+			if (distSqr > SQUARE(light.Out + radius))
+				continue;
+
+			float distance = sqrt(distSqr);
+			float attenuation = 1.0f - distance / light.Out;
+			float intensity = attenuation * light.Intensity * light.Luma;
+
+			// If collecting shadows, try collecting shadow-casting light.
+			if (prioritizeShadowLight && light.CastShadows && intensity >= brightest)
+			{
+				brightest = intensity;
+				brightestLight = &light;
+			}
+
+			RendererLightNode node = { &light, intensity, distance, 1 };
+			tempLights.push_back(node);
 		}
 
 		if (!useCachedRoomLights)
@@ -584,8 +609,15 @@ namespace TEN::Renderer
 			for (int roomToCheck : room.Neighbors)
 			{
 				auto& currentRoom = _rooms[roomToCheck];
-				for (auto& light : currentRoom.Lights)
+				int lightCount = (int)currentRoom.Lights.size();
+
+				for (int j = 0; j < lightCount; j++)
 				{
+					auto& light = currentRoom.Lights[j];
+
+					float intensity = 0;
+					float dist = 0;
+
 					// Check only lights different from sun.
 					if (light.Type == LightType::Sun)
 					{
@@ -594,25 +626,66 @@ namespace TEN::Renderer
 							continue;
 
 						// Sun is added without distance checks.
-						float intensity = light.Intensity * Luma(light.Color);
-						RendererLightNode node = { &light, intensity, 0.0f, 0 };
-						tempLights.push_back(node);
-
-						if (roomsLights != nullptr)
-							roomsLights->push_back(node);
+						intensity = light.Intensity * Luma(light.Color);
 					}
-					else if (light.Type == LightType::Point || 
-							 light.Type == LightType::Shadow ||
-							 light.Type == LightType::Spot)
+					else if (light.Type == LightType::Point || light.Type == LightType::Shadow)
 					{
 						float distSqr = Vector3::DistanceSquared(pos, light.Position);
-						processLight(light, distSqr, 0);
+
+						// Collect only lights nearer than 20 blocks.
+						if (distSqr >= SQUARE(BLOCK(20)))
+							continue;
+
+						// Check out radius.
+						if (distSqr > SQUARE(light.Out + radius))
+							continue;
+
+						dist = sqrt(distSqr);
+						float attenuation = 1.0f - dist / light.Out;
+						intensity = attenuation * light.Intensity * Luma(light.Color);
+
+						// If collecting shadows, try collecting shadow-casting light.
+						if (prioritizeShadowLight && light.CastShadows && light.Type == LightType::Point && intensity >= brightest)
+						{
+							brightest = intensity;
+							brightestLight = &light;
+						}
+					}
+					else if (light.Type == LightType::Spot)
+					{
+						float distSqr = Vector3::DistanceSquared(pos, light.Position);
+
+						// Collect only lights nearer than 20 blocks.
+						if (distSqr >= SQUARE(BLOCK(20)))
+							continue;
+
+						// Check range.
+						if (distSqr > SQUARE(light.Out + radius))
+							continue;
+
+						dist = sqrt(distSqr);
+						float attenuation = 1.0f - dist / light.Out;
+						intensity = attenuation * light.Intensity * light.Luma;
+
+						// If collecting shadows, try collecting shadow-casting light.
+						if (prioritizeShadowLight && light.CastShadows && intensity >= brightest)
+						{
+							brightest = intensity;
+							brightestLight = &light;
+						}
 					}
 					else
 					{
 						// Invalid light type.
 						continue;
 					}
+
+					RendererLightNode node = { &light, intensity, dist, 0 };
+
+					if (roomsLights != nullptr)
+						roomsLights->push_back(node);
+
+					tempLights.push_back(node);
 				}
 			}
 		}
@@ -634,7 +707,7 @@ namespace TEN::Renderer
 		// Put actual lights in provided vector.
 		outputLights->clear();
 
-		// Add brightest light, if collecting shadow light is specified, even if it's far in range.
+		// Add brightest ligh, if collecting shadow light is specified, even if it's far in range.
 		if (prioritizeShadowLight && brightestLight)
 			outputLights->push_back(brightestLight);
 
@@ -717,14 +790,12 @@ namespace TEN::Renderer
 
 	void Renderer::CollectLightsForRoom(short roomNumber, RenderView &renderView)
 	{
-		if (_rooms.size() < roomNumber)
-		{
+		if (_rooms.size() <= roomNumber)
 			return;
-		}
 
 		RendererRoom& room = _rooms[roomNumber];
 		ROOM_INFO* r = &g_Level.Rooms[roomNumber];
-		
+
 		// Collect dynamic lights for rooms
 		for (int i = 0; i < _dynamicLights[_dynamicLightList].size(); i++)
 		{
@@ -761,7 +832,7 @@ namespace TEN::Renderer
 
 	void Renderer::CollectEffects(short roomNumber)
 	{
-		if (_rooms.size() < roomNumber)
+		if (_rooms.size() <= roomNumber)
 			return;
 
 		RendererRoom& room = _rooms[roomNumber];

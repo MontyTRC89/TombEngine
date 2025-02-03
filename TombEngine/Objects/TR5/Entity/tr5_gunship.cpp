@@ -98,7 +98,7 @@ namespace TEN::Entities::Creatures::TR5
 				if (GunShipCounter >= 15)
 					return AnimateItem(*item);
 
-				TriggerDynamicLight(
+				SpawnDynamicLight(
 					origin.x, origin.y, origin.z, 16,
 					(GetRandomControl() & 0x3F) + 96,
 					(GetRandomControl() & 0x1F) + 64,
@@ -137,7 +137,7 @@ namespace TEN::Entities::Creatures::TR5
 				}
 				else
 				{
-					TriggerDynamicLight(
+					SpawnDynamicLight(
 						origin.x, origin.y, origin.z,
 						16,
 						(GetRandomControl() & 0x3F) + 96,

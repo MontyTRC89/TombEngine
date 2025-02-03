@@ -73,7 +73,8 @@ namespace TEN::Entities::Generic
 		spark->dSize = spark->size / 8;
 
 		int spriteOffset = GlobalCounter % Objects[ID_FIRE_SPRITES].nmeshes;
-		spark->spriteIndex = Objects[ID_FIRE_SPRITES].meshIndex + spriteOffset;
+		spark->SpriteSeqID = ID_FIRE_SPRITES;
+		spark->SpriteID = spriteOffset;
 	}
 
 	void DoFlameTorch()
@@ -190,7 +191,7 @@ namespace TEN::Entities::Generic
 				Random::GenerateFloat(0.4f, 0.5f),
 				0.0f);
 			float lightFalloff = Random::GenerateFloat(0.04f, 0.045f);
-			TriggerDynamicLight(pos.x, pos.y, pos.z, lightFalloff * UCHAR_MAX, lightColor.R() * UCHAR_MAX, lightColor.G() * UCHAR_MAX, lightColor.B() * UCHAR_MAX);
+			SpawnDynamicLight(pos.x, pos.y, pos.z, lightFalloff * UCHAR_MAX, lightColor.R() * UCHAR_MAX, lightColor.G() * UCHAR_MAX, lightColor.B() * UCHAR_MAX);
 
 			if (!(Wibble & 3))
 				TriggerTorchFlame(laraItem->Index, 0);
@@ -289,39 +290,12 @@ namespace TEN::Entities::Generic
 				Random::GenerateFloat(0.4f, 0.5f),
 				0.0f);
 			float lightFalloff = Random::GenerateFloat(0.04f, 0.045f);
-			TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, lightFalloff * UCHAR_MAX, lightColor.R() * UCHAR_MAX, lightColor.G() * UCHAR_MAX, lightColor.B() * UCHAR_MAX);
+			SpawnDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, lightFalloff * UCHAR_MAX, lightColor.R() * UCHAR_MAX, lightColor.G() * UCHAR_MAX, lightColor.B() * UCHAR_MAX);
 			
 			if (!(Wibble & 7))
 				TriggerTorchFlame(itemNumber, 1);
 
 			SoundEffect(SFX_TR4_LOOP_FOR_SMALL_FIRES, &item->Pose);
-		}
-	}
-
-	void LaraTorch(Vector3i* origin, Vector3i* target)
-	{
-		auto pos1 = GameVector(*origin, LaraItem->RoomNumber);
-		auto pos2 = GameVector(*target);
-
-		const auto& color = g_GameFlow->GetSettings()->Camera.BinocularLightColor;
-
-		TriggerDynamicLight(pos1.x, pos1.y, pos1.z, 12, color.GetR(), color.GetG(), color.GetB());
-
-		if (!LOS(&pos1, &pos2))
-		{
-			int l = sqrt(pow(pos1.x - pos2.x, 2) + pow(pos1.y - pos2.y, 2) + pow(pos1.z - pos2.z, 2)) * CLICK(1);
-
-			if (l + 8 > 31)
-				l = 31;
-
-			auto dir = pos1.ToVector3() - pos2.ToVector3();
-			dir.Normalize();
-			dir *= BLOCK(1);
-
-			byte r = std::max(0, color.GetR() - l);
-			byte g = std::max(0, color.GetG() - l);
-			byte b = std::max(0, color.GetB() - l);
-			TriggerDynamicLight(pos2.x + dir.x, pos2.y + dir.y, pos2.z + dir.z, l + 12, r, g, b);
 		}
 	}
 

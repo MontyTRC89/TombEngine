@@ -263,6 +263,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 	{
 		Lara.Control.Weapon.HasFired = true;
 		Lara.Control.Weapon.Fired = true;
+		Lara.RightArm.GunFlash = Weapons[(int)Lara.Control.Weapon.GunType].FlashTime;
 
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
 			SoundEffect(SFX_TR4_REVOLVER_FIRE, nullptr);
@@ -441,12 +442,6 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 			if (isFiring && !result)
 				TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y);
 		}
-	}
-
-	if (drawTarget && (hasHit || !result))
-	{
-		auto& color = g_GameFlow->GetSettings()->Camera.LasersightLightColor;
-		TriggerDynamicLight(target2.x, target2.y, target2.z, 64, color.GetR(), color.GetG(), color.GetB());
 	}
 
 	return hitProcessed;

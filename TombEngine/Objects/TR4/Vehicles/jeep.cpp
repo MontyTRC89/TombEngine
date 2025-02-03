@@ -853,7 +853,7 @@ namespace TEN::Entities::Vehicles
 		if (IsHeld(In::Brake))
 		{
 			auto pos = GetJointPosition(jeepItem, 11, Vector3i(0, -144, -1024));
-			TriggerDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
+			SpawnDynamicLight(pos.x, pos.y, pos.z, 10, 64, 0, 0);
 
 			jeepItem->MeshBits.Set(17);
 			jeepItem->MeshBits.Clear(JeepBrakeLightJoints);

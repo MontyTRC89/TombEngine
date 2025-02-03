@@ -84,6 +84,7 @@ namespace TEN::Effects::Environment
 
 		// Clear starfield.
 		ResetStarField = true;
+		Stars.clear();
 		Meteors.clear();
 	}
 

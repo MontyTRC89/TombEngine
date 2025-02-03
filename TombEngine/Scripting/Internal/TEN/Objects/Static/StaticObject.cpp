@@ -228,10 +228,10 @@ void Static::SetName(std::string const & name)
 		return;
 	}
 
-	if (s_callbackSetName(name, m_mesh))
+	if (_callbackSetName(name, m_mesh))
 	{
 		// remove the old name if we have one
-		s_callbackRemoveName(m_mesh.Name);
+		_callbackRemoveName(m_mesh.Name);
 		m_mesh.Name = name;
 	}
 	else

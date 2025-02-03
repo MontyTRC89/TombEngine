@@ -308,16 +308,20 @@ bool CreaturePathfind(ItemInfo* item, Vector3i prevPos, short angle, short tilt)
 			item->Pose.Position.z = prevPos.z | WALL_MASK;
 
 		floor = GetFloor(item->Pose.Position.x, y, item->Pose.Position.z, &roomNumber);
-		height = g_Level.PathfindingBoxes[floor->PathfindingBoxID].height;
-		if (!Objects[item->ObjectNumber].nonLot)
+
+		if (floor->PathfindingBoxID != NO_VALUE)
 		{
-			nextBox = LOT->Node[floor->PathfindingBoxID].exitBox;
-		}
-		else
-		{
-			floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 			height = g_Level.PathfindingBoxes[floor->PathfindingBoxID].height;
-			nextBox = floor->PathfindingBoxID;
+			if (!Objects[item->ObjectNumber].nonLot)
+			{
+				nextBox = LOT->Node[floor->PathfindingBoxID].exitBox;
+			}
+			else
+			{
+				floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
+				height = g_Level.PathfindingBoxes[floor->PathfindingBoxID].height;
+				nextBox = floor->PathfindingBoxID;
+			}
 		}
 
 		if (nextBox == NO_VALUE)
@@ -745,7 +749,7 @@ static void SpawnCreatureGunEffect(const ItemInfo& item, const CreatureMuzzleFla
 
 	auto muzzlePos = muzzleFlash.Bite;
 	auto pos = GetJointPosition(item, muzzlePos);
-	TriggerDynamicLight(pos.x, pos.y, pos.z, 15, 128, 64, 16);
+	SpawnDynamicLight(pos.x, pos.y, pos.z, 15, 128, 64, 16);
 
 	if (muzzleFlash.UseSmoke)
 	{
@@ -799,7 +803,7 @@ void CreatureHealth(ItemInfo* item)
 	}
 }
 
-void CreatureDie(int itemNumber, bool doExplosion)
+void CreatureDie(int itemNumber, bool doExplosion, bool forceExplosion)
 {
 	int flags = 0;
 	if (doExplosion)
@@ -818,6 +822,11 @@ void CreatureDie(int itemNumber, bool doExplosion)
 			break;
 
 		case HitEffect::NonExplosive:
+			if (forceExplosion)
+			{
+				flags |= BODY_DO_EXPLOSION;
+				break;
+			}
 			return;
 
 		default:

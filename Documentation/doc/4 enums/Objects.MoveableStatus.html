@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.6 Lua API</title>
+    <title>TombEngine 1.7.2 (Developer) Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -99,6 +99,7 @@
 <ul class="nowrap">
   <li>    <a href="../5 lua utility modules/EventSequence.html">EventSequence</a></li>
   <li>    <a href="../5 lua utility modules/Timer.html">Timer</a></li>
+  <li>    <a href="../5 lua utility modules/Type.html">Type</a></li>
 </ul>
 
 </div>
@@ -135,13 +136,13 @@
 
 <p>Table of Objects.MoveableStatus constants. </p>
 
-<p>To be used with <a href="../2 classes/Objects.Moveable.html#Moveable:GetStatus">Objects.Moveable.GetStatus</a> and <a href="../2 classes/Objects.Moveable.html#Moveable:SetStatus">Objects.Moveable.SetStatus</a> functions.</p>
+<p> To be used with <a href="../2 classes/Objects.Moveable.html#Moveable:GetStatus">Objects.Moveable.GetStatus</a> and <a href="../2 classes/Objects.Moveable.html#Moveable:SetStatus">Objects.Moveable.SetStatus</a> functions.</p>
 
 <ul>
-    <li><code>INACTIVE</code> - object was never activated.</li>
-    <li><code>ACTIVE</code> - object is active.</li>
-    <li><code>DEACTIVATED</code> - object was active before and was deactivated.</li>
-    <li><code>INVISIBLE</code> - object is invisible.</li>
+    <li><code>INACTIVE</code> - moveable is inactive (was never activated).</li>
+    <li><code>ACTIVE</code> - moveable is active.</li>
+    <li><code>DEACTIVATED</code> - moveable is deactivated (was previously active and later deactivated).</li>
+    <li><code>INVISIBLE</code> - moveable is invisible.</li>
 </ul>
 
 
