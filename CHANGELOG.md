@@ -6,7 +6,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ## [Version 1.7.X] (link to release) - yyyy-mm-dd
 
 ### Bug fixes
-
+* Fixed Trigger_Triggerer not working.
 
 ### New Features
 
