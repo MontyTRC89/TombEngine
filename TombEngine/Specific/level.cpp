@@ -394,16 +394,34 @@ void LoadObjects()
 			anim.EndFrameNumber = ReadInt32();
 			anim.NextAnimNumber = ReadInt32();
 			anim.NextFrameNumber = ReadInt32();
-			/*anim.BlendFrameCount =*/ ReadCount();
+			/*anim.BlendFrameCount = */ReadCount();
 
-			auto start = ReadVector2();
-			auto end = ReadVector2();
-			auto startHandle = ReadVector2();
-			auto endHandle = ReadVector2();
-			//anim.BlendCurve = BezierCurve2D(start, startHandle, endHandle, end);
+			/*auto blendCurveStart = */ReadVector2();
+			/*auto blendCurveEnd = */ReadVector2();
+			/*auto blendCurveStartHandle = */ReadVector2();
+			/*auto blendCurveEndHandle = */ReadVector2();
+			//anim.BlendCurve = BezierCurve2D(blendCurveStart, blendCurveEnd, blendCurveStartHandle, blendCurveEndHandle);
 
-			anim.VelocityStart = ReadVector3();
-			anim.VelocityEnd = ReadVector3();
+			auto fixedMotionCurveXStart = ReadVector2();
+			auto fixedMotionCurveXEnd = ReadVector2();
+			/*auto fixedMotionCurveXStartHandle = */ReadVector2();
+			/*auto fixedMotionCurveXEndHandle = */ReadVector2();
+			//anim.FixedMotionCurveX = BezierCurve2D(fixedMotionCurveXStart, fixedMotionCurveXEnd, fixedMotionCurveXStartHandle, fixedMotionCurveXEndHandle);
+
+			auto fixedMotionCurveYStart = ReadVector2();
+			auto fixedMotionCurveYEnd = ReadVector2();
+			/*auto fixedMotionCurveYStartHandle = */ReadVector2();
+			/*auto fixedMotionCurveYEndHandle = */ReadVector2();
+			//anim.FixedMotionCurveY = BezierCurve2D(fixedMotionCurveYStart, fixedMotionCurveYEnd, fixedMotionCurveYStartHandle, fixedMotionCurveYEndHandle);
+
+			auto fixedMotionCurveZStart = ReadVector2();
+			auto fixedMotionCurveZEnd = ReadVector2();
+			/*auto fixedMotionCurveZStartHandle = */ReadVector2();
+			/*auto fixedMotionCurveZEndHandle = */ReadVector2();
+			//anim.FixedMotionCurveZ = BezierCurve2D(fixedMotionCurveZStart, fixedMotionCurveZEnd, fixedMotionCurveZStartHandle, fixedMotionCurveZEndHandle);
+
+			anim.VelocityStart = Vector3(fixedMotionCurveXStart.y, fixedMotionCurveYStart.y, fixedMotionCurveZStart.y);
+			anim.VelocityEnd = Vector3(fixedMotionCurveXEnd.y, fixedMotionCurveYEnd.y, fixedMotionCurveZEnd.y);
 
 			// Load keyframes.
 			int frameCount = ReadCount();
