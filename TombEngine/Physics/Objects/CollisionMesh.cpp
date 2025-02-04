@@ -67,12 +67,54 @@ namespace TEN::Physics
 		}
 	};
 
+	// Check if 3 vertices form convex angle.
+	bool IsConvex(const Vector3& a, const Vector3& b, const Vector3& c, const Plane& plane)
+	{
+		auto cross = (b - a).Cross(c - b);
+		return (cross.Dot(plane.Normal()) > 0); // Ensure consistent winding.
+	}
+
+	void TriangulateMonotonePolygon(const std::vector<int>& polygon, std::vector<int>& optimizedIds, const std::vector<Vector3>& vertices, const Plane& plane)
+	{
+		if (polygon.size() < 3)
+			return;
+
+		// Sort vertices by projection onto dominant plane axis.
+		auto sortedPolygon = polygon;
+		std::sort(sortedPolygon.begin(), sortedPolygon.end(), [&](int a, int b)
+		{
+			return vertices[a].Dot(plane.Normal()) < vertices[b].Dot(plane.Normal());
+		});
+
+		auto stack = std::vector<int>{};
+		stack.push_back(sortedPolygon[0]);
+		stack.push_back(sortedPolygon[1]);
+
+		for (int i = 2; i < sortedPolygon.size(); ++i)
+		{
+			int top = stack.back();
+			stack.pop_back();
+
+			while (!stack.empty() && IsConvex(vertices[stack.back()], vertices[top], vertices[sortedPolygon[i]], plane))
+			{
+				optimizedIds.push_back(stack.back());
+				optimizedIds.push_back(top);
+				optimizedIds.push_back(sortedPolygon[i]);
+				top = stack.back();
+				stack.pop_back();
+			}
+
+			stack.push_back(top);
+			stack.push_back(sortedPolygon[i]);
+		}
+	}
+
 	// TODO: Not working right.
 	void CollisionMeshDesc::Optimize()
 	{
 		constexpr auto PLANE_HEIGHT_STEP = BLOCK(1 / 32.0f);
 
-		return;
+		//return;
 
 		using VertexArray = std::array<int, LocalCollisionTriangle::VERTEX_COUNT>;
 
@@ -108,7 +150,7 @@ namespace TEN::Physics
 			auto edgeCount = std::unordered_map<std::pair<int, int>, int, PairHash>{};
 			auto adjacencyMap = std::unordered_map<int, std::unordered_set<int>>{};
 
-			// Count shared edges.
+			// 2.1) Count shared edges.
 			for (const auto& tri : tris)
 			{
 				for (int j = 0; j < 3; j++)
@@ -124,7 +166,7 @@ namespace TEN::Physics
 				}
 			}
 
-			// Extract boundary edges (edges that appear only once).
+			// 2.2) Extract boundary edges (edges that appear only once).
 			auto boundaryEdges = std::vector<std::pair<int, int>>{};
 			for (const auto& [edge, count] : edgeCount)
 			{
@@ -132,7 +174,7 @@ namespace TEN::Physics
 					boundaryEdges.push_back(edge);
 			}
 
-			// Order boundary edges into polygon.
+			// 2.3) Order boundary edges into polygon.
 			auto polygon = std::vector<int>{};
 			if (!boundaryEdges.empty())
 			{
@@ -143,7 +185,7 @@ namespace TEN::Physics
 				while (!boundaryEdges.empty())
 				{
 					bool found = false;
-					for (auto it = boundaryEdges.begin(); it != boundaryEdges.end(); ++it)
+					for (auto it = boundaryEdges.begin(); it != boundaryEdges.end(); it++)
 					{
 						if (it->first == polygon.back())
 						{
@@ -167,7 +209,10 @@ namespace TEN::Physics
 				}
 			}
 
-			// Triangulate polygon using Ear Clipping.
+			// 2.4) Use optimized triangulation function.
+			//TriangulateMonotonePolygon(polygon, optimizedIds, _vertices, plane);
+
+			// 2.5) Triangulate polygon using Ear Clipping.
 			if (polygon.size() >= 3)
 			{
 				auto remaining = polygon;
