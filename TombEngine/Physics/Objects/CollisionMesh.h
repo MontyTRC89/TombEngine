@@ -46,7 +46,7 @@ namespace TEN::Physics
 	public:
 		// Constructors
 
-		LocalCollisionTriangle(int vertex0Id, int vertex1Id, int vertex2Id);
+		LocalCollisionTriangle(int vertexId0, int vertexId1, int vertexId2);
 
 		// Getters
 
