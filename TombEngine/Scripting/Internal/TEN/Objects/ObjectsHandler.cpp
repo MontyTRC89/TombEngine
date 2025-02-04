@@ -162,7 +162,7 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table& parent) :
 		[this](auto && ... param) { return AddName(std::forward<decltype(param)>(param)...); },
 		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); });
 
-	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_ObjID, kObjIDs);
+	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_ObjID, OBJECT_ID_NAME_MAP);
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_RoomFlagID, ROOM_FLAG_IDS);
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_RoomReverb, ROOM_REVERB_TYPES);
 	m_handler.MakeReadOnlyTable(m_table_objects, ScriptReserved_WeaponType, WEAPON_TYPES);
