@@ -179,6 +179,11 @@ namespace TEN::Physics
 						int current = remaining[i];
 						int next = remaining[(i + 1) % remaining.size()];
 
+						// Ensure correct winding order.
+						auto faceNormal = (_vertices[prev] - _vertices[current]).Cross(_vertices[next] - _vertices[current]);
+						if (faceNormal.Dot(plane.Normal()) > 0)
+							std::swap(prev, next);
+
 						optimizedIds.push_back(prev);
 						optimizedIds.push_back(current);
 						optimizedIds.push_back(next);
