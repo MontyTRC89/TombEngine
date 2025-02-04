@@ -138,9 +138,9 @@ void RoomData::GenerateCollisionMesh()
 			CollectSectorCollisionMeshTriangles(desc, sector, *sectorNorth, *sectorSouth, *sectorEast, *sectorWest);
 		}
 	}
+	desc.Optimize();
 
 	// Create collision mesh.
-	desc.Optimize();
 	CollisionMesh = TEN::Physics::CollisionMesh(Position.ToVector3(), Quaternion::Identity, desc);
 }
 

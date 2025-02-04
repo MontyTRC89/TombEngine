@@ -58,20 +58,11 @@ namespace TEN::Physics
 		_ids.push_back(vertex2ID);
 	}
 
-	struct PairHash
-	{
-		template <typename T1, typename T2>
-		std::size_t operator()(const std::pair<T1, T2>& pair) const
-		{
-			return std::hash<T1>{}(pair.first) ^ (std::hash<T2>{}(pair.second) << 1);
-		}
-	};
-
 	// Check if 3 vertices form convex angle.
 	bool IsConvex(const Vector3& a, const Vector3& b, const Vector3& c, const Plane& plane)
 	{
 		auto cross = (b - a).Cross(c - b);
-		return (cross.Dot(plane.Normal()) > 0); // Ensure consistent winding.
+		return (cross.Dot(plane.Normal()) > 0.0f); // Ensure consistent winding.
 	}
 
 	void TriangulateMonotonePolygon(const std::vector<int>& polygon, std::vector<int>& optimizedIds, const std::vector<Vector3>& vertices, const Plane& plane)
@@ -90,7 +81,7 @@ namespace TEN::Physics
 		stack.push_back(sortedPolygon[0]);
 		stack.push_back(sortedPolygon[1]);
 
-		for (int i = 2; i < sortedPolygon.size(); ++i)
+		for (int i = 2; i < sortedPolygon.size(); i++)
 		{
 			int top = stack.back();
 			stack.pop_back();
@@ -112,14 +103,14 @@ namespace TEN::Physics
 	// TODO: Not working right.
 	void CollisionMeshDesc::Optimize()
 	{
+		return;
 		constexpr auto PLANE_HEIGHT_STEP = BLOCK(1 / 32.0f);
 
-		//return;
+		using VertexArray = std::array<int, LocalCollisionTriangle::VERTEX_COUNT>; // Vertex IDs of vertices defining triangle.
+		using EdgePair	  = std::pair<int, int>;								   // Vertex IDs of vertices defining edge.
 
-		using VertexArray = std::array<int, LocalCollisionTriangle::VERTEX_COUNT>;
-
-		// 1) Group triangles by planes.
-		auto trisByPlane = std::unordered_map<Plane, std::vector<VertexArray>>{};
+		// 1) Group coplanar triangles.
+		auto coplanarTriMap = std::unordered_map<Plane, std::vector<VertexArray>>{};
 		for (int i = 0; i < _ids.size(); i += LocalCollisionTriangle::VERTEX_COUNT)
 		{
 			// Get vertices.
@@ -131,50 +122,71 @@ namespace TEN::Physics
 			auto edge0 = vertex1 - vertex0;
 			auto edge1 = vertex2 - vertex0;
 
-			// Calculate edge normal.
+			// Calculate plane normal. TODO: Should be rounded to account for floating-point imprecision?
 			auto normal = edge0.Cross(edge1);
 			normal.Normalize();
 
-			// Calculate plane distance.
+			// Calculate plane distance. NOTE: Rounded to discrete steps to account for floating-point imprecision.
 			float dist = RoundToStep(normal.Dot(vertex0), PLANE_HEIGHT_STEP);
 
-			// Collect triangle IDs.
+			// Collect triangles by plane.
 			auto plane = Plane(normal, dist);
-			trisByPlane[plane].push_back({ _ids[i], _ids[i + 1], _ids[i + 2] });
+			coplanarTriMap[plane].push_back({ _ids[i], _ids[i + 1], _ids[i + 2] });
 		}
 
-		// 2) Process plane triangles.
-		auto optimizedIds = std::vector<int>{};
-		for (const auto& [plane, tris] : trisByPlane)
+		// TEST: Check triangle groupings.
+		/*auto optimizedIds2 = std::vector<int>{};
+		for (auto& [plane, tris] : trisByPlane)
 		{
-			auto edgeCount = std::unordered_map<std::pair<int, int>, int, PairHash>{};
-			auto adjacencyMap = std::unordered_map<int, std::unordered_set<int>>{};
+			if (tris.size() > 1)
+				tris.erase(tris.begin() + 1, tris.end());
 
-			// 2.1) Count shared edges.
+			optimizedIds2.push_back(tris[0][0]);
+			optimizedIds2.push_back(tris[0][1]);
+			optimizedIds2.push_back(tris[0][2]);
+		}
+		_ids = std::move(optimizedIds2);
+		return;*/
+
+		// 2) Process coplanar triangles.
+		auto optimizedIds = std::vector<int>{};
+		for (const auto& [plane, tris] : coplanarTriMap)
+		{
+			// 2.1) Count shared edges and track vertex adjacency.
+			auto edgeCountMap = std::unordered_map<EdgePair, int, PairHash>{};
+			auto adjacentVertexMap = std::unordered_map<int, std::unordered_set<int>>{};
 			for (const auto& tri : tris)
 			{
-				for (int j = 0; j < 3; j++)
+				// Run through vertices.
+				for (int i = 0; i < LocalCollisionTriangle::VERTEX_COUNT; i++)
 				{
-					int a = tri[j];
-					int b = tri[(j + 1) % 3];
-					if (a > b)
-						std::swap(a, b);
+					// Get edge vertices.
+					int vertexID0 = tri[i];
+					int vertexID1 = tri[(i + 1) % LocalCollisionTriangle::VERTEX_COUNT];
 
-					edgeCount[{ a, b }]++;
-					adjacencyMap[a].insert(b);
-					adjacencyMap[b].insert(a);
+					// Order ID pairs in sequence.
+					if (vertexID0 > vertexID1)
+						std::swap(vertexID0, vertexID1);
+
+					// Update edge count map.
+					auto edgePair = EdgePair{ vertexID0, vertexID1 };
+					edgeCountMap[edgePair]++;
+
+					// Update adjacent vertex map.
+					adjacentVertexMap[vertexID0].insert(vertexID1);
+					adjacentVertexMap[vertexID1].insert(vertexID0);
 				}
 			}
 
-			// 2.2) Extract boundary edges (edges that appear only once).
-			auto boundaryEdges = std::vector<std::pair<int, int>>{};
-			for (const auto& [edge, count] : edgeCount)
+			// 2.2) Extract boundary edges.
+			auto boundaryEdges = std::vector<EdgePair>{};
+			for (const auto& [edge, count] : edgeCountMap)
 			{
-				if (count == 1)
+				if (count <= 1)
 					boundaryEdges.push_back(edge);
 			}
 
-			// 2.3) Order boundary edges into polygon.
+			// 2.3) Order boundary edges into closed polygon.
 			auto polygon = std::vector<int>{};
 			if (!boundaryEdges.empty())
 			{
@@ -184,35 +196,35 @@ namespace TEN::Physics
 
 				while (!boundaryEdges.empty())
 				{
-					bool found = false;
+					bool isFound = false;
 					for (auto it = boundaryEdges.begin(); it != boundaryEdges.end(); it++)
 					{
 						if (it->first == polygon.back())
 						{
 							polygon.push_back(it->second);
 							boundaryEdges.erase(it);
-							found = true;
+							isFound = true;
 							break;
 						}
 						else if (it->second == polygon.back())
 						{
 							polygon.push_back(it->first);
 							boundaryEdges.erase(it);
-							found = true;
+							isFound = true;
 							break;
 						}
 					}
 
 					// FAILSAFE: Prevent infinite loop if no matching edge found.
-					if (!found)
+					if (!isFound)
 						break;
 				}
 			}
 
-			// 2.4) Use optimized triangulation function.
+			// 2.4) Triangulate polygon using optimized monotone approach.
 			//TriangulateMonotonePolygon(polygon, optimizedIds, _vertices, plane);
 
-			// 2.5) Triangulate polygon using Ear Clipping.
+			// 2.4) Triangulate polygon using Ear Clipping.
 			if (polygon.size() >= 3)
 			{
 				auto remaining = polygon;
@@ -226,7 +238,7 @@ namespace TEN::Physics
 
 						// Ensure correct winding order.
 						auto faceNormal = (_vertices[prev] - _vertices[current]).Cross(_vertices[next] - _vertices[current]);
-						if (faceNormal.Dot(plane.Normal()) > 0)
+						if (faceNormal.Dot(plane.Normal()) > 0.0f)
 							std::swap(prev, next);
 
 						optimizedIds.push_back(prev);
@@ -340,9 +352,10 @@ namespace TEN::Physics
 
 	void LocalCollisionTriangle::DrawDebug(const Matrix& transformMatrix, const Matrix& rotMatrix, const std::vector<Vector3>& vertices) const
 	{
-		constexpr auto TRI_COLOR		  = Color(1.0f, 1.0f, 0.0f, 0.1f);
-		constexpr auto NORMAL_LINE_LENGTH = BLOCK(0.15f);
-		constexpr auto NORMAL_LINE_COLOR  = Color(1.0f, 1.0f, 1.0f);
+		constexpr auto TRI_SURF_COLOR	 = Color(1.0f, 1.0f, 0.0f, 0.1f);
+		constexpr auto TRI_OUTLINE_COLOR = Color(1.0f, 1.0f, 1.0f, 0.25f);
+		constexpr auto NORMAL_LENGTH	 = BLOCK(0.2f);
+		constexpr auto NORMAL_COLOR		 = Color(1.0f, 1.0f, 1.0f);
 
 		// Get vertices.
 		auto vertex0 = Vector3::Transform(GetVertex0(vertices), transformMatrix);
@@ -352,16 +365,17 @@ namespace TEN::Physics
 		// Get normal.
 		auto normal = Vector3::Transform(GetNormal(vertices), rotMatrix);
 
-		// Draw triangle.
-		DrawDebugTriangle(vertex0, vertex1, vertex2, TRI_COLOR);
+		// Draw triangle surface.
+		DrawDebugTriangle(vertex0, vertex1, vertex2, TRI_SURF_COLOR);
 
-		DrawDebugLine(vertex0, vertex1, Color(1,1,1));
-		DrawDebugLine(vertex1, vertex2, Color(1,1,1));
-		DrawDebugLine(vertex2, vertex0, Color(1,1,1));
+		// Draw triangle outline.
+		DrawDebugLine(vertex0, vertex1, TRI_OUTLINE_COLOR);
+		DrawDebugLine(vertex1, vertex2, TRI_OUTLINE_COLOR);
+		DrawDebugLine(vertex2, vertex0, TRI_OUTLINE_COLOR);
 
-		// Draw normal line.
+		// Draw normal.
 		auto center = (vertex0 + vertex1 + vertex2) / VERTEX_COUNT;
-		DrawDebugLine(center, Geometry::TranslatePoint(center, normal, NORMAL_LINE_LENGTH), NORMAL_LINE_COLOR);
+		DrawDebugLine(center, Geometry::TranslatePoint(center, normal, NORMAL_LENGTH), NORMAL_COLOR);
 	}
 
 	CollisionMesh::CollisionMesh(const Vector3& pos, const Quaternion& orient, const CollisionMeshDesc& desc)

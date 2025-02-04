@@ -31,6 +31,15 @@ namespace TEN::Math
 	Vector4 Screen(const Vector4& ambient, const Vector4& tint);
 }
 
+struct PairHash
+{
+	template <typename T1, typename T2>
+	size_t operator()(const std::pair<T1, T2>& pair) const
+	{
+		return (std::hash<T1>{}(pair.first) ^ (std::hash<T2>{}(pair.second) << 1));
+	}
+};
+
 namespace std
 {
 	template <>
