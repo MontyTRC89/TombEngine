@@ -158,10 +158,29 @@ static void HandleBridgeDebug(const ItemInfo& item)
 	}
 }
 
+static void HandleRoomDebug(const ItemInfo& item)
+{
+	auto& room = g_Level.Rooms[item.RoomNumber];
+
+	static int timer = 0;
+	if (timer != 0)
+	{
+		timer--;
+		PrintDebugMessage("Room mesh regenerated.");
+	}
+
+	if (IsClicked(In::Action))
+	{
+		timer = 15;
+		room.GenerateCollisionMesh();
+	}
+}
+
 static void HandlePlayerDebug(const ItemInfo& item)
 {
 	HandleLosDebug(item);
 	HandleBridgeDebug(item);
+	HandleRoomDebug(item);
 
 	if constexpr (!DebugBuild)
 		return;
