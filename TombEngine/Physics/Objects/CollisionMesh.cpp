@@ -58,15 +58,26 @@ namespace TEN::Physics
 		_ids.push_back(vertex2ID);
 	}
 
-	// TODO
+	struct PairHash
+	{
+		template <typename T1, typename T2>
+		std::size_t operator()(const std::pair<T1, T2>& pair) const
+		{
+			return std::hash<T1>{}(pair.first) ^ (std::hash<T2>{}(pair.second) << 1);
+		}
+	};
+
+	// TODO: Not working right.
 	void CollisionMeshDesc::Optimize()
 	{
 		constexpr auto PLANE_HEIGHT_STEP = BLOCK(1 / 32.0f);
 
 		return;
 
-		// 1) Group triangles by their planes.
-		auto trisByPlane = std::unordered_map<Plane, std::vector<std::array<int, LocalCollisionTriangle::VERTEX_COUNT>>>{};
+		using VertexArray = std::array<int, LocalCollisionTriangle::VERTEX_COUNT>;
+
+		// 1) Group triangles by planes.
+		auto trisByPlane = std::unordered_map<Plane, std::vector<VertexArray>>{};
 		for (int i = 0; i < _ids.size(); i += LocalCollisionTriangle::VERTEX_COUNT)
 		{
 			// Get vertices.
@@ -78,80 +89,106 @@ namespace TEN::Physics
 			auto edge0 = vertex1 - vertex0;
 			auto edge1 = vertex2 - vertex0;
 
-			// Calculate plane normal and distance.
+			// Calculate edge normal.
 			auto normal = edge0.Cross(edge1);
 			normal.Normalize();
-			//normal = RoundNormal(normal, NORMAL_TOLERANCE);
-			float d = RoundToStep(normal.Dot(vertex0), PLANE_HEIGHT_STEP);
 
-			// Collect triangle by plane.
-			auto plane = Plane(normal, d);
+			// Calculate plane distance.
+			float dist = RoundToStep(normal.Dot(vertex0), PLANE_HEIGHT_STEP);
+
+			// Collect triangle IDs.
+			auto plane = Plane(normal, dist);
 			trisByPlane[plane].push_back({ _ids[i], _ids[i + 1], _ids[i + 2] });
 		}
 
-		// Step 2: Merge coplanar triangles in each group
-		std::vector<int> optimizedIds;
-
+		// 2) Process plane triangles.
+		auto optimizedIds = std::vector<int>{};
 		for (const auto& [plane, tris] : trisByPlane)
 		{
-			// Build adjacency map for coplanar triangles
-			std::unordered_map<int, std::unordered_set<int>> adjacencyMap;
+			auto edgeCount = std::unordered_map<std::pair<int, int>, int, PairHash>{};
+			auto adjacencyMap = std::unordered_map<int, std::unordered_set<int>>{};
 
-			for (const auto& triangle : tris)
+			// Count shared edges.
+			for (const auto& tri : tris)
 			{
-				adjacencyMap[triangle[0]].insert(triangle[1]);
-				adjacencyMap[triangle[0]].insert(triangle[2]);
-				adjacencyMap[triangle[1]].insert(triangle[0]);
-				adjacencyMap[triangle[1]].insert(triangle[2]);
-				adjacencyMap[triangle[2]].insert(triangle[0]);
-				adjacencyMap[triangle[2]].insert(triangle[1]);
+				for (int j = 0; j < 3; j++)
+				{
+					int a = tri[j];
+					int b = tri[(j + 1) % 3];
+					if (a > b)
+						std::swap(a, b);
+
+					edgeCount[{ a, b }]++;
+					adjacencyMap[a].insert(b);
+					adjacencyMap[b].insert(a);
+				}
 			}
 
-			// Find connected components and merge
-			std::unordered_set<int> visited;
-			for (const auto& triangle : tris)
+			// Extract boundary edges (edges that appear only once).
+			auto boundaryEdges = std::vector<std::pair<int, int>>{};
+			for (const auto& [edge, count] : edgeCount)
 			{
-				if (visited.count(triangle[0]) > 0)
-					continue;
+				if (count == 1)
+					boundaryEdges.push_back(edge);
+			}
 
-				std::vector<int> polygon;
-				int currentID = triangle[0];
-				do
+			// Order boundary edges into polygon.
+			auto polygon = std::vector<int>{};
+			if (!boundaryEdges.empty())
+			{
+				polygon.push_back(boundaryEdges.front().first);
+				polygon.push_back(boundaryEdges.front().second);
+				boundaryEdges.erase(boundaryEdges.begin());
+
+				while (!boundaryEdges.empty())
 				{
-					polygon.push_back(currentID);
-					visited.insert(currentID);
-
-					// Find the next vertex in the loop
-					int nextID = -1;
-					for (int neighbor : adjacencyMap[currentID])
+					bool found = false;
+					for (auto it = boundaryEdges.begin(); it != boundaryEdges.end(); ++it)
 					{
-						if (visited.count(neighbor) == 0) // Unvisited neighbor
+						if (it->first == polygon.back())
 						{
-							nextID = neighbor;
+							polygon.push_back(it->second);
+							boundaryEdges.erase(it);
+							found = true;
+							break;
+						}
+						else if (it->second == polygon.back())
+						{
+							polygon.push_back(it->first);
+							boundaryEdges.erase(it);
+							found = true;
 							break;
 						}
 					}
 
-					if (nextID == -1)
+					// FAILSAFE: Prevent infinite loop if no matching edge found.
+					if (!found)
+						break;
+				}
+			}
+
+			// Triangulate polygon using Ear Clipping.
+			if (polygon.size() >= 3)
+			{
+				auto remaining = polygon;
+				while (remaining.size() > 2)
+				{
+					for (int i = 0; i < remaining.size(); i++)
 					{
-						// If no valid next vertex, the loop is broken. Exit to prevent infinite loop.
+						int prev = remaining[(i + remaining.size() - 1) % remaining.size()];
+						int current = remaining[i];
+						int next = remaining[(i + 1) % remaining.size()];
+
+						optimizedIds.push_back(prev);
+						optimizedIds.push_back(current);
+						optimizedIds.push_back(next);
+						remaining.erase(remaining.begin() + i);
 						break;
 					}
-
-					currentID = nextID;
-				} while (currentID != polygon[0]); // Back to starting vertex
-
-				// Triangulate the polygon (naive fan triangulation)
-				for (size_t i = 1; i < polygon.size() - 1; ++i)
-				{
-					optimizedIds.push_back(polygon[0]);
-					optimizedIds.push_back(polygon[i]);
-					optimizedIds.push_back(polygon[i + 1]);
 				}
 			}
 		}
 
-		// Step 3: Replace _ids with the optimized list
 		_ids = std::move(optimizedIds);
 	}
 
@@ -267,6 +304,10 @@ namespace TEN::Physics
 
 		// Draw triangle.
 		DrawDebugTriangle(vertex0, vertex1, vertex2, TRI_COLOR);
+
+		DrawDebugLine(vertex0, vertex1, Color(1,1,1));
+		DrawDebugLine(vertex1, vertex2, Color(1,1,1));
+		DrawDebugLine(vertex2, vertex0, Color(1,1,1));
 
 		// Draw normal line.
 		auto center = (vertex0 + vertex1 + vertex2) / VERTEX_COUNT;
