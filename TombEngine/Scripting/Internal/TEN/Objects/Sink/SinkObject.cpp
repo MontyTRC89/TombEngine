@@ -14,8 +14,8 @@ Sink
 @pragma nostrip
 */
 
-static auto IndexError = index_error_maker(Sink, ScriptReserved_Sink);
-static auto NewIndexError = newindex_error_maker(Sink, ScriptReserved_Sink);
+static auto IndexError = IndexErrorMaker(Sink, ScriptReserved_Sink);
+static auto NewIndexError = NewIndexErrorMaker(Sink, ScriptReserved_Sink);
 
 Sink::Sink(SinkInfo& ref) : m_sink{ref}
 {};

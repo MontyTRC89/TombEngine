@@ -16,7 +16,6 @@ static constexpr char ScriptReserved_Util[]				= "Util";
 static constexpr char ScriptReserved_Effects[]			= "Effects";
 
 // Classes
-static constexpr char ScriptReserved_Static[]			= "Static";
 static constexpr char ScriptReserved_Camera[]			= "Camera";
 static constexpr char ScriptReserved_Sink[]				= "Sink";
 static constexpr char ScriptReserved_SoundSource[]		= "SoundSource";
@@ -401,6 +400,10 @@ static constexpr char ScriptReserved_LogLevelError[]	= "ERROR";
 // Internal
 static constexpr char ScriptReserved_LaraObject[] = "LaraObject";
 
+// =======
+// OBJECTS
+// =======
+
 // Room
 
 constexpr char ScriptReserved_Room[]				= "Room";
@@ -414,6 +417,39 @@ constexpr char ScriptReserved_RoomIsTagPresent[]	= "IsTagPresent";
 constexpr char ScriptReserved_RoomSetFlag[]			= "SetFlag";
 constexpr char ScriptReserved_RoomSetName[]			= "SetName";
 constexpr char ScriptReserved_RoomSetReverbType[]	= "SetReverbType";
+
+// Static
+
+constexpr char ScriptReserved_Static[]				= "Static";
+constexpr char ScriptReserved_StaticDisable[]		= "Disable";
+constexpr char ScriptReserved_StaticEnable[]		= "Enable";
+constexpr char ScriptReserved_StaticGetActive[]		= "GetActive";
+constexpr char ScriptReserved_StaticGetColor[]		= "GetColor";
+constexpr char ScriptReserved_StaticGetHP[]			= "GetHP";
+constexpr char ScriptReserved_StaticGetName[]		= "GetName";
+constexpr char ScriptReserved_StaticGetPosition[]	= "GetPosition";
+constexpr char ScriptReserved_StaticGetRotation[]	= "GetRotation";
+constexpr char ScriptReserved_StaticGetScale[]		= "GetScale";
+constexpr char ScriptReserved_StaticGetSlot[]		= "GetSlot";
+constexpr char ScriptReserved_StaticGetSolid[]		= "GetSolid";
+constexpr char ScriptReserved_StaticSetColor[]		= "SetColor";
+constexpr char ScriptReserved_StaticSetHitPoints[]			= "SetHP";
+constexpr char ScriptReserved_StaticSetName[]		= "SetName";
+constexpr char ScriptReserved_StaticSetPosition[]	= "SetPosition";
+constexpr char ScriptReserved_StaticSetRotation[]	= "SetRotation";
+constexpr char ScriptReserved_StaticSetScale[]		= "SetScale";
+constexpr char ScriptReserved_StaticSetSlot[]		= "SetSlot";
+constexpr char ScriptReserved_StaticSetSolid[]		= "SetSolid";
+constexpr char ScriptReserved_StaticShatter[]		= "Shatter";
+
+// =====
+// TYPES
+// =====
+
+// Rotation
+
+constexpr char ScriptReserved_Rotation[]			= "Rotation";
+constexpr char ScriptReserved_RotationDirection[]	= "Direction";
 
 // Vec2
 
@@ -439,8 +475,3 @@ constexpr char ScriptReserved_Vec3Lerp[]			= "Lerp";
 constexpr char ScriptReserved_Vec3Normalize[]		= "Normalize";
 constexpr char ScriptReserved_Vec3Rotate[]			= "Rotate";
 constexpr char ScriptReserved_Vec3Translate[]		= "Translate";
-
-// Rotation object
-
-constexpr char ScriptReserved_Rotation[]			= "Rotation";
-constexpr char ScriptReserved_RotationDirection[]	= "Direction";

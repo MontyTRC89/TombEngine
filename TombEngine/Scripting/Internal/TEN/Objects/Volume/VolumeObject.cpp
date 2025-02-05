@@ -16,8 +16,8 @@ Activator volume.
 @pragma nostrip
 */
 
-static auto IndexError = index_error_maker(Volume, ScriptReserved_Volume);
-static auto NewIndexError = newindex_error_maker(Volume, ScriptReserved_Volume);
+static auto IndexError = IndexErrorMaker(Volume, ScriptReserved_Volume);
+static auto NewIndexError = NewIndexErrorMaker(Volume, ScriptReserved_Volume);
 
 Volume::Volume(TriggerVolume& volume) :
 	_volume(volume)

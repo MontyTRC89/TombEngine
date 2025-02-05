@@ -31,8 +31,8 @@ using namespace TEN::Math;
 // @tenclass Objects.Moveable
 // pragma nostrip
 
-static auto IndexError = index_error_maker(Moveable, ScriptReserved_Moveable);
-static auto NewIndexError = newindex_error_maker(Moveable, ScriptReserved_Moveable);
+static auto IndexError = IndexErrorMaker(Moveable, ScriptReserved_Moveable);
+static auto NewIndexError = NewIndexErrorMaker(Moveable, ScriptReserved_Moveable);
 
 /*** Used to generate a new moveable dynamically at runtime.
 For more information on each parameter, see the

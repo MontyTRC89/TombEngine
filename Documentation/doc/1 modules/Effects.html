@@ -140,7 +140,7 @@
 	<td class="summary">Emit blood.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#EmitAirBubble">EmitAirBubble(pos[, size][, amplitude])</a></td>
+	<td class="name" ><a href="#EmitAirBubble">EmitAirBubble(pos[, size][, amp])</a></td>
 	<td class="summary">Emit air bubble in a water room.</td>
 	</tr>
 	<tr>
@@ -251,51 +251,51 @@
         </li>
         <li><span class="parameter">gravity</span>
             <span class="types"><span class="type">float</span></span>
-         (default 0) Specifies if the particle will fall over time. Positive values ascend, negative values descend. Recommended range: [-1000 and 1000].
+         Specifies if the particle will fall over time. Positive values ascend, negative values descend. Recommended range: [-1000 and 1000]. <strong>Default: 0</strong>
         </li>
         <li><span class="parameter">rotVel</span>
             <span class="types"><span class="type">float</span></span>
-         (default 0) Rotational velocity in degrees.
+         Rotational velocity in degrees. <strong>Default: 0</strong>
         </li>
         <li><span class="parameter">startColor</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
-         (default Color(255, 255, 255)) Color at start of life.
+         Color at start of life. <strong>Default: Color(255, 255, 255)</strong>
         </li>
         <li><span class="parameter">endColor</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
-         (default Color(255, 255, 255)) Color to fade toward. This will finish long before the end of the particle's life due to internal math.
+         Color to fade toward. This will finish long before the end of the particle's life due to internal math. <strong>Default: Color(255, 255, 255)</strong>
         </li>
         <li><span class="parameter">blendMode</span>
             <span class="types"><a class="type" href="../4 enums/Effects.BlendID.html#">BlendID</a></span>
-         (default TEN.Effects.BlendID.ALPHABLEND) Render blend mode.
+         Render blend mode. <strong>TEN.Effects.BlendID.ALPHABLEND</strong>
         </li>
         <li><span class="parameter">startSize</span>
             <span class="types"><span class="type">float</span></span>
-         (default 10) Size at start of life.
+         Size at start of life. <strong>Default: 10</strong>
         </li>
         <li><span class="parameter">endSize</span>
             <span class="types"><span class="type">float</span></span>
-         (default 0) Size at end of life. The particle will linearly shrink or grow toward this size over its lifespan.
+         Size at end of life. The particle will linearly shrink or grow toward this size over its lifespan. <strong>Default: 0</strong>
         </li>
         <li><span class="parameter">life</span>
             <span class="types"><span class="type">float</span></span>
-         (default 2) Lifespan in seconds.
+         Lifespan in seconds. <strong>Default: 2</strong>
         </li>
         <li><span class="parameter">applyDamage</span>
             <span class="types"><span class="type">bool</span></span>
-         (default false) Specifies if the particle will harm the player on collision.
+         Specify if the particle will harm the player on collision. <strong>Default: false</strong>
         </li>
         <li><span class="parameter">applyPoison</span>
             <span class="types"><span class="type">bool</span></span>
-         (default false) Specifies if the particle will poison the player on collision.
+         Specify if the particle will poison the player on collision. <strong>Default: false</strong>
         </li>
         <li><span class="parameter">spriteSeqID</span>
             <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-         (default Objects.ObjID.DEFAULT_SPRITES) ID of the sprite sequence object.
+         ID of the sprite sequence object. <strong>Default: Objects.ObjID.DEFAULT_SPRITES</strong>
         </li>
         <li><span class="parameter">startRot</span>
             <span class="types"><span class="type">float</span></span>
-         (default random) Rotation at start of life.
+         Rotation at start of life. <strong>Default: random</strong>
         </li>
     </ul>
 
@@ -504,7 +504,7 @@
 </dd>
     <dt>
     <a name = "EmitAirBubble"></a>
-    <strong>EmitAirBubble(pos[, size][, amplitude])</strong>
+    <strong>EmitAirBubble(pos[, size][, amp])</strong>
     </dt>
     <dd>
     Emit air bubble in a water room.
@@ -515,16 +515,16 @@
     <ul>
         <li><span class="parameter">pos</span>
             <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-         The position where the air bubble will be spawned. Needs to be in a water room.
+         World position where the effect will be spawned. Must be in a water room.
         </li>
         <li><span class="parameter">size</span>
             <span class="types"><span class="type">float</span></span>
-         The size of the air bubble.
+         Sprite size. <strong>Default: 32</strong>
          (<em>optional</em>)
         </li>
-        <li><span class="parameter">amplitude</span>
+        <li><span class="parameter">amp</span>
             <span class="types"><span class="type">float</span></span>
-         The oscillation amplitude of the air bubble.
+         Oscillation amplitude. <strong>Default: 32</strong>
          (<em>optional</em>)
         </li>
     </ul>
