@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.7 Lua API</title>
+    <title>TombEngine 1.7.2 (Developer) Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -108,38 +108,36 @@
 
 <h1>Primitive Class <code>Rotation</code></h1>
 <p>Represents a degree-based 3D rotation.</p>
-<p> All values are clamped to the range [0.0, 360.0].</p>
+<p> All angle components are in degrees clamped to the range [0.0, 360.0].</p>
 
 
 <h2><a href="#Members">Members</a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" ><a href="#x">x</a></td>
-	<td class="summary">(float) X angle component.</td>
+	<td class="summary">(float) X angle component in degrees.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#y">y</a></td>
-	<td class="summary">(float) Y angle component.</td>
+	<td class="summary">(float) Y angle component in degrees.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#z">z</a></td>
-	<td class="summary">(float) Z angle component.</td>
+	<td class="summary">(float) Z angle component in degrees.</td>
 	</tr>
 </table>
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" ><a href="#Rotation">Rotation(x, y, z)</a></td>
-	<td class="summary">
-
-</td>
+	<td class="summary">Create a Rotation object.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Direction">Direction()</a></td>
-	<td class="summary">Converts rotation to a direction normal.</td>
+	<td class="summary">Get the normalized direction vector of this Rotation.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#__tostring">__tostring(rotation)</a></td>
+	<td class="name" ><a href="#__tostring">__tostring(rot)</a></td>
 	<td class="summary">
 
 </td>
@@ -158,7 +156,7 @@
     <strong>x</strong>
     </dt>
     <dd>
-    (float) X angle component.
+    (float) X angle component in degrees.
 
 
 
@@ -173,7 +171,7 @@
     <strong>y</strong>
     </dt>
     <dd>
-    (float) Y angle component.
+    (float) Y angle component in degrees.
 
 
 
@@ -188,7 +186,7 @@
     <strong>z</strong>
     </dt>
     <dd>
-    (float) Z angle component.
+    (float) Z angle component in degrees.
 
 
 
@@ -207,9 +205,7 @@
     <strong>Rotation(x, y, z)</strong>
     </dt>
     <dd>
-
-
-
+    Create a Rotation object.
 
 
 
@@ -217,15 +213,15 @@
     <ul>
         <li><span class="parameter">x</span>
             <span class="types"><span class="type">float</span></span>
-         X angle component.
+         X angle component in degrees.
         </li>
         <li><span class="parameter">y</span>
             <span class="types"><span class="type">float</span></span>
-         Y angle component.
+         Y angle component in degrees.
         </li>
         <li><span class="parameter">z</span>
             <span class="types"><span class="type">float</span></span>
-         Z angle component.
+         Z angle component in degrees.
         </li>
     </ul>
 
@@ -233,7 +229,7 @@
     <ol>
 
            <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
-        A Rotation.
+        A new Rotation object.
     </ol>
 
 
@@ -245,7 +241,7 @@
     <strong>Direction()</strong>
     </dt>
     <dd>
-    Converts rotation to a direction normal.
+    Get the normalized direction vector of this Rotation.
 
 
 
@@ -254,7 +250,7 @@
     <ol>
 
            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-        resulting normal calculated from this rotation.
+        Normalized direction vector.
     </ol>
 
 
@@ -263,7 +259,7 @@
 </dd>
     <dt>
     <a name = "__tostring"></a>
-    <strong>__tostring(rotation)</strong>
+    <strong>__tostring(rot)</strong>
     </dt>
     <dd>
 
@@ -274,9 +270,9 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">rotation</span>
+        <li><span class="parameter">rot</span>
             <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
-         this Rotation.
+         This Rotation.
         </li>
     </ul>
 
@@ -284,7 +280,7 @@
     <ol>
 
            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-        A string showing the X, Y, and Z angle components of the Rotation.
+        A string showing the X, Y, and Z angle components of this Rotation.
     </ol>
 
 

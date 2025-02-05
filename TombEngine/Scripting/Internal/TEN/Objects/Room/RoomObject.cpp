@@ -19,8 +19,8 @@
 
 //namespace TEN::Scripting
 //{
-	static auto IndexError = index_error_maker(Room, ScriptReserved_Volume);
-	static auto NewIndexError = newindex_error_maker(Room, ScriptReserved_Volume);
+	static auto IndexError = IndexErrorMaker(Room, ScriptReserved_Volume);
+	static auto NewIndexError = NewIndexErrorMaker(Room, ScriptReserved_Volume);
 
 	Room::Room(ROOM_INFO& room) :
 		_room(room)
@@ -89,9 +89,9 @@
 			return;
 
 		// Remove previous name if it already exists.
-		if (s_callbackSetName(name, _room))
+		if (_callbackSetName(name, _room))
 		{
-			s_callbackRemoveName(_room.Name);
+			_callbackRemoveName(_room.Name);
 			_room.Name = name;
 		}
 		else

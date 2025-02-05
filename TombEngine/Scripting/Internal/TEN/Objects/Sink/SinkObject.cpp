@@ -14,8 +14,8 @@ Sink
 @pragma nostrip
 */
 
-static auto IndexError = index_error_maker(Sink, ScriptReserved_Sink);
-static auto NewIndexError = newindex_error_maker(Sink, ScriptReserved_Sink);
+static auto IndexError = IndexErrorMaker(Sink, ScriptReserved_Sink);
+static auto NewIndexError = NewIndexErrorMaker(Sink, ScriptReserved_Sink);
 
 Sink::Sink(SinkInfo& ref) : m_sink{ref}
 {};
@@ -83,10 +83,10 @@ void Sink::SetName(const std::string& id)
 		return;
 	}
 
-	if (s_callbackSetName(id, m_sink))
+	if (_callbackSetName(id, m_sink))
 	{
 		// remove the old name if we have one
-		s_callbackRemoveName(m_sink.Name);
+		_callbackRemoveName(m_sink.Name);
 		m_sink.Name = id;
 	}
 	else

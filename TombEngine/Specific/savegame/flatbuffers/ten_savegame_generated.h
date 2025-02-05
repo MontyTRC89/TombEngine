@@ -2290,6 +2290,11 @@ struct LaraInventoryDataT : public flatbuffers::NativeTable {
   int32_t small_waterskin = 0;
   int32_t big_waterskin = 0;
   bool has_binoculars = false;
+  bool has_compass = false;
+  bool has_stopwatch = false;
+  bool has_diary = false;
+  bool has_load = false;
+  bool has_save = false;
   bool has_crowbar = false;
   bool has_torch = false;
   bool has_lasersight = false;
@@ -2320,22 +2325,27 @@ struct LaraInventoryData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_SMALL_WATERSKIN = 12,
     VT_BIG_WATERSKIN = 14,
     VT_HAS_BINOCULARS = 16,
-    VT_HAS_CROWBAR = 18,
-    VT_HAS_TORCH = 20,
-    VT_HAS_LASERSIGHT = 22,
-    VT_HAS_SILENCER = 24,
-    VT_TOTAL_SMALL_MEDIPACKS = 26,
-    VT_TOTAL_LARGE_MEDIPACKS = 28,
-    VT_TOTAL_FLARES = 30,
-    VT_TOTAL_SECRETS = 32,
-    VT_PUZZLES = 34,
-    VT_KEYS = 36,
-    VT_PICKUPS = 38,
-    VT_EXAMINES = 40,
-    VT_PUZZLES_COMBO = 42,
-    VT_KEYS_COMBO = 44,
-    VT_PICKUPS_COMBO = 46,
-    VT_EXAMINES_COMBO = 48
+    VT_HAS_COMPASS = 18,
+    VT_HAS_STOPWATCH = 20,
+    VT_HAS_DIARY = 22,
+    VT_HAS_LOAD = 24,
+    VT_HAS_SAVE = 26,
+    VT_HAS_CROWBAR = 28,
+    VT_HAS_TORCH = 30,
+    VT_HAS_LASERSIGHT = 32,
+    VT_HAS_SILENCER = 34,
+    VT_TOTAL_SMALL_MEDIPACKS = 36,
+    VT_TOTAL_LARGE_MEDIPACKS = 38,
+    VT_TOTAL_FLARES = 40,
+    VT_TOTAL_SECRETS = 42,
+    VT_PUZZLES = 44,
+    VT_KEYS = 46,
+    VT_PICKUPS = 48,
+    VT_EXAMINES = 50,
+    VT_PUZZLES_COMBO = 52,
+    VT_KEYS_COMBO = 54,
+    VT_PICKUPS_COMBO = 56,
+    VT_EXAMINES_COMBO = 58
   };
   bool is_busy() const {
     return GetField<uint8_t>(VT_IS_BUSY, 0) != 0;
@@ -2357,6 +2367,21 @@ struct LaraInventoryData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   bool has_binoculars() const {
     return GetField<uint8_t>(VT_HAS_BINOCULARS, 0) != 0;
+  }
+  bool has_compass() const {
+    return GetField<uint8_t>(VT_HAS_COMPASS, 0) != 0;
+  }
+  bool has_stopwatch() const {
+    return GetField<uint8_t>(VT_HAS_STOPWATCH, 0) != 0;
+  }
+  bool has_diary() const {
+    return GetField<uint8_t>(VT_HAS_DIARY, 0) != 0;
+  }
+  bool has_load() const {
+    return GetField<uint8_t>(VT_HAS_LOAD, 0) != 0;
+  }
+  bool has_save() const {
+    return GetField<uint8_t>(VT_HAS_SAVE, 0) != 0;
   }
   bool has_crowbar() const {
     return GetField<uint8_t>(VT_HAS_CROWBAR, 0) != 0;
@@ -2415,6 +2440,11 @@ struct LaraInventoryData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_SMALL_WATERSKIN) &&
            VerifyField<int32_t>(verifier, VT_BIG_WATERSKIN) &&
            VerifyField<uint8_t>(verifier, VT_HAS_BINOCULARS) &&
+           VerifyField<uint8_t>(verifier, VT_HAS_COMPASS) &&
+           VerifyField<uint8_t>(verifier, VT_HAS_STOPWATCH) &&
+           VerifyField<uint8_t>(verifier, VT_HAS_DIARY) &&
+           VerifyField<uint8_t>(verifier, VT_HAS_LOAD) &&
+           VerifyField<uint8_t>(verifier, VT_HAS_SAVE) &&
            VerifyField<uint8_t>(verifier, VT_HAS_CROWBAR) &&
            VerifyField<uint8_t>(verifier, VT_HAS_TORCH) &&
            VerifyField<uint8_t>(verifier, VT_HAS_LASERSIGHT) &&
@@ -2470,6 +2500,21 @@ struct LaraInventoryDataBuilder {
   }
   void add_has_binoculars(bool has_binoculars) {
     fbb_.AddElement<uint8_t>(LaraInventoryData::VT_HAS_BINOCULARS, static_cast<uint8_t>(has_binoculars), 0);
+  }
+  void add_has_compass(bool has_compass) {
+    fbb_.AddElement<uint8_t>(LaraInventoryData::VT_HAS_COMPASS, static_cast<uint8_t>(has_compass), 0);
+  }
+  void add_has_stopwatch(bool has_stopwatch) {
+    fbb_.AddElement<uint8_t>(LaraInventoryData::VT_HAS_STOPWATCH, static_cast<uint8_t>(has_stopwatch), 0);
+  }
+  void add_has_diary(bool has_diary) {
+    fbb_.AddElement<uint8_t>(LaraInventoryData::VT_HAS_DIARY, static_cast<uint8_t>(has_diary), 0);
+  }
+  void add_has_load(bool has_load) {
+    fbb_.AddElement<uint8_t>(LaraInventoryData::VT_HAS_LOAD, static_cast<uint8_t>(has_load), 0);
+  }
+  void add_has_save(bool has_save) {
+    fbb_.AddElement<uint8_t>(LaraInventoryData::VT_HAS_SAVE, static_cast<uint8_t>(has_save), 0);
   }
   void add_has_crowbar(bool has_crowbar) {
     fbb_.AddElement<uint8_t>(LaraInventoryData::VT_HAS_CROWBAR, static_cast<uint8_t>(has_crowbar), 0);
@@ -2539,6 +2584,11 @@ inline flatbuffers::Offset<LaraInventoryData> CreateLaraInventoryData(
     int32_t small_waterskin = 0,
     int32_t big_waterskin = 0,
     bool has_binoculars = false,
+    bool has_compass = false,
+    bool has_stopwatch = false,
+    bool has_diary = false,
+    bool has_load = false,
+    bool has_save = false,
     bool has_crowbar = false,
     bool has_torch = false,
     bool has_lasersight = false,
@@ -2576,6 +2626,11 @@ inline flatbuffers::Offset<LaraInventoryData> CreateLaraInventoryData(
   builder_.add_has_lasersight(has_lasersight);
   builder_.add_has_torch(has_torch);
   builder_.add_has_crowbar(has_crowbar);
+  builder_.add_has_save(has_save);
+  builder_.add_has_load(has_load);
+  builder_.add_has_diary(has_diary);
+  builder_.add_has_stopwatch(has_stopwatch);
+  builder_.add_has_compass(has_compass);
   builder_.add_has_binoculars(has_binoculars);
   builder_.add_old_busy(old_busy);
   builder_.add_is_busy(is_busy);
@@ -2596,6 +2651,11 @@ inline flatbuffers::Offset<LaraInventoryData> CreateLaraInventoryDataDirect(
     int32_t small_waterskin = 0,
     int32_t big_waterskin = 0,
     bool has_binoculars = false,
+    bool has_compass = false,
+    bool has_stopwatch = false,
+    bool has_diary = false,
+    bool has_load = false,
+    bool has_save = false,
     bool has_crowbar = false,
     bool has_torch = false,
     bool has_lasersight = false,
@@ -2629,6 +2689,11 @@ inline flatbuffers::Offset<LaraInventoryData> CreateLaraInventoryDataDirect(
       small_waterskin,
       big_waterskin,
       has_binoculars,
+      has_compass,
+      has_stopwatch,
+      has_diary,
+      has_load,
+      has_save,
       has_crowbar,
       has_torch,
       has_lasersight,
@@ -4887,6 +4952,8 @@ struct ParticleInfoT : public flatbuffers::NativeTable {
   int32_t fx_obj = 0;
   int32_t room_number = 0;
   int32_t node_number = 0;
+  std::unique_ptr<TEN::Save::Vector3> target_pos{};
+  int32_t sprite_id = 0;
 };
 
 struct ParticleInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -4930,7 +4997,9 @@ struct ParticleInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_DYNAMIC = 70,
     VT_FX_OBJ = 72,
     VT_ROOM_NUMBER = 74,
-    VT_NODE_NUMBER = 76
+    VT_NODE_NUMBER = 76,
+    VT_TARGET_POS = 78,
+    VT_SPRITE_ID = 80
   };
   int32_t x() const {
     return GetField<int32_t>(VT_X, 0);
@@ -5043,6 +5112,12 @@ struct ParticleInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t node_number() const {
     return GetField<int32_t>(VT_NODE_NUMBER, 0);
   }
+  const TEN::Save::Vector3 *target_pos() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_TARGET_POS);
+  }
+  int32_t sprite_id() const {
+    return GetField<int32_t>(VT_SPRITE_ID, 0);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_X) &&
@@ -5082,6 +5157,8 @@ struct ParticleInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_FX_OBJ) &&
            VerifyField<int32_t>(verifier, VT_ROOM_NUMBER) &&
            VerifyField<int32_t>(verifier, VT_NODE_NUMBER) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_TARGET_POS) &&
+           VerifyField<int32_t>(verifier, VT_SPRITE_ID) &&
            verifier.EndTable();
   }
   ParticleInfoT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -5204,6 +5281,12 @@ struct ParticleInfoBuilder {
   void add_node_number(int32_t node_number) {
     fbb_.AddElement<int32_t>(ParticleInfo::VT_NODE_NUMBER, node_number, 0);
   }
+  void add_target_pos(const TEN::Save::Vector3 *target_pos) {
+    fbb_.AddStruct(ParticleInfo::VT_TARGET_POS, target_pos);
+  }
+  void add_sprite_id(int32_t sprite_id) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_SPRITE_ID, sprite_id, 0);
+  }
   explicit ParticleInfoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -5253,8 +5336,12 @@ inline flatbuffers::Offset<ParticleInfo> CreateParticleInfo(
     int32_t dynamic = 0,
     int32_t fx_obj = 0,
     int32_t room_number = 0,
-    int32_t node_number = 0) {
+    int32_t node_number = 0,
+    const TEN::Save::Vector3 *target_pos = 0,
+    int32_t sprite_id = 0) {
   ParticleInfoBuilder builder_(_fbb);
+  builder_.add_sprite_id(sprite_id);
+  builder_.add_target_pos(target_pos);
   builder_.add_node_number(node_number);
   builder_.add_room_number(room_number);
   builder_.add_fx_obj(fx_obj);
@@ -8839,6 +8926,11 @@ inline void LaraInventoryData::UnPackTo(LaraInventoryDataT *_o, const flatbuffer
   { auto _e = small_waterskin(); _o->small_waterskin = _e; }
   { auto _e = big_waterskin(); _o->big_waterskin = _e; }
   { auto _e = has_binoculars(); _o->has_binoculars = _e; }
+  { auto _e = has_compass(); _o->has_compass = _e; }
+  { auto _e = has_stopwatch(); _o->has_stopwatch = _e; }
+  { auto _e = has_diary(); _o->has_diary = _e; }
+  { auto _e = has_load(); _o->has_load = _e; }
+  { auto _e = has_save(); _o->has_save = _e; }
   { auto _e = has_crowbar(); _o->has_crowbar = _e; }
   { auto _e = has_torch(); _o->has_torch = _e; }
   { auto _e = has_lasersight(); _o->has_lasersight = _e; }
@@ -8872,6 +8964,11 @@ inline flatbuffers::Offset<LaraInventoryData> CreateLaraInventoryData(flatbuffer
   auto _small_waterskin = _o->small_waterskin;
   auto _big_waterskin = _o->big_waterskin;
   auto _has_binoculars = _o->has_binoculars;
+  auto _has_compass = _o->has_compass;
+  auto _has_stopwatch = _o->has_stopwatch;
+  auto _has_diary = _o->has_diary;
+  auto _has_load = _o->has_load;
+  auto _has_save = _o->has_save;
   auto _has_crowbar = _o->has_crowbar;
   auto _has_torch = _o->has_torch;
   auto _has_lasersight = _o->has_lasersight;
@@ -8897,6 +8994,11 @@ inline flatbuffers::Offset<LaraInventoryData> CreateLaraInventoryData(flatbuffer
       _small_waterskin,
       _big_waterskin,
       _has_binoculars,
+      _has_compass,
+      _has_stopwatch,
+      _has_diary,
+      _has_load,
+      _has_save,
       _has_crowbar,
       _has_torch,
       _has_lasersight,
@@ -9706,6 +9808,8 @@ inline void ParticleInfo::UnPackTo(ParticleInfoT *_o, const flatbuffers::resolve
   { auto _e = fx_obj(); _o->fx_obj = _e; }
   { auto _e = room_number(); _o->room_number = _e; }
   { auto _e = node_number(); _o->node_number = _e; }
+  { auto _e = target_pos(); if (_e) _o->target_pos = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = sprite_id(); _o->sprite_id = _e; }
 }
 
 inline flatbuffers::Offset<ParticleInfo> ParticleInfo::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ParticleInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -9753,6 +9857,8 @@ inline flatbuffers::Offset<ParticleInfo> CreateParticleInfo(flatbuffers::FlatBuf
   auto _fx_obj = _o->fx_obj;
   auto _room_number = _o->room_number;
   auto _node_number = _o->node_number;
+  auto _target_pos = _o->target_pos ? _o->target_pos.get() : 0;
+  auto _sprite_id = _o->sprite_id;
   return TEN::Save::CreateParticleInfo(
       _fbb,
       _x,
@@ -9791,7 +9897,9 @@ inline flatbuffers::Offset<ParticleInfo> CreateParticleInfo(flatbuffers::FlatBuf
       _dynamic,
       _fx_obj,
       _room_number,
-      _node_number);
+      _node_number,
+      _target_pos,
+      _sprite_id);
 }
 
 inline SoundtrackT *Soundtrack::UnPack(const flatbuffers::resolver_function_t *_resolver) const {

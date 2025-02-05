@@ -382,7 +382,7 @@ namespace TEN::Renderer
 
 	void Renderer::CollectItems(short roomNumber, RenderView& renderView)
 	{
-		if (_rooms.size() < roomNumber)
+		if (_rooms.size() <= roomNumber)
 			return;
 
 		auto& rendererRoom = _rooms[roomNumber];
@@ -440,10 +440,10 @@ namespace TEN::Renderer
 			newItem.ObjectID = item.ObjectNumber;
 			newItem.Color = item.Model.Color;
 			newItem.Position = item.Pose.Position.ToVector3();
-			newItem.Translation = Matrix::CreateTranslation(newItem.Position.x, newItem.Position.y, newItem.Position.z);
+			newItem.Translation = Matrix::CreateTranslation(newItem.Position);
 			newItem.Rotation = item.Pose.Orientation.ToRotationMatrix();
-			newItem.Scale = Matrix::CreateScale(1.0f);
-			newItem.World = newItem.Rotation * newItem.Translation;
+			newItem.Scale = Matrix::CreateScale(item.Pose.Scale);
+			newItem.World = newItem.Scale * newItem.Rotation * newItem.Translation;
 
 			// Disable interpolation either when renderer slot or item slot has flag. 
 			// Renderer slot has no interpolation flag set in case it is fetched for first time (e.g. item first time in frustum).
@@ -455,6 +455,7 @@ namespace TEN::Renderer
 				newItem.PrevPosition = newItem.Position;
 				newItem.PrevTranslation = newItem.Translation;
 				newItem.PrevRotation = newItem.Rotation;
+				newItem.PrevScale = newItem.Scale;
 				newItem.PrevWorld = newItem.World;
 
 				// Otherwise all frames until next ControlPhase will not be interpolated.
@@ -470,6 +471,7 @@ namespace TEN::Renderer
 			newItem.InterpolatedPosition = Vector3::Lerp(newItem.PrevPosition, newItem.Position, GetInterpolationFactor(forceValue));
 			newItem.InterpolatedTranslation = Matrix::Lerp(newItem.PrevTranslation, newItem.Translation, GetInterpolationFactor(forceValue));
 			newItem.InterpolatedRotation = Matrix::Lerp(newItem.InterpolatedRotation, newItem.Rotation, GetInterpolationFactor(forceValue));
+			newItem.InterpolatedScale = Matrix::Lerp(newItem.InterpolatedScale, newItem.Scale, GetInterpolationFactor(forceValue));
 			newItem.InterpolatedWorld = Matrix::Lerp(newItem.PrevWorld, newItem.World, GetInterpolationFactor(forceValue));
 			
 			for (int j = 0; j < MAX_BONES; j++)
@@ -484,7 +486,7 @@ namespace TEN::Renderer
 
 	void Renderer::CollectStatics(short roomNumber, RenderView& renderView)
 	{
-		if (_rooms.size() < roomNumber)
+		if (_rooms.size() <= roomNumber)
 			return;
 
 		auto& room = _rooms[roomNumber];
@@ -540,7 +542,7 @@ namespace TEN::Renderer
 				}
 				else
 				{
-					// Collecy only dynamic lights and use cached lights from rooms
+					// Collect only dynamic lights and use cached lights from rooms
 					CollectLights(mesh->Pose.Position.ToVector3(), 1024, room.RoomNumber, NO_VALUE, false, true, &mesh->CachedRoomLights, &lights);
 				}
 			}
@@ -566,45 +568,38 @@ namespace TEN::Renderer
 		// Now collect lights from dynamic list and from rooms
 		std::vector<RendererLightNode> tempLights;
 		tempLights.reserve(MAX_LIGHTS_DRAW);
-		
+
 		auto& room = _rooms[roomNumber];
 
 		RendererLight* brightestLight = nullptr;
-		float highestIntensity = 0.0f;
-
-		auto calculateIntensity = [](float distSqr, const RendererLight& light, float radius) -> std::optional<float>
-		{
-			if (distSqr >= SQUARE(BLOCK(20)) || distSqr > SQUARE(light.Out + radius))
-				return std::nullopt; // Light is too far.
-
-			float distance = sqrt(distSqr);
-			float attenuation = 1.0f - distance / light.Out;
-			return attenuation * light.Intensity * light.Luma;
-		};
-
-		auto processLight = [&](RendererLight& light, float distSqr, int dynamicFlag)
-		{
-			float distance = sqrt(distSqr);
-			float intensity = calculateIntensity(distSqr, light, radius).value_or(0.0f);
-
-			if (intensity <= EPSILON)
-				return;
-
-			if ((light.Type == LightType::Point || light.Type == LightType::Spot) &&
-				 light.CastShadows && prioritizeShadowLight && intensity >= highestIntensity)
-			{
-				highestIntensity = intensity;
-				brightestLight = &light;
-			}
-
-			tempLights.push_back({ &light, intensity, distance, dynamicFlag });
-		};
+		float brightest = 0.0f;
 
 		// Dynamic lights have the priority
 		for (auto& light : _dynamicLights[_dynamicLightList])
 		{
 			float distSqr = Vector3::DistanceSquared(pos, light.Position);
-			processLight(light, distSqr, 1);
+
+			// Collect only lights nearer than 20 sectors
+			if (distSqr >= SQUARE(BLOCK(20)))
+				continue;
+
+			// Check the out radius
+			if (distSqr > SQUARE(light.Out + radius))
+				continue;
+
+			float distance = sqrt(distSqr);
+			float attenuation = 1.0f - distance / light.Out;
+			float intensity = attenuation * light.Intensity * light.Luma;
+
+			// If collecting shadows, try collecting shadow-casting light.
+			if (prioritizeShadowLight && light.CastShadows && intensity >= brightest)
+			{
+				brightest = intensity;
+				brightestLight = &light;
+			}
+
+			RendererLightNode node = { &light, intensity, distance, 1 };
+			tempLights.push_back(node);
 		}
 
 		if (!useCachedRoomLights)
@@ -613,8 +608,15 @@ namespace TEN::Renderer
 			for (int roomToCheck : room.Neighbors)
 			{
 				auto& currentRoom = _rooms[roomToCheck];
-				for (auto& light : currentRoom.Lights)
+				int lightCount = (int)currentRoom.Lights.size();
+
+				for (int j = 0; j < lightCount; j++)
 				{
+					auto& light = currentRoom.Lights[j];
+
+					float intensity = 0;
+					float dist = 0;
+
 					// Check only lights different from sun.
 					if (light.Type == LightType::Sun)
 					{
@@ -623,25 +625,66 @@ namespace TEN::Renderer
 							continue;
 
 						// Sun is added without distance checks.
-						float intensity = light.Intensity * Luma(light.Color);
-						RendererLightNode node = { &light, intensity, 0.0f, 0 };
-						tempLights.push_back(node);
-
-						if (roomsLights != nullptr)
-							roomsLights->push_back(node);
+						intensity = light.Intensity * Luma(light.Color);
 					}
-					else if (light.Type == LightType::Point || 
-							 light.Type == LightType::Shadow ||
-							 light.Type == LightType::Spot)
+					else if (light.Type == LightType::Point || light.Type == LightType::Shadow)
 					{
 						float distSqr = Vector3::DistanceSquared(pos, light.Position);
-						processLight(light, distSqr, 0);
+
+						// Collect only lights nearer than 20 blocks.
+						if (distSqr >= SQUARE(BLOCK(20)))
+							continue;
+
+						// Check out radius.
+						if (distSqr > SQUARE(light.Out + radius))
+							continue;
+
+						dist = sqrt(distSqr);
+						float attenuation = 1.0f - dist / light.Out;
+						intensity = attenuation * light.Intensity * Luma(light.Color);
+
+						// If collecting shadows, try collecting shadow-casting light.
+						if (prioritizeShadowLight && light.CastShadows && light.Type == LightType::Point && intensity >= brightest)
+						{
+							brightest = intensity;
+							brightestLight = &light;
+						}
+					}
+					else if (light.Type == LightType::Spot)
+					{
+						float distSqr = Vector3::DistanceSquared(pos, light.Position);
+
+						// Collect only lights nearer than 20 blocks.
+						if (distSqr >= SQUARE(BLOCK(20)))
+							continue;
+
+						// Check range.
+						if (distSqr > SQUARE(light.Out + radius))
+							continue;
+
+						dist = sqrt(distSqr);
+						float attenuation = 1.0f - dist / light.Out;
+						intensity = attenuation * light.Intensity * light.Luma;
+
+						// If collecting shadows, try collecting shadow-casting light.
+						if (prioritizeShadowLight && light.CastShadows && intensity >= brightest)
+						{
+							brightest = intensity;
+							brightestLight = &light;
+						}
 					}
 					else
 					{
 						// Invalid light type.
 						continue;
 					}
+
+					RendererLightNode node = { &light, intensity, dist, 0 };
+
+					if (roomsLights != nullptr)
+						roomsLights->push_back(node);
+
+					tempLights.push_back(node);
 				}
 			}
 		}
@@ -663,7 +706,7 @@ namespace TEN::Renderer
 		// Put actual lights in provided vector.
 		outputLights->clear();
 
-		// Add brightest light, if collecting shadow light is specified, even if it's far in range.
+		// Add brightest ligh, if collecting shadow light is specified, even if it's far in range.
 		if (prioritizeShadowLight && brightestLight)
 			outputLights->push_back(brightestLight);
 
@@ -746,7 +789,7 @@ namespace TEN::Renderer
 
 	void Renderer::CollectLightsForRoom(short roomNumber, RenderView &renderView)
 	{
-		if (_rooms.size() < roomNumber)
+		if (_rooms.size() <= roomNumber)
 			return;
 
 		RendererRoom& room = _rooms[roomNumber];
@@ -788,7 +831,7 @@ namespace TEN::Renderer
 
 	void Renderer::CollectEffects(short roomNumber)
 	{
-		if (_rooms.size() < roomNumber)
+		if (_rooms.size() <= roomNumber)
 			return;
 
 		RendererRoom& room = _rooms[roomNumber];

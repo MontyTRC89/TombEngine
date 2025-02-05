@@ -72,7 +72,8 @@ namespace TEN::Entities::Generic
 		spark->dSize = spark->size / 8;
 
 		int spriteOffset = GlobalCounter % Objects[ID_FIRE_SPRITES].nmeshes;
-		spark->spriteIndex = Objects[ID_FIRE_SPRITES].meshIndex + spriteOffset;
+		spark->SpriteSeqID = ID_FIRE_SPRITES;
+		spark->SpriteID = spriteOffset;
 	}
 
 	void DoFlameTorch()
@@ -188,7 +189,7 @@ namespace TEN::Entities::Generic
 				Random::GenerateFloat(0.4f, 0.5f),
 				0.0f);
 			float lightFalloff = Random::GenerateFloat(0.04f, 0.045f);
-			TriggerDynamicLight(pos.x, pos.y, pos.z, lightFalloff * UCHAR_MAX, lightColor.R() * UCHAR_MAX, lightColor.G() * UCHAR_MAX, lightColor.B() * UCHAR_MAX);
+			SpawnDynamicLight(pos.x, pos.y, pos.z, lightFalloff * UCHAR_MAX, lightColor.R() * UCHAR_MAX, lightColor.G() * UCHAR_MAX, lightColor.B() * UCHAR_MAX);
 
 			if (!(Wibble & 3))
 				TriggerTorchFlame(laraItem->Index, 0);
@@ -287,7 +288,7 @@ namespace TEN::Entities::Generic
 				Random::GenerateFloat(0.4f, 0.5f),
 				0.0f);
 			float lightFalloff = Random::GenerateFloat(0.04f, 0.045f);
-			TriggerDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, lightFalloff * UCHAR_MAX, lightColor.R() * UCHAR_MAX, lightColor.G() * UCHAR_MAX, lightColor.B() * UCHAR_MAX);
+			SpawnDynamicLight(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, lightFalloff * UCHAR_MAX, lightColor.R() * UCHAR_MAX, lightColor.G() * UCHAR_MAX, lightColor.B() * UCHAR_MAX);
 			
 			if (!(Wibble & 7))
 				TriggerTorchFlame(itemNumber, 1);

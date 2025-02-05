@@ -323,7 +323,7 @@ Possible event type values:
 */
 void LogicHandler::HandleEvent(const std::string& name, EventType type, sol::optional<Moveable&> activator)
 {
-	TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? (Activator)activator.value().GetIndex() : (Activator)short(LaraItem->Index));
+	TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? (Activator)(short)activator->GetIndex() : (Activator)(short)LaraItem->Index);
 }
 
 /*** Attempt to find an event set and enable specified event in it.
@@ -959,9 +959,9 @@ void LogicHandler::ExecuteFunction(const std::string& name, short idOne, short i
 void LogicHandler::ExecuteFunction(const std::string& name, TEN::Control::Volumes::Activator activator, const std::string& arguments)
 {
 	sol::protected_function func = (*m_handler.GetState())[ScriptReserved_LevelFuncs][name.c_str()];
-	if (std::holds_alternative<short>(activator))
+	if (std::holds_alternative<int>(activator))
 	{
-		func(std::make_unique<Moveable>(std::get<short>(activator), true), arguments);
+		func(std::make_unique<Moveable>(std::get<int>(activator), true), arguments);
 	}
 	else
 	{
@@ -1193,6 +1193,8 @@ For example:
 			print("death")
 		end
 	end
+@tfield function OnUseItem Will be called when using an item from inventory.
+@tfield function OnFreeze Will be called when any of the Freeze modes are activated.
 @table LevelFuncs
 */
 

@@ -497,7 +497,7 @@ bool DoFlareLight(ItemInfo& item, const Vector3i& pos, int flareLife)
 	auto color = (flareColor * intensity * std::clamp(mult, 0.0f, 1.0f));
 
 	// Spawn dynamic light.
-	TriggerDynamicPointLight(lightPos, Color(color), falloff, false, GetHash(item.Name));
+	SpawnDynamicPointLight(lightPos, Color(color), falloff, false, GetHash(item.Name));
 
 	// Spawn lensflare if brightness is not 0.
 	if (settings.LensflareBrightness > EPSILON)
