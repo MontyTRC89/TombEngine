@@ -116,7 +116,7 @@ namespace TEN::Scripting
 	/// Get this static's visibility state.
 	// @function Static:GetActive
 	// @treturn bool Visibility state.
-	bool Static::GetActiveStatus()
+	bool Static::GetActiveStatus() const
 	{
 		return ((_static.flags & StaticMeshFlags::SM_VISIBLE) != 0);
 	}
@@ -124,7 +124,7 @@ namespace TEN::Scripting
 	/// Get this static's solid collision state.
 	// @function Static:GetSolid
 	// @treturn bool Solid collision state. __True: solid__, __False: soft__
-	bool Static::GetSolidStatus()
+	bool Static::GetSolidStatus() const
 	{
 		return ((_static.flags & StaticMeshFlags::SM_SOLID) != 0);
 	}

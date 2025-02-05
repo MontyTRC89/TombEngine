@@ -42,8 +42,8 @@ namespace TEN::Scripting
 		float		GetScale() const;
 		ScriptColor GetColor() const;
 		int			GetHitPoints() const;
-		bool		GetActiveStatus();
-		bool		GetSolidStatus();
+		bool		GetActiveStatus() const;
+		bool		GetSolidStatus() const;
 
 		// Setters
 
