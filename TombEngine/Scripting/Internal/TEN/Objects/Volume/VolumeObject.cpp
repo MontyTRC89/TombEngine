@@ -145,10 +145,9 @@ bool Volume::IsMoveableInside(const Moveable& mov)
 {
 	for (const auto& entry : _volume.StateQueue)
 	{
-		// TODO: Use int, not short.
-		if (std::holds_alternative<short>(entry.Activator))
+		if (std::holds_alternative<int>(entry.Activator))
 		{
-			int id = std::get<short>(entry.Activator);
+			int id = std::get<int>(entry.Activator);
 			auto& mov2 = std::make_unique<Moveable>(id);
 
 			if (mov2.get()->GetName() == mov.GetName())

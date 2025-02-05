@@ -959,9 +959,9 @@ void LogicHandler::ExecuteFunction(const std::string& name, short idOne, short i
 void LogicHandler::ExecuteFunction(const std::string& name, TEN::Control::Volumes::Activator activator, const std::string& arguments)
 {
 	sol::protected_function func = (*m_handler.GetState())[ScriptReserved_LevelFuncs][name.c_str()];
-	if (std::holds_alternative<short>(activator))
+	if (std::holds_alternative<int>(activator))
 	{
-		func(std::make_unique<Moveable>(std::get<short>(activator), true), arguments);
+		func(std::make_unique<Moveable>(std::get<int>(activator), true), arguments);
 	}
 	else
 	{

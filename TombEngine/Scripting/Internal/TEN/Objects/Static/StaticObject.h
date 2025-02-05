@@ -44,5 +44,5 @@ public:
 	void Shatter();
 
 private:
-	MESH_INFO & m_mesh;
+	MESH_INFO& m_mesh;
 };

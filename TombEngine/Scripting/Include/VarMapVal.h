@@ -10,7 +10,6 @@ struct ROOM_INFO;
 
 using VarMapVal = std::variant<
 	int,
-	short,
 	std::reference_wrapper<MESH_INFO>,
 	std::reference_wrapper<LevelCameraInfo>,
 	std::reference_wrapper<SinkInfo>,
