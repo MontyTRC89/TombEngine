@@ -429,7 +429,7 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 	if (!data)
 		return;
 
-	// Don't process legacy triggers if trigger triggerer wasn't used
+	// Don't process legacy triggers if Triggerer flag was used in editor and Trigger_Triggerer wasn't activated or used.
 	if (floor->Flags.MarkTriggerer && !floor->Flags.MarkTriggererActive)
 		return;
 
@@ -846,7 +846,7 @@ void TestTriggers(ItemInfo* item, bool isHeavy, int heavyFlags)
 	short roomNumber = item->RoomNumber;
 	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 
-	// Don't process legacy triggers if trigger triggerer wasn't used
+	// Don't process legacy triggers if Triggerer flag was used in editor and Trigger_Triggerer wasn't activated or used.
 	if (floor->Flags.MarkTriggerer && !floor->Flags.MarkTriggererActive)
 		return;
 
@@ -858,7 +858,7 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 	auto roomNum = roomNumber;
 	auto floor = GetFloor(x, y, z, &roomNum);
 
-	// Don't process legacy triggers if trigger triggerer wasn't used
+	// Don't process legacy triggers if Triggerer flag was used in editor and Trigger_Triggerer wasn't activated or used.
 	if (floor->Flags.MarkTriggerer && !floor->Flags.MarkTriggererActive)
 		return;
 
