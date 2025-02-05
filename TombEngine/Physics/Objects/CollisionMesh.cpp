@@ -124,18 +124,18 @@ namespace TEN::Physics
 		// Check if point is inside triangle (barycentric coordinates must be in range [0, 1]).
 		return (u >= 0.0f && v >= 0.0f && (u + v) <= 1.0f);
 	}
-
+	
 	// TODO: Not working right.
 	void CollisionMeshDesc::Optimize()
 	{
-		return;
-		constexpr auto PLANE_HEIGHT_STEP = BLOCK(1 / 32.0f);
+		//return;
+		constexpr auto PLANE_HEIGHT_STEP = BLOCK(1 / 64.0f);
 
 		using VertexArray = std::array<int, LocalCollisionTriangle::VERTEX_COUNT>; // Vertex IDs of vertices defining triangle.
 		using EdgePair	  = std::pair<int, int>;								   // Vertex IDs of vertices defining edge.
 
 		// 1) Group coplanar triangles.
-		auto coplanarTriMap = std::unordered_map<Plane, std::vector<VertexArray>>{};
+		auto coplanarTriMap = std::unordered_map<Plane, std::vector<VertexArray>>{}; // Key = plane, value = triangles.
 		for (int i = 0; i < _ids.size(); i += LocalCollisionTriangle::VERTEX_COUNT)
 		{
 			// Get vertices.
@@ -151,7 +151,7 @@ namespace TEN::Physics
 			auto normal = edge0.Cross(edge1);
 			normal.Normalize();
 
-			// Calculate plane distance. NOTE: Rounded to discrete steps to account for floating-point imprecision.
+			// Calculate plane distance.
 			float dist = RoundToStep(normal.Dot(vertex0), PLANE_HEIGHT_STEP);
 
 			// Collect triangles by plane.
@@ -164,8 +164,8 @@ namespace TEN::Physics
 		for (const auto& [plane, tris] : coplanarTriMap)
 		{
 			// 2.1) Count shared edges and track vertex adjacency.
-			auto edgeCountMap = std::unordered_map<EdgePair, int, PairHash>{};
-			//auto adjacentVertexMap = std::unordered_map<int, std::unordered_set<int>>{};
+			auto edgeCountMap = std::unordered_map<EdgePair, int, PairHash>{};			  // Key = vertex ID pair defining edge, value = edge count.
+			auto vertexAdjacencyMap = std::unordered_map<int, std::unordered_set<int>>{}; // Key = vertex ID, value = adjacent vertex ID.
 			for (const auto& tri : tris)
 			{
 				// Run through vertices.
@@ -175,7 +175,7 @@ namespace TEN::Physics
 					int vertexId0 = tri[i];
 					int vertexId1 = tri[(i + 1) % LocalCollisionTriangle::VERTEX_COUNT];
 
-					// Order ID pairs in sequence.
+					// Order vertex ID pairs in sequence.
 					if (vertexId0 > vertexId1)
 						std::swap(vertexId0, vertexId1);
 
@@ -183,9 +183,9 @@ namespace TEN::Physics
 					auto edgePair = EdgePair{ vertexId0, vertexId1 };
 					edgeCountMap[edgePair]++;
 
-					// Update adjacent vertex map.
-					//adjacentVertexMap[vertexId0].insert(vertexId1);
-					//adjacentVertexMap[vertexId1].insert(vertexId0);
+					// Update vertex adjacency map.
+					vertexAdjacencyMap[vertexId0].insert(vertexId1);
+					vertexAdjacencyMap[vertexId1].insert(vertexId0);
 				}
 			}
 
@@ -193,20 +193,25 @@ namespace TEN::Physics
 			auto boundaryEdges = std::vector<EdgePair>{};
 			for (const auto& [edge, count] : edgeCountMap)
 			{
-				if (count <= 1)
-					boundaryEdges.push_back(edge);
+				if (count != 1)
+					continue;
+
+				boundaryEdges.push_back(edge);
 			}
 
-			// 2.3) Process edges into ordered polygon loops.
+			// 2.3) Process boundary edges into polygon loops.
 			auto polygons = std::vector<std::vector<int>>{};
 			while (!boundaryEdges.empty())
 			{
 				auto polygon = std::vector<int>{};
+				
+				const auto& firstEdgeIt = boundaryEdges.begin();
+				const auto& [firstVertexId0, firstVertexId1] = *firstEdgeIt;
 
 				// Add first boundary edge.
-				polygon.push_back(boundaryEdges.begin()->first);
-				polygon.push_back(boundaryEdges.begin()->second);
-				boundaryEdges.erase(boundaryEdges.begin());
+				polygon.push_back(firstVertexId0);
+				polygon.push_back(firstVertexId1);
+				boundaryEdges.erase(firstEdgeIt);
 
 				// Run through remaining boundary edges.
 				while (!boundaryEdges.empty())
@@ -216,56 +221,60 @@ namespace TEN::Physics
 					bool isFound = false;
 					for (auto it = boundaryEdges.begin(); it != boundaryEdges.end(); it++)
 					{
-						auto& [vertexId0, vertexId1] = *it;
+						const auto& [vertexId0, vertexId1] = *it;
 
 						// If current vertex is equal to the one in polygon, add next vertex.
 						if (vertexId0 == polygon.back())
 						{
+							// Add vertex ID to polygon and remove used edge.
 							polygon.push_back(vertexId1);
-							boundaryEdges.erase(it);  // Remove used edge
+							boundaryEdges.erase(it);
+
 							isFound = true;
 							break;
 						}
 						else if (vertexId1 == polygon.back())
 						{
+							// Add vertex ID to polygon and remove used edge.
 							polygon.push_back(vertexId0);
-							boundaryEdges.erase(it);  // Remove used edge
+							boundaryEdges.erase(it);
+
 							isFound = true;
 							break;
 						}
 					}
 
-					// No matching edge is found; finalize current polygon and start new one.
+					// No matching edge found; finalize polygon.
 					if (!isFound)
 						break;
 				}
 
-				// TODO: Not completely working.
+				// TODO: Fix. Sometimes creates holes.
 				// Remove redundant collinear vertices.
-				/*
 				auto simplifiedPolygon = std::vector<int>{};
+				simplifiedPolygon.reserve(polygon.size() / 2);
 				for (int i = 0; i < polygon.size(); i++)
 				{
 					// Get vertex IDs.
 					int vertexId = polygon[i];
-					int prevVertexId = polygon[(i + (polygon.size() - 1)) % polygon.size()];
-					int nextVertexId = polygon[(i + 1) % polygon.size()];
+					int prevVertexId = polygon[(i == 0) ? (polygon.size() - 1) : (i - 1)];
+					int nextVertexId = polygon[(i == (polygon.size() - 1)) ? 0 : (i + 1)];
 
 					// Calculate edges.
 					auto edge0 = _vertices[vertexId] - _vertices[prevVertexId];
 					auto edge1 = _vertices[nextVertexId] - _vertices[vertexId];
 
 					// Check collinearity using cross product.
-					if (abs(edge0.Cross(edge1).LengthSquared()) > EPSILON)
-						simplifiedPolygon.push_back(vertexId);
+					if (edge0.Cross(edge1).LengthSquared() > EPSILON)
+						simplifiedPolygon.emplace_back(vertexId);
 				}
 
-				polygon = std::move(simplifiedPolygon);
-				*/
+				// TEMP: Don't use optimised polygon for now.
+				//simplifiedPolygon = polygon;
 
-				// If a polygon was successfully created, ensure it is stored in the list.
-				if (!polygon.empty())
-					polygons.push_back(polygon);  // Add the polygon to the result list
+				// Collect valid polygon.
+				if (simplifiedPolygon.size() >= LocalCollisionTriangle::VERTEX_COUNT)
+					polygons.push_back(std::move(simplifiedPolygon));
 			}
 
 			// 2.4) Triangulate polygon using optimized monotone approach.
@@ -280,81 +289,30 @@ namespace TEN::Physics
 					continue;
 
 				// Create mutable polygon copy for triangulation.
-				auto remaining = polygon;
-
-				while (remaining.size() > 2)
+				auto remainingVertexIds = polygon;
+				while (remainingVertexIds.size() > 2)
 				{
-					for (int i = 0; i < remaining.size(); i++)
+					for (int i = 0; i < remainingVertexIds.size(); i++)
 					{
-						int prev = remaining[(i + remaining.size() - 1) % remaining.size()];
-						int current = remaining[i];
-						int next = remaining[(i + 1) % remaining.size()];
+						int vertexId = remainingVertexIds[i];
+						int prevVertexId = remainingVertexIds[(i + (remainingVertexIds.size() - 1)) % remainingVertexIds.size()];
+						int nextVertexId = remainingVertexIds[(i + 1) % remainingVertexIds.size()];
 
 						// Ensure correct winding order.
-						auto faceNormal = (_vertices[prev] - _vertices[current]).Cross(_vertices[next] - _vertices[current]);
+						auto faceNormal = (_vertices[prevVertexId] - _vertices[vertexId]).Cross(_vertices[nextVertexId] - _vertices[vertexId]);
 						if (faceNormal.Dot(plane.Normal()) > 0.0f)
-							std::swap(prev, next);
+							std::swap(prevVertexId, nextVertexId);
 
-						optimizedIds.push_back(prev);
-						optimizedIds.push_back(current);
-						optimizedIds.push_back(next);
-						remaining.erase(remaining.begin() + i);
+						// Collect optimized vertex IDs.
+						optimizedIds.push_back(prevVertexId);
+						optimizedIds.push_back(vertexId);
+						optimizedIds.push_back(nextVertexId);
+
+						remainingVertexIds.erase(remainingVertexIds.begin() + i);
 						break;
 					}
 				}
 			}
-/*
-			// 2.3) Store edge vertices in hash map for fast bidirectional lookup.
-			auto edgeMap = std::unordered_map<int, int>{};
-			for (const auto& [vertexId0, vertexId1] : boundaryEdges)
-			{
-				edgeMap[vertexId0] = vertexId1;
-				edgeMap[vertexId1] = vertexId0;
-			}
-
-			// 2.4) Process edges into ordered polygon loops.
-			auto polygons = std::vector<std::vector<int>>{};
-			while (!edgeMap.empty())
-			{
-				auto polygon = std::vector<int>{};
-
-				// Start with arbitrary edge.
-				auto it = edgeMap.begin();
-				int start = it->first;
-				int current = start;
-
-				do
-				{
-					polygon.push_back(current);
-
-					int next = edgeMap[current];
-					edgeMap.erase(current); // Remove used edge.
-					edgeMap.erase(next);	// Remove its pair.
-
-					current = next;
-				}
-				while (current != start && edgeMap.count(current)); // Stop if loop closes
-
-				// Remove redundant collinear vertices
-				auto simplifiedPolygon = std::vector<int>{};
-				for (int i = 0; i < polygon.size(); i++)
-				{
-					int prev = polygon[(i + polygon.size() - 1) % polygon.size()];
-					int current = polygon[i];
-					int next = polygon[(i + 1) % polygon.size()];
-
-					// Check collinearity using cross product.
-					auto edge1 = _vertices[current] - _vertices[prev];
-					auto edge2 = _vertices[next] - _vertices[current];
-
-					if (abs(edge1.Cross(edge2).LengthSquared()) > EPSILON)
-						simplifiedPolygon.push_back(current);
-				}
-
-				polygons.push_back(std::move(simplifiedPolygon));
-				//polygons.push_back(std::move(polygon));
-			}
-*/
 
 /*
 			// 2.4) Triangulate simplified polygons.
