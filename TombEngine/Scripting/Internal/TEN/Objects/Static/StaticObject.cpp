@@ -113,17 +113,17 @@ namespace TEN::Scripting
 		return _static.HitPoints;
 	}
 
-	/// Get this static's visibility state.
+	/// Get this static's visibility status.
 	// @function Static:GetActive
-	// @treturn bool Visibility state.
+	// @treturn bool Status.  __true: visible__, __false: invisible__
 	bool Static::GetActiveStatus() const
 	{
 		return ((_static.flags & StaticMeshFlags::SM_VISIBLE) != 0);
 	}
 
-	/// Get this static's solid collision state.
+	/// Get this static's solid collision status.
 	// @function Static:GetSolid
-	// @treturn bool Solid collision state. __True: solid__, __False: soft__
+	// @treturn bool Solid Status. __true: solid__, __false: soft__
 	bool Static::GetSolidStatus() const
 	{
 		return ((_static.flags & StaticMeshFlags::SM_SOLID) != 0);
@@ -151,7 +151,7 @@ namespace TEN::Scripting
 
 	/// Set this static's slot ID.
 	// @function Static:SetSlot
-	// @tparam int New slot ID.
+	// @tparam int slotID New slot ID.
 	void Static::SetSlot(int slotID)
 	{
 		_static.staticNumber = slotID;
@@ -160,7 +160,7 @@ namespace TEN::Scripting
 
 	/// Set this static's world position.
 	// @function Static:SetPosition
-	// @tparam Vec3 New world position.
+	// @tparam Vec3 pos New world position.
 	void Static::SetPosition(const Vec3& pos)
 	{
 		_static.pos.Position = pos.ToVector3i();
@@ -169,7 +169,7 @@ namespace TEN::Scripting
 
 	/// Set this static's rotation.
 	// @function Static:SetRotation
-	// @tparam Rotation New rotation.
+	// @tparam Rotation rot New rotation.
 	void Static::SetRotation(const Rotation& rot)
 	{
 		_static.pos.Orientation = rot.ToEulerAngles();
@@ -178,16 +178,16 @@ namespace TEN::Scripting
 
 	/// Set this static's world scale.
 	// @function Static:SetScale
-	// @tparam Scale New world scale.
+	// @tparam float scale New world scale.
 	void Static::SetScale(float scale)
 	{
 		_static.scale = scale;
 		_static.Dirty = true;
 	}
 
-	/// Set the static's color
+	/// Set this static's color.
 	// @function Static:SetColor
-	// @tparam Color color the new color of the static 
+	// @tparam Color color New color.
 	void Static::SetColor(ScriptColor const& col)
 	{
 		_static.color = col;
@@ -196,15 +196,15 @@ namespace TEN::Scripting
 
 	/// Set this static's hit points. Used only with shatterable statics.
 	// @function Static:SetHP
-	// @tparam int New hit points.
+	// @tparam int hitPoints New hit points.
 	void Static::SetHitPoints(int hitPoints)
 	{
 		_static.HitPoints = hitPoints;
 	}
 
-	/// Set this static's solid collision state.
+	/// Set this static's solid collision status.
 	// @function Static:SetSolid
-	// @tparam bool Solid collision state. __True: solid__, __False: soft__
+	// @tparam bool status New status. __true: solid__, __false: soft__
 	void Static::SetSolidStatus(bool status)
 	{
 		if (status)
