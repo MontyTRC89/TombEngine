@@ -7,6 +7,7 @@
 #include "Scripting/Internal/ScriptUtil.h"
 
 using namespace TEN::Effects::Hair;
+using namespace TEN::Scripting::Types;
 
 namespace TEN::Scripting
 {
@@ -46,7 +47,8 @@ namespace TEN::Scripting
 		SystemSettings::Register(parent);
 		WeaponSettings::Register(parent);
 
-		parent.new_usertype<Settings>(ScriptReserved_Settings,
+		parent.new_usertype<Settings>(
+			ScriptReserved_Settings,
 			sol::constructors<Settings()>(),
 			sol::meta_function::new_index, NewIndexErrorMaker(Settings, ScriptReserved_Settings),
 			ScriptReserved_AnimSettings, &Settings::Animations,

@@ -17,6 +17,7 @@
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 
 using namespace TEN::Effects::Electricity;
+using namespace TEN::Scripting::Types;
 
 /***
 Saving data, triggering functions, and callbacks for level-specific scripts.
@@ -42,7 +43,16 @@ enum class CallbackPoint
 	PostFreeze
 };
 
-static const std::unordered_map<std::string, CallbackPoint> CALLBACK_POINTS
+enum class LevelEndReason
+{
+	LevelComplete,
+	LoadGame,
+	ExitToTitle,
+	Death,
+	Other
+};
+
+static const auto CALLBACK_POINTS = std::unordered_map<std::string, CallbackPoint>
 {
 	{ ScriptReserved_PreStart, CallbackPoint::PreStart },
 	{ ScriptReserved_PostStart, CallbackPoint::PostStart },
@@ -62,7 +72,7 @@ static const std::unordered_map<std::string, CallbackPoint> CALLBACK_POINTS
 	{ ScriptReserved_PostFreeze, CallbackPoint::PostFreeze }
 };
 
-static const std::unordered_map<std::string, EventType> EVENT_TYPES
+static const auto EVENT_TYPES = std::unordered_map<std::string, EventType>
 {
 	{ ScriptReserved_EventOnEnter, EventType::Enter },
 	{ ScriptReserved_EventOnInside, EventType::Inside },
@@ -76,16 +86,7 @@ static const std::unordered_map<std::string, EventType> EVENT_TYPES
 	{ ScriptReserved_EventOnFreeze, EventType::Freeze }
 };
 
-enum class LevelEndReason
-{
-	LevelComplete,
-	LoadGame,
-	ExitToTitle,
-	Death,
-	Other
-};
-
-static const std::unordered_map<std::string, LevelEndReason> LEVEL_END_REASONS
+static const auto LEVEL_END_REASONS = std::unordered_map<std::string, LevelEndReason>
 {
 	{ ScriptReserved_EndReasonLevelComplete, LevelEndReason::LevelComplete },
 	{ ScriptReserved_EndReasonLoadGame, LevelEndReason::LoadGame },

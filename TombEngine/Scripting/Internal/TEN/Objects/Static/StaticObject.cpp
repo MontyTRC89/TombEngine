@@ -9,6 +9,8 @@
 #include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 
+using namespace TEN::Scripting::Types;
+
 /// Represents a static object in the game world.
 //
 // @tenclass Objects.Static

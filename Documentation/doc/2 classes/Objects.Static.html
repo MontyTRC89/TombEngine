@@ -82,6 +82,7 @@
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
+  <li>    <a href="../4 enums/Objects.HandStatus.html">Objects.HandStatus</a></li>
   <li>    <a href="../4 enums/Objects.WeaponType.html">Objects.WeaponType</a></li>
   <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
@@ -145,43 +146,43 @@
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Static:GetActive">Static:GetActive()</a></td>
-	<td class="summary">Get this static's visibility state.</td>
+	<td class="summary">Get this static's visibility status.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Static:GetSolid">Static:GetSolid()</a></td>
-	<td class="summary">Get this static's solid collision state.</td>
+	<td class="summary">Get this static's solid collision status.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Static:SetName">Static:SetName(name)</a></td>
 	<td class="summary">Set this static's unique identifier string.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Static:SetSlot">Static:SetSlot(New)</a></td>
+	<td class="name" ><a href="#Static:SetSlot">Static:SetSlot(slotID)</a></td>
 	<td class="summary">Set this static's slot ID.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Static:SetPosition">Static:SetPosition(New)</a></td>
+	<td class="name" ><a href="#Static:SetPosition">Static:SetPosition(pos)</a></td>
 	<td class="summary">Set this static's world position.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Static:SetRotation">Static:SetRotation(New)</a></td>
+	<td class="name" ><a href="#Static:SetRotation">Static:SetRotation(rot)</a></td>
 	<td class="summary">Set this static's rotation.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Static:SetScale">Static:SetScale(New)</a></td>
+	<td class="name" ><a href="#Static:SetScale">Static:SetScale(scale)</a></td>
 	<td class="summary">Set this static's world scale.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Static:SetColor">Static:SetColor(color)</a></td>
-	<td class="summary">Set the static's color</td>
+	<td class="summary">Set this static's color.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Static:SetHP">Static:SetHP(New)</a></td>
+	<td class="name" ><a href="#Static:SetHP">Static:SetHP(hitPoints)</a></td>
 	<td class="summary">Set this static's hit points.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Static:SetSolid">Static:SetSolid(Solid)</a></td>
-	<td class="summary">Set this static's solid collision state.</td>
+	<td class="name" ><a href="#Static:SetSolid">Static:SetSolid(status)</a></td>
+	<td class="summary">Set this static's solid collision status.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Static:Enable">Static:Enable()</a></td>
@@ -356,7 +357,7 @@
     <strong>Static:GetActive()</strong>
     </dt>
     <dd>
-    Get this static's visibility state.
+    Get this static's visibility status.
 
 
 
@@ -365,7 +366,7 @@
     <ol>
 
            <span class="types"><span class="type">bool</span></span>
-        Visibility state.
+        Status.  <strong>true: visible</strong>, <strong>false: invisible</strong>
     </ol>
 
 
@@ -377,7 +378,7 @@
     <strong>Static:GetSolid()</strong>
     </dt>
     <dd>
-    Get this static's solid collision state.
+    Get this static's solid collision status.
 
 
 
@@ -386,7 +387,7 @@
     <ol>
 
            <span class="types"><span class="type">bool</span></span>
-        Solid collision state. <strong>True: solid</strong>, <strong>False: soft</strong>
+        Solid Status. <strong>true: solid</strong>, <strong>false: soft</strong>
     </ol>
 
 
@@ -417,7 +418,7 @@
 </dd>
     <dt>
     <a name = "Static:SetSlot"></a>
-    <strong>Static:SetSlot(New)</strong>
+    <strong>Static:SetSlot(slotID)</strong>
     </dt>
     <dd>
     Set this static's slot ID.
@@ -426,9 +427,9 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">New</span>
+        <li><span class="parameter">slotID</span>
             <span class="types"><span class="type">int</span></span>
-         slot ID.
+         New slot ID.
         </li>
     </ul>
 
@@ -439,7 +440,7 @@
 </dd>
     <dt>
     <a name = "Static:SetPosition"></a>
-    <strong>Static:SetPosition(New)</strong>
+    <strong>Static:SetPosition(pos)</strong>
     </dt>
     <dd>
     Set this static's world position.
@@ -448,9 +449,9 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">New</span>
+        <li><span class="parameter">pos</span>
             <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-         world position.
+         New world position.
         </li>
     </ul>
 
@@ -461,7 +462,7 @@
 </dd>
     <dt>
     <a name = "Static:SetRotation"></a>
-    <strong>Static:SetRotation(New)</strong>
+    <strong>Static:SetRotation(rot)</strong>
     </dt>
     <dd>
     Set this static's rotation.
@@ -470,9 +471,9 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">New</span>
+        <li><span class="parameter">rot</span>
             <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
-         rotation.
+         New rotation.
         </li>
     </ul>
 
@@ -483,7 +484,7 @@
 </dd>
     <dt>
     <a name = "Static:SetScale"></a>
-    <strong>Static:SetScale(New)</strong>
+    <strong>Static:SetScale(scale)</strong>
     </dt>
     <dd>
     Set this static's world scale.
@@ -492,9 +493,9 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">New</span>
-            <span class="types"><span class="type">Scale</span></span>
-         world scale.
+        <li><span class="parameter">scale</span>
+            <span class="types"><span class="type">float</span></span>
+         New world scale.
         </li>
     </ul>
 
@@ -508,7 +509,7 @@
     <strong>Static:SetColor(color)</strong>
     </dt>
     <dd>
-    Set the static's color
+    Set this static's color.
 
 
 
@@ -516,7 +517,7 @@
     <ul>
         <li><span class="parameter">color</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
-         the new color of the static
+         New color.
         </li>
     </ul>
 
@@ -527,7 +528,7 @@
 </dd>
     <dt>
     <a name = "Static:SetHP"></a>
-    <strong>Static:SetHP(New)</strong>
+    <strong>Static:SetHP(hitPoints)</strong>
     </dt>
     <dd>
     Set this static's hit points.  Used only with shatterable statics.
@@ -536,9 +537,9 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">New</span>
+        <li><span class="parameter">hitPoints</span>
             <span class="types"><span class="type">int</span></span>
-         hit points.
+         New hit points.
         </li>
     </ul>
 
@@ -549,18 +550,18 @@
 </dd>
     <dt>
     <a name = "Static:SetSolid"></a>
-    <strong>Static:SetSolid(Solid)</strong>
+    <strong>Static:SetSolid(status)</strong>
     </dt>
     <dd>
-    Set this static's solid collision state.
+    Set this static's solid collision status.
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">Solid</span>
+        <li><span class="parameter">status</span>
             <span class="types"><span class="type">bool</span></span>
-         collision state. <strong>True: solid</strong>, <strong>False: soft</strong>
+         New status. <strong>true: solid</strong>, <strong>false: soft</strong>
         </li>
     </ul>
 
