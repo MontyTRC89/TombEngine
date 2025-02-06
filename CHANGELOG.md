@@ -6,6 +6,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ## [Version 1.7.X] (link to release) - yyyy-mm-dd
 
 ### Bug fixes
+* Fixed Trigger_Triggerer not working.
 * Fixed display pickup numeric string not being interpolated in high framerate mode.
 * Fixed two block platform room portal traversal failing in some cases.
 * Fixed incorrect handling of dynamic light shadows.
