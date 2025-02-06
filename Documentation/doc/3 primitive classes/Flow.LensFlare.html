@@ -82,6 +82,7 @@
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
+  <li>    <a href="../4 enums/Objects.HandStatus.html">Objects.HandStatus</a></li>
   <li>    <a href="../4 enums/Objects.WeaponType.html">Objects.WeaponType</a></li>
   <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
@@ -107,7 +108,7 @@
 <div id="content">
 
 <h1>Primitive Class <code>Flow.LensFlare</code></h1>
-<p>Represents a global lens flare (not to be confused with lensflare object).</p>
+<p>Represents a global lens flare (not to be confused with the lens flare object).</p>
 <p>
 
 </p>
@@ -120,40 +121,40 @@
 	<td class="summary">Create a LensFlare object.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#LensFlare:GetEnabled">LensFlare:GetEnabled()</a></td>
-	<td class="summary">Get the lens flare's enabled status.</td>
-	</tr>
-	<tr>
 	<td class="name" ><a href="#LensFlare:GetSunSpriteID">LensFlare:GetSunSpriteID()</a></td>
-	<td class="summary">Get the sun's sprite ID.</td>
+	<td class="summary">Get this lens flare's sun sprite ID.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#LensFlare:GetPitch">LensFlare:GetPitch()</a></td>
-	<td class="summary">Get the lens flare's pitch angle in degrees.</td>
+	<td class="summary">Get this lens flare's pitch angle in degrees.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#LensFlare:GetYaw">LensFlare:GetYaw()</a></td>
-	<td class="summary">Get the lens flare's yaw angle in degrees.</td>
+	<td class="summary">Get this lens flare's yaw angle in degrees.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#LensFlare:SetColor">LensFlare:SetColor()</a></td>
+	<td class="name" ><a href="#LensFlare:GetColor">LensFlare:GetColor()</a></td>
 	<td class="summary">Get the lens flare's color.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#LensFlare:GetEnabled">LensFlare:GetEnabled()</a></td>
+	<td class="summary">Get this lens flare's enabled status.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#LensFlare:SetSunSpriteID">LensFlare:SetSunSpriteID(New)</a></td>
-	<td class="summary">Set the lens flare's sun sprite ID.</td>
+	<td class="summary">Set this lens flare's sun sprite ID.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#LensFlare:SetPitch">LensFlare:SetPitch(New)</a></td>
-	<td class="summary">Set the lens flare's pitch angle.</td>
+	<td class="summary">Set this lens flare's pitch angle.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#LensFlare:SetYaw">LensFlare:SetYaw(New)</a></td>
-	<td class="summary">Set the lens flare's yaw angle.</td>
+	<td class="summary">Set this lens flare's yaw angle.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#LensFlare:SetColor">LensFlare:SetColor(New)</a></td>
-	<td class="summary">Set the lens flare's color.</td>
+	<td class="summary">Set this lens flare's color.</td>
 	</tr>
 </table>
 
@@ -169,7 +170,7 @@
     <strong>LensFlare(Pitch, Yaw, Color.)</strong>
     </dt>
     <dd>
-    Create a LensFlare object. ()
+    Create a LensFlare object.
 
 
 
@@ -203,32 +204,11 @@
 
 </dd>
     <dt>
-    <a name = "LensFlare:GetEnabled"></a>
-    <strong>LensFlare:GetEnabled()</strong>
-    </dt>
-    <dd>
-    Get the lens flare's enabled status. ()
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">bool</span></span>
-        Lens flare's enabled status.
-    </ol>
-
-
-
-
-</dd>
-    <dt>
     <a name = "LensFlare:GetSunSpriteID"></a>
     <strong>LensFlare:GetSunSpriteID()</strong>
     </dt>
     <dd>
-    Get the sun's sprite ID. ()
+    Get this lens flare's sun sprite ID.
 
 
 
@@ -249,7 +229,7 @@
     <strong>LensFlare:GetPitch()</strong>
     </dt>
     <dd>
-    Get the lens flare's pitch angle in degrees. ()
+    Get this lens flare's pitch angle in degrees.
 
 
 
@@ -270,7 +250,7 @@
     <strong>LensFlare:GetYaw()</strong>
     </dt>
     <dd>
-    Get the lens flare's yaw angle in degrees. ()
+    Get this lens flare's yaw angle in degrees.
 
 
 
@@ -287,11 +267,11 @@
 
 </dd>
     <dt>
-    <a name = "LensFlare:SetColor"></a>
-    <strong>LensFlare:SetColor()</strong>
+    <a name = "LensFlare:GetColor"></a>
+    <strong>LensFlare:GetColor()</strong>
     </dt>
     <dd>
-    Get the lens flare's color. ()
+    Get the lens flare's color.
 
 
 
@@ -302,11 +282,32 @@
 
 </dd>
     <dt>
+    <a name = "LensFlare:GetEnabled"></a>
+    <strong>LensFlare:GetEnabled()</strong>
+    </dt>
+    <dd>
+    Get this lens flare's enabled status.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        Enabled status. <strong>true: enabled</strong>, <strong>false: disabled</strong>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
     <a name = "LensFlare:SetSunSpriteID"></a>
     <strong>LensFlare:SetSunSpriteID(New)</strong>
     </dt>
     <dd>
-    Set the lens flare's sun sprite ID. ()
+    Set this lens flare's sun sprite ID.
 
 
 
@@ -314,7 +315,7 @@
     <ul>
         <li><span class="parameter">New</span>
             <span class="types"><span class="type">int</span></span>
-         sprite ID.
+         sun sprite ID.
         </li>
     </ul>
 
@@ -328,7 +329,7 @@
     <strong>LensFlare:SetPitch(New)</strong>
     </dt>
     <dd>
-    Set the lens flare's pitch angle. (float)
+    Set this lens flare's pitch angle.
 
 
 
@@ -350,7 +351,7 @@
     <strong>LensFlare:SetYaw(New)</strong>
     </dt>
     <dd>
-    Set the lens flare's yaw angle. (float)
+    Set this lens flare's yaw angle.
 
 
 
@@ -372,7 +373,7 @@
     <strong>LensFlare:SetColor(New)</strong>
     </dt>
     <dd>
-    Set the lens flare's color. (Color)
+    Set this lens flare's color.
 
 
 

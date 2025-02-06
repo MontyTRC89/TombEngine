@@ -17,6 +17,7 @@
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 
 using namespace TEN::Effects::Electricity;
+using namespace TEN::Scripting::Types;
 
 /***
 Saving data, triggering functions, and callbacks for level-specific scripts.
@@ -42,7 +43,16 @@ enum class CallbackPoint
 	PostFreeze
 };
 
-static const std::unordered_map<std::string, CallbackPoint> CALLBACK_POINTS
+enum class LevelEndReason
+{
+	LevelComplete,
+	LoadGame,
+	ExitToTitle,
+	Death,
+	Other
+};
+
+static const auto CALLBACK_POINTS = std::unordered_map<std::string, CallbackPoint>
 {
 	{ ScriptReserved_PreStart, CallbackPoint::PreStart },
 	{ ScriptReserved_PostStart, CallbackPoint::PostStart },
@@ -62,7 +72,7 @@ static const std::unordered_map<std::string, CallbackPoint> CALLBACK_POINTS
 	{ ScriptReserved_PostFreeze, CallbackPoint::PostFreeze }
 };
 
-static const std::unordered_map<std::string, EventType> EVENT_TYPES
+static const auto EVENT_TYPES = std::unordered_map<std::string, EventType>
 {
 	{ ScriptReserved_EventOnEnter, EventType::Enter },
 	{ ScriptReserved_EventOnInside, EventType::Inside },
@@ -76,16 +86,7 @@ static const std::unordered_map<std::string, EventType> EVENT_TYPES
 	{ ScriptReserved_EventOnFreeze, EventType::Freeze }
 };
 
-enum class LevelEndReason
-{
-	LevelComplete,
-	LoadGame,
-	ExitToTitle,
-	Death,
-	Other
-};
-
-static const std::unordered_map<std::string, LevelEndReason> LEVEL_END_REASONS
+static const auto LEVEL_END_REASONS = std::unordered_map<std::string, LevelEndReason>
 {
 	{ ScriptReserved_EndReasonLevelComplete, LevelEndReason::LevelComplete },
 	{ ScriptReserved_EndReasonLoadGame, LevelEndReason::LoadGame },
@@ -323,7 +324,7 @@ Possible event type values:
 */
 void LogicHandler::HandleEvent(const std::string& name, EventType type, sol::optional<Moveable&> activator)
 {
-	TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? (Activator)activator.value().GetIndex() : (Activator)short(LaraItem->Index));
+	TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? (Activator)(short)activator->GetIndex() : (Activator)(short)LaraItem->Index);
 }
 
 /*** Attempt to find an event set and enable specified event in it.
@@ -959,9 +960,9 @@ void LogicHandler::ExecuteFunction(const std::string& name, short idOne, short i
 void LogicHandler::ExecuteFunction(const std::string& name, TEN::Control::Volumes::Activator activator, const std::string& arguments)
 {
 	sol::protected_function func = (*m_handler.GetState())[ScriptReserved_LevelFuncs][name.c_str()];
-	if (std::holds_alternative<short>(activator))
+	if (std::holds_alternative<int>(activator))
 	{
-		func(std::make_unique<Moveable>(std::get<short>(activator), true), arguments);
+		func(std::make_unique<Moveable>(std::get<int>(activator), true), arguments);
 	}
 	else
 	{

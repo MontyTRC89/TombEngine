@@ -36,7 +36,7 @@ namespace TEN::Scripting::Util
 	// @usage
 	// local flamePlinthPos = flamePlinth:GetPosition() + Vec3(0, flamePlinthHeight, 0);
 	// print(Misc.HasLineOfSight(enemyHead:GetRoomNumber(), enemyHead:GetPosition(), flamePlinthPos))
-	[[nodiscard]] static bool HasLineOfSight(int roomID, const Vec3& posA, const Vec3& posB)
+	static bool HasLineOfSight(int roomID, const Vec3& posA, const Vec3& posB)
 	{
 		auto vector0 = posA.ToGameVector();
 		auto vector1 = posB.ToGameVector();
@@ -208,6 +208,6 @@ namespace TEN::Scripting::Util
 		tableUtil.set_function(ScriptReserved_PrintLog, &PrintLog);
 
 		auto handler = LuaHandler(state);
-		handler.MakeReadOnlyTable(tableUtil, ScriptReserved_LogLevel, LOG_LEVEL);
+		handler.MakeReadOnlyTable(tableUtil, ScriptReserved_LogLevel, LOG_LEVEL_IDS);
 	}
 }

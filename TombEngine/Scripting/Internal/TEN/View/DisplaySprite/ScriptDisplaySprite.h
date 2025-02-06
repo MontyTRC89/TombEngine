@@ -1,10 +1,12 @@
 #pragma once
+
 #include "Game/effects/DisplaySprite.h"
 #include "Objects/game_object_ids.h"
 #include "Scripting/Internal/TEN/Types/Color/Color.h"
 #include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 
 using namespace TEN::Effects::DisplaySprite;
+using namespace TEN::Scripting::Types;
 
 enum BLEND_MODE;
 

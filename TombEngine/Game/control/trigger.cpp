@@ -47,16 +47,16 @@ int TriggerActive(ItemInfo* item)
 			{
 				--item->Timer;
 				if (!item->Timer)
-					item->Timer = -1;
+					item->Timer = NO_VALUE;
 			}
-			else if (item->Timer < -1)
+			else if (item->Timer < NO_VALUE)
 			{
 				++item->Timer;
-				if (item->Timer == -1)
+				if (item->Timer == NO_VALUE)
 					item->Timer = 0;
 			}
 
-			if (item->Timer <= -1)
+			if (item->Timer <= NO_VALUE)
 				flag = !flag;
 		}
 	}
