@@ -115,7 +115,7 @@ static const auto LEVEL_END_REASONS = std::unordered_map<std::string, LevelEndRe
 	// COMPATIBILITY
 	{ "LEVELCOMPLETE", LevelEndReason::LevelComplete },
 	{ "LOADGAME", LevelEndReason::LoadGame },
-	{ "LEVELCOMPLETE", LevelEndReason::ExitToTitle }
+	{ "EXITTOTITLE", LevelEndReason::ExitToTitle }
 };
 
 static constexpr char const* strKey = "__internal_name";
