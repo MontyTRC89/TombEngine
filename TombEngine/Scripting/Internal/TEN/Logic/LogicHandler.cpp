@@ -74,7 +74,9 @@ static const auto CALLBACK_POINTS = std::unordered_map<std::string, CallbackPoin
 	{ "PRELOAD", CallbackPoint::PreLoad },
 	{ "POSTLOAD", CallbackPoint::PostLoad },
 	{ "PRELOOP", CallbackPoint::PreLoop },
+	{ "PRECONTROLPHASE", CallbackPoint::PreLoop },
 	{ "POSTLOOP", CallbackPoint::PostLoop },
+	{ "POSTCONTROLPHASE", CallbackPoint::PostLoop },
 	{ "PRESAVE", CallbackPoint::PreSave },
 	{ "POSTSAVE", CallbackPoint::PostSave },
 	{ "PREEND", CallbackPoint::PreEnd },
@@ -82,9 +84,7 @@ static const auto CALLBACK_POINTS = std::unordered_map<std::string, CallbackPoin
 	{ "PREUSEITEM", CallbackPoint::PreUseItem },
 	{ "POSTUSEITEM", CallbackPoint::PostUseItem },
 	{ "PREFREEZE", CallbackPoint::PreFreeze },
-	{ "POSTFREEZE", CallbackPoint::PostFreeze },
-	{ "PRECONTROLPHASE", CallbackPoint::PreLoop },
-	{ "POSTCONTROLPHASE", CallbackPoint::PostLoop }
+	{ "POSTFREEZE", CallbackPoint::PostFreeze }
 };
 
 static const auto EVENT_TYPES = std::unordered_map<std::string, EventType>
