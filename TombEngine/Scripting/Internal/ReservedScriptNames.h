@@ -60,35 +60,32 @@ static constexpr char ScriptReserved_DisplayStringSetScale[]		= "SetScale";
 static constexpr char ScriptReserved_DisplayStringSetColor[]		= "SetColor";
 static constexpr char ScriptReserved_DisplaySpriteDraw[]			= "Draw";
 
-static constexpr char ScriptReserved_EndReasonExitToTitle[]		= "EXITTOTITLE";
-static constexpr char ScriptReserved_EndReasonLevelComplete[]	= "LEVELCOMPLETE";
-static constexpr char ScriptReserved_EndReasonLoadGame[]		= "LOADGAME";
 static constexpr char ScriptReserved_EndReasonDeath[]			= "DEATH";
+static constexpr char ScriptReserved_EndReasonExitToTitle[]		= "EXIT_TO_TITLE";
+static constexpr char ScriptReserved_EndReasonLevelComplete[]	= "LEVEL_COMPLETE";
+static constexpr char ScriptReserved_EndReasonLoadGame[]		= "LOAD_GAME";
 static constexpr char ScriptReserved_EndReasonOther[]			= "OTHER";
 
 // Callback points
-static constexpr char ScriptReserved_PreStart[]			= "PRESTART";
-static constexpr char ScriptReserved_PostStart[]		= "POSTSTART";
-static constexpr char ScriptReserved_PreEnd[]			= "PREEND";
-static constexpr char ScriptReserved_PostEnd[]			= "POSTEND";
-static constexpr char ScriptReserved_PreSave[]			= "PRESAVE";
-static constexpr char ScriptReserved_PostSave[]			= "POSTSAVE";
-static constexpr char ScriptReserved_PreLoad[]			= "PRELOAD";
-static constexpr char ScriptReserved_PostLoad[]			= "POSTLOAD";
-static constexpr char ScriptReserved_PreControlPhase[]	= "PRECONTROLPHASE";  // DEPRECATED
-static constexpr char ScriptReserved_PostControlPhase[]	= "POSTCONTROLPHASE"; // DEPRECATED
-static constexpr char ScriptReserved_PreLoop[]			= "PRELOOP";
-static constexpr char ScriptReserved_PostLoop[]			= "POSTLOOP";
-static constexpr char ScriptReserved_PreUseItem[]		= "PREUSEITEM";
-static constexpr char ScriptReserved_PostUseItem[]		= "POSTUSEITEM";
-static constexpr char ScriptReserved_PreFreeze[]			= "PREFREEZE";
-static constexpr char ScriptReserved_PostFreeze[]		= "POSTFREEZE";
+static constexpr char ScriptReserved_PreStart[]			= "PRE_START";
+static constexpr char ScriptReserved_PostStart[]		= "POST_START";
+static constexpr char ScriptReserved_PreEnd[]			= "PRE_END";
+static constexpr char ScriptReserved_PostEnd[]			= "POST_END";
+static constexpr char ScriptReserved_PreSave[]			= "PRE_SAVE";
+static constexpr char ScriptReserved_PostSave[]			= "POST_SAVE";
+static constexpr char ScriptReserved_PreLoad[]			= "PRE_LOAD";
+static constexpr char ScriptReserved_PostLoad[]			= "POST_LOAD";
+static constexpr char ScriptReserved_PreLoop[]			= "PRE_LOOP";
+static constexpr char ScriptReserved_PostLoop[]			= "POST_LOOP";
+static constexpr char ScriptReserved_PreUseItem[]		= "PRE_USE_ITEM";
+static constexpr char ScriptReserved_PostUseItem[]		= "POST_USE_ITEM";
+static constexpr char ScriptReserved_PreFreeze[]		= "PRE_FREEZE";
+static constexpr char ScriptReserved_PostFreeze[]		= "POST_FREEZE";
 
 // Built-in LevelFuncs
 static constexpr char ScriptReserved_OnStart[]			= "OnStart";
 static constexpr char ScriptReserved_OnLoad[]			= "OnLoad";
 static constexpr char ScriptReserved_OnLoop[]			= "OnLoop";
-static constexpr char ScriptReserved_OnControlPhase[]	= "OnControlPhase"; // DEPRECATED
 static constexpr char ScriptReserved_OnSave[]			= "OnSave";
 static constexpr char ScriptReserved_OnEnd[]			= "OnEnd";
 static constexpr char ScriptReserved_OnUseItem[]		= "OnUseItem";
@@ -103,7 +100,7 @@ static constexpr char ScriptReserved_EventOnLoad[]		= "LOAD";
 static constexpr char ScriptReserved_EventOnLoop[]		= "LOOP";
 static constexpr char ScriptReserved_EventOnSave[]		= "SAVE";
 static constexpr char ScriptReserved_EventOnEnd[]		= "END";
-static constexpr char ScriptReserved_EventOnUseItem[]	= "USEITEM";
+static constexpr char ScriptReserved_EventOnUseItem[]	= "USE_ITEM";
 static constexpr char ScriptReserved_EventOnFreeze[]	= "FREEZE";
 
 // Member functions
