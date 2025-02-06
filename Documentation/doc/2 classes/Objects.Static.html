@@ -82,6 +82,7 @@
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
+  <li>    <a href="../4 enums/Objects.HandStatus.html">Objects.HandStatus</a></li>
   <li>    <a href="../4 enums/Objects.WeaponType.html">Objects.WeaponType</a></li>
   <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
@@ -108,7 +109,7 @@
 <div id="content">
 
 <h1>Class <code>Objects.Static</code></h1>
-<p>Statics</p>
+<p>Represents a static object in the game world.</p>
 <p>
 
 </p>
@@ -117,87 +118,84 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#Static:Enable">Static:Enable()</a></td>
-	<td class="summary">Enable the static, for cases when it was shattered or manually disabled before.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Static:Disable">Static:Disable()</a></td>
-	<td class="summary">Disable the static</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Static:GetActive">Static:GetActive()</a></td>
-	<td class="summary">Get static mesh visibility</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Static:GetSolid">Static:GetSolid()</a></td>
-	<td class="summary">Get static mesh solid collision state</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Static:SetSolid">Static:SetSolid(solidState)</a></td>
-	<td class="summary">Set static mesh solid collision state</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Static:GetPosition">Static:GetPosition()</a></td>
-	<td class="summary">Get the static's position</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Static:SetPosition">Static:SetPosition(position)</a></td>
-	<td class="summary">Set the static's position</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Static:GetRotation">Static:GetRotation()</a></td>
-	<td class="summary">Get the static's rotation</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Static:SetRotation">Static:SetRotation(rotation)</a></td>
-	<td class="summary">Set the static's rotation</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Static:GetScale">Static:GetScale()</a></td>
-	<td class="summary">Get the static's scale</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Static:SetScale">Static:SetScale(scale)</a></td>
-	<td class="summary">Set the static's scale</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Static:GetHP">Static:GetHP()</a></td>
-	<td class="summary">Get current HP (hit points/health points)
- Used only with shatterable static meshes.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Static:SetHP">Static:SetHP(HP)</a></td>
-	<td class="summary">Set current HP (hit points/health points)
- Used only with shatterable static meshes.</td>
-	</tr>
-	<tr>
 	<td class="name" ><a href="#Static:GetName">Static:GetName()</a></td>
-	<td class="summary">Get the static's unique string identifier</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Static:SetName">Static:SetName(name)</a></td>
-	<td class="summary">Set the static's name (its unique string identifier)
- e.g.</td>
+	<td class="summary">Get this static's unique string identifier.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Static:GetSlot">Static:GetSlot()</a></td>
-	<td class="summary">Get the static's slot number (as listed in Tomb Editor and WadTool)</td>
+	<td class="summary">Get this static's slot ID.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Static:SetSlot">Static:SetSlot(slot)</a></td>
-	<td class="summary">Set the static's slot number (as listed in Tomb Editor and WadTool)</td>
+	<td class="name" ><a href="#Static:GetPosition">Static:GetPosition()</a></td>
+	<td class="summary">Get this static's world position.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Static:GetRotation">Static:GetRotation()</a></td>
+	<td class="summary">Get this static's world rotation.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Static:GetScale">Static:GetScale()</a></td>
+	<td class="summary">Get this static's world scale.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Static:GetColor">Static:GetColor()</a></td>
-	<td class="summary">Get the static's color</td>
+	<td class="summary">Get this static's color.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Static:GetHP">Static:GetHP()</a></td>
+	<td class="summary">Get this static's hit points.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Static:GetActive">Static:GetActive()</a></td>
+	<td class="summary">Get this static's visibility status.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Static:GetSolid">Static:GetSolid()</a></td>
+	<td class="summary">Get this static's solid collision status.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Static:SetName">Static:SetName(name)</a></td>
+	<td class="summary">Set this static's unique identifier string.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Static:SetSlot">Static:SetSlot(slotID)</a></td>
+	<td class="summary">Set this static's slot ID.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Static:SetPosition">Static:SetPosition(pos)</a></td>
+	<td class="summary">Set this static's world position.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Static:SetRotation">Static:SetRotation(rot)</a></td>
+	<td class="summary">Set this static's rotation.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Static:SetScale">Static:SetScale(scale)</a></td>
+	<td class="summary">Set this static's world scale.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Static:SetColor">Static:SetColor(color)</a></td>
-	<td class="summary">Set the static's color</td>
+	<td class="summary">Set this static's color.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Static:SetHP">Static:SetHP(hitPoints)</a></td>
+	<td class="summary">Set this static's hit points.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Static:SetSolid">Static:SetSolid(status)</a></td>
+	<td class="summary">Set this static's solid collision status.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Static:Enable">Static:Enable()</a></td>
+	<td class="summary">Enable this static.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Static:Disable">Static:Disable()</a></td>
+	<td class="summary">Disable this static.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Static:Shatter">Static:Shatter()</a></td>
-	<td class="summary">Shatter static mesh</td>
+	<td class="summary">Shatter this static.</td>
 	</tr>
 </table>
 
@@ -209,11 +207,376 @@
 
     <dl class="function">
     <dt>
+    <a name = "Static:GetName"></a>
+    <strong>Static:GetName()</strong>
+    </dt>
+    <dd>
+    Get this static's unique string identifier.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        Name string.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Static:GetSlot"></a>
+    <strong>Static:GetSlot()</strong>
+    </dt>
+    <dd>
+    Get this static's slot ID.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        Slot ID.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Static:GetPosition"></a>
+    <strong>Static:GetPosition()</strong>
+    </dt>
+    <dd>
+    Get this static's world position.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+        World position.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Static:GetRotation"></a>
+    <strong>Static:GetRotation()</strong>
+    </dt>
+    <dd>
+    Get this static's world rotation.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
+        World rotation.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Static:GetScale"></a>
+    <strong>Static:GetScale()</strong>
+    </dt>
+    <dd>
+    Get this static's world scale.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">float</span></span>
+        World scale.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Static:GetColor"></a>
+    <strong>Static:GetColor()</strong>
+    </dt>
+    <dd>
+    Get this static's color.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
+        Color.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Static:GetHP"></a>
+    <strong>Static:GetHP()</strong>
+    </dt>
+    <dd>
+    Get this static's hit points.  Used only with shatterable statics.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        Hit points.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Static:GetActive"></a>
+    <strong>Static:GetActive()</strong>
+    </dt>
+    <dd>
+    Get this static's visibility status.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        Status.  <strong>true: visible</strong>, <strong>false: invisible</strong>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Static:GetSolid"></a>
+    <strong>Static:GetSolid()</strong>
+    </dt>
+    <dd>
+    Get this static's solid collision status.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        Solid Status. <strong>true: solid</strong>, <strong>false: soft</strong>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Static:SetName"></a>
+    <strong>Static:SetName(name)</strong>
+    </dt>
+    <dd>
+    Set this static's unique identifier string.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         New name.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Static:SetSlot"></a>
+    <strong>Static:SetSlot(slotID)</strong>
+    </dt>
+    <dd>
+    Set this static's slot ID.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">slotID</span>
+            <span class="types"><span class="type">int</span></span>
+         New slot ID.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Static:SetPosition"></a>
+    <strong>Static:SetPosition(pos)</strong>
+    </dt>
+    <dd>
+    Set this static's world position.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pos</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         New world position.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Static:SetRotation"></a>
+    <strong>Static:SetRotation(rot)</strong>
+    </dt>
+    <dd>
+    Set this static's rotation.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">rot</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
+         New rotation.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Static:SetScale"></a>
+    <strong>Static:SetScale(scale)</strong>
+    </dt>
+    <dd>
+    Set this static's world scale.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">scale</span>
+            <span class="types"><span class="type">float</span></span>
+         New world scale.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Static:SetColor"></a>
+    <strong>Static:SetColor(color)</strong>
+    </dt>
+    <dd>
+    Set this static's color.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">color</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
+         New color.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Static:SetHP"></a>
+    <strong>Static:SetHP(hitPoints)</strong>
+    </dt>
+    <dd>
+    Set this static's hit points.  Used only with shatterable statics.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">hitPoints</span>
+            <span class="types"><span class="type">int</span></span>
+         New hit points.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Static:SetSolid"></a>
+    <strong>Static:SetSolid(status)</strong>
+    </dt>
+    <dd>
+    Set this static's solid collision status.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">status</span>
+            <span class="types"><span class="type">bool</span></span>
+         New status. <strong>true: solid</strong>, <strong>false: soft</strong>
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
     <a name = "Static:Enable"></a>
     <strong>Static:Enable()</strong>
     </dt>
     <dd>
-    Enable the static, for cases when it was shattered or manually disabled before.
+    Enable this static.  Used when previously shattered disabled manually.
 
 
 
@@ -228,378 +591,10 @@
     <strong>Static:Disable()</strong>
     </dt>
     <dd>
-    Disable the static
+    Disable this static.
 
 
 
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Static:GetActive"></a>
-    <strong>Static:GetActive()</strong>
-    </dt>
-    <dd>
-    Get static mesh visibility
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">bool</span></span>
-        visibility state
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Static:GetSolid"></a>
-    <strong>Static:GetSolid()</strong>
-    </dt>
-    <dd>
-    Get static mesh solid collision state
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">bool</span></span>
-        solid collision state (true if solid, false if soft)
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Static:SetSolid"></a>
-    <strong>Static:SetSolid(solidState)</strong>
-    </dt>
-    <dd>
-    Set static mesh solid collision state
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">solidState</span>
-            <span class="types"><span class="type">bool</span></span>
-         if set, collision will be solid, if not, will be soft
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Static:GetPosition"></a>
-    <strong>Static:GetPosition()</strong>
-    </dt>
-    <dd>
-    Get the static's position
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-        a copy of the static's position
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Static:SetPosition"></a>
-    <strong>Static:SetPosition(position)</strong>
-    </dt>
-    <dd>
-    Set the static's position
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">position</span>
-            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-         the new position of the static
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Static:GetRotation"></a>
-    <strong>Static:GetRotation()</strong>
-    </dt>
-    <dd>
-    Get the static's rotation
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
-        a copy of the static's rotation
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Static:SetRotation"></a>
-    <strong>Static:SetRotation(rotation)</strong>
-    </dt>
-    <dd>
-    Set the static's rotation
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">rotation</span>
-            <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
-         the static's new rotation
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Static:GetScale"></a>
-    <strong>Static:GetScale()</strong>
-    </dt>
-    <dd>
-    Get the static's scale
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">float</span></span>
-        current static scale
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Static:SetScale"></a>
-    <strong>Static:SetScale(scale)</strong>
-    </dt>
-    <dd>
-    Set the static's scale
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">scale</span>
-            <span class="types"><span class="type">Scale</span></span>
-         the static's new scale
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Static:GetHP"></a>
-    <strong>Static:GetHP()</strong>
-    </dt>
-    <dd>
-    Get current HP (hit points/health points)
- Used only with shatterable static meshes.
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">int</span></span>
-        the amount of HP the static currently has
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Static:SetHP"></a>
-    <strong>Static:SetHP(HP)</strong>
-    </dt>
-    <dd>
-    Set current HP (hit points/health points)
- Used only with shatterable static meshes.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">HP</span>
-            <span class="types"><span class="type">int</span></span>
-         the amount of HP to give the static
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Static:GetName"></a>
-    <strong>Static:GetName()</strong>
-    </dt>
-    <dd>
-    Get the static's unique string identifier
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-        the static's name
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Static:SetName"></a>
-    <strong>Static:SetName(name)</strong>
-    </dt>
-    <dd>
-    Set the static's name (its unique string identifier)
- e.g.  "my_vase" or "oldrubble"
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">name</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-         The static's new name
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Static:GetSlot"></a>
-    <strong>Static:GetSlot()</strong>
-    </dt>
-    <dd>
-    Get the static's slot number (as listed in Tomb Editor and WadTool)
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-        the static's slot number
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Static:SetSlot"></a>
-    <strong>Static:SetSlot(slot)</strong>
-    </dt>
-    <dd>
-    Set the static's slot number (as listed in Tomb Editor and WadTool)
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">slot</span>
-            <span class="types"><span class="type">int</span></span>
-         The static's slot number
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Static:GetColor"></a>
-    <strong>Static:GetColor()</strong>
-    </dt>
-    <dd>
-    Get the static's color
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
-        a copy of the static's color
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Static:SetColor"></a>
-    <strong>Static:SetColor(color)</strong>
-    </dt>
-    <dd>
-    Set the static's color
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">color</span>
-            <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
-         the new color of the static
-        </li>
-    </ul>
 
 
 
@@ -611,7 +606,7 @@
     <strong>Static:Shatter()</strong>
     </dt>
     <dd>
-    Shatter static mesh
+    Shatter this static.
 
 
 
