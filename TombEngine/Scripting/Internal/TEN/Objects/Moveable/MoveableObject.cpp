@@ -24,6 +24,7 @@
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Effects::Items;
 using namespace TEN::Math;
+using namespace TEN::Scripting::Types;
 
 /// Represents a moveable object in the game world.
 // Examples include the player, traps, enemies, doors, and pickups. See also @{Objects.LaraObject} for player-specific features.

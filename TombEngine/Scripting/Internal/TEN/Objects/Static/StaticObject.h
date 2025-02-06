@@ -5,8 +5,10 @@
 
 namespace sol { class state; }
 
-class ScriptColor;
 class Vec3;
+namespace TEN::Scripting::Types { class ScriptColor; }
+
+using namespace TEN::Scripting::Types;
 
 namespace TEN::Scripting
 {

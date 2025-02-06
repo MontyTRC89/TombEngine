@@ -17,7 +17,6 @@ static constexpr char ScriptReserved_Effects[]			= "Effects";
 
 // Classes
 static constexpr char ScriptReserved_Camera[]			= "Camera";
-static constexpr char ScriptReserved_Sink[]				= "Sink";
 static constexpr char ScriptReserved_SoundSource[]		= "SoundSource";
 static constexpr char ScriptReserved_AIObject[]			= "AIObject";
 static constexpr char ScriptReserved_Volume[]			= "Volume";
@@ -369,7 +368,8 @@ static constexpr char ScriptReserved_GetDisplayPosition[]			= "GetDisplayPositio
 static constexpr char ScriptReserved_GetCursorDisplayPosition[]		= "GetCursorDisplayPosition"; // Deprecated
 static constexpr char ScriptReserved_GetMouseDisplayPosition[]		= "GetMouseDisplayPosition";
 
-// Enums
+// Tables
+
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";
 static constexpr char ScriptReserved_BlendID[]					= "BlendID";
 static constexpr char ScriptReserved_EffectID[]					= "EffectID";
@@ -418,6 +418,16 @@ constexpr char ScriptReserved_RoomSetFlag[]			= "SetFlag";
 constexpr char ScriptReserved_RoomSetName[]			= "SetName";
 constexpr char ScriptReserved_RoomSetReverbType[]	= "SetReverbType";
 
+// Sink
+
+constexpr char ScriptReserved_Sink[]				= "Sink";
+constexpr char ScriptReserved_SinkGetName[]			= "GetName";
+constexpr char ScriptReserved_SinkGetPosition[]		= "GetPosition";
+constexpr char ScriptReserved_SinkGetStrength[]		= "GetStrength";
+constexpr char ScriptReserved_SinkSetName[]			= "SetName";
+constexpr char ScriptReserved_SinkSetPosition[]		= "SetPosition";
+constexpr char ScriptReserved_SinkSetStrength[]		= "SetStrength";
+
 // Static
 
 constexpr char ScriptReserved_Static[]				= "Static";
@@ -433,7 +443,7 @@ constexpr char ScriptReserved_StaticGetScale[]		= "GetScale";
 constexpr char ScriptReserved_StaticGetSlot[]		= "GetSlot";
 constexpr char ScriptReserved_StaticGetSolid[]		= "GetSolid";
 constexpr char ScriptReserved_StaticSetColor[]		= "SetColor";
-constexpr char ScriptReserved_StaticSetHitPoints[]			= "SetHP";
+constexpr char ScriptReserved_StaticSetHitPoints[]	= "SetHP";
 constexpr char ScriptReserved_StaticSetName[]		= "SetName";
 constexpr char ScriptReserved_StaticSetPosition[]	= "SetPosition";
 constexpr char ScriptReserved_StaticSetRotation[]	= "SetRotation";

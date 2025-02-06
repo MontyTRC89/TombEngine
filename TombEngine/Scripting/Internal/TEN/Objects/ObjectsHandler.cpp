@@ -8,6 +8,7 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/TEN/Objects/Camera/CameraObject.h"
 #include "Scripting/Internal/TEN/Objects/Lara/AmmoTypes.h"
+#include "Scripting/Internal/TEN/Objects/Lara/HandStatuses.h"
 #include "Scripting/Internal/TEN/Objects/Lara/LaraObject.h"
 #include "Scripting/Internal/TEN/Objects/Lara/WeaponTypes.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableStatuses.h"
@@ -18,6 +19,8 @@
 #include "Scripting/Internal/TEN/Objects/Sink/SinkObject.h"
 #include "Scripting/Internal/TEN/Objects/SoundSource/SoundSourceObject.h"
 #include "Scripting/Internal/TEN/Objects/Volume/VolumeObject.h"
+
+using namespace TEN::Scripting::Objects;
 
 /// Objects including moveables, statics, cameras, and others.
 // @tentable Objects 
@@ -160,12 +163,12 @@ ObjectsHandler::ObjectsHandler(sol::state* lua, sol::table& parent) :
 		[this](auto && ... param) { return AddName(std::forward<decltype(param)>(param)...); },
 		[this](auto && ... param) { return RemoveName(std::forward<decltype(param)>(param)...); });
 
-	_handler.MakeReadOnlyTable(_table_objects, ScriptReserved_ObjID, kObjIDs);
+	_handler.MakeReadOnlyTable(_table_objects, ScriptReserved_ObjID, GAME_OBJECT_IDS);
 	_handler.MakeReadOnlyTable(_table_objects, ScriptReserved_RoomFlagID, ROOM_FLAG_IDS);
 	_handler.MakeReadOnlyTable(_table_objects, ScriptReserved_RoomReverb, ROOM_REVERB_TYPES);
 	_handler.MakeReadOnlyTable(_table_objects, ScriptReserved_WeaponType, WEAPON_TYPES);
 	_handler.MakeReadOnlyTable(_table_objects, ScriptReserved_AmmoType, AMMO_TYPES);
-	_handler.MakeReadOnlyTable(_table_objects, ScriptReserved_HandStatus, HandStatusMap);
+	_handler.MakeReadOnlyTable(_table_objects, ScriptReserved_HandStatus, HAND_STATUSES);
 	_handler.MakeReadOnlyTable(_table_objects, ScriptReserved_MoveableStatus, MOVEABLE_STATUSES);
 }
 

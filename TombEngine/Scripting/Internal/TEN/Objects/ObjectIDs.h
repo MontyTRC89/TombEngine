@@ -1196,7 +1196,8 @@ Table of constants.
 @table PickupConstants
 */
 
-static const std::unordered_map<std::string, GAME_OBJECT_ID> kObjIDs{
+static const auto GAME_OBJECT_IDS = std::unordered_map<std::string, GAME_OBJECT_ID>
+{
 	{ "LARA", ID_LARA },
 	{ "LARA_EXTRA_ANIMS", ID_LARA_EXTRA_ANIMS },
 	{ "PISTOLS_ANIM", ID_PISTOLS_ANIM },

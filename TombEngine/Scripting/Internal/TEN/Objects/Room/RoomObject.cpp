@@ -13,6 +13,8 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Scripting::Types;
+
 /// Room object.
 // @tenclass Objects.Room
 // @pragma nostrip

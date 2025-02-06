@@ -2,8 +2,11 @@
 #include "Scripting/Internal/TEN/Flow/LensFlare/LensFlare.h"
 
 #include "Objects/game_object_ids.h"
+#include "Scripting/Internal/TEN/Types/Color/Color.h"
 #include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
 #include "Specific/level.h"
+
+using namespace TEN::Scripting::Types;
 
 /// Represents a global lens flare (not to be confused with lensflare object).
 //
