@@ -121,10 +121,6 @@
 	<td class="summary">Determine if there is a clear line of sight between two positions.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#CalculateDistance">CalculateDistance(posA, posB)</a></td>
-	<td class="summary">Calculate the distance between two positions.</td>
-	</tr>
-	<tr>
 	<td class="name" ><a href="#CalculateHorizontalDistance">CalculateHorizontalDistance(posA, posB)</a></td>
 	<td class="summary">Calculate the horizontal distance between two positions.</td>
 	</tr>
@@ -201,38 +197,6 @@
         <pre class="example"><span class="keyword">local</span> flamePlinthPos = flamePlinth:GetPosition() + Vec3(<span class="number">0</span>, flamePlinthHeight, <span class="number">0</span>);
 <span class="global">print</span>(Misc.HasLineOfSight(enemyHead:GetRoomNumber(), enemyHead:GetPosition(), flamePlinthPos))</pre>
     </ul>
-
-</dd>
-    <dt>
-    <a name = "CalculateDistance"></a>
-    <strong>CalculateDistance(posA, posB)</strong>
-    </dt>
-    <dd>
-    Calculate the distance between two positions.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">posA</span>
-            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-         First position.
-        </li>
-        <li><span class="parameter">posB</span>
-            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-         Second position.
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">float</span></span>
-        Distance between two positions.
-    </ol>
-
-
-
 
 </dd>
     <dt>

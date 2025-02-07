@@ -298,7 +298,6 @@ static constexpr char ScriptReserved_GetSoundSourceByName[]			= "GetSoundSourceB
 static constexpr char ScriptReserved_GetVolumeByName[]				= "GetVolumeByName";
 static constexpr char ScriptReserved_GetRoomsByTag[]				= "GetRoomsByTag";
 static constexpr char ScriptReserved_GetRoomByName[]				= "GetRoomByName";
-static constexpr char ScriptReserved_CalculateDistance[]			= "CalculateDistance";
 static constexpr char ScriptReserved_CalculateHorizontalDistance[]	= "CalculateHorizontalDistance";
 static constexpr char ScriptReserved_PercentToScreen[]				= "PercentToScreen";
 static constexpr char ScriptReserved_ScreenToPercent[]				= "ScreenToPercent";
