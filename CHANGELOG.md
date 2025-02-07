@@ -20,6 +20,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed custom shatter sounds with custom sound IDs not playing correctly.
 
 ### New Features
+* Added diary module.
 * Added ability to use keys and puzzle items underwater.
  - You must update your Lara object: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Lara/TEN_Lara.wad2
 * Added a particle based waterfall emitter object and associated sprite slots.
@@ -55,7 +56,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### Lua API changes
 * Fixed Flow.FreezeMode.FULL drawing incorrect background.
 * Fixed DisplayString scale argument not being optional, as stated in documentation.
-* Added Diary Module.
 
 ## [Version 1.7](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.3) - 2024-12-25
 
