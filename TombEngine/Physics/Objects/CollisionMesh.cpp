@@ -131,7 +131,7 @@ namespace TEN::Physics
 		DrawDebugLine(vertex1, vertex2, TRI_OUTLINE_COLOR);
 		DrawDebugLine(vertex2, vertex0, TRI_OUTLINE_COLOR);
 
-		// Draw normal.
+		// Draw triangle normal.
 		auto center = (vertex0 + vertex1 + vertex2) / VERTEX_COUNT;
 		DrawDebugLine(center, Geometry::TranslatePoint(center, normal, NORMAL_LENGTH), NORMAL_COLOR);
 	}

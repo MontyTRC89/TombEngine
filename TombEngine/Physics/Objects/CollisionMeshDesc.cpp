@@ -123,6 +123,10 @@ namespace TEN::Physics
 		{
 			auto polygon = std::vector<int>{};
 
+			// TODO:
+			// - Split polygon into isolated islands.
+			// - Process monotone, irregular, and holed polygons.
+
 			const auto& firstEdgeIt = boundaryEdges.begin();
 			const auto& [firstVertexId0, firstVertexId1] = *firstEdgeIt;
 
@@ -182,6 +186,7 @@ namespace TEN::Physics
 
 	CollisionMeshDesc::CoplanarTriangleMap CollisionMeshDesc::GetCoplanarTriangleMap() const
 	{
+		constexpr auto NORMAL_EPSILON	 = 0.0001f;
 		constexpr auto PLANE_HEIGHT_STEP = BLOCK(1 / 64.0f);
 
 		// Collect coplanar triangle groups.
@@ -197,9 +202,10 @@ namespace TEN::Physics
 			auto edge0 = vertex1 - vertex0;
 			auto edge1 = vertex2 - vertex0;
 
-			// Calculate plane normal. TODO: Should be rounded to account for floating-point imprecision?
+			// Calculate plane normal.
 			auto normal = edge0.Cross(edge1);
 			normal.Normalize();
+			normal = RoundNormal(normal, NORMAL_EPSILON);
 
 			// Calculate plane distance.
 			float dist = RoundToStep(normal.Dot(vertex0), PLANE_HEIGHT_STEP);
@@ -266,6 +272,7 @@ namespace TEN::Physics
 		auto boundaryEdges = std::vector<EdgeVertexIdPair>{};
 		for (const auto& [edge, count] : edgeCountMap)
 		{
+			// Filter out non-boundary edge.
 			if (count != 1)
 				continue;
 
@@ -280,7 +287,7 @@ namespace TEN::Physics
 	{
 		// Remove redundant collinear vertices.
 		auto simplifiedPolygon = std::vector<int>{};
-		simplifiedPolygon.reserve(polygon.size() / 2);
+		simplifiedPolygon.reserve(polygon.size() / 3);
 		for (int i = 0; i < polygon.size(); i++)
 		{
 			// Get vertex IDs.

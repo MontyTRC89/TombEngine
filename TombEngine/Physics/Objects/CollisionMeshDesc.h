@@ -13,9 +13,9 @@ namespace TEN::Physics
 
 		using TriangleVertexIds	  = std::array<int, VERTEX_COUNT>;
 		using EdgeVertexIdPair	  = std::pair<int, int>;
-		using CoplanarTriangleMap = std::unordered_map<Plane, std::vector<TriangleVertexIds>>;
+		using CoplanarTriangleMap = std::unordered_map<Plane, std::vector<TriangleVertexIds>>; // Key = plane, value = triangle IDs.
 		using EdgeCountMap		  = std::unordered_map<EdgeVertexIdPair, int, PairHash>;	   // Key = vertex ID pair defining edge, value = edge count.
-		using VertexAdjacencyMap  = std::unordered_map<int, std::unordered_set<int>>;		   // Key = vertex ID, value = adjacent vertex ID.
+		using VertexAdjacencyMap  = std::unordered_map<int, std::unordered_set<int>>;		   // Key = vertex ID, value = adjacent vertex IDs.
 
 		// Fields
 
