@@ -168,7 +168,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 	MESH_INFO* mesh = nullptr;
 	auto vector = Vector3i::Zero;
 	int itemNumber = ObjectOnLOS2(origin, target, &vector, &mesh);
-	bool hasHit = (itemNumber != NO_VALUE);
+	bool hasHit = (itemNumber != NO_LOS_ITEM);
 
 	if (hasHit)
 	{
@@ -441,7 +441,7 @@ static bool DoRayBox(const GameVector& origin, const GameVector& target, const G
 
 int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INFO** staticObj, GAME_OBJECT_ID priorityObjectID)
 {
-	ClosestItem = NO_VALUE;
+	ClosestItem = NO_LOS_ITEM;
 	ClosestDist = SQUARE(target->x - origin->x) + SQUARE(target->y - origin->y) + SQUARE(target->z - origin->z);
 
 	for (int roomNumber : LosRoomNumbers)

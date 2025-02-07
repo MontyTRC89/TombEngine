@@ -6,7 +6,7 @@
 
 struct MESH_INFO;
 
-constexpr auto NO_LOS_ITEM = -1;
+constexpr auto NO_LOS_ITEM = INT_MAX;
 
 // Legacy LOS functions
 
