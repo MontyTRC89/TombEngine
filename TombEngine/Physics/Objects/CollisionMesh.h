@@ -6,32 +6,7 @@ using namespace TEN::Structures;
 
 namespace TEN::Physics
 {
-	class CollisionMeshDesc
-	{
-	private:
-		// Fields
-
-		std::vector<Vector3> _vertices = {};
-		std::vector<int>	 _ids	   = {};
-
-		std::unordered_map<Vector3, int> _vertexMap = {}; // Key = vertex, value = vertex ID.
-
-	public:
-		// Constructors
-
-		CollisionMeshDesc() = default;
-
-		// Getters
-
-		unsigned int				GetTriangleCount() const;
-		const std::vector<Vector3>& GetVertices() const;
-		const std::vector<int>&		GetIds() const;
-
-		// Utilities
-
-		void InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2);
-		void Optimize();
-	};
+	class CollisionMeshDesc;
 
 	class LocalCollisionTriangle
 	{

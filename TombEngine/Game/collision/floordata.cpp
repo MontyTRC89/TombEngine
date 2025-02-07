@@ -206,7 +206,7 @@ int FloorInfo::GetSurfaceHeight(int x, int z, bool isFloor) const
 	auto normal = tri.Plane.Normal();
 	float relPlaneHeight = -((normal.x * sectorPoint.x) + (normal.z * sectorPoint.y)) / normal.y;
 
-	// Due to precision loss, we can't recover NO_HEIGHT constant from the plane, and must return original integer constant.
+	// FAILSAFE: Due to float precision loss, NO_HEIGHT constant can't be recovered from plane and original value must be returned from original definition.
 	if (tri.Plane.D() == (float)NO_HEIGHT)
 		return NO_HEIGHT;
 
@@ -235,14 +235,13 @@ int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 		if (!bridgeSurfaceHeight.has_value())
 			continue;
 
-		// Use bridge midpoint to decide whether to return bridge height or room height, in case probe point
-		// is located within the bridge. Without it, dynamic bridges may fail while Lara is standing on them.
+		// Use bridge midpoint to decide whether to return bridge height or room height in case probe point
+		// is located within bridge. Without it, dynamic bridges may fail while player stands on it.
 		int thickness = bridge.GetCeilingBorder(bridgeItem) - bridge.GetFloorBorder(bridgeItem);
 		int midpoint = bridgeItem.Pose.Position.y + thickness / 2;
 
-		// Decide whether to override midpoint with surface height, if bridge type is tilt.
-		// It is needed to prevent submerging into tilted bridges, as their surface height does not correspond
-		// to their height function.
+		// HACK: Override midpoint with surface height if bridge is tilted.
+		// Necessary to prevent submerging into tilted bridges as their surface heights do not correspond to their height functions.
 		if (bridgeItem.ObjectNumber >= GAME_OBJECT_ID::ID_BRIDGE_TILT1 &&
 			bridgeItem.ObjectNumber <= GAME_OBJECT_ID::ID_BRIDGE_TILT4)
 		{
@@ -253,9 +252,9 @@ int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 		if (isFloor)
 		{
 			// Test if bridge floor height is closer.
-			if (midpoint >= pos.y &&				// Bridge midpoint is below position.
-				*bridgeSurfaceHeight < floorHeight &&   // Bridge floor height is above current closest floor height.
-				*bridgeSurfaceHeight >= ceilingHeight)  // Bridge ceiling height is below sector ceiling height.
+			if (midpoint >= pos.y &&				   // Bridge midpoint is below position.
+				*bridgeSurfaceHeight < floorHeight &&  // Bridge floor height is above current closest floor height.
+				*bridgeSurfaceHeight >= ceilingHeight) // Bridge ceiling height is below sector ceiling height.
 			{
 				floorHeight = *bridgeSurfaceHeight;
 			}
@@ -263,7 +262,7 @@ int FloorInfo::GetSurfaceHeight(const Vector3i& pos, bool isFloor) const
 		else
 		{
 			// Test if bridge ceiling height is closer.
-			if (midpoint <= pos.y &&			// Bridge midpoint is above position.
+			if (midpoint <= pos.y &&					// Bridge midpoint is above position.
 				*bridgeSurfaceHeight > ceilingHeight && // Bridge ceiling height is below current closest ceiling height.
 				*bridgeSurfaceHeight <= floorHeight)	// Bridge floor height is above sector floor height.
 			{

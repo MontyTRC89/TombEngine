@@ -59,7 +59,7 @@ enum class ClimbDirectionFlags
 class RoomVector 
 {
 public:
-	// Members
+	// Fields
 
 	int RoomNumber = 0;
 	int Height	   = 0;
@@ -137,7 +137,7 @@ struct SectorFlagData
 class FloorInfo
 {
 public:
-	// Members
+	// Fields
 
 	int ID = 0;
 
