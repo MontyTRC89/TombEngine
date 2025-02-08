@@ -373,6 +373,8 @@ table ParticleInfo {
 	fx_obj: int32;
 	room_number: int32;
 	node_number: int32;
+	target_pos: Vector3;
+	sprite_id: int32;
 }
 
 table Soundtrack {
