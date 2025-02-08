@@ -11,7 +11,7 @@ namespace TEN::Math
 	float	CeilToStep(float value, float step);
 	float	RoundToStep(float value, float step);
 	float	Remap(float value, float min0, float max0, float min1, float max1);
-	Vector3 RoundNormal(const XMFLOAT3& normal, float epsilon = EPSILON);
+	Vector3 RoundNormal(const Vector3& normal, float epsilon = EPSILON);
 
 	// Interpolation
 

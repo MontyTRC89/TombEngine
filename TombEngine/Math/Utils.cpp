@@ -26,7 +26,7 @@ namespace TEN::Math
 		return Lerp(min1, max1, alpha);
 	}
 
-	Vector3 RoundNormal(const XMFLOAT3& normal, float epsilon)
+	Vector3 RoundNormal(const Vector3& normal, float epsilon)
 	{
 		return Vector3(
 			round(normal.x / epsilon),
