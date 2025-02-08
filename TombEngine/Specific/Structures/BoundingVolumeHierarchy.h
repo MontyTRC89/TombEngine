@@ -5,8 +5,8 @@
 // https://github.com/erincatto/box2d/blob/main/src/collision/b2_dynamic_tree.cpp
 // https://www.gdcvault.com/play/1025909/Math-for-Game-Developers-Dynamic
 
-// NOTE: _leafIDMap is a hash map for convenience. If performance suffers with too many Move() and Remove() calls, a method with faster access can be substituted in.
-// However, it requires maintaining a index variable outside the BVH instance, so a hash map is preferred for the benefit of cleaner code. -- Sezz 2024.11.05
+// NOTE: _leafIDMap is a hash map for convenience. If performance suffers with too many Move() and Remove() calls, a method with faster access can be implemented.
+// However, it requires maintaining an odd index variable outside the BVH instance, so a hash map is preferred for the benefit of cleaner code. -- Sezz 2024.11.05
 
 namespace TEN::Structures
 {

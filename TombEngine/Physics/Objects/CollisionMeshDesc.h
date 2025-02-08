@@ -51,6 +51,6 @@ namespace TEN::Physics
 		std::vector<EdgeVertexIdPair> GetBoundaryEdges(const EdgeCountMap& edgeCountMap) const;
 		
 		std::vector<int> GetSimplifiedPolygon(const std::vector<int>& polygon) const;
-		void			 TriangulatePolygon(std::vector<int>& optimizedIds, const std::vector<int>& polygon, const Plane& plane) const;
+		void			 TriangulatePolygon(std::vector<int>& optimizedVertexIds, const std::vector<int>& polygon, const Plane& plane) const;
 	};
 }

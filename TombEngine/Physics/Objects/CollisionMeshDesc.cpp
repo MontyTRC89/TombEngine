@@ -88,7 +88,7 @@ namespace TEN::Physics
 		return (u >= 0.0f && v >= 0.0f && (u + v) <= 1.0f);
 	}
 	
-	// TODO: Not working right.
+	// TODO: Finish sub-function implementations.
 	void CollisionMeshDesc::Optimize()
 	{
 		return;
@@ -97,17 +97,31 @@ namespace TEN::Physics
 		auto coplanarTriMap = GetCoplanarTriangleMap();
 
 		// 2) Process coplanar triangles into optimized vertex IDs.
-		auto optimizedIds = std::vector<int>{};
+		auto optimizedVertexIds = std::vector<int>{};
 		for (const auto& [plane, tris] : coplanarTriMap)
 		{
-			// Triangulate polygons.
+			// Get optimal polygons from coplanar triangles.
 			auto polygons = GetPolygons(tris);
+
+			// Triangulate polygons.
 			for (const auto& polygon : polygons)
-				TriangulatePolygon(optimizedIds, polygon, plane);
+				TriangulatePolygon(optimizedVertexIds, polygon, plane);
 		}
 
-		// 3) Store optimized vertex IDs.
-		_ids = std::move(optimizedIds);
+		// 3) Finalize optimized vertices and IDs.
+		auto optimizedVertices = std::vector<Vector3>{};
+		auto reoptimizedVertexIds = std::vector<int>{};
+		for (int vertexId : optimizedVertexIds)
+		{
+			const auto& vertex = _vertices[vertexId];
+
+			optimizedVertices.push_back(vertex);
+			reoptimizedVertexIds.push_back((int)optimizedVertices.size() - 1);
+		}
+
+		// 4) Store optimized vertices and IDs.
+		_vertices = std::move(optimizedVertices);
+		_ids = std::move(reoptimizedVertexIds);
 	}
 
 	std::vector<std::vector<int>> CollisionMeshDesc::GetPolygons(const std::vector<TriangleVertexIds>& tris) const
@@ -308,13 +322,13 @@ namespace TEN::Physics
 	}
 
 	// TODO: Use better method for complex polygons.
-	void CollisionMeshDesc::TriangulatePolygon(std::vector<int>& optimizedIds, const std::vector<int>& polygon, const Plane& plane) const
+	void CollisionMeshDesc::TriangulatePolygon(std::vector<int>& optimizedVertexIds, const std::vector<int>& polygon, const Plane& plane) const
 	{
 		// Invalid polygon; return early.
 		if (polygon.size() < VERTEX_COUNT)
 			return;
 
-		// Triangulate using Ear Clipping method.
+		// Triangulate using ear clipping method.
 		auto remainingVertexIds = polygon;
 		while (remainingVertexIds.size() > 2)
 		{
@@ -330,9 +344,9 @@ namespace TEN::Physics
 					std::swap(prevVertexId, nextVertexId);
 
 				// Collect optimized vertex IDs.
-				optimizedIds.push_back(prevVertexId);
-				optimizedIds.push_back(vertexId);
-				optimizedIds.push_back(nextVertexId);
+				optimizedVertexIds.push_back(prevVertexId);
+				optimizedVertexIds.push_back(vertexId);
+				optimizedVertexIds.push_back(nextVertexId);
 
 				// Remove vertex ID.
 				remainingVertexIds.erase(remainingVertexIds.begin() + i);
