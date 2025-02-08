@@ -309,7 +309,7 @@ namespace TEN::Renderer
 					AddSpriteBillboardConstrained(
 						&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
 						center,
-						Vector4(255.0f, 255.0f, 255.0f, 0.5f),
+						Vector4(1.0f, 1.0f, 1.0f, 0.5f),
 						PI_DIV_2, 1.0f, Vector2(4, Vector3::Distance(origin, target)), BlendMode::Additive, dir, true, view);
 
 
