@@ -27,6 +27,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
  - You must use this version: https://github.com/TombEngine/Resources/raw/refs/heads/main/Wad2%20Objects/Interactables/TEN_Waterfall_Emitter.wad2
 
 ### Lua API changes
+* Added alpha transparency functionality for statics and moveables by using SetColor() method.
 * Added Effects.EmitAirBubble() function to spawn air bubbles.
 * Added additional arguments for Sprite object slot and starting rotation value for EmitParticle function.
 * Added various Translate() methods to Vec2 and Vec3 script objects.
