@@ -2632,6 +2632,7 @@ namespace TEN::Renderer
 								object.BlendMode = blendMode;
 								object.LightMode = refMesh->LightMode;
 								object.Polygon = &bucket.Polygons[p];
+								object.Room = &_rooms[object.Static->RoomNumber];
 
 								view.TransparentObjectsToDraw.push_back(object);
 							}

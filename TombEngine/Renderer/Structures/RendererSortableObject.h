@@ -27,14 +27,14 @@ namespace TEN::Renderer::Structures
 		BlendMode BlendMode;
 		LightMode LightMode;
 
+		RendererRoom* Room;
 		RendererBucket* Bucket;
 		RendererPolygon* Polygon;
 
 		union
 		{
-			RendererRoom* Room;
-			RendererStatic* Static;
 			RendererItem* Item;
+			RendererStatic* Static;
 			RendererEffect* Effect;
 			RendererSpriteToDraw* Sprite;
 		};
