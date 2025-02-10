@@ -507,7 +507,7 @@ namespace TEN::Renderer
 								object.Distance = distance;
 								object.BlendMode = bucket.BlendMode;
 								object.Bucket = &bucket;
-								object.Mesh = mesh;
+								object.LightMode = mesh->LightMode;
 								object.Polygon = &bucket.Polygons[p];
 								object.World = rat->Transform;
 								object.Room = &_rooms[rat->RoomNumber];
@@ -635,7 +635,7 @@ namespace TEN::Renderer
 						object.Distance = dist;
 						object.BlendMode = bucket.BlendMode;
 						object.Bucket = &bucket;
-						object.Mesh = &mesh;
+						object.LightMode = mesh.LightMode;
 						object.Polygon = &poly;
 						object.World = worldMatrix;
 						object.Room = &_rooms[fish.RoomNumber];
@@ -753,7 +753,7 @@ namespace TEN::Renderer
 						object.Distance = dist;
 						object.BlendMode = bucket.BlendMode;
 						object.Bucket = &bucket;
-						object.Mesh = &mesh;
+						object.LightMode = mesh.LightMode;
 						object.Polygon = &bucket.Polygons[p];
 						object.World = transformMatrix;
 						object.Room = &_rooms[bat.RoomNumber];
@@ -875,7 +875,7 @@ namespace TEN::Renderer
 						object.Distance = dist;
 						object.BlendMode = bucket.BlendMode;
 						object.Bucket = &bucket;
-						object.Mesh = &mesh;
+						object.LightMode = mesh.LightMode;
 						object.Polygon = &bucket.Polygons[p];
 						object.World = transformMatrix;
 						object.Room = &_rooms[beetle.RoomNumber];
@@ -1005,7 +1005,7 @@ namespace TEN::Renderer
 						object.Distance = dist;
 						object.BlendMode = bucket.BlendMode;
 						object.Bucket = &bucket;
-						object.Mesh = &mesh;
+						object.LightMode = mesh.LightMode;
 						object.Polygon = &bucket.Polygons[p];
 						object.World = transformMatrix;
 						object.Room = &_rooms[locust.roomNumber];
@@ -2630,9 +2630,8 @@ namespace TEN::Renderer
 								object.Centre = Vector3::Transform(bucket.Polygons[p].Centre, statics[i]->World);
 								object.Distance = Vector3::Distance(object.Centre, view.Camera.WorldPosition);
 								object.BlendMode = blendMode;
-								object.Mesh = refMesh;
+								object.LightMode = refMesh->LightMode;
 								object.Polygon = &bucket.Polygons[p];
-								object.Room = &_rooms[object.Static->RoomNumber];
 
 								view.TransparentObjectsToDraw.push_back(object);
 							}
@@ -3170,7 +3169,7 @@ namespace TEN::Renderer
 						object.BlendMode = blendMode;
 						object.Bucket = &bucket;
 						object.Item = itemToDraw;
-						object.Mesh = mesh;
+						object.LightMode = mesh->LightMode;
 						object.Polygon = &bucket.Polygons[p];
 
 						view.TransparentObjectsToDraw.push_back(object);
@@ -3677,7 +3676,7 @@ namespace TEN::Renderer
 
 		_stStatic.Color = Vector4::One;
 		_stStatic.AmbientLight = objectInfo->Room->AmbientLight;
-		_stStatic.LightMode = (int)objectInfo->Mesh->LightMode;
+		_stStatic.LightMode = (int)objectInfo->LightMode;
 		BindStaticLights(objectInfo->Room->LightsToDraw);
 		_cbStatic.UpdateData(_stStatic, _context.Get());
 
