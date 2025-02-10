@@ -21,6 +21,7 @@ namespace TEN::Renderer::Structures
 		RendererObjectType ObjectType;
 		int Distance;
 		Vector3 Centre;
+		BlendMode BlendMode;
 		RendererMesh* Mesh;
 		RendererBucket* Bucket;
 		RendererRoom* Room;
