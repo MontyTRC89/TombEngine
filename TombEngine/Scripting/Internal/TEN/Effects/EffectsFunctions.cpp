@@ -137,7 +137,7 @@ namespace TEN::Scripting::Effects
 	static void EmitParticle(Vec3 pos, Vec3 velocity, int spriteIndex, TypeOrNil<int> gravity, TypeOrNil<float> rot, 
 							TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<BlendMode> blendMode, 
 							TypeOrNil<int> startSize, TypeOrNil<int> endSize, TypeOrNil<float> lifetime, 
-							TypeOrNil<bool> damage, TypeOrNil<bool> poison, TypeOrNil<GAME_OBJECT_ID> objectID, TypeOrNil<float> startRot, TypeOrNil<bool> animated, TypeOrNil<float> frameRate, TypeOrNil<int> animationType)
+							TypeOrNil<bool> damage, TypeOrNil<bool> poison, TypeOrNil<GAME_OBJECT_ID> objectID, TypeOrNil<float> startRot)
 	{
 		// Ensure objectID is valid 
 		GAME_OBJECT_ID effectiveObjectID = USE_IF_HAVE(GAME_OBJECT_ID, objectID, ID_DEFAULT_SPRITES); 
@@ -158,6 +158,97 @@ namespace TEN::Scripting::Effects
 
 		ScriptColor colorStart = USE_IF_HAVE(ScriptColor, startColor, ScriptColor( 255, 255, 255 ));
 		ScriptColor colorEnd = USE_IF_HAVE(ScriptColor, endColor, ScriptColor( 255, 255, 255 ));
+
+		s->sR = colorStart.GetR();
+		s->sG = colorStart.GetG();
+		s->sB = colorStart.GetB();
+
+		s->dR = colorEnd.GetR();
+		s->dG = colorEnd.GetG();
+		s->dB = colorEnd.GetB();
+
+		//there is no blend mode 7
+		BlendMode bMode = USE_IF_HAVE(BlendMode, blendMode, BlendMode::AlphaBlend);
+		s->blendMode = BlendMode(std::clamp(int(bMode), int(BlendMode::Opaque), int(BlendMode::AlphaBlend)));
+
+		s->x = pos.x;
+		s->y = pos.y;
+		s->z = pos.z;
+		s->roomNumber = FindRoomNumber(Vector3i(pos.x, pos.y, pos.z));
+		constexpr float secsPerFrame = 1.0f / (float)FPS;
+
+		float life = USE_IF_HAVE(float, lifetime, 2.0f);
+		life = std::max(0.1f, life);
+		int lifeInFrames = (int)round(life / secsPerFrame);
+
+		s->life = s->sLife = lifeInFrames;
+		s->colFadeSpeed = lifeInFrames / 2;
+		s->fadeToBlack = lifeInFrames / 3;
+
+		s->xVel = short(velocity.x * 32);
+		s->yVel = short(velocity.y * 32);
+		s->zVel = short(velocity.z * 32);
+
+		int sSize = USE_IF_HAVE(int, startSize, 10);
+		int eSize = USE_IF_HAVE(int, endSize, 0);
+
+		s->sSize = s->size = float(sSize);
+		s->dSize = float(eSize);
+
+		s->scalar = 2;
+
+		s->flags = SP_SCALE | SP_ROTATE | SP_DEF | SP_EXPDEF;
+
+		bool applyPoison = USE_IF_HAVE(bool, poison, false);
+		bool applyDamage = USE_IF_HAVE(bool, damage, false);
+
+		if (applyPoison)
+			s->flags |= SP_POISON;
+
+		if (applyDamage)
+			s->flags |= SP_DAMAGE;
+
+		//todo add option to turn off wind?
+		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WIND, s->roomNumber))
+			s->flags |= SP_WIND;
+
+		float rotAdd = USE_IF_HAVE(float, rot, 0.0f);
+
+		s->rotAng = USE_IF_HAVE(float, startRot, (GetRandomControl() & 0x0FFF));
+		s->rotAdd = byte(ANGLE(rotAdd) >> 4);
+
+		s->friction = 0;
+		s->maxYvel  = 0;
+
+		s->gravity  = grav;
+	}
+
+	static void EmitAdvancedParticle(sol::table tbl)
+	{
+
+		/*Vec3 pos, Vec3 velocity, int spriteIndex, TypeOrNil<int> gravity, TypeOrNil<float> rot,
+		TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<BlendMode> blendMode,
+		TypeOrNil<int> startSize, TypeOrNil<int> endSize, TypeOrNil<float> lifetime,
+		TypeOrNil<bool> damage, TypeOrNil<bool> poison, TypeOrNil<GAME_OBJECT_ID> objectID, TypeOrNil<float> startRot, TypeOrNil<bool> animated, TypeOrNil<float> frameRate, TypeOrNil<int> animationType*/
+		// Ensure objectID is valid 
+		GAME_OBJECT_ID effectiveObjectID = USE_IF_HAVE(GAME_OBJECT_ID, objectID, ID_DEFAULT_SPRITES);
+
+		// Validate the effective object ID 
+		if (!CheckIfSlotExists(effectiveObjectID, "Particle spawn script function"))
+			return;
+
+		int grav = USE_IF_HAVE(int, gravity, 0);
+
+		grav = std::clamp(grav, -32768, 32767);
+
+		auto* s = GetFreeParticle();
+
+		s->on = true;
+
+		s->spriteIndex = Objects[effectiveObjectID].meshIndex + spriteIndex;
+
+		ScriptColor colorStart = USE_IF_HAVE(ScriptColor, startColor, ScriptColor(255, 255, 255));
+		ScriptColor colorEnd = USE_IF_HAVE(ScriptColor, endColor, ScriptColor(255, 255, 255));
 
 		s->sR = colorStart.GetR();
 		s->sG = colorStart.GetG();
@@ -230,9 +321,9 @@ namespace TEN::Scripting::Effects
 		s->rotAdd = byte(ANGLE(rotAdd) >> 4);
 
 		s->friction = 0;
-		s->maxYvel  = 0;
+		s->maxYvel = 0;
 
-		s->gravity  = grav;
+		s->gravity = grav;
 	}
 	
 /***Emit a shockwave, similar to that seen when a harpy projectile hits something.
