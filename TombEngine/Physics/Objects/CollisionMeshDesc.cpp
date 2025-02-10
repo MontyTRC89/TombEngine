@@ -54,47 +54,13 @@ namespace TEN::Physics
 		_ids.push_back(vertexId2);
 	}
 
-	// TEMP
-	// Check if 3 vertices form convex angle.
-	bool IsConvex(const Vector3& a, const Vector3& b, const Vector3& c, const Plane& plane)
-	{
-		auto cross = (b - a).Cross(c - b);
-		return (cross.Dot(plane.Normal()) > 0.0f); // Ensure consistent winding.
-	}
-	
-	// TEMP
-	bool PointInTriangle(const Vector3& pt, const Vector3& v0, const Vector3& v1, const Vector3& v2)
-	{
-		// Compute vectors.
-		auto v0v1 = v1 - v0;
-		auto v0v2 = v2 - v0;
-		auto v0p = pt - v0;
-
-		// Compute dot products.
-		float dot00 = v0v1.Dot(v0v1);
-		float dot01 = v0v1.Dot(v0v2);
-		float dot02 = v0v1.Dot(v0p);
-		float dot11 = v0v2.Dot(v0v2);
-		float dot12 = v0v2.Dot(v0p);
-
-		// Compute determinant (denominator).
-		float invDenom = 1.0f / (dot00 * dot11 - dot01 * dot01);
-
-		// Compute barycentric coordinates.
-		float u = (dot11 * dot02 - dot01 * dot12) * invDenom;
-		float v = (dot00 * dot12 - dot01 * dot02) * invDenom;
-
-		// Check if point is inside triangle (barycentric coordinates must be in range [0, 1]).
-		return (u >= 0.0f && v >= 0.0f && (u + v) <= 1.0f);
-	}
-	
-	// TODO: Finish sub-function implementations.
 	void CollisionMeshDesc::Optimize()
 	{
 		return;
 
 		// 1) Get coplanar triangle map.
 		auto coplanarTriMap = GetCoplanarTriangleMap();
+		PrintDebugMessage("coplanar size: %d", (int)coplanarTriMap.size());
 
 		// 2) Process coplanar triangles into optimized vertex IDs.
 		auto optimizedVertexIds = std::vector<int>{};
@@ -105,12 +71,16 @@ namespace TEN::Physics
 
 			// Triangulate polygons.
 			for (const auto& polygon : polygons)
-				TriangulatePolygon(optimizedVertexIds, polygon, plane);
+				TriangulatePolygon(optimizedVertexIds, polygon, plane.Normal());
 		}
 
-		// 3) Finalize optimized vertices and IDs.
 		auto optimizedVertices = std::vector<Vector3>{};
+		optimizedVertices.reserve(optimizedVertexIds.size());
+		
 		auto reoptimizedVertexIds = std::vector<int>{};
+		reoptimizedVertexIds.reserve(optimizedVertexIds.size());
+
+		// 3) Finalize optimized vertices and IDs.
 		for (int vertexId : optimizedVertexIds)
 		{
 			const auto& vertex = _vertices[vertexId];
@@ -185,19 +155,17 @@ namespace TEN::Physics
 					break;
 			}
 
-			// 2.3) Simplify polygon.
-			auto simplifiedPolygon = GetSimplifiedPolygon(polygon);
-			//simplifiedPolygon = polygon; // TEMP: Don't use optimised polygon for now.
-
-			// 2.4) Collect valid polygon.
-			if (simplifiedPolygon.size() >= VERTEX_COUNT)
-				polygons.push_back(std::move(simplifiedPolygon));
+			// 2.3) Simplify and collect valid polygon.
+			SimplifyPolygon(polygon);
+			if (polygon.size() >= VERTEX_COUNT)
+				polygons.push_back(std::move(polygon));
 		}
 
 		// 3) Return optimal polygons.
 		return polygons;
 	}
 
+	// TODO: Make rounding optional.
 	CollisionMeshDesc::CoplanarTriangleMap CollisionMeshDesc::GetCoplanarTriangleMap() const
 	{
 		constexpr auto NORMAL_EPSILON	 = 0.0001f;
@@ -296,125 +264,113 @@ namespace TEN::Physics
 		return boundaryEdges;
 	}
 
-	// TODO: Fix. Sometimes creates holes.
-	std::vector<int> CollisionMeshDesc::GetSimplifiedPolygon(const std::vector<int>& polygon) const
+	void CollisionMeshDesc::SimplifyPolygon(std::vector<int>& polygon) const
 	{
-		// Remove redundant collinear vertices.
-		auto simplifiedPolygon = std::vector<int>{};
-		simplifiedPolygon.reserve(polygon.size() / 3);
-		for (int i = 0; i < polygon.size(); i++)
+		// Remove redundant collinear vertices from polygon.
+		int i = 0;
+		while (polygon.size() > VERTEX_COUNT)
 		{
 			// Get vertex IDs.
-			int vertexId = polygon[i];
-			int prevVertexId = polygon[(i == 0) ? (polygon.size() - 1) : (i - 1)];
-			int nextVertexId = polygon[(i == (polygon.size() - 1)) ? 0 : (i + 1)];
+			int vertexId0 = polygon[i];
+			int vertexId1 = polygon[(i + 1) % polygon.size()];
+			int vertexId2 = polygon[(i + 2) % polygon.size()];
+
+			// Get vertices.
+			const auto& vertex0 = _vertices[vertexId0];
+			const auto& vertex1 = _vertices[vertexId1];
+			const auto& vertex2 = _vertices[vertexId2];
 
 			// Calculate edges.
-			auto edge0 = _vertices[vertexId] - _vertices[prevVertexId];
-			auto edge1 = _vertices[nextVertexId] - _vertices[vertexId];
+			auto edge0 = vertex1 - vertex0;
+			auto edge1 = vertex2 - vertex1;
 
-			// Check collinearity using cross product.
-			if (edge0.Cross(edge1).LengthSquared() > EPSILON)
-				simplifiedPolygon.emplace_back(vertexId);
+			// Edges are collinear; remove vertex 1 and remain at current vertex.
+			auto edgeCross = edge0.Cross(edge1);
+			if (edgeCross.LengthSquared() < EPSILON)
+			{
+				polygon.erase(polygon.begin() + ((i + 1) % polygon.size()));
+				if (i >= polygon.size())
+					i = (int)polygon.size() - 1;
+			}
+			// Edges aren't collinear; move to next vertex.
+			else
+			{
+				i++;
+				if (i >= polygon.size())
+					break;
+			}
 		}
-
-		return simplifiedPolygon;
 	}
 
 	// TODO: Use better method for complex polygons.
-	void CollisionMeshDesc::TriangulatePolygon(std::vector<int>& optimizedVertexIds, const std::vector<int>& polygon, const Plane& plane) const
+	void CollisionMeshDesc::TriangulatePolygon(std::vector<int>& optimizedVertexIds, const std::vector<int>& polygon, const Vector3& normal) const
 	{
 		// Invalid polygon; return early.
 		if (polygon.size() < VERTEX_COUNT)
 			return;
 
+		int count = 0;
+
 		// Triangulate using ear clipping method.
-		auto remainingVertexIds = polygon;
-		while (remainingVertexIds.size() > 2)
+		auto vertexIds = polygon;
+		int i = 0;
+		while (vertexIds.size() > 2)
 		{
-			for (int i = 0; i < remainingVertexIds.size(); i++)
+			// Get vertex IDs.
+			int vertexId0 = vertexIds[i];
+			int vertexId1 = vertexIds[(i + 1) % vertexIds.size()];
+			int vertexId2 = vertexIds[(i + 2) % vertexIds.size()];
+
+			// Ensure correct winding order.
+			auto faceNormal = (_vertices[vertexId0] - _vertices[vertexId1]).Cross(_vertices[vertexId2] - _vertices[vertexId1]);
+			if (faceNormal.Dot(normal) > 0.0f)
+				std::swap(vertexId0, vertexId2);
+
+			// Get vertices.
+			const auto& vertex0 = _vertices[vertexId0];
+			const auto& vertex1 = _vertices[vertexId1];
+			const auto& vertex2 = _vertices[vertexId2];
+
+			// Calculate edges.
+			auto edge0 = vertex1 - vertex0;
+			auto edge1 = vertex2 - vertex1;
+
+			// Project edges onto plane by removing component along normal.
+			auto projEdge0 = edge0 - (normal * (edge0.Dot(normal) / normal.LengthSquared()));
+			auto projEdge1 = edge1 - (normal * (edge1.Dot(normal) / normal.LengthSquared()));
+
+			// Calculate cross product of projected edges.
+			auto edgeCross = projEdge0.Cross(projEdge1);
+
+			// Angle between edges is convex (< 180 degrees).
+			//if (true)
+			if (edgeCross.LengthSquared() >= 0.0f)
 			{
-				int vertexId = remainingVertexIds[i];
-				int prevVertexId = remainingVertexIds[(i + (remainingVertexIds.size() - 1)) % remainingVertexIds.size()];
-				int nextVertexId = remainingVertexIds[(i + 1) % remainingVertexIds.size()];
-
-				// Ensure correct winding order.
-				auto faceNormal = (_vertices[prevVertexId] - _vertices[vertexId]).Cross(_vertices[nextVertexId] - _vertices[vertexId]);
-				if (faceNormal.Dot(plane.Normal()) > 0.0f)
-					std::swap(prevVertexId, nextVertexId);
-
 				// Collect optimized vertex IDs.
-				optimizedVertexIds.push_back(prevVertexId);
-				optimizedVertexIds.push_back(vertexId);
-				optimizedVertexIds.push_back(nextVertexId);
+				optimizedVertexIds.push_back(vertexId0);
+				optimizedVertexIds.push_back(vertexId1);
+				optimizedVertexIds.push_back(vertexId2);
 
-				// Remove vertex ID.
-				remainingVertexIds.erase(remainingVertexIds.begin() + i);
-				break;
+				// Remove vertex 1.
+				vertexIds.erase(vertexIds.begin() + ((i + 1) % vertexIds.size()));
+				if (i == vertexIds.size())
+					i--;
+
+				count = 0;
 			}
-		}
-
-/*
-		// 2.4) Triangulate simplified polygons.
-		auto optimizedIds = std::vector<int>{};
-		for (const auto& polygon : polygons)
-		{
-			// Skip invalid polygons.
-			if (polygon.size() < 3)
-				continue;
-
-			// Make mutable copy for triangulation.
-			auto remaining = polygon;
-
-			while (remaining.size() > 2)
+			// Angle between edges is reflex (>= 180 degrees).
+			else
 			{
-				bool earFound = false;
-				for (int i = 0; i < remaining.size(); i++)
+				// Skip current vertex.
+				i = (i + 1) % vertexIds.size();
+				count++;
+
+				if (count > 10)
 				{
-					int prev = remaining[(i + remaining.size() - 1) % remaining.size()];
-					int current = remaining[i];
-					int next = remaining[(i + 1) % remaining.size()];
-
-					// Ensure correct winding order.
-					auto edge1 = _vertices[current] - _vertices[prev];
-					auto edge2 = _vertices[next] - _vertices[current];
-					auto normal = edge1.Cross(edge2);
-
-					// Skip if triangle is flipped.
-					if (normal.Dot(plane.Normal()) < 0.0f)
-						continue;
-
-					// Check if any other vertex is inside this triangle.
-					bool isEar = true;
-					for (int v : remaining)
-					{
-						if (v == prev || v == current || v == next)
-							continue;
-
-						if (PointInTriangle(_vertices[v], _vertices[prev], _vertices[current], _vertices[next]))
-						{
-							isEar = false;
-							break;
-						}
-					}
-
-					// Clip ear.
-					if (isEar)
-					{
-						optimizedIds.push_back(prev);
-						optimizedIds.push_back(current);
-						optimizedIds.push_back(next);
-						remaining.erase(remaining.begin() + i);
-						earFound = true;
-						break;
-					}
-				}
-
-				// Prevent infinite loop if no ear found.
-				if (!earFound)
+					PrintDebugMessage("Fail!");
 					break;
+				}
 			}
 		}
-*/
 	}
 }
