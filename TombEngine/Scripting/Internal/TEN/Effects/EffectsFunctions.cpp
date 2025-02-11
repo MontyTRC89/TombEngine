@@ -507,7 +507,8 @@ namespace TEN::Scripting::Effects
 	}
 }
 
-/// @table particleData Structure for EmitAdvancedParticle table.
+/// Structure for EmitAdvancedParticle table.
+// @table particleData Structure for EmitAdvancedParticle table.
 // @tfield Vec3 position World position.
 // @tfield Vec3 velocity Velocity.
 // @tfield[opt] Objects.ObjID spriteSeqID ID of the sprite sequence object. __Default: Objects.ObjID.DEFAULT_SPRITES__
@@ -529,7 +530,7 @@ namespace TEN::Scripting::Effects
 // @tfield[opt] bool wind Specify if the particle will be affected by wind in outside rooms. __Default: true__
 // @tfield[opt] int damageHit Specify the damage particle will harm the player on collision. __Default: 2__
 // @tfield[opt] bool animated Specify if the particle will be animated. __Default: false__
-// @tfield[opt] Effects.ParticleAnimationType animationType . __Default: TEN.Effects.ParticleAnimationType.LOOP__
+// @tfield[opt] Effects.ParticleAnimationType animationType Specify the the type of animation the particle will use. __Default: TEN.Effects.ParticleAnimationType.LOOP__
 // @tfield[opt] float frameRate The framerate with which the particle will be animated. __Default: 1__
 
 
