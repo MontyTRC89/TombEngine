@@ -44,12 +44,13 @@ namespace TEN::Collision::Attractor
 	class AttractorObject
 	{
 	private:
-		// Members
+		// Fields
 
-		AttractorType		 _type			 = AttractorType::Edge;
-		Vector3				 _position		 = Vector3::Zero;
-		int					 _roomNumber	 = 0;
-		Quaternion			 _orientation	 = Quaternion::Identity;
+		AttractorType _type		   = AttractorType::Edge;
+		Vector3		  _position	   = Vector3::Zero;
+		int			  _roomNumber  = 0;
+		Quaternion	  _orientation = Quaternion::Identity;
+
 		std::vector<Vector3> _points		 = {};
 		std::vector<float>	 _segmentLengths = {};
 		float				 _length		 = 0.0f;
