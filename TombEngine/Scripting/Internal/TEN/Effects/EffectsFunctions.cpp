@@ -215,21 +215,24 @@ namespace TEN::Scripting::Effects
 
 	/// Emit a particle.
 	// @function EmitParticle
-	// @tparam Vec3 pos World position.
-	// @tparam Vec3 vel Velocity.
-	// @tparam int spriteID ID of the sprite in the sprite sequence object.
-	// @tparam float gravity Specifies if the particle will fall over time. Positive values ascend, negative values descend. Recommended range: [-1000 and 1000]. __Default: 0__
-	// @tparam float rotVel Rotational velocity in degrees. __Default: 0__
-	// @tparam Color startColor Color at start of life. __Default: Color(255, 255, 255)__
-	// @tparam Color endColor Color to fade toward. This will finish long before the end of the particle's life due to internal math. __Default: Color(255, 255, 255)__
-	// @tparam Effects.BlendID blendMode Render blend mode. __TEN.Effects.BlendID.ALPHABLEND__
-	// @tparam float startSize Size at start of life. __Default: 10__
-	// @tparam float endSize Size at end of life. The particle will linearly shrink or grow toward this size over its lifespan. __Default: 0__
-	// @tparam float life Lifespan in seconds. __Default: 2__
-	// @tparam bool applyDamage Specify if the particle will harm the player on collision. __Default: false__
-	// @tparam bool applyPoison Specify if the particle will poison the player on collision. __Default: false__
-	// @tparam Objects.ObjID spriteSeqID ID of the sprite sequence object. __Default: Objects.ObjID.DEFAULT_SPRITES__
-	// @tparam float startRot Rotation at start of life. __Default: random__
+	// @tparam particleData The table holding all the particle data. Refer to table particleData for arguments and values.
+	// 
+	// @table particleData
+	// @tfield Vec3 pos World position.
+	// @tfield Vec3 vel Velocity.
+	// @tfield int spriteID ID of the sprite in the sprite sequence object.
+	// @tfield float gravity Specifies if the particle will fall over time. Positive values ascend, negative values descend. Recommended range: [-1000 and 1000]. __Default: 0__
+	// @tfield float rotVel Rotational velocity in degrees. __Default: 0__
+	// @tfield Color startColor Color at start of life. __Default: Color(255, 255, 255)__
+	// @tfield Color endColor Color to fade toward. This will finish long before the end of the particle's life due to internal math. __Default: Color(255, 255, 255)__
+	// @tfield Effects.BlendID blendMode Render blend mode. __TEN.Effects.BlendID.ALPHABLEND__
+	// @tfield float startSize Size at start of life. __Default: 10__
+	// @tfield float endSize Size at end of life. The particle will linearly shrink or grow toward this size over its lifespan. __Default: 0__
+	// @tfield float life Lifespan in seconds. __Default: 2__
+	// @tfield bool applyDamage Specify if the particle will harm the player on collision. __Default: false__
+	// @tfield bool applyPoison Specify if the particle will poison the player on collision. __Default: false__
+	// @tfield Objects.ObjID spriteSeqID ID of the sprite sequence object. __Default: Objects.ObjID.DEFAULT_SPRITES__
+	// @tfield float startRot Rotation at start of life. __Default: random__
 	// @usage
 	// local particle = {
 	// position = GetMoveableByName("camera_target_6") :GetPosition(), 
