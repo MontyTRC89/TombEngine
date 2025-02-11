@@ -149,7 +149,7 @@ struct Particle
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
 	int spriteObj;
 	float framerate;
-	int animationType;
+	ParticleAnimationMode animationType;
 
 	int PrevX;
 	int PrevY;
@@ -186,10 +186,10 @@ struct ParticleDynamic
 
 enum class ParticleAnimationMode
 {
-	SequentialLoop,      // Frames loop sequentially
-	OneTimePlay,         // Frames play once, then freeze on the last frame
-	BackAndForth,        // Frames go forward, then backward
-	SpreadOverLifetime   // Frames are evenly distributed over the particle's lifetime
+	LOOP,      // Frames loop sequentially
+	ONESHOT,         // Frames play once, then freeze on the last frame
+	PINGPONG,        // Frames go forward, then backward
+	LIFETIMESPREAD   // Frames are evenly distributed over the particle's lifetime
 };
 
 extern GameBoundingBox DeadlyBounds;

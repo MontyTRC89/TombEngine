@@ -301,7 +301,7 @@ namespace TEN::Scripting::Effects
 
 		if (animatedSpr)
 		{
-			float applyAnimation = tbl.get_or("animationType", 1);
+			ParticleAnimationMode applyAnimation = tbl.get_or("animationType", ParticleAnimationMode::LOOP);
 			float applyFramerate = tbl.get_or("frameRate",1.0f);
 			int spriteObj = static_cast<int>(effectiveObjectID);
 			s->flags |= SP_ANIMATED;
