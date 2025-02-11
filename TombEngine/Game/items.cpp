@@ -893,7 +893,7 @@ void UpdateAllItems()
 			auto prevPose = item->Pose;
 
 			if (Objects[item->ObjectNumber].control != nullptr)
-				Objects[item->ObjectNumber].control(itemNumber);
+				Objects[item->ObjectNumber].control(item->Index);
 
 			// Update bridge.
 			if (item->IsBridge() && item->Pose != prevPose)
@@ -902,7 +902,7 @@ void UpdateAllItems()
 				bridge.Update(*item);
 			}
 
-			TestVolumes(itemNumber);
+			TestVolumes(item->Index);
 			ProcessEffects(item);
 
 			if (item->AfterDeath > 0 && item->AfterDeath < ITEM_DEATH_TIMEOUT && !(Wibble & 3))
@@ -912,9 +912,8 @@ void UpdateAllItems()
 		}
 		else
 		{
-			KillItem(itemNumber);
+			KillItem(item->Index);
 		}
-
 	}
 
 	InItemControlLoop = false;
