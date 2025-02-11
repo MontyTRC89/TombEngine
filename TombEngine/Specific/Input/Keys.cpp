@@ -131,6 +131,7 @@ namespace TEN::Input
 		{ MK_AXIS_Z_POS, "Mouse Z+" },
 
 		// Gamepad keys
+		// TODO: Find a way to display XBox controller keys when using that controller type.
 		{ GK_BUTTON_1, "Gamepad 1" },
 		{ GK_BUTTON_2, "Gamepad 2" },
 		{ GK_BUTTON_3, "Gamepad 3" },

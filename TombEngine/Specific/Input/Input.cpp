@@ -38,9 +38,9 @@ namespace TEN::Input
 
 	RumbleData RumbleInfo = {};
 	std::unordered_map<int, float>						KeyMap;			// Key = key ID, value = key value.
-	std::unordered_map<InputAxisID, Vector2>			AxisMap;		// Key = Input axis ID, value = axis.
-	std::unordered_map<InputActionID, InputAction>		ActionMap;		// Key = Input action ID, value = input action.
-	std::unordered_map<InputActionID, ActionQueueState> ActionQueueMap; // Key = InputActionID, value = action queue state.
+	std::unordered_map<InputAxisID, Vector2>			AxisMap;		// Key = input axis ID, value = axis.
+	std::unordered_map<InputActionID, InputAction>		ActionMap;		// Key = input action ID, value = input action.
+	std::unordered_map<InputActionID, ActionQueueState> ActionQueueMap; // Key = inputActionID, value = action queue state.
 
 	// OIS interfaces
 
@@ -610,8 +610,7 @@ namespace TEN::Input
 		RumbleInfo.Power -= RumbleInfo.FadeSpeed;
 
 		// Don't update effect too frequently if its value hasn't changed much.
-		if (RumbleInfo.Power >= 0.2f &&
-			RumbleInfo.LastPower - RumbleInfo.Power < 0.1f)
+		if (RumbleInfo.Power >= 0.2f && (RumbleInfo.LastPower - RumbleInfo.Power) < 0.1f)
 			return;
 
 		if (RumbleInfo.Power <= 0.0f)
@@ -816,13 +815,13 @@ namespace TEN::Input
 	}
 
 	// Time in game frames.
-	unsigned long GetActionTimeActive(InputActionID actionID)
+	unsigned int GetActionTimeActive(InputActionID actionID)
 	{
 		return ActionMap[actionID].GetTimeActive();
 	}
 
 	// Time in game frames.
-	unsigned long GetActionTimeInactive(InputActionID actionID)
+	unsigned int GetActionTimeInactive(InputActionID actionID)
 	{
 		return ActionMap[actionID].GetTimeInactive();
 	}
