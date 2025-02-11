@@ -219,8 +219,6 @@ namespace TEN::Scripting::Effects
 		constexpr auto DEFAULT_LIFE = 2.0f;
 		constexpr auto SECS_PER_FRAME = 1.0f / (float)FPS;
 
-		static const auto DEFAULT_COLOR = ScriptColor(255, 255, 255);
-
 		auto convertedSpriteSeqID = tbl.get_or("objectID", ID_DEFAULT_SPRITES);
 		if (!CheckIfSlotExists(convertedSpriteSeqID, "EmitParticle() script function."))
 			return;
@@ -231,8 +229,8 @@ namespace TEN::Scripting::Effects
 		part.SpriteSeqID = convertedSpriteSeqID;
 		part.SpriteID = tbl.get_or("spriteIndex", 0);
 
-		int convertedBlendMode = tbl.get_or("blendMode", BlendMode::AlphaBlend);
-		part.blendMode = BlendMode(std::clamp((int)convertedBlendMode, (int)BlendMode::Opaque, (int)BlendMode::AlphaBlend));
+		BlendMode bMode = tbl.get_or("blendMode", BlendMode::AlphaBlend);
+		part.blendMode = BlendMode(std::clamp(int(bMode), int(BlendMode::Opaque), int(BlendMode::AlphaBlend)));
 
 		Vec3 pos = tbl["position"];
 		part.x = pos.x;
@@ -258,12 +256,12 @@ namespace TEN::Scripting::Effects
 		part.friction = 0;
 		part.maxYvel = 0;
 
-		auto convertedStartColor = tbl.get_or("startColor", DEFAULT_COLOR);
+		auto convertedStartColor = tbl.get_or("startColor", ScriptColor(255, 255, 255));
 		part.sR = convertedStartColor.GetR();
 		part.sG = convertedStartColor.GetG();
 		part.sB = convertedStartColor.GetB();
 
-		auto convertedEndColor = tbl.get_or("endColor", DEFAULT_COLOR);
+		auto convertedEndColor = tbl.get_or("endColor", ScriptColor(255, 255, 255));
 		part.dR = convertedEndColor.GetR();
 		part.dG = convertedEndColor.GetG();
 		part.dB = convertedEndColor.GetB();
