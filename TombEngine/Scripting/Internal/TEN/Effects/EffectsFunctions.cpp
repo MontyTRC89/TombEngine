@@ -314,7 +314,7 @@ namespace TEN::Scripting::Effects
 			s->flags |= SP_ANIMATED;
 			s->spriteObj = spriteObj;
 			s->framerate = applyFramerate;
-			s->animationType = applyAnimation;
+			s->animationType = ParticleAnimationMode(std::clamp(int(applyAnimation), int(ParticleAnimationMode::LOOP), int(ParticleAnimationMode::LIFETIMESPREAD)));
 
 		}
 
