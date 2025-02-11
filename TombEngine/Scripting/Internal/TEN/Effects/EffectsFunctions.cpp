@@ -482,6 +482,7 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
 
 		auto handler = LuaHandler{ state };
+		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_AnimationType, ANIMATION_TYPE);
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_BlendID, BLEND_IDS);
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_EffectID, EFFECT_IDS);
 	}
