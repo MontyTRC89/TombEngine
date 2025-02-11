@@ -249,7 +249,7 @@ namespace TEN::Scripting::Effects
 		constexpr auto DEFAULT_LIFE = 2.0f;
 		constexpr auto SECS_PER_FRAME = 1.0f / (float)FPS;
 
-		auto convertedSpriteSeqID = particleData.get_or("objectID", ID_DEFAULT_SPRITES);
+		auto convertedSpriteSeqID = particleData.get_or("spriteSeqID", ID_DEFAULT_SPRITES);
 		if (!CheckIfSlotExists(convertedSpriteSeqID, "EmitParticle() script function."))
 			return;
 
@@ -321,7 +321,7 @@ namespace TEN::Scripting::Effects
 		bool animatedSpr = particleData.get_or("animated", false);
 		if (animatedSpr)
 		{
-			ParticleAnimationMode applyAnimation = particleData.get_or("animationType", ParticleAnimationMode::None);
+			ParticleAnimationMode applyAnimation = particleData.get_or("animationType", ParticleAnimationMode::Loop);
 			float applyFramerate = particleData.get_or("frameRate", 1.0f);
 			part.flags |= SP_ANIMATED;
 			part.framerate = applyFramerate;
@@ -507,19 +507,29 @@ namespace TEN::Scripting::Effects
 	}
 }
 
-/// @table particleData
-// @tfield Vec3 pos World position.
-// @tfield Vec3 vel Velocity.
-// @tfield int spriteID ID of the sprite in the sprite sequence object.
-// @tfield float gravity Specifies if the particle will fall over time. Positive values ascend, negative values descend. Recommended range: [-1000 and 1000]. __Default: 0__
-// @tfield float rotVel Rotational velocity in degrees. __Default: 0__
-// @tfield Color startColor Color at start of life. __Default: Color(255, 255, 255)__
-// @tfield Color endColor Color to fade toward. This will finish long before the end of the particle's life due to internal math. __Default: Color(255, 255, 255)__
-// @tfield Effects.BlendID blendMode Render blend mode. __TEN.Effects.BlendID.ALPHABLEND__
-// @tfield float startSize Size at start of life. __Default: 10__
-// @tfield float endSize Size at end of life. The particle will linearly shrink or grow toward this size over its lifespan. __Default: 0__
-// @tfield float life Lifespan in seconds. __Default: 2__
-// @tfield bool applyDamage Specify if the particle will harm the player on collision. __Default: false__
-// @tfield bool applyPoison Specify if the particle will poison the player on collision. __Default: false__
-// @tfield Objects.ObjID spriteSeqID ID of the sprite sequence object. __Default: Objects.ObjID.DEFAULT_SPRITES__
-// @tfield float startRot Rotation at start of life. __Default: random__
+/// @table particleData Structure for EmitAdvancedParticle table.
+// @tfield Vec3 position World position.
+// @tfield Vec3 velocity Velocity.
+// @tfield[opt] Objects.ObjID spriteSeqID ID of the sprite sequence object. __Default: Objects.ObjID.DEFAULT_SPRITES__
+// @tfield[opt] int spriteIndex ID of the sprite in the sprite sequence object.__Default: 0__
+// @tfield[opt] float lifetime Lifespan in seconds. __Default: 2__
+// @tfield[opt] float maxYVelocity Specifies ithe maximum Y velocity for the particle. __Default: 0__
+// @tfield[opt] float gravity Specifies if the particle will fall over time. Positive values ascend, negative values descend. Recommended range: [-1000 and 1000]. __Default: 0__
+// @tfield[opt] float friction Specifies the friction with which the particle will slow down over time. __Default: 0__
+// @tfield[opt] float startRot Rotation at start of life. __Default: random__
+// @tfield[opt] float rotationSpeed Rotational velocity in degrees. __Default: 0__
+// @tfield[opt] float startSize Size at start of life. __Default: 10__
+// @tfield[opt] float endSize Size at end of life. The particle will linearly shrink or grow toward this size over its lifespan. __Default: 0__
+// @tfield[opt] Color startColor Color at start of life. __Default: Color(255, 255, 255)__
+// @tfield[opt] Color endColor Color to fade toward. This will finish long before the end of the particle's life due to internal math. __Default: Color(255, 255, 255)__
+// @tfield[opt] Effects.BlendID blendMode Render blend mode. __TEN.Effects.BlendID.ALPHABLEND__
+// @tfield[opt] bool damage Specify if the particle will harm the player on collision. __Default: false__
+// @tfield[opt] bool poison Specify if the particle will poison the player on collision. __Default: false__
+// @tfield[opt] bool burn Specify if the particle will burn the player on collision. __Default: false__
+// @tfield[opt] bool wind Specify if the particle will be affected by wind in outside rooms. __Default: true__
+// @tfield[opt] int damageHit Specify the damage particle will harm the player on collision. __Default: 2__
+// @tfield[opt] bool animated Specify if the particle will be animated. __Default: false__
+// @tfield[opt] Effects.ParticleAnimationType animationType . __Default: TEN.Effects.ParticleAnimationType.LOOP__
+// @tfield[opt] float frameRate The framerate with which the particle will be animated. __Default: 1__
+
+

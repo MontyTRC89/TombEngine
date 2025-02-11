@@ -9,10 +9,10 @@ Constants for particle animation type constants.
 
 /*** Table of Effects.ParticleAnimationType type constants (for use with particles).
 
- - `LOOP`
- - `ONE_SHOT`
- - `BACK_AND_FORTH`
- - `LIFE_TIME_SPREAD`
+ - `LOOP` Frames loop sequentially.
+ - `ONE_SHOT` Frames play once, then freeze on the last frame.
+ - `BACK_AND_FORTH` Frames loop till end and then reverse.
+ - `LIFE_TIME_SPREAD` Frames are distributed over the particle's lifetime
 
 @table Effects.ParticleAnimationType
 */
