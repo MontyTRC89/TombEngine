@@ -318,6 +318,7 @@ static constexpr char ScriptReserved_EnableEvent[]					= "EnableEvent";
 static constexpr char ScriptReserved_DisableEvent[]					= "DisableEvent";
 
 static constexpr char ScriptReserved_EmitParticle[]					= "EmitParticle";
+static constexpr char ScriptReserved_EmitAdvancedParticle[]			= "EmitAdvancedParticle";
 static constexpr char ScriptReserved_EmitLightningArc[]				= "EmitLightningArc";
 static constexpr char ScriptReserved_EmitShockwave[]				= "EmitShockwave";
 static constexpr char ScriptReserved_EmitLight[]					= "EmitLight";

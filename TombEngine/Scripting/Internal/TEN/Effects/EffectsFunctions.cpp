@@ -226,18 +226,13 @@ namespace TEN::Scripting::Effects
 	static void EmitAdvancedParticle(sol::table tbl)
 	{
 
-		/*Vec3 pos, Vec3 velocity, int spriteIndex, TypeOrNil<int> gravity, TypeOrNil<float> rot,
-		TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<BlendMode> blendMode,
-		TypeOrNil<int> startSize, TypeOrNil<int> endSize, TypeOrNil<float> lifetime,
-		TypeOrNil<bool> damage, TypeOrNil<bool> poison, TypeOrNil<GAME_OBJECT_ID> objectID, TypeOrNil<float> startRot, TypeOrNil<bool> animated, TypeOrNil<float> frameRate, TypeOrNil<int> animationType*/
-		// Ensure objectID is valid 
-		GAME_OBJECT_ID effectiveObjectID = USE_IF_HAVE(GAME_OBJECT_ID, objectID, ID_DEFAULT_SPRITES);
+		GAME_OBJECT_ID effectiveObjectID = tbl.get_or("objectID", ID_DEFAULT_SPRITES);
 
 		// Validate the effective object ID 
 		if (!CheckIfSlotExists(effectiveObjectID, "Particle spawn script function"))
 			return;
 
-		int grav = USE_IF_HAVE(int, gravity, 0);
+		int grav = tbl.get_or("gravity", 0);
 
 		grav = std::clamp(grav, -32768, 32767);
 
@@ -245,10 +240,10 @@ namespace TEN::Scripting::Effects
 
 		s->on = true;
 
-		s->spriteIndex = Objects[effectiveObjectID].meshIndex + spriteIndex;
+		s->spriteIndex = Objects[effectiveObjectID].meshIndex + tbl.get_or("spriteIndex", 0);
 
-		ScriptColor colorStart = USE_IF_HAVE(ScriptColor, startColor, ScriptColor(255, 255, 255));
-		ScriptColor colorEnd = USE_IF_HAVE(ScriptColor, endColor, ScriptColor(255, 255, 255));
+		ScriptColor colorStart = tbl.get_or("startColor", ScriptColor(255, 255, 255));
+		ScriptColor colorEnd = tbl.get_or("endColor", ScriptColor(255, 255, 255));
 
 		s->sR = colorStart.GetR();
 		s->sG = colorStart.GetG();
@@ -259,8 +254,10 @@ namespace TEN::Scripting::Effects
 		s->dB = colorEnd.GetB();
 
 		//there is no blend mode 7
-		BlendMode bMode = USE_IF_HAVE(BlendMode, blendMode, BlendMode::AlphaBlend);
+		BlendMode bMode = tbl.get_or("blendMode", BlendMode::AlphaBlend);
 		s->blendMode = BlendMode(std::clamp(int(bMode), int(BlendMode::Opaque), int(BlendMode::AlphaBlend)));
+
+		Vec3 pos = tbl["position"];
 
 		s->x = pos.x;
 		s->y = pos.y;
@@ -268,7 +265,7 @@ namespace TEN::Scripting::Effects
 		s->roomNumber = FindRoomNumber(Vector3i(pos.x, pos.y, pos.z));
 		constexpr float secsPerFrame = 1.0f / (float)FPS;
 
-		float life = USE_IF_HAVE(float, lifetime, 2.0f);
+		float life = tbl.get_or("lifetime", 2.0f);
 		life = std::max(0.1f, life);
 		int lifeInFrames = (int)round(life / secsPerFrame);
 
@@ -276,12 +273,14 @@ namespace TEN::Scripting::Effects
 		s->colFadeSpeed = lifeInFrames / 2;
 		s->fadeToBlack = lifeInFrames / 3;
 
+		Vec3 velocity = tbl["velocity"];
+
 		s->xVel = short(velocity.x * 32);
 		s->yVel = short(velocity.y * 32);
 		s->zVel = short(velocity.z * 32);
 
-		int sSize = USE_IF_HAVE(int, startSize, 10);
-		int eSize = USE_IF_HAVE(int, endSize, 0);
+		int sSize = tbl.get_or("startSize", 10);
+		int eSize = tbl.get_or("endSize",0);
 
 		s->sSize = s->size = float(sSize);
 		s->dSize = float(eSize);
@@ -290,9 +289,9 @@ namespace TEN::Scripting::Effects
 
 		s->flags = SP_SCALE | SP_ROTATE | SP_DEF | SP_EXPDEF;
 
-		bool applyPoison = USE_IF_HAVE(bool, poison, false);
-		bool applyDamage = USE_IF_HAVE(bool, damage, false);
-		bool animatedSpr = USE_IF_HAVE(bool, animated, false);
+		bool applyPoison = tbl.get_or("poison", false);
+		bool applyDamage = tbl.get_or("damage", false);
+		bool animatedSpr = tbl.get_or("animated", false);
 
 		if (applyPoison)
 			s->flags |= SP_POISON;
@@ -302,8 +301,8 @@ namespace TEN::Scripting::Effects
 
 		if (animatedSpr)
 		{
-			float applyAnimation = USE_IF_HAVE(int, animationType, 1);
-			float applyFramerate = USE_IF_HAVE(float, frameRate, 1.0f);
+			float applyAnimation = tbl.get_or("animationType", 1);
+			float applyFramerate = tbl.get_or("frameRate",1.0f);
 			int spriteObj = static_cast<int>(effectiveObjectID);
 			s->flags |= SP_ANIMATED;
 			s->spriteObj = spriteObj;
@@ -311,17 +310,21 @@ namespace TEN::Scripting::Effects
 			s->animationType = applyAnimation;
 
 		}
-		//todo add option to turn off wind?
-		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WIND, s->roomNumber))
-			s->flags |= SP_WIND;
 
-		float rotAdd = USE_IF_HAVE(float, rot, 0.0f);
+		bool applyWind = tbl.get_or("wind", true);
 
-		s->rotAng = USE_IF_HAVE(float, startRot, (GetRandomControl() & 0x0FFF));
+		if (applyWind)
+		{
+			if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WIND, s->roomNumber))
+				s->flags |= SP_WIND;
+		}
+		float rotAdd = tbl.get_or("rotationSpeed", 0.0f);
+
+		s->rotAng = tbl.get_or("startRotation", (GetRandomControl() & 0x0FFF));
 		s->rotAdd = byte(ANGLE(rotAdd) >> 4);
 
-		s->friction = 0;
-		s->maxYvel = 0;
+		s->friction = tbl.get_or("friction", 0);
+		s->maxYvel = tbl.get_or("maxYVelocity",0);
 
 		s->gravity = grav;
 	}
@@ -461,6 +464,7 @@ namespace TEN::Scripting::Effects
 
 		tableEffects.set_function(ScriptReserved_EmitLightningArc, &EmitLightningArc);
 		tableEffects.set_function(ScriptReserved_EmitParticle, &EmitParticle);
+		tableEffects.set_function(ScriptReserved_EmitAdvancedParticle, &EmitAdvancedParticle);
 		tableEffects.set_function(ScriptReserved_EmitShockwave, &EmitShockwave);
 		tableEffects.set_function(ScriptReserved_EmitLight, &EmitLight);
 		tableEffects.set_function(ScriptReserved_EmitSpotLight, &EmitSpotLight);
