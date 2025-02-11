@@ -203,13 +203,16 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 	float normalizedAge = particleAge / particle.sLife;  // Progress as a fraction [0.0, 1.0]
 
 	// Retrieve sprite sequence information
-	int firstFrame = Objects[objectID].meshIndex;          // Starting sprite index
+	//int firstFrame = Objects[objectID].meshIndex;          // Starting sprite index
 	int totalFrames = -Objects[objectID].nmeshes;          // Total frames (assuming nmeshes is negative)
 	if (totalFrames <= 0)
 	{
-		particle.spriteIndex = firstFrame;  // Default to the first frame if no valid frames exist
+		particle.SpriteSeqID = objectID;
+		particle.SpriteID = 0;  // Default to the first frame if no valid frames exist
 		return;
 	}
+
+	particle.SpriteSeqID = objectID;
 
 	// Handle animation modes
 	switch (animationType)
@@ -218,7 +221,7 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 	{
 		float frameDuration = frameRate > 0 ? 1.0f / frameRate : 1.0f / totalFrames;  // Duration per frame
 		int currentFrame = static_cast<int>(particleAge / frameDuration) % totalFrames;  // Wrap frames
-		particle.spriteIndex = firstFrame + currentFrame;
+		particle.SpriteID = currentFrame;
 		break;
 	}
 
@@ -228,7 +231,7 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 		int currentFrame = static_cast<int>(particleAge / (totalDuration / totalFrames));
 		if (currentFrame >= totalFrames)
 			currentFrame = totalFrames - 1;  // Clamp to the last frame
-		particle.spriteIndex = firstFrame + currentFrame;
+		particle.SpriteID = currentFrame;
 		break;
 	}
 
@@ -238,7 +241,7 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 		int totalFrameSteps = totalFrames * 2 - 2;  // Forward and backward frames (avoiding double-count of last frame)
 		int step = static_cast<int>(particleAge / frameDuration) % totalFrameSteps;
 		int currentFrame = step < totalFrames ? step : totalFrames - (step - totalFrames) - 1;
-		particle.spriteIndex = firstFrame + currentFrame;
+		particle.SpriteID = currentFrame;
 		break;
 	}
 
@@ -247,12 +250,12 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 		int currentFrame = static_cast<int>(normalizedAge * totalFrames);
 		if (currentFrame >= totalFrames)
 			currentFrame = totalFrames - 1;  // Clamp to the last frame
-		particle.spriteIndex = firstFrame + currentFrame;
+		particle.SpriteID = currentFrame;
 		break;
 	}
 
 	default:  // Default behavior: keep the first frame
-		particle.spriteIndex = firstFrame;
+		particle.SpriteID = 0;
 		break;
 	}
 }
@@ -422,16 +425,16 @@ void UpdateSparks()
 				SetSpriteSequence(spark, ID_EXPLOSION_SPRITES);
 
 
-			if (spark->flags & SP_ANIMATED)
+			if (spark.flags & SP_ANIMATED)
 			{
-				ParticleAnimationMode animationType = static_cast<ParticleAnimationMode>(spark->animationType);
-				GAME_OBJECT_ID spriteObject = static_cast<GAME_OBJECT_ID>(spark->spriteObj);
-				SetAdvancedSpriteSequence(*spark, spriteObject,  animationType, spark->framerate);
+				ParticleAnimationMode animationType = static_cast<ParticleAnimationMode>(spark.animationType);
+				GAME_OBJECT_ID spriteObject = static_cast<GAME_OBJECT_ID>(spark.SpriteSeqID);
+				SetAdvancedSpriteSequence(spark, spriteObject,  animationType, spark.framerate);
 			}
 
-			if ((spark->flags & SP_FIRE && LaraItem->Effect.Type == EffectType::None) ||
-				(spark->flags & SP_DAMAGE) || 
-				(spark->flags & SP_POISON))
+			if ((spark.flags & SP_FIRE && LaraItem->Effect.Type == EffectType::None) ||
+				(spark.flags & SP_DAMAGE) || 
+				(spark.flags & SP_POISON))
 			{
 				int ds = spark.size * (spark.scalar / 2.0);
 
@@ -445,11 +448,11 @@ void UpdateSparks()
 								ItemBurn(LaraItem);
 
 
-							if (spark->flags & SP_DAMAGE)
-								DoDamage(LaraItem, spark->damage);
+							if (spark.flags & SP_DAMAGE)
+								DoDamage(LaraItem, spark.damage);
 
-							if (spark->flags & SP_POISON)
-								Lara.Status.Poison += spark->damage;
+							if (spark.flags & SP_POISON)
+								Lara.Status.Poison += spark.damage;
 						}
 					}
 				}

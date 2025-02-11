@@ -215,7 +215,6 @@ namespace TEN::Scripting::Effects
 
 	static void EmitAdvancedParticle(sol::table tbl)
 	{
-
 		constexpr auto DEFAULT_START_SIZE = 10.0f;
 		constexpr auto DEFAULT_LIFE = 2.0f;
 		constexpr auto SECS_PER_FRAME = 1.0f / (float)FPS;
@@ -226,107 +225,89 @@ namespace TEN::Scripting::Effects
 		if (!CheckIfSlotExists(convertedSpriteSeqID, "EmitParticle() script function."))
 			return;
 
-		int grav = tbl.get_or("gravity", 0);
+		auto& part = *GetFreeParticle();
 
-		grav = std::clamp(grav, -32768, 32767);
+		part.on = true;
+		part.SpriteSeqID = convertedSpriteSeqID;
+		part.SpriteID = tbl.get_or("spriteIndex", 0);
 
-		auto* part = GetFreeParticle();
-
-		part->on = true;
-
-		part->spriteIndex = Objects[convertedSpriteSeqID].meshIndex + tbl.get_or("spriteIndex", 0);
-
-		ScriptColor colorStart = tbl.get_or("startColor", ScriptColor(255, 255, 255));
-		ScriptColor colorEnd = tbl.get_or("endColor", ScriptColor(255, 255, 255));
-
-		part->sR = colorStart.GetR();
-		part->sG = colorStart.GetG();
-		part->sB = colorStart.GetB();
-
-		part->dR = colorEnd.GetR();
-		part->dG = colorEnd.GetG();
-		part->dB = colorEnd.GetB();
-
-		//there is no blend mode 7
-		BlendMode bMode = tbl.get_or("blendMode", BlendMode::AlphaBlend);
-		part->blendMode = BlendMode(std::clamp(int(bMode), int(BlendMode::Opaque), int(BlendMode::AlphaBlend)));
+		int convertedBlendMode = tbl.get_or("blendMode", BlendMode::AlphaBlend);
+		part.blendMode = BlendMode(std::clamp((int)convertedBlendMode, (int)BlendMode::Opaque, (int)BlendMode::AlphaBlend));
 
 		Vec3 pos = tbl["position"];
+		part.x = pos.x;
+		part.y = pos.y;
+		part.z = pos.z;
+		part.roomNumber = FindRoomNumber(Vector3i(pos.x, pos.y, pos.z));
 
-		part->x = pos.x;
-		part->y = pos.y;
-		part->z = pos.z;
-		part->roomNumber = FindRoomNumber(Vector3i(pos.x, pos.y, pos.z));
-		constexpr float secsPerFrame = 1.0f / (float)FPS;
+		Vec3 vel = tbl["velocity"];
+		part.xVel = short(vel.x * 32);
+		part.yVel = short(vel.y * 32);
+		part.zVel = short(vel.z * 32);
 
-		float life = tbl.get_or("lifetime", 2.0f);
-		life = std::max(0.1f, life);
-		int lifeInFrames = (int)round(life / secsPerFrame);
+		float rotAdd = tbl.get_or("rotationSpeed", 0.0f);
+		part.rotAng = tbl.get_or("startRotation", TO_DEGREES(Random::GenerateAngle()));
+		part.rotAdd = byte(ANGLE(rotAdd) >> 4);
 
-		part->life = part->sLife = lifeInFrames;
-		part->colFadeSpeed = lifeInFrames / 2;
-		part->fadeToBlack = lifeInFrames / 3;
+		part.sSize =
+			part.size = tbl.get_or("startSize", DEFAULT_START_SIZE);
+		part.dSize = tbl.get_or("endSize", 0.0f);
+		part.scalar = 2;
 
-		Vec3 velocity = tbl["velocity"];
+		part.gravity = (short)std::clamp((float) tbl.get_or("gravity", 0.0f), (float)SHRT_MIN, (float)SHRT_MAX);
+		part.friction = 0;
+		part.maxYvel = 0;
 
-		part->xVel = short(velocity.x * 32);
-		part->yVel = short(velocity.y * 32);
-		part->zVel = short(velocity.z * 32);
+		auto convertedStartColor = tbl.get_or("startColor", DEFAULT_COLOR);
+		part.sR = convertedStartColor.GetR();
+		part.sG = convertedStartColor.GetG();
+		part.sB = convertedStartColor.GetB();
 
-		int sSize = tbl.get_or("startSize", 10);
-		int eSize = tbl.get_or("endSize",0);
+		auto convertedEndColor = tbl.get_or("endColor", DEFAULT_COLOR);
+		part.dR = convertedEndColor.GetR();
+		part.dG = convertedEndColor.GetG();
+		part.dB = convertedEndColor.GetB();
 
-		part->sSize = part->size = float(sSize);
-		part->dSize = float(eSize);
+		float convertedLife = std::max(0.1f, (float) tbl.get_or("lifetime", DEFAULT_LIFE));
+		part.life =
+			part.sLife = (int)round(convertedLife / SECS_PER_FRAME);
+		part.colFadeSpeed = part.life / 2;
+		part.fadeToBlack = part.life / 3;
 
-		part->scalar = 2;
+		part.flags = SP_SCALE | SP_ROTATE | SP_DEF | SP_EXPDEF;
 
-		part->flags = SP_SCALE | SP_ROTATE | SP_DEF | SP_EXPDEF;
+		part.damage = tbl.get_or("damageHit", 2);
 
-		bool applyPoison = tbl.get_or("poison", false);
-		bool applyDamage = tbl.get_or("damage", false);
-		bool applyBurn	 = tbl.get_or("burn", false);
+		bool convertedApplyPoison = tbl.get_or("poison", false);
+		if (convertedApplyPoison)
+			part.flags |= SP_POISON;
+
+		bool convertedApplyDamage = tbl.get_or("damage", false);
+		if (convertedApplyDamage)
+			part.flags |= SP_DAMAGE;
+
+		bool convertedApplyBurn = tbl.get_or("burn", false);
+		if (convertedApplyBurn)
+			part.flags |= SP_FIRE;
+
 		bool animatedSpr = tbl.get_or("animated", false);
-
-		if (applyPoison)
-			part->flags |= SP_POISON;
-
-		if (applyDamage)
-			part->flags |= SP_DAMAGE;
-
-		if (applyBurn)
-			part->flags |= SP_FIRE;
-
-		part->damage = tbl.get_or("damageHit", 2);
-
 		if (animatedSpr)
 		{
 			ParticleAnimationMode applyAnimation = tbl.get_or("animationType", ParticleAnimationMode::LOOP);
-			float applyFramerate = tbl.get_or("frameRate",1.0f);
-			int spriteObj = static_cast<int>(effectiveObjectID);
-			part->flags |= SP_ANIMATED;
-			part->spriteObj = spriteObj;
-			part->framerate = applyFramerate;
-			part->animationType = ParticleAnimationMode(std::clamp(int(applyAnimation), int(ParticleAnimationMode::LOOP), int(ParticleAnimationMode::LIFETIMESPREAD)));
+			float applyFramerate = tbl.get_or("frameRate", 1.0f);
+			part.flags |= SP_ANIMATED;
+			part.framerate = applyFramerate;
+			part.animationType = ParticleAnimationMode(std::clamp(int(applyAnimation), int(ParticleAnimationMode::LOOP), int(ParticleAnimationMode::LIFETIMESPREAD)));
 
 		}
 
-		bool applyWind = tbl.get_or("wind", true);
-
-		if (applyWind)
+		bool convertedApplyWind = tbl.get_or("wind", true);
+		if (convertedApplyWind)
 		{
-			if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WIND, part->roomNumber))
-				part->flags |= SP_WIND;
+			if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WIND, part.roomNumber))
+				part.flags |= SP_WIND;
 		}
-		float rotAdd = tbl.get_or("rotationSpeed", 0.0f);
 
-		part->rotAng = tbl.get_or("startRotation", (GetRandomControl() & 0x0FFF));
-		part->rotAdd = byte(ANGLE(rotAdd) >> 4);
-
-		part->friction = tbl.get_or("friction", 0);
-		part->maxYvel = tbl.get_or("maxYVelocity",0);
-
-		part->gravity = grav;
 	}
 	
 /***Emit a shockwave, similar to that seen when a harpy projectile hits something.
