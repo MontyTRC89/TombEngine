@@ -20,12 +20,12 @@
 
 using TEN::Renderer::g_Renderer;
 
-/// Utility functions for various calculations.
-// @tentable Util
-// @pragma nostrip
-
 namespace TEN::Scripting::Util
 {
+	/// Utility functions for various calculations.
+	// @tentable Util
+	// @pragma nostrip
+
 	/// Determine if there is a clear line of sight between two positions.
 	// NOTE: Limited to room geometry. Objects are ignored.
 	// @function HasLineOfSight()
@@ -36,25 +36,14 @@ namespace TEN::Scripting::Util
 	// @usage
 	// local flamePlinthPos = flamePlinth:GetPosition() + Vec3(0, flamePlinthHeight, 0);
 	// print(Misc.HasLineOfSight(enemyHead:GetRoomNumber(), enemyHead:GetPosition(), flamePlinthPos))
-	[[nodiscard]] static bool HasLineOfSight(int roomID, const Vec3& posA, const Vec3& posB)
+	static bool HasLineOfSight(int roomID, const Vec3& posA, const Vec3& posB)
 	{
 		auto vector0 = posA.ToGameVector();
 		auto vector1 = posB.ToGameVector();
 
 		MESH_INFO* mesh = nullptr;
 		auto vector = Vector3i::Zero;
-		return (LOS(&vector0, &vector1) &&
-			ObjectOnLOS2(&vector0, &vector1, &vector, &mesh) == NO_LOS_ITEM);
-	}
-
-	///Calculate the distance between two positions.
-	//@function CalculateDistance
-	//@tparam Vec3 posA First position.
-	//@tparam Vec3 posB Second position.
-	//@treturn float Distance between two positions.
-	static float CalculateDistance(const Vec3& posA, const Vec3& posB)
-	{
-		return posA.Distance(posB);
+		return (LOS(&vector0, &vector1) && ObjectOnLOS2(&vector0, &vector1, &vector, &mesh) == NO_LOS_ITEM);
 	}
 
 	/// Calculate the horizontal distance between two positions.
@@ -192,13 +181,17 @@ namespace TEN::Scripting::Util
 		TENLog(message, level, LogConfig::All, USE_IF_HAVE(bool, allowSpam, false));
 	}
 
+	static float CalculateDistance(const Vec3& posA, const Vec3& posB)
+	{
+		return posA.Distance(posB);
+	}
+
 	void Register(sol::state* state, sol::table& parent)
 	{
 		auto tableUtil = sol::table(state->lua_state(), sol::create);
 		parent.set(ScriptReserved_Util, tableUtil);
 
 		tableUtil.set_function(ScriptReserved_HasLineOfSight, &HasLineOfSight);
-		tableUtil.set_function(ScriptReserved_CalculateDistance, &CalculateDistance);
 		tableUtil.set_function(ScriptReserved_CalculateHorizontalDistance, &CalculateHorizontalDistance);
 		tableUtil.set_function(ScriptReserved_GetDisplayPosition, &GetDisplayPosition);
 		tableUtil.set_function(ScriptReserved_PickMoveable, &PickMoveable);
@@ -207,7 +200,10 @@ namespace TEN::Scripting::Util
 		tableUtil.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
 		tableUtil.set_function(ScriptReserved_PrintLog, &PrintLog);
 
+		// COMPATIBILITY
+		tableUtil.set_function("CalculateDistance", &CalculateDistance);
+
 		auto handler = LuaHandler(state);
-		handler.MakeReadOnlyTable(tableUtil, ScriptReserved_LogLevel, LOG_LEVEL);
+		handler.MakeReadOnlyTable(tableUtil, ScriptReserved_LogLevel, LOG_LEVEL_IDS);
 	}
 }

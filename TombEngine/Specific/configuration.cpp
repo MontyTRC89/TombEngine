@@ -89,7 +89,7 @@ BOOL CALLBACK DialogProc(HWND handle, UINT msg, WPARAM wParam, LPARAM lParam)
 		g_Configuration.AntialiasingMode = AntialiasingMode::Low;
 		SendDlgItemMessage(handle, IDC_ANTIALIASING, BM_SETCHECK, 1, 0);
 
-		g_Configuration.ShadowType = ShadowMode::Lara;
+		g_Configuration.ShadowType = ShadowMode::Player;
 		SendDlgItemMessage(handle, IDC_SHADOWS, BM_SETCHECK, 1, 0);
 
 		g_Configuration.EnableCaustics = true;
@@ -310,7 +310,7 @@ void InitDefaultConfiguration()
 
 	g_Configuration.ScreenWidth = currentScreenResolution.x;
 	g_Configuration.ScreenHeight = currentScreenResolution.y;
-	g_Configuration.ShadowType = ShadowMode::Lara;
+	g_Configuration.ShadowType = ShadowMode::Player;
 	g_Configuration.ShadowMapSize = GameConfiguration::DEFAULT_SHADOW_MAP_SIZE;
 	g_Configuration.ShadowBlobsMax = GameConfiguration::DEFAULT_SHADOW_BLOBS_MAX;
 	g_Configuration.EnableCaustics = true;

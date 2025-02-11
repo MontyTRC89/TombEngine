@@ -106,6 +106,7 @@ namespace TEN::Effects::Spark
 
 		sptr = {};
 		sptr.on = true;
+		sptr.dynamic = NO_VALUE;
 		sptr.sR = colorStart.x * 0.33f * UCHAR_MAX;
 		sptr.sG = colorStart.y * 0.33f * UCHAR_MAX;
 		sptr.sB = colorStart.z * 0.33f * UCHAR_MAX;
@@ -132,7 +133,8 @@ namespace TEN::Effects::Spark
 			sptr.rotAdd = GenerateAngle(0, 63) + 64;
 
 		sptr.scalar = 3;
-		sptr.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + 12;
+		sptr.SpriteSeqID = ID_DEFAULT_SPRITES;
+		sptr.SpriteID = SPR_BULLETIMPACT;
 		sptr.size = GenerateInt(6, 12);
 		sptr.sSize = sptr.size;
 		sptr.dSize = 1;

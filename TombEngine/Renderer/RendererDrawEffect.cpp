@@ -308,9 +308,16 @@ namespace TEN::Renderer
 
 					AddSpriteBillboardConstrained(
 						&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
-						center, Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f), PI_DIV_2, 1.0f,
-						Vector2(arc.width * 8, Vector3::Distance(origin, target)),
-						BlendMode::Additive, dir, true, view);
+						center,
+						Vector4(1.0f, 1.0f, 1.0f, 0.5f),
+						PI_DIV_2, 1.0f, Vector2(4, Vector3::Distance(origin, target)), BlendMode::Additive, dir, true, view);
+
+
+					AddSpriteBillboardConstrained(
+						&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
+						center,
+						Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
+						PI_DIV_2, 1.0f, Vector2(arc.width * 8, Vector3::Distance(origin, target)), BlendMode::Additive, dir, true, view);					
 				}
 			}
 		}
@@ -498,7 +505,8 @@ namespace TEN::Renderer
 				}
 
 				// Disallow sprites out of bounds.
-				int spriteIndex = std::clamp((int)particle.spriteIndex, 0, (int)_sprites.size());
+				int spriteIndex = Objects[particle.SpriteSeqID].meshIndex + particle.SpriteID;
+				spriteIndex = std::clamp(spriteIndex, 0, (int)_sprites.size());
 
 				AddSpriteBillboard(
 					&_sprites[spriteIndex],
@@ -862,6 +870,9 @@ namespace TEN::Renderer
 
 				p2 = Vector3::Transform(p2, rotMatrix);
 				p3 = Vector3::Transform(p3, rotMatrix);
+
+				if (shockwave->style == (int)ShockwaveStyle::Invisible)
+					return;
 
 				if (shockwave->style == (int)ShockwaveStyle::Normal)
 				{

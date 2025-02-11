@@ -17,6 +17,7 @@
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 
 using namespace TEN::Effects::Electricity;
+using namespace TEN::Scripting::Types;
 
 /***
 Saving data, triggering functions, and callbacks for level-specific scripts.
@@ -42,7 +43,16 @@ enum class CallbackPoint
 	PostFreeze
 };
 
-static const std::unordered_map<std::string, CallbackPoint> CALLBACK_POINTS
+enum class LevelEndReason
+{
+	LevelComplete,
+	LoadGame,
+	ExitToTitle,
+	Death,
+	Other
+};
+
+static const auto CALLBACK_POINTS = std::unordered_map<std::string, CallbackPoint>
 {
 	{ ScriptReserved_PreStart, CallbackPoint::PreStart },
 	{ ScriptReserved_PostStart, CallbackPoint::PostStart },
@@ -50,8 +60,6 @@ static const std::unordered_map<std::string, CallbackPoint> CALLBACK_POINTS
 	{ ScriptReserved_PostLoad, CallbackPoint::PostLoad },
 	{ ScriptReserved_PreLoop, CallbackPoint::PreLoop },
 	{ ScriptReserved_PostLoop, CallbackPoint::PostLoop },
-	{ ScriptReserved_PreControlPhase, CallbackPoint::PreLoop },    // DEPRECATED
-	{ ScriptReserved_PostControlPhase, CallbackPoint::PostLoop },  // DEPRECATED
 	{ ScriptReserved_PreSave, CallbackPoint::PreSave },
 	{ ScriptReserved_PostSave, CallbackPoint::PostSave },
 	{ ScriptReserved_PreEnd, CallbackPoint::PreEnd },
@@ -59,10 +67,27 @@ static const std::unordered_map<std::string, CallbackPoint> CALLBACK_POINTS
 	{ ScriptReserved_PreUseItem, CallbackPoint::PreUseItem },
 	{ ScriptReserved_PostUseItem, CallbackPoint::PostUseItem },
 	{ ScriptReserved_PreFreeze, CallbackPoint::PreFreeze },
-	{ ScriptReserved_PostFreeze, CallbackPoint::PostFreeze }
+	{ ScriptReserved_PostFreeze, CallbackPoint::PostFreeze },
+
+	// COMPATIBILITY
+	{ "POSTSTART", CallbackPoint::PostStart },
+	{ "PRELOAD", CallbackPoint::PreLoad },
+	{ "POSTLOAD", CallbackPoint::PostLoad },
+	{ "PRELOOP", CallbackPoint::PreLoop },
+	{ "PRECONTROLPHASE", CallbackPoint::PreLoop },
+	{ "POSTLOOP", CallbackPoint::PostLoop },
+	{ "POSTCONTROLPHASE", CallbackPoint::PostLoop },
+	{ "PRESAVE", CallbackPoint::PreSave },
+	{ "POSTSAVE", CallbackPoint::PostSave },
+	{ "PREEND", CallbackPoint::PreEnd },
+	{ "POSTEND", CallbackPoint::PostEnd },
+	{ "PREUSEITEM", CallbackPoint::PreUseItem },
+	{ "POSTUSEITEM", CallbackPoint::PostUseItem },
+	{ "PREFREEZE", CallbackPoint::PreFreeze },
+	{ "POSTFREEZE", CallbackPoint::PostFreeze }
 };
 
-static const std::unordered_map<std::string, EventType> EVENT_TYPES
+static const auto EVENT_TYPES = std::unordered_map<std::string, EventType>
 {
 	{ ScriptReserved_EventOnEnter, EventType::Enter },
 	{ ScriptReserved_EventOnInside, EventType::Inside },
@@ -73,25 +98,24 @@ static const std::unordered_map<std::string, EventType> EVENT_TYPES
 	{ ScriptReserved_EventOnStart, EventType::Start },
 	{ ScriptReserved_EventOnEnd, EventType::End },
 	{ ScriptReserved_EventOnUseItem, EventType::UseItem },
-	{ ScriptReserved_EventOnFreeze, EventType::Freeze }
+	{ ScriptReserved_EventOnFreeze, EventType::Freeze },
+
+	// COMPATIBILITY
+	{ "USEITEM", EventType::UseItem }
 };
 
-enum class LevelEndReason
-{
-	LevelComplete,
-	LoadGame,
-	ExitToTitle,
-	Death,
-	Other
-};
-
-static const std::unordered_map<std::string, LevelEndReason> LEVEL_END_REASONS
+static const auto LEVEL_END_REASONS = std::unordered_map<std::string, LevelEndReason>
 {
 	{ ScriptReserved_EndReasonLevelComplete, LevelEndReason::LevelComplete },
 	{ ScriptReserved_EndReasonLoadGame, LevelEndReason::LoadGame },
 	{ ScriptReserved_EndReasonExitToTitle, LevelEndReason::ExitToTitle },
 	{ ScriptReserved_EndReasonDeath, LevelEndReason::Death },
-	{ ScriptReserved_EndReasonOther, LevelEndReason::Other }
+	{ ScriptReserved_EndReasonOther, LevelEndReason::Other },
+
+	// COMPATIBILITY
+	{ "LEVELCOMPLETE", LevelEndReason::LevelComplete },
+	{ "LOADGAME", LevelEndReason::LoadGame },
+	{ "EXITTOTITLE", LevelEndReason::ExitToTitle }
 };
 
 static constexpr char const* strKey = "__internal_name";
@@ -224,29 +248,29 @@ designer to add calls to `OnStart`, `OnLoad`, etc. in their level script.
 
 Possible values for `point`:
 	-- These take functions which accept no arguments
-	PRESTART -- will be called immediately before OnStart
-	POSTSTART -- will be called immediately after OnStart
+	PRE_START -- will be called immediately before OnStart
+	POST_START -- will be called immediately after OnStart
 
-	PRESAVE -- will be called immediately before OnSave
-	POSTSAVE -- will be called immediately after OnSave
+	PRE_SAVE -- will be called immediately before OnSave
+	POST_SAVE -- will be called immediately after OnSave
 
-	PRELOAD -- will be called immediately before OnLoad
-	POSTLOAD -- will be called immediately after OnLoad
+	PRE_LOAD -- will be called immediately before OnLoad
+	POST_LOAD -- will be called immediately after OnLoad
 
-	PREFREEZE -- will be called before entering freeze mode
-	POSTFREEZE -- will be called immediately after exiting freeze mode
+	PRE_FREEZE -- will be called before entering freeze mode
+	POST_FREEZE -- will be called immediately after exiting freeze mode
 
 	-- These take a LevelEndReason arg, like OnEnd
-	PREEND -- will be called immediately before OnEnd
-	POSTEND -- will be called immediately after OnEnd
+	PRE_END -- will be called immediately before OnEnd
+	POST_END -- will be called immediately after OnEnd
 
 	-- These take functions which accepts a deltaTime argument
-	PRELOOP -- will be called in the beginning of game loop
-	POSTLOOP -- will be called at the end of game loop
+	PRE_LOOP -- will be called in the beginning of game loop
+	POST_LOOP -- will be called at the end of game loop
 
 	-- These take functions which accepts an objectNumber argument, like OnUseItem
-	PREUSEITEM -- will be called immediately before OnUseItem
-	POSTUSEITEM -- will be called immediately after OnUseItem
+	PRE_USE_ITEM -- will be called immediately before OnUseItem
+	POST_USE_ITEM -- will be called immediately after OnUseItem
 
 The order in which two functions with the same CallbackPoint are called is undefined.
 i.e. if you register `MyFunc` and `MyFunc2` with `PRELOOP`, both will be called in the beginning of game loop, but there is no guarantee that `MyFunc` will be called before `MyFunc2`, or vice-versa.
@@ -313,7 +337,7 @@ Possible event type values:
 	START
 	END
 	LOOP
-	USEITEM
+	USE_ITEM
 	MENU
 
 @function HandleEvent
@@ -323,7 +347,7 @@ Possible event type values:
 */
 void LogicHandler::HandleEvent(const std::string& name, EventType type, sol::optional<Moveable&> activator)
 {
-	TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? (Activator)activator.value().GetIndex() : (Activator)short(LaraItem->Index));
+	TEN::Control::Volumes::HandleEvent(name, type, activator.has_value() ? (Activator)(short)activator->GetIndex() : (Activator)(short)LaraItem->Index);
 }
 
 /*** Attempt to find an event set and enable specified event in it.
@@ -959,9 +983,9 @@ void LogicHandler::ExecuteFunction(const std::string& name, short idOne, short i
 void LogicHandler::ExecuteFunction(const std::string& name, TEN::Control::Volumes::Activator activator, const std::string& arguments)
 {
 	sol::protected_function func = (*m_handler.GetState())[ScriptReserved_LevelFuncs][name.c_str()];
-	if (std::holds_alternative<short>(activator))
+	if (std::holds_alternative<int>(activator))
 	{
-		func(std::make_unique<Moveable>(std::get<short>(activator), true), arguments);
+		func(std::make_unique<Moveable>(std::get<int>(activator), true), arguments);
 	}
 	else
 	{
@@ -1181,9 +1205,9 @@ and provides the delta time (a float representing game time since last call) via
 @tfield function OnSave Will be called when the player saves the game, just *before* data is saved
 @tfield function OnEnd(EndReason) Will be called when leaving a level. This includes finishing it, exiting to the menu, or loading a save in a different level. It can take an `EndReason` arg:
 
-	EXITTOTITLE
-	LEVELCOMPLETE
-	LOADGAME
+	EXIT_TO_TITLE
+	LEVEL_COMPLETE
+	LOAD_GAME
 	DEATH
 	OTHER
 
@@ -1220,10 +1244,12 @@ void LogicHandler::InitCallbacks()
 
 	assignCB(m_onStart, ScriptReserved_OnStart);
 	assignCB(m_onLoad, ScriptReserved_OnLoad);
-	assignCB(m_onLoop, ScriptReserved_OnControlPhase);
 	assignCB(m_onLoop, ScriptReserved_OnLoop);
 	assignCB(m_onSave, ScriptReserved_OnSave);
 	assignCB(m_onEnd, ScriptReserved_OnEnd);
 	assignCB(m_onUseItem, ScriptReserved_OnUseItem);
 	assignCB(m_onBreak, ScriptReserved_OnFreeze);
+
+	// COMPATIBILITY
+	assignCB(m_onLoop, "OnControlPhase");
 }
