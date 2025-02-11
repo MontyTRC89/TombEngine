@@ -508,7 +508,7 @@ namespace TEN::Scripting::Effects
 }
 
 /// Structure for EmitAdvancedParticle table.
-// @table particleData Structure for EmitAdvancedParticle table.
+// @table particleData
 // @tfield Vec3 position World position.
 // @tfield Vec3 velocity Velocity.
 // @tfield[opt] Objects.ObjID spriteSeqID ID of the sprite sequence object. __Default: Objects.ObjID.DEFAULT_SPRITES__
