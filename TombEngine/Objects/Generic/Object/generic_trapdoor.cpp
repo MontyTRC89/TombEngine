@@ -50,6 +50,21 @@ namespace TEN::Entities::Generic
 	};
 	static auto FloorTrapDoorPos = Vector3i(0, 0, -655);
 
+	// -571 is the standard height of all puzzle and key items.
+	const auto WaterFloorTrapDoorPos = Vector3i(0, -571, 0);
+	const ObjectCollisionBounds WaterFloorTrapDoorBounds =
+	{
+		GameBoundingBox(
+				-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
+				-BLOCK(1.0f), 0,
+				-BLOCK(3 / 4.0f), BLOCK(3 / 4.0f)
+			),
+		std::pair(
+			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
+			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f))
+		)
+	};
+
 	static std::optional<int> GetTrapDoorFloorHeight(const ItemInfo& item, const Vector3i& pos)
 	{
 		if (!item.MeshBits.TestAny() || item.ItemFlags[2] == 0)
@@ -161,6 +176,25 @@ namespace TEN::Entities::Generic
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* trapDoorItem = &g_Level.Items[itemNumber];
+
+		/*bool isUnderwater = (player->Control.WaterStatus == WaterStatus::Underwater);
+		bool isActionReady = (IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() != NO_VALUE);
+		bool isPlayerAvailable = (!isUnderwater &&
+			player->Control.Look.OpticRange == 0 &&
+			laraItem->Animation.ActiveState == LS_IDLE &&
+			laraItem->Animation.AnimNumber == LA_STAND_IDLE) ||
+			(isUnderwater &&
+				player->Control.Look.OpticRange == 0 &&
+				laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE &&
+				laraItem->Animation.AnimNumber == LA_UNDERWATER_IDLE);
+
+
+		bool actionActive = player->Control.IsMoving && player->Context.InteractedItem == itemNumber;
+
+		const auto& bounds = isUnderwater ? WaterKeyHoleBounds : KeyHoleBounds;
+		const auto& position = isUnderwater ? WaterKeyHolePosition : KeyHolePosition; 
+		laraItem->Animation.AnimNumber = isUnderwater ? LA_UNDERWATER_USE_KEY : LA_USE_KEY;
+		*/
 
 		if ((IsHeld(In::Action) &&
 			laraItem->Animation.ActiveState == LS_IDLE &&
