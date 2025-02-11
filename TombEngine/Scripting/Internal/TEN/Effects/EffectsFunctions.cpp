@@ -215,8 +215,7 @@ namespace TEN::Scripting::Effects
 
 	/// Emit a particle with extensive configuration options including animations.
 	// @function EmitAdvancedParticle
-	// @tparam particleData The table holding all the particle data.
-	// 
+	// @tparam particleData particleData The table holding all the particle data.
 	// @usage
 	// local particle = {
 	// position = GetMoveableByName("camera_target_6") :GetPosition(), 
