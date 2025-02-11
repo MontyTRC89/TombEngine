@@ -2616,9 +2616,9 @@ namespace TEN::Renderer
 						if (bucket.NumVertices == 0)
 							continue;
 
-						auto blendMode = statics[i]->Color.w < 1.0f ? BlendMode::AlphaBlend : bucket.BlendMode;
+						auto blendMode = GetBlendModeFromAlpha(bucket.BlendMode, statics[i]->Color.w);
 
-						if (IsSortedBlendMode(blendMode))
+						if (IsSortedBlendMode(blendMode) || statics[i]->Color.w < 1.0f)
 						{
 							for (int p = 0; p < bucket.Polygons.size(); p++)
 							{
@@ -3153,7 +3153,7 @@ namespace TEN::Renderer
 				if (bucket.NumVertices == 0)
 					continue;
 
-				auto blendMode = itemToDraw->Color.w < 1.0f ? BlendMode::AlphaBlend : bucket.BlendMode;
+				auto blendMode = GetBlendModeFromAlpha(bucket.BlendMode, itemToDraw->Color.w);
 
 				if (IsSortedBlendMode(blendMode))
 				{
@@ -3185,7 +3185,7 @@ namespace TEN::Renderer
 				if (bucket.NumVertices == 0)
 					continue;
 
-				auto blendMode = itemToDraw->Color.w < 1.0f ? BlendMode::AlphaBlend : bucket.BlendMode;
+				auto blendMode = GetBlendModeFromAlpha(bucket.BlendMode, itemToDraw->Color.w);
 				
 				if (rendererPass == RendererPass::ShadowMap)
 				{

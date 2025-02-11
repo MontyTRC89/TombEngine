@@ -585,6 +585,14 @@ namespace TEN::Renderer
 				blendMode == BlendMode::FastAlphaBlend);
 		}
 
+		static inline BlendMode GetBlendModeFromAlpha(BlendMode blendMode, float alpha)
+		{
+			if (alpha < 1.0f && (blendMode == BlendMode::Opaque || blendMode == BlendMode::FastAlphaBlend))
+				return BlendMode::AlphaBlend;
+			else
+				return blendMode;
+		}
+
 		inline RendererObject& GetStaticRendererObject(short objectNumber)
 		{
 			return _staticObjects[Statics.GetIndex(objectNumber)].value();
