@@ -253,8 +253,8 @@ namespace TEN::Scripting::Effects
 		part.scalar = 2;
 
 		part.gravity = (short)std::clamp((float) tbl.get_or("gravity", 0.0f), (float)SHRT_MIN, (float)SHRT_MAX);
-		part.friction = 0;
-		part.maxYvel = 0;
+		part.friction = tbl.get_or("friction", 0);
+		part.maxYvel = tbl.get_or("maxYVelocity", 0);
 
 		auto convertedStartColor = tbl.get_or("startColor", ScriptColor(255, 255, 255));
 		part.sR = convertedStartColor.GetR();
