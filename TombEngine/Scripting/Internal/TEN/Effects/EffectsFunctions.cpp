@@ -329,7 +329,7 @@ namespace TEN::Scripting::Effects
 
 		}
 
-		bool convertedApplyWind = particleData.get_or("wind", true);
+		bool convertedApplyWind = particleData.get_or("wind", false);
 		if (convertedApplyWind)
 		{
 			if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WIND, part.roomNumber))
@@ -527,7 +527,7 @@ namespace TEN::Scripting::Effects
 // @tfield[opt] bool damage Specify if the particle will harm the player on collision. __Default: false__
 // @tfield[opt] bool poison Specify if the particle will poison the player on collision. __Default: false__
 // @tfield[opt] bool burn Specify if the particle will burn the player on collision. __Default: false__
-// @tfield[opt] bool wind Specify if the particle will be affected by wind in outside rooms. __Default: true__
+// @tfield[opt] bool wind Specify if the particle will be affected by wind in outside rooms. __Default: false__
 // @tfield[opt] int damageHit Specify the damage particle will harm the player on collision. __Default: 2__
 // @tfield[opt] bool animated Specify if the particle will be animated. __Default: false__
 // @tfield[opt] Effects.ParticleAnimationType animationType Specify the the type of animation the particle will use. __Default: TEN.Effects.ParticleAnimationType.LOOP__
