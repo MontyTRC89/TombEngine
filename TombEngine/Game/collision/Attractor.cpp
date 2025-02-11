@@ -287,7 +287,8 @@ namespace TEN::Collision::Attractor
 
 	bool AttractorObject::Intersects(const BoundingSphere& sphere) const
 	{
-		auto localSphere = BoundingSphere(Vector3::Transform(sphere.Center, GetTransformMatrix().Invert()), sphere.Radius);
+		auto localCenter = Vector3::Transform(sphere.Center, GetTransformMatrix().Invert());
+		auto localSphere = BoundingSphere(localCenter, sphere.Radius);
 		return localSphere.Intersects(_aabb);
 	}
 
