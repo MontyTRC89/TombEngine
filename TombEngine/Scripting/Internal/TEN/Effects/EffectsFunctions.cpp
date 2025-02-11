@@ -213,6 +213,41 @@ namespace TEN::Scripting::Effects
 			part.flags |= SP_WIND;
 	}
 
+	/// Emit a particle.
+	// @function EmitParticle
+	// @tparam Vec3 pos World position.
+	// @tparam Vec3 vel Velocity.
+	// @tparam int spriteID ID of the sprite in the sprite sequence object.
+	// @tparam float gravity Specifies if the particle will fall over time. Positive values ascend, negative values descend. Recommended range: [-1000 and 1000]. __Default: 0__
+	// @tparam float rotVel Rotational velocity in degrees. __Default: 0__
+	// @tparam Color startColor Color at start of life. __Default: Color(255, 255, 255)__
+	// @tparam Color endColor Color to fade toward. This will finish long before the end of the particle's life due to internal math. __Default: Color(255, 255, 255)__
+	// @tparam Effects.BlendID blendMode Render blend mode. __TEN.Effects.BlendID.ALPHABLEND__
+	// @tparam float startSize Size at start of life. __Default: 10__
+	// @tparam float endSize Size at end of life. The particle will linearly shrink or grow toward this size over its lifespan. __Default: 0__
+	// @tparam float life Lifespan in seconds. __Default: 2__
+	// @tparam bool applyDamage Specify if the particle will harm the player on collision. __Default: false__
+	// @tparam bool applyPoison Specify if the particle will poison the player on collision. __Default: false__
+	// @tparam Objects.ObjID spriteSeqID ID of the sprite sequence object. __Default: Objects.ObjID.DEFAULT_SPRITES__
+	// @tparam float startRot Rotation at start of life. __Default: random__
+	// @usage
+	// EmitParticle(
+	// 	pos,
+	// 	Vec3(math.random(), math.random(), math.random()),
+	// 	22, -- spriteID
+	// 	0, -- gravity
+	// 	-2, -- rotVel
+	// 	Color(255, 0, 0), -- startColor
+	// 	Color(0,  255, 0), -- endColor
+	// 	TEN.Effects.BlendID.ADDITIVE, -- blendMode
+	// 	15, -- startSize
+	// 	50, -- endSize
+	// 	20, -- life
+	// 	false, -- applyDamage
+	// 	true, -- applyPoison
+	//  Objects.ObjID.DEFAULT_SPRITES, -- spriteSeqID
+	//  180 -- startRot
+	//  )
 	static void EmitAdvancedParticle(sol::table tbl)
 	{
 		constexpr auto DEFAULT_START_SIZE = 10.0f;
@@ -291,11 +326,11 @@ namespace TEN::Scripting::Effects
 		bool animatedSpr = tbl.get_or("animated", false);
 		if (animatedSpr)
 		{
-			ParticleAnimationMode applyAnimation = tbl.get_or("animationType", ParticleAnimationMode::LOOP);
+			ParticleAnimationMode applyAnimation = tbl.get_or("animationType", ParticleAnimationMode::None);
 			float applyFramerate = tbl.get_or("frameRate", 1.0f);
 			part.flags |= SP_ANIMATED;
 			part.framerate = applyFramerate;
-			part.animationType = ParticleAnimationMode(std::clamp(int(applyAnimation), int(ParticleAnimationMode::LOOP), int(ParticleAnimationMode::LIFETIMESPREAD)));
+			part.animationType = ParticleAnimationMode(std::clamp(int(applyAnimation), int(ParticleAnimationMode::None), int(ParticleAnimationMode::LifeTimeSpread)));
 
 		}
 

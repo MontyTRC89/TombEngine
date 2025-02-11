@@ -110,10 +110,11 @@ struct NODEOFFSET_INFO
 
 enum class ParticleAnimationMode
 {
-	LOOP,      // Frames loop sequentially
-	ONESHOT,         // Frames play once, then freeze on the last frame
-	PINGPONG,        // Frames go forward, then backward
-	LIFETIMESPREAD   // Frames are evenly distributed over the particle's lifetime
+	None,			 // No Animation
+	Loop,			 // Frames loop sequentially
+	OneShot,         // Frames play once, then freeze on the last frame
+	BackAndForth,        // Frames go forward, then backward
+	LifeTimeSpread   // Frames are evenly distributed over the particle's lifetime
 };
 
 struct Particle

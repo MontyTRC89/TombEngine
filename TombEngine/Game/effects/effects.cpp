@@ -217,7 +217,7 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 	// Handle animation modes
 	switch (animationType)
 	{
-	case ParticleAnimationMode::LOOP:  // Frames loop sequentially
+	case ParticleAnimationMode::Loop:  // Frames loop sequentially
 	{
 		float frameDuration = frameRate > 0 ? 1.0f / frameRate : 1.0f / totalFrames;  // Duration per frame
 		int currentFrame = static_cast<int>(particleAge / frameDuration) % totalFrames;  // Wrap frames
@@ -225,7 +225,7 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 		break;
 	}
 
-	case ParticleAnimationMode::ONESHOT:  // Frames play once, then freeze on the last frame
+	case ParticleAnimationMode::OneShot:  // Frames play once, then freeze on the last frame
 	{
 		float totalDuration = frameRate > 0 ? totalFrames / frameRate : particle.sLife;
 		int currentFrame = static_cast<int>(particleAge / (totalDuration / totalFrames));
@@ -235,7 +235,7 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 		break;
 	}
 
-	case ParticleAnimationMode::PINGPONG:  // Frames go forward and then backward
+	case ParticleAnimationMode::BackAndForth:  // Frames go forward and then backward
 	{
 		float frameDuration = frameRate > 0 ? 1.0f / frameRate : 1.0f / totalFrames;
 		int totalFrameSteps = totalFrames * 2 - 2;  // Forward and backward frames (avoiding double-count of last frame)
@@ -245,7 +245,7 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 		break;
 	}
 
-	case ParticleAnimationMode::LIFETIMESPREAD:  // Distribute all frames evenly over lifetime
+	case ParticleAnimationMode::LifeTimeSpread:  // Distribute all frames evenly over lifetime
 	{
 		int currentFrame = static_cast<int>(normalizedAge * totalFrames);
 		if (currentFrame >= totalFrames)
@@ -253,6 +253,13 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 		particle.SpriteID = currentFrame;
 		break;
 	}
+
+	case ParticleAnimationMode::None:  // Distribute all frames evenly over lifetime
+	{
+		particle.SpriteID = 0;
+		break;
+	}
+
 
 	default:  // Default behavior: keep the first frame
 		particle.SpriteID = 0;
