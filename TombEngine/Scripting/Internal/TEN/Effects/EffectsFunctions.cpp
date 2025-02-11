@@ -292,6 +292,7 @@ namespace TEN::Scripting::Effects
 
 		bool applyPoison = tbl.get_or("poison", false);
 		bool applyDamage = tbl.get_or("damage", false);
+		bool applyBurn	 = tbl.get_or("burn", false);
 		bool animatedSpr = tbl.get_or("animated", false);
 
 		if (applyPoison)
@@ -299,6 +300,11 @@ namespace TEN::Scripting::Effects
 
 		if (applyDamage)
 			s->flags |= SP_DAMAGE;
+
+		if (applyBurn)
+			s->flags |= SP_FIRE;
+
+		s->damage = tbl.get_or("damageHit", 2);
 
 		if (animatedSpr)
 		{

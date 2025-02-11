@@ -155,6 +155,7 @@ struct Particle
 	int fxObj;
 	int roomNumber;
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
+	int damage;
 	int spriteObj;
 	float framerate;
 	ParticleAnimationMode animationType;

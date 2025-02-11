@@ -436,10 +436,10 @@ void UpdateSparks()
 								ItemBurn(LaraItem);
 
 							if (spark->flags & SP_DAMAGE)
-								DoDamage(LaraItem, 2);
+								DoDamage(LaraItem, spark->damage);
 
 							if (spark->flags & SP_POISON)
-								Lara.Status.Poison += 5;
+								Lara.Status.Poison += spark->damage;
 						}
 					}
 				}
