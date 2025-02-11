@@ -9,7 +9,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 
 ### New Features
-
+* Implemented Advanced Particles with animations and other effects. Refer to Lua Docs.
 
 ### Lua API changes
 
