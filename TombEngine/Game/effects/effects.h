@@ -108,6 +108,14 @@ struct NODEOFFSET_INFO
 	unsigned char gotIt;
 };
 
+enum class ParticleAnimationMode
+{
+	LOOP,      // Frames loop sequentially
+	ONESHOT,         // Frames play once, then freeze on the last frame
+	PINGPONG,        // Frames go forward, then backward
+	LIFETIMESPREAD   // Frames are evenly distributed over the particle's lifetime
+};
+
 struct Particle
 {
 	int x;
@@ -182,14 +190,6 @@ struct ParticleDynamic
 	byte B;
 	byte Flags;
 	byte Pad[2];
-};
-
-enum class ParticleAnimationMode
-{
-	LOOP,      // Frames loop sequentially
-	ONESHOT,         // Frames play once, then freeze on the last frame
-	PINGPONG,        // Frames go forward, then backward
-	LIFETIMESPREAD   // Frames are evenly distributed over the particle's lifetime
 };
 
 extern GameBoundingBox DeadlyBounds;

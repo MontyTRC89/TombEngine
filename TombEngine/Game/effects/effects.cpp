@@ -208,7 +208,7 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 	// Handle animation modes
 	switch (animationType)
 	{
-	case ParticleAnimationMode::SequentialLoop:  // Frames loop sequentially
+	case ParticleAnimationMode::LOOP:  // Frames loop sequentially
 	{
 		float frameDuration = frameRate > 0 ? 1.0f / frameRate : 1.0f / totalFrames;  // Duration per frame
 		int currentFrame = static_cast<int>(particleAge / frameDuration) % totalFrames;  // Wrap frames
@@ -216,7 +216,7 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 		break;
 	}
 
-	case ParticleAnimationMode::OneTimePlay:  // Frames play once, then freeze on the last frame
+	case ParticleAnimationMode::ONESHOT:  // Frames play once, then freeze on the last frame
 	{
 		float totalDuration = frameRate > 0 ? totalFrames / frameRate : particle.sLife;
 		int currentFrame = static_cast<int>(particleAge / (totalDuration / totalFrames));
@@ -226,7 +226,7 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 		break;
 	}
 
-	case ParticleAnimationMode::BackAndForth:  // Frames go forward and then backward
+	case ParticleAnimationMode::PINGPONG:  // Frames go forward and then backward
 	{
 		float frameDuration = frameRate > 0 ? 1.0f / frameRate : 1.0f / totalFrames;
 		int totalFrameSteps = totalFrames * 2 - 2;  // Forward and backward frames (avoiding double-count of last frame)
@@ -236,7 +236,7 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 		break;
 	}
 
-	case ParticleAnimationMode::SpreadOverLifetime:  // Distribute all frames evenly over lifetime
+	case ParticleAnimationMode::LIFETIMESPREAD:  // Distribute all frames evenly over lifetime
 	{
 		int currentFrame = static_cast<int>(normalizedAge * totalFrames);
 		if (currentFrame >= totalFrames)
