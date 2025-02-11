@@ -16,6 +16,7 @@
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptUtil.h"
+#include "Scripting/Internal/TEN/Effects/AnimationType.h"
 #include "Scripting/Internal/TEN/Effects/BlendIDs.h"
 #include "Scripting/Internal/TEN/Effects/EffectIDs.h"
 #include "Scripting/Internal/TEN/Types/Color/Color.h"
