@@ -67,7 +67,7 @@ namespace TEN::Player
 				continue;
 
 			// 2.3) Test if edge slope is illegal.
-			if (abs(attracColl.SlopeAngle) >= STEEP_FLOOR_SLOPE_ANGLE)
+			if (abs(attracColl.SlopeAngle) >= DEFAULT_STEEP_FLOOR_SLOPE_ANGLE)
 				continue;
 
 			// 2.4) Test edge angle relation.
@@ -465,7 +465,7 @@ namespace TEN::Player
 				continue;
 
 			// 3) Test if wall edge is steep.
-			if (abs(attracColl.SlopeAngle) >= STEEP_FLOOR_SLOPE_ANGLE)
+			if (abs(attracColl.SlopeAngle) >= DEFAULT_STEEP_FLOOR_SLOPE_ANGLE)
 				continue;
 
 			// 4) Test wall edge angle relation.
@@ -807,7 +807,7 @@ namespace TEN::Player
 		const auto& player = GetLaraInfo(item);
 
 		// Extended crawl moveset disabled; return nullopt.
-		if (!g_GameFlow->HasCrawlExtended())
+		if (!g_GameFlow->GetSettings()->Animations.CrawlExtended)
 			return std::nullopt;
 
 		// Get attractor collisions.
@@ -870,7 +870,7 @@ namespace TEN::Player
 		constexpr auto VERTICAL_OFFSET = -CLICK(1);
 
 		// Crouch action held and extended crawl moveset enabled; return nullopt.
-		if (IsHeld(In::Crouch) && g_GameFlow->HasCrawlExtended())
+		if (IsHeld(In::Crouch) && g_GameFlow->GetSettings()->Animations.CrawlExtended)
 			return std::nullopt;
 
 		// Get tread water vault climb context.
@@ -908,7 +908,7 @@ namespace TEN::Player
 		};
 
 		// Crouch action held and extended crawl moveset enabled; return nullopt.
-		if (IsHeld(In::Crouch) && g_GameFlow->HasCrawlExtended())
+		if (IsHeld(In::Crouch) && g_GameFlow->GetSettings()->Animations.CrawlExtended)
 			return std::nullopt;
 
 		// Get tread water vault climb context.
@@ -947,7 +947,7 @@ namespace TEN::Player
 		constexpr auto VERTICAL_OFFSET = CLICK(1);
 
 		// Crouch action held and extended crawl moveset enabled; return nullopt.
-		if (IsHeld(In::Crouch) && g_GameFlow->HasCrawlExtended())
+		if (IsHeld(In::Crouch) && g_GameFlow->GetSettings()->Animations.CrawlExtended)
 			return std::nullopt;
 
 		// Get tread water vault climb context.
@@ -986,7 +986,7 @@ namespace TEN::Player
 		constexpr auto VERTICAL_OFFSET = -CLICK(1);
 
 		// Extended crawl moveset disabled; return nullopt.
-		if (!g_GameFlow->HasCrawlExtended())
+		if (!g_GameFlow->GetSettings()->Animations.CrawlExtended)
 			return std::nullopt;
 
 		// Get tread water vault climb context.
@@ -1024,7 +1024,7 @@ namespace TEN::Player
 		};
 
 		// Extended crawl moveset disabled; return nullopt.
-		if (!g_GameFlow->HasCrawlExtended())
+		if (!g_GameFlow->GetSettings()->Animations.CrawlExtended)
 			return std::nullopt;
 
 		// Get tread water vault climb context.
@@ -1063,7 +1063,7 @@ namespace TEN::Player
 		constexpr auto VERTICAL_OFFSET = CLICK(1);
 
 		// Extended crawl moveset disabled; return nullopt.
-		if (!g_GameFlow->HasCrawlExtended())
+		if (!g_GameFlow->GetSettings()->Animations.CrawlExtended)
 			return std::nullopt;
 
 		// Get tread water vault climb context.

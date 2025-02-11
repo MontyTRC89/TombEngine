@@ -46,7 +46,7 @@ namespace TEN::Player
 				continue;
 
 			// 3) Test if edge slope is steep.
-			if (abs(attracColl.SlopeAngle) >= STEEP_FLOOR_SLOPE_ANGLE)
+			if (abs(attracColl.SlopeAngle) >= DEFAULT_STEEP_FLOOR_SLOPE_ANGLE)
 				continue;
 
 			// 4) Test edge angle relation.

@@ -100,7 +100,7 @@ namespace TEN::Player
 
 	bool CanSteerOnSlide(const ItemInfo& item, const CollisionInfo& coll)
 	{
-		return g_GameFlow->HasSlideExtended();
+		return g_GameFlow->GetSettings()->Animations.SlideExtended;
 	}
 
 	bool CanDismountTightrope(const ItemInfo& item, const CollisionInfo& coll)

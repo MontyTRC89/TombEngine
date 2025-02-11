@@ -87,7 +87,7 @@ namespace TEN::Player
 		const auto& player = GetLaraInfo(item);
 
 		// 1) Check if AFK posing is enabled.
-		if (!g_GameFlow->HasAFKPose())
+		if (!g_GameFlow->GetSettings()->Animations.PoseTimeout)
 			return false;
 
 		// 2) Test player hand and water status.
@@ -477,7 +477,7 @@ namespace TEN::Player
 		const auto& player = GetLaraInfo(item);
 
 		// 1) Check if crouch roll is enabled.
-		if (!g_GameFlow->HasCrouchRoll())
+		if (!g_GameFlow->GetSettings()->Animations.CrouchRoll)
 			return false;
 
 		// 2) Test water depth.

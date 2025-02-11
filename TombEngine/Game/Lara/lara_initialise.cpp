@@ -182,7 +182,7 @@ void InitializeLaraStartPosition(ItemInfo& playerItem)
 	playerItem.Location.Height = playerItem.Pose.Position.y;
 }
 
-static void InitializePlayerVehicle(ItemInfo& playerItem)
+void InitializePlayerVehicle(ItemInfo& playerItem)
 {
 	if (PlayerVehicleObjectID == GAME_OBJECT_ID::ID_NO_OBJECT)
 		return;
@@ -194,7 +194,6 @@ static void InitializePlayerVehicle(ItemInfo& playerItem)
 	// Restore vehicle.
 	TENLog("Transferring vehicle " + GetObjectName(PlayerVehicleObjectID) + " from the previous level.");
 	vehicle->Pose = playerItem.Pose;
-	ItemNewRoom(vehicle->Index, playerItem.RoomNumber);
 	SetLaraVehicle(&playerItem, vehicle);
 	playerItem.Animation = PlayerAnim;
 
@@ -251,7 +250,7 @@ static void InitializePlayerVehicle(ItemInfo& playerItem)
 	if (vehicle->ObjectNumber == GAME_OBJECT_ID::ID_RUBBER_BOAT ||
 		vehicle->ObjectNumber == GAME_OBJECT_ID::ID_SPEEDBOAT)
 	{
-		g_Level.Items[vehicle->Index].Active = false;
+		RemoveActiveItem(vehicle->Index, false);
 		AddActiveItem(vehicle->Index);
 		g_Level.Items[vehicle->Index].Status = ITEM_ACTIVE;
 	}
@@ -297,9 +296,6 @@ void InitializeLaraLevelJump(ItemInfo* item, LaraInfo* playerBackup)
 
 	// Restore hit points.
 	item->HitPoints = PlayerHitPoints;
-
-	// Restore vehicle.
-	InitializePlayerVehicle(*item);
 }
 
 void InitializeLaraDefaultInventory(ItemInfo& item)
@@ -324,6 +320,18 @@ void InitializeLaraDefaultInventory(ItemInfo& item)
 
 	if (Objects[ID_BINOCULARS_ITEM].loaded)
 		player.Inventory.HasBinoculars = true;
+
+	if (Objects[ID_STOPWATCH_ITEM].loaded)
+		player.Inventory.HasStopwatch = true;
+		
+	if (Objects[ID_PC_LOAD_INV_ITEM].loaded)
+		player.Inventory.HasLoad = true;
+
+	if (Objects[ID_PC_SAVE_INV_ITEM].loaded)
+		player.Inventory.HasSave = true;
+
+	if (Objects[ID_COMPASS_ITEM].loaded)
+		player.Inventory.HasCompass = true;
 
 	player.Inventory.BeetleLife = DEFAULT_BEETLE_LIFE;
 

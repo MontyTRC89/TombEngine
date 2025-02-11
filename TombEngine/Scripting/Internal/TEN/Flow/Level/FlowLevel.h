@@ -1,10 +1,12 @@
 #pragma once
-#include <string>
 #include "Scripting/Internal/TEN/Flow/SkyLayer/SkyLayer.h"
-#include "Scripting/Internal/TEN/Flow/Mirror/Mirror.h"
+#include "Scripting/Internal/TEN/Flow/LensFlare/LensFlare.h"
+#include "Scripting/Internal/TEN/Flow/Starfield/Starfield.h"
 #include "Scripting/Internal/TEN/Flow/Fog/Fog.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Scripting/Internal/TEN/Flow/InventoryItem/InventoryItem.h"
+
+using namespace TEN::Scripting;
 
 static const std::unordered_map<std::string, WeatherType> WEATHER_TYPES
 {
@@ -28,10 +30,12 @@ struct Level : public ScriptInterfaceLevel
 	SkyLayer	Layer1		 = {};
 	SkyLayer	Layer2		 = {};
 	Fog			Fog			 = {};
-	Mirror		Mirror		 = {};
 	int			LevelFarView = 0;
 	std::string AmbientTrack = {};
-	
+
+	LensFlare LensFlare = {};
+	Starfield Starfield = {};
+
 	WeatherType Weather			= WeatherType::None;
 	float		WeatherStrength = 1.0f;
 	bool		Storm			= false;
@@ -41,6 +45,8 @@ struct Level : public ScriptInterfaceLevel
 	std::vector<InventoryItem> InventoryObjects = {};
 
 	bool ResetHub = false;
+
+	// TODO: Clean up this mess.
 
 	RGBAColor8Byte GetFogColor() const override;
 	bool GetFogEnabled() const override;
@@ -54,7 +60,6 @@ struct Level : public ScriptInterfaceLevel
 	void SetLevelFarView(short val);
 	static void Register(sol::table& parent);
 	WeatherType GetWeatherType() const override;
-	short GetMirrorRoom() const override;
 	short GetFogMinDistance() const override;
 	short GetFogMaxDistance() const override;
 	short GetFarView() const override;
@@ -62,4 +67,19 @@ struct Level : public ScriptInterfaceLevel
 	int GetSecrets() const override;
 	std::string GetAmbientTrack() const override;
 	bool GetResetHubEnabled() const override;
+
+	// Lens flare getters
+	bool  GetLensFlareEnabled() const override;
+	int	  GetLensFlareSunSpriteID() const override;
+	short GetLensFlarePitch() const override;
+	short GetLensFlareYaw() const override;
+	Color GetLensFlareColor() const override;
+
+	// Starfield getters
+	bool  GetStarfieldStarsEnabled() const override;
+	bool  GetStarfieldMeteorsEnabled() const override;
+	int	  GetStarfieldStarCount() const override;
+	int	  GetStarfieldMeteorCount() const override;
+	int	  GetStarfieldMeteorSpawnDensity() const override;
+	float GetStarfieldMeteorVelocity() const override;
 };

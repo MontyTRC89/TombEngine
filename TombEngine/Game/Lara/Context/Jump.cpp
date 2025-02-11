@@ -214,7 +214,7 @@ namespace TEN::Player
 		const auto& player = GetLaraInfo(item);
 
 		// 1) Check if sprint jump is enabled.
-		if (!g_GameFlow->HasSprintJump())
+		if (!g_GameFlow->GetSettings()->Animations.SprintJump)
 			return false;
 
 		// 2) Check for jump state dispatch.
@@ -241,7 +241,7 @@ namespace TEN::Player
 		return true;
 
 		// Check whether extended slide mechanics are enabled.
-		if (!g_GameFlow->HasSlideExtended())
+		if (!g_GameFlow->GetSettings()->Animations.SlideExtended)
 			return true;
 
 		// TODO: Broken on diagonal slides?
@@ -290,7 +290,7 @@ namespace TEN::Player
 				continue;
 
 			// 3) Test if edge slope is steep.
-			if (abs(attracColl.SlopeAngle) >= STEEP_FLOOR_SLOPE_ANGLE)
+			if (abs(attracColl.SlopeAngle) >= DEFAULT_STEEP_FLOOR_SLOPE_ANGLE)
 				continue;
 
 			// 4) Test edge angle relation.

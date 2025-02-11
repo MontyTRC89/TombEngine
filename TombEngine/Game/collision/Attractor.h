@@ -68,7 +68,8 @@ namespace TEN::Collision::Attractor
 		~AttractorObject();
 
 		// Getters
-
+		
+		AttractorType	   GetType() const;
 		int				   GetRoomNumber() const;
 		float			   GetLength() const;
 		const BoundingBox& GetAabb() const;

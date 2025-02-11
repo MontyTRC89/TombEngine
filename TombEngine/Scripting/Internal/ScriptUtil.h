@@ -1,19 +1,21 @@
 #pragma once
-#define index_error_maker(CPP_TYPE, LUA_CLASS_NAME) [](CPP_TYPE& item, sol::object key) \
+
+#include "Scripting/Internal/ScriptAssert.h"
+
+#define IndexErrorMaker(CPP_TYPE, LUA_CLASS_NAME) [](CPP_TYPE& item, sol::object key) \
 { \
-	std::string err = "Attempted to read missing var \"" + key.as<std::string>() + "\" from " + LUA_CLASS_NAME; \
+	std::string err = "Attempted to read missing variable \"" + key.as<std::string>() + "\" from " + LUA_CLASS_NAME; \
 	ScriptAssert(false, err);\
 }
 
-#define newindex_error_maker(CPP_TYPE, LUA_CLASS_NAME) [](CPP_TYPE& item, sol::object key) \
+#define NewIndexErrorMaker(CPP_TYPE, LUA_CLASS_NAME) [](CPP_TYPE& item, sol::object key) \
 { \
-	std::string err = "Attempted to set missing var \"" + key.as<std::string>() + "\" of " + LUA_CLASS_NAME; \
+	std::string err = "Attempted to set missing variable \"" + key.as<std::string>() + "\" of " + LUA_CLASS_NAME; \
 	ScriptAssert(false, err);\
 }
 
-// Helper type to allow us to more easily specify "give a value of type X or just give nil" parameters.
-// Sol doesn't (at the time of writing) have any mechanisms to do this kind of optional argument without
-// drawbacks, or at least no mechanisms that I could find.
+// Helper type to allow specification of optional parameters.
+// Sol doesn't (at the time of writing) have any mechanisms to do this kind of optional argument without drawbacks.
 //
 // sol::optional doesn't distinguish between nil values and values of the wrong type
 // (so we can't provide the user with an error message to tell them they messed up).

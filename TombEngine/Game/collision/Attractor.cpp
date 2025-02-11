@@ -57,6 +57,11 @@ namespace TEN::Collision::Attractor
 		DetachAllPlayers();
 	}
 
+	AttractorType AttractorObject::GetType() const
+	{
+		return _type;
+	}
+
 	int AttractorObject::GetRoomNumber() const
 	{
 		return _roomNumber;
@@ -348,7 +353,7 @@ namespace TEN::Collision::Attractor
 			break;
 
 		case AttractorType::WallEdge:
-			labelString = "Wall Edge";
+			labelString = "Wall edge";
 			break;
 
 		default:

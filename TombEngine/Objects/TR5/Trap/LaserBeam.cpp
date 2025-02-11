@@ -37,8 +37,6 @@ namespace TEN::Entities::Traps
 		Radius = (item.TriggerFlags == 0) ? RADIUS_STEP : (abs(item.TriggerFlags) * RADIUS_STEP);
 		IsLethal = (item.TriggerFlags > 0);
 		IsHeavyActivator = (item.TriggerFlags <= 0);
-
-		Update(item);
 	}
 
 	static void SpawnLaserSpark(const GameVector& pos, short angle, int count, const Vector4& colorStart)
@@ -74,10 +72,20 @@ namespace TEN::Entities::Traps
 
 	static void SpawnLaserBeamLight(const Vector3& pos, int roomNumber, const Color& color, float intensity, float amplitudeMax)
 	{
-		constexpr auto FALLOFF = 0.03f;
+		constexpr auto LASER_BEAM_FALLOFF = BLOCK(1.5f);
 
 		float intensityNorm = intensity - Random::GenerateFloat(0.0f, amplitudeMax);
-		TriggerDynamicLight(pos, color * intensityNorm, FALLOFF);
+		SpawnDynamicPointLight(pos, color * intensityNorm, LASER_BEAM_FALLOFF);
+	}
+
+	void LaserBeamEffect::StoreInterpolationData()
+	{
+		for (int i = 0; i < Vertices.size(); i++)
+		{
+			OldVertices[i] = Vertices[i];
+		}
+
+		OldColor = Color;
 	}
 
 	void LaserBeamEffect::Update(const ItemInfo& item)
@@ -153,6 +161,8 @@ namespace TEN::Entities::Traps
 			item.Model.Color.w = 0.0f;
 			return;
 		}
+
+		beam.StoreInterpolationData();
 
 		// Brightness fade-in and distortion.
 		if (item.Model.Color.w < 1.0f)

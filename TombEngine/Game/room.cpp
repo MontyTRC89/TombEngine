@@ -8,15 +8,17 @@
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
 #include "Game/items.h"
-#include "Renderer/Renderer.h"
 #include "Math/Math.h"
 #include "Objects/game_object_ids.h"
+#include "Objects/Generic/Doors/generic_doors.h"
+#include "Renderer/Renderer.h"
 #include "Specific/Structures/BoundingVolumeHierarchy.h"
 #include "Specific/trutils.h"
 
 using namespace TEN::Collision::Attractor;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
+using namespace TEN::Entities::Doors;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
 using namespace TEN::Structures;
@@ -111,10 +113,78 @@ static void RemoveRoomFlipItems(const ROOM_INFO& room)
 		{
 			auto& bridge = GetBridgeObject(item);
 
-			UpdateBridgeItem(item, true);
+			UpdateBridgeItem(item, BridgeUpdateType::Normal);
 			bridge.GetAttractor().DetachAllPlayers();
 		}
 	}
+}
+
+static void FlipRooms(int roomNumber, ROOM_INFO& activeRoom, ROOM_INFO& flippedRoom)
+{
+	RemoveRoomFlipItems(activeRoom);
+
+	// Swap rooms.
+	std::swap(activeRoom, flippedRoom);
+	activeRoom.flippedRoom = flippedRoom.flippedRoom;
+	flippedRoom.flippedRoom = NO_VALUE;
+	activeRoom.itemNumber = flippedRoom.itemNumber;
+	activeRoom.fxNumber = flippedRoom.fxNumber;
+
+	AddRoomFlipItems(activeRoom);
+
+	// Update active room sectors.
+	for (auto& sector : activeRoom.Sectors)
+		sector.RoomNumber = roomNumber;
+
+	// Update flipped room sectors.
+	for (auto& sector : flippedRoom.Sectors)
+		sector.RoomNumber = activeRoom.flippedRoom;
+
+	// Update renderer data.
+	g_Renderer.FlipRooms(roomNumber, activeRoom.flippedRoom);
+}
+
+void ResetRoomData()
+{
+	// Remove all door collisions.
+	for (const auto& item : g_Level.Items)
+	{
+		if (item.ObjectNumber == NO_VALUE || !item.Data.is<DOOR_DATA>())
+			continue;
+
+		auto& doorItem = g_Level.Items[item.Index];
+		auto& door = *(DOOR_DATA*)doorItem.Data;
+
+		if (door.opened)
+			continue;
+
+		OpenThatDoor(&door.d1, &door);
+		OpenThatDoor(&door.d2, &door);
+		OpenThatDoor(&door.d1flip, &door);
+		OpenThatDoor(&door.d2flip, &door);
+		door.opened = true;
+	}
+
+	// Unflip all rooms and remove all bridges and stopper flags.
+	for (int roomNumber = 0; roomNumber < g_Level.Rooms.size(); roomNumber++)
+	{
+		auto& room = g_Level.Rooms[roomNumber];
+		if (room.flippedRoom != NO_VALUE && room.flipNumber != NO_VALUE && FlipStats[room.flipNumber])
+		{
+			auto& flippedRoom = g_Level.Rooms[room.flippedRoom];
+			FlipRooms(roomNumber, room, flippedRoom);
+		}
+
+		for (auto& sector : room.Sectors)
+		{
+			sector.Stopper = false;
+			sector.BridgeItemNumbers.clear();
+		}
+	}
+
+	// Make sure no pathfinding boxes are blocked (either by doors or by other door-like objects).
+	for (int pathfindingBoxID = 0; pathfindingBoxID < g_Level.PathfindingBoxes.size(); pathfindingBoxID++)
+		g_Level.PathfindingBoxes[pathfindingBoxID].flags &= ~BLOCKED;
 }
 
 void DoFlipMap(int group)
@@ -131,7 +201,7 @@ void DoFlipMap(int group)
 		auto& room = g_Level.Rooms[roomNumber];
 
 		// Handle flipmap.
-		if (room.flippedRoom >= 0 && room.flipNumber == group)
+		if (room.flippedRoom != NO_VALUE && room.flipNumber == group)
 		{
 			auto& flippedRoom = g_Level.Rooms[room.flippedRoom];
 
@@ -150,7 +220,7 @@ void DoFlipMap(int group)
 
 			AddRoomFlipItems(room);
 
-			g_Renderer.FlipRooms(roomNumber, room.flippedRoom);
+			FlipRooms(roomNumber, room, flippedRoom);
 
 			// Update active room sectors.
 			for (auto& sector : room.Sectors)
@@ -253,11 +323,11 @@ GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool getVisibilityBox)
 
 	if (getVisibilityBox)
 	{
-		bounds = StaticObjects[mesh.staticNumber].visibilityBox * mesh.scale;
+		bounds = Statics[mesh.staticNumber].visibilityBox * mesh.scale;
 	}
 	else
 	{
-		bounds = StaticObjects[mesh.staticNumber].collisionBox * mesh.scale;
+		bounds = Statics[mesh.staticNumber].collisionBox * mesh.scale;
 	}
 
 	return bounds;
@@ -266,6 +336,9 @@ GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool getVisibilityBox)
 bool IsPointInRoom(const Vector3i& pos, int roomNumber)
 {
 	const auto& room = g_Level.Rooms[roomNumber];
+
+	if (!room.Active())
+		return false;
 
 	if (pos.z >= (room.Position.z + BLOCK(1)) && pos.z <= (room.Position.z + BLOCK(room.ZSize - 1)) &&
 		pos.y <= room.BottomHeight && pos.y > room.TopHeight &&
@@ -277,7 +350,7 @@ bool IsPointInRoom(const Vector3i& pos, int roomNumber)
 	return false;
 }
 
-int FindRoomNumber(const Vector3i& pos, int startRoomNumber)
+int FindRoomNumber(const Vector3i& pos, int startRoomNumber, bool onlyNeighbors)
 {
 	if (startRoomNumber != NO_VALUE && startRoomNumber < g_Level.Rooms.size())
 	{
@@ -285,18 +358,20 @@ int FindRoomNumber(const Vector3i& pos, int startRoomNumber)
 		for (int neighborRoomNumber : room.NeighborRoomNumbers)
 		{
 			const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
-			if (neighborRoomNumber != startRoomNumber && neighborRoom.Active() &&
-				IsPointInRoom(pos, neighborRoomNumber))
+			if (neighborRoomNumber != startRoomNumber && IsPointInRoom(pos, neighborRoomNumber))
 			{
 				return neighborRoomNumber;
 			}
 		}
 	}
 
-	for (int roomNumber = 0; roomNumber < g_Level.Rooms.size(); roomNumber++)
+	if (!onlyNeighbors)
 	{
-		if (IsPointInRoom(pos, roomNumber) && g_Level.Rooms[roomNumber].Active())
-			return roomNumber;
+		for (int roomNumber = 0; roomNumber < g_Level.Rooms.size(); roomNumber++)
+		{
+			if (IsPointInRoom(pos, roomNumber))
+				return roomNumber;
+		}
 	}
 
 	return (startRoomNumber != NO_VALUE) ? startRoomNumber : 0;
@@ -317,7 +392,7 @@ Vector3i GetRoomCenter(int roomNumber)
 		room.Position.z + halfDepth);
 }
 
-static std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchDepth, std::vector<int>& visitedRoomNumbers = std::vector<int>{})
+std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchDepth, std::vector<int>& visitedRoomNumbers)
 {
 	// Invalid room; return empty vector.
 	if (g_Level.Rooms.size() <= roomNumber)

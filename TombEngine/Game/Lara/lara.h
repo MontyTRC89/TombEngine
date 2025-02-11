@@ -47,6 +47,7 @@ constexpr auto LARA_HEIGHT_MONKEY	  = 850;		  // Height in monkey swing states.
 constexpr auto LARA_HEIGHT_TREAD	  = 700;		  // Height in water surface tread states.
 constexpr auto LARA_HEIGHT_STRETCH	  = 870;		  // Height in jump up and edge hang states.
 constexpr auto LARA_HEIGHT_SURFACE	  = 800;		  // Height when resurfacing water.
+constexpr auto LARA_HEIGHT_UNDERWATER = 254;		  // Minimum height underwater.
 constexpr auto LARA_HEADROOM		  = 160;
 
 // Radii
@@ -64,16 +65,13 @@ constexpr auto LARA_DIVE_DEATH_VELOCITY = 134.0f;
 constexpr auto LARA_TERMINAL_VELOCITY	= CLICK(10);
 constexpr auto PLAYER_RELEASE_VELOCITY	= Vector3(0.0f, 1.0f, 2.0f);
 
-// Swim velocities
-constexpr auto LARA_SWIM_VELOCITY_ACCEL		   = 2.0f;
-constexpr auto LARA_SWIM_VELOCITY_DECEL		   = 1.5f;
-constexpr auto LARA_TREAD_VELOCITY_MAX		   = 17.5f;
-constexpr auto LARA_SWIM_VELOCITY_MAX		   = 50.0f;
-constexpr auto LARA_SWIM_INTERTIA_VELOCITY_MIN = 33.5f;
+constexpr auto LARA_SWIM_VELOCITY_ACCEL_COEFF		 = 0.04f;
+constexpr auto LARA_SWIM_VELOCITY_DECEL_COEFF		 = 0.03f;
+constexpr auto LARA_TREAD_VELOCITY_MAX_COEFF		 = 0.35f;
+constexpr auto LARA_SWIM_INTERTIA_VELOCITY_MIN_COEFF = 0.67f;
 
 // Timer values
 constexpr auto PLAYER_POSITION_ADJUST_MAX_TIME = 3 * FPS;  // 3 seconds allowed for position adjustment.
-constexpr auto PLAYER_POSE_TIME				   = 20 * FPS; // 20 seconds to AFK pose.
 constexpr auto PLAYER_RUN_JUMP_TIME			   = 22;	   // Frames to count before a running jump is possible.
 constexpr auto PLAYER_SPRINT_JUMP_TIME		   = 46;	   // Frames to count before a sprint jump is possible.
 
@@ -91,7 +89,7 @@ constexpr auto LARA_STAMINA_CRITICAL  = LARA_STAMINA_MAX / 2;
 
 // Effect node values
 constexpr auto PLAYER_DRIP_NODE_MAX	  = 64.0f;
-constexpr auto PLAYER_BUBBLE_NODE_MAX = 12.0f;
+constexpr auto PLAYER_BUBBLE_NODE_MAX = 8.0f;
 
 constexpr auto STEPUP_HEIGHT		= (int)CLICK(1.5f);
 constexpr auto CRAWL_STEPUP_HEIGHT	= CLICK(1) - 1;
@@ -101,6 +99,7 @@ constexpr auto SHALLOW_WATER_DEPTH	= (int)CLICK(0.5f);
 constexpr auto WADE_WATER_DEPTH		= STEPUP_HEIGHT;
 constexpr auto SWIM_WATER_DEPTH		= CLICK(2.75f);
 constexpr auto SLOPE_DIFFERENCE		= 60;
+constexpr auto SWAMP_GRAVITY_COEFF	= 3.0f;
 
 extern LaraInfo		 Lara;
 extern ItemInfo*	 LaraItem;

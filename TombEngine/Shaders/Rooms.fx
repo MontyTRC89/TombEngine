@@ -7,6 +7,8 @@
 #include "./Shadows.hlsli"
 #include "./ShaderLight.hlsli"
 
+#define ROOM_LIGHT_COEFF 0.7f
+
 cbuffer RoomBuffer : register(b5)
 {
 	int Water;
@@ -135,48 +137,36 @@ PixelShaderOutput PS(PixelShaderInput input)
 	if (AmbientOcclusion == 1)
 	{
 		float2 samplePosition;
-		samplePosition = input.PositionCopy.xy / input.PositionCopy.w;               // perspective divide
+		samplePosition = input.PositionCopy.xy / input.PositionCopy.w; // Perspective divide
 		samplePosition = samplePosition * 0.5f + 0.5f; // transform to range 0.0 - 1.0  
 		samplePosition.y = 1.0f - samplePosition.y;
 		occlusion = pow(SSAOTexture.Sample(SSAOSampler, samplePosition).x, AmbientOcclusionExponent);
 	}
 
-	if (CastShadows)
+	lighting = DoShadow(input.WorldPosition, normal, lighting, -2.5f);
+	lighting = DoBlobShadows(input.WorldPosition, lighting);
+
+	bool onlyPointLights = (NumRoomLights & ~LT_MASK) == LT_MASK_POINT;
+	int numLights = NumRoomLights & LT_MASK;
+
+	for (int i = 0; i < numLights; i++)
 	{
-        if (Light.Type == LT_POINT)
-        {
-            DoPointLightShadow(input.WorldPosition, lighting);
-
-        }
-        else if (Light.Type == LT_SPOT)
-        {
-            DoSpotLightShadow(input.WorldPosition, lighting);
-        }
-	}
-
-    DoBlobShadows(input.WorldPosition, lighting);
-
-	if (doLights)
-	{
-		for (int i = 0; i < NumRoomLights; i++)
+		if (onlyPointLights)
 		{
-			float3 lightPos = RoomLights[i].Position.xyz;
-			float3 color = RoomLights[i].Color.xyz;
-			float radius = RoomLights[i].Out;
+			lighting += DoPointLight(input.WorldPosition, normal, RoomLights[i]) * ROOM_LIGHT_COEFF;
+		}
+		else
+		{
+			// Room dynamic lights can only be spot or point, so we use simplified function for that.
 
-			float3 lightVec = (lightPos - input.WorldPosition);
-			float distance = length(lightVec);
-			if (distance > radius)
-				continue;
+			float isPoint = step(0.5f, RoomLights[i].Type == LT_POINT);
+			float isSpot  = step(0.5f, RoomLights[i].Type == LT_SPOT);
 
-			lightVec = normalize(lightVec);
-			float d = saturate(dot(normal, lightVec ));
-			if (d < 0)
-				continue;
+			float3 pointLight = float3(0.0f, 0.0f, 0.0f);
+			float3 spotLight  = float3(0.0f, 0.0f, 0.0f);
+			DoPointAndSpotLight(input.WorldPosition, normal, RoomLights[i], pointLight, spotLight);
 			
-			float attenuation = pow(((radius - distance) / radius), 2);
-
-			lighting += color * attenuation * d;
+			lighting += pointLight * isPoint * ROOM_LIGHT_COEFF + spotLight  * isSpot * ROOM_LIGHT_COEFF;
 		}
 	}
 

@@ -7,8 +7,9 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
-#include "Specific/level.h"
 #include "Math/Math.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Specific/level.h"
 
 using namespace TEN::Math;
 
@@ -144,13 +145,15 @@ namespace TEN::Entities::TR4
 
 			if (beetle->On)
 			{
+				beetle->StoreInterpolationData();
+
 				auto oldPos = beetle->Pose.Position;
 
 				beetle->Pose.Position.x += beetle->Velocity * phd_sin(beetle->Pose.Orientation.y);
 				beetle->Pose.Position.y += beetle->VerticalVelocity;
 				beetle->Pose.Position.z += beetle->Velocity * phd_cos(beetle->Pose.Orientation.y);
 
-				beetle->VerticalVelocity += GRAVITY;
+				beetle->VerticalVelocity += g_GameFlow->GetSettings()->Physics.Gravity;
 
 				int dx = LaraItem->Pose.Position.x - beetle->Pose.Position.x;
 				int dy = LaraItem->Pose.Position.y - beetle->Pose.Position.y;

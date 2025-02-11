@@ -143,6 +143,11 @@ table LaraInventoryData {
 	small_waterskin: int32;
 	big_waterskin: int32;
 	has_binoculars: bool;
+	has_compass: bool;
+	has_stopwatch: bool;
+	has_diary: bool;
+	has_load: bool;
+	has_save: bool;
 	has_crowbar: bool;
 	has_torch: bool;
 	has_lasersight: bool;
@@ -286,10 +291,16 @@ table PlayerContextData {
 	water_surface_dist: int32;
 }
 
+table CollisionInfoData {
+	last_bridge_item_number: int32;
+	last_bridge_item_pose: Pose;
+}
+
 table Lara {
 	context: PlayerContextData;
 	control: LaraControlData;
 	effect: PlayerEffectData;
+	collision: CollisionInfoData;
 	extra_anim: int32;
 	extra_head_rot: EulerAngles;
 	extra_torso_rot: EulerAngles;
@@ -307,6 +318,11 @@ table Lara {
 	target_entity_number: int32;
 	torch: TorchData;
 	weapons: [CarriedWeaponInfo];
+}
+
+table Camera {
+	position: GameVector;
+	target: GameVector;
 }
 
 table FixedCamera {
@@ -369,6 +385,8 @@ table ParticleInfo {
 	fx_obj: int32;
 	room_number: int32;
 	node_number: int32;
+	target_pos: Vector3;
+	sprite_id: int32;
 }
 
 table Soundtrack {
@@ -383,13 +401,17 @@ table SwarmObjectInfo {
 	flags: int32;
 }
 
+table RopeSegment {
+	segment: Vector3;
+	velocity: Vector3;
+	normalised_segment: Vector3;
+	mesh_segment: Vector3;
+	coord: Vector3;
+}
+
 table Rope {
-	segments: [Vector3];
-	velocities: [Vector3];
-	normalised_segments: [Vector3];
-	mesh_segments: [Vector3];
+	segments: [RopeSegment];
 	position: Vector3;
-	coords: [Vector3];
 	segment_length: int32;
 	active: int32;
 	coiled: int32;
@@ -403,6 +425,7 @@ table Pendulum {
 
 table EventSet {
 	index: int32;
+	statuses: [bool];
 	call_counters: [int32];
 }
 
@@ -459,6 +482,10 @@ table boolTable {
 	scalar: bool;
 }
 
+table timeTable {
+	scalar: int32;
+}
+
 table vec2Table {
 	vec: Vector2;
 }
@@ -484,6 +511,7 @@ union VarUnion {
 	tab: ScriptTable,
 	num: doubleTable,
 	boolean: boolTable,
+	time: timeTable,
 	vec2: vec2Table,
 	vec3: vec3Table,
 	rotation: rotationTable,
@@ -501,7 +529,7 @@ table UnionVec {
 
 table SaveGameHeader {
 	level_name: string;
-	days: int32;
+	level_hash: int32;
 	hours: int32;
 	minutes: int32;
 	seconds: int32;
@@ -514,6 +542,7 @@ table SaveGameStatistics {
 	ammo_hits: int32;
 	ammo_used: int32;
 	medipacks_used: int32;
+	damage_taken: int32;
 	distance: int32;
 	kills: int32;
 	secrets: int32;
@@ -524,6 +553,8 @@ table SaveGame {
 	header: SaveGameHeader;
 	game: SaveGameStatistics;
 	level: SaveGameStatistics;
+	secret_bits: int32;
+	camera: Camera;
 	lara: Lara;
 	rooms: [Room];
 	items: [Item];
@@ -578,6 +609,10 @@ table SaveGame {
 	callbacks_post_load: [string];
 	callbacks_pre_loop: [string];
 	callbacks_post_loop: [string];
+	callbacks_pre_useitem: [string];
+	callbacks_post_useitem: [string];
+	callbacks_pre_freeze: [string];
+	callbacks_post_freeze: [string];
 }
 
 root_type TEN.Save.SaveGame;

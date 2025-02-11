@@ -29,7 +29,7 @@ namespace TEN::Player
 		constexpr auto WALL_HEIGHT_MIN = CLICK(2);
 
 		// 1) Check if ledge jumps are enabled.
-		if (!g_GameFlow->HasLedgeJumps())
+		if (!g_GameFlow->GetSettings()->Animations.LedgeJumps)
 			return false;
 
 		// Ray collision setup at minimum ledge height.
@@ -293,7 +293,7 @@ namespace TEN::Player
 			}
 
 			// 3.2) Test if edge slope is steep.
-			if (abs(attracColl.SlopeAngle) >= STEEP_FLOOR_SLOPE_ANGLE)
+			if (abs(attracColl.SlopeAngle) >= DEFAULT_STEEP_FLOOR_SLOPE_ANGLE)
 				continue;
 
 			// 3.3) Test if connecting edge heading angle is within cornering threshold.
@@ -338,7 +338,7 @@ namespace TEN::Player
 			}
 
 			// 2) Test if edge slope is steep.
-			if (abs(attracColl.SlopeAngle) >= STEEP_FLOOR_SLOPE_ANGLE)
+			if (abs(attracColl.SlopeAngle) >= DEFAULT_STEEP_FLOOR_SLOPE_ANGLE)
 				continue;
 
 			// 3) Test edge angle relation.
@@ -391,7 +391,7 @@ namespace TEN::Player
 						continue;
 
 					// 2) Test if edge slope is steep.
-					if (abs(attracColl2.SlopeAngle) >= STEEP_FLOOR_SLOPE_ANGLE)
+					if (abs(attracColl2.SlopeAngle) >= DEFAULT_STEEP_FLOOR_SLOPE_ANGLE)
 						continue;
 
 					// 3) Test edge angle relation.

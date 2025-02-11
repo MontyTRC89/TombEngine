@@ -407,8 +407,8 @@ namespace TEN::Collision::Point
 	{
 		short slopeAngle = Geometry::GetSurfaceSlopeAngle(GetFloorNormal());
 		short steepSlopeAngle = (GetFloorBridgeItemNumber() != NO_VALUE) ?
-			STEEP_FLOOR_SLOPE_ANGLE :
-			GetBottomSector().GetSurfaceIllegalSlopeAngle(_position.x, _position.z, true);
+			DEFAULT_STEEP_FLOOR_SLOPE_ANGLE :
+			GetBottomSector().GetSurfaceSteepSlopeAngle(_position.x, _position.z, true);
 		
 		return (abs(slopeAngle) >= steepSlopeAngle);
 	}
@@ -417,8 +417,8 @@ namespace TEN::Collision::Point
 	{
 		short slopeAngle = Geometry::GetSurfaceSlopeAngle(GetCeilingNormal(), -Vector3::UnitY);
 		short steepSlopeAngle = (GetCeilingBridgeItemNumber() != NO_VALUE) ?
-			STEEP_CEILING_SLOPE_ANGLE :
-			GetTopSector().GetSurfaceIllegalSlopeAngle(_position.x, _position.z, false);
+			DEFAULT_STEEP_CEILING_SLOPE_ANGLE :
+			GetTopSector().GetSurfaceSteepSlopeAngle(_position.x, _position.z, false);
 		
 		return (abs(slopeAngle) >= steepSlopeAngle);
 	}

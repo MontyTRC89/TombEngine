@@ -54,7 +54,7 @@ namespace TEN::Player
 		auto pointColl = GetPointCollision(item);
 
 		// 2) Test for slippery ceiling slope and check if overhang climb is disabled.
-		if (pointColl.IsSteepCeiling() && !g_GameFlow->HasOverhangClimb())
+		if (pointColl.IsSteepCeiling() && !g_GameFlow->GetSettings()->Animations.OverhangClimb)
 			return true;
 
 		// 3) Assess point collision.
