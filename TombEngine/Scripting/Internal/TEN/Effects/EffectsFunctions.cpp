@@ -213,26 +213,10 @@ namespace TEN::Scripting::Effects
 			part.flags |= SP_WIND;
 	}
 
-	/// Emit a particle.
-	// @function EmitParticle
-	// @tparam particleData The table holding all the particle data. Refer to table particleData for arguments and values.
+	/// Emit a particle with extensive configuration options including animations.
+	// @function EmitAdvancedParticle
+	// @tparam particleData The table holding all the particle data.
 	// 
-	// @table particleData
-	// @tfield Vec3 pos World position.
-	// @tfield Vec3 vel Velocity.
-	// @tfield int spriteID ID of the sprite in the sprite sequence object.
-	// @tfield float gravity Specifies if the particle will fall over time. Positive values ascend, negative values descend. Recommended range: [-1000 and 1000]. __Default: 0__
-	// @tfield float rotVel Rotational velocity in degrees. __Default: 0__
-	// @tfield Color startColor Color at start of life. __Default: Color(255, 255, 255)__
-	// @tfield Color endColor Color to fade toward. This will finish long before the end of the particle's life due to internal math. __Default: Color(255, 255, 255)__
-	// @tfield Effects.BlendID blendMode Render blend mode. __TEN.Effects.BlendID.ALPHABLEND__
-	// @tfield float startSize Size at start of life. __Default: 10__
-	// @tfield float endSize Size at end of life. The particle will linearly shrink or grow toward this size over its lifespan. __Default: 0__
-	// @tfield float life Lifespan in seconds. __Default: 2__
-	// @tfield bool applyDamage Specify if the particle will harm the player on collision. __Default: false__
-	// @tfield bool applyPoison Specify if the particle will poison the player on collision. __Default: false__
-	// @tfield Objects.ObjID spriteSeqID ID of the sprite sequence object. __Default: Objects.ObjID.DEFAULT_SPRITES__
-	// @tfield float startRot Rotation at start of life. __Default: random__
 	// @usage
 	// local particle = {
 	// position = GetMoveableByName("camera_target_6") :GetPosition(), 
@@ -259,14 +243,14 @@ namespace TEN::Scripting::Effects
 	// frameRate = .25,
 	// animationType = TEN.Effects.ParticleAnimationType.LOOP,
 	// }
-	// 	EmitAdvancedParticle(particle)
-	static void EmitAdvancedParticle(sol::table tbl)
+	// EmitAdvancedParticle(particle)
+	static void EmitAdvancedParticle(sol::table particleData)
 	{
 		constexpr auto DEFAULT_START_SIZE = 10.0f;
 		constexpr auto DEFAULT_LIFE = 2.0f;
 		constexpr auto SECS_PER_FRAME = 1.0f / (float)FPS;
 
-		auto convertedSpriteSeqID = tbl.get_or("objectID", ID_DEFAULT_SPRITES);
+		auto convertedSpriteSeqID = particleData.get_or("objectID", ID_DEFAULT_SPRITES);
 		if (!CheckIfSlotExists(convertedSpriteSeqID, "EmitParticle() script function."))
 			return;
 
@@ -274,46 +258,46 @@ namespace TEN::Scripting::Effects
 
 		part.on = true;
 		part.SpriteSeqID = convertedSpriteSeqID;
-		part.SpriteID = tbl.get_or("spriteIndex", 0);
+		part.SpriteID = particleData.get_or("spriteIndex", 0);
 
-		BlendMode bMode = tbl.get_or("blendMode", BlendMode::AlphaBlend);
+		BlendMode bMode = particleData.get_or("blendMode", BlendMode::AlphaBlend);
 		part.blendMode = BlendMode(std::clamp(int(bMode), int(BlendMode::Opaque), int(BlendMode::AlphaBlend)));
 
-		Vec3 pos = tbl["position"];
+		Vec3 pos = particleData["position"];
 		part.x = pos.x;
 		part.y = pos.y;
 		part.z = pos.z;
 		part.roomNumber = FindRoomNumber(Vector3i(pos.x, pos.y, pos.z));
 
-		Vec3 vel = tbl["velocity"];
+		Vec3 vel = particleData["velocity"];
 		part.xVel = short(vel.x * 32);
 		part.yVel = short(vel.y * 32);
 		part.zVel = short(vel.z * 32);
 
-		float rotAdd = tbl.get_or("rotationSpeed", 0.0f);
-		part.rotAng = tbl.get_or("startRotation", TO_DEGREES(Random::GenerateAngle()));
+		float rotAdd = particleData.get_or("rotationSpeed", 0.0f);
+		part.rotAng = particleData.get_or("startRotation", TO_DEGREES(Random::GenerateAngle()));
 		part.rotAdd = byte(ANGLE(rotAdd) >> 4);
 
 		part.sSize =
-			part.size = tbl.get_or("startSize", DEFAULT_START_SIZE);
-		part.dSize = tbl.get_or("endSize", 0.0f);
+			part.size = particleData.get_or("startSize", DEFAULT_START_SIZE);
+		part.dSize = particleData.get_or("endSize", 0.0f);
 		part.scalar = 2;
 
-		part.gravity = (short)std::clamp((float) tbl.get_or("gravity", 0.0f), (float)SHRT_MIN, (float)SHRT_MAX);
-		part.friction = tbl.get_or("friction", 0);
-		part.maxYvel = tbl.get_or("maxYVelocity", 0);
+		part.gravity = (short)std::clamp((float) particleData.get_or("gravity", 0.0f), (float)SHRT_MIN, (float)SHRT_MAX);
+		part.friction = particleData.get_or("friction", 0);
+		part.maxYvel = particleData.get_or("maxYVelocity", 0);
 
-		auto convertedStartColor = tbl.get_or("startColor", ScriptColor(255, 255, 255));
+		auto convertedStartColor = particleData.get_or("startColor", ScriptColor(255, 255, 255));
 		part.sR = convertedStartColor.GetR();
 		part.sG = convertedStartColor.GetG();
 		part.sB = convertedStartColor.GetB();
 
-		auto convertedEndColor = tbl.get_or("endColor", ScriptColor(255, 255, 255));
+		auto convertedEndColor = particleData.get_or("endColor", ScriptColor(255, 255, 255));
 		part.dR = convertedEndColor.GetR();
 		part.dG = convertedEndColor.GetG();
 		part.dB = convertedEndColor.GetB();
 
-		float convertedLife = std::max(0.1f, (float) tbl.get_or("lifetime", DEFAULT_LIFE));
+		float convertedLife = std::max(0.1f, (float) particleData.get_or("lifetime", DEFAULT_LIFE));
 		part.life =
 			part.sLife = (int)round(convertedLife / SECS_PER_FRAME);
 		part.colFadeSpeed = part.life / 2;
@@ -321,32 +305,32 @@ namespace TEN::Scripting::Effects
 
 		part.flags = SP_SCALE | SP_ROTATE | SP_DEF | SP_EXPDEF;
 
-		part.damage = tbl.get_or("damageHit", 2);
+		part.damage = particleData.get_or("damageHit", 2);
 
-		bool convertedApplyPoison = tbl.get_or("poison", false);
+		bool convertedApplyPoison = particleData.get_or("poison", false);
 		if (convertedApplyPoison)
 			part.flags |= SP_POISON;
 
-		bool convertedApplyDamage = tbl.get_or("damage", false);
+		bool convertedApplyDamage = particleData.get_or("damage", false);
 		if (convertedApplyDamage)
 			part.flags |= SP_DAMAGE;
 
-		bool convertedApplyBurn = tbl.get_or("burn", false);
+		bool convertedApplyBurn = particleData.get_or("burn", false);
 		if (convertedApplyBurn)
 			part.flags |= SP_FIRE;
 
-		bool animatedSpr = tbl.get_or("animated", false);
+		bool animatedSpr = particleData.get_or("animated", false);
 		if (animatedSpr)
 		{
-			ParticleAnimationMode applyAnimation = tbl.get_or("animationType", ParticleAnimationMode::None);
-			float applyFramerate = tbl.get_or("frameRate", 1.0f);
+			ParticleAnimationMode applyAnimation = particleData.get_or("animationType", ParticleAnimationMode::None);
+			float applyFramerate = particleData.get_or("frameRate", 1.0f);
 			part.flags |= SP_ANIMATED;
 			part.framerate = applyFramerate;
 			part.animationType = ParticleAnimationMode(std::clamp(int(applyAnimation), int(ParticleAnimationMode::None), int(ParticleAnimationMode::LifeTimeSpread)));
 
 		}
 
-		bool convertedApplyWind = tbl.get_or("wind", true);
+		bool convertedApplyWind = particleData.get_or("wind", true);
 		if (convertedApplyWind)
 		{
 			if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WIND, part.roomNumber))
@@ -523,3 +507,20 @@ namespace TEN::Scripting::Effects
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_EffectID, EFFECT_IDS);
 	}
 }
+
+/// @table particleData
+// @tfield Vec3 pos World position.
+// @tfield Vec3 vel Velocity.
+// @tfield int spriteID ID of the sprite in the sprite sequence object.
+// @tfield float gravity Specifies if the particle will fall over time. Positive values ascend, negative values descend. Recommended range: [-1000 and 1000]. __Default: 0__
+// @tfield float rotVel Rotational velocity in degrees. __Default: 0__
+// @tfield Color startColor Color at start of life. __Default: Color(255, 255, 255)__
+// @tfield Color endColor Color to fade toward. This will finish long before the end of the particle's life due to internal math. __Default: Color(255, 255, 255)__
+// @tfield Effects.BlendID blendMode Render blend mode. __TEN.Effects.BlendID.ALPHABLEND__
+// @tfield float startSize Size at start of life. __Default: 10__
+// @tfield float endSize Size at end of life. The particle will linearly shrink or grow toward this size over its lifespan. __Default: 0__
+// @tfield float life Lifespan in seconds. __Default: 2__
+// @tfield bool applyDamage Specify if the particle will harm the player on collision. __Default: false__
+// @tfield bool applyPoison Specify if the particle will poison the player on collision. __Default: false__
+// @tfield Objects.ObjID spriteSeqID ID of the sprite sequence object. __Default: Objects.ObjID.DEFAULT_SPRITES__
+// @tfield float startRot Rotation at start of life. __Default: random__
