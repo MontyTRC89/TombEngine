@@ -373,7 +373,7 @@ static constexpr char ScriptReserved_GetMouseDisplayPosition[]		= "GetMouseDispl
 
 // Enums
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";
-static constexpr char ScriptReserved_AnimationType[]			= "AnimationType";
+static constexpr char ScriptReserved_ParticleAnimationType[]	= "ParticleAnimationType";
 static constexpr char ScriptReserved_BlendID[]					= "BlendID";
 static constexpr char ScriptReserved_EffectID[]					= "EffectID";
 static constexpr char ScriptReserved_ActionID[]					= "ActionID";

@@ -24,7 +24,7 @@ Constants for animation type constants.
 @table Effects.AnimationType
 */
 
-static const std::unordered_map<std::string, ParticleAnimationMode> ANIMATION_TYPE
+static const std::unordered_map<std::string, ParticleAnimationMode> PARTICLE_ANIMATION_TYPE
 {
 	{ "LOOP", ParticleAnimationMode::LOOP },
 	{ "ONESHOT", ParticleAnimationMode::ONESHOT },
