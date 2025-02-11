@@ -6,6 +6,8 @@
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Specific/clock.h"
 
+using namespace TEN::Scripting::Types;
+
 namespace TEN::Scripting
 {
 	struct AnimSettings

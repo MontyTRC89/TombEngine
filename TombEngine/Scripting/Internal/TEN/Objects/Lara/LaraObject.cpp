@@ -2,30 +2,27 @@
 #include "LaraObject.h"
 
 #include "Game/camera.h"
+#include "Game/effects/item_fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
 #include "Objects/Generic/Object/burning_torch.h"
-#include "Game/effects/item_fx.h"
-#include "Specific/level.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/TEN/Objects/Lara/AmmoTypes.h"
+#include "Specific/level.h"
 
-/***
-Class for extra Lara-only functions.
-Do not try to create an object of this type; use the built-in *Lara* variable instead.
-
-In addition, LaraObject inherits all the functions of @{Objects.Moveable|Moveable}.
-
-@tenclass Objects.LaraObject
-@pragma nostrip
-*/
+/// Class for extra player-only functions.
+// Do not try to create an object of this type. Use the built-in *Lara* variable instead.
+// LaraObject inherits all the functions of @{Objects.Moveable|Moveable}.
+//
+// @tenclass Objects.LaraObject
+// @pragma nostrip
 
 constexpr auto LUA_CLASS_NAME{ ScriptReserved_LaraObject };
 using namespace TEN::Entities::Generic;
 
-/// Set Lara poison
+/// Set player poison.
 // @function LaraObject:SetPoison
 // @tparam[opt] int Poison; maximum value is 128 (default 0)
 // @usage
@@ -35,9 +32,13 @@ void LaraObject::SetPoison(sol::optional<int> potency)
 	auto* lara = GetLaraInfo(_moveable);
 
 	if (potency.has_value())
+	{
 		lara->Status.Poison = std::clamp(potency.value(), 0, (int)LARA_POISON_MAX);
+	}
 	else
+	{
 		lara->Status.Poison = 0;
+	}
 }
 
 /// Get poison potency of Lara

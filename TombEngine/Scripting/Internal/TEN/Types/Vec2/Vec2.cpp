@@ -90,7 +90,7 @@ Vec2::Vec2(const Vector2& vector)
 // @function __tostring
 std::string Vec2::ToString() const
 {
-	return "{ " + std::to_string(x) + ", " + std::to_string(y) + " }";
+	return "{" + std::to_string(x) + ", " + std::to_string(y) + "}";
 }
 
 /// Get a copy of this Vec2 normalized to length 1.

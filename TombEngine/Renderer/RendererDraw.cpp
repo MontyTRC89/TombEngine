@@ -128,27 +128,28 @@ namespace TEN::Renderer
 
 	void Renderer::RenderShadowMap(RendererItem* item, RenderView& renderView)
 	{
-		// Doesn't cast shadow
+		// Doesn't cast shadow.
 		if (_moveableObjects[item->ObjectID].value().ShadowType == ShadowMode::None)
 			return;
 
-		// Only render for Lara if such setting is active
-		if (g_Configuration.ShadowType == ShadowMode::Lara && _moveableObjects[item->ObjectID].value().ShadowType != ShadowMode::Lara)
+		// Only render for player if such setting is active.
+		if (g_Configuration.ShadowType == ShadowMode::Player && _moveableObjects[item->ObjectID].value().ShadowType != ShadowMode::Player)
 			return;
 
-		// No shadow light found
+		// No shadow light found.
 		if (_shadowLight == nullptr)
 			return;
 
-		// Shadow light found but type is incorrect
+		// Shadow light found but type is incorrect.
 		if (_shadowLight->Type != LightType::Point && _shadowLight->Type != LightType::Spot)
 			return;
 
-		// Reset GPU state
+		// Reset GPU state.
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
 
-		auto shadowLightPos = _shadowLight->Hash == 0 ? _shadowLight->Position :
+		auto shadowLightPos = (_shadowLight->Hash == 0) ?
+			_shadowLight->Position :
 			Vector3::Lerp(_shadowLight->PrevPosition, _shadowLight->Position, GetInterpolationFactor());
 
 		for (int step = 0; step < 6; step++)
@@ -185,7 +186,7 @@ namespace TEN::Renderer
 
 			auto projection = Matrix::CreatePerspectiveFieldOfView(90.0f * PI / 180.0f, 1.0f, 16.0f, _shadowLight->Out);
 
-			CCameraMatrixBuffer shadowProjection;
+			auto shadowProjection = CCameraMatrixBuffer{};
 			shadowProjection.ViewProjection = view * projection;
 			_cbCameraMatrices.UpdateData(shadowProjection, _context.Get());
 			BindConstantBufferVS(ConstantBufferRegister::Camera, _cbCameraMatrices.get());
@@ -194,7 +195,7 @@ namespace TEN::Renderer
 
 			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
-			RendererObject& obj = GetRendererObject((GAME_OBJECT_ID)item->ObjectID);
+			auto& obj = GetRendererObject((GAME_OBJECT_ID)item->ObjectID);
 
 			_stItem.World = item->InterpolatedWorld;
 			_stItem.Color = item->Color;
@@ -225,7 +226,7 @@ namespace TEN::Renderer
 					if (bucket.BlendMode != BlendMode::Opaque && bucket.BlendMode != BlendMode::AlphaTest)
 						continue;
 
-					// Draw vertices
+					// Draw vertices.
 					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 
 					_numShadowMapDrawCalls++;
@@ -234,7 +235,7 @@ namespace TEN::Renderer
 
 			if (item->ObjectID == ID_LARA)
 			{
-				RendererRoom& room = _rooms[item->RoomNumber];
+				auto& room = _rooms[item->RoomNumber];
 
 				DrawLaraHolsters(item, &room, renderView, RendererPass::ShadowMap);
 				DrawLaraJoints(item, &room, renderView, RendererPass::ShadowMap);

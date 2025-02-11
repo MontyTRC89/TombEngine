@@ -6,7 +6,9 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ## [Version 1.7.X] (link to release) - yyyy-mm-dd
 
 ### Bug fixes
-* Fixed display pickup numeric string not being interpolated in 60FPS mode.
+* Fixed bridges moving the player when the player is underwater.
+* Fixed trigger triggerer not working.
+* Fixed display pickup numeric string not being interpolated in high framerate mode.
 * Fixed two block platform room portal traversal failing in some cases.
 * Fixed incorrect handling of dynamic light shadows.
 * Fixed ricochet flashes after using explosive weapons.
@@ -16,17 +18,19 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed invisible HK ammo in the inventory.
 * Fixed flickering rat emitter.
 * Fixed player model submerging into the floor while swimming underwater.
+* Fixed custom shatter sounds with custom sound IDs not playing correctly.
 
 ### New Features
-* Added various Translate() methods to Vec2 and Vec3 script objects.
+* Added diary module.
+* Added ability to use keys and puzzle items underwater.
+ - You must update your Lara object: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Lara/TEN_Lara.wad2
 * Added a particle based waterfall emitter object and associated sprite slots.
-- You must use this version: https://github.com/TombEngine/Resources/raw/refs/heads/main/Wad2%20Objects/Interactables/TEN_Waterfall_Emitter.wad2
-
+ - You must use this version: https://github.com/TombEngine/Resources/raw/refs/heads/main/Wad2%20Objects/Interactables/TEN_Waterfall_Emitter.wad2
 
 ### Lua API changes
 * Added Effects.EmitAirBubble() function to spawn air bubbles.
-
 * Added additional arguments for Sprite object slot and starting rotation value for EmitParticle function.
+* Added various Translate() methods to Vec2 and Vec3 script objects.
   
 ## [Version 1.7.1] (https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.4) - 2025-04-01
 
