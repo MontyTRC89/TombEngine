@@ -216,68 +216,72 @@ namespace TEN::Scripting::Effects
 	static void EmitAdvancedParticle(sol::table tbl)
 	{
 
-		GAME_OBJECT_ID effectiveObjectID = tbl.get_or("objectID", ID_DEFAULT_SPRITES);
+		constexpr auto DEFAULT_START_SIZE = 10.0f;
+		constexpr auto DEFAULT_LIFE = 2.0f;
+		constexpr auto SECS_PER_FRAME = 1.0f / (float)FPS;
 
-		// Validate the effective object ID 
-		if (!CheckIfSlotExists(effectiveObjectID, "Particle spawn script function"))
+		static const auto DEFAULT_COLOR = ScriptColor(255, 255, 255);
+
+		auto convertedSpriteSeqID = tbl.get_or("objectID", ID_DEFAULT_SPRITES);
+		if (!CheckIfSlotExists(convertedSpriteSeqID, "EmitParticle() script function."))
 			return;
 
 		int grav = tbl.get_or("gravity", 0);
 
 		grav = std::clamp(grav, -32768, 32767);
 
-		auto* s = GetFreeParticle();
+		auto* part = GetFreeParticle();
 
-		s->on = true;
+		part->on = true;
 
-		s->spriteIndex = Objects[effectiveObjectID].meshIndex + tbl.get_or("spriteIndex", 0);
+		part->spriteIndex = Objects[convertedSpriteSeqID].meshIndex + tbl.get_or("spriteIndex", 0);
 
 		ScriptColor colorStart = tbl.get_or("startColor", ScriptColor(255, 255, 255));
 		ScriptColor colorEnd = tbl.get_or("endColor", ScriptColor(255, 255, 255));
 
-		s->sR = colorStart.GetR();
-		s->sG = colorStart.GetG();
-		s->sB = colorStart.GetB();
+		part->sR = colorStart.GetR();
+		part->sG = colorStart.GetG();
+		part->sB = colorStart.GetB();
 
-		s->dR = colorEnd.GetR();
-		s->dG = colorEnd.GetG();
-		s->dB = colorEnd.GetB();
+		part->dR = colorEnd.GetR();
+		part->dG = colorEnd.GetG();
+		part->dB = colorEnd.GetB();
 
 		//there is no blend mode 7
 		BlendMode bMode = tbl.get_or("blendMode", BlendMode::AlphaBlend);
-		s->blendMode = BlendMode(std::clamp(int(bMode), int(BlendMode::Opaque), int(BlendMode::AlphaBlend)));
+		part->blendMode = BlendMode(std::clamp(int(bMode), int(BlendMode::Opaque), int(BlendMode::AlphaBlend)));
 
 		Vec3 pos = tbl["position"];
 
-		s->x = pos.x;
-		s->y = pos.y;
-		s->z = pos.z;
-		s->roomNumber = FindRoomNumber(Vector3i(pos.x, pos.y, pos.z));
+		part->x = pos.x;
+		part->y = pos.y;
+		part->z = pos.z;
+		part->roomNumber = FindRoomNumber(Vector3i(pos.x, pos.y, pos.z));
 		constexpr float secsPerFrame = 1.0f / (float)FPS;
 
 		float life = tbl.get_or("lifetime", 2.0f);
 		life = std::max(0.1f, life);
 		int lifeInFrames = (int)round(life / secsPerFrame);
 
-		s->life = s->sLife = lifeInFrames;
-		s->colFadeSpeed = lifeInFrames / 2;
-		s->fadeToBlack = lifeInFrames / 3;
+		part->life = part->sLife = lifeInFrames;
+		part->colFadeSpeed = lifeInFrames / 2;
+		part->fadeToBlack = lifeInFrames / 3;
 
 		Vec3 velocity = tbl["velocity"];
 
-		s->xVel = short(velocity.x * 32);
-		s->yVel = short(velocity.y * 32);
-		s->zVel = short(velocity.z * 32);
+		part->xVel = short(velocity.x * 32);
+		part->yVel = short(velocity.y * 32);
+		part->zVel = short(velocity.z * 32);
 
 		int sSize = tbl.get_or("startSize", 10);
 		int eSize = tbl.get_or("endSize",0);
 
-		s->sSize = s->size = float(sSize);
-		s->dSize = float(eSize);
+		part->sSize = part->size = float(sSize);
+		part->dSize = float(eSize);
 
-		s->scalar = 2;
+		part->scalar = 2;
 
-		s->flags = SP_SCALE | SP_ROTATE | SP_DEF | SP_EXPDEF;
+		part->flags = SP_SCALE | SP_ROTATE | SP_DEF | SP_EXPDEF;
 
 		bool applyPoison = tbl.get_or("poison", false);
 		bool applyDamage = tbl.get_or("damage", false);
@@ -285,25 +289,25 @@ namespace TEN::Scripting::Effects
 		bool animatedSpr = tbl.get_or("animated", false);
 
 		if (applyPoison)
-			s->flags |= SP_POISON;
+			part->flags |= SP_POISON;
 
 		if (applyDamage)
-			s->flags |= SP_DAMAGE;
+			part->flags |= SP_DAMAGE;
 
 		if (applyBurn)
-			s->flags |= SP_FIRE;
+			part->flags |= SP_FIRE;
 
-		s->damage = tbl.get_or("damageHit", 2);
+		part->damage = tbl.get_or("damageHit", 2);
 
 		if (animatedSpr)
 		{
 			ParticleAnimationMode applyAnimation = tbl.get_or("animationType", ParticleAnimationMode::LOOP);
 			float applyFramerate = tbl.get_or("frameRate",1.0f);
 			int spriteObj = static_cast<int>(effectiveObjectID);
-			s->flags |= SP_ANIMATED;
-			s->spriteObj = spriteObj;
-			s->framerate = applyFramerate;
-			s->animationType = ParticleAnimationMode(std::clamp(int(applyAnimation), int(ParticleAnimationMode::LOOP), int(ParticleAnimationMode::LIFETIMESPREAD)));
+			part->flags |= SP_ANIMATED;
+			part->spriteObj = spriteObj;
+			part->framerate = applyFramerate;
+			part->animationType = ParticleAnimationMode(std::clamp(int(applyAnimation), int(ParticleAnimationMode::LOOP), int(ParticleAnimationMode::LIFETIMESPREAD)));
 
 		}
 
@@ -311,18 +315,18 @@ namespace TEN::Scripting::Effects
 
 		if (applyWind)
 		{
-			if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WIND, s->roomNumber))
-				s->flags |= SP_WIND;
+			if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WIND, part->roomNumber))
+				part->flags |= SP_WIND;
 		}
 		float rotAdd = tbl.get_or("rotationSpeed", 0.0f);
 
-		s->rotAng = tbl.get_or("startRotation", (GetRandomControl() & 0x0FFF));
-		s->rotAdd = byte(ANGLE(rotAdd) >> 4);
+		part->rotAng = tbl.get_or("startRotation", (GetRandomControl() & 0x0FFF));
+		part->rotAdd = byte(ANGLE(rotAdd) >> 4);
 
-		s->friction = tbl.get_or("friction", 0);
-		s->maxYvel = tbl.get_or("maxYVelocity",0);
+		part->friction = tbl.get_or("friction", 0);
+		part->maxYvel = tbl.get_or("maxYVelocity",0);
 
-		s->gravity = grav;
+		part->gravity = grav;
 	}
 	
 /***Emit a shockwave, similar to that seen when a harpy projectile hits something.

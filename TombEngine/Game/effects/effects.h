@@ -170,7 +170,6 @@ struct Particle
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
   
 	int damage;
-	int spriteObj;
 	float framerate;
 	ParticleAnimationMode animationType;
 
