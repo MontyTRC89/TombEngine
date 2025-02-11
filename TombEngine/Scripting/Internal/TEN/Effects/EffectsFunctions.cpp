@@ -231,23 +231,32 @@ namespace TEN::Scripting::Effects
 	// @tparam Objects.ObjID spriteSeqID ID of the sprite sequence object. __Default: Objects.ObjID.DEFAULT_SPRITES__
 	// @tparam float startRot Rotation at start of life. __Default: random__
 	// @usage
-	// EmitParticle(
-	// 	pos,
-	// 	Vec3(math.random(), math.random(), math.random()),
-	// 	22, -- spriteID
-	// 	0, -- gravity
-	// 	-2, -- rotVel
-	// 	Color(255, 0, 0), -- startColor
-	// 	Color(0,  255, 0), -- endColor
-	// 	TEN.Effects.BlendID.ADDITIVE, -- blendMode
-	// 	15, -- startSize
-	// 	50, -- endSize
-	// 	20, -- life
-	// 	false, -- applyDamage
-	// 	true, -- applyPoison
-	//  Objects.ObjID.DEFAULT_SPRITES, -- spriteSeqID
-	//  180 -- startRot
-	//  )
+	// local particle = {
+	// position = GetMoveableByName("camera_target_6") :GetPosition(), 
+	// velocity = Vec3(0, 0, 10),
+	// objectID = TEN.Objects.ObjID.CUSTOM_BAR_GRAPHIC,
+	// spriteIndex = 0,
+	// lifetime = 10,
+	// maxYVelocity = 0,
+	// gravity = 0,
+	// friction = 10,
+	// startRotation = 0,
+	// rotationSpeed = 0,
+	// startSize = 80,
+	// endSize = 80,
+	// wind = false,
+	// startColor = TEN.Color(128, 128, 128),
+	// endColor = TEN.Color(128, 128, 128),
+	// blendMode = TEN.Effects.BlendID.ADDITIVE,
+	// damage = true,
+	// poison = false,
+	// burn = false,
+	// damageHit = 80,
+	// animated = true,
+	// frameRate = .25,
+	// animationType = TEN.Effects.ParticleAnimationType.LOOP,
+	// }
+	// 	EmitAdvancedParticle(particle)
 	static void EmitAdvancedParticle(sol::table tbl)
 	{
 		constexpr auto DEFAULT_START_SIZE = 10.0f;
