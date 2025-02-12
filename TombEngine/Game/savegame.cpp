@@ -1045,16 +1045,20 @@ const std::vector<byte> SaveGame::Build()
 		{
 			auto& currVolume = room->TriggerVolumes[j];
 
-			std::vector<flatbuffers::Offset<Save::VolumeState>> queue;
+			auto queue = std::vector<flatbuffers::Offset<Save::VolumeState>>{};
 			for (int k = 0; k < currVolume.StateQueue.size(); k++)
 			{
 				auto& entry = currVolume.StateQueue[k];
 
 				int activator = NO_VALUE;
-				if (std::holds_alternative<short>(entry.Activator))
-					activator = std::get<short>(entry.Activator);
+				if (std::holds_alternative<int>(entry.Activator))
+				{
+					activator = std::get<int>(entry.Activator);
+				}
 				else
+				{
 					continue;
+				}
 
 				Save::VolumeStateBuilder volstate{ fbb };
 				volstate.add_status((int)entry.Status);

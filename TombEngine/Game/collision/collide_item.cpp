@@ -895,7 +895,8 @@ void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, PointCollisionData&
 		auto deltaPose = Pose(deltaPos, deltaOrient);
 
 		// Item is grounded and bridge position changed; set shift.
-		if (deltaPose != Pose::Zero && !item.Animation.IsAirborne)
+		if (deltaPose != Pose::Zero && !item.Animation.IsAirborne &&
+			item.IsLara() ? (GetLaraInfo(item).Control.WaterStatus != WaterStatus::Underwater && GetLaraInfo(item).Control.WaterStatus != WaterStatus::FlyCheat) : true)
 		{
 			const auto& bridgePos = bridgeItem.Pose.Position;
 

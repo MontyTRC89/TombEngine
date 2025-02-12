@@ -521,7 +521,7 @@ enum LaraAnim
 	LA_CRAWL_BACK_TO_IDLE_RIGHT = 277,								// Crawl back > crawl idle, right foot first
 	LA_REMOVE_PUZZLE = 278,											// Remove puzzle item > idle
 	LA_CRAWL_BACK_TO_IDLE_LEFT = 279,								// Crawl back > crawl idle, left foot first
-	LA_CRAWL_BACK_TO_IDLE_LEFT_END = 280,							// Unused.
+	LA_REMOVE_PUZZLE_UNDERWATER = 280,								// Remove puzzle item > underwater idle
 	LA_CRAWL_TURN_LEFT_TO_IDLE_EARLY = 281,							// Crawl rotate left > crawl idle, early opportunity
 	LA_CRAWL_TURN_RIGHT_TO_IDLE_EARLY = 282,						// Crawl rotate right > crawl idle, early opportunity
 	LA_MONKEY_TURN_LEFT_TO_IDLE_EARLY = 283,						// Turn left on monkey swing > monkey swing idle, 1st opportunity
@@ -829,7 +829,6 @@ enum LaraAnim
 	NUM_LARA_ANIMS
 
 	// TRASHED ANIMS (reuse slots before going any higher and remove entries from this list when you do):
-	// 280,
 	// 368, 370,
 	// 442
 };

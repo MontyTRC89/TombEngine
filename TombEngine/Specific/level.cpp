@@ -1474,7 +1474,7 @@ bool LoadLevel(const std::string& path, bool partial)
 		InitializeNeighborRoomList();
 		GetCarriedItems();
 		GetAIPickups();
-		g_GameScriptEntities->AssignLara();
+		g_GameScriptEntities->AssignPlayer();
 		UpdateProgress(90, partial);
 
 		if (!partial)

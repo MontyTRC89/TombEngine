@@ -38,6 +38,7 @@ using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Math;
+using namespace TEN::Scripting::Types;
 
 namespace TEN::Scripting::Effects
 {

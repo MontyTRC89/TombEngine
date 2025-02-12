@@ -708,9 +708,7 @@ int GlobalItemReplace(short search, GAME_OBJECT_ID replace)
 
 const std::string& GetObjectName(GAME_OBJECT_ID objectID)
 {
-	static const auto UNKNOWN_OBJECT = std::string("UNKNOWN_OBJECT");
-
-	for (const auto& [name, id] : OBJECT_ID_NAME_MAP)
+	for (auto it = GAME_OBJECT_IDS.begin(); it != GAME_OBJECT_IDS.end(); ++it)
 	{
 		if (id == objectID)
 			return name;
