@@ -67,18 +67,6 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
 
-	auto& room = g_Level.Rooms[item->RoomNumber];
-	for (auto& staticObj : room.mesh)
-	{
-		if (IsClicked(In::Action))
-			staticObj.Transform.Scale.z += 0.1f;
-		else if (IsClicked(In::Walk))
-			staticObj.Transform.Scale.z -= 0.1f;
-		staticObj.Dirty = true;
-
-
-	}
-
 	// Alert nearby creatures.
 	if (player.Control.Weapon.HasFired)
 	{

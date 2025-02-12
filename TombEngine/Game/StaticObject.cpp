@@ -4,38 +4,42 @@
 
 //namespace TEN
 //{
-	GameBoundingBox MESH_INFO::GetAabb(bool getVisibilityAabb) const
+	GameBoundingBox MESH_INFO::GetVisibilityAabb() const
 	{
-		static auto bounds = GameBoundingBox();
+		auto aabb = Statics[ObjectId].visibilityBox;
+		ScaleAabb(aabb);
+		return aabb;
+	}
 
-		if (getVisibilityAabb)
-		{
-			bounds = Statics[ObjectId].visibilityBox;
-		}
-		else
-		{
-			bounds = Statics[ObjectId].collisionBox;
-		}
+	GameBoundingBox MESH_INFO::GetCollisionAabb() const
+	{
+		auto aabb = Statics[ObjectId].collisionBox;
+		ScaleAabb(aabb);
+		return aabb;
+	}
 
-		auto center = bounds.GetCenter();
-		auto extents = bounds.GetExtents();
+	void MESH_INFO::ScaleAabb(GameBoundingBox& aabb) const
+	{
+		// Calculate scaled parameters.
+		auto center = aabb.GetCenter();
+		auto extents = aabb.GetExtents();
 		auto scaledExtents = extents * Transform.Scale;
 		auto scaledOffset = (center * Transform.Scale) - center;
 
-		bounds.X1 = (center.x - scaledExtents.x) + scaledOffset.x;
-		bounds.X2 = (center.x + scaledExtents.x) + scaledOffset.x;
-		bounds.Y1 = (center.y - scaledExtents.y) + scaledOffset.y;
-		bounds.Y2 = (center.y + scaledExtents.y) + scaledOffset.y;
-		bounds.Z1 = (center.z - scaledExtents.z) + scaledOffset.z;
-		bounds.Z2 = (center.z + scaledExtents.z) + scaledOffset.z;
-		return bounds;
+		// Scale AABB.
+		aabb.X1 = (center.x - scaledExtents.x) + scaledOffset.x;
+		aabb.X2 = (center.x + scaledExtents.x) + scaledOffset.x;
+		aabb.Y1 = (center.y - scaledExtents.y) + scaledOffset.y;
+		aabb.Y2 = (center.y + scaledExtents.y) + scaledOffset.y;
+		aabb.Z1 = (center.z - scaledExtents.z) + scaledOffset.z;
+		aabb.Z2 = (center.z + scaledExtents.z) + scaledOffset.z;
 	}
 
-	GameBoundingBox& GetBoundsAccurate(const MESH_INFO& staticObj, bool getVisibilityBox)
+	GameBoundingBox& GetBoundsAccurate(const MESH_INFO& staticObj, bool getVisibilityAabb)
 	{
-		static auto bounds = GameBoundingBox();
+		static auto aabb = GameBoundingBox();
 
-		bounds = staticObj.GetAabb(getVisibilityBox);
-		return bounds;
+		aabb = getVisibilityAabb ? staticObj.GetVisibilityAabb() : staticObj.GetCollisionAabb();
+		return aabb;
 	}
 //}

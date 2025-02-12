@@ -19,6 +19,9 @@ enum GAME_OBJECT_ID : short;
 	// class StaticObject
 	struct MESH_INFO
 	{
+	public:
+		// Fields
+
 		std::string	   Name		= {};
 		//int			   Id		= 0; // TODO: Store static ID.
 		GAME_OBJECT_ID ObjectId = GAME_OBJECT_ID::ID_NO_OBJECT;
@@ -31,8 +34,17 @@ enum GAME_OBJECT_ID : short;
 		int	 Flags	   = 0;
 		bool Dirty	   = false;
 
-		GameBoundingBox GetAabb(bool getVisibilityAabb) const; // TODO: Use DX BoundingBox natively.
+		// Getters
+
+		GameBoundingBox GetVisibilityAabb() const; // TODO: Use DX BoundingBox natively.
+		GameBoundingBox GetCollisionAabb() const; // TODO: Use DX BoundingBox natively.
+
+	private:
+		// Helpers
+
+		void ScaleAabb(GameBoundingBox& aabb) const;
 	};
 
-	GameBoundingBox& GetBoundsAccurate(const MESH_INFO& staticObj, bool getVisibilityBox);
+	// TODO: Deprecate.
+	GameBoundingBox& GetBoundsAccurate(const MESH_INFO& staticObj, bool getVisibilityAabb);
 //}
