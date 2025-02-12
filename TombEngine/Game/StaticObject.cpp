@@ -1,4 +1,5 @@
 #include "framework.h"
+#include "Game/StaticObject.h"
 
 #include "Game/Setup.h"
 
