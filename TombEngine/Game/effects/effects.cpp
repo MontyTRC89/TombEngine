@@ -30,6 +30,7 @@
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Blood;
@@ -437,6 +438,12 @@ void UpdateSparks()
 				ParticleAnimationMode animationType = static_cast<ParticleAnimationMode>(spark.animationType);
 				GAME_OBJECT_ID spriteObject = static_cast<GAME_OBJECT_ID>(spark.SpriteSeqID);
 				SetAdvancedSpriteSequence(spark, spriteObject,  animationType, spark.framerate);
+			}
+
+			if (spark.flags & SP_LIGHT)
+			{
+
+				SpawnDynamicPointLight(Vector3(spark.x, spark.y, spark.z), ScriptColor(spark.r, spark.g, spark.b), spark.lightRadius, false, GetHash(std::string()));
 			}
 
 			if ((spark.flags & SP_FIRE && LaraItem->Effect.Type == EffectType::None) ||

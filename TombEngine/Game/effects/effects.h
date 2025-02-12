@@ -43,6 +43,7 @@ enum SpriteEnumFlag
 	SP_POISON	  = (1 << 14),
 	SP_COLOR	  = (1 << 15),
 	SP_ANIMATED	  = (1 << 16),
+	SP_LIGHT	  = (1 << 17),
 };
 
 // Used by Particle.nodeNumber.
@@ -173,6 +174,9 @@ struct Particle
 	int damage;
 	float framerate;
 	ParticleAnimationMode animationType;
+
+	float lightRadius;
+	float lightFlicker;
 
 	int PrevX;
 	int PrevY;
