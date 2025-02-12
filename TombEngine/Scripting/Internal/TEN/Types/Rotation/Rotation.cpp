@@ -71,6 +71,7 @@ namespace TEN::Scripting
 	}
 
 	/// Get the linearly interpolated Rotation between this Rotation and the input Rotation according to the input alpha.
+	// @function Lerp
 	// @tparam Rotation rot Interpolation target.
 	// @tparam float alpha Interpolation alpha in the range [0, 1].
 	// @treturn Rotation Linearly interpolated rotation.
