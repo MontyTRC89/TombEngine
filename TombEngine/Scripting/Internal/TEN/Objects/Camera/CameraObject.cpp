@@ -16,8 +16,8 @@ Basic cameras that can point at Lara or at a CAMERA_TARGET.
 @pragma nostrip
 */
 
-static auto IndexError = index_error_maker(CameraObject, ScriptReserved_Camera);
-static auto NewIndexError = newindex_error_maker(CameraObject, ScriptReserved_Camera);
+static auto IndexError = IndexErrorMaker(CameraObject, ScriptReserved_Camera);
+static auto NewIndexError = NewIndexErrorMaker(CameraObject, ScriptReserved_Camera);
 
 CameraObject::CameraObject(LevelCameraInfo & ref) : m_camera{ref}
 {};

@@ -211,7 +211,7 @@ float Vec3::Length() const
 // @function __tostring
 std::string Vec3::ToString() const
 {
-	return "{ " + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + " }";
+	return "{" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + "}";
 }
 
 Vec3 Vec3::Add(const Vec3& vector0, const Vec3& vector1)

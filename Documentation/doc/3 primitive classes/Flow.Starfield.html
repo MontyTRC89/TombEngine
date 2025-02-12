@@ -82,6 +82,7 @@
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
+  <li>    <a href="../4 enums/Objects.HandStatus.html">Objects.HandStatus</a></li>
   <li>    <a href="../4 enums/Objects.WeaponType.html">Objects.WeaponType</a></li>
   <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
@@ -97,6 +98,7 @@
 </ul>
 <h2>5 Lua utility modules</h2>
 <ul class="nowrap">
+  <li>    <a href="../5 lua utility modules/Diary.html">Diary</a></li>
   <li>    <a href="../5 lua utility modules/EventSequence.html">EventSequence</a></li>
   <li>    <a href="../5 lua utility modules/Timer.html">Timer</a></li>
   <li>    <a href="../5 lua utility modules/Type.html">Type</a></li>
@@ -107,7 +109,7 @@
 <div id="content">
 
 <h1>Primitive Class <code>Flow.Starfield</code></h1>
-<p>Represents a starfield.</p>
+<p>Represents a starfield in the sky.</p>
 <p>
 
 </p>
@@ -124,44 +126,44 @@
 	<td class="summary">Create a starfield object with stars and meteors.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Starfield:GetStarsEnabled">Starfield:GetStarsEnabled()</a></td>
-	<td class="summary">Get the starfield's enabled status of stars.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Starfield:GetMeteorsEnabled">Starfield:GetMeteorsEnabled()</a></td>
-	<td class="summary">Get the starfield's enabled status of meteors.</td>
-	</tr>
-	<tr>
 	<td class="name" ><a href="#Starfield:GetStarCount">Starfield:GetStarCount()</a></td>
-	<td class="summary">Get the starfield's number of stars.</td>
+	<td class="summary">Get this starfield's number of stars.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Starfield:GetMeteorCount">Starfield:GetMeteorCount()</a></td>
-	<td class="summary">Get the starfield's number of meteors.</td>
+	<td class="summary">Get this starfield's number of meteors.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Starfield:GetMeteorSpawnDensity">Starfield:GetMeteorSpawnDensity()</a></td>
-	<td class="summary">Get the starfield's meteor spawn density.</td>
+	<td class="summary">Get this starfield's meteor spawn density.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Starfield:GetMeteorVelocity">Starfield:GetMeteorVelocity()</a></td>
-	<td class="summary">Get the starfield's meteor velocity.</td>
+	<td class="summary">Get this starfield's meteor velocity.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Starfield:GetStarsEnabled">Starfield:GetStarsEnabled()</a></td>
+	<td class="summary">Get this starfield's stars enabled status.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Starfield:GetMeteorsEnabled">Starfield:GetMeteorsEnabled()</a></td>
+	<td class="summary">Get this starfield's meteors enabled status.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Starfield:SetStarCount">Starfield:SetStarCount(New)</a></td>
-	<td class="summary">Set the starfield's number of stars (6000 max).</td>
+	<td class="summary">Set this starfield's number of stars.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Starfield:SetMeteorCount">Starfield:SetMeteorCount(New)</a></td>
-	<td class="summary">Set the starfield's number of meteors (100 max).</td>
+	<td class="summary">Set this starfield's number of meteors.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Starfield:SetMeteorSpawnDensity">Starfield:SetMeteorSpawnDensity(New)</a></td>
-	<td class="summary">Set the starfield's meteor spawn density.</td>
+	<td class="summary">Set this starfield's meteor spawn density.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Starfield:SetMeteorVelocity">Starfield:SetMeteorVelocity(New)</a></td>
-	<td class="summary">Set the starfield's meteor velocity.</td>
+	<td class="summary">Set this starfield's meteor velocity.</td>
 	</tr>
 </table>
 
@@ -177,7 +179,7 @@
     <strong>Starfield(starCount)</strong>
     </dt>
     <dd>
-    Create a starfield object with only stars. ()
+    Create a starfield object with only stars.
 
 
 
@@ -205,7 +207,7 @@
     <strong>Starfield(starCount, meteorCount)</strong>
     </dt>
     <dd>
-    Create a starfield object with stars and meteors. ()
+    Create a starfield object with stars and meteors.
 
 
 
@@ -213,11 +215,11 @@
     <ul>
         <li><span class="parameter">starCount</span>
             <span class="types"><span class="type">int</span></span>
-         Star count (6000 max).
+         Star count. <strong>Max: 6000</strong>
         </li>
         <li><span class="parameter">meteorCount</span>
             <span class="types"><span class="type">int</span></span>
-         Meteor count (100 max).
+         Meteor count. <strong>Max: 100</strong>
         </li>
     </ul>
 
@@ -233,53 +235,11 @@
 
 </dd>
     <dt>
-    <a name = "Starfield:GetStarsEnabled"></a>
-    <strong>Starfield:GetStarsEnabled()</strong>
-    </dt>
-    <dd>
-    Get the starfield's enabled status of stars. ()
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">bool</span></span>
-        Stars enabled status.
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Starfield:GetMeteorsEnabled"></a>
-    <strong>Starfield:GetMeteorsEnabled()</strong>
-    </dt>
-    <dd>
-    Get the starfield's enabled status of meteors. ()
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">bool</span></span>
-        Meteors enabled status.
-    </ol>
-
-
-
-
-</dd>
-    <dt>
     <a name = "Starfield:GetStarCount"></a>
     <strong>Starfield:GetStarCount()</strong>
     </dt>
     <dd>
-    Get the starfield's number of stars. ()
+    Get this starfield's number of stars.
 
 
 
@@ -300,7 +260,7 @@
     <strong>Starfield:GetMeteorCount()</strong>
     </dt>
     <dd>
-    Get the starfield's number of meteors. ()
+    Get this starfield's number of meteors.
 
 
 
@@ -321,7 +281,7 @@
     <strong>Starfield:GetMeteorSpawnDensity()</strong>
     </dt>
     <dd>
-    Get the starfield's meteor spawn density. ()
+    Get this starfield's meteor spawn density.
 
 
 
@@ -342,7 +302,7 @@
     <strong>Starfield:GetMeteorVelocity()</strong>
     </dt>
     <dd>
-    Get the starfield's meteor velocity. ()
+    Get this starfield's meteor velocity.
 
 
 
@@ -359,11 +319,53 @@
 
 </dd>
     <dt>
+    <a name = "Starfield:GetStarsEnabled"></a>
+    <strong>Starfield:GetStarsEnabled()</strong>
+    </dt>
+    <dd>
+    Get this starfield's stars enabled status.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        Stars enabled status. <strong>true: enabled</strong>, <strong>false: disabled</strong>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Starfield:GetMeteorsEnabled"></a>
+    <strong>Starfield:GetMeteorsEnabled()</strong>
+    </dt>
+    <dd>
+    Get this starfield's meteors enabled status.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        Meteors enabled status. <strong>true: enabled</strong>, <strong>false: disabled</strong>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
     <a name = "Starfield:SetStarCount"></a>
     <strong>Starfield:SetStarCount(New)</strong>
     </dt>
     <dd>
-    Set the starfield's number of stars (6000 max). (int)
+    Set this starfield's number of stars.
 
 
 
@@ -371,7 +373,7 @@
     <ul>
         <li><span class="parameter">New</span>
             <span class="types"><span class="type">int</span></span>
-         count.
+         star count.
         </li>
     </ul>
 
@@ -385,7 +387,7 @@
     <strong>Starfield:SetMeteorCount(New)</strong>
     </dt>
     <dd>
-    Set the starfield's number of meteors (100 max). (int)
+    Set this starfield's number of meteors.
 
 
 
@@ -393,7 +395,7 @@
     <ul>
         <li><span class="parameter">New</span>
             <span class="types"><span class="type">int</span></span>
-         count.
+         meteor count.
         </li>
     </ul>
 
@@ -407,7 +409,7 @@
     <strong>Starfield:SetMeteorSpawnDensity(New)</strong>
     </dt>
     <dd>
-    Set the starfield's meteor spawn density. (int)
+    Set this starfield's meteor spawn density.
 
 
 
@@ -415,7 +417,7 @@
     <ul>
         <li><span class="parameter">New</span>
             <span class="types"><span class="type">int</span></span>
-         spawn density.
+         meteor spawn density.
         </li>
     </ul>
 
@@ -429,15 +431,15 @@
     <strong>Starfield:SetMeteorVelocity(New)</strong>
     </dt>
     <dd>
-    Set the starfield's meteor velocity. (float)
+    Set this starfield's meteor velocity.
 
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">New</span>
-            <span class="types"><span class="type">int</span></span>
-         velocity.
+            <span class="types"><span class="type">float</span></span>
+         meteor velocity.
         </li>
     </ul>
 

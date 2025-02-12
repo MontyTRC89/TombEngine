@@ -13,14 +13,16 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Scripting::Types;
+
 /// Room object.
 // @tenclass Objects.Room
 // @pragma nostrip
 
 //namespace TEN::Scripting
 //{
-	static auto IndexError = index_error_maker(Room, ScriptReserved_Volume);
-	static auto NewIndexError = newindex_error_maker(Room, ScriptReserved_Volume);
+	static auto IndexError = IndexErrorMaker(Room, ScriptReserved_Volume);
+	static auto NewIndexError = NewIndexErrorMaker(Room, ScriptReserved_Volume);
 
 	Room::Room(ROOM_INFO& room) :
 		_room(room)
