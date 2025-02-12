@@ -1,18 +1,18 @@
 #include "framework.h"
-#include "Specific/Worker.h"
+#include "Specific/Parallel.h"
 
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 
 namespace TEN::Utils
 {
-	WorkerController& g_Worker = WorkerController::Get();
+	ParallelTaskManager& g_Parallel = ParallelTaskManager::Get();
 
-	WorkerController::WorkerController()
+	ParallelTaskManager::ParallelTaskManager()
 	{
 		_deinitialize = false;
 	}
 
-	WorkerController::~WorkerController()
+	ParallelTaskManager::~ParallelTaskManager()
 	{
 		// LOCK: Restrict shutdown flag access.
 		{
@@ -41,23 +41,23 @@ namespace TEN::Utils
 		}
 	}
 
-	WorkerController& WorkerController::Get()
+	ParallelTaskManager& ParallelTaskManager::Get()
 	{
-		static auto instance = WorkerController();
+		static auto instance = ParallelTaskManager();
 		return instance;
 	}
 
-	unsigned int WorkerController::GetThreadCount() const
+	unsigned int ParallelTaskManager::GetThreadCount() const
 	{
 		return (unsigned int)_threads.size();
 	}
 
-	unsigned int WorkerController::GetCoreCount() const
+	unsigned int ParallelTaskManager::GetCoreCount() const
 	{
 		return std::max(std::thread::hardware_concurrency(), 1u);
 	}
 
-	void WorkerController::Initialize()
+	void ParallelTaskManager::Initialize()
 	{
 		// Reserve threads.
 		unsigned int threadCount = g_GameFlow->GetSettings()->System.Multithreaded ? (GetCoreCount() * 2) : 1;
@@ -65,15 +65,15 @@ namespace TEN::Utils
 
 		// Create threads.
 		for (int i = 0; i < threadCount; i++)
-			_threads.push_back(std::thread(&WorkerController::Worker, this));
+			_threads.push_back(std::thread(&ParallelTaskManager::Worker, this));
 	}
 
-	std::future<void> WorkerController::AddTask(const WorkerTask& task)
+	std::future<void> ParallelTaskManager::AddTask(const ParallelTask& task)
 	{
-		return AddTasks(WorkerTaskGroup{ task });
+		return AddTasks(ParallelTaskGroup{ task });
 	}
 
-	std::future<void> WorkerController::AddTasks(const WorkerTaskGroup& tasks)
+	std::future<void> ParallelTaskManager::AddTasks(const ParallelTaskGroup& tasks)
 	{
 		// HEAP ALLOC: Create counter and promise.
 		auto counter = std::make_shared<std::atomic<int>>();
@@ -92,12 +92,12 @@ namespace TEN::Utils
 		return promise->get_future();
 	}
 
-	std::future<void> WorkerController::AddTasks(int elementCount, const std::function<void(int, int)>& splitTask)
+	std::future<void> ParallelTaskManager::AddTasks(int elementCount, const std::function<void(int, int)>& splitTask)
 	{
 		// TODO: Make this a configuration option?
 		constexpr auto SERIAL_UNIT_COUNT_MAX = 32;
 
-		auto tasks = WorkerTaskGroup{};
+		auto tasks = ParallelTaskGroup{};
 
 		// Process in parallel.
 		if (g_GameFlow->GetSettings()->System.Multithreaded &&
@@ -125,11 +125,11 @@ namespace TEN::Utils
 		return AddTasks(tasks);
 	}
 
-	void WorkerController::Worker()
+	void ParallelTaskManager::Worker()
 	{
 		while (true)
 		{
-			auto task = WorkerTask();
+			auto task = ParallelTask();
 
 			// LOCK: Restrict task queue access.
 			{
@@ -151,7 +151,7 @@ namespace TEN::Utils
 		}
 	}
 
-	void WorkerController::AddTask(const WorkerTask& task, std::shared_ptr<std::atomic<int>> counter, std::shared_ptr<std::promise<void>> promise)
+	void ParallelTaskManager::AddTask(const ParallelTask& task, std::shared_ptr<std::atomic<int>> counter, std::shared_ptr<std::promise<void>> promise)
 	{
 		// Increment counter for task group.
 		counter->fetch_add(1, std::memory_order_relaxed);
@@ -160,7 +160,7 @@ namespace TEN::Utils
 		_tasks.push([this, task, counter, promise]() { HandleTask(task, *counter, *promise); });
 	}
 
-	void WorkerController::HandleTask(const WorkerTask& task, std::atomic<int>& counter, std::promise<void>& promise)
+	void ParallelTaskManager::HandleTask(const ParallelTask& task, std::atomic<int>& counter, std::promise<void>& promise)
 	{
 		// Execute task.
 		if (task)

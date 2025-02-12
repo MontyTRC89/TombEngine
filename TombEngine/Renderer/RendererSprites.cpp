@@ -3,7 +3,7 @@
 
 #include "Renderer/Structures/RendererSpriteBucket.h"
 #include "Renderer/Renderer.h"
-#include "Specific/Worker.h"
+#include "Specific/Parallel.h"
 
 using namespace TEN::Renderer::Structures;
 
@@ -314,7 +314,7 @@ namespace TEN::Renderer
 					_stInstancedSpriteBuffer.Sprites[i].UV[1].w = spriteToDraw.Sprite->UV[3].y;
 				}
 			};
-			g_Worker.AddTasks((int)spriteBucket.SpritesToDraw.size(), prepareSprites).wait();
+			g_Parallel.AddTasks((int)spriteBucket.SpritesToDraw.size(), prepareSprites).wait();
 
 			BindTexture(TextureRegister::ColorMap, spriteBucket.Sprite->Texture, SamplerStateRegister::LinearClamp);
 			_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
