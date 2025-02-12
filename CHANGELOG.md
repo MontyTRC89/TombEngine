@@ -49,6 +49,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed gravity being applied when vaulting on the same frame as the player lands.
 
 ### New Features
+* Added multithreading setting to flow system settings.
 * Added realtime shader reloading in debug mode by pressing F9 key.
 * Added load, save, stopwatch and compass as a functional pick-up items with ability to add or remove them from inventory.
 * Increased particle limit from 1024 to 4096.

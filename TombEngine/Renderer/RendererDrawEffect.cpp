@@ -1291,14 +1291,14 @@ namespace TEN::Renderer
 		}
 	}
 
-	Matrix Renderer::GetWorldMatrixForSprite(RendererSpriteToDraw* sprite, RenderView& view)
+	Matrix Renderer::GetWorldMatrixForSprite(const RendererSpriteToDraw& sprite, RenderView& view)
 	{
 		auto spriteMatrix = Matrix::Identity;
-		auto scaleMatrix = Matrix::CreateScale(sprite->Width * sprite->Scale, sprite->Height * sprite->Scale, sprite->Scale);
+		auto scaleMatrix = Matrix::CreateScale(sprite.Width * sprite.Scale, sprite.Height * sprite.Scale, sprite.Scale);
 
-		auto spritePos = sprite->pos;
+		auto spritePos = sprite.pos;
 
-		if (sprite->Type == SpriteType::ThreeD)
+		if (sprite.Type == SpriteType::ThreeD)
 		{
 			ReflectMatrixOptionally(spriteMatrix);
 		}
@@ -1307,23 +1307,23 @@ namespace TEN::Renderer
 			ReflectVectorOptionally(spritePos);
 		}
 
-		switch (sprite->Type)
+		switch (sprite.Type)
 		{
 		case SpriteType::Billboard:
 		{
 			auto cameraUp = Vector3(view.Camera.View._12, view.Camera.View._22, view.Camera.View._32);
-			spriteMatrix = scaleMatrix * Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateBillboard(spritePos, Camera.pos.ToVector3(), cameraUp);
+			spriteMatrix = scaleMatrix * Matrix::CreateRotationZ(sprite.Rotation) * Matrix::CreateBillboard(spritePos, Camera.pos.ToVector3(), cameraUp);
 		}
 		break;
 
 		case SpriteType::CustomBillboard:
 		{
-			auto rotMatrix = Matrix::CreateRotationY(sprite->Rotation);
+			auto rotMatrix = Matrix::CreateRotationY(sprite.Rotation);
 			auto quadForward = Vector3(0.0f, 0.0f, 1.0f);
 			spriteMatrix = scaleMatrix * Matrix::CreateConstrainedBillboard(
 				spritePos,
 				Camera.pos.ToVector3(),
-				sprite->ConstrainAxis,
+				sprite.ConstrainAxis,
 				nullptr,
 				&quadForward);
 		}
@@ -1332,7 +1332,7 @@ namespace TEN::Renderer
 		case SpriteType::LookAtBillboard:
 		{
 			auto translationMatrix = Matrix::CreateTranslation(spritePos);
-			auto rotMatrix = Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateLookAt(Vector3::Zero, sprite->LookAtAxis, Vector3::UnitZ);
+			auto rotMatrix = Matrix::CreateRotationZ(sprite.Rotation) * Matrix::CreateLookAt(Vector3::Zero, sprite.LookAtAxis, Vector3::UnitZ);
 			spriteMatrix = scaleMatrix * rotMatrix * translationMatrix;
 		}
 		break;
