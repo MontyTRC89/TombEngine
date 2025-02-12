@@ -8,7 +8,7 @@ using namespace TEN::Math;
 
 namespace TEN::Scripting
 {
-	/// Represents a degree-based 3D rotation.
+	/// Represents a 3D rotation.
 	// All angle components are in degrees clamped to the range [0.0, 360.0].
 	// @tenprimitive Rotation
 	// @pragma nostrip
@@ -21,11 +21,13 @@ namespace TEN::Scripting
 		// Register type.
 		parent.new_usertype<Rotation>(
 			ScriptReserved_Rotation,
-			ctors(),
-			sol::call_constructor, ctors(),
+			ctors(), sol::call_constructor, ctors(),
 
+			// Meta functions
 			sol::meta_function::to_string, &Rotation::ToString,
 
+			// Utilities
+			ScriptReserved_RotationLerp, &Rotation::Lerp,
 			ScriptReserved_RotationDirection, &Rotation::Direction,
 
 			/// (float) X angle component in degrees.
@@ -66,6 +68,17 @@ namespace TEN::Scripting
 		x = TO_DEGREES(eulers.x);
 		y = TO_DEGREES(eulers.y);
 		z = TO_DEGREES(eulers.z);
+	}
+
+	/// Get the linearly interpolated Rotation between this Rotation and the input Rotation according to the input alpha.
+	// @tparam Rotation rot Interpolation target.
+	// @tparam float alpha Interpolation alpha in the range [0, 1].
+	// @treturn Rotation Linearly interpolated rotation.
+	Rotation Rotation::Lerp(const Rotation& rot, float alpha) const
+	{
+		auto orientFrom = ToEulerAngles();
+		auto orientTo = rot.ToEulerAngles();
+		return Rotation(EulerAngles::Lerp(orientFrom, orientTo, alpha));
 	}
 
 	/// Get the normalized direction vector of this Rotation.
