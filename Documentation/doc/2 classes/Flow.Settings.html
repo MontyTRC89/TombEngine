@@ -305,6 +305,10 @@
 	<td class="summary">How should the application respond to script errors?</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#multiThreaded">multiThreaded</a></td>
+	<td class="summary">Use multithreading in certain calculations.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#fastReload">fastReload</a></td>
 	<td class="summary">Can the game utilize the fast reload feature?</td>
 	</tr>
@@ -1246,6 +1250,29 @@
         <li><span class="parameter">errorMode</span>
             <span class="types"><a class="type" href="../4 enums/Flow.ErrorMode.html#">ErrorMode</a></span>
          error mode to use. */
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "multiThreaded"></a>
+    <strong>multiThreaded</strong>
+    </dt>
+    <dd>
+    Use multithreading in certain calculations.  <br>
+ When set to <code>true</code>, some performance-critical calculations will be performed in parallel, which can give
+ a significant performance boost. Don't disable unless you have problems with launching or using TombEngine.
+
+
+
+    <ul>
+        <li><span class="parameter">multiThreaded</span>
+            <span class="types"><span class="type">bool</span></span>
+         determines whether to use multithreading or not. */
         </li>
     </ul>
 
