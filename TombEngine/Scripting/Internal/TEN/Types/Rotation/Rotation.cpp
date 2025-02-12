@@ -82,7 +82,7 @@ namespace TEN::Scripting
 	// @treturn string A string showing the X, Y, and Z angle components of this Rotation.
 	std::string Rotation::ToString() const
 	{
-		return ("{ " + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + " }");
+		return ("{" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + "}");
 	}
 
 	EulerAngles Rotation::ToEulerAngles() const

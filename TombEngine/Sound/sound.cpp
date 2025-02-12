@@ -1085,7 +1085,7 @@ void PlaySecretTrack()
 int GetShatterSound(int shatterID)
 {
 	auto fxID = Statics[shatterID].shatterSound;
-	if (fxID != NO_VALUE && fxID < NUM_SFX)
+	if (fxID != NO_VALUE && fxID < g_Level.SoundMap.size())
 		return fxID;
 
 	return SFX_TR4_SMASH_ROCK;

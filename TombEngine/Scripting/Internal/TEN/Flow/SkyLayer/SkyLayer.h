@@ -2,9 +2,11 @@
 
 #include "Scripting/Internal/TEN/Types/Color/Color.h"
 
-namespace sol {
-	class state;
-}
+namespace sol { class state; }
+
+namespace TEN::Scripting::Types { class ScriptColor; }
+
+using namespace TEN::Scripting::Types;
 
 struct SkyLayer
 {

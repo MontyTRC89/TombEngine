@@ -6,19 +6,33 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ## [Version 1.7.X] (link to release) - yyyy-mm-dd
 
 ### Bug fixes
+* Fixed bridges moving the player when the player is underwater.
+* Fixed trigger triggerer not working.
+* Fixed display pickup numeric string not being interpolated in high framerate mode.
 * Fixed two block platform room portal traversal failing in some cases.
-* Fixed dynamic light shadows not being handled correctly.
+* Fixed incorrect handling of dynamic light shadows.
 * Fixed ricochet flashes after using explosive weapons.
 * Fixed incorrect flare draw in crawl state.
-* Fixed starfield remaining active in the next level, if next level does not have starfield specified.
+* Fixed starfield remaining active in the next level if next level does not have a starfield specified.
+* Fixed wetness player attribute not being preserved in savegames.
+* Fixed invisible HK ammo in the inventory.
+* Fixed flickering rat emitter.
+* Fixed player model submerging into the floor while swimming underwater.
+* Fixed custom shatter sounds with custom sound IDs not playing correctly.
 
 ### New Features
+* Added multithreading and an option for it to flow system settings.
+* Added ability to use keys and puzzle items underwater.
+ - You must update your Lara object: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Lara/TEN_Lara.wad2
 * Added a particle based waterfall emitter object and associated sprite slots.
-- You must use this version: https://github.com/TombEngine/Resources/raw/refs/heads/main/Wad2%20Objects/Interactables/TEN_Waterfall_Emitter.wad2
-
+ - You must use this version: https://github.com/TombEngine/Resources/raw/refs/heads/main/Wad2%20Objects/Interactables/TEN_Waterfall_Emitter.wad2
 
 ### Lua API changes
-
+* Added diary module.
+* Added Effects.EmitAirBubble() function to spawn air bubbles.
+* Added additional arguments for Sprite object slot and starting rotation value for EmitParticle function.
+* Added various Translate() methods to Vec2 and Vec3 script objects.
+  
 ## [Version 1.7.1] (https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.4) - 2025-04-01
 
 ### Bug fixes

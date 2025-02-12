@@ -103,7 +103,7 @@ enum class CullMode
 enum class ShadowMode
 {
 	None,
-	Lara,
+	Player,
 	All
 };
 

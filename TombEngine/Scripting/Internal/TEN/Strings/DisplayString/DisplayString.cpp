@@ -5,7 +5,10 @@
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Strings/DisplayString/DisplayString.h"
+#include "Scripting/Internal/TEN/Types/Color/Color.h"
 #include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
+
+using namespace TEN::Scripting::Types;
 
 /*** A string appearing on the screen.
 Can be used for subtitles and "2001, somewhere in Egypt"-style messages.

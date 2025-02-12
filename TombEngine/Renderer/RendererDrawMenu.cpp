@@ -130,7 +130,7 @@ namespace TEN::Renderer
 		sprintf(stringBuffer, "%d x %d", screenResolution.x, screenResolution.y);
 
 		auto* shadowMode = g_Gui.GetCurrentSettings().Configuration.ShadowType != ShadowMode::None ?
-			(g_Gui.GetCurrentSettings().Configuration.ShadowType == ShadowMode::Lara ? STRING_SHADOWS_PLAYER : STRING_SHADOWS_ALL) : STRING_SHADOWS_NONE;
+			(g_Gui.GetCurrentSettings().Configuration.ShadowType == ShadowMode::Player ? STRING_SHADOWS_PLAYER : STRING_SHADOWS_ALL) : STRING_SHADOWS_NONE;
 
 		const char* antialiasMode;
 		switch (g_Gui.GetCurrentSettings().Configuration.AntialiasingMode)
@@ -759,7 +759,7 @@ namespace TEN::Renderer
 		if (pickup.Count != 1)
 		{
 			auto countString = (pickup.Count != NO_VALUE) ? std::to_string(pickup.Count) : COUNT_STRING_INF;
-			auto countStringPos = pickup.Position + COUNT_STRING_OFFSET;
+			auto countStringPos = pos + COUNT_STRING_OFFSET;
 
 			AddString(countString, countStringPos, Color(PRINTSTRING_COLOR_WHITE), pickup.StringScale, SF());
 		}
@@ -770,8 +770,8 @@ namespace TEN::Renderer
 	{
 		constexpr auto AMBIENT_LIGHT_COLOR = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
+		unsigned int stride = sizeof(Vertex);
+		unsigned int offset = 0;
 
 		auto screenRes = GetScreenResolution();
 		auto factor = Vector2(
@@ -781,10 +781,10 @@ namespace TEN::Renderer
 		pos2D *= factor;
 		scale *= (factor.x > factor.y) ? factor.y : factor.x;
 
-		int index = g_Gui.ConvertObjectToInventoryItem(objectNumber);
-		if (index != -1)
+		int invObjectID = g_Gui.ConvertObjectToInventoryItem(objectNumber);
+		if (invObjectID != NO_VALUE)
 		{
-			const auto& invObject = InventoryObjectTable[index];
+			const auto& invObject = InventoryObjectTable[invObjectID];
 
 			pos2D.y += invObject.YOffset;
 			orient += invObject.Orientation;
@@ -794,7 +794,7 @@ namespace TEN::Renderer
 		auto projMatrix = Matrix::CreateOrthographic(_screenWidth, _screenHeight, -BLOCK(1), BLOCK(1));
 
 		auto& moveableObject = _moveableObjects[objectNumber];
-		if (!moveableObject)
+		if (!moveableObject.has_value())
 			return;
 
 		const auto& object = Objects[objectNumber];
@@ -806,7 +806,7 @@ namespace TEN::Renderer
 				&g_Level.Frames[GetAnimData(object.animIndex).FramePtr],
 				0.0f
 			};
-			UpdateAnimation(nullptr, *moveableObject, frameData, 0xFFFFFFFF);
+			UpdateAnimation(nullptr, *moveableObject, frameData, UINT_MAX);
 		}
 
 		auto pos = _viewportToolkit.Unproject(Vector3(pos2D.x, pos2D.y, 1.0f), projMatrix, viewMatrix, Matrix::Identity);
@@ -821,35 +821,37 @@ namespace TEN::Renderer
 		_shaders.Bind(Shader::Inventory);
 
 		// Set matrices.
-		CCameraMatrixBuffer hudCamera;
+		auto hudCamera = CCameraMatrixBuffer{};
 		hudCamera.CamDirectionWS = -Vector4::UnitZ;
 		hudCamera.ViewProjection = viewMatrix * projMatrix;
 		_cbCameraMatrices.UpdateData(hudCamera, _context.Get());
 		BindConstantBufferVS(ConstantBufferRegister::Camera, _cbCameraMatrices.get());
 
-		for (int n = 0; n < (*moveableObject).ObjectMeshes.size(); n++)
+		for (int i = 0; i < moveableObject->ObjectMeshes.size(); i++)
 		{
-			if (meshBits && !(meshBits & (1 << n)))
+			if (meshBits && !(meshBits & (1 << i)))
 				continue;
 
-			auto* mesh = (*moveableObject).ObjectMeshes[n];
-
 			// HACK: Rotate compass needle.
-			if (objectNumber == ID_COMPASS_ITEM && n == 1)
-				(*moveableObject).LinearizedBones[n]->ExtraRotation = EulerAngles(0, g_Gui.CompassNeedleAngle - ANGLE(180.0f), 0).ToQuaternion();
+			if (objectNumber == ID_COMPASS_ITEM && i == 1)
+				moveableObject->LinearizedBones[i]->ExtraRotation = EulerAngles(0, g_Gui.CompassNeedleAngle - ANGLE(180.0f), 0).ToQuaternion();
 
 			// Construct world matrix.
-			auto tMatrix = Matrix::CreateTranslation(pos.x, pos.y, pos.z + BLOCK(1));
+			auto translationMatrix = Matrix::CreateTranslation(pos.x, pos.y, pos.z + BLOCK(1));
 			auto rotMatrix = orient.ToRotationMatrix();
 			auto scaleMatrix = Matrix::CreateScale(scale);
-			auto worldMatrix = scaleMatrix * rotMatrix * tMatrix;
+			auto worldMatrix = scaleMatrix * rotMatrix * translationMatrix;
 
-			if (object.animIndex != -1)
-				_stItem.World = (*moveableObject).AnimationTransforms[n] * worldMatrix;
+			if (object.animIndex != NO_VALUE)
+			{
+				_stItem.World = moveableObject->AnimationTransforms[i] * worldMatrix;
+			}
 			else
-				_stItem.World = (*moveableObject).BindPoseTransforms[n] * worldMatrix;
+			{
+				_stItem.World = moveableObject->BindPoseTransforms[i] * worldMatrix;
+			}
 
-			_stItem.BoneLightModes[n] = (int)LightMode::Dynamic;
+			_stItem.BoneLightModes[i] = (int)LightMode::Dynamic;
 			_stItem.Color = Vector4::One;
 			_stItem.AmbientLight = AMBIENT_LIGHT_COLOR;
 
@@ -857,7 +859,8 @@ namespace TEN::Renderer
 			BindConstantBufferVS(ConstantBufferRegister::Item, _cbItem.get());
 			BindConstantBufferPS(ConstantBufferRegister::Item, _cbItem.get());
 
-			for (const auto& bucket : mesh->Buckets)
+			const auto& mesh = *moveableObject->ObjectMeshes[i];
+			for (const auto& bucket : mesh.Buckets)
 			{
 				if (bucket.NumVertices == 0)
 					continue;
@@ -870,11 +873,9 @@ namespace TEN::Renderer
 				BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
 				 if (bucket.BlendMode != BlendMode::Opaque)
-					Renderer::SetBlendMode(bucket.BlendMode, true);
+					SetBlendMode(bucket.BlendMode, true);
 
-				SetAlphaTest(
-					(bucket.BlendMode == BlendMode::AlphaTest) ? AlphaTestMode::GreatherThan : AlphaTestMode::None,
-					ALPHA_TEST_THRESHOLD);
+				SetAlphaTest((bucket.BlendMode == BlendMode::AlphaTest) ? AlphaTestMode::GreatherThan : AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 				DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 				_numMoveablesDrawCalls++;

@@ -1442,7 +1442,7 @@ bool LoadLevel(const std::string& path, bool partial)
 		InitializeLara(!InitializeGame && CurrentLevel > 0);
 		GetCarriedItems();
 		GetAIPickups();
-		g_GameScriptEntities->AssignLara();
+		g_GameScriptEntities->AssignPlayer();
 		UpdateProgress(90, partial);
 
 		if (!partial)
