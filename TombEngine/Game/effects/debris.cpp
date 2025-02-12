@@ -61,23 +61,23 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 {
 	int meshIndex = 0;
 	short yRot = 0;
-	float scale;
+	Vector3 scale;
 	Vector3 pos;
 	bool isStatic;
 
 	if (mesh)
 	{
-		if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
+		if (!(mesh->Flags & StaticMeshFlags::SM_VISIBLE))
 			return;
 
 		isStatic = true;
-		meshIndex = Statics[mesh->staticNumber].meshNumber;
-		yRot = mesh->pos.Orientation.y;
-		pos = Vector3(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z);
-		scale = mesh->scale;
+		meshIndex = Statics[mesh->ObjectId].meshNumber;
+		yRot = mesh->Transform.Orientation.y;
+		pos = Vector3(mesh->Transform.Position.x, mesh->Transform.Position.y, mesh->Transform.Position.z);
+		scale = mesh->Transform.Scale;
 
 		if (mesh->HitPoints <= 0)
-			mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
+			mesh->Flags &= ~StaticMeshFlags::SM_VISIBLE;
 
 		SmashedMeshRoom[SmashedMeshCount] = roomNumber;
 		SmashedMesh[SmashedMeshCount] = mesh;
@@ -89,7 +89,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 		meshIndex = item->meshIndex;
 		yRot = item->yRot;
 		pos = item->sphere.Center;
-		scale = 1.0f;
+		scale = Vector3::One;
 	}
 
 	auto fragmentsMesh = &g_Level.Meshes[meshIndex];
@@ -129,9 +129,9 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 
 				Matrix rotationMatrix = Matrix::CreateFromYawPitchRoll(TO_RAD(yRot), 0, 0);
 
-				Vector3 pos1 = fragmentsMesh->positions[poly->indices[indices[j * 3 + 0]]] * scale;
-				Vector3 pos2 = fragmentsMesh->positions[poly->indices[indices[j * 3 + 1]]] * scale;
-				Vector3 pos3 = fragmentsMesh->positions[poly->indices[indices[j * 3 + 2]]] * scale;
+				auto pos1 = fragmentsMesh->positions[poly->indices[indices[j * 3 + 0]]] * scale;
+				auto pos2 = fragmentsMesh->positions[poly->indices[indices[j * 3 + 1]]] * scale;
+				auto pos3 = fragmentsMesh->positions[poly->indices[indices[j * 3 + 2]]] * scale;
 
 				Vector2 uv1 = poly->textureCoordinates[indices[j * 3 + 0]];
 				Vector2 uv2 = poly->textureCoordinates[indices[j * 3 + 1]];
@@ -182,7 +182,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 				fragment->velocity = CalculateFragmentImpactVelocity(fragment->worldPosition, ShatterImpactData.impactDirection, ShatterImpactData.impactLocation);
 				fragment->roomNumber = roomNumber;
 				fragment->numBounces = 0;
-				fragment->color = isStatic ? mesh->color : item->color;
+				fragment->color = isStatic ? mesh->Color : item->color;
 				fragment->lightMode = fragmentsMesh->lightMode;
 
 				fragment->UpdateTransform();

@@ -1,4 +1,6 @@
 #pragma once
+
+#include "Game/StaticObject.h"
 #include "Math/Math.h"
 
 using namespace TEN::Math;
@@ -35,12 +37,6 @@ enum RoomEnvFlags
 	ENV_FLAG_COLD			 = (1 << 12)
 };
 
-enum StaticMeshFlags : short
-{
-	SM_VISIBLE = 1,
-	SM_SOLID = 2
-};
-
 struct ROOM_VERTEX
 {
 	Vector3 position;
@@ -70,19 +66,6 @@ struct ROOM_LIGHT
 	float dx, dy, dz;    // Direction - used only by sun and spot lights
 	byte type;
 	bool castShadows;
-};
-
-struct MESH_INFO
-{
-	Pose pos;
-	int roomNumber;
-	float scale;
-	short staticNumber;
-	short flags;
-	Vector4 color;
-	short HitPoints;
-	std::string Name;
-	bool Dirty;
 };
 
 struct ROOM_INFO
@@ -133,7 +116,6 @@ Vector3i GetRoomCenter(int roomNumber);
 int IsRoomOutside(int x, int y, int z);
 void InitializeNeighborRoomList();
 
-GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool getVisibilityBox);
 std::vector<int> GetNeighborRoomNumbers(int roomNumber, unsigned int searchDepth, std::vector<int>& visitedRoomNumbers = std::vector<int>{});
 
 namespace TEN::Collision::Room
