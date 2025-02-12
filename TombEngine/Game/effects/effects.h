@@ -175,8 +175,9 @@ struct Particle
 	float framerate;
 	ParticleAnimationMode animationType;
 
-	float lightRadius;
-	float lightFlicker;
+	int lightRadius;
+	int lightFlicker;
+	int lightFlickerS;
 
 	int PrevX;
 	int PrevY;

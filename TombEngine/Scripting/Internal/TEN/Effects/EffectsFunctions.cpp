@@ -238,6 +238,9 @@ namespace TEN::Scripting::Effects
 	// poison = false,
 	// burn = false,
 	// damageHit = 80,
+	// light = true,
+	// lightRadius = 6, 
+	// lightFlicker = 5, 
 	// animated = true,
 	// frameRate = .25,
 	// animationType = TEN.Effects.ParticleAnimationType.LOOP,
@@ -318,6 +321,20 @@ namespace TEN::Scripting::Effects
 		if (convertedApplyBurn)
 			part.flags |= SP_FIRE;
 
+		bool convertedApplyLight = particleData.get_or("light", false);
+		if (convertedApplyLight)
+		{
+			part.flags |= SP_LIGHT;
+			int lightRadius = particleData.get_or("lightRadius", 0);
+			part.lightRadius = lightRadius * BLOCK(0.25f);
+			int flicker = particleData.get_or("lightFlicker", 0);
+			
+			if (flicker > 0)
+			{
+				part.lightFlicker = particleData.get_or("lightFlicker", 0);
+				part.lightFlickerS = particleData.get_or("lightFlicker", 0);
+			}
+		}
 		bool animatedSpr = particleData.get_or("animated", false);
 		if (animatedSpr)
 		{
@@ -426,11 +443,11 @@ namespace TEN::Scripting::Effects
 		TriggerBlood(pos.x, pos.y, pos.z, -1, USE_IF_HAVE(int, count, 1));
 	}
 
-	/// Emit air bubble in a water room.
-	// @function EmitAirBubble
-	// @tparam Vec3 pos World position where the effect will be spawned. Must be in a water room.
-	// @tparam[opt] float size Sprite size. __Default: 32__
-	// @tparam[opt] float amp Oscillation amplitude. __Default: 32__
+/// Emit air bubble in a water room.
+// @function EmitAirBubble
+// @tparam Vec3 pos World position where the effect will be spawned. Must be in a water room.
+// @tparam[opt] float size Sprite size. __Default: 32__
+// @tparam[opt] float amp Oscillation amplitude. __Default: 32__
 	static void EmitAirBubble(const Vec3& pos, TypeOrNil<float> size, TypeOrNil<float> amp)
 	{
 		constexpr auto DEFAULT_SIZE = 128.0f;
@@ -529,6 +546,9 @@ namespace TEN::Scripting::Effects
 // @tfield[opt] bool burn Specify if the particle will burn the player on collision. __Default: false__
 // @tfield[opt] bool wind Specify if the particle will be affected by wind in outside rooms. __Default: false__
 // @tfield[opt] int damageHit Specify the damage particle will harm the player on collision. __Default: 2__
+// @tfield[opt] bool light Specify if the particle will be emit a light based on its color. __Default: false__
+// @tfield[opt] int lightRadius measured in "clicks" or 256 world units. __Default: 0__
+// @tfield[opt] int lightFlicker The interval at which light should flicker. __Default: 0__
 // @tfield[opt] bool animated Specify if the particle will be animated. __Default: false__
 // @tfield[opt] Effects.ParticleAnimationType animationType Specify the the type of animation the particle will use. __Default: TEN.Effects.ParticleAnimationType.LOOP__
 // @tfield[opt] float frameRate The framerate with which the particle will be animated. __Default: 1__

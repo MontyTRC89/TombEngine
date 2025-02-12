@@ -442,8 +442,39 @@ void UpdateSparks()
 
 			if (spark.flags & SP_LIGHT)
 			{
+				float radius = spark.lightRadius * spark.size / spark.sSize;
+				// Decrease flicker timer if set
+				if (spark.lightFlicker > 0)
+				{
+					spark.lightFlicker--;
 
-				SpawnDynamicPointLight(Vector3(spark.x, spark.y, spark.z), ScriptColor(spark.r, spark.g, spark.b), spark.lightRadius, false, GetHash(std::string()));
+					if (spark.lightFlicker <= 0)
+					{
+						// Apply random flicker effect
+						int random = GetRandomControl();
+						int colorOffset = (random % 21) - 10; // Random change between -10 and +10
+
+						byte r = std::clamp(spark.r + colorOffset, 0, 255);
+						byte g = std::clamp(spark.g + colorOffset, 0, 255);
+						byte b = std::clamp(spark.b + colorOffset, 0, 255);
+
+						// Reset flicker timer
+						spark.lightFlicker = spark.lightFlickerS;
+
+						// Emit flickering light
+						SpawnDynamicPointLight(Vector3(spark.x, spark.y, spark.z), ScriptColor(r, g, b), radius, false, GetHash(std::string()));
+					}
+					else
+					{
+						// Normal light emission while flicker is counting down
+						SpawnDynamicPointLight(Vector3(spark.x, spark.y, spark.z), ScriptColor(spark.r, spark.g, spark.b), radius, false, GetHash(std::string()));
+					}
+				}
+				else
+				{
+					// If flicker is disabled or 0, just emit normal light
+					SpawnDynamicPointLight(Vector3(spark.x, spark.y, spark.z), ScriptColor(spark.r, spark.g, spark.b), radius, false, GetHash(std::string()));
+				}
 			}
 
 			if ((spark.flags & SP_FIRE && LaraItem->Effect.Type == EffectType::None) ||
@@ -460,7 +491,6 @@ void UpdateSparks()
 						{
 							if (spark.flags & SP_FIRE)
 								ItemBurn(LaraItem);
-
 
 							if (spark.flags & SP_DAMAGE)
 								DoDamage(LaraItem, spark.damage);
