@@ -169,8 +169,8 @@ namespace TEN::Scripting::Effects
 		part.yVel = short(vel.y * 32);
 		part.zVel = short(vel.z * 32);
 
-		part.rotAng = ANGLE(ValueOr<float>(startRot, TO_DEGREES(Random::GenerateAngle())));
-		part.rotAdd = byte(ANGLE(ValueOr<float>(rotVel, 0.0f)) >> 4);
+		part.rotAng = ANGLE(ValueOr<float>(startRot, TO_DEGREES(Random::GenerateAngle()))) >> 4;
+		part.rotAdd = ANGLE(ValueOr<float>(rotVel, 0.0f)) >> 4;
 		
 		part.sSize =
 		part.size = ValueOr<float>(startSize, DEFAULT_START_SIZE);
@@ -277,7 +277,8 @@ namespace TEN::Scripting::Effects
 		part.zVel = short(vel.z * 32);
 
 		float rotAdd = particleData.get_or("rotationSpeed", 0.0f);
-		part.rotAng = particleData.get_or("startRotation", TO_DEGREES(Random::GenerateAngle()));
+		float rotAng = particleData.get_or("startRotation", TO_DEGREES(Random::GenerateAngle()));
+		part.rotAng = ANGLE(rotAng);
 		part.rotAdd = byte(ANGLE(rotAdd) >> 4);
 
 		part.sSize =
@@ -540,7 +541,7 @@ namespace TEN::Scripting::Effects
 // @tfield[opt] float maxYVelocity Specifies ithe maximum Y velocity for the particle. __Default: 0__
 // @tfield[opt] float gravity Specifies if the particle will fall over time. Positive values ascend, negative values descend. Recommended range: [-1000 and 1000]. __Default: 0__
 // @tfield[opt] float friction Specifies the friction with which the particle will slow down over time. __Default: 0__
-// @tfield[opt] float startRot Rotation at start of life. __Default: random__
+// @tfield[opt] float startRotation Rotation at start of life. __Default: random__
 // @tfield[opt] float rotationSpeed Rotational velocity in degrees. __Default: 0__
 // @tfield[opt] float startSize Size at start of life. __Default: 10__
 // @tfield[opt] float endSize Size at end of life. The particle will linearly shrink or grow toward this size over its lifespan. __Default: 0__
