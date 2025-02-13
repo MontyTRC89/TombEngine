@@ -180,7 +180,7 @@ namespace TEN::Scripting::Util
 	// 
 	static void PrintLog(const std::string& message, const LogLevel& level, TypeOrNil<bool> allowSpam)
 	{
-		TENLog(message, level, LogConfig::All, USE_IF_HAVE(bool, allowSpam, false));
+		TENLog(message, level, LogConfig::All, ValueOr<bool>(allowSpam, false));
 	}
 
 	static float CalculateDistance(const Vec3& posA, const Vec3& posB)

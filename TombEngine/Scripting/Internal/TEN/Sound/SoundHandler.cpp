@@ -20,7 +20,7 @@ namespace TEN::Scripting::Sound
 	//@tparam Sound.SoundTrackType type of the audio track to play
 	static void PlayAudioTrack(const std::string& trackName, TypeOrNil<SoundTrackType> mode)
 	{
-		auto playMode = USE_IF_HAVE(SoundTrackType, mode, SoundTrackType::OneShot);
+		auto playMode = ValueOr<SoundTrackType>(mode, SoundTrackType::OneShot);
 		PlaySoundTrack(trackName, playMode);
 	}
 
@@ -30,7 +30,7 @@ namespace TEN::Scripting::Sound
 	// @tparam bool fromStart specifies whether ambient track should play from the start, or crossfade at a random position
 	static void SetAmbientTrack(const std::string& trackName, TypeOrNil<bool> fromTheBeginning)
 	{
-		auto pos = USE_IF_HAVE(bool, fromTheBeginning, false) ? std::optional<QWORD>(0) : std::optional<QWORD>();
+		auto pos = ValueOr<bool>(fromTheBeginning, false) ? std::optional<QWORD>(0) : std::optional<QWORD>();
 		PlaySoundTrack(trackName, SoundTrackType::BGM, pos, pos.has_value() ? SOUND_XFADETIME_ONESHOT : SOUND_XFADETIME_BGM);
 	}
 
@@ -46,7 +46,7 @@ namespace TEN::Scripting::Sound
 	//@tparam Sound.SoundTrackType type of the audio track
 	static void StopAudioTrack(TypeOrNil<SoundTrackType> mode)
 	{
-		auto playMode = USE_IF_HAVE(SoundTrackType, mode, SoundTrackType::OneShot);
+		auto playMode = ValueOr<SoundTrackType>(mode, SoundTrackType::OneShot);
 		StopSoundTrack(playMode, SOUND_XFADETIME_ONESHOT);
 	}
 
@@ -56,7 +56,7 @@ namespace TEN::Scripting::Sound
 	//@treturn float current loudness of a specified audio track
 	static float GetAudioTrackLoudness(TypeOrNil<SoundTrackType> mode)
 	{
-		auto playMode = USE_IF_HAVE(SoundTrackType, mode, SoundTrackType::OneShot);
+		auto playMode = ValueOr<SoundTrackType>(mode, SoundTrackType::OneShot);
 		return GetSoundTrackLoudness(playMode);
 	}
 

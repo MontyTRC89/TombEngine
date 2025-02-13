@@ -85,17 +85,17 @@ static std::unique_ptr<DisplayString> CreateString(const std::string& key, const
 		ScriptAssertF(false, "Wrong argument type for {}.new \"flags\" argument; must be a table or nil.\n{}", ScriptReserved_DisplayString, getCallStack());
 	}
 
-	if (!IsValidOptionalArg(isTranslated))	
+	if (!IsValidOptional(isTranslated))	
 		ScriptAssertF(false, "Wrong argument type for {}.new \"translated\" argument; must be a bool or nil.\n{}", ScriptReserved_DisplayString, getCallStack());
 
-	if (!IsValidOptionalArg(color))	
+	if (!IsValidOptional(color))	
 		ScriptAssertF(false, "Wrong argument type for {}.new \"color\" argument; must be a {} or nil.\n{}", ScriptReserved_DisplayString, ScriptReserved_Color, getCallStack());
 
-	if (!IsValidOptionalArg(scale))	
+	if (!IsValidOptional(scale))	
 		ScriptAssertF(false, "Wrong argument type for {}.new \"scale\" argument; must be a float or nil.\n{}", ScriptReserved_DisplayString, getCallStack());
 
-	auto string = UserDisplayString(key, pos, USE_IF_HAVE(float, scale, 1.0f), USE_IF_HAVE(ScriptColor, color, ScriptColor(255, 255, 255)),
-									flagArray, USE_IF_HAVE(bool, isTranslated, false), g_GameFlow->CurrentFreezeMode);
+	auto string = UserDisplayString(key, pos, ValueOr<float>(scale, 1.0f), ValueOr<ScriptColor>(color, ScriptColor(255, 255, 255)),
+									flagArray, ValueOr<bool>(isTranslated, false), g_GameFlow->CurrentFreezeMode);
 
 
 	DisplayString::SetItemCallbackRoutine(id, string);

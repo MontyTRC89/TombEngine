@@ -148,9 +148,9 @@ Vec2 Vec2::Rotate(float rot) const
 
 /// Get the linearly interpolated Vec2 between this Vec2 and the input Vec2 according to the input interpolation alpha.
 // @function Vec2:Lerp
-// @tparam Vec2 vector Target interpolation vector.
+// @tparam Vec2 vector Interpolation target.
 // @tparam float alpha Interpolation alpha in the range [0, 1].
-// @treturn Vec2 Linearly interpolated vector
+// @treturn Vec2 Linearly interpolated vector.
 Vec2 Vec2::Lerp(const Vec2& vector, float alpha) const
 {
 	auto vector0 = ToVector2();
