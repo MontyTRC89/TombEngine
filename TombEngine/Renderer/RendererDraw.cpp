@@ -2543,7 +2543,7 @@ namespace TEN::Renderer
 						if (IgnoreReflectionPassForRoom(current->RoomNumber))
 							continue;
 
-						if (current->Color.w < 1.0f)
+						if (current->Color.w < ALPHA_BLEND_THRESHOLD)
 							continue;
 
 						auto world = current->World;
@@ -2618,7 +2618,7 @@ namespace TEN::Renderer
 
 						auto blendMode = GetBlendModeFromAlpha(bucket.BlendMode, statics[i]->Color.w);
 
-						if (IsSortedBlendMode(blendMode) || statics[i]->Color.w < 1.0f)
+						if (IsSortedBlendMode(blendMode) || statics[i]->Color.w < ALPHA_BLEND_THRESHOLD)
 						{
 							for (int p = 0; p < bucket.Polygons.size(); p++)
 							{
