@@ -440,6 +440,9 @@ void UpdateSparks()
 				SetAdvancedSpriteSequence(spark, spriteObject,  animationType, spark.framerate);
 			}
 
+			if (spark.flags & SP_SOUND)
+				SoundEffect(spark.sound, &Pose(Vector3(spark.x, spark.y, spark.z)), SoundEnvironment::Always);
+
 			if (spark.flags & SP_LIGHT)
 			{
 				float radius = spark.lightRadius * spark.size / spark.sSize;

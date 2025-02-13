@@ -44,6 +44,7 @@ enum SpriteEnumFlag
 	SP_COLOR	  = (1 << 15),
 	SP_ANIMATED	  = (1 << 16),
 	SP_LIGHT	  = (1 << 17),
+	SP_SOUND	  = (1 << 18),
 };
 
 // Used by Particle.nodeNumber.
@@ -178,6 +179,8 @@ struct Particle
 	int lightRadius;
 	int lightFlicker;
 	int lightFlickerS;
+
+	int sound;
 
 	int PrevX;
 	int PrevY;

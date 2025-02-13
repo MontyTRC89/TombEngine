@@ -321,6 +321,12 @@ namespace TEN::Scripting::Effects
 		if (convertedApplyBurn)
 			part.flags |= SP_FIRE;
 
+		int convertedApplySound = particleData.get_or("sound", -1);
+		if (convertedApplySound > 0)
+		{
+			part.flags |= SP_SOUND;
+			part.sound = convertedApplySound;
+		}
 		bool convertedApplyLight = particleData.get_or("light", false);
 		if (convertedApplyLight)
 		{
@@ -549,6 +555,7 @@ namespace TEN::Scripting::Effects
 // @tfield[opt] bool light Specify if the particle will be emit a light based on its color. __Default: false__
 // @tfield[opt] int lightRadius measured in "clicks" or 256 world units. __Default: 0__
 // @tfield[opt] int lightFlicker The interval at which light should flicker. __Default: 0__
+// @tfield[opt] int sound ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window. __Default: None__
 // @tfield[opt] bool animated Specify if the particle will be animated. __Default: false__
 // @tfield[opt] Effects.ParticleAnimationType animationType Specify the the type of animation the particle will use. __Default: TEN.Effects.ParticleAnimationType.LOOP__
 // @tfield[opt] float frameRate The framerate with which the particle will be animated. __Default: 1__
