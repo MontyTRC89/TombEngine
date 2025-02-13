@@ -168,8 +168,8 @@ namespace TEN::Scripting::Effects
 		part.yVel = short(vel.y * 32);
 		part.zVel = short(vel.z * 32);
 
-		part.rotAng = ANGLE(ValueOr<float>(startRot, TO_DEGREES(Random::GenerateAngle())));
-		part.rotAdd = byte(ANGLE(ValueOr<float>(rotVel, 0.0f)) >> 4);
+		part.rotAng = ANGLE(ValueOr<float>(startRot, TO_DEGREES(Random::GenerateAngle()))) >> 4;
+		part.rotAdd = ANGLE(ValueOr<float>(rotVel, 0.0f)) >> 4;
 		
 		part.sSize =
 		part.size = ValueOr<float>(startSize, DEFAULT_START_SIZE);
