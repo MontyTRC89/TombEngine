@@ -260,7 +260,7 @@ namespace TEN::Scripting::Effects
 
 		part.on = true;
 		part.SpriteSeqID = convertedSpriteSeqID;
-		part.SpriteID = particleData.get_or("spriteIndex", 0);
+		part.SpriteID = particleData.get_or("spriteID", 0);
 
 		auto bMode = particleData.get_or("blendMode", BlendMode::AlphaBlend);
 		part.blendMode = bMode;
@@ -552,10 +552,10 @@ namespace TEN::Scripting::Effects
 // @tfield[opt] bool burn Specify if the particle will burn the player on collision. __Default: false__
 // @tfield[opt] bool wind Specify if the particle will be affected by wind in outside rooms. __Default: false__
 // @tfield[opt] int damageHit Specify the damage particle will harm the player on collision. __Default: 2__
-// @tfield[opt] bool light Specify if the particle will be emit a light based on its color. Recommended for single particles. __Default: false__
+// @tfield[opt] bool light Specify if the particle will be emit a light based on its color. Caution: Recommended only for a single particle. Having too many particles with lights can overflow the light system. __Default: false__
 // @tfield[opt] int lightRadius measured in "clicks" or 256 world units. __Default: 0__
 // @tfield[opt] int lightFlicker The interval at which light should flicker. __Default: 0__
-// @tfield[opt] int sound ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window. Looping sounds recommended. __Default: None__
+// @tfield[opt] int sound ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window. Looping sounds recommended. Caution: Recommended only for a single particle. Having too many particles with sounds can overflow the sound system. __Default: None__
 // @tfield[opt] bool animated Specify if the particle will be animated. __Default: false__
 // @tfield[opt] Effects.ParticleAnimationType animationType Specify the the type of animation the particle will use. __Default: TEN.Effects.ParticleAnimationType.LOOP__
 // @tfield[opt] float frameRate The framerate with which the particle will be animated. __Default: 1__
