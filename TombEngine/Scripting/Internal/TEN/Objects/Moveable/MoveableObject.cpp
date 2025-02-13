@@ -81,13 +81,13 @@ static std::unique_ptr<Moveable> Create(GAME_OBJECT_ID objID, const std::string&
 			scriptMov->SetPosition(pos, true);
 		}
 
-		scriptMov->SetRotation(USE_IF_HAVE(Rotation, rot, Rotation()));
+		scriptMov->SetRotation(ValueOr<Rotation>(rot, Rotation()));
 		scriptMov->Initialize();
 
 		if (std::holds_alternative<int>(animNumber))
 		{
 			scriptMov->SetAnimNumber(std::get<int>(animNumber), objID);
-			scriptMov->SetFrameNumber(USE_IF_HAVE(int, frameNumber, 0));
+			scriptMov->SetFrameNumber(ValueOr<int>(frameNumber, 0));
 		}
 
 		if (std::holds_alternative<int>(hp))
@@ -95,8 +95,8 @@ static std::unique_ptr<Moveable> Create(GAME_OBJECT_ID objID, const std::string&
 			scriptMov->SetHP(std::get<int>(hp));
 		}
 
-		scriptMov->SetOcb(USE_IF_HAVE(int, ocb, 0));
-		scriptMov->SetAIBits(USE_IF_HAVE(aiBitsType, aiBits, aiBitsType{}));
+		scriptMov->SetOcb(ValueOr<int>(ocb, 0));
+		scriptMov->SetAIBits(ValueOr<aiBitsType>(aiBits, aiBitsType{}));
 		scriptMov->SetColor(ScriptColor(Vector4::One));
 		mov.CarriedItem = NO_VALUE;
 

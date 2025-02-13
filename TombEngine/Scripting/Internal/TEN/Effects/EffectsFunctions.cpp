@@ -58,11 +58,11 @@ namespace TEN::Scripting::Effects
 		auto p1 = Vector3(src.x, src.y, src.z);
 		auto p2 = Vector3(dest.x, dest.y, dest.z);
 
-		int segs = USE_IF_HAVE(int, segments, 10);
+		int segs = ValueOr<int>(segments, 10);
 
 		segs = std::clamp(segs, 1, 127);
 
-		int width = USE_IF_HAVE(int, beamWidth, 2);
+		int width = ValueOr<int>(beamWidth, 2);
 
 		width = std::clamp(width, 1, 127);
 
@@ -70,7 +70,7 @@ namespace TEN::Scripting::Effects
 		// This takes into account a "hardcoded" FPS of 30 and the fact that
 		// lightning loses two "life" each frame.
 		constexpr auto kMaxLifeSeconds = 4.233f; 
-		float life = USE_IF_HAVE(float, lifetime, 1.0f);
+		float life = ValueOr<float>(lifetime, 1.0f);
 		life = std::clamp(life, 0.0f, kMaxLifeSeconds);
 
 		constexpr float secsPerFrame = 1.0f / (float)FPS;
@@ -82,11 +82,11 @@ namespace TEN::Scripting::Effects
 		// an even number to avoid overshooting a value of 0 and wrapping around.
 		byte byteLife = lifeInFrames * 2;
 
-		int amp = USE_IF_HAVE(int, amplitude, 20);
+		int amp = ValueOr<int>(amplitude, 20);
 		byte byteAmplitude = std::clamp(amp, 1, 255);
 
-		bool isSmooth = USE_IF_HAVE(bool, smooth, false);
-		bool isDrift = USE_IF_HAVE(bool, endDrift, false);
+		bool isSmooth = ValueOr<bool>(smooth, false);
+		bool isDrift = ValueOr<bool>(endDrift, false);
 
 		char flags = 0;
 		if(isSmooth)
@@ -95,7 +95,7 @@ namespace TEN::Scripting::Effects
 		if(isDrift)
 			flags |= 2;
 
-		ScriptColor col = USE_IF_HAVE(ScriptColor, color, ScriptColor( 255, 255, 255 ));
+		ScriptColor col = ValueOr<ScriptColor>(color, ScriptColor( 255, 255, 255 ));
 
 		SpawnElectricity(p1, p2, byteAmplitude, col.GetR(), col.GetG(), col.GetB(), byteLife, flags, width, segs);
 	}
@@ -146,7 +146,7 @@ namespace TEN::Scripting::Effects
 
 		static const auto DEFAULT_COLOR = ScriptColor(255, 255, 255);
 
-		auto convertedSpriteSeqID = USE_IF_HAVE(GAME_OBJECT_ID, spriteSeqID, ID_DEFAULT_SPRITES); 
+		auto convertedSpriteSeqID = ValueOr<GAME_OBJECT_ID>(spriteSeqID, ID_DEFAULT_SPRITES); 
 		if (!CheckIfSlotExists(convertedSpriteSeqID, "EmitParticle() script function."))
 			return;
 
@@ -156,7 +156,7 @@ namespace TEN::Scripting::Effects
 		part.SpriteSeqID = convertedSpriteSeqID;
 		part.SpriteID = spriteID;
 
-		auto convertedBlendMode = USE_IF_HAVE(BlendMode, blendMode, BlendMode::AlphaBlend);
+		auto convertedBlendMode = ValueOr<BlendMode>(blendMode, BlendMode::AlphaBlend);
 		part.blendMode = BlendMode(std::clamp((int)convertedBlendMode, (int)BlendMode::Opaque, (int)BlendMode::AlphaBlend));
 
 		part.x = pos.x;
@@ -168,29 +168,29 @@ namespace TEN::Scripting::Effects
 		part.yVel = short(vel.y * 32);
 		part.zVel = short(vel.z * 32);
 
-		part.rotAng = ANGLE(USE_IF_HAVE(float, startRot, TO_DEGREES(Random::GenerateAngle())));
-		part.rotAdd = byte(ANGLE(USE_IF_HAVE(float, rotVel, 0.0f)) >> 4);
+		part.rotAng = ANGLE(ValueOr<float>(startRot, TO_DEGREES(Random::GenerateAngle())));
+		part.rotAdd = byte(ANGLE(ValueOr<float>(rotVel, 0.0f)) >> 4);
 		
 		part.sSize =
-		part.size = USE_IF_HAVE(float, startSize, DEFAULT_START_SIZE);
-		part.dSize = USE_IF_HAVE(float, endSize, 0.0f);
+		part.size = ValueOr<float>(startSize, DEFAULT_START_SIZE);
+		part.dSize = ValueOr<float>(endSize, 0.0f);
 		part.scalar = 2;
 
-		part.gravity = (short)std::clamp(USE_IF_HAVE(float, gravity, 0.0f), (float)SHRT_MIN, (float)SHRT_MAX);
+		part.gravity = (short)std::clamp(ValueOr<float>(gravity, 0.0f), (float)SHRT_MIN, (float)SHRT_MAX);
 		part.friction = 0;
 		part.maxYvel = 0;
 
-		auto convertedStartColor = USE_IF_HAVE(ScriptColor, startColor, DEFAULT_COLOR);
+		auto convertedStartColor = ValueOr<ScriptColor>(startColor, DEFAULT_COLOR);
 		part.sR = convertedStartColor.GetR();
 		part.sG = convertedStartColor.GetG();
 		part.sB = convertedStartColor.GetB();
 
-		auto convertedEndColor = USE_IF_HAVE(ScriptColor, endColor, DEFAULT_COLOR);
+		auto convertedEndColor = ValueOr<ScriptColor>(endColor, DEFAULT_COLOR);
 		part.dR = convertedEndColor.GetR();
 		part.dG = convertedEndColor.GetG();
 		part.dB = convertedEndColor.GetB();
 
-		float convertedLife = std::max(0.1f, USE_IF_HAVE(float, life, DEFAULT_LIFE));
+		float convertedLife = std::max(0.1f, ValueOr<float>(life, DEFAULT_LIFE));
 		part.life =
 		part.sLife = (int)round(convertedLife / SECS_PER_FRAME);
 		part.colFadeSpeed = part.life / 2;
@@ -198,11 +198,11 @@ namespace TEN::Scripting::Effects
 
 		part.flags = SP_SCALE | SP_ROTATE | SP_DEF | SP_EXPDEF;
 
-		bool convertedApplyPoison = USE_IF_HAVE(bool, applyPoison, false);
+		bool convertedApplyPoison = ValueOr<bool>(applyPoison, false);
 		if (convertedApplyPoison)
 			part.flags |= SP_POISON;
 
-		bool convertedApplyDamage = USE_IF_HAVE(bool, applyDamage, false);
+		bool convertedApplyDamage = ValueOr<bool>(applyDamage, false);
 		if (convertedApplyDamage)
 			part.flags |= SP_DAMAGE;
 
@@ -230,20 +230,20 @@ namespace TEN::Scripting::Effects
 
 		auto pose = Pose(Vector3i(pos.x, pos.y, pos.z));
 
-		int innerRad = USE_IF_HAVE(int, innerRadius, 0);
-		int outerRad = USE_IF_HAVE(int, outerRadius, 128);
+		int innerRad = ValueOr<int>(innerRadius, 0);
+		int outerRad = ValueOr<int>(outerRadius, 128);
 
-		auto color = USE_IF_HAVE(ScriptColor, col, ScriptColor(255, 255, 255));
-		int spd = USE_IF_HAVE(int, speed, 50);
-		int ang = USE_IF_HAVE(int, angle, 0);
+		auto color = ValueOr<ScriptColor>(col, ScriptColor(255, 255, 255));
+		int spd = ValueOr<int>(speed, 50);
+		int ang = ValueOr<int>(angle, 0);
  
-		float life = USE_IF_HAVE(float, lifetime, 1.0f);
+		float life = ValueOr<float>(lifetime, 1.0f);
 		life = std::clamp(life, 0.0f, LIFE_IN_SECONDS_MAX);
 
 		// Normalize to range [0, 255].
 		int lifeInFrames = (int)round(life / SECONDS_PER_FRAME);
 
-		bool doDamage = USE_IF_HAVE(bool, hurtPlayer, false);
+		bool doDamage = ValueOr<bool>(hurtPlayer, false);
 
 		TriggerShockwave(
 			&pose, innerRad, outerRad, spd,
@@ -263,9 +263,9 @@ namespace TEN::Scripting::Effects
 */
 	static void EmitLight(Vec3 pos, TypeOrNil<ScriptColor> col, TypeOrNil<int> radius, TypeOrNil<bool> castShadows, TypeOrNil<std::string> name)
 	{
-		auto color = USE_IF_HAVE(ScriptColor, col, ScriptColor(255, 255, 255));
-		int rad = (float)(USE_IF_HAVE(int, radius, 20) * BLOCK(0.25f));
-		SpawnDynamicPointLight(pos.ToVector3(), color, rad, USE_IF_HAVE(bool, castShadows, false), GetHash(USE_IF_HAVE(std::string, name, std::string())));
+		auto color = ValueOr<ScriptColor>(col, ScriptColor(255, 255, 255));
+		int rad = (float)(ValueOr<int>(radius, 20) * BLOCK(0.25f));
+		SpawnDynamicPointLight(pos.ToVector3(), color, rad, ValueOr<bool>(castShadows, false), GetHash(ValueOr<std::string>(name, std::string())));
 	}
 
 /***Emit dynamic directional spotlight that lasts for a single frame.
@@ -282,11 +282,11 @@ namespace TEN::Scripting::Effects
 */
 	static void EmitSpotLight(Vec3 pos, Vec3 dir, TypeOrNil<ScriptColor> col, TypeOrNil<int> radius, TypeOrNil<int> falloff, TypeOrNil<int> distance, TypeOrNil<bool> castShadows, TypeOrNil<std::string> name)
 	{
-		auto color = USE_IF_HAVE(ScriptColor, col, ScriptColor(255, 255, 255));
-		int rad =	  (float)(USE_IF_HAVE(int, radius,   10) * BLOCK(0.25f));
-		int fallOff = (float)(USE_IF_HAVE(int, falloff,   5) * BLOCK(0.25f));
-		int dist =	  (float)(USE_IF_HAVE(int, distance, 20) * BLOCK(0.25f));
-		SpawnDynamicSpotLight(pos.ToVector3(), dir.ToVector3(), color, rad, fallOff, dist, USE_IF_HAVE(bool, castShadows, false), GetHash(USE_IF_HAVE(std::string, name, std::string())));
+		auto color = ValueOr<ScriptColor>(col, ScriptColor(255, 255, 255));
+		int rad =	  (float)(ValueOr<int>(radius,   10) * BLOCK(0.25f));
+		int fallOff = (float)(ValueOr<int>(falloff,   5) * BLOCK(0.25f));
+		int dist =	  (float)(ValueOr<int>(distance, 20) * BLOCK(0.25f));
+		SpawnDynamicSpotLight(pos.ToVector3(), dir.ToVector3(), color, rad, fallOff, dist, ValueOr<bool>(castShadows, false), GetHash(ValueOr<std::string>(name, std::string())));
 	}
 
 /***Emit blood.
@@ -296,7 +296,7 @@ namespace TEN::Scripting::Effects
 */
 	static void EmitBlood(const Vec3& pos, TypeOrNil<int> count)
 	{
-		TriggerBlood(pos.x, pos.y, pos.z, -1, USE_IF_HAVE(int, count, 1));
+		TriggerBlood(pos.x, pos.y, pos.z, -1, ValueOr<int>(count, 1));
 	}
 
 	/// Emit air bubble in a water room.
@@ -310,8 +310,8 @@ namespace TEN::Scripting::Effects
 		constexpr auto DEFAULT_AMP	= 32.0f;
 
 		int roomNumber = FindRoomNumber(pos.ToVector3i());
-		float convertedSize = USE_IF_HAVE(float, size, DEFAULT_SIZE);
-		float convertedAmp = USE_IF_HAVE(float, amp, DEFAULT_AMP);
+		float convertedSize = ValueOr<float>(size, DEFAULT_SIZE);
+		float convertedAmp = ValueOr<float>(amp, DEFAULT_AMP);
 		SpawnBubble(pos.ToVector3(), roomNumber, convertedSize, convertedAmp);
 	}
 
@@ -322,7 +322,7 @@ namespace TEN::Scripting::Effects
 */
 	static void EmitFire(const Vec3& pos, TypeOrNil<float> size)
 	{
-		AddFire(pos.x, pos.y, pos.z, FindRoomNumber(Vector3i(pos.x, pos.y, pos.z)), USE_IF_HAVE(float, size, 1));
+		AddFire(pos.x, pos.y, pos.z, FindRoomNumber(Vector3i(pos.x, pos.y, pos.z)), ValueOr<float>(size, 1));
 	}
 
 /***Make an explosion. Does not hurt Lara
@@ -333,7 +333,7 @@ namespace TEN::Scripting::Effects
 */
 	static void MakeExplosion(Vec3 pos, TypeOrNil<float> size, TypeOrNil<bool> shockwave)
 	{
-		TriggerExplosion(Vector3(pos.x, pos.y, pos.z), USE_IF_HAVE(float, size, 512.0f), true, false, USE_IF_HAVE(bool, shockwave, false), FindRoomNumber(Vector3i(pos.x, pos.y, pos.z)));
+		TriggerExplosion(Vector3(pos.x, pos.y, pos.z), ValueOr<float>(size, 512.0f), true, false, ValueOr<bool>(shockwave, false), FindRoomNumber(Vector3i(pos.x, pos.y, pos.z)));
 	}
 
 /***Make an earthquake
@@ -342,7 +342,7 @@ namespace TEN::Scripting::Effects
 */
 	static void Earthquake(TypeOrNil<int> strength)
 	{
-		int str = USE_IF_HAVE(int, strength, 100);
+		int str = ValueOr<int>(strength, 100);
 		Camera.bounce = -str;
 	}
 
