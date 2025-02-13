@@ -150,9 +150,9 @@ Vec3 Vec3::Rotate(const Rotation& rot) const
 
 /// Get the linearly interpolated Vec3 between this Vec3 and the input Vec3 according to the input interpolation alpha.
 // @function Vec3:Lerp
-// @tparam Vec3 vector Target interpolation vector.
+// @tparam Vec3 vector Interpolation target.
 // @tparam float alpha Interpolation alpha in the range [0, 1].
-// @treturn Vec3 Linearly interpolated vector
+// @treturn Vec3 Linearly interpolated vector.
 Vec3 Vec3::Lerp(const Vec3& vector, float alpha) const
 {
 	auto vector0 = ToVector3();
