@@ -18,9 +18,9 @@
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptUtil.h"
-#include "Scripting/Internal/TEN/Effects/AnimationType.h"
 #include "Scripting/Internal/TEN/Effects/BlendIDs.h"
 #include "Scripting/Internal/TEN/Effects/EffectIDs.h"
+#include "Scripting/Internal/TEN/Effects/ParticleAnimTypes.h"
 #include "Scripting/Internal/TEN/Types/Color/Color.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
@@ -263,7 +263,7 @@ namespace TEN::Scripting::Effects
 		part.SpriteID = particleData.get_or("spriteIndex", 0);
 
 		auto bMode = particleData.get_or("blendMode", BlendMode::AlphaBlend);
-		part.blendMode = BlendMode(std::clamp(int(bMode), int(BlendMode::Opaque), int(BlendMode::AlphaBlend)));
+		part.blendMode = bMode;
 
 		Vec3 pos = particleData["position"];
 		part.x = pos.x;
@@ -344,11 +344,11 @@ namespace TEN::Scripting::Effects
 		bool animatedSpr = particleData.get_or("animated", false);
 		if (animatedSpr)
 		{
-			ParticleAnimationMode applyAnimation = particleData.get_or("animationType", ParticleAnimationMode::Loop);
+			ParticleAnimType applyAnim = particleData.get_or("animationType", ParticleAnimType::Loop);
 			float applyFramerate = particleData.get_or("frameRate", 1.0f);
 			part.flags |= SP_ANIMATED;
 			part.framerate = applyFramerate;
-			part.animationType = ParticleAnimationMode(std::clamp(int(applyAnimation), int(ParticleAnimationMode::None), int(ParticleAnimationMode::LifeTimeSpread)));
+			part.animationType = ParticleAnimType(std::clamp(int(applyAnim), int(ParticleAnimType::None), int(ParticleAnimType::LifetimeSpread)));
 
 		}
 
@@ -524,9 +524,9 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
 
 		auto handler = LuaHandler{ state };
-		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_ParticleAnimationType, PARTICLE_ANIMATION_TYPE);
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_BlendID, BLEND_IDS);
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_EffectID, EFFECT_IDS);
+		handler.MakeReadOnlyTable(tableEffects, "ParticleAnimationType", PARTICLE_ANIM_TYPES);
 	}
 }
 
@@ -535,7 +535,7 @@ namespace TEN::Scripting::Effects
 // @tfield Vec3 position World position.
 // @tfield Vec3 velocity Velocity.
 // @tfield[opt] Objects.ObjID spriteSeqID ID of the sprite sequence object. __Default: Objects.ObjID.DEFAULT_SPRITES__
-// @tfield[opt] int spriteIndex ID of the sprite in the sprite sequence object.__Default: 0__
+// @tfield[opt] int spriteID ID of the sprite in the sprite sequence object.__Default: 0__
 // @tfield[opt] float lifetime Lifespan in seconds. __Default: 2__
 // @tfield[opt] float maxYVelocity Specifies ithe maximum Y velocity for the particle. __Default: 0__
 // @tfield[opt] float gravity Specifies if the particle will fall over time. Positive values ascend, negative values descend. Recommended range: [-1000 and 1000]. __Default: 0__
@@ -546,7 +546,7 @@ namespace TEN::Scripting::Effects
 // @tfield[opt] float endSize Size at end of life. The particle will linearly shrink or grow toward this size over its lifespan. __Default: 0__
 // @tfield[opt] Color startColor Color at start of life. __Default: Color(255, 255, 255)__
 // @tfield[opt] Color endColor Color to fade toward. This will finish long before the end of the particle's life due to internal math. __Default: Color(255, 255, 255)__
-// @tfield[opt] Effects.BlendID blendMode Render blend mode. __TEN.Effects.BlendID.ALPHABLEND__
+// @tfield[opt] Effects.BlendID blendMode Render blend mode. __TEN.Effects.BlendID.ALPHA_BLEND__
 // @tfield[opt] bool damage Specify if the particle will harm the player on collision. __Default: false__
 // @tfield[opt] bool poison Specify if the particle will poison the player on collision. __Default: false__
 // @tfield[opt] bool burn Specify if the particle will burn the player on collision. __Default: false__

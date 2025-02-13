@@ -189,7 +189,7 @@ void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID)
 	particle.SpriteID = (int)round(Lerp(0.0f, spriteCount, normalizedAge));
 }
 
-void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	ParticleAnimationMode animationType, float frameRate)
+void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	ParticleAnimType animationType, float frameRate)
 {
 	// Ensure valid lifespan
 	if (particle.life <= 0)
@@ -218,7 +218,7 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 	// Handle animation modes
 	switch (animationType)
 	{
-	case ParticleAnimationMode::Loop:  // Frames loop sequentially
+	case ParticleAnimType::Loop:  // Frames loop sequentially
 	{
 		float frameDuration = frameRate > 0 ? 1.0f / frameRate : 1.0f / totalFrames;  // Duration per frame
 		int currentFrame = static_cast<int>(particleAge / frameDuration) % totalFrames;  // Wrap frames
@@ -226,7 +226,7 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 		break;
 	}
 
-	case ParticleAnimationMode::OneShot:  // Frames play once, then freeze on the last frame
+	case ParticleAnimType::OneShot:  // Frames play once, then freeze on the last frame
 	{
 		float totalDuration = frameRate > 0 ? totalFrames / frameRate : particle.sLife;
 		int currentFrame = static_cast<int>(particleAge / (totalDuration / totalFrames));
@@ -236,7 +236,7 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 		break;
 	}
 
-	case ParticleAnimationMode::BackAndForth:  // Frames go forward and then backward
+	case ParticleAnimType::BackAndForth:  // Frames go forward and then backward
 	{
 		float frameDuration = frameRate > 0 ? 1.0f / frameRate : 1.0f / totalFrames;
 		int totalFrameSteps = totalFrames * 2 - 2;  // Forward and backward frames (avoiding double-count of last frame)
@@ -246,7 +246,7 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 		break;
 	}
 
-	case ParticleAnimationMode::LifeTimeSpread:  // Distribute all frames evenly over lifetime
+	case ParticleAnimType::LifetimeSpread:  // Distribute all frames evenly over lifetime
 	{
 		int currentFrame = static_cast<int>(normalizedAge * totalFrames);
 		if (currentFrame >= totalFrames)
@@ -255,7 +255,7 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 		break;
 	}
 
-	case ParticleAnimationMode::None:  // Distribute all frames evenly over lifetime
+	case ParticleAnimType::None:  // Distribute all frames evenly over lifetime
 	{
 		particle.SpriteID = 0;
 		break;
@@ -435,7 +435,7 @@ void UpdateSparks()
 
 			if (spark.flags & SP_ANIMATED)
 			{
-				ParticleAnimationMode animationType = static_cast<ParticleAnimationMode>(spark.animationType);
+				ParticleAnimType animationType = static_cast<ParticleAnimType>(spark.animationType);
 				GAME_OBJECT_ID spriteObject = static_cast<GAME_OBJECT_ID>(spark.SpriteSeqID);
 				SetAdvancedSpriteSequence(spark, spriteObject,  animationType, spark.framerate);
 			}

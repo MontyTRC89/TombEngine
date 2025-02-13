@@ -47,6 +47,15 @@ enum SpriteEnumFlag
 	SP_SOUND	  = (1 << 18),
 };
 
+enum class ParticleAnimType
+{
+	None,
+	OneShot,
+	Loop,
+	BackAndForth,
+	LifetimeSpread
+};
+
 // Used by Particle.nodeNumber.
 enum ParticleNodeOffsetIDs
 {
@@ -110,15 +119,6 @@ struct NODEOFFSET_INFO
 	unsigned char gotIt;
 };
 
-enum class ParticleAnimationMode
-{
-	None,			 // No Animation
-	Loop,			 // Frames loop sequentially
-	OneShot,         // Frames play once, then freeze on the last frame
-	BackAndForth,        // Frames go forward, then backward
-	LifeTimeSpread   // Frames are evenly distributed over the particle's lifetime
-};
-
 struct Particle
 {
 	bool on;
@@ -174,7 +174,7 @@ struct Particle
   
 	int damage;
 	float framerate;
-	ParticleAnimationMode animationType;
+	ParticleAnimType animationType;
 
 	int lightRadius;
 	int lightFlicker;
@@ -266,7 +266,7 @@ void ClearInactiveEffects(std::vector<TEffect>& effects)
 Particle* GetFreeParticle();
 
 void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID);
-void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID, ParticleAnimationMode animationType, float frameRate);
+void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID, ParticleAnimType animationType, float frameRate);
 
 void DetatchSpark(int num, SpriteEnumFlag type);
 void UpdateSparks();
