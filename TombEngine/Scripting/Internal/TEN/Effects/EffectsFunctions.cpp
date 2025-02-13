@@ -238,6 +238,7 @@ namespace TEN::Scripting::Effects
 	// poison = false,
 	// burn = false,
 	// damageHit = 80,
+	// sound = 197,
 	// light = true,
 	// lightRadius = 6, 
 	// lightFlicker = 5, 
@@ -552,10 +553,10 @@ namespace TEN::Scripting::Effects
 // @tfield[opt] bool burn Specify if the particle will burn the player on collision. __Default: false__
 // @tfield[opt] bool wind Specify if the particle will be affected by wind in outside rooms. __Default: false__
 // @tfield[opt] int damageHit Specify the damage particle will harm the player on collision. __Default: 2__
-// @tfield[opt] bool light Specify if the particle will be emit a light based on its color. __Default: false__
+// @tfield[opt] bool light Specify if the particle will be emit a light based on its color. Recommended for single particles. __Default: false__
 // @tfield[opt] int lightRadius measured in "clicks" or 256 world units. __Default: 0__
 // @tfield[opt] int lightFlicker The interval at which light should flicker. __Default: 0__
-// @tfield[opt] int sound ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window. __Default: None__
+// @tfield[opt] int sound ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window. Looping sounds recommended. __Default: None__
 // @tfield[opt] bool animated Specify if the particle will be animated. __Default: false__
 // @tfield[opt] Effects.ParticleAnimationType animationType Specify the the type of animation the particle will use. __Default: TEN.Effects.ParticleAnimationType.LOOP__
 // @tfield[opt] float frameRate The framerate with which the particle will be animated. __Default: 1__
