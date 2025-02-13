@@ -229,8 +229,8 @@ namespace TEN::Structures
 		// Get existing empty node ID.
 		else
 		{
-			nodeId = _freeNodeIds.back();
-			_freeNodeIds.pop_back();
+			nodeId = _freeNodeIds.top();
+			_freeNodeIds.pop();
 		}
 
 		return nodeId;
@@ -469,7 +469,7 @@ namespace TEN::Structures
 
 		// Clear node and mark free.
 		node = {};
-		_freeNodeIds.push_back(nodeId);
+		_freeNodeIds.push(nodeId);
 
 		// Shrink capacity if empty to avoid memory bloat.
 		if (_nodes.size() == _freeNodeIds.size())

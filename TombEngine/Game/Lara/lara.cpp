@@ -343,7 +343,7 @@ static void HandlePlayerDebug(const ItemInfo& item)
 	HandleRoomDebug(item);
 	HandleCollMeshOptimizationDebug(item);
 
-	if constexpr (!DebugBuild)
+	if constexpr (!DEBUG_BUILD)
 		return;
 
 	// Collision stats.

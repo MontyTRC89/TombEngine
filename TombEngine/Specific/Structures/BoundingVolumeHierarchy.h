@@ -37,7 +37,7 @@ namespace TEN::Structures
 		// Fields
 
 		std::vector<Node>			 _nodes		  = {};
-		std::vector<int>			 _freeNodeIds = {};
+		std::stack<int>				 _freeNodeIds = {};
 		std::unordered_map<int, int> _leafIdMap	  = {}; // Key = object ID, value = leaf ID.
 		int							 _rootId	  = NO_VALUE;
 
