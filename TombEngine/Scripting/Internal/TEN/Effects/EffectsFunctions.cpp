@@ -220,7 +220,7 @@ namespace TEN::Scripting::Effects
 	// position = GetMoveableByName("camera_target_6") :GetPosition(), 
 	// velocity = Vec3(0, 0, 10),
 	// objectID = TEN.Objects.ObjID.CUSTOM_BAR_GRAPHIC,
-	// spriteIndex = 0,
+	// spriteID = 0,
 	// lifetime = 10,
 	// maxYVelocity = 0,
 	// gravity = 0,
