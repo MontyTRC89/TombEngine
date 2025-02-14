@@ -278,8 +278,8 @@ namespace TEN::Scripting::Effects
 
 		float rotAdd = particleData.get_or("rotationSpeed", 0.0f);
 		float rotAng = particleData.get_or("startRotation", TO_DEGREES(Random::GenerateAngle()));
-		part.rotAng = ANGLE(rotAng);
-		part.rotAdd = byte(ANGLE(rotAdd) >> 4);
+		part.rotAng = ANGLE(rotAng) >> 4;
+		part.rotAdd = ANGLE(rotAdd) >> 4;
 
 		part.sSize =
 			part.size = particleData.get_or("startSize", DEFAULT_START_SIZE);
