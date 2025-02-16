@@ -267,21 +267,19 @@ namespace TEN::Renderer
 
 				for (int l = 0; l < (int)room.mesh.size(); l++)
 				{
-					RendererStatic* staticInfo = &r->Statics[l];
-					MESH_INFO* oldMesh = &room.mesh[l];
+					auto& rendererStatic = r->Statics[l];
+					auto& nativeStatic = room.mesh[l];
 
-					oldMesh->Dirty = true;
+					rendererStatic.ObjectNumber = nativeStatic.ObjectId;
+					rendererStatic.RoomNumber = nativeStatic.RoomNumber;
+					rendererStatic.Color = nativeStatic.Color;
+					rendererStatic.AmbientLight = r->AmbientLight;
+					rendererStatic.Pose = nativeStatic.Transform;
+					rendererStatic.OriginalSphere = Statics[rendererStatic.ObjectNumber].visibilityBox.ToLocalBoundingSphere();
+					rendererStatic.IndexInRoom = l;
 
-					staticInfo->ObjectNumber = oldMesh->staticNumber;
-					staticInfo->RoomNumber = oldMesh->roomNumber;
-					staticInfo->Color = oldMesh->color;
-					staticInfo->AmbientLight = r->AmbientLight;
-					staticInfo->Pose = oldMesh->pos;
-					staticInfo->Scale = oldMesh->scale;
-					staticInfo->OriginalSphere = Statics[staticInfo->ObjectNumber].visibilityBox.ToLocalBoundingSphere();
-					staticInfo->IndexInRoom = l;
-
-					staticInfo->Update();
+					nativeStatic.Dirty = true;
+					rendererStatic.Update();
 				}
 			}
 
