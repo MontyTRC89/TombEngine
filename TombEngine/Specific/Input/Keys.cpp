@@ -1,0 +1,181 @@
+#include "framework.h"
+#include "Specific/Input/Keys.h"
+
+#include <OISKeyboard.h>
+#include <OISMouse.h>
+
+using namespace OIS;
+
+namespace TEN::Input
+{
+	static const auto KEY_NAME_MAP = std::unordered_map<int, std::string>
+	{
+		{ KC_UNASSIGNED, "<None>" },
+
+		// Keyboard keys
+		{ KC_ESCAPE, "Esc" },
+		{ KC_1, "1" },
+		{ KC_2, "2" },
+		{ KC_3, "3" },
+		{ KC_4, "4" },
+		{ KC_5, "5" },
+		{ KC_6, "6" },
+		{ KC_7, "7" },
+		{ KC_8, "8" },
+		{ KC_9, "9" },
+		{ KC_0, "0" },
+		{ KC_MINUS, "-" },
+		{ KC_EQUALS, "+" },
+		{ KC_BACK, "Back" },
+		{ KC_TAB, "Tab" },
+		{ KC_Q, "Q" },
+		{ KC_W, "W" },
+		{ KC_E, "E" },
+		{ KC_R, "R" },
+		{ KC_T, "T" },
+		{ KC_Y, "Y" },
+		{ KC_U, "U" },
+		{ KC_I, "I" },
+		{ KC_O, "O" },
+		{ KC_P, "P" },
+		{ KC_LBRACKET, "[" },
+		{ KC_RBRACKET, "]" },
+		{ KC_RETURN, "Enter" },
+		{ KC_LCONTROL, "Ctrl" },
+		{ KC_A, "A" },
+		{ KC_S, "S" },
+		{ KC_D, "D" },
+		{ KC_F, "F" },
+		{ KC_G, "G" },
+		{ KC_H, "H" },
+		{ KC_J, "J" },
+		{ KC_K, "K" },
+		{ KC_L, "L" },
+		{ KC_SEMICOLON, ";" },
+		{ KC_APOSTROPHE, "'" },
+		{ KC_GRAVE, "`" },
+		{ KC_LSHIFT, "Shift" },
+		{ KC_BACKSLASH, "Back Slash" },
+		{ KC_Z, "Z" },
+		{ KC_X, "X" },
+		{ KC_C, "C" },
+		{ KC_V, "V" },
+		{ KC_B, "B" },
+		{ KC_N, "N" },
+		{ KC_M, "M" },
+		{ KC_COMMA, "," },
+		{ KC_PERIOD, "." },
+		{ KC_SLASH, "/" },
+		{ KC_RSHIFT, "Shift" },
+		{ KC_MULTIPLY, "Pad X" },
+		{ KC_LMENU, "Alt" },
+		{ KC_SPACE, "Space" },
+		{ KC_CAPITAL, "Caps Lock" },
+		{ KC_F1, "F1" },
+		{ KC_F2, "F2" },
+		{ KC_F3, "F3" },
+		{ KC_F4, "F4" },
+		{ KC_F5, "F5" },
+		{ KC_F6, "F6" },
+		{ KC_F7, "F7" },
+		{ KC_F8, "F8" },
+		{ KC_F9, "F9" },
+		{ KC_F10, "F10" },
+		{ KC_NUMLOCK, "Num Lock" },
+		{ KC_SCROLL, "Scroll Lock" },
+		{ KC_NUMPAD7, "Pad 7" },
+		{ KC_NUMPAD8, "Pad 8" },
+		{ KC_NUMPAD9, "Pad 9" },
+		{ KC_SUBTRACT, "Pad -" },
+		{ KC_NUMPAD4, "Pad 4" },
+		{ KC_NUMPAD5, "Pad 5" },
+		{ KC_NUMPAD6, "Pad 6" },
+		{ KC_ADD, "Pad +" },
+		{ KC_NUMPAD1, "Pad 1" },
+		{ KC_NUMPAD2, "Pad 2" },
+		{ KC_NUMPAD3, "Pad 3" },
+		{ KC_NUMPAD0, "Pad 0" },
+		{ KC_DECIMAL, "Pad ." },
+		{ KC_OEM_102, "\\" },
+		{ KC_F11, "F11" },
+		{ KC_F12, "F12" },
+		{ KC_NUMPADENTER, "Pad Enter" },
+		{ KC_RCONTROL, "Ctrl" },
+		{ KC_DIVIDE, "Pad /" },
+		{ KC_RMENU, "Alt" },
+		{ KC_HOME, "Home" },
+		{ KC_UP, "Up" },
+		{ KC_PGUP, "Page Up" },
+		{ KC_LEFT, "Left" },
+		{ KC_RIGHT, "Right" },
+		{ KC_END, "End" },
+		{ KC_DOWN, "Down" },
+		{ KC_PGDOWN, "Page Down" },
+		{ KC_INSERT, "Insert" },
+		{ KC_DELETE, "Del" },
+
+		// Mouse keys
+		{ MK_LCLICK, "Left-Click" },
+		{ MK_RCLICK, "Right-Click" },
+		{ MK_MCLICK, "Middle-Click" },
+		{ MK_BUTTON_4, "Mouse 4" },
+		{ MK_BUTTON_5, "Mouse 5" },
+		{ MK_BUTTON_6, "Mouse 6" },
+		{ MK_BUTTON_7, "Mouse 7" },
+		{ MK_BUTTON_8, "Mouse 8" },
+		{ MK_AXIS_X_NEG, "Mouse X-" },
+		{ MK_AXIS_X_POS, "Mouse X+" },
+		{ MK_AXIS_Y_NEG, "Mouse Y-" },
+		{ MK_AXIS_Y_POS, "Mouse Y+" },
+		{ MK_AXIS_Z_NEG, "Mouse Z-" },
+		{ MK_AXIS_Z_POS, "Mouse Z+" },
+
+		// Gamepad keys
+		// TODO: Find a way to display XBox controller keys when using that controller type.
+		{ GK_BUTTON_1, "Gamepad 1" },
+		{ GK_BUTTON_2, "Gamepad 2" },
+		{ GK_BUTTON_3, "Gamepad 3" },
+		{ GK_BUTTON_4, "Gamepad 4" },
+		{ GK_BUTTON_5, "Gamepad 5" },
+		{ GK_BUTTON_6, "Gamepad 6" },
+		{ GK_BUTTON_7, "Gamepad 7" },
+		{ GK_BUTTON_8, "Gamepad 8" },
+		{ GK_BUTTON_9, "Gamepad 9" },
+		{ GK_BUTTON_10, "Gamepad 10" },
+		{ GK_BUTTON_11, "Gamepad 11" },
+		{ GK_BUTTON_12, "Gamepad 12" },
+		{ GK_BUTTON_13, "Gamepad 13" },
+		{ GK_BUTTON_14, "Gamepad 14" },
+		{ GK_BUTTON_15, "Gamepad 15" },
+		{ GK_BUTTON_16, "Gamepad 16" },
+		{ GK_AXIS_X_NEG, "Stick X-" },
+		{ GK_AXIS_X_POS, "Stick X+" },
+		{ GK_AXIS_Y_NEG, "Stick Y-" },
+		{ GK_AXIS_Y_POS, "Stick Y+" },
+		{ GK_AXIS_Z_NEG, "Stick Z-" },
+		{ GK_AXIS_Z_POS, "Stick Z+" },
+		{ GK_AXIS_W_NEG, "Stick W-" },
+		{ GK_AXIS_W_POS, "Stick W+" },
+		{ GK_AXIS_L_TRIGGER_1, "Left Trigger 1" },
+		{ GK_AXIS_L_TRIGGER_2, "Left Trigger 2" },
+		{ GK_AXIS_R_TRIGGER_1, "Right Trigger 1" },
+		{ GK_AXIS_R_TRIGGER_2, "Right Trigger 2" },
+		{ GK_DPAD_UP, "D-Pad Up" },
+		{ GK_DPAD_DOWN, "D-Pad Down" },
+		{ GK_DPAD_LEFT, "D-Pad Left" },
+		{ GK_DPAD_RIGHT, "D-Pad Right" }
+	};
+
+	const std::string& GetKeyName(int keyID)
+	{
+		// Find and return key name.
+		auto it = KEY_NAME_MAP.find(keyID);
+		if (it != KEY_NAME_MAP.end())
+		{
+			const auto& [keyID, name] = *it;
+			return name;
+		}
+
+		return KEY_NAME_MAP.at(KC_UNASSIGNED);
+	}
+}

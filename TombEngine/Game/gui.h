@@ -120,7 +120,7 @@ namespace TEN::Gui
 	{
 	private:
 		// Input inquirers
-		bool GuiIsPulsed(ActionID actionID) const;
+		bool GuiIsPulsed(InputActionID actionID) const;
 		bool GuiIsSelected(bool onClicked = true) const;
 		bool GuiIsDeselected() const;
 		bool CanSelect() const;
@@ -132,7 +132,7 @@ namespace TEN::Gui
 		int OptionCount;
 		int SelectedSaveSlot;
 
-		float TimeInMenu = -1.0f;
+		int TimeInMenu = NO_VALUE;
 		SettingsData CurrentSettings;
 
 		// Inventory variables

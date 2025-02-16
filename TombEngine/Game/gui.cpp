@@ -23,7 +23,6 @@
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
-#include "Specific/Input/InputAction.h"
 #include "Specific/clock.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
@@ -124,7 +123,7 @@ namespace TEN::Gui
 		STRING_ACTIONS_LOAD
 	};
 
-	bool GuiController::GuiIsPulsed(ActionID actionID) const
+	bool GuiController::GuiIsPulsed(InputActionID actionID) const
 	{
 		constexpr auto DELAY		 = 0.1f;
 		constexpr auto INITIAL_DELAY = 0.4f;
@@ -134,7 +133,7 @@ namespace TEN::Gui
 			return false;
 
 		// Pulse only directional inputs.
-		auto oppositeAction = std::optional<ActionID>(std::nullopt);
+		auto oppositeAction = std::optional<InputActionID>(std::nullopt);
 		switch (actionID)
 		{
 		case In::Forward:
@@ -239,7 +238,7 @@ namespace TEN::Gui
 	{
 		if (mode != InvMode)
 		{
-			TimeInMenu = 0.0f;
+			TimeInMenu = 0;
 			InvMode = mode;
 		}
 	}
@@ -723,17 +722,17 @@ namespace TEN::Gui
 					}
 					else
 					{
-						int selectedKey = 0;
-						for (selectedKey = 0; selectedKey < MAX_INPUT_SLOTS; selectedKey++)
+						int selectedKeyID = 0;
+						for (selectedKeyID = 0; selectedKeyID < KEY_COUNT; selectedKeyID++)
 						{
-							if (KeyMap[selectedKey])
+							if (KeyMap[selectedKeyID])
 								break;
 						}
 
-						if (selectedKey == MAX_INPUT_SLOTS)
-							selectedKey = 0;
+						if (selectedKeyID == KEY_COUNT)
+							selectedKeyID = 0;
 
-						if (selectedKey && !g_KeyNames[selectedKey].empty())
+						if (selectedKeyID && !GetKeyName(selectedKeyID).empty())
 						{
 							unsigned int baseIndex = 0;
 							switch (MenuToDisplay)
@@ -754,7 +753,7 @@ namespace TEN::Gui
 								break;
 							}
 
-							Bindings[1][baseIndex + SelectedOption] = selectedKey;
+							g_Bindings.SetKeyBinding(InputDeviceID::Custom, InputActionID(baseIndex + SelectedOption), selectedKeyID);
 							DefaultConflict();
 
 							CurrentSettings.NewKeyWaitTimer = 0.0f;
@@ -855,8 +854,8 @@ namespace TEN::Gui
 				if (SelectedOption == (OptionCount - 1))
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					CurrentSettings.Configuration.Bindings = Bindings[1];
-					g_Configuration.Bindings = Bindings[1];
+					CurrentSettings.Configuration.Bindings = g_Bindings.GetBindingProfile(InputDeviceID::Custom);
+					g_Configuration.Bindings = g_Bindings.GetBindingProfile(InputDeviceID::Custom);
 					SaveConfiguration();
 					MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 					SelectedOption = 2;
@@ -867,7 +866,7 @@ namespace TEN::Gui
 				if (SelectedOption == OptionCount)
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
-					Bindings[1] = CurrentSettings.Configuration.Bindings;
+					g_Bindings.SetBindingProfile(InputDeviceID::Custom, CurrentSettings.Configuration.Bindings);
 					MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 					SelectedOption = 2;
 					return;
@@ -2190,7 +2189,7 @@ namespace TEN::Gui
 				{
 					// HACK.
 					ClearAllActions();
-					ActionMap[(int)In::Flare].Update(1.0f);
+					ActionMap[In::Flare].Update(1.0f);
 
 					HandleWeapon(item);
 					ClearAllActions();
