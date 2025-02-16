@@ -54,8 +54,10 @@ namespace TEN::Input
 
 		float activeDelaySecs = (_timeActive > (unsigned int)round(initialDelaySecs / DELTA_TIME)) ? delaySecs : initialDelaySecs;
 		unsigned int activeDelayGameFrames = (unsigned int)round(activeDelaySecs / DELTA_TIME);
+
 		unsigned int delayGameFrames = (unsigned int)floor(_timeActive / activeDelayGameFrames) * activeDelayGameFrames;
-		if (delayGameFrames > ((unsigned int)floor(_prevTimeActive / activeDelayGameFrames) * activeDelayGameFrames))
+		unsigned int prevDelayGameFrames = (unsigned int)floor(_prevTimeActive / activeDelayGameFrames) * activeDelayGameFrames;
+		if (delayGameFrames > prevDelayGameFrames)
 			return true;
 
 		return false;
