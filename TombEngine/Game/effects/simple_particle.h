@@ -1,5 +1,6 @@
 #pragma once
 #include "Objects\objectslist.h"
+#include <SimpleMath.h>
 
 enum class BlendMode;
 struct ItemInfo;
@@ -10,7 +11,7 @@ namespace TEN::Effects
 
 	struct SimpleParticle
 	{
-		DirectX::SimpleMath::Vector3 worldPosition;
+		Vector3 worldPosition;
 		float size;
 		float age;
 		float ageRate;
@@ -20,6 +21,15 @@ namespace TEN::Effects
 		GAME_OBJECT_ID sequence;
 		bool active;
 		BlendMode blendMode;
+
+		Vector3 PrevWorldPosition = Vector3::Zero;
+		float	PrevSize		  = 0.0f;
+
+		void StoreInterpolationData()
+		{
+			PrevWorldPosition = worldPosition;
+			PrevSize = size;
+		}
 	};
 
 	extern std::array<SimpleParticle, SIMPLE_PARTICLE_NUM_MAX> simpleParticles;

@@ -6,18 +6,34 @@ struct ItemInfo;
 
 namespace TEN::Effects::Hair
 {
+	enum class PlayerHairType
+	{
+		Normal,
+		YoungLeft,
+		YoungRight
+	};
+
 	class HairUnit
 	{
 	private:
 		// Constants
 
-		static constexpr auto HAIR_GRAVITY = 10.0f;
+		static constexpr auto HAIR_GRAVITY_COEFF = 1.66f;
 
 		struct HairSegment
 		{
 			Vector3	   Position	   = Vector3::Zero;
 			Vector3	   Velocity	   = Vector3::Zero;
 			Quaternion Orientation = Quaternion::Identity;
+
+			Vector3	   PrevPosition	   = Vector3::Zero;
+			Quaternion PrevOrientation = Quaternion::Identity;
+
+			void StoreInterpolationData()
+			{
+				PrevPosition = Position;
+				PrevOrientation = Orientation;
+			}
 		};
 
 	public:
@@ -29,12 +45,18 @@ namespace TEN::Effects::Hair
 		GAME_OBJECT_ID			 ObjectID = GAME_OBJECT_ID::ID_NO_OBJECT;
 		std::vector<HairSegment> Segments = {};
 
+		// Getters
+		
+		static int GetRootMeshID(int hairUnitID);
+
 		// Utilities
 
 		void Update(const ItemInfo& item, int hairUnitID);
 
 	private:
 		// Helpers
+
+		static int GetHairTypeIndex(int hairUnitID, bool isYoung);
 
 		Vector3						GetRelBaseOffset(int hairUnitID, bool isYoung);
 		Vector3						GetWaterProbeOffset(const ItemInfo& item);

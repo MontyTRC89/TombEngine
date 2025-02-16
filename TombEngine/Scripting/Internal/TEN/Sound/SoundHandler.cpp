@@ -5,7 +5,7 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Sound/SoundTrackTypes.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Sound/sound.h"
 
 /// Functions for sound management.
@@ -20,16 +20,18 @@ namespace TEN::Scripting::Sound
 	//@tparam Sound.SoundTrackType type of the audio track to play
 	static void PlayAudioTrack(const std::string& trackName, TypeOrNil<SoundTrackType> mode)
 	{
-		auto playMode = USE_IF_HAVE(SoundTrackType, mode, SoundTrackType::OneShot);
+		auto playMode = ValueOr<SoundTrackType>(mode, SoundTrackType::OneShot);
 		PlaySoundTrack(trackName, playMode);
 	}
 
-	///Set and play an ambient track
-	//@function SetAmbientTrack
-	//@tparam string name of track (without file extension) to play
-	static void SetAmbientTrack(const std::string& trackName)
+	/// Set and play an ambient track
+	// @function SetAmbientTrack
+	// @tparam string name of track (without file extension) to play
+	// @tparam bool fromStart specifies whether ambient track should play from the start, or crossfade at a random position
+	static void SetAmbientTrack(const std::string& trackName, TypeOrNil<bool> fromTheBeginning)
 	{
-		PlaySoundTrack(trackName, SoundTrackType::BGM);
+		auto pos = ValueOr<bool>(fromTheBeginning, false) ? std::optional<QWORD>(0) : std::optional<QWORD>();
+		PlaySoundTrack(trackName, SoundTrackType::BGM, pos, pos.has_value() ? SOUND_XFADETIME_ONESHOT : SOUND_XFADETIME_BGM);
 	}
 
 	///Stop any audio tracks currently playing
@@ -44,7 +46,7 @@ namespace TEN::Scripting::Sound
 	//@tparam Sound.SoundTrackType type of the audio track
 	static void StopAudioTrack(TypeOrNil<SoundTrackType> mode)
 	{
-		auto playMode = USE_IF_HAVE(SoundTrackType, mode, SoundTrackType::OneShot);
+		auto playMode = ValueOr<SoundTrackType>(mode, SoundTrackType::OneShot);
 		StopSoundTrack(playMode, SOUND_XFADETIME_ONESHOT);
 	}
 
@@ -54,7 +56,7 @@ namespace TEN::Scripting::Sound
 	//@treturn float current loudness of a specified audio track
 	static float GetAudioTrackLoudness(TypeOrNil<SoundTrackType> mode)
 	{
-		auto playMode = USE_IF_HAVE(SoundTrackType, mode, SoundTrackType::OneShot);
+		auto playMode = ValueOr<SoundTrackType>(mode, SoundTrackType::OneShot);
 		return GetSoundTrackLoudness(playMode);
 	}
 

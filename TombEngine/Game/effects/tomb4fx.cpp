@@ -12,6 +12,7 @@
 #include "Game/effects/Drip.h"
 #include "Game/effects/Ripple.h"
 #include "Game/effects/smoke.h"
+#include "Game/effects/Splash.h"
 #include "Game/effects/weather.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -27,6 +28,7 @@ using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
+using namespace TEN::Effects::Splash;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
 using namespace TEN::Math;
@@ -35,13 +37,7 @@ using TEN::Renderer::g_Renderer;
 // NOTE: This fixes body part exploding instantly if entity is on ground.
 constexpr auto BODY_PART_SPAWN_VERTICAL_OFFSET = CLICK(1);
 
-char LaserSightActive = 0;
-char LaserSightCol = 0;
 int NextGunshell = 0;
-
-int LaserSightX;
-int LaserSightY;
-int LaserSightZ;
 
 int NextFireSpark = 1;
 int NextSmokeSpark = 0;
@@ -51,7 +47,7 @@ FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
-FIRE_LIST Fires[MAX_FIRE_LIST];
+std::vector<FIRE_LIST> Fires;
 
 int GetFreeFireSpark()
 {
@@ -109,15 +105,15 @@ void TriggerGlobalStaticFlame()
 	spark->fadeToBlack = 0;
 	spark->life = 8;
 	spark->sLife = 8;
-	spark->y = 0;
-	spark->x = (GetRandomControl() & 7) - 4;
+	spark->position = Vector3i(
+		(GetRandomControl() & 7) - 4,
+		0,
+		(GetRandomControl() & 7) - 4
+	);
 	spark->maxYvel = 0;
 	spark->gravity = 0;
-	spark->z = (GetRandomControl() & 7) - 4;
 	spark->friction = 0;
-	spark->xVel = 0;
-	spark->yVel = 0;
-	spark->zVel = 0;
+	spark->velocity = Vector3i::Zero;
 	spark->flags = SP_NONE;
 	spark->dSize = spark->sSize = spark->size = (GetRandomControl() & 0x1F) + -128;
 }
@@ -136,12 +132,16 @@ void TriggerGlobalFireSmoke()
 	spark->fadeToBlack = 16;
 	spark->colFadeSpeed = (GetRandomControl() & 7) + 32;
 	spark->life = spark->sLife = (GetRandomControl() & 0xF) + 57;
-	spark->x = (GetRandomControl() & 0xF) - 8;
-	spark->y = -256 - (GetRandomControl() & 0x7F);
-	spark->z = (GetRandomControl() & 0xF) - 8;
-	spark->xVel = (GetRandomControl() & 0xFF) - 128;
-	spark->yVel = -16 - (GetRandomControl() & 0xF);
-	spark->zVel = (GetRandomControl() & 0xFF) - 128;
+	spark->position = Vector3i(
+		(GetRandomControl() & 0xF) - 8,
+		-256 - (GetRandomControl() & 0x7F),
+		(GetRandomControl() & 0xF) - 8
+	);
+	spark->velocity = Vector3i(
+		(GetRandomControl() & 0xFF) - 128,
+		-16 - (GetRandomControl() & 0xF),
+		(GetRandomControl() & 0xFF) - 128
+	);
 	spark->friction = 4;
 
 	if (GetRandomControl() & 1)
@@ -177,12 +177,16 @@ void TriggerGlobalFireFlame()
 	spark->fadeToBlack = 8;
 	spark->colFadeSpeed = (GetRandomControl() & 3) + 8;
 	spark->life = spark->sLife = (GetRandomControl() & 7) + 32;
-	spark->y = 0;
-	spark->x = 4 * (GetRandomControl() & 0x1F) - 64;
-	spark->z = 4 * (GetRandomControl() & 0x1F) - 64;
-	spark->xVel = 2 * (GetRandomControl() & 0xFF) - 256;
-	spark->yVel = -16 - (GetRandomControl() & 0xF);
-	spark->zVel = 2 * (GetRandomControl() & 0xFF) - 256;
+	spark->position = Vector3i(
+		4 * (GetRandomControl() & 0x1F) - 64,
+		0,
+		4 * (GetRandomControl() & 0x1F) - 64
+	);
+	spark->velocity = Vector3i(
+		2 * (GetRandomControl() & 0xFF) - 256,
+		-16 - (GetRandomControl() & 0xF),
+		2 * (GetRandomControl() & 0xFF) - 256
+	);
 	spark->friction = 5;
 	spark->gravity = -32 - (GetRandomControl() & 0x1F);
 	spark->maxYvel = -16 - (GetRandomControl() & 7);
@@ -302,7 +306,8 @@ static void AttachAndCreateSpark(Particle* spark, const ItemInfo* item, int mesh
 	int v = (GetRandomControl() & 0x3F) + 192;
 
 	spark->life = spark->sLife = v / 6;
-	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + spriteID;
+	spark->SpriteSeqID = ID_DEFAULT_SPRITES;
+	spark->SpriteID = spriteID;
 
 	spark->xVel = v * (pos2.x - pos1.x) / 10;
 	spark->yVel = v * (pos2.y - pos1.y) / 10;
@@ -369,31 +374,20 @@ void UpdateFireProgress()
 
 void AddFire(int x, int y, int z, short roomNum, float size, short fade)
 {
-	FIRE_LIST* fptr = &Fires[0];
-	int i = 0;
-	while (fptr->on)
-	{
-		fptr++;
-		if (++i >= MAX_FIRE_LIST)
-			return;
-	}
-
-	if (fade)
-		fptr->on = fade;
-	else
-		fptr->on = 1;
-
-	fptr->x = x;
-	fptr->y = y;
-	fptr->z = z;
-	fptr->roomNumber = roomNum;
-	fptr->size = size;
+	FIRE_LIST newFire;
+	
+	newFire.fade = (fade == 0 ? 1 : (unsigned char)fade);
+	newFire.position = Vector3i(x, y, z);
+	newFire.roomNumber = roomNum;
+	newFire.size = size;
+	newFire.StoreInterpolationData();
+	
+	Fires.push_back(newFire);
 }
 
 void ClearFires()
 {
-	for (int i = 0; i < MAX_FIRE_LIST; i++)
-		Fires[i].on = false;
+	Fires.clear();
 }
 
 void UpdateFireSparks()
@@ -414,29 +408,33 @@ void UpdateFireSparks()
 				continue;
 			}
 
+			spark->StoreInterpolationData();
+
 			if (spark->sLife - spark->life < spark->colFadeSpeed)
 			{
 				int dl = ((spark->sLife - spark->life) << 16) / spark->colFadeSpeed;
 
-				spark->r = spark->sR + (dl * (spark->dR - spark->sR) >> 16);
-				spark->g = spark->sG + (dl * (spark->dG - spark->sG) >> 16);
-				spark->b = spark->sB + (dl * (spark->dB - spark->sB) >> 16);
+				spark->color = Vector3i(
+					spark->sR + (dl * (spark->dR - spark->sR) >> 16),
+					spark->sG + (dl * (spark->dG - spark->sG) >> 16),
+					spark->sB + (dl * (spark->dB - spark->sB) >> 16)
+				);
 			}
 			else if (spark->life >= spark->fadeToBlack)
 			{
-				spark->r = spark->dR;
-				spark->g = spark->dG;
-				spark->b = spark->dB;
+				spark->color = Vector3i(spark->dR, spark->dG, spark->dB);
 			}
 			else
 			{
 				int dl = ((spark->life - spark->fadeToBlack) << 16) / spark->fadeToBlack + 0x10000;
 
-				spark->r = dl * spark->dR >> 16;
-				spark->g = dl * spark->dG >> 16;
-				spark->b = dl * spark->dB >> 16;
+				spark->color = Vector3i(
+					dl * spark->dR >> 16,
+					dl * spark->dG >> 16,
+					dl * spark->dB >> 16
+				);
 
-				if (spark->r < 8 && spark->g < 8 && spark->b < 8)
+				if (spark->color.x < 8 && spark->color.y < 8 && spark->color.z < 8)
 				{
 					spark->on = false;
 					continue;
@@ -451,23 +449,21 @@ void UpdateFireSparks()
 			spark->def = sprite;
 
 			int dl = ((spark->sLife - spark->life) << 16) / spark->sLife;
-			spark->yVel += spark->gravity;
+			spark->velocity.y += spark->gravity;
 			if (spark->maxYvel)
 			{
-				if ((spark->yVel < 0 && spark->yVel < (spark->maxYvel << 5)) ||
-					(spark->yVel > 0 && spark->yVel > (spark->maxYvel << 5)))
-					spark->yVel = spark->maxYvel << 5;
+				if ((spark->velocity.y < 0 && spark->velocity.y < (spark->maxYvel << 5)) ||
+					(spark->velocity.y > 0 && spark->velocity.y > (spark->maxYvel << 5)))
+					spark->velocity.y = spark->maxYvel << 5;
 			}
 
 			if (spark->friction)
 			{
-				spark->xVel -= spark->xVel >> spark->friction;
-				spark->zVel -= spark->zVel >> spark->friction;
+				spark->velocity.x -= spark->velocity.x >> spark->friction;
+				spark->velocity.z -= spark->velocity.z >> spark->friction;
 			}
 
-			spark->x += spark->xVel / 48;
-			spark->y += spark->yVel / 48;
-			spark->z += spark->zVel / 48;
+			spark->position += spark->velocity / 48;
 
 			spark->size = spark->sSize + ((dl * (spark->dSize - spark->sSize)) / 65536);
 		}
@@ -528,6 +524,8 @@ void UpdateSmoke()
 				continue;
 			}
 
+			spark->StoreInterpolationData();
+
 			if (spark->sLife - spark->life >= spark->colFadeSpeed)
 			{
 				if (spark->life >= spark->fadeToBlack)
@@ -566,64 +564,49 @@ void UpdateSmoke()
 
 			int dl = ((spark->sLife - spark->life) << 16) / spark->sLife;
 
-			spark->yVel += spark->gravity;
-
+			spark->velocity.y += spark->gravity;
+			
 			if (spark->maxYvel != 0)
 			{
-				if (spark->yVel < 0)
+				if (spark->velocity.y < 0)
 				{
-					if (spark->yVel < spark->maxYvel)
+					if (spark->velocity.y < spark->maxYvel)
 					{
-						spark->yVel = spark->maxYvel;
+						spark->velocity.y = spark->maxYvel;
 					}
 				}
 				else
 				{
-					if (spark->yVel > spark->maxYvel)
+					if (spark->velocity.y > spark->maxYvel)
 					{
-						spark->yVel = spark->maxYvel;
+						spark->velocity.y = spark->maxYvel;
 					}
 				}
 			}
 
 			if (spark->friction & 0xF)
 			{
-				spark->xVel -= spark->xVel >> (spark->friction & 0xF);
-				spark->zVel -= spark->zVel >> (spark->friction & 0xF);
+				spark->velocity.x -= spark->velocity.x >> (spark->friction & 0xF);
+				spark->velocity.z -= spark->velocity.z >> (spark->friction & 0xF);
 			}
 
 			if (spark->friction & 0xF0)
 			{
-				spark->yVel -= spark->yVel >> (spark->friction >> 4);
+				spark->velocity.y -= spark->velocity.y >> (spark->friction >> 4);
 			}
 
-			spark->x += spark->xVel >> 5;
-			spark->y += spark->yVel >> 5;
-			spark->z += spark->zVel >> 5;
+			spark->position.x += spark->velocity.x >> 5;
+			spark->position.y += spark->velocity.y >> 5;
+			spark->position.z += spark->velocity.z >> 5;
 
 			if (spark->flags & SP_WIND)
 			{
-				spark->x += Weather.Wind().x;
-				spark->z += Weather.Wind().z;
+				spark->position.x += Weather.Wind().x;
+				spark->position.z += Weather.Wind().z;
 			}
 
 			spark->size = spark->sSize + (dl * (spark->dSize - spark->sSize) >> 16);
 		}
-	}
-}
-
-byte TriggerGunSmoke_SubFunction(LaraWeaponType weaponType)
-{
-	switch (weaponType)
-	{
-	case LaraWeaponType::HK:
-	case LaraWeaponType::RocketLauncher:
-	case LaraWeaponType::GrenadeLauncher:
-		return 24; //(12) Rocket and Grenade value for TriggerGunSmoke in TR3 have the value 12 ! (the HK is not included there)
-
-	// other weapon
-	default:
-		return 0;
 	}
 }
 
@@ -643,12 +626,12 @@ void TriggerShatterSmoke(int x, int y, int z)
 	spark->fadeToBlack = 24 - (GetRandomControl() & 7);
 	spark->blendMode = BlendMode::Additive;
 	spark->life = spark->sLife = (GetRandomControl() & 7) + 48;
-	spark->x = (GetRandomControl() & 0x1F) + x - 16;
-	spark->y = (GetRandomControl() & 0x1F) + y - 16;
-	spark->z = (GetRandomControl() & 0x1F) + z - 16;
-	spark->xVel = 2 * (GetRandomControl() & 0x1FF) - 512;
-	spark->yVel = 2 * (GetRandomControl() & 0x1FF) - 512;
-	spark->zVel = 2 * (GetRandomControl() & 0x1FF) - 512;
+	spark->position.x = (GetRandomControl() & 0x1F) + x - 16;
+	spark->position.y = (GetRandomControl() & 0x1F) + y - 16;
+	spark->position.z = (GetRandomControl() & 0x1F) + z - 16;
+	spark->velocity.x = 2 * (GetRandomControl() & 0x1FF) - 512;
+	spark->velocity.y = 2 * (GetRandomControl() & 0x1FF) - 512;
+	spark->velocity.z = 2 * (GetRandomControl() & 0x1FF) - 512;
 	spark->friction = 7;
 
 	if (GetRandomControl() & 1)
@@ -760,52 +743,55 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 			pos = GetJointPosition(LaraItem, LM_LHAND, Vector3i(-16, 35, 48));
 	}
 
-	auto* gshell = &Gunshells[GetFreeGunshell()];
-
-	gshell->pos.Position = pos;
-	gshell->pos.Orientation.x = 0;
-	gshell->pos.Orientation.y = 0;
-	gshell->pos.Orientation.z = GetRandomControl();
-	gshell->roomNumber = LaraItem->RoomNumber;
-	gshell->speed = (GetRandomControl() & 0x1F) + 16;
-	gshell->fallspeed = -48 - (GetRandomControl() & 7);
-	gshell->objectNumber = objNum;
-	gshell->counter = (GetRandomControl() & 0x1F) + 60;
-
-	if (hand)
+	if (g_GameFlow->GetSettings()->Weapons[(int)weaponType - 1].Shell)
 	{
-		if (weaponType == LaraWeaponType::Shotgun)
-		{
-			gshell->dirXrot =
-				Lara.LeftArm.Orientation.y +
-				Lara.ExtraTorsoRot.y +
-				LaraItem->Pose.Orientation.y -
-				(GetRandomControl() & 0xFFF) +
-				10240;
-			gshell->pos.Orientation.y +=
-				Lara.LeftArm.Orientation.y +
-				Lara.ExtraTorsoRot.y +
-				LaraItem->Pose.Orientation.y;
+		auto& gunshell = Gunshells[GetFreeGunshell()];
 
-			if (gshell->speed < 24)
-				gshell->speed += 24;
+		gunshell.pos.Position = pos;
+		gunshell.pos.Orientation.x = 0;
+		gunshell.pos.Orientation.y = 0;
+		gunshell.pos.Orientation.z = GetRandomControl();
+		gunshell.roomNumber = LaraItem->RoomNumber;
+		gunshell.speed = (GetRandomControl() & 0x1F) + 16;
+		gunshell.fallspeed = -48 - (GetRandomControl() & 7);
+		gunshell.objectNumber = objNum;
+		gunshell.counter = (GetRandomControl() & 0x1F) + 60;
+
+		if (hand)
+		{
+			if (weaponType == LaraWeaponType::Shotgun)
+			{
+				gunshell.dirXrot =
+					Lara.LeftArm.Orientation.y +
+					Lara.ExtraTorsoRot.y +
+					LaraItem->Pose.Orientation.y -
+					(GetRandomControl() & 0xFFF) +
+					10240;
+				gunshell.pos.Orientation.y +=
+					Lara.LeftArm.Orientation.y +
+					Lara.ExtraTorsoRot.y +
+					LaraItem->Pose.Orientation.y;
+
+				if (gunshell.speed < 24)
+					gunshell.speed += 24;
+			}
+			else
+			{
+				gunshell.dirXrot =
+					Lara.LeftArm.Orientation.y +
+					LaraItem->Pose.Orientation.y -
+					(GetRandomControl() & 0xFFF) +
+					18432;
+			}
 		}
 		else
 		{
-			gshell->dirXrot =
+			gunshell.dirXrot =
 				Lara.LeftArm.Orientation.y +
-				LaraItem->Pose.Orientation.y -
-				(GetRandomControl() & 0xFFF) +
+				LaraItem->Pose.Orientation.y +
+				(GetRandomControl() & 0xFFF) -
 				18432;
 		}
-	}
-	else
-	{
-		gshell->dirXrot =
-			Lara.LeftArm.Orientation.y +
-			LaraItem->Pose.Orientation.y +
-			(GetRandomControl() & 0xFFF) -
-			18432;
 	}
 
 	if (LaraItem->MeshBits.TestAny())
@@ -825,6 +811,8 @@ void UpdateGunShells()
 
 		if (gunshell->counter)
 		{
+			gunshell->StoreInterpolationData();
+
 			auto prevPos = gunshell->pos.Position;
 
 			gunshell->counter--;
@@ -846,7 +834,7 @@ void UpdateGunShells()
 				gunshell->speed -= gunshell->speed >> 1;
 			}
 			else
-				gunshell->fallspeed += 6;
+				gunshell->fallspeed += g_GameFlow->GetSettings()->Physics.Gravity;
 
 			gunshell->pos.Orientation.x += ((gunshell->speed / 2) + 7) * ANGLE(1.0f);
 			gunshell->pos.Orientation.y += gunshell->speed * ANGLE(1.0f);
@@ -1009,11 +997,9 @@ void TriggerUnderwaterExplosion(ItemInfo* item, int flag)
 			int dy = item->Pose.Position.y - waterHeight;
 			if (dy < 2048)
 			{
-				SplashSetup.y = waterHeight;
-				SplashSetup.x = item->Pose.Position.x;
-				SplashSetup.z = item->Pose.Position.z;
-				SplashSetup.innerRadius = 160;
-				SplashSetup.splashPower = 2048 - dy;
+				SplashSetup.Position = Vector3(item->Pose.Position.x, waterHeight, item->Pose.Position.z);
+				SplashSetup.InnerRadius = 160;
+				SplashSetup.SplashPower = 2048 - dy;
 
 				SetupSplash(&SplashSetup, item->RoomNumber);
 			}
@@ -1219,7 +1205,8 @@ void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned ch
 			spark->rotAdd = (GetRandomControl() & 0xF) + 16;
 
 		spark->scalar = 1;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST;
+		spark->SpriteSeqID = ID_DEFAULT_SPRITES;
+		spark->SpriteID = SPR_UNDERWATERDUST;
 		spark->maxYvel = 0;
 		spark->gravity = (GetRandomControl() & 0x3F) + 64;
 		spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 32;
@@ -1234,6 +1221,8 @@ void UpdateShockwaves()
 		if (shockwave.life <= 0)
 			continue;
 
+		shockwave.StoreInterpolationData();
+
 		shockwave.life--;
 
 		// Spawn light.
@@ -1241,7 +1230,7 @@ void UpdateShockwaves()
 		{
 			auto lightColor = Color(shockwave.r / (float)UCHAR_MAX, shockwave.g / (float)UCHAR_MAX, shockwave.b / (float)UCHAR_MAX);
 			auto pos = Vector3(shockwave.x, shockwave.y, shockwave.z);
-			TriggerDynamicLight(pos, lightColor, shockwave.life / (float)UCHAR_MAX);
+			SpawnDynamicPointLight(pos, lightColor, shockwave.life / 4.0f);
 		}
 
 		if (shockwave.style != (int)ShockwaveStyle::Knockback)
@@ -1317,7 +1306,8 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 	spark->flags = 2058;
 	spark->scalar = 3;
 	spark->gravity = 0;
-	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLES;
+	spark->SpriteSeqID = ID_DEFAULT_SPRITES;
+	spark->SpriteID = SPR_BUBBLES;
 	spark->maxYvel = 0;
 	int size = (GetRandomControl() & 7) + 63;
 	spark->sSize = size >> 1;
@@ -1331,93 +1321,6 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 		SpawnBubble(pos, roomNumber, (int)BubbleFlags::LargeScale | (int)BubbleFlags::HighAmplitude);
 	}
 }
-
-/*void TriggerExplosionSmokeEnd(int x, int y, int z, int unk)
-{
-	auto* spark = GetFreeParticle();
-
-	spark->on = 1;
-	if (unk)
-	{
-		spark->sR = 0;
-		spark->sG = 0;
-		spark->sB = 0;
-		spark->dR = 192;
-		spark->dG = 192;
-		spark->dB = 208;
-	}
-	else
-	{
-		spark->dR = 64;
-		spark->sR = 144;
-		spark->sG = 144;
-		spark->sB = 144;
-		spark->dG = 64;
-		spark->dB = 64;
-	}
-
-	spark->colFadeSpeed = 8;
-	spark->fadeToBlack = 64;
-	spark->life = spark->sLife = (GetRandomControl() & 0x1F) + 96;
-
-	if (unk)
-		spark->blendMode = BlendMode::Additive;
-	else
-		spark->blendMode = 3;
-
-	spark->x = (GetRandomControl() & 0x1F) + x - 16;
-	spark->y = (GetRandomControl() & 0x1F) + y - 16;
-	spark->z = (GetRandomControl() & 0x1F) + z - 16;
-	spark->xVel = ((GetRandomControl() & 0xFFF) - 2048) >> 2;
-	spark->yVel = (GetRandomControl() & 0xFF) - 128;
-	spark->zVel = ((GetRandomControl() & 0xFFF) - 2048) >> 2;
-
-	if (unk)
-	{
-		spark->friction = 20;
-		spark->yVel >>= 4;
-		spark->y += 32;
-	}
-	else
-		spark->friction = 6;
-
-	spark->flags = 538;
-	spark->rotAng = GetRandomControl() & 0xFFF;
-
-	if (GetRandomControl() & 1)
-		spark->rotAdd = -((GetRandomControl() & 0xF) + 16);
-	else
-		spark->rotAdd = (GetRandomControl() & 0xF) + 16;
-	spark->scalar = 3;
-
-	if (unk)
-	{
-		spark->maxYvel = 0;
-		spark->gravity = 0;
-	}
-	else
-	{
-		spark->gravity = -3 - (GetRandomControl() & 3);
-		spark->maxYvel = -4 - (GetRandomControl() & 3);
-	}
-
-	int size = (GetRandomControl() & 0x1F) + 128;
-	spark->dSize = size;
-	spark->sSize = size >> 2;
-	spark->size = size >> 2;
-}
-*/
-/*void DrawLensFlares(ItemInfo* item)
-{
-	GameVector pos;
-
-	pos.x = item->pos.Position.x;
-	pos.y = item->pos.Position.y;
-	pos.z = item->pos.Position.z;
-	pos.roomNumber = item->roomNumber;
-
-	SetUpLensFlare(0, 0, 0, &pos);
-}*/
 
 void TriggerFenceSparks(int x, int y, int z, int kill, int crane)
 {

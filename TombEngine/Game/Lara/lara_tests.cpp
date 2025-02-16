@@ -141,6 +141,7 @@ bool TestLaraHang(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.ForwardAngle = lara->Control.MoveAngle;
+	coll->Setup.ForceSolidStatics = true;
 
 	// When Lara is about to move, use larger embed offset for stabilizing diagonal shimmying)
 	int embedOffset = 4;
@@ -743,14 +744,16 @@ CornerTestResult TestItemAtNextCornerPosition(ItemInfo* item, CollisionInfo* col
 
 bool TestHangSwingIn(ItemInfo* item, CollisionInfo* coll)
 {
-	auto* lara = GetLaraInfo(item);
+	int vPos = item->Pose.Position.y;
+	auto pointColl = GetPointCollision(*item, item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius) + item->Animation.Velocity.z);
 
-	int y = item->Pose.Position.y;
-	auto probe = GetPointCollision(*item, item->Pose.Orientation.y, OFFSET_RADIUS(coll->Setup.Radius));
+	// 1) Test for wall.
+	if (pointColl.GetFloorHeight() == NO_HEIGHT)
+		return false;
 
-	if ((probe.GetFloorHeight() - y) > 0 &&
-		(probe.GetCeilingHeight() - y) < -CLICK(1.6f) &&
-		probe.GetFloorHeight() != NO_HEIGHT)
+	// 2) Test leg space.
+	if ((pointColl.GetFloorHeight() - vPos) > 0 &&
+		(pointColl.GetCeilingHeight() - vPos) < -CLICK(1.6f))
 	{
 		return true;
 	}
@@ -911,6 +914,7 @@ bool TestPlayerWaterStepOut(ItemInfo* item, CollisionInfo* coll)
 bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+	const auto& settings = g_GameFlow->GetSettings()->Animations;
 
 	if (coll->CollisionType != CollisionType::Front || !IsHeld(In::Action))
 		return false;
@@ -924,26 +928,28 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	if (coll->Middle.Ceiling > -STEPUP_HEIGHT)
 		return false;
 
-	int frontFloor = coll->Front.Floor + LARA_HEIGHT_TREAD;
-	if (coll->Front.Bridge == NO_VALUE &&
-		(frontFloor <= -CLICK(2) ||
-		frontFloor > CLICK(1.25f) - 4))
+	// HACK: Probe at incremetal height steps to account for room stacks. -- Sezz 2024.10.28
+	int frontFloor = NO_HEIGHT;
+	
+	bool hasLedge = false;
+	int yOffset = CLICK(1.25f);
+	while (yOffset > -CLICK(2))
 	{
-		return false;
+		auto pointColl = GetPointCollision(*item, item->Pose.Orientation.y, BLOCK(0.2f), yOffset);
+
+		frontFloor = pointColl.GetFloorHeight() - item->Pose.Position.y;
+		if (frontFloor > -CLICK(2) &&
+			frontFloor <= (CLICK(1.25f) - 4))
+		{
+			hasLedge = true;
+			break;
+		}
+
+		yOffset -= CLICK(0.5f);
 	}
 
-	// Extra bridge check.
-	if (coll->Front.Bridge != NO_VALUE)
-	{
-		int bridgeBorder = GetBridgeBorder(g_Level.Items[coll->Front.Bridge], false) - item->Pose.Position.y;
-		
-		frontFloor = bridgeBorder - CLICK(0.5f);
-		if (frontFloor <= -CLICK(2) ||
-			frontFloor > CLICK(1.25f) - 4)
-		{
-			return false;
-		}
-	}
+	if (!hasLedge)
+		return false;
 
 	if (!TestValidLedge(item, coll))
 		return false;
@@ -959,7 +965,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (g_GameFlow->HasCrawlExtended())
+			if (settings.CrawlExtended)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_1_STEP);
 			else
 				return false;
@@ -971,7 +977,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (g_GameFlow->HasCrawlExtended())
+			if (settings.CrawlExtended)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_M1_STEP);
 			else
 				return false;
@@ -984,7 +990,7 @@ bool TestLaraWaterClimbOut(ItemInfo* item, CollisionInfo* coll)
 	{
 		if (headroom < LARA_HEIGHT)
 		{
-			if (g_GameFlow->HasCrawlExtended())
+			if (settings.CrawlExtended)
 				SetAnimation(item, LA_ONWATER_TO_CROUCH_0_STEP);
 			else
 				return false;
@@ -1444,6 +1450,7 @@ std::optional<VaultTestResult> TestLaraAutoMonkeySwingJump(ItemInfo* item, Colli
 std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll)
 {
 	auto* lara = GetLaraInfo(item);
+	auto& settings = g_GameFlow->GetSettings()->Animations;
 
 	if (lara->Control.HandStatus != HandStatus::Free)
 		return std::nullopt;
@@ -1480,7 +1487,7 @@ std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll
 
 		// Vault to crouch up two steps.
 		vaultResult = TestLaraVault2StepsToCrouch(item, coll);
-		if (vaultResult.has_value() && g_GameFlow->HasCrawlExtended())
+		if (vaultResult.has_value() && settings.CrawlExtended)
 		{
 			vaultResult->TargetState = LS_VAULT_2_STEPS_CROUCH;
 			if (!HasStateDispatch(item, vaultResult->TargetState))
@@ -1502,7 +1509,7 @@ std::optional<VaultTestResult> TestLaraVault(ItemInfo* item, CollisionInfo* coll
 
 		// Vault to crouch up three steps.
 		vaultResult = TestLaraVault3StepsToCrouch(item, coll);
-		if (vaultResult.has_value() && g_GameFlow->HasCrawlExtended())
+		if (vaultResult.has_value() && settings.CrawlExtended)
 		{
 			vaultResult->TargetState = LS_VAULT_3_STEPS_CROUCH;
 			if (!HasStateDispatch(item, vaultResult->TargetState))
@@ -1773,7 +1780,7 @@ bool TestLaraPoleCollision(ItemInfo* item, CollisionInfo* coll, bool goingUp, fl
 
 	bool atLeastOnePoleCollided = false;
 
-	auto collObjects = GetCollidedObjects(*item, true, false, BLOCK(1), ObjectCollectionMode::Items);
+	auto collObjects = GetCollidedObjects(*item, true, false, BLOCK(2), ObjectCollectionMode::Items);
 	if (!collObjects.IsEmpty())
 	{
 		auto laraBox = GameBoundingBox(item).ToBoundingOrientedBox(item->Pose);

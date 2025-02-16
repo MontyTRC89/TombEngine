@@ -33,7 +33,7 @@ using namespace TEN::Entities;
 using namespace TEN::Entities::Switches;
 
 ObjectHandler Objects;
-StaticInfo StaticObjects[MAX_STATICS];
+StaticHandler Statics;
 
 void ObjectHandler::Initialize() 
 { 
@@ -76,10 +76,55 @@ ObjectInfo& ObjectHandler::GetFirstAvailableObject()
 	return _objects[0];
 }
 
+void StaticHandler::Initialize()
+{
+	_lut.resize(0);
+	_lut.reserve(LUT_SIZE);
+	_statics.resize(0);
+}
+
+int StaticHandler::GetIndex(int staticID)
+{
+	if (staticID < 0 || staticID >= _lut.size())
+	{
+		TENLog("Attempted to get index of missing static object " + std::to_string(staticID) + ".", LogLevel::Warning);
+		return _lut.front();
+	}
+
+	return _lut[staticID];
+}
+
+StaticInfo& StaticHandler::operator [](int staticID)
+{
+	if (staticID < 0)
+	{
+		TENLog("Attempted to access missing static object " + std::to_string(staticID) + ".", LogLevel::Warning);
+		return _statics.front();
+	}
+
+	if (staticID >= _lut.size())
+		_lut.resize(staticID + 1, NO_VALUE);
+
+	if (_lut[staticID] != NO_VALUE)
+		return _statics[_lut[staticID]];
+
+	_statics.emplace_back();
+	_lut[staticID] = (int)_statics.size() - 1;
+
+	return _statics.back();
+}
+
 // NOTE: JointRotationFlags allows bones to be rotated with CreatureJoint().
 void ObjectInfo::SetBoneRotationFlags(int boneID, int flags)
 {
-	g_Level.Bones[boneIndex + (boneID * 4)] |= flags;
+	int index = boneIndex + (boneID * 4);
+	if (index < 0 || index >= g_Level.Bones.size())
+	{
+		TENLog("Failed to set rotation flag for bone ID " + std::to_string(boneID), LogLevel::Warning);
+		return;
+	}
+
+	g_Level.Bones[index] |= flags;
 }
 
 void ObjectInfo::SetHitEffect(HitEffect hitEffect)
@@ -137,7 +182,6 @@ void InitializeSpecialEffects()
 	memset(&FireSparks, 0, MAX_SPARKS_FIRE * sizeof(FIRE_SPARKS));
 	memset(&SmokeSparks, 0, MAX_SPARKS_SMOKE * sizeof(SMOKE_SPARKS));
 	memset(&Gunshells, 0, MAX_GUNSHELL * sizeof(GUNSHELL_STRUCT));
-	memset(&Splashes, 0, MAX_SPLASHES * sizeof(SPLASH_STRUCT));
 	memset(&ShockWaves, 0, MAX_SHOCKWAVE * sizeof(SHOCKWAVE_STRUCT));
 	memset(&Particles, 0, MAX_PARTICLES * sizeof(Particle));
 
@@ -182,6 +226,7 @@ void InitializeObjects()
 		obj->hitEffect = HitEffect::None;
 		obj->explodableMeshbits = 0;
 		obj->intelligent = false;
+		obj->AlwaysActive = false;
 		obj->waterCreature = false;
 		obj->nonLot = false;
 		obj->usingDrawAnimatingItem = true;

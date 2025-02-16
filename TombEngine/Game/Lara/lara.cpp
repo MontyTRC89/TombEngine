@@ -67,8 +67,8 @@ using namespace TEN::Gui;
 
 using TEN::Renderer::g_Renderer;
 
-LaraInfo Lara = {};
-ItemInfo* LaraItem;
+LaraInfo	  Lara			= {};
+ItemInfo*	  LaraItem		= nullptr;
 CollisionInfo LaraCollision = {};
 
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
@@ -357,7 +357,9 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 		break;
 	}
 
-	SaveGame::Statistics.Game.Distance += (int)round(Vector3i::Distance(prevPos, item->Pose.Position));
+	int deltaDist = (int)round(Vector3i::Distance(prevPos, item->Pose.Position));
+	SaveGame::Statistics.Game.Distance  += deltaDist;
+	SaveGame::Statistics.Level.Distance += deltaDist;
 
 	if (DebugMode)
 	{
@@ -382,13 +384,12 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.BlockMonkeySwingEdge = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = true;
+	coll->Setup.ForceSolidStatics = false;
 	coll->Setup.PrevPosition = item->Pose.Position;
 	coll->Setup.PrevAnimObjectID = item->Animation.AnimObjectID;
 	coll->Setup.PrevAnimNumber = item->Animation.AnimNumber;
 	coll->Setup.PrevFrameNumber = item->Animation.FrameNumber;
 	coll->Setup.PrevState = item->Animation.ActiveState;
-
-	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 
 	// Handle look-around.
 	if (((IsHeld(In::Look) && CanPlayerLookAround(*item)) ||
@@ -403,6 +404,8 @@ void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
 		ResetPlayerLookAround(*item);
 	}
 	player.Control.Look.Mode = LookMode::None;
+
+	UpdateLaraRoom(item, -LARA_HEIGHT / 2);
 
 	// Process vehicles.
 	if (HandleLaraVehicle(item, coll))
@@ -452,6 +455,7 @@ void LaraWaterSurface(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.BlockMonkeySwingEdge = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
+	coll->Setup.ForceSolidStatics = false;
 	coll->Setup.PrevPosition = item->Pose.Position;
 
 	// Handle look-around.
@@ -524,6 +528,7 @@ void LaraUnderwater(ItemInfo* item, CollisionInfo* coll)
 	coll->Setup.BlockMonkeySwingEdge = false;
 	coll->Setup.EnableObjectPush = true;
 	coll->Setup.EnableSpasm = false;
+	coll->Setup.ForceSolidStatics = false;
 	coll->Setup.PrevPosition = item->Pose.Position;
 
 	// Handle look-around.
@@ -636,6 +641,7 @@ void LaraCheat(ItemInfo* item, CollisionInfo* coll)
 
 		ResetPlayerFlex(item);
 		InitializeLaraMeshes(item);
+		item->Animation.IsAirborne = false;
 		item->HitPoints = LARA_HEALTH_MAX;
 		player.Control.HandStatus = HandStatus::Free;
 	}
@@ -654,6 +660,7 @@ void UpdateLara(ItemInfo* item, bool isTitle)
 
 	// Control player.
 	InItemControlLoop = true;
+
 	LaraControl(item, &LaraCollision);
 	HandlePlayerFlyCheat(*item);
 	InItemControlLoop = false;

@@ -14,6 +14,7 @@
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Switches/switch.h"
 #include "Renderer/Renderer.h"
+#include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
@@ -261,18 +262,20 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 	{
 		Lara.Control.Weapon.HasFired = true;
 		Lara.Control.Weapon.Fired = true;
+		Lara.RightArm.GunFlash = Weapons[(int)Lara.Control.Weapon.GunType].FlashTime;
 
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
 			SoundEffect(SFX_TR4_REVOLVER_FIRE, nullptr);
 	}
 
-	bool hasHit = false;
+	bool hitProcessed = false;
 
 	MESH_INFO* mesh = nullptr;
 	auto vector = Vector3i::Zero;
 	int itemNumber = ObjectOnLOS2(origin, target, &vector, &mesh);
+	bool hasHit = itemNumber != NO_LOS_ITEM;
 
-	if (itemNumber != NO_LOS_ITEM)
+	if (hasHit)
 	{
 		target2.x = vector.x - ((vector.x - origin->x) >> 5);
 		target2.y = vector.y - ((vector.y - origin->y) >> 5);
@@ -286,7 +289,7 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 			{
 				if (itemNumber < 0)
 				{
-					if (StaticObjects[mesh->staticNumber].shatterType != ShatterType::None)
+					if (Statics[mesh->staticNumber].shatterType != ShatterType::None)
 					{
 						const auto& weapon = Weapons[(int)Lara.Control.Weapon.GunType];
 						mesh->HitPoints -= weapon.Damage;
@@ -294,10 +297,10 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 						ShatterImpactData.impactLocation = Vector3(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z);
 						ShatterObject(nullptr, mesh, 128, target2.RoomNumber, 0);
 						SoundEffect(GetShatterSound(mesh->staticNumber), (Pose*)mesh);
+						hitProcessed = true;
 					}
 
-					TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
-					TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
+					TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y);
 				}
 				else
 				{
@@ -312,14 +315,15 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 								ShatterImpactData.impactDirection = dir;
 								ShatterImpactData.impactLocation = ShatterItem.sphere.Center;
 								ShatterObject(&ShatterItem, 0, 128, target2.RoomNumber, 0);
-								TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);							
+								TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, false);
+								hitProcessed = true;
 						}
 						else
 						{
 							auto* object = &Objects[item->ObjectNumber];
 
 							if (drawTarget && (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver ||
-								Lara.Control.Weapon.GunType == LaraWeaponType::HK))
+											   Lara.Control.Weapon.GunType == LaraWeaponType::HK))
 							{
 								if (object->intelligent || object->HitRoutine)
 								{
@@ -342,33 +346,21 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 											}
 										}
 									}
-									HitTarget(LaraItem, item, &target2, Weapons[(int)Lara.Control.Weapon.GunType].Damage, false, bestJointIndex);
+
+									HitTarget(LaraItem, item, &target2, Weapons[(int)Lara.Control.Weapon.GunType].AlternateDamage, false, bestJointIndex);
+									hitProcessed = true;
 								}
 								else
 								{
 									// TR5
 									if (object->hitEffect == HitEffect::Richochet)
-										TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
+										TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y);
 								}
 							}
-							else
+							else if (item->ObjectNumber >= ID_SMASH_OBJECT1 && item->ObjectNumber <= ID_SMASH_OBJECT8)
 							{
-								if (item->ObjectNumber >= ID_SMASH_OBJECT1 && item->ObjectNumber <= ID_SMASH_OBJECT8)
-								{
-									SmashObject(itemNumber);
-								}
-								else
-								{
-									const auto& weapon = Weapons[(int)Lara.Control.Weapon.GunType];
-									if (object->HitRoutine != nullptr)
-									{
-										object->HitRoutine(*item, *LaraItem, target2, weapon.Damage, false, NO_VALUE);
-									}
-									else
-									{
-										DefaultItemHit(*item, *LaraItem, target2, weapon.Damage, false, NO_VALUE);
-									}
-								}
+								SmashObject(itemNumber);
+								hitProcessed = true;
 							}
 						}
 					}
@@ -418,9 +410,11 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 								item->Status = ITEM_ACTIVE;
 								item->Flags |= IFLAG_ACTIVATION_MASK | 0x40;
 							}
+
+							hitProcessed = true;
 						}
 
-						TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 3, 0);
+						TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y);
 					}
 				}
 			}
@@ -430,8 +424,6 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 					FireCrossBowFromLaserSight(*LaraItem, origin, &target2);
 			}
 		}
-
-		hasHit = true;
 	}
 	else
 	{
@@ -447,20 +439,11 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 			target2.z -= (target2.z - origin->z) >> 5;
 
 			if (isFiring && !result)
-				TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y, 8, 0);
+				TriggerRicochetSpark(target2, LaraItem->Pose.Orientation.y);
 		}
 	}
 
-	if (drawTarget && (hasHit || !result))
-	{
-		TriggerDynamicLight(target2.x, target2.y, target2.z, 64, 255, 0, 0);
-		LaserSightActive = 1;
-		LaserSightX = target2.x;
-		LaserSightY = target2.y;
-		LaserSightZ = target2.z;
-	}
-
-	return hasHit;
+	return hitProcessed;
 }
 
 static bool DoRayBox(const GameVector& origin, const GameVector& target, const GameBoundingBox& bounds,
@@ -512,89 +495,18 @@ static bool DoRayBox(const GameVector& origin, const GameVector& target, const G
 			// If mesh is visible.
 			if (item->MeshBits & (1 << i))
 			{
+				float distance;
 				const auto& sphere = spheres[i];
 
-				// NOTE: Not worth doing what's commented below. *Rewrite completely.*
-				// TODO: this approach is the correct one but, again, Core's math is a mystery and this test was meant
-				// to fail deliberately in some way. I've so added again Core's legacy test for allowing the current game logic
-				// but after more testing we should trash it in the future and restore the new way.
-#if 0
-				// Create the bounding sphere and test it against the ray
-				BoundingSphere sph = BoundingSphere(Vector3(sphere->x, sphere->y, sphere->z), sphere->r);
-				float newDist;
-				if (sph.Intersects(rayStart, rayDirNormalized, newDist))
+				if (sphere.Intersects(rayOrigin, rayDir, distance))
 				{
-					// HACK: Core seems to take in account for distance not the real hit point but the centre of the sphere.
-					// This can work well for example for GUARDIAN because the head sphere is so big that would always be hit
-					// and eyes would not be destroyed.
-					newDist = sqrt(SQUARE(sphere->x - start->x) + SQUARE(sphere->y - start->y) + SQUARE(sphere->z - start->z));
-
-					// Test for min distance
-					if (newDist < minDistance)
+					// Test for minimum distance.
+					if (distance < minDist)
 					{
-						minDistance = newDist;
-						meshPtr = &g_Level.Meshes[obj->meshIndex + i];
+						minDist = distance;
+						meshIndex = object->meshIndex + i;
 						bit = 1 << i;
 						sp = i;
-					}
-				}
-#endif
-
-				Vector3i p[4];
-
-				p[1].x = origin.x;
-				p[1].y = origin.y;
-				p[1].z = origin.z;
-				p[2].x = target.x;
-				p[2].y = target.y;
-				p[2].z = target.z;
-				p[3].x = sphere.Center.x;
-				p[3].y = sphere.Center.y;
-				p[3].z = sphere.Center.z;
-
-				int r0 = (p[3].x - p[1].x) * (p[2].x - p[1].x) +
-					(p[3].y - p[1].y) * (p[2].y - p[1].y) +
-					(p[3].z - p[1].z) * (p[2].z - p[1].z);
-
-				int r1 = SQUARE(p[2].x - p[1].x) +
-					SQUARE(p[2].y - p[1].y) +
-					SQUARE(p[2].z - p[1].z);
-
-				if (((r0 < 0 && r1 < 0) ||
-					(r1 > 0 && r0 > 0)) &&
-					(abs(r0) <= abs(r1)))
-				{
-					r1 >>= 16;
-					if (r1)
-						r0 /= r1;
-					else
-						r0 = 0;
-
-					p[0].x = p[1].x + ((r0 * (p[2].x - p[1].x)) >> 16);
-					p[0].y = p[1].y + ((r0 * (p[2].y - p[1].y)) >> 16);
-					p[0].z = p[1].z + ((r0 * (p[2].z - p[1].z)) >> 16);
-
-					int dx = SQUARE(p[0].x - p[3].x);
-					int dy = SQUARE(p[0].y - p[3].y);
-					int dz = SQUARE(p[0].z - p[3].z);
-
-					int distance = dx + dy + dz;
-
-					if (distance < SQUARE(sphere.Radius))
-					{
-						dx = SQUARE(sphere.Center.x - origin.x);
-						dy = SQUARE(sphere.Center.y - origin.y);
-						dz = SQUARE(sphere.Center.z - origin.z);
-
-						distance = dx + dy + dz;
-
-						if (distance < minDist)
-						{
-							minDist = distance;
-							meshIndex = object->meshIndex + i;
-							bit = 1 << i;
-							sp = i;
-						}
 					}
 				}
 			}
@@ -673,7 +585,7 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 			if (priorityObjectID != GAME_OBJECT_ID::ID_NO_OBJECT && item.ObjectNumber != priorityObjectID)
 				continue;
 
-			if (item.ObjectNumber != ID_LARA && Objects[item.ObjectNumber].collision == nullptr)
+			if (item.ObjectNumber != ID_LARA && (Objects[item.ObjectNumber].collision == nullptr || !item.Collidable))
 				continue;
 
 			if (item.ObjectNumber == ID_LARA && priorityObjectID != ID_LARA)
