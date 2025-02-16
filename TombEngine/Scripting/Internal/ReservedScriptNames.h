@@ -456,6 +456,7 @@ constexpr char ScriptReserved_StaticShatter[]		= "Shatter";
 
 constexpr char ScriptReserved_Rotation[]			= "Rotation";
 constexpr char ScriptReserved_RotationDirection[]	= "Direction";
+constexpr char ScriptReserved_RotationLerp[]		= "Lerp";
 
 // Vec2
 
