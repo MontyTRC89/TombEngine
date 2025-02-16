@@ -106,7 +106,8 @@ RGBAColor8Byte::operator Vector3() const
 
 RGBAColor8Byte::operator Vector4() const
 {
-	return Vector4(ByteComponentToFloat(r), ByteComponentToFloat(g), ByteComponentToFloat(b), ByteComponentToFloat(a));
+	// Alpha exists on a normalized range from 0 to 1, unlike color components, which are on a range from 0 to 2.
+	return Vector4(ByteComponentToFloat(r), ByteComponentToFloat(g), ByteComponentToFloat(b), ByteComponentToFloat(a) / 2.0f);
 }
 
 RGBAColor8Byte::operator D3DCOLOR() const

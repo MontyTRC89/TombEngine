@@ -505,8 +505,9 @@ namespace TEN::Renderer
 								object.ObjectType = RendererObjectType::MoveableAsStatic;
 								object.Centre = centre;
 								object.Distance = distance;
+								object.BlendMode = bucket.BlendMode;
 								object.Bucket = &bucket;
-								object.Mesh = mesh;
+								object.LightMode = mesh->LightMode;
 								object.Polygon = &bucket.Polygons[p];
 								object.World = rat->Transform;
 								object.Room = &_rooms[rat->RoomNumber];
@@ -632,8 +633,9 @@ namespace TEN::Renderer
 						object.ObjectType = RendererObjectType::MoveableAsStatic;
 						object.Centre = center;
 						object.Distance = dist;
+						object.BlendMode = bucket.BlendMode;
 						object.Bucket = &bucket;
-						object.Mesh = &mesh;
+						object.LightMode = mesh.LightMode;
 						object.Polygon = &poly;
 						object.World = worldMatrix;
 						object.Room = &_rooms[fish.RoomNumber];
@@ -749,8 +751,9 @@ namespace TEN::Renderer
 						object.ObjectType = RendererObjectType::MoveableAsStatic;
 						object.Centre = centre;
 						object.Distance = dist;
+						object.BlendMode = bucket.BlendMode;
 						object.Bucket = &bucket;
-						object.Mesh = &mesh;
+						object.LightMode = mesh.LightMode;
 						object.Polygon = &bucket.Polygons[p];
 						object.World = transformMatrix;
 						object.Room = &_rooms[bat.RoomNumber];
@@ -870,8 +873,9 @@ namespace TEN::Renderer
 						object.ObjectType = RendererObjectType::MoveableAsStatic;
 						object.Centre = centre;
 						object.Distance = dist;
+						object.BlendMode = bucket.BlendMode;
 						object.Bucket = &bucket;
-						object.Mesh = &mesh;
+						object.LightMode = mesh.LightMode;
 						object.Polygon = &bucket.Polygons[p];
 						object.World = transformMatrix;
 						object.Room = &_rooms[beetle.RoomNumber];
@@ -999,8 +1003,9 @@ namespace TEN::Renderer
 						object.ObjectType = RendererObjectType::MoveableAsStatic;
 						object.Centre = centre;
 						object.Distance = dist;
+						object.BlendMode = bucket.BlendMode;
 						object.Bucket = &bucket;
-						object.Mesh = &mesh;
+						object.LightMode = mesh.LightMode;
 						object.Polygon = &bucket.Polygons[p];
 						object.World = transformMatrix;
 						object.Room = &_rooms[locust.roomNumber];
@@ -2538,6 +2543,9 @@ namespace TEN::Renderer
 						if (IgnoreReflectionPassForRoom(current->RoomNumber))
 							continue;
 
+						if (current->Color.w < ALPHA_BLEND_THRESHOLD)
+							continue;
+
 						auto world = current->World;
 						ReflectMatrixOptionally(world);
 
@@ -2608,7 +2616,9 @@ namespace TEN::Renderer
 						if (bucket.NumVertices == 0)
 							continue;
 
-						if (IsSortedBlendMode(bucket.BlendMode))
+						auto blendMode = GetBlendModeFromAlpha(bucket.BlendMode, statics[i]->Color.w);
+
+						if (IsSortedBlendMode(blendMode) || statics[i]->Color.w < ALPHA_BLEND_THRESHOLD)
 						{
 							for (int p = 0; p < bucket.Polygons.size(); p++)
 							{
@@ -2619,7 +2629,8 @@ namespace TEN::Renderer
 								object.Static = statics[i];
 								object.Centre = Vector3::Transform(bucket.Polygons[p].Centre, statics[i]->World);
 								object.Distance = Vector3::Distance(object.Centre, view.Camera.WorldPosition);
-								object.Mesh = refMesh;
+								object.BlendMode = blendMode;
+								object.LightMode = refMesh->LightMode;
 								object.Polygon = &bucket.Polygons[p];
 								object.Room = &_rooms[object.Static->RoomNumber];
 
@@ -2663,6 +2674,7 @@ namespace TEN::Renderer
 									object.ObjectType = RendererObjectType::Room;
 									object.Centre = bucket.Centre;
 									object.Distance = Vector3::Distance(view.Camera.WorldPosition, bucket.Polygons[p].Centre);
+									object.BlendMode = bucket.BlendMode;
 									object.Bucket = &bucket;
 									object.Room = room;
 									object.Polygon = &bucket.Polygons[p];
@@ -3136,31 +3148,32 @@ namespace TEN::Renderer
 
 		if (rendererPass == RendererPass::CollectTransparentFaces)
 		{
-			for (int j = 0; j < mesh->Buckets.size(); j++)
+			for (auto& bucket : mesh->Buckets)
 			{
-				auto& bucket = mesh->Buckets[j];
+				if (bucket.NumVertices == 0)
+					continue;
 
-				if (rendererPass == RendererPass::CollectTransparentFaces)
+				auto blendMode = GetBlendModeFromAlpha(bucket.BlendMode, itemToDraw->Color.w);
+
+				if (IsSortedBlendMode(blendMode))
 				{
-					if (IsSortedBlendMode(bucket.BlendMode))
+					for (int p = 0; p < bucket.Polygons.size(); p++)
 					{
-						for (int p = 0; p < bucket.Polygons.size(); p++)
-						{
-							auto centre = Vector3::Transform(
-								bucket.Polygons[p].Centre, itemToDraw->InterpolatedAnimTransforms[boneIndex] * itemToDraw->InterpolatedWorld);
-							int distance = (centre - cameraPos).Length();
+						auto centre = Vector3::Transform(
+							bucket.Polygons[p].Centre, itemToDraw->InterpolatedAnimTransforms[boneIndex] * itemToDraw->InterpolatedWorld);
+						int distance = (centre - cameraPos).Length();
 
-							RendererSortableObject object;
-							object.ObjectType = RendererObjectType::Moveable;
-							object.Centre = centre;
-							object.Distance = distance;
-							object.Bucket = &bucket;
-							object.Item = itemToDraw;
-							object.Mesh = mesh;
-							object.Polygon = &bucket.Polygons[p];
+						RendererSortableObject object;
+						object.ObjectType = RendererObjectType::Moveable;
+						object.Centre = centre;
+						object.Distance = distance;
+						object.BlendMode = blendMode;
+						object.Bucket = &bucket;
+						object.Item = itemToDraw;
+						object.LightMode = mesh->LightMode;
+						object.Polygon = &bucket.Polygons[p];
 
-							view.TransparentObjectsToDraw.push_back(object);
-						}
+						view.TransparentObjectsToDraw.push_back(object);
 					}
 				}
 			}
@@ -3171,6 +3184,8 @@ namespace TEN::Renderer
 			{
 				if (bucket.NumVertices == 0)
 					continue;
+
+				auto blendMode = GetBlendModeFromAlpha(bucket.BlendMode, itemToDraw->Color.w);
 				
 				if (rendererPass == RendererPass::ShadowMap)
 				{
@@ -3183,11 +3198,11 @@ namespace TEN::Renderer
 				}
 				else
 				{
-					int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
+					int passes = rendererPass == RendererPass::Opaque && blendMode == BlendMode::AlphaTest ? 2 : 1;
 
 					for (int p = 0; p < passes; p++)
 					{
-						if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
+						if (!SetupBlendModeAndAlphaTest(blendMode, rendererPass, p))
 						{
 							continue;
 						}
@@ -3306,7 +3321,7 @@ namespace TEN::Renderer
 					view.TransparentObjectsToDraw[i].ObjectType == object->ObjectType &&
 					view.TransparentObjectsToDraw[i].Room->RoomNumber == object->Room->RoomNumber &&
 					view.TransparentObjectsToDraw[i].Bucket->Texture == object->Bucket->Texture &&
-					view.TransparentObjectsToDraw[i].Bucket->BlendMode == object->Bucket->BlendMode &&
+					view.TransparentObjectsToDraw[i].BlendMode == object->BlendMode &&
 					_sortedPolygonsIndices.size() + (view.TransparentObjectsToDraw[i].Polygon->Shape == 0 ? 6 : 3) < MAX_TRANSPARENT_VERTICES)
 				{
 					auto* currentObject = &view.TransparentObjectsToDraw[i];
@@ -3330,7 +3345,7 @@ namespace TEN::Renderer
 					view.TransparentObjectsToDraw[i].ObjectType == object->ObjectType &&
 					view.TransparentObjectsToDraw[i].Item->ItemNumber == object->Item->ItemNumber &&
 					view.TransparentObjectsToDraw[i].Bucket->Texture == object->Bucket->Texture &&
-					view.TransparentObjectsToDraw[i].Bucket->BlendMode == object->Bucket->BlendMode &&
+					view.TransparentObjectsToDraw[i].BlendMode == object->BlendMode &&
 					_sortedPolygonsIndices.size() + (view.TransparentObjectsToDraw[i].Polygon->Shape == 0 ? 6 : 3) < MAX_TRANSPARENT_VERTICES)
 				{
 					auto* currentObject = &view.TransparentObjectsToDraw[i];
@@ -3355,7 +3370,7 @@ namespace TEN::Renderer
 					view.TransparentObjectsToDraw[i].Static->RoomNumber == object->Static->RoomNumber &&
 					view.TransparentObjectsToDraw[i].Static->IndexInRoom == object->Static->IndexInRoom &&
 					view.TransparentObjectsToDraw[i].Bucket->Texture == object->Bucket->Texture &&
-					view.TransparentObjectsToDraw[i].Bucket->BlendMode == object->Bucket->BlendMode &&
+					view.TransparentObjectsToDraw[i].BlendMode == object->BlendMode &&
 					_sortedPolygonsIndices.size() + (view.TransparentObjectsToDraw[i].Polygon->Shape == 0 ? 6 : 3) < MAX_TRANSPARENT_VERTICES)
 				{
 					auto* currentObject = &view.TransparentObjectsToDraw[i];
@@ -3379,7 +3394,7 @@ namespace TEN::Renderer
 					view.TransparentObjectsToDraw[i].ObjectType == object->ObjectType &&
 					view.TransparentObjectsToDraw[i].Room->RoomNumber == object->Room->RoomNumber &&
 					view.TransparentObjectsToDraw[i].Bucket->Texture == object->Bucket->Texture &&
-					view.TransparentObjectsToDraw[i].Bucket->BlendMode == object->Bucket->BlendMode &&
+					view.TransparentObjectsToDraw[i].BlendMode == object->BlendMode &&
 					_sortedPolygonsIndices.size() + (view.TransparentObjectsToDraw[i].Polygon->Shape == 0 ? 6 : 3) < MAX_TRANSPARENT_VERTICES)
 				{
 					auto* currentObject = &view.TransparentObjectsToDraw[i];
@@ -3512,7 +3527,7 @@ namespace TEN::Renderer
 		if (objectInfo->Bucket->Animated != 0)
 			_shaders.Bind(Shader::RoomsAnimated);
 
-		SetBlendMode(objectInfo->Bucket->BlendMode);
+		SetBlendMode(objectInfo->BlendMode);
 		SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 		// Draw geometry
@@ -3573,7 +3588,7 @@ namespace TEN::Renderer
 
 		SetDepthState(DepthState::Read);
 		SetCullMode(CullMode::CounterClockwise);
-		SetBlendMode(objectInfo->Bucket->BlendMode);
+		SetBlendMode(objectInfo->BlendMode);
 		SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 		_shaders.Bind(Shader::Items);
@@ -3630,7 +3645,7 @@ namespace TEN::Renderer
 
 		SetDepthState(DepthState::Read);
 		SetCullMode(CullMode::CounterClockwise);
-		SetBlendMode(objectInfo->Bucket->BlendMode);
+		SetBlendMode(objectInfo->BlendMode);
 		SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 		BindTexture(TextureRegister::ColorMap, &std::get<0>(_staticTextures[objectInfo->Bucket->Texture]),
@@ -3662,13 +3677,13 @@ namespace TEN::Renderer
 
 		_stStatic.Color = Vector4::One;
 		_stStatic.AmbientLight = objectInfo->Room->AmbientLight;
-		_stStatic.LightMode = (int)objectInfo->Mesh->LightMode;
+		_stStatic.LightMode = (int)objectInfo->LightMode;
 		BindStaticLights(objectInfo->Room->LightsToDraw);
 		_cbStatic.UpdateData(_stStatic, _context.Get());
 
 		SetDepthState(DepthState::Read);
 		SetCullMode(CullMode::CounterClockwise);
-		SetBlendMode(objectInfo->Bucket->BlendMode);
+		SetBlendMode(objectInfo->BlendMode);
 		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
 		BindTexture(TextureRegister::ColorMap, &std::get<0>(_staticTextures[objectInfo->Bucket->Texture]),
