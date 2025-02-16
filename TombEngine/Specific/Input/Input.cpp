@@ -261,7 +261,7 @@ namespace TEN::Input
 
 			g_Bindings.SetConflict(actionID, false);
 
-			int key = g_Bindings.GetBoundKeyID(InputDeviceID::KeyboardMouse, (InputActionID)i);
+			int key = g_Bindings.GetBoundKeyID(InputDeviceID::Default, (InputActionID)i);
 			for (int j = 0; j < (int)InputActionID::Count; j++)
 			{
 				if (key != g_Bindings.GetBoundKeyID(InputDeviceID::Custom, (InputActionID)j))
@@ -547,7 +547,7 @@ namespace TEN::Input
 		{
 			auto deviceID = (InputDeviceID)i;
 
-			if (deviceID == InputDeviceID::KeyboardMouse && g_Bindings.TestConflict(actionID))
+			if (deviceID == InputDeviceID::Default && g_Bindings.TestConflict(actionID))
 				continue;
 
 			int keyID = g_Bindings.GetBoundKeyID((InputDeviceID)i, actionID);
@@ -736,7 +736,7 @@ namespace TEN::Input
 		{
 			auto actionID = (InputActionID)i;
 
-			int defaultKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::KeyboardMouse, actionID);
+			int defaultKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Default, actionID);
 			int userKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Custom, actionID);
 
 			if (userKeyID != KC_UNASSIGNED &&

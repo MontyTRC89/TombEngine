@@ -474,7 +474,7 @@ bool LoadConfiguration()
 			sprintf(buffer, "Action%d", i);
 
 			auto actionID = (InputActionID)i;
-			int boundKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::KeyboardMouse, actionID);
+			int boundKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Default, actionID);
 
 			if (GetDWORDRegKey(inputKey, buffer, &tempKeyID, boundKeyID) != ERROR_SUCCESS)
 			{
@@ -495,7 +495,7 @@ bool LoadConfiguration()
 	// Input key doesn't exist; use default bindings.
 	else
 	{
-		g_Configuration.Bindings = g_Bindings.GetBindingProfile(InputDeviceID::KeyboardMouse);
+		g_Configuration.Bindings = g_Bindings.GetBindingProfile(InputDeviceID::Default);
 	}
 
 	RegCloseKey(rootKey);

@@ -111,7 +111,7 @@ namespace TEN::Input
 		// Initialize default bindings.
 		_bindings =
 		{
-			{ InputDeviceID::KeyboardMouse, DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE },
+			{ InputDeviceID::Default, DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE },
 			{ InputDeviceID::Custom, DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE }
 		};
 
@@ -171,7 +171,7 @@ namespace TEN::Input
 		// Reset binding profile defaults.
 		switch (deviceID)
 		{
-		case InputDeviceID::KeyboardMouse:
+		case InputDeviceID::Default:
 			_bindings[deviceID] = DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
 			break;
 

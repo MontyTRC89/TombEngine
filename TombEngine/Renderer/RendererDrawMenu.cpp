@@ -316,7 +316,7 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int defaultKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::KeyboardMouse, (InputActionID)k);
+						int defaultKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Default, (InputActionID)k);
 						int userKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Custom, (InputActionID)k);
 
 						int key = userKeyID ? userKeyID : defaultKeyID;
@@ -369,7 +369,7 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int defaultKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::KeyboardMouse, (InputActionID)(baseIndex + k));
+						int defaultKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Default, (InputActionID)(baseIndex + k));
 						int userKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Custom, (InputActionID)(baseIndex + k));
 
 						int key = userKeyID ? userKeyID : defaultKeyID;
@@ -428,7 +428,7 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int defaultKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::KeyboardMouse, (InputActionID)(baseIndex + k));
+						int defaultKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Default, (InputActionID)(baseIndex + k));
 						int userKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Custom, (InputActionID)(baseIndex + k));
 
 						int key = userKeyID ? userKeyID : defaultKeyID;
@@ -480,7 +480,7 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int defaultKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::KeyboardMouse, (InputActionID)(baseIndex + k));
+						int defaultKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Default, (InputActionID)(baseIndex + k));
 						int userKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Custom, (InputActionID)(baseIndex + k));
 
 						int key = userKeyID ? userKeyID : defaultKeyID;

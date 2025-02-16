@@ -6,15 +6,19 @@ namespace TEN::Input
 
 	using BindingProfile = std::unordered_map<InputActionID, int>; // Key = input action ID, value = key ID.
 
-	// TODO: These don't represent devices yet, it's still the legacy way (i.e. default binding + custom binding on top).
-	enum class InputDeviceID
+	// TODO: These don't represent devices yet, it's still the legacy way
+	// (i.e. default binding + custom binding on top).
+	// A future refactor should modernise this system.
+	enum class InputDeviceID // ProfileID
 	{
-		KeyboardMouse,
+		Default,
+		Custom,
+
+		//KeyboardMouse,
 		//Gamepad,
 		//XBox,
 		//Dualshock,
 		//Dancepad,
-		Custom,
 
 		Count
 	};
