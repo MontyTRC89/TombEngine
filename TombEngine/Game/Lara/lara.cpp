@@ -63,6 +63,372 @@ LaraInfo	  Lara			= {};
 ItemInfo*	  LaraItem		= nullptr;
 CollisionInfo LaraCollision = {};
 
+//temp debug
+#include <Game/control/los.h>
+#include "Specific/Input/Input.h"
+#include <OISKeyboard.h>
+#include <Game/collision/Los.h>
+using namespace TEN::Collision::Room;
+using namespace TEN::Collision::Los;
+
+//temp debug
+static void HandleLosDebug(const ItemInfo& item)
+{
+	// Hold T/G to rotate LOS ray.
+	static auto rot = EulerAngles::Identity;
+	if (KeyMap[OIS::KC_T])
+	{
+		rot.x += ANGLE(2);
+	}
+	else if (KeyMap[OIS::KC_G])
+	{
+		rot.x -= ANGLE(2);
+	}
+
+	auto dir = (item.Pose.Orientation + rot).ToDirection();
+
+	float dist = BLOCK(4.5f);
+
+	short roomNumber = item.RoomNumber;
+	GetFloor(item.Pose.Position.x, item.Pose.Position.y, item.Pose.Position.z, &roomNumber);
+
+	auto origin = (item.Pose.Position + Vector3i(0, -BLOCK(0.9f), 0)).ToVector3();
+	auto target = Geometry::TranslatePoint(origin, dir, dist);
+	auto los = GetLosCollision(origin, roomNumber, dir, dist, true, true, true);
+	float closestDist = los.Room.Distance;
+	target = los.Room.Position;
+
+	for (const auto& movLos : los.Items)
+	{
+		if (movLos.Item->ObjectNumber == ID_LARA)
+			continue;
+
+		if (movLos.Distance < closestDist)
+		{
+			closestDist = movLos.Distance;
+			target = movLos.Position;
+			break;
+		}
+	}
+
+	for (const auto& staticLos : los.Statics)
+	{
+		if (staticLos.Distance < closestDist)
+		{
+			closestDist = staticLos.Distance;
+			target = staticLos.Position;
+			break;
+		}
+	}
+
+	DrawDebugLine(origin, target, Vector4::One);
+	DrawDebugTarget(target, Quaternion::Identity, 100, Color(1, 1, 1));
+}
+
+//temp debug
+static void HandleBridgeDebug(const ItemInfo& item)
+{
+	auto pointColl = GetPointCollision(item);
+
+	// Move bridge with mouse.
+	// Hold Y to move vertically.
+	// Hold R/E to rotate.
+	if (pointColl.GetFloorBridgeItemNumber() != NO_VALUE)
+	{
+		auto& bridgeItem = g_Level.Items[pointColl.GetFloorBridgeItemNumber()];
+
+		auto rot = EulerAngles::Identity;
+		if (KeyMap[OIS::KC_R])
+		{
+			rot.y += ANGLE(2);
+		}
+		else if (KeyMap[OIS::KC_E])
+		{
+			rot.y -= ANGLE(2);
+		}
+		bridgeItem.Pose.Orientation += rot;
+
+		auto matrix = Matrix::CreateRotationY(TO_RAD(Camera.actualAngle));
+		auto delta = KeyMap[OIS::KC_Y] ?
+			Vector3(0.0f, GetMouseAxis().y * BLOCK(0.5f), 0.0f) :
+			Vector3::Transform(Vector3(GetMouseAxis().x * BLOCK(0.5f), 0, GetMouseAxis().y * -BLOCK(0.5f)), matrix);
+
+		bridgeItem.Pose.Position += delta;
+		UpdateItemRoom(bridgeItem.Index);
+	}
+}
+
+static void HandleRoomDebug(const ItemInfo& item)
+{
+	auto& room = g_Level.Rooms[item.RoomNumber];
+
+	static int timer = 0;
+	if (timer != 0)
+	{
+		timer--;
+		PrintDebugMessage("Room mesh regenerated.");
+	}
+
+	if (IsClicked(In::Action))
+	{
+		timer = 15;
+		room.GenerateCollisionMesh();
+	}
+}
+
+static void HandleCollMeshOptimizationDebug(const ItemInfo& item)
+{
+	auto base = item.Pose.Position.ToVector3() + Vector3(0.0f, -BLOCK(1), 0.0f);
+	auto tris = std::vector<std::array<Vector3, 3>>{};
+
+	// Create tris
+	auto verts = std::vector<Vector3>{};
+	verts.push_back(Vector3(0 * 100, 0, 1 * 100));
+	verts.push_back(Vector3(0 * 100, 0, 2 * 100));
+	verts.push_back(Vector3(1 * 100, 0, 2 * 100));
+	verts.push_back(Vector3(2 * 100, 0, 2 * 100));
+	verts.push_back(Vector3(2 * 100, 0, 1 * 100));
+	verts.push_back(Vector3(2 * 100, 0, 0 * 100));
+	verts.push_back(Vector3(1 * 100, 0, 0 * 100));
+	verts.push_back(Vector3(0 * 100, 0, 0 * 100));
+	verts.push_back(Vector3(0 * 100, 0, 0 * 100));
+
+	// Create tris
+	//tris.push_back(std::array<Vector3, 3>{ Vector3(-200, 0, 0), Vector3(200, 0, 0), Vector3(0, 0, 200) });
+	//tris.push_back(std::array<Vector3, 3>{ Vector3(200, 0, 0), Vector3(-200, 0, 0), Vector3(0, 0, -200) });
+
+	// Define rotation
+	static auto orient = EulerAngles::Identity;
+	if (KeyMap[OIS::KC_Q])
+	{
+		orient.x += IsHeld(In::Walk) ? ANGLE(2) : ANGLE(-2);
+	}
+	else if (KeyMap[OIS::KC_W])
+	{
+		orient.z += IsHeld(In::Walk) ? ANGLE(2) : ANGLE(-2);
+	}
+
+	// Snap
+	int orients = 8;
+	static bool dbSnap = true;
+	if (KeyMap[OIS::KC_E] && dbSnap)
+	{
+		static int type = 0;
+		type = (type + 1) % orients;
+
+		if (type == 0)
+		{
+			orient = EulerAngles::Identity;
+		}
+		else if (type == 1)
+		{
+			orient = EulerAngles(ANGLE(90), 0, 0);
+		}
+		else if (type == 2)
+		{
+			orient = EulerAngles(ANGLE(180), 0, 0);
+		}
+		else if (type == 3)
+		{
+			orient = EulerAngles(0, 0, ANGLE(90));
+		}
+		else if (type == 4)
+		{
+			orient = EulerAngles(0, 0, ANGLE(180));
+		}
+		else if (type == 5)
+		{
+			orient = EulerAngles(ANGLE(90), 0, ANGLE(90));
+		}
+		else if (type == 6)
+		{
+			orient = EulerAngles(ANGLE(90), 0, ANGLE(180));
+		}
+		else if (type == 7)
+		{
+			orient = EulerAngles(ANGLE(180), 0, ANGLE(90));
+		}
+	}
+	dbSnap = !KeyMap[OIS::KC_E];
+
+	// Rotate verts
+	for (auto& vert : verts)
+	{
+		vert = Vector3::Transform(vert, orient.ToRotationMatrix());
+	}
+
+	// Add tris
+	for (int i = 0; i < verts.size(); i++)
+	{
+		const auto& vert0 = verts[i];
+		const auto& vert1 = verts[(i + 1) % verts.size()];
+		const auto& vert2 = Vector3(100, 0, 100);
+	}
+
+	int i = 0;
+	while (verts.size() > 3)
+	{
+		// Get vertices.
+		const auto& vertex0 = verts[i];
+		const auto& vertex1 = verts[(i + 1) % verts.size()];
+		const auto& vertex2 = verts[(i + 2) % verts.size()];
+
+		// Calculate edges.
+		auto edge0 = vertex1 - vertex0;
+		auto edge1 = vertex2 - vertex1;
+
+		// Check collinearity using cross product.
+		auto edgeCross = edge0.Cross(edge1);
+		if (edgeCross.LengthSquared() < EPSILON)
+		{
+			verts.erase(verts.begin() + ((i + 1) % verts.size()));
+			if (i == verts.size())
+				i = (int)verts.size() - 1;
+		}
+		else
+		{
+			i++;
+			if (i >= (verts.size()))
+				break;
+		}
+	}
+
+	for (const auto& vert : verts)
+	{
+		DrawDebugSphere(BoundingSphere(vert + base, 10), Color(1, 1, 1, 0.2f), RendererDebugPage::None, false);
+	}
+
+	return;
+
+	// Create desc
+	auto desc = CollisionMeshDesc();
+	for (const auto& tri : tris)
+		desc.InsertTriangle(tri[0] + base, tri[1] + base, tri[2] + base);
+	desc.Optimize();
+
+	// Add triangles.
+	const auto& vertices = desc.GetVertices();
+	const auto& ids = desc.GetIds();
+	for (int i = 0; i < ids.size(); i += 3)
+	{
+		// Outline
+		DrawDebugLine(vertices[ids[i]], vertices[ids[i + 1]], Color(1, 1, 1));
+		DrawDebugLine(vertices[ids[i + 1]], vertices[ids[i + 2]], Color(1, 1, 1));
+		DrawDebugLine(vertices[ids[i + 2]], vertices[ids[i]], Color(1, 1, 1));
+
+		// Edge spheres
+		int mult = 0;
+		DrawDebugSphere(BoundingSphere(vertices[ids[i]], 10 + (i * mult)), Color(1, 1, 1, 0.2f), RendererDebugPage::None, false);
+		DrawDebugSphere(BoundingSphere(vertices[ids[i + 1]], 10 + (i * mult)), Color(1, 1, 1, 0.2f), RendererDebugPage::None, false);
+		DrawDebugSphere(BoundingSphere(vertices[ids[i + 2]], 10 + (i * mult)), Color(1, 1, 1, 0.2f), RendererDebugPage::None, false);
+
+		// Triangle
+		DrawDebugTriangle(vertices[ids[i]], vertices[ids[i + 1]], vertices[ids[i + 2]], Color(1, 1, 0, 0.2f));
+
+		// Normal
+		auto edge0 = vertices[ids[i + 1]] - vertices[ids[i]];
+		auto edge1 = vertices[ids[i + 2]] - vertices[ids[i]];
+		auto normal = edge0.Cross(edge1);
+		normal.Normalize();
+		auto center = (vertices[ids[i]] + vertices[ids[i + 1]] + vertices[ids[i + 2]]) / 3;
+		DrawDebugLine(center, Geometry::TranslatePoint(center, normal, BLOCK(0.1f)), Color(1,1,1));
+	}
+
+}
+
+static void HandlePlayerDebug(const ItemInfo& item)
+{
+	HandleLosDebug(item);
+	HandleBridgeDebug(item);
+	HandleRoomDebug(item);
+	HandleCollMeshOptimizationDebug(item);
+
+	if constexpr (!DEBUG_BUILD)
+		return;
+
+	// Collision stats.
+	if (g_Renderer.GetDebugPage() == RendererDebugPage::CollisionStats)
+	{
+		DrawNearbySectorFlags(item);
+	}
+	// Pathfinding stats.
+	else if (g_Renderer.GetDebugPage() == RendererDebugPage::PathfindingStats)
+	{
+		DrawNearbyPathfinding(GetPointCollision(item).GetBottomSector().PathfindingBoxID);
+	}
+	// Room stats.
+	else if (g_Renderer.GetDebugPage() == RendererDebugPage::RoomStats)
+	{
+		const auto& room = g_Level.Rooms[Camera.pos.RoomNumber];
+
+		PrintDebugMessage("Room number: %d", room.RoomNumber);
+		PrintDebugMessage("Sectors: %d", room.Sectors.size());
+		PrintDebugMessage("Bridges: %d", room.Bridges.GetIds().size());
+		PrintDebugMessage("Trigger volumes: %d", room.TriggerVolumes.size());
+
+		// Draw room collision meshes.
+		for (int neighborRoomNumber : room.NeighborRoomNumbers)
+		{
+			const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+
+			neighborRoom.CollisionMesh.DrawDebug();
+		}
+	}
+	// Bridge stats.
+	else if (g_Renderer.GetDebugPage() == RendererDebugPage::BridgeStats)
+	{
+		auto bridgeItemNumbers = std::set<int>{};
+
+		const auto& room = g_Level.Rooms[Camera.pos.RoomNumber];
+		for (int neighborRoomNumber : room.NeighborRoomNumbers)
+		{
+			const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+
+			// Collect bridge item numbers.
+			for (int bridgeItemNumber : neighborRoom.Bridges.GetIds())
+				bridgeItemNumbers.insert(bridgeItemNumber);
+
+			// Draw bridge tree.
+			neighborRoom.Bridges.DrawDebug();
+		}
+
+		// Draw bridge collision meshes.
+		for (int bridgeItemNumber : bridgeItemNumbers)
+		{
+			auto& bridgeItem = g_Level.Items[bridgeItemNumber];
+			auto& bridge = GetBridgeObject(bridgeItem);
+
+			bridge.GetCollisionMesh().DrawDebug();
+		}
+
+		// Print bridge item numbers in sector.
+		auto pointColl = GetPointCollision(item);
+		PrintDebugMessage("Bridge moveable IDs in room %d, sector %d:", pointColl.GetRoomNumber(), pointColl.GetSector().ID);
+		if (pointColl.GetSector().BridgeItemNumbers.empty())
+		{
+			PrintDebugMessage("None");
+		}
+		else
+		{
+			for (int bridgeItemNumber : pointColl.GetSector().BridgeItemNumbers)
+				PrintDebugMessage("%d", bridgeItemNumber);
+		}
+	}
+	// Portal stats.
+	else if (g_Renderer.GetDebugPage() == RendererDebugPage::PortalStats)
+	{
+		const auto& room = g_Level.Rooms[Camera.pos.RoomNumber];
+		PrintDebugMessage("Portals in room %d: %d", room.RoomNumber, room.Portals.size());
+
+		for (int neighborRoomNumber : room.NeighborRoomNumbers)
+		{
+			const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
+			for (const auto& portal : neighborRoom.Portals)
+				portal.CollisionMesh.DrawDebug();
+		}
+	}
+}
+
 void LaraControl(ItemInfo* item, CollisionInfo* coll)
 {
 	auto& player = GetLaraInfo(*item);
@@ -83,7 +449,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 			player.Control.HandStatus = HandStatus::Free;
 		}
 
-		++player.Control.Count.PositionAdjust;
+		player.Control.Count.PositionAdjust++;
 	}
 	else
 	{
@@ -335,11 +701,7 @@ void LaraControl(ItemInfo* item, CollisionInfo* coll)
 	SaveGame::Statistics.Game.Distance  += deltaDist;
 	SaveGame::Statistics.Level.Distance += deltaDist;
 
-	if (DebugMode)
-	{
-		DrawNearbyPathfinding(GetPointCollision(*item).GetBottomSector().PathfindingBoxID);
-		DrawNearbySectorFlags(*item);
-	}
+	HandlePlayerDebug(*item);
 }
 
 void LaraAboveWater(ItemInfo* item, CollisionInfo* coll)
