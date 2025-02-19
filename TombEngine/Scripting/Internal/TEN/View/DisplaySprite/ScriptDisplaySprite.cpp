@@ -10,6 +10,7 @@
 #include "Scripting/Internal/TEN/Types/Color/Color.h"
 #include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 
+using namespace TEN::Scripting::Types;
 using TEN::Renderer::g_Renderer;
 
 /// Represents a display sprite.

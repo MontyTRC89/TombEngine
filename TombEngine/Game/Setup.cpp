@@ -78,38 +78,38 @@ ObjectInfo& ObjectHandler::GetFirstAvailableObject()
 
 void StaticHandler::Initialize()
 {
-	_lookupTable.resize(0);
-	_lookupTable.reserve(_defaultLUTSize);
+	_lut.resize(0);
+	_lut.reserve(LUT_SIZE);
 	_statics.resize(0);
 }
 
 int StaticHandler::GetIndex(int staticID)
 {
-	if (staticID < 0 || staticID >= _lookupTable.size())
+	if (staticID < 0 || staticID >= _lut.size())
 	{
-		TENLog("Attempt to get nonexistent static mesh ID slot index (" + std::to_string(staticID) + ")", LogLevel::Warning);
-		return _lookupTable.front();
+		TENLog("Attempted to get index of missing static object " + std::to_string(staticID) + ".", LogLevel::Warning);
+		return _lut.front();
 	}
 
-	return _lookupTable[staticID];
+	return _lut[staticID];
 }
 
 StaticInfo& StaticHandler::operator [](int staticID)
 {
 	if (staticID < 0)
 	{
-		TENLog("Attempt to access illegal static mesh ID slot info", LogLevel::Warning);
+		TENLog("Attempted to access missing static object " + std::to_string(staticID) + ".", LogLevel::Warning);
 		return _statics.front();
 	}
 
-	if (staticID >= _lookupTable.size())
-		_lookupTable.resize(staticID + 1, NO_VALUE);
+	if (staticID >= _lut.size())
+		_lut.resize(staticID + 1, NO_VALUE);
 
-	if (_lookupTable[staticID] != NO_VALUE)
-		return _statics[_lookupTable[staticID]];
+	if (_lut[staticID] != NO_VALUE)
+		return _statics[_lut[staticID]];
 
 	_statics.emplace_back();
-	_lookupTable[staticID] = (int)_statics.size() - 1;
+	_lut[staticID] = (int)_statics.size() - 1;
 
 	return _statics.back();
 }

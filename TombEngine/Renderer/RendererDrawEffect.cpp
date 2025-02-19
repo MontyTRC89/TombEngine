@@ -308,9 +308,16 @@ namespace TEN::Renderer
 
 					AddSpriteBillboardConstrained(
 						&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
-						center, Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f), PI_DIV_2, 1.0f,
-						Vector2(arc.width * 8, Vector3::Distance(origin, target)),
-						BlendMode::Additive, dir, true, view);
+						center,
+						Vector4(1.0f, 1.0f, 1.0f, 0.5f),
+						PI_DIV_2, 1.0f, Vector2(4, Vector3::Distance(origin, target)), BlendMode::Additive, dir, true, view);
+
+
+					AddSpriteBillboardConstrained(
+						&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
+						center,
+						Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
+						PI_DIV_2, 1.0f, Vector2(arc.width * 8, Vector3::Distance(origin, target)), BlendMode::Additive, dir, true, view);					
 				}
 			}
 		}
@@ -498,7 +505,8 @@ namespace TEN::Renderer
 				}
 
 				// Disallow sprites out of bounds.
-				int spriteIndex = std::clamp((int)particle.spriteIndex, 0, (int)_sprites.size());
+				int spriteIndex = Objects[particle.SpriteSeqID].meshIndex + particle.SpriteID;
+				spriteIndex = std::clamp(spriteIndex, 0, (int)_sprites.size());
 
 				AddSpriteBillboard(
 					&_sprites[spriteIndex],
@@ -862,6 +870,9 @@ namespace TEN::Renderer
 
 				p2 = Vector3::Transform(p2, rotMatrix);
 				p3 = Vector3::Transform(p3, rotMatrix);
+
+				if (shockwave->style == (int)ShockwaveStyle::Invisible)
+					return;
 
 				if (shockwave->style == (int)ShockwaveStyle::Normal)
 				{
@@ -1280,14 +1291,14 @@ namespace TEN::Renderer
 		}
 	}
 
-	Matrix Renderer::GetWorldMatrixForSprite(RendererSpriteToDraw* sprite, RenderView& view)
+	Matrix Renderer::GetWorldMatrixForSprite(const RendererSpriteToDraw& sprite, RenderView& view)
 	{
 		auto spriteMatrix = Matrix::Identity;
-		auto scaleMatrix = Matrix::CreateScale(sprite->Width * sprite->Scale, sprite->Height * sprite->Scale, sprite->Scale);
+		auto scaleMatrix = Matrix::CreateScale(sprite.Width * sprite.Scale, sprite.Height * sprite.Scale, sprite.Scale);
 
-		auto spritePos = sprite->pos;
+		auto spritePos = sprite.pos;
 
-		if (sprite->Type == SpriteType::ThreeD)
+		if (sprite.Type == SpriteType::ThreeD)
 		{
 			ReflectMatrixOptionally(spriteMatrix);
 		}
@@ -1296,23 +1307,23 @@ namespace TEN::Renderer
 			ReflectVectorOptionally(spritePos);
 		}
 
-		switch (sprite->Type)
+		switch (sprite.Type)
 		{
 		case SpriteType::Billboard:
 		{
 			auto cameraUp = Vector3(view.Camera.View._12, view.Camera.View._22, view.Camera.View._32);
-			spriteMatrix = scaleMatrix * Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateBillboard(spritePos, Camera.pos.ToVector3(), cameraUp);
+			spriteMatrix = scaleMatrix * Matrix::CreateRotationZ(sprite.Rotation) * Matrix::CreateBillboard(spritePos, Camera.pos.ToVector3(), cameraUp);
 		}
 		break;
 
 		case SpriteType::CustomBillboard:
 		{
-			auto rotMatrix = Matrix::CreateRotationY(sprite->Rotation);
+			auto rotMatrix = Matrix::CreateRotationY(sprite.Rotation);
 			auto quadForward = Vector3(0.0f, 0.0f, 1.0f);
 			spriteMatrix = scaleMatrix * Matrix::CreateConstrainedBillboard(
 				spritePos,
 				Camera.pos.ToVector3(),
-				sprite->ConstrainAxis,
+				sprite.ConstrainAxis,
 				nullptr,
 				&quadForward);
 		}
@@ -1321,7 +1332,7 @@ namespace TEN::Renderer
 		case SpriteType::LookAtBillboard:
 		{
 			auto translationMatrix = Matrix::CreateTranslation(spritePos);
-			auto rotMatrix = Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateLookAt(Vector3::Zero, sprite->LookAtAxis, Vector3::UnitZ);
+			auto rotMatrix = Matrix::CreateRotationZ(sprite.Rotation) * Matrix::CreateLookAt(Vector3::Zero, sprite.LookAtAxis, Vector3::UnitZ);
 			spriteMatrix = scaleMatrix * rotMatrix * translationMatrix;
 		}
 		break;

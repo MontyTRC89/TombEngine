@@ -16,8 +16,8 @@ Basic cameras that can point at Lara or at a CAMERA_TARGET.
 @pragma nostrip
 */
 
-static auto IndexError = index_error_maker(CameraObject, ScriptReserved_Camera);
-static auto NewIndexError = newindex_error_maker(CameraObject, ScriptReserved_Camera);
+static auto IndexError = IndexErrorMaker(CameraObject, ScriptReserved_Camera);
+static auto NewIndexError = NewIndexErrorMaker(CameraObject, ScriptReserved_Camera);
 
 CameraObject::CameraObject(LevelCameraInfo & ref) : m_camera{ref}
 {};
@@ -90,14 +90,12 @@ std::string CameraObject::GetName() const
 void CameraObject::SetName(std::string const & id) 
 {
 	if (!ScriptAssert(!id.empty(), "Name cannot be blank. Not setting name."))
-	{
 		return;
-	}
 
-	if (s_callbackSetName(id, m_camera))
+	if (_callbackSetName(id, m_camera))
 	{
-		// remove the old name if we have one
-		s_callbackRemoveName(m_camera.Name);
+		// Remove old name if it exists.
+		_callbackRemoveName(m_camera.Name);
 		m_camera.Name = id;
 	}
 	else
