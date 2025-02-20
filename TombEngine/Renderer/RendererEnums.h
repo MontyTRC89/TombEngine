@@ -67,6 +67,8 @@ constexpr auto MAX_LENS_FLARES_DRAW = 8;
 constexpr auto ROOM_AMBIENT_MAP_SIZE = 64;
 constexpr auto MAX_ROOM_AMBIENT_MAPS = 10;
 
+constexpr auto SSR_DOWNSCALE_FACTOR = 4;
+
 enum class LightType
 {
 	Sun = 0,
@@ -175,7 +177,11 @@ enum class TextureRegister
 	EnvironmentMapBack = 8,
 	SSAO = 9,
 	WaterReflectionMap = 10,
-	SSRHashBuffer = 11
+	SSRHashBuffer = 11,
+	WaterNormalMap = 12,
+	WaterRefractionTexture = 13,
+	WaterReflectionTexture = 14,
+	WaterDistortionMap = 15,
 };
 
 enum class SamplerStateRegister
@@ -193,6 +199,7 @@ enum class ConstantBufferRegister
 {
 	Camera = 0,
 	Item = 1,
+	Water = 2,
 	InstancedStatics = 3,
 	ShadowLight = 4,
 	Room = 5,

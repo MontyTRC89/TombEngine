@@ -41,6 +41,8 @@ namespace TEN::Renderer::Utils
 		Load(Shader::PostProcessExclusion, "PostProcess", "Exclusion", ShaderType::Pixel);
 		Load(Shader::PostProcessFinalPass, "PostProcess", "FinalPass", ShaderType::Pixel);
 		Load(Shader::PostProcessLensFlare, "PostProcess", "LensFlare", ShaderType::Pixel);
+		Load(Shader::PostProcessHorizontalBlur, "PostProcess", "HorizontalBlur", ShaderType::Pixel);
+		Load(Shader::PostProcessVerticalBlur, "PostProcess", "VerticalBlur", ShaderType::Pixel);
 
 		Load(Shader::Ssao, "SSAO", "", ShaderType::Pixel);
 		Load(Shader::SsaoBlur, "SSAO", "Blur", ShaderType::Pixel);
@@ -144,11 +146,14 @@ namespace TEN::Renderer::Utils
 
 	void ShaderManager::LoadWaterShaders()
 	{
-		Load(Shader::RoomsWaterReflection, "RoomAmbient", "WaterReflections", ShaderType::PixelAndVertex);
+		Load(Shader::RoomsWaterReflection, "Water", "WaterReflections", ShaderType::PixelAndVertex);
 		
 		Load(Shader::SSR, "Water", "SSR", ShaderType::Vertex);
 		Load(Shader::SSRProjectHash, "Water", "SSRProjectHash", ShaderType::Pixel);
 		Load(Shader::SSRResolveHash, "Water", "SSRResolveHash", ShaderType::Pixel);
+
+		Load(Shader::WaterVertexShader, "Water", "Water", ShaderType::Vertex);
+		Load(Shader::WaterPixelShader, "Water", "Water", ShaderType::Pixel);
 	}
 
 	void ShaderManager::Bind(Shader shader, bool forceNull)
@@ -301,6 +306,22 @@ namespace TEN::Renderer::Utils
 			loadOrCompileShader(wideFileName, "CS", funcName, "cs_5_0", rendererShader.Compute.Blob);
 			throwIfFailed(_device->CreateComputeShader(rendererShader.Compute.Blob->GetBufferPointer(), rendererShader.Compute.Blob->GetBufferSize(),
 													   nullptr, rendererShader.Compute.Shader.GetAddressOf()));
+		}
+
+		// Load or compile and create hull shader.
+		if (type == ShaderType::Hull)
+		{
+			loadOrCompileShader(wideFileName, "HS", funcName, "hs_5_0", rendererShader.Compute.Blob);
+			throwIfFailed(_device->CreateHullShader(rendererShader.Hull.Blob->GetBufferPointer(), rendererShader.Compute.Blob->GetBufferSize(),
+				nullptr, rendererShader.Hull.Shader.GetAddressOf()));
+		}
+
+		// Load or compile and create domain shader.
+		if (type == ShaderType::Domain)
+		{
+			loadOrCompileShader(wideFileName, "DS", funcName, "ds_5_0", rendererShader.Compute.Blob);
+			throwIfFailed(_device->CreateDomainShader(rendererShader.Domain.Blob->GetBufferPointer(), rendererShader.Compute.Blob->GetBufferSize(),
+				nullptr, rendererShader.Domain.Shader.GetAddressOf()));
 		}
 
 		// Increment compile counter.

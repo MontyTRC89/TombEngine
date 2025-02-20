@@ -1303,7 +1303,7 @@ namespace TEN::Renderer
 			auto cameraUp = Vector3(view.Camera.View._12, view.Camera.View._22, view.Camera.View._32);
 			spriteMatrix = scaleMatrix * Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateBillboard(spritePos, Camera.pos.ToVector3(), cameraUp);
 		}
-		break;
+		break; 
 
 		case SpriteType::CustomBillboard:
 		{

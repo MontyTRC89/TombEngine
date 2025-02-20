@@ -26,5 +26,6 @@ namespace TEN::Renderer::ConstantBuffers
 		ShaderLensFlare LensFlares[MAX_LENS_FLARES_DRAW];
 		//--
 		int NumLensFlares;
+		int WaterLevel;
 	};
 }

@@ -25,7 +25,7 @@ struct PixelShaderInput
 {
 	float4 Position: SV_POSITION;
 	float3 WorldPosition: POSITION0;
-    float4 ReflectionPosition : POSITION1;
+    //float4 ReflectionPosition : POSITION1;
 	float3 Normal: NORMAL;
 	float2 UV: TEXCOORD0;
 	float4 Color: COLOR;
@@ -51,6 +51,11 @@ SamplerState SSAOSampler : register(s9);
 
 Texture2D WaterReflectionTexture : register(t10);
 SamplerState WaterReflectionSampler : register(s10);
+
+Texture2D<uint> HashTexture : register(t11);
+
+Texture2D WaterNormalTexture : register(t12);
+SamplerState WaterNormalTextureSampler : register(s12);
 
 struct PixelShaderOutput
 {
@@ -82,9 +87,6 @@ PixelShaderInput VS(VertexShaderInput input)
 		screenPos.x += xOffset * weight;
 		screenPos.y += yOffset * weight;
 	}
-	
-    float4x4 waterMatrix = mul(WaterReflectionView, Projection);
-    output.ReflectionPosition = mul(float4(pos, 1.0f), waterMatrix);
 	
 	output.Position = screenPos;
 	output.Normal = input.Normal;
@@ -125,14 +127,157 @@ float3 PackNormal(float3 n)
 	return n.xyz;
 }
 
+float2 Project(float3 worldPos)
+{
+    float4 clipPos = mul(float4(worldPos, 1.0f), ViewProjection);
+    float2 ndc = clipPos.xy / clipPos.w;
+    ndc = ndc * 0.5f + 0.5f;
+    ndc.y = 1.0f - ndc.y;
+    
+    return ndc;
+}
+
+float ComputeReflectionConfidence(uint2 reflectedPixel, uint2 frameSize)
+{
+    // Load hash buffer value for the reflected position
+    uint hash = HashTexture.Load(uint3(reflectedPixel, 0));
+
+    // If hash is zero, it's an invalid reflection
+    float confidence = (hash > 0) ? 1.0 : 0.0;
+
+    // Smooth transition for unreliable reflections
+    float2 uv = float2(reflectedPixel) / frameSize;
+    float edgeFade = smoothstep(0.05, 0.2, uv) * smoothstep(0.05, 0.2, 1.0 - uv);
+
+    return confidence * edgeFade;
+}
+
+float3 BlurReflection(float2 uv, float strength)
+{
+    float3 color = 0.0;
+    float weightSum = 0.0;
+
+    // Larger kernel for more noticeable blur
+    float2 offsets[9] =
+    {
+        float2(-1, -1), float2(0, -1), float2(1, -1),
+        float2(-1, 0), float2(0, 0), float2(1, 0),
+        float2(-1, 1), float2(0, 1), float2(1, 1)
+    };
+    
+    float weights[9] =
+    {
+        0.05, 0.1, 0.05,
+        0.1, 0.4, 0.1,
+        0.05, 0.1, 0.05
+    };
+
+    for (int i = 0; i < 9; i++)
+    {
+        float2 sampleUV = uv + offsets[i] * strength;
+        float3 sampleColor = WaterReflectionTexture.Sample(
+        WaterReflectionSampler, sampleUV).
+        rgb;
+        color += sampleColor * weights[i];
+        weightSum += weights[i];
+    }
+
+    return color / weightSum;
+}
+
+float ComputeReflectionFade(float3 normalWS, float3 viewDirWS)
+{
+    float fresnelFactor = saturate(dot(normalWS, viewDirWS)); // Dot product for angle effect
+    return pow(fresnelFactor, 2.0); // Adjust exponent for smooth fading
+}
+
+float ComputeReflectionValidity(uint2 reflectedPixel, uint2 frameSize)
+{
+    // Load hash buffer value for the reflected position
+    uint hash = HashTexture.Load(uint3(reflectedPixel, 0));
+
+    // If hash is zero, it's an invalid reflection
+    return (hash > 0) ? 1.0 : 0.0;
+}
+
+float ComputeProximityFade(uint2 reflectedPixel, uint2 frameSize)
+{
+    float fade = 1.0;
+    int searchRadius = 16; // Tune for smoothness
+
+    // Loop over nearby pixels to detect missing data
+    for (int y = -searchRadius; y <= searchRadius; y++)
+    {
+        for (int x = -searchRadius; x <= searchRadius; x++)
+        {
+            uint2 neighborPixel = reflectedPixel + uint2(x, y);
+
+            // Clamp to screen size
+            neighborPixel = clamp(neighborPixel, uint2(0, 0), frameSize - 1);
+
+            // Check if the neighbor is missing
+            if (ComputeReflectionValidity(neighborPixel, frameSize) == 0.0)
+            {
+                float dist = length(float2(x, y)) / searchRadius;
+                fade = min(fade, smoothstep(0.5, 1.0, dist));
+            }
+        }
+    }
+
+    return fade;
+}
+
+float2 ComputeScrollingUV(float2 baseUV, float time, float2 speed)
+{
+    return baseUV + time * speed;
+}
+
+float2 DistortUV(float2 reflectedUV, float3 normal, float strength)
+{
+    return reflectedUV + normal.xy * strength;
+}
+
+float GetFresnel(float3 eyeVector, float3 normalVector)
+{
+    float fangle = 1 + dot(eyeVector, normalVector);
+    fangle = pow(fangle, 5);
+    float fresnelTerm = 1 / fangle;
+	
+    return fresnelTerm;
+}
+
+float2 Noise2(float2 uv, float time)
+{
+    float n = sin(dot(uv, float2(12.9898, 78.233))) * 43758.5453;
+    return float2(frac(n), frac(n * sin(time)));
+}
+
+float3 BlurSSR(float2 uv, float blurRadius)
+{
+    float3 color = float3(0, 0, 0);
+    float weightSum = 0.0;
+
+    for (int x = -5; x <= 5; x++)
+    {
+        for (int y = -5; y <= 5; y++)
+        {
+            float2 offset = float2(x, y) * blurRadius;
+            float weight = exp(-dot(offset, offset) / (2.0 * blurRadius * blurRadius));
+            color += WaterReflectionTexture.Sample(WaterReflectionSampler, uv + offset).rgb * weight;
+            weightSum += weight;
+        }
+    }
+    return color / weightSum;
+}
+
 PixelShaderOutput PS(PixelShaderInput input)
 {
 	PixelShaderOutput output;
 	
-	if (WaterReflections)
+	/*if (WaterReflections)
     {
         clip(WaterHeight - input.WorldPosition.y);
-    }
+    }*/
 
 	output.Color = Texture.Sample(Sampler, input.UV);
 
@@ -213,18 +358,46 @@ PixelShaderOutput PS(PixelShaderInput input)
 	output.Color = DoFogBulbsForPixel(output.Color, float4(input.FogBulbs.xyz, 1.0f));
 	output.Color = DoDistanceFogForPixel(output.Color, FogColor, input.DistanceFog);
 	
-    if (BlendMode == BLENDMODE_DYNAMIC_WATER_SURFACE)
+    /*if (BlendMode == BLENDMODE_DYNAMIC_WATER_SURFACE)
     {
-        float2 ProjectedTexCoords;
-        ProjectedTexCoords.x = input.ReflectionPosition.x / input.ReflectionPosition.w / 2.0f + 0.5f;
-        ProjectedTexCoords.y = -input.ReflectionPosition.y / input.ReflectionPosition.w / 2.0f + 0.5f;
-
-    // Campionamento della texture con il colore riflesso
-        float4 reflectedColor = WaterReflectionTexture.Sample(WaterReflectionSampler, ProjectedTexCoords);
+        float3 eyeVector = normalize(CamPositionWS.xyz - input.WorldPosition.xyz);
+       
+		// Get reflected pixel coordinates
+        float2 reflectedUV = Project(input.WorldPosition);
+        uint2 reflectedPixel = reflectedUV * ViewSize;
 		
-        output.Color.xyz = lerp(output.Color.xyz, reflectedColor.xyz, 0.3f);
+		// Sample the waves normal map
+        float2 wavesSamplePosition = frac(input.WorldPosition.xyz / 16384.0f).xz;
+        wavesSamplePosition += float2(0.0f, 1.0f) * Frame / 1000.0f;
+		float3 wavesNormal = WaterNormalTexture.Sample(WaterNormalTextureSampler, wavesSamplePosition);
+        wavesNormal = UnpackNormalMap(float4(wavesNormal, 1.0f));
+        wavesNormal = normalize(float3(wavesNormal.x, -wavesNormal.z, wavesNormal.y));
+		
+		// Sample the reflection texture
+    
+        float2 perturbatedUV = reflectedUV + wavesNormal.xz * 0.008f;
+        float3 reflectedColor =
+			//BlurSSR(reflectedUV, 0.01f);
+			WaterReflectionTexture.Sample(WaterReflectionSampler, perturbatedUV).xyz;
+	
+		// Calculate specular highlights
+        float3 lightDir = -normalize(float3(0.0f, 1.0f, 0.0f));
+        float3 reflectDir = reflect(lightDir, wavesNormal);
+        float3 specularColor = float3(1.0f, 1.0f, 1.0f);
+		float specularIntensity = 1.0f;
+        float specularFactor = pow(saturate(dot(CamDirectionWS.xyz, reflectDir)), 1.0f * SPEC_FACTOR);
+        float3 specularTerm = specularFactor * specularColor * specularIntensity;
 
-    }
+        //float3 halfVector = normalize(eyeVector + lightDir); // Vettore metà tra view e light
+        //specularTerm = pow(saturate(dot(wavesNormal, halfVector)), 1.0f) * specularIntensity;
+    
+		// Compute the Fresnel term
+        float3 waterNormal = float3(0.0f, -1.0f, 0.0f);
+        float fresnelTerm = GetFresnel(eyeVector, waterNormal);
+		
+		// Calculate the final color
+        output.Color.xyz = lerp(output.Color.xyz, reflectedColor.xyz, fresnelTerm) + specularTerm.xyz;
+    }*/
 
 	return output;
 }

@@ -20,6 +20,9 @@ struct PixelShaderInput
 Texture2D ColorTexture : register(t0);
 SamplerState ColorSampler : register(s0);
 
+static const float Weights[9] = { 0.05, 0.09, 0.12, 0.15, 0.18, 0.15, 0.12, 0.09, 0.05 };
+static const int Offset[9] = { -4, -3, -2, -1, 0, 1, 2, 3, 4 };
+
 PixelShaderInput VS(VertexShaderInput input)
 {
     PixelShaderInput output;
@@ -188,4 +191,38 @@ float4 PSLensFlare(PixelShaderInput input) : SV_Target
 	color.xyz += totalLensFlareColor;
 
 	return color;
+}
+
+float4 PSHorizontalBlur(PixelShaderInput input) : SV_Target
+{
+    float3 color = float3(0, 0, 0);
+    float weightSum = 0.0;
+    int blurFactor = 5;
+	
+    for (int i = -blurFactor; i <= blurFactor; i++)
+    {
+        float weight = exp(-0.5 * (i / (float) blurFactor) * (i / (float) blurFactor)); // Gaussian weight
+        float2 offset = float2(i * InvViewSize.x, 0.0);
+        color += ColorTexture.Sample(ColorSampler, input.UV + offset).rgb * weight;
+        weightSum += weight;
+    }
+
+    return float4(color / weightSum, 1.0);
+}
+
+float4 PSVerticalBlur(PixelShaderInput input) : SV_Target
+{
+    float3 color = float3(0, 0, 0);
+    float weightSum = 0.0;
+    int blurFactor = 5;
+	
+    for (int i = -blurFactor; i <= blurFactor; i++)
+    {
+        float weight = exp(-0.5 * (i / (float) blurFactor) * (i / (float) blurFactor)); // Gaussian weight
+        float2 offset = float2(0.0, i * InvViewSize.x);
+        color += ColorTexture.Sample(ColorSampler, input.UV + offset).rgb * weight;
+        weightSum += weight;
+    }
+
+    return float4(color / weightSum, 1.0);
 }

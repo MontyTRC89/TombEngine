@@ -20,8 +20,6 @@ namespace TEN::Renderer::ConstantBuffers
 		//--
 		Matrix DualParaboloidView;
 		//--
-		Matrix WaterReflectionView;
-		//--
 		Vector4 CamPositionWS;
 		//--
 		Vector4 CamDirectionWS;

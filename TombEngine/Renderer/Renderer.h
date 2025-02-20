@@ -39,6 +39,7 @@
 #include "Renderer/ConstantBuffers/ConstantBuffer.h"
 #include "Renderer/ConstantBuffers/PostProcessBuffer.h"
 #include "Renderer/ConstantBuffers/SMAABuffer.h"
+#include "Renderer/ConstantBuffers/WaterConstantBuffer.h"
 #include "Renderer/Structures/RendererBone.h"
 #include "Renderer/Structures/RendererDoor.h"
 #include "Renderer/Structures/RendererStringToDraw.h"
@@ -46,6 +47,7 @@
 #include "Renderer/Structures/RendererSprite.h"
 #include "Renderer/Structures/RendererAnimatedTexture.h"
 #include "Renderer/Structures/RendererAnimatedTextureSet.h"
+#include "Renderer/Structures/RendererWaterPlaneBucket.h"
 #include "Renderer/Graphics/Texture2D.h"
 #include "Renderer/Graphics/IndexBuffer.h"
 #include "Renderer/Graphics/RenderTarget2D.h"
@@ -125,8 +127,6 @@ namespace TEN::Renderer
 		RenderTarget2D _tempRoomAmbientRenderTarget3;
 		RenderTarget2D _tempRoomAmbientRenderTarget4;
 		Texture2DArray _shadowMap;
-		RenderTarget2D _waterRenderTargets[2];
-		UAVRenderTarget2D _SSRHashBuffer;
 
 		// Constant buffers
 
@@ -162,6 +162,8 @@ namespace TEN::Renderer
 		ConstantBuffer<CInstancedStaticMeshBuffer> _cbInstancedStaticMeshBuffer;
 		CSMAABuffer _stSMAABuffer;
 		ConstantBuffer<CSMAABuffer> _cbSMAABuffer;
+		CWaterConstantBuffer _stWater;
+		ConstantBuffer<CWaterConstantBuffer> _cbWater;
 
 		// Primitive batches
 
@@ -318,7 +320,6 @@ namespace TEN::Renderer
 		RenderTarget2D _SMAAEdgesRenderTarget;
 		RenderTarget2D _SMAABlendRenderTarget;
 
-		Matrix _waterMatrix;
 		// Post-process
 
 		PostProcessMode _postProcessMode = PostProcessMode::None;
@@ -346,6 +347,16 @@ namespace TEN::Renderer
 
 		std::vector<Texture2D> _causticTextures;
 		RendererMirror* _currentMirror = nullptr;
+
+		// Water
+
+		RenderTarget2D _waterReflectionsRenderTarget;
+		UAVRenderTarget2D _waterReflectionsHashBuffer;
+		Texture2D _waterNormalMap;
+		RenderTarget2D _waterReflectionsTempRenderTarget;
+		Texture2D _waterDistortionMap;
+		Texture2D _wave0NormalMap;
+		Texture2D _wave1NormalMap;
 
 		// Transparency
 
@@ -407,6 +418,7 @@ namespace TEN::Renderer
 		void DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
 		void DrawRooms(RenderView& view, RendererPass rendererPass);
 		void DrawItems(RenderView& view, RendererPass rendererPass, bool onlyPlayer = false);
+		void DrawWater(RenderView& view);
 		void DrawAnimatingItem(RendererItem* item, RenderView& view, RendererPass rendererPass);
 		void DrawWaterfalls(RendererItem* item, RenderView& view, int fps, RendererPass rendererPass);
 		void DrawBaddyGunflashes(RenderView& view);
@@ -494,7 +506,8 @@ namespace TEN::Renderer
 		float CalculateFrameRate();
 		void InterpolateCamera(float interpFactor);
 		void CopyRenderTarget(RenderTarget2D* source, RenderTarget2D* dest, RenderView& view);
-		void RenderSimpleSceneForWaterReflections(RenderTarget2D* renderTarget, WaterPlane& waterPlane, RenderView& view);
+		void BlurRenderTarget(RenderTarget2D* sources, RenderView& view);
+		void RenderSimpleSceneForWaterReflections(RenderTarget2D* renderTarget, RendererWaterPlane* waterPlane, RenderView& view);
 
 		void AddSpriteBillboard(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D, float scale,
 					 Vector2 size, BlendMode blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);

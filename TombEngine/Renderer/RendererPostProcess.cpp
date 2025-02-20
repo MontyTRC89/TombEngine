@@ -179,7 +179,7 @@ namespace TEN::Renderer
 
 		UINT stride = sizeof(PostProcessVertex);
 		UINT offset = 0;
-
+		 
 		_context->IASetVertexBuffers(0, 1, _fullscreenTriangleVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 
 		float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
@@ -188,5 +188,45 @@ namespace TEN::Renderer
 
 		BindRenderTargetAsTexture(TextureRegister::ColorMap, source, SamplerStateRegister::PointWrap);
 		DrawTriangles(3, 0);
+	}
+
+	void Renderer::BlurRenderTarget(RenderTarget2D* source, RenderView& view)
+	{
+		SetBlendMode(BlendMode::Opaque, true);
+		SetCullMode(CullMode::CounterClockwise, true);
+		SetDepthState(DepthState::Write, true);
+		_context->RSSetViewports(1, &view.Viewport);
+		ResetScissor();
+
+		// Common vertex shader to all fullscreen effects
+		_shaders.Bind(Shader::PostProcess);
+
+		// We draw a fullscreen triangle
+		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		_context->IASetInputLayout(_fullscreenTriangleInputLayout.Get());
+
+		UINT stride = sizeof(PostProcessVertex);
+		UINT offset = 0;
+
+		_context->IASetVertexBuffers(0, 1, _fullscreenTriangleVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+
+		float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+		_context->ClearRenderTargetView(_postProcessRenderTarget[0].RenderTargetView.Get(), clearColor);
+		_context->OMSetRenderTargets(1, _postProcessRenderTarget[0].RenderTargetView.GetAddressOf(), nullptr);
+
+		_shaders.Bind(Shader::PostProcessHorizontalBlur);
+
+		BindRenderTargetAsTexture(TextureRegister::ColorMap, source, SamplerStateRegister::PointWrap);
+		DrawTriangles(3, 0);
+
+		_context->ClearRenderTargetView(_postProcessRenderTarget[1].RenderTargetView.Get(), clearColor);
+		_context->OMSetRenderTargets(1, _postProcessRenderTarget[1].RenderTargetView.GetAddressOf(), nullptr);
+
+		_shaders.Bind(Shader::PostProcessVerticalBlur);
+
+		BindRenderTargetAsTexture(TextureRegister::ColorMap, &_postProcessRenderTarget[0], SamplerStateRegister::PointWrap);
+		DrawTriangles(3, 0);
+
+		CopyRenderTarget(&_postProcessRenderTarget[1], source, view);
 	}
 }

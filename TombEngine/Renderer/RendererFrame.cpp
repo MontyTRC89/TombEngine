@@ -149,6 +149,60 @@ namespace TEN::Renderer
 
 		for (int i = 0; i < std::min(MAX_LENS_FLARES_DRAW, (int)tempLensFlares.size()); i++)
 			renderView.LensFlaresToDraw.push_back(tempLensFlares[i]);
+
+		// Collect water planes
+		for (auto* roomPtr : renderView.RoomsToDraw)
+		{  
+			for (auto& bucket : roomPtr->Buckets)
+			{
+				if (bucket.BlendMode == BlendMode::DynamicWaterSurface)
+				{
+					//WaterPlane waterPlane = g_Level.WaterPlanes[bucket.WaterPlaneIndex];
+					int waterHeight = 0;
+
+					int index = -1;
+					for (int i = 0; i < renderView.WaterPlanesToDraw.size(); i++)
+					{
+						if (renderView.WaterPlanesToDraw[i].WaterLevel == waterHeight)
+						{
+							index = i;
+							break;
+						}
+					}     
+
+					if (index == -1)
+					{
+						renderView.WaterPlanesToDraw.push_back(RendererWaterPlane());
+						index = (int)renderView.WaterPlanesToDraw.size() - 1;
+						    
+						Vector3 cameraWorldPosition = renderView.Camera.WorldPosition;
+						cameraWorldPosition.y = waterHeight - cameraWorldPosition.y;
+
+						Vector3 direction = renderView.Camera.WorldDirection;
+						direction.y = waterHeight - direction.y;
+						direction.Normalize();
+
+						Vector3 up = Vector3::UnitY;
+						float roll = 0;
+
+						Matrix upRotation = Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, roll);
+						up = Vector3::Transform(up, upRotation);
+						up.Normalize();
+
+						renderView.WaterPlanesToDraw[index].WaterLevel = waterHeight;
+						renderView.WaterPlanesToDraw[index].ReflectionViewMatrix = Matrix::CreateLookAt(cameraWorldPosition, cameraWorldPosition + 1024 * direction, up);
+						renderView.WaterPlanesToDraw[index].CameraPositionWS = cameraWorldPosition;
+						renderView.WaterPlanesToDraw[index].CameraDirectionWS = direction;
+					}
+					
+					RendererWaterPlaneBucket waterPlaneBucket;
+					waterPlaneBucket.Room = roomPtr;
+					waterPlaneBucket.Bucket = &bucket;
+
+					renderView.WaterPlanesToDraw[index].Buckets.push_back(waterPlaneBucket);
+				}
+			}
+		}
 	}
 
 	bool Renderer::CheckPortal(short parentRoomNumber, RendererDoor* door, Vector4 viewPort, Vector4* clipPort, RenderView& renderView)

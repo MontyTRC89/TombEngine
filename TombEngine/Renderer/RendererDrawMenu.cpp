@@ -1310,7 +1310,7 @@ namespace TEN::Renderer
 			rect.right = rect.left + thumbWidth;
 			rect.bottom = rect.top + thumbWidth / aspectRatio;
 
-			_spriteBatch->Draw(_waterRenderTargets[0].ShaderResourceView.Get(), rect);
+			_spriteBatch->Draw(_waterReflectionsRenderTarget.ShaderResourceView.Get(), rect);
 			thumbY += thumbWidth / aspectRatio;
 
 			_spriteBatch->End();

@@ -61,6 +61,8 @@ namespace TEN::Renderer::Utils
 		PostProcessExclusion,
 		PostProcessFinalPass,
 		PostProcessLensFlare,
+		PostProcessHorizontalBlur,
+		PostProcessVerticalBlur,
 
 		// SSAO
 
@@ -72,6 +74,9 @@ namespace TEN::Renderer::Utils
 		SSR,
 		SSRProjectHash,
 		SSRResolveHash,
+
+		WaterVertexShader,
+		WaterPixelShader,
 
 		Count
 	};

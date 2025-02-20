@@ -69,6 +69,7 @@ namespace TEN::Renderer
 		_cbInstancedSpriteBuffer = CreateConstantBuffer<CInstancedSpriteBuffer>();
 		_cbInstancedStaticMeshBuffer = CreateConstantBuffer<CInstancedStaticMeshBuffer>();
 		_cbSMAABuffer = CreateConstantBuffer<CSMAABuffer>();
+		_cbWater = CreateConstantBuffer<CWaterConstantBuffer>();
 
 		// Prepare HUD Constant buffer.
 		_cbHUDBar = CreateConstantBuffer<CHUDBarBuffer>();
@@ -222,7 +223,7 @@ namespace TEN::Renderer
 		InitializeGameBars();
 		InitializeSpriteQuad();
 		InitializeSky();
-
+		 
 		_roomAmbientMapFront = RenderTarget2D(_device.Get(), ROOM_AMBIENT_MAP_SIZE, ROOM_AMBIENT_MAP_SIZE, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_D32_FLOAT);
 		_roomAmbientMapBack = RenderTarget2D(_device.Get(), ROOM_AMBIENT_MAP_SIZE, ROOM_AMBIENT_MAP_SIZE, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_D32_FLOAT);
 
@@ -475,14 +476,14 @@ namespace TEN::Renderer
 		_normalsRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN);
 		_SSAORenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN);
 		_SSAOBlurredRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN);
-		_waterRenderTargets[0] = RenderTarget2D(_device.Get(), w , h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_D24_UNORM_S8_UINT);
-		_waterRenderTargets[1] = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_D24_UNORM_S8_UINT);
-		_SSRHashBuffer = UAVRenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8_UINT);
-
+		_waterReflectionsRenderTarget = RenderTarget2D(_device.Get(), w / SSR_DOWNSCALE_FACTOR, h / SSR_DOWNSCALE_FACTOR, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_D24_UNORM_S8_UINT);
+		_waterReflectionsHashBuffer = UAVRenderTarget2D(_device.Get(), w / SSR_DOWNSCALE_FACTOR, h / SSR_DOWNSCALE_FACTOR, DXGI_FORMAT_R32_UINT);
+		_waterReflectionsTempRenderTarget = RenderTarget2D(_device.Get(), w / SSR_DOWNSCALE_FACTOR, h / SSR_DOWNSCALE_FACTOR, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_D24_UNORM_S8_UINT);
+		        
 		// Initialize sprite and primitive batches
 		_spriteBatch = std::make_unique<SpriteBatch>(_context.Get());
 		_primitiveBatch = std::make_unique<PrimitiveBatch<Vertex>>(_context.Get());
-
+		    
 		// Initialize viewport
 		_viewport.TopLeftX = 0;
 		_viewport.TopLeftY = 0;
@@ -490,7 +491,7 @@ namespace TEN::Renderer
 		_viewport.Height = h;
 		_viewport.MinDepth = 0.0f;
 		_viewport.MaxDepth = 1.0f;
-
+		   
 		_shadowMapViewport.TopLeftX = 0;
 		_shadowMapViewport.TopLeftY = 0;
 		_shadowMapViewport.Width = g_Configuration.ShadowMapSize;
@@ -535,6 +536,10 @@ namespace TEN::Renderer
 		SetTextureOrDefault(_loadingBarBorder, GetAssetPath(L"Textures/LoadingBarBorder.png"));
 		SetTextureOrDefault(_loadingBarInner, GetAssetPath(L"Textures/LoadingBarInner.png"));
 		SetTextureOrDefault(_whiteTexture, GetAssetPath(L"Textures/WhiteSprite.png")); 
+		SetTextureOrDefault(_waterNormalMap, GetAssetPath(L"Textures/Water.png"));
+		SetTextureOrDefault(_waterDistortionMap, GetAssetPath(L"Textures/WaterDistortionMap.png"));
+		SetTextureOrDefault(_wave0NormalMap, GetAssetPath(L"Textures/Wave0Normal.png"));
+		SetTextureOrDefault(_wave1NormalMap, GetAssetPath(L"Textures/Wave1Normal.png"));
 
 		_whiteSprite.Height = _whiteTexture.Height;
 		_whiteSprite.Width = _whiteTexture.Width;

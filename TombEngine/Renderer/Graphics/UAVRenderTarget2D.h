@@ -45,6 +45,16 @@ namespace TEN::Renderer::Graphics
 
 			res = device->CreateUnorderedAccessView(Texture.Get(), &uavDesc, UnorderedAccessView.GetAddressOf());
 			throwIfFailed(res);
+
+			// Set up description of shader resource view.
+			auto shaderDesc = D3D11_SHADER_RESOURCE_VIEW_DESC{};
+			shaderDesc.Format = format;
+			shaderDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+			shaderDesc.Texture2D.MostDetailedMip = 0;
+			shaderDesc.Texture2D.MipLevels = 1;
+
+			res = device->CreateShaderResourceView(Texture.Get(), &shaderDesc, &ShaderResourceView);
+			throwIfFailed(res);
 		}
 	};
 }

@@ -11,7 +11,6 @@ cbuffer CBCamera : register(b0)
     float4x4 InverseProjection;
     float4x4 InverseView;
     float4x4 DualParaboloidView;
-    float4x4 WaterReflectionView;
 	float4 CamPositionWS;
 	float4 CamDirectionWS;
 	//--
@@ -37,8 +36,7 @@ cbuffer CBCamera : register(b0)
 	//--
     int RefreshRate;
 	int NumFogBulbs;
-    float WaterHeight;
-    int WaterReflections;
+    float2 UnusedCamera;
 	//--
 	ShaderFogBulb FogBulbs[MAX_FOG_BULBS];
 };
