@@ -160,7 +160,7 @@ namespace TEN::Entities::TR4
 			}
 		}
 
-		if (laraItem->Animation.AnimNumber == LA_PICKUP_PEDESTAL_HIGH && laraItem->Animation.FrameNumber == GetAnimData(LA_PICKUP_PEDESTAL_HIGH).frameBase + 45)
+		if (laraItem->Animation.AnimNumber == LA_PICKUP_PEDESTAL_HIGH && laraItem->Animation.FrameNumber == GetAnimData(LA_PICKUP_PEDESTAL_HIGH).frameBase + 45 && keyHoleItem->ItemFlags[1])
 		{
 			//room_number = item->room_number;
 			//floor = GetFloor(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, &room_number);
@@ -174,7 +174,7 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
-			keyHoleItem->ItemFlags[1] = 0;
+			//keyHoleItem->ItemFlags[1] = 0;
 			ObjectCollision(itemNumber, laraItem, coll);
 		}
 	}
