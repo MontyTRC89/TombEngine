@@ -24,7 +24,6 @@ static constexpr char ScriptReserved_Color[]			= "Color";
 static constexpr char ScriptReserved_DisplayString[]	= "DisplayString";
 static constexpr char ScriptReserved_LevelFunc[]		= "LevelFunc";
 static constexpr char ScriptReserved_Statistics[]		= "Statistics";
-static constexpr char ScriptReserved_Collision[]		= "Collision";
 
 // Settings sections
 static constexpr char ScriptReserved_Settings[]			= "Settings";
@@ -83,7 +82,6 @@ static constexpr char ScriptReserved_PreUseItem[]		= "PRE_USE_ITEM";
 static constexpr char ScriptReserved_PostUseItem[]		= "POST_USE_ITEM";
 static constexpr char ScriptReserved_PreFreeze[]		= "PRE_FREEZE";
 static constexpr char ScriptReserved_PostFreeze[]		= "POST_FREEZE";
-
 
 // Built-in LevelFuncs
 static constexpr char ScriptReserved_OnStart[]			= "OnStart";
@@ -366,38 +364,6 @@ static constexpr char ScriptReserved_PickStatic[]					= "PickStaticByDisplayPosi
 static constexpr char ScriptReserved_GetDisplayPosition[]			= "GetDisplayPosition";
 static constexpr char ScriptReserved_GetCursorDisplayPosition[]		= "GetCursorDisplayPosition"; // Deprecated
 static constexpr char ScriptReserved_GetMouseDisplayPosition[]		= "GetMouseDisplayPosition";
-
-
-static constexpr char ScriptReserved_GetColPosition[]				= "GetPosition";
-static constexpr char ScriptReserved_GetColRoomNumber[]				= "GetRoomNumber";
-static constexpr char ScriptReserved_GetSector[]					= "GetSector";
-static constexpr char ScriptReserved_GetBottomSector[]				= "GetBottomSector";
-static constexpr char ScriptReserved_GetTopSector[]					= "GetTopSector";
-static constexpr char ScriptReserved_GetFloorHeight[]				= "GetFloorHeight";
-static constexpr char ScriptReserved_GetCeilingHeight[]				= "GetCeilingHeight";
-static constexpr char ScriptReserved_GetFloorNormal[]				= "GetFloorNormal";
-static constexpr char ScriptReserved_GetCeilingNormal[]				= "GetCeilingNormal";
-static constexpr char ScriptReserved_GetFloorBridgeItemNumber[]		= "GetFloorBridgeItemNumber";
-static constexpr char ScriptReserved_GetCeilingBridgeItemNumber[]	= "GetCeilingBridgeItemNumber";
-static constexpr char ScriptReserved_GetWaterSurfaceHeight[]		= "GetWaterSurfaceHeight";
-static constexpr char ScriptReserved_GetWaterBottomHeight[]			= "GetWaterBottomHeight";
-static constexpr char ScriptReserved_GetWaterTopHeight[]			= "GetWaterTopHeight";
-
-static constexpr char ScriptReserved_IsWall[]						= "IsWall";
-static constexpr char ScriptReserved_IsSteepFloor[]					= "IsSteepFloor";
-static constexpr char ScriptReserved_IsSteepCeiling[]				= "IsSteepCeiling";
-static constexpr char ScriptReserved_IsDiagonalFloorStep[]			= "IsDiagonalFloorStep";
-static constexpr char ScriptReserved_IsDiagonalCeilingStep[]		= "IsDiagonalCeilingStep";
-static constexpr char ScriptReserved_IsDiagonalFloorSplit[]			= "IsDiagonalFloorSplit";
-static constexpr char ScriptReserved_IsDiagonalCeilingSplit[]		= "IsDiagonalCeilingSplit";
-static constexpr char ScriptReserved_IsFlippedDiagonalFloorSplit[]	= "IsFlippedDiagonalFloorSplit";
-static constexpr char ScriptReserved_IsFlippedDiagonalCeilingSplit[]= "IsFlippedDiagonalCeilingSplit";
-static constexpr char ScriptReserved_TestEnvironmentFlag[]			= "TestEnvironmentFlag";
-
-static constexpr char ScriptReserved_GetPointCollision[]			= "GetPointCollision";
-
-
-
 
 // Tables
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";

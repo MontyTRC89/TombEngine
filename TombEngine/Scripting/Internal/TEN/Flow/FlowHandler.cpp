@@ -21,10 +21,12 @@
 #include "Scripting/Internal/TEN/Types/Time/Time.h"
 #include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Util/Collision.h"
 #include "Sound/sound.h"
 #include "Specific/trutils.h"
 
 using namespace TEN::Scripting;
+using namespace TEN::Scripting::Util;
 
 /***
 Functions that (mostly) don't directly impact in-game mechanics. Used for setup
@@ -316,6 +318,9 @@ Specify which translations in the strings table correspond to which languages.
 	Fog::Register(tableFlow);
 	LensFlare::Register(tableFlow);
 	Starfield::Register(tableFlow);
+
+	// Util
+	ScriptCollision::Register(tableFlow);
 
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, WEATHER_TYPES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, PLAYER_TYPES);
