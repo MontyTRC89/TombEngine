@@ -573,8 +573,8 @@ end
 --
 function CustomBar:SetBackgroundSpriteSlot(slot, id)
 	if slot and id and LevelVars.Engine.CustomBars.bars[self.name] then
-		LevelVars.Engine.CustomBars.bars[self.name].objectIdBar = slot
-		LevelVars.Engine.CustomBars.bars[self.name].spriteIdBar = id
+		LevelVars.Engine.CustomBars.bars[self.name].objectIdBg = slot
+		LevelVars.Engine.CustomBars.bars[self.name].spriteIdBg = id
 	end
 end
 
@@ -584,7 +584,7 @@ end
 --
 function CustomBar:SetBackgroundAlignMode(alignMode)
 	if alignMode and LevelVars.Engine.CustomBars.bars[self.name] then
-		LevelVars.Engine.CustomBars.bars[self.name].alignMode = alignMode
+		LevelVars.Engine.CustomBars.bars[self.name].alignModeBg = alignMode
 	end
 end
 ---
@@ -593,7 +593,7 @@ end
 --
 function CustomBar:SetBackgroundScaleMode(scaleMode)
 	if scaleMode and LevelVars.Engine.CustomBars.bars[self.name] then
-		LevelVars.Engine.CustomBars.bars[self.name].scaleMode = scaleMode
+		LevelVars.Engine.CustomBars.bars[self.name].scaleModeBg = scaleMode
 	end
 end
 ---
@@ -613,7 +613,7 @@ end
 --
 function CustomBar:SetBarPosition(pos)
 	if pos and LevelVars.Engine.CustomBars.bars[self.name] then
-		LevelVars.Engine.CustomBars.bars[self.name].posBg = pos
+		LevelVars.Engine.CustomBars.bars[self.name].posBar = pos
 	end
 end
 ---
@@ -650,8 +650,8 @@ end
 --
 function CustomBar:SetBarSpriteSlot(slot, id)
 	if slot and id and LevelVars.Engine.CustomBars.bars[self.name] then
-		LevelVars.Engine.CustomBars.bars[self.name].objectIdBg = slot
-		LevelVars.Engine.CustomBars.bars[self.name].spriteIdBg = id
+		LevelVars.Engine.CustomBars.bars[self.name].objectIdBar = slot
+		LevelVars.Engine.CustomBars.bars[self.name].spriteIdBar = id
 	end
 end
 ---
@@ -660,7 +660,7 @@ end
 --
 function CustomBar:SetBarAlignMode(alignMode)
 	if alignMode and LevelVars.Engine.CustomBars.bars[self.name] then
-		LevelVars.Engine.CustomBars.bars[self.name].alignModeBg = alignMode
+		LevelVars.Engine.CustomBars.bars[self.name].alignMode = alignMode
 	end
 end
 ---
@@ -669,7 +669,7 @@ end
 --
 function CustomBar:SetBarScaleMode(scaleMode)
 	if scaleMode and LevelVars.Engine.CustomBars.bars[self.name] then
-		LevelVars.Engine.CustomBars.bars[self.name].scaleModeBg = scaleMode
+		LevelVars.Engine.CustomBars.bars[self.name].scaleMode = scaleMode
 	end
 end
 ---
