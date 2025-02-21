@@ -65,9 +65,9 @@ namespace TEN::Scripting::Util
 	{
 		static const auto DEFAULT_AXIS = Vec3(0.0f, 1.0f, 0.0f);
 
-		short convertexAngle = ANGLE(headingAngle);
-		auto convertexAxis = axis.value_or(DEFAULT_AXIS).ToVector3();
-		_pointCollision = GetPointCollision(pos.ToVector3i(), roomNumber, convertexAngle, forward, down, right, convertexAxis);
+		short convertedAngle = ANGLE(headingAngle);
+		auto convertedAxis = axis.value_or(DEFAULT_AXIS).ToVector3();
+		_pointCollision = GetPointCollision(pos.ToVector3i(), roomNumber, convertedAngle, forward, down, right, convertedAxis);
 	}
 
 	Vec3 ScriptCollision::GetPosition()
