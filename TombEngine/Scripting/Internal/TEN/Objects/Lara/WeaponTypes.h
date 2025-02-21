@@ -1,4 +1,5 @@
 #pragma once
+#include "framework.h"
 
 #include "Game/control/control.h"
 #include "Game/Lara/lara_struct.h"
@@ -7,10 +8,10 @@
 // @enum Objects.WeaponType
 // @pragma nostrip
 
-/// Table of Objects.WeaponType constants.
-// To be used with @{Objects.LaraObject.GetWeaponType} and @{Objects.LaraObject.SetWeaponType} functions.
+/// Objects.WeaponType constants. To be used with @{Objects.LaraObject.GetWeaponType} and @{Objects.LaraObject.SetWeaponType} functions.
 // 
-// Note that this table also contains the flare and torch, as they are internally counted as "weapons" the engine.
+// Note that this enumeration also contains flare and torch - these are counted as "weapon" internally by the engine, and indicate
+// an object that is currently in Lara's hands.
 // 
 // - `NONE`
 // - `PISTOLS`

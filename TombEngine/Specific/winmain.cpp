@@ -14,7 +14,6 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/configuration.h"
-#include "Specific/Parallel.h"
 #include "Specific/trutils.h"
 #include "Scripting/Internal/LanguageScript.h"
 #include "Scripting/Include/ScriptInterfaceState.h"
@@ -593,7 +592,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	DoTheGame = true;
 
-	g_Parallel.Initialize();
 	ThreadEnded = false;
 	ThreadHandle = BeginThread(GameMain, ThreadID);
 

@@ -328,12 +328,10 @@ void lara_col_run_forward(ItemInfo* item, CollisionInfo* coll)
 	player.Control.MoveAngle = item->Pose.Orientation.y;
 	item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0;
-	coll->Setup.LowerFloorBound = IsHeld(In::Walk) ? STEPUP_HEIGHT : NO_LOWER_BOUND;
+	coll->Setup.LowerFloorBound = NO_LOWER_BOUND;
 	coll->Setup.UpperFloorBound = -STEPUP_HEIGHT;
 	coll->Setup.LowerCeilingBound = 0;
 	coll->Setup.BlockFloorSlopeUp = true;
-	coll->Setup.BlockFloorSlopeDown = IsHeld(In::Walk);
-	coll->Setup.BlockDeathFloorDown = IsHeld(In::Walk);
 	coll->Setup.ForwardAngle = player.Control.MoveAngle;
 	GetCollisionInfo(coll, item);
 	LaraResetGravityStatus(item, coll);

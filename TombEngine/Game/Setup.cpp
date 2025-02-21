@@ -78,38 +78,38 @@ ObjectInfo& ObjectHandler::GetFirstAvailableObject()
 
 void StaticHandler::Initialize()
 {
-	_lut.resize(0);
-	_lut.reserve(LUT_SIZE);
+	_lookupTable.resize(0);
+	_lookupTable.reserve(_defaultLUTSize);
 	_statics.resize(0);
 }
 
 int StaticHandler::GetIndex(int staticID)
 {
-	if (staticID < 0 || staticID >= _lut.size())
+	if (staticID < 0 || staticID >= _lookupTable.size())
 	{
-		TENLog("Attempted to get index of missing static object " + std::to_string(staticID) + ".", LogLevel::Warning);
-		return _lut.front();
+		TENLog("Attempt to get nonexistent static mesh ID slot index (" + std::to_string(staticID) + ")", LogLevel::Warning);
+		return _lookupTable.front();
 	}
 
-	return _lut[staticID];
+	return _lookupTable[staticID];
 }
 
 StaticInfo& StaticHandler::operator [](int staticID)
 {
 	if (staticID < 0)
 	{
-		TENLog("Attempted to access missing static object " + std::to_string(staticID) + ".", LogLevel::Warning);
+		TENLog("Attempt to access illegal static mesh ID slot info", LogLevel::Warning);
 		return _statics.front();
 	}
 
-	if (staticID >= _lut.size())
-		_lut.resize(staticID + 1, NO_VALUE);
+	if (staticID >= _lookupTable.size())
+		_lookupTable.resize(staticID + 1, NO_VALUE);
 
-	if (_lut[staticID] != NO_VALUE)
-		return _statics[_lut[staticID]];
+	if (_lookupTable[staticID] != NO_VALUE)
+		return _statics[_lookupTable[staticID]];
 
 	_statics.emplace_back();
-	_lut[staticID] = (int)_statics.size() - 1;
+	_lookupTable[staticID] = (int)_statics.size() - 1;
 
 	return _statics.back();
 }
@@ -183,6 +183,7 @@ void InitializeSpecialEffects()
 	memset(&SmokeSparks, 0, MAX_SPARKS_SMOKE * sizeof(SMOKE_SPARKS));
 	memset(&Gunshells, 0, MAX_GUNSHELL * sizeof(GUNSHELL_STRUCT));
 	memset(&Blood, 0, MAX_SPARKS_BLOOD * sizeof(BLOOD_STRUCT));
+	memset(&Splashes, 0, MAX_SPLASHES * sizeof(SPLASH_STRUCT));
 	memset(&ShockWaves, 0, MAX_SHOCKWAVE * sizeof(SHOCKWAVE_STRUCT));
 	memset(&Particles, 0, MAX_PARTICLES * sizeof(Particle));
 

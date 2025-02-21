@@ -11,15 +11,13 @@ namespace TEN::Hud
 	class HudController
 	{
 	public:
-		// Fields
-
+		// Members
 		StatusBarsController		StatusBars		  = {};
 		PickupSummaryController		PickupSummary	  = {};
 		SpeedometerController		Speedometer		  = {};
 		TargetHighlighterController TargetHighlighter = {};
 
 		// Utilities
-
 		void Update(const ItemInfo& playerItem);
 		void Draw(const ItemInfo& playerItem) const;
 		void Clear();

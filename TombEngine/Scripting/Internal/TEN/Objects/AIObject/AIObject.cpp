@@ -14,8 +14,8 @@ AI object
 @pragma nostrip
 */
 
-static auto IndexError = IndexErrorMaker(AIObject, ScriptReserved_AIObject);
-static auto NewIndexError = NewIndexErrorMaker(AIObject, ScriptReserved_AIObject);
+static auto IndexError = index_error_maker(AIObject, ScriptReserved_AIObject);
+static auto NewIndexError = newindex_error_maker(AIObject, ScriptReserved_AIObject);
 
 AIObject::AIObject(AI_OBJECT & ref) : m_aiObject{ref}
 {};
@@ -132,15 +132,17 @@ std::string AIObject::GetName() const
 	return m_aiObject.Name;
 }
 
-void AIObject::SetName(const std::string& id)
+void AIObject::SetName(std::string const & id) 
 {
 	if (!ScriptAssert(!id.empty(), "Name cannot be blank. Not setting name."))
-		return;
-
-	if (_callbackSetName(id, m_aiObject))
 	{
-		// Remove old name if it exists.
-		_callbackRemoveName(m_aiObject.Name);
+		return;
+	}
+
+	if (s_callbackSetName(id, m_aiObject))
+	{
+		// remove the old name if we have one
+		s_callbackRemoveName(m_aiObject.Name);
 		m_aiObject.Name = id;
 	}
 	else

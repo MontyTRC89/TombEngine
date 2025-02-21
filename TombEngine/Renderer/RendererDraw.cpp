@@ -128,28 +128,27 @@ namespace TEN::Renderer
 
 	void Renderer::RenderShadowMap(RendererItem* item, RenderView& renderView)
 	{
-		// Doesn't cast shadow.
+		// Doesn't cast shadow
 		if (_moveableObjects[item->ObjectID].value().ShadowType == ShadowMode::None)
 			return;
 
-		// Only render for player if such setting is active.
-		if (g_Configuration.ShadowType == ShadowMode::Player && _moveableObjects[item->ObjectID].value().ShadowType != ShadowMode::Player)
+		// Only render for Lara if such setting is active
+		if (g_Configuration.ShadowType == ShadowMode::Lara && _moveableObjects[item->ObjectID].value().ShadowType != ShadowMode::Lara)
 			return;
 
-		// No shadow light found.
+		// No shadow light found
 		if (_shadowLight == nullptr)
 			return;
 
-		// Shadow light found but type is incorrect.
+		// Shadow light found but type is incorrect
 		if (_shadowLight->Type != LightType::Point && _shadowLight->Type != LightType::Spot)
 			return;
 
-		// Reset GPU state.
+		// Reset GPU state
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
 
-		auto shadowLightPos = (_shadowLight->Hash == 0) ?
-			_shadowLight->Position :
+		auto shadowLightPos = _shadowLight->Hash == 0 ? _shadowLight->Position :
 			Vector3::Lerp(_shadowLight->PrevPosition, _shadowLight->Position, GetInterpolationFactor());
 
 		for (int step = 0; step < 6; step++)
@@ -186,7 +185,7 @@ namespace TEN::Renderer
 
 			auto projection = Matrix::CreatePerspectiveFieldOfView(90.0f * PI / 180.0f, 1.0f, 16.0f, _shadowLight->Out);
 
-			auto shadowProjection = CCameraMatrixBuffer{};
+			CCameraMatrixBuffer shadowProjection;
 			shadowProjection.ViewProjection = view * projection;
 			_cbCameraMatrices.UpdateData(shadowProjection, _context.Get());
 			BindConstantBufferVS(ConstantBufferRegister::Camera, _cbCameraMatrices.get());
@@ -195,7 +194,7 @@ namespace TEN::Renderer
 
 			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
-			auto& obj = GetRendererObject((GAME_OBJECT_ID)item->ObjectID);
+			RendererObject& obj = GetRendererObject((GAME_OBJECT_ID)item->ObjectID);
 
 			_stItem.World = item->InterpolatedWorld;
 			_stItem.Color = item->Color;
@@ -226,7 +225,7 @@ namespace TEN::Renderer
 					if (bucket.BlendMode != BlendMode::Opaque && bucket.BlendMode != BlendMode::AlphaTest)
 						continue;
 
-					// Draw vertices.
+					// Draw vertices
 					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 
 					_numShadowMapDrawCalls++;
@@ -235,7 +234,7 @@ namespace TEN::Renderer
 
 			if (item->ObjectID == ID_LARA)
 			{
-				auto& room = _rooms[item->RoomNumber];
+				RendererRoom& room = _rooms[item->RoomNumber];
 
 				DrawLaraHolsters(item, &room, renderView, RendererPass::ShadowMap);
 				DrawLaraJoints(item, &room, renderView, RendererPass::ShadowMap);
@@ -486,8 +485,7 @@ namespace TEN::Renderer
 
 				if (rat->On)
 				{
-					int index = (GlobalCounter + i) % Objects[ID_RATS_EMITTER].nmeshes;
-					auto* mesh = GetMesh(Objects[ID_RATS_EMITTER].meshIndex + index);
+					RendererMesh* mesh = GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
 
 					for (int j = 0; j < mesh->Buckets.size(); j++)
 					{
@@ -563,8 +561,7 @@ namespace TEN::Renderer
 
 					if (rat->On)
 					{
-						int index = (GlobalCounter + i) % Objects[ID_RATS_EMITTER].nmeshes;
-						const auto& mesh = *GetMesh(Objects[ID_RATS_EMITTER].meshIndex + index);
+						const auto& mesh = *GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
 
 						auto world = rat->Transform;
 						ReflectMatrixOptionally(world);
@@ -2925,7 +2922,7 @@ namespace TEN::Renderer
 					rDrawSprite.Width = STAR_SIZE * star.Scale;
 					rDrawSprite.Height = STAR_SIZE * star.Scale;
 
-					_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(rDrawSprite, renderView);
+					_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
 					_stInstancedSpriteBuffer.Sprites[i].Color = Vector4(
 						star.Color.x,
 						star.Color.y,
@@ -2988,7 +2985,7 @@ namespace TEN::Renderer
 						rDrawSprite.Height = 192;
 						rDrawSprite.ConstrainAxis = meteor.Direction;
 
-						_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(rDrawSprite, renderView);
+						_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
 						_stInstancedSpriteBuffer.Sprites[i].Color = Vector4(
 							meteor.Color.x,
 							meteor.Color.y,
@@ -3092,7 +3089,7 @@ namespace TEN::Renderer
 			rDrawSprite.Height = SUN_SIZE;
 			rDrawSprite.color = renderView.LensFlaresToDraw[0].Color;
 
-			_stInstancedSpriteBuffer.Sprites[0].World = GetWorldMatrixForSprite(rDrawSprite, renderView);
+			_stInstancedSpriteBuffer.Sprites[0].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
 			_stInstancedSpriteBuffer.Sprites[0].Color = renderView.LensFlaresToDraw[0].Color;
 			_stInstancedSpriteBuffer.Sprites[0].IsBillboard = 1;
 			_stInstancedSpriteBuffer.Sprites[0].IsSoftParticle = 0;
@@ -3442,7 +3439,7 @@ namespace TEN::Renderer
 					uv2 = spr->Sprite->UV[2];
 					uv3 = spr->Sprite->UV[3];
 
-					auto world = GetWorldMatrixForSprite(*currentObject->Sprite, view);
+					auto world = GetWorldMatrixForSprite(currentObject->Sprite, view);
 					
 					Vertex v0;
 					v0.Position = Vector3::Transform(p0t, world);

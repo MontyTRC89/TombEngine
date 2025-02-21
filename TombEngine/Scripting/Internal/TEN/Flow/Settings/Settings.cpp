@@ -7,7 +7,6 @@
 #include "Scripting/Internal/ScriptUtil.h"
 
 using namespace TEN::Effects::Hair;
-using namespace TEN::Scripting::Types;
 
 namespace TEN::Scripting
 {
@@ -47,10 +46,9 @@ namespace TEN::Scripting
 		SystemSettings::Register(parent);
 		WeaponSettings::Register(parent);
 
-		parent.new_usertype<Settings>(
-			ScriptReserved_Settings,
+		parent.new_usertype<Settings>(ScriptReserved_Settings,
 			sol::constructors<Settings()>(),
-			sol::meta_function::new_index, NewIndexErrorMaker(Settings, ScriptReserved_Settings),
+			sol::meta_function::new_index, newindex_error_maker(Settings, ScriptReserved_Settings),
 			ScriptReserved_AnimSettings, &Settings::Animations,
 			ScriptReserved_FlareSettings, &Settings::Flare,
 			ScriptReserved_CameraSettings, &Settings::Camera,
@@ -70,7 +68,7 @@ namespace TEN::Scripting
 		parent.create().new_usertype<AnimSettings>(
 			ScriptReserved_AnimSettings, sol::constructors<AnimSettings()>(),
 			sol::call_constructor, sol::constructors<AnimSettings()>(),
-			sol::meta_function::new_index, NewIndexErrorMaker(AnimSettings, ScriptReserved_AnimSettings),
+			sol::meta_function::new_index, newindex_error_maker(AnimSettings, ScriptReserved_AnimSettings),
 
 		/// Extended crawl moveset.
 		// @tfield bool crawlExtended when enabled, player will be able to traverse across one-click steps in crawlspaces.
@@ -113,7 +111,7 @@ namespace TEN::Scripting
 	{
 		parent.create().new_usertype<CameraSettings>(ScriptReserved_CameraSettings, sol::constructors<CameraSettings()>(),
 			sol::call_constructor, sol::constructors<CameraSettings()>(),
-			sol::meta_function::new_index, NewIndexErrorMaker(CameraSettings, ScriptReserved_CameraSettings),
+			sol::meta_function::new_index, newindex_error_maker(CameraSettings, ScriptReserved_CameraSettings),
 
 		/// Determines highlight color in binocular mode.
 		// @tfield Color binocularLightColor color of highlight, when player presses action. Zero color means there will be no highlight.
@@ -136,7 +134,7 @@ namespace TEN::Scripting
 	{
 		parent.create().new_usertype<FlareSettings>(ScriptReserved_FlareSettings, sol::constructors<FlareSettings()>(),
 			sol::call_constructor, sol::constructors<FlareSettings()>(),
-			sol::meta_function::new_index, NewIndexErrorMaker(FlareSettings, ScriptReserved_FlareSettings),
+			sol::meta_function::new_index, newindex_error_maker(FlareSettings, ScriptReserved_FlareSettings),
 
 		/// Flare color.
 		// @tfield Color color flare color. Used for sparks and lensflare coloring as well.
@@ -185,7 +183,7 @@ namespace TEN::Scripting
 	{
 		parent.create().new_usertype<HairSettings>(ScriptReserved_HairSettings, sol::constructors<HairSettings()>(),
 			sol::call_constructor, sol::constructors<HairSettings()>(),
-			sol::meta_function::new_index, NewIndexErrorMaker(HairSettings, ScriptReserved_HairSettings),
+			sol::meta_function::new_index, newindex_error_maker(HairSettings, ScriptReserved_HairSettings),
 
 		/// Root mesh to which hair object will attach to.
 		// @tfield int mesh index of a root mesh to which hair will attach. Root mesh may be different for each hair object.
@@ -208,7 +206,7 @@ namespace TEN::Scripting
 	{
 		parent.create().new_usertype<HudSettings>(ScriptReserved_HudSettings, sol::constructors<HudSettings()>(),
 			sol::call_constructor, sol::constructors<HudSettings()>(),
-			sol::meta_function::new_index, NewIndexErrorMaker(HudSettings, ScriptReserved_HudSettings),
+			sol::meta_function::new_index, newindex_error_maker(HudSettings, ScriptReserved_HudSettings),
 
 		/// Toggle in-game status bars visibility.
 		// @tfield bool statusBars if disabled, all status bars (health, air, stamina) will be hidden.
@@ -235,7 +233,7 @@ namespace TEN::Scripting
 	{
 		parent.create().new_usertype<PhysicsSettings>(ScriptReserved_PhysicsSettings, sol::constructors<PhysicsSettings()>(),
 			sol::call_constructor, sol::constructors<PhysicsSettings()>(),
-			sol::meta_function::new_index, NewIndexErrorMaker(PhysicsSettings, ScriptReserved_PhysicsSettings),
+			sol::meta_function::new_index, newindex_error_maker(PhysicsSettings, ScriptReserved_PhysicsSettings),
 
 		/// Global world gravity.
 		// @tfield float gravity specifies global gravity. Mostly affects Lara and several other objects.
@@ -255,7 +253,7 @@ namespace TEN::Scripting
 	{
 		parent.create().new_usertype<WeaponSettings>(ScriptReserved_WeaponSettings, sol::constructors<WeaponSettings()>(),
 			sol::call_constructor, sol::constructors<WeaponSettings()>(),
-			sol::meta_function::new_index, NewIndexErrorMaker(WeaponSettings, ScriptReserved_WeaponSettings),
+			sol::meta_function::new_index, newindex_error_maker(WeaponSettings, ScriptReserved_WeaponSettings),
 
 		/// Shooting accuracy.
 		// @tfield float accuracy determines accuracy range in angles (smaller angles mean higher accuracy). Applicable only for firearms.
@@ -322,17 +320,11 @@ namespace TEN::Scripting
 	{
 		parent.create().new_usertype<SystemSettings>(ScriptReserved_SystemSettings, sol::constructors<SystemSettings()>(),
 			sol::call_constructor, sol::constructors<SystemSettings()>(),
-			sol::meta_function::new_index, NewIndexErrorMaker(SystemSettings, ScriptReserved_SystemSettings),
+			sol::meta_function::new_index, newindex_error_maker(SystemSettings, ScriptReserved_SystemSettings),
 
 		/// How should the application respond to script errors?
 		// @tfield Flow.ErrorMode errorMode error mode to use. */
 		"errorMode", &SystemSettings::ErrorMode,
-
-		/// Use multithreading in certain calculations. <br>
-		// When set to `true`, some performance-critical calculations will be performed in parallel, which can give
-		// a significant performance boost. Don't disable unless you have problems with launching or using TombEngine.
-		// @tfield bool multithreaded determines whether to use multithreading or not. */
-		"multithreaded", &SystemSettings::Multithreaded,
 
 		/// Can the game utilize the fast reload feature? <br>
 		// When set to `true`, the game will attempt to perform fast savegame reloading if current level is the same as

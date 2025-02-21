@@ -3,8 +3,6 @@
 
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Game/animation.h"
-#include "Game/control/box.h"
-#include "Game/control/los.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
 #include "Game/effects/Blood.h"
@@ -16,7 +14,6 @@
 #include "Game/effects/Ripple.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
-#include "Game/effects/Splash.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/items.h"
@@ -25,7 +22,6 @@
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/objectslist.h"
-#include "Objects/TR5/Emitter/Waterfall.h"
 #include "Renderer/Renderer.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
@@ -41,8 +37,6 @@ using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Light;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Spark;
-using namespace TEN::Effects::Splash;
-using namespace TEN::Effects::WaterfallEmitter;
 using namespace TEN::Math;
 using namespace TEN::Math::Random;
 
@@ -58,7 +52,10 @@ ParticleDynamic ParticleDynamics[MAX_PARTICLE_DYNAMICS];
 FX_INFO EffectList[MAX_SPAWNED_ITEM_COUNT];
 
 GameBoundingBox DeadlyBounds;
+SPLASH_SETUP SplashSetup;
+SPLASH_STRUCT Splashes[MAX_SPLASHES];
 
+int SplashCount = 0;
 int Wibble = 0;
 
 Vector3i NodeVectors[ParticleNodeOffsetIDs::NodeMax];
@@ -161,8 +158,7 @@ Particle* GetFreeParticle()
 	}
 
 	auto& part = Particles[partID];
-	part.SpriteSeqID = ID_DEFAULT_SPRITES;
-	part.SpriteID = 0;
+	part.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
 	part.blendMode = BlendMode::Additive;
 	part.extras = 0;
 	part.dynamic = NO_VALUE;
@@ -182,16 +178,16 @@ void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID)
 	if (particleAge > particle.life )
 		return;	
 
-	int spriteCount = -Objects[objectID].nmeshes - 1;
+	int numSprites = -Objects[objectID].nmeshes - 1;
 	float normalizedAge = particleAge / particle.life;
-	particle.SpriteSeqID = objectID;
-	particle.SpriteID = (int)round(Lerp(0.0f, spriteCount, normalizedAge));
+	particle.spriteIndex = Objects[objectID].meshIndex + (int)round(Lerp(0.0f, numSprites, normalizedAge));
 }
 
 void UpdateWibble()
 {
 	// Update oscillator seed.
 	Wibble = (Wibble + WIBBLE_SPEED) & WIBBLE_MAX;
+
 }
 
 void UpdateSparks()
@@ -207,72 +203,69 @@ void UpdateSparks()
 
 	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
-		auto& spark = Particles[i];
+		auto* spark = &Particles[i];
 
-		if (spark.on)
+		if (spark->on)
 		{
-			spark.StoreInterpolationData();
+			spark->StoreInterpolationData();
 
-			spark.life--;
+			spark->life--;
 
-			if (!spark.life)
+			if (!spark->life)
 			{
-				if (spark.dynamic != -1)
-					ParticleDynamics[spark.dynamic].On = false;
+				if (spark->dynamic != -1)
+					ParticleDynamics[spark->dynamic].On = false;
 
-				spark.on = false;
+				spark->on = false;
 				continue;
 			}
-
-			if (HandleWaterfallParticle(spark))
-				continue;
 			
-			int life = spark.sLife - spark.life;
-			if (life < spark.colFadeSpeed)
+			int life = spark->sLife - spark->life;
+			if (life < spark->colFadeSpeed)
 			{
-				int dl = (life << 16) / spark.colFadeSpeed;
-				spark.r = spark.sR + (dl * (spark.dR - spark.sR) >> 16);
-				spark.g = spark.sG + (dl * (spark.dG - spark.sG) >> 16);
-				spark.b = spark.sB + (dl * (spark.dB - spark.sB) >> 16);
+				int dl = (life << 16) / spark->colFadeSpeed;
+				spark->r = spark->sR + (dl * (spark->dR - spark->sR) >> 16);
+				spark->g = spark->sG + (dl * (spark->dG - spark->sG) >> 16);
+				spark->b = spark->sB + (dl * (spark->dB - spark->sB) >> 16);
 			}
-			else if (spark.life >= spark.fadeToBlack)
+			else if (spark->life >= spark->fadeToBlack)
 			{
-				spark.r = spark.dR;
-				spark.g = spark.dG;
-				spark.b = spark.dB;
+				spark->r = spark->dR;
+				spark->g = spark->dG;
+				spark->b = spark->dB;
 			}
 			else
 			{
-				spark.r = (spark.dR * (((spark.life - spark.fadeToBlack) << 16) / spark.fadeToBlack + 0x10000)) >> 16;
-				spark.g = (spark.dG * (((spark.life - spark.fadeToBlack) << 16) / spark.fadeToBlack + 0x10000)) >> 16;
-				spark.b = (spark.dB * (((spark.life - spark.fadeToBlack) << 16) / spark.fadeToBlack + 0x10000)) >> 16;
+				spark->r = (spark->dR * (((spark->life - spark->fadeToBlack) << 16) / spark->fadeToBlack + 0x10000)) >> 16;
+				spark->g = (spark->dG * (((spark->life - spark->fadeToBlack) << 16) / spark->fadeToBlack + 0x10000)) >> 16;
+				spark->b = (spark->dB * (((spark->life - spark->fadeToBlack) << 16) / spark->fadeToBlack + 0x10000)) >> 16;
 
-				if (spark.r < 8 && spark.g < 8 && spark.b < 8)
+				if (spark->r < 8 && spark->g < 8 && spark->b < 8)
 				{
-					spark.on = 0;
+					spark->on = 0;
 					continue;
 				}
 			}
 
-			if (spark.life == spark.colFadeSpeed)
+			if (spark->life == spark->colFadeSpeed)
 			{
-				if (spark.flags & SP_UNDERWEXP)
-					spark.dSize /= 4;
+				if (spark->flags & SP_UNDERWEXP)
+					spark->dSize /= 4;
 			}
 
-			if (spark.flags & SP_ROTATE)
-				spark.rotAng = (spark.rotAng + spark.rotAdd) & 0x0FFF;
+			if (spark->flags & SP_ROTATE)
+				spark->rotAng = (spark->rotAng + spark->rotAdd) & 0x0FFF;
 
-			if (spark.sLife - spark.life == spark.extras >> 3 &&
-					spark.extras & 7)
+			if (spark->sLife - spark->life == spark->extras >> 3 &&
+				spark->extras & 7)
 			{
 				int explosionType;
 
-				if (spark.flags & SP_UNDERWEXP)
+				if (spark->flags & SP_UNDERWEXP)
 				{
 					explosionType = 1;
 				}
-				else if (spark.flags & SP_PLASMAEXP)
+				else if (spark->flags & SP_PLASMAEXP)
 				{
 					explosionType = 2;
 				}
@@ -281,95 +274,95 @@ void UpdateSparks()
 					explosionType = 0;
 				}
 
-				for (int j = 0; j < (spark.extras & 7); j++)
+				for (int j = 0; j < (spark->extras & 7); j++)
 				{
-					if (spark.flags & SP_COLOR)
+					if (spark->flags & SP_COLOR)
 					{
 						TriggerExplosionSparks(
-							spark.x, spark.y, spark.z,
-							(spark.extras & 7) - 1,
-							spark.dynamic,
+							spark->x, spark->y, spark->z,
+							(spark->extras & 7) - 1,
+							spark->dynamic,
 							explosionType,
-							spark.roomNumber,
-							Vector3(spark.dR, spark.dG, spark.dB),
-							Vector3(spark.sR, spark.sG, spark.sB));
+							spark->roomNumber, 
+							Vector3(spark->dR, spark->dG, spark->dB), 
+							Vector3(spark->sR, spark->sG, spark->sB));
 					}
 					else
 					{
 						TriggerExplosionSparks(
-							spark.x, spark.y, spark.z,
-							(spark.extras & 7) - 1,
-							spark.dynamic,
+							spark->x, spark->y, spark->z,
+							(spark->extras & 7) - 1,
+							spark->dynamic,
 							explosionType,
-							spark.roomNumber);
+							spark->roomNumber);
 					}
-
-					spark.dynamic = -1;
+					
+					spark->dynamic = -1;
 				}
 
 				if (explosionType == 1)
 				{
 					TriggerExplosionBubble(
-						spark.x,
-						spark.y,
-						spark.z,
-						spark.roomNumber);
+						spark->x,
+						spark->y,
+						spark->z,
+						spark->roomNumber);
 				}
 
-				spark.extras = 0;
+				spark->extras = 0;
 			}
 
-			spark.yVel += spark.gravity;
-			if (spark.maxYvel)
+			spark->yVel += spark->gravity;
+			if (spark->maxYvel)
 			{
-				if (spark.yVel > spark.maxYvel)
-					spark.yVel = spark.maxYvel;
+				if (spark->yVel > spark->maxYvel)
+					spark->yVel = spark->maxYvel;
 			}
 
-			if (spark.friction & 0xF)
+			if (spark->friction & 0xF)
 			{
-				spark.xVel -= spark.xVel >> (spark.friction & 0xF);
-				spark.zVel -= spark.zVel >> (spark.friction & 0xF);
+				spark->xVel -= spark->xVel >> (spark->friction & 0xF);
+				spark->zVel -= spark->zVel >> (spark->friction & 0xF);
 			}
 
-			if (spark.friction & 0xF0)
-				spark.yVel -= spark.yVel >> (spark.friction >> 4);
+			if (spark->friction & 0xF0)
+				spark->yVel -= spark->yVel >> (spark->friction >> 4);
 
-			spark.x += spark.xVel >> 5;
-			spark.y += spark.yVel >> 5;
-			spark.z += spark.zVel >> 5;
+			spark->x += spark->xVel >> 5;
+			spark->y += spark->yVel >> 5;
+			spark->z += spark->zVel >> 5;
 
-			if (spark.flags & SP_WIND)
+			if (spark->flags & SP_WIND)
 			{
-				spark.x += Weather.Wind().x;
-				spark.z += Weather.Wind().z;
+				spark->x += Weather.Wind().x;
+				spark->z += Weather.Wind().z;
 			}
 
-			int dl = ((spark.sLife - spark.life) * 65536) / spark.sLife;
-			spark.size = (spark.sSize + ((dl * (spark.dSize - spark.sSize)) / 65536));
+			int dl = ((spark->sLife - spark->life) * 65536) / spark->sLife;
+			spark->size = (spark->sSize + ((dl * (spark->dSize - spark->sSize)) / 65536));
+		
+			if (spark->flags & SP_EXPLOSION)
+				SetSpriteSequence(*spark, ID_EXPLOSION_SPRITES);
 
-			if (spark.flags & SP_EXPLOSION)
-				SetSpriteSequence(spark, ID_EXPLOSION_SPRITES);
-
-			if ((spark.flags & SP_FIRE && LaraItem->Effect.Type == EffectType::None) ||
-				(spark.flags & SP_DAMAGE) ||
-				(spark.flags & SP_POISON))
+			if ((spark->flags & SP_FIRE && LaraItem->Effect.Type == EffectType::None) ||
+				(spark->flags & SP_DAMAGE) || 
+				(spark->flags & SP_POISON))
 			{
-				int ds = spark.size * (spark.scalar / 2.0);
+				int ds = spark->size * (spark->scalar / 2.0);
 
-				if (spark.x + ds > DeadlyBounds.X1 && spark.x - ds < DeadlyBounds.X2)
+				if (spark->x + ds > DeadlyBounds.X1 && spark->x - ds < DeadlyBounds.X2)
 				{
-					if (spark.y + ds > DeadlyBounds.Y1 && spark.y - ds < DeadlyBounds.Y2)
+					if (spark->y + ds > DeadlyBounds.Y1 && spark->y - ds < DeadlyBounds.Y2)
 					{
-						if (spark.z + ds > DeadlyBounds.Z1 && spark.z - ds < DeadlyBounds.Z2)
+						if (spark->z + ds > DeadlyBounds.Z1 && spark->z - ds < DeadlyBounds.Z2)
 						{
-							if (spark.flags & SP_FIRE)
+							if (spark->flags & SP_FIRE)
 								ItemBurn(LaraItem);
 
-							if (spark.flags & SP_DAMAGE)
+							if (spark->flags & SP_DAMAGE)
 								DoDamage(LaraItem, 2);
 
-							if (spark.flags & SP_POISON)
+							if (spark->flags & SP_POISON)
 								Lara.Status.Poison += 5;
 						}
 					}
@@ -378,26 +371,25 @@ void UpdateSparks()
 		}
 	}
 
-
 	for (int i = 0; i < MAX_PARTICLES; i++)
 	{
-		auto& spark = Particles[i];
+		auto* spark = &Particles[i];
 
-		if (spark.on && spark.dynamic != -1)
+		if (spark->on && spark->dynamic != -1)
 		{
-			auto* dynsp = &ParticleDynamics[spark.dynamic];
+			auto* dynsp = &ParticleDynamics[spark->dynamic];
 			
 			if (dynsp->Flags & 3)
 			{
 				int random = GetRandomControl();
 
-				int x = spark.x + 16 * (random & 0xF);
-				int y = spark.y + (random & 0xF0);
-				int z = spark.z + ((random >> 4) & 0xF0);
+				int x = spark->x + 16 * (random & 0xF);
+				int y = spark->y + (random & 0xF0);
+				int z = spark->z + ((random >> 4) & 0xF0);
 
 				byte r, g, b;
 
-				int dl = spark.sLife - spark.life - 1;
+				int dl = spark->sLife - spark->life - 1;
 				if (dl >= 2)
 				{
 					if (dl >= 4)
@@ -432,7 +424,7 @@ void UpdateSparks()
 					r = 255 - (dl << 6) - (random & 0x1F);
 				}
 
-				if (spark.flags & SP_PLASMAEXP)
+				if (spark->flags & SP_PLASMAEXP)
 				{
 					int falloff;
 					if (dynsp->Falloff <= 28)
@@ -446,9 +438,9 @@ void UpdateSparks()
 				{
 					int falloff = (dynsp->Falloff <= 28) ? dynsp->Falloff : 31;
 
-					if (spark.flags & SP_COLOR)
+					if (spark->flags & SP_COLOR)
 					{
-						SpawnDynamicLight(x, y, z, falloff, spark.dR, spark.dG, spark.dB);
+						SpawnDynamicLight(x, y, z, falloff, spark->dR, spark->dG, spark->dB);
 					}
 					else
 					{
@@ -765,8 +757,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 		spark->zVel = 0;
 		spark->friction = 0;
 		spark->flags = SP_UNDERWEXP | SP_DEF | SP_SCALE; 
-		spark->SpriteSeqID = ID_DEFAULT_SPRITES;
-		spark->SpriteID = SPR_BUBBLES;
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLES;
 		spark->scalar = 3;
 		spark->gravity = 0;
 		spark->maxYvel = 0;
@@ -978,6 +969,123 @@ void TriggerSuperJetFlame(ItemInfo* item, int yvel, int deadly)
 	}
 }
 
+void SetupSplash(const SPLASH_SETUP* const setup, int room)
+{
+	constexpr size_t NUM_SPLASHES = 3;
+	int numSplashesSetup = 0;
+	float splashVelocity;
+
+	for (int i = 0; i < MAX_SPLASHES; i++)
+	{
+		SPLASH_STRUCT& splash = Splashes[i];
+
+		if (!splash.isActive)
+		{
+			if (numSplashesSetup == 0)
+			{
+				float splashPower = fmin(256, setup->splashPower);
+				splash.isActive = true;
+				splash.x = setup->x;
+				splash.y = setup->y;
+				splash.z = setup->z;
+				splash.life = 62;
+				splash.isRipple = false;
+				splash.innerRad = setup->innerRadius;
+				splashVelocity = splashPower / 16;
+				splash.innerRadVel = splashVelocity;
+				splash.heightSpeed = splashPower * 1.2f;
+				splash.height = 0;
+				splash.heightVel = -16;
+				splash.outerRad = setup->innerRadius / 3;
+				splash.outerRadVel = splashVelocity * 1.5f;
+				splash.spriteSequenceStart = 8; // Splash texture.
+				numSplashesSetup++;
+			}
+			else
+			{
+				float thickness = Random::GenerateFloat(64,128);
+				splash.isActive = true;
+				splash.x = setup->x;
+				splash.y = setup->y;
+				splash.z = setup->z;
+				splash.isRipple = true;
+				float vel;
+
+				if (numSplashesSetup == 2)
+					vel = (splashVelocity / 16) + Random::GenerateFloat(2, 4);
+				else
+					vel = (splashVelocity / 7) + Random::GenerateFloat(3, 7);
+				
+				float innerRadius = 0;
+				splash.innerRad = innerRadius;
+				splash.innerRadVel = vel * 1.3f;
+				splash.outerRad = innerRadius+thickness;
+				splash.outerRadVel = vel * 2.3f;
+				splash.heightSpeed = 128;
+				splash.height = 0;
+				splash.heightVel = -16;
+
+				float t = vel / (splashVelocity / 2) + 16;
+				t = fmax(0, fmin(t, 1));
+				splash.life = Lerp(48.0f, 70.0f, t);
+				splash.spriteSequenceStart = 4; // Splash texture.
+				splash.spriteSequenceEnd = 7; // Splash texture.
+				splash.animationSpeed = fmin(0.6f, (1 / splash.outerRadVel) * 2);
+
+				numSplashesSetup++;
+			}
+
+			if (numSplashesSetup == NUM_SPLASHES)
+				break;
+			
+			continue;
+		}
+	}
+
+	SpawnSplashDrips(Vector3(setup->x, setup->y - 15, setup->z), room, 32);
+
+	auto soundPosition = Pose(Vector3i(setup->x, setup->y, setup->z));
+	SoundEffect(SFX_TR4_LARA_SPLASH, &soundPosition);
+}
+
+void UpdateSplashes()
+{
+	if (SplashCount)
+		SplashCount--;
+
+	for (int i = 0; i < MAX_SPLASHES; i++)
+	{
+		auto& splash = Splashes[i];
+
+		if (splash.isActive)
+		{
+			splash.StoreInterpolationData();
+
+			splash.life--;
+			if (splash.life <= 0)
+				splash.isActive = false;
+			
+			splash.heightSpeed += splash.heightVel;
+			splash.height += splash.heightSpeed;
+
+			if (splash.height < 0)
+			{
+				splash.height = 0;
+				if (!splash.isRipple)
+					splash.isActive = false;
+			}
+			
+			splash.innerRad += splash.innerRadVel;
+			splash.outerRad += splash.outerRadVel;
+			splash.animationPhase += splash.animationSpeed;
+			short sequenceLength = splash.spriteSequenceEnd - splash.spriteSequenceStart;
+
+			if (splash.animationPhase > sequenceLength)
+				splash.animationPhase = fmod(splash.animationPhase, sequenceLength);
+		}
+	}
+}
+
 short DoBloodSplat(int x, int y, int z, short speed, short direction, short roomNumber)
 {
 	short probedRoomNumber = GetPointCollision(Vector3i(x, y, z), roomNumber).GetRoomNumber();
@@ -1123,8 +1231,7 @@ void TriggerWaterfallMist(const ItemInfo& item)
 			spark->sSize = spark->size = Random::GenerateInt(0, 3) * scale + size;
 			spark->dSize = 2 * spark->size;
 
-			spark->SpriteSeqID = ID_DEFAULT_SPRITES;
-			spark->SpriteID = Random::GenerateInt(0, 100) > 95 ? 17 : 0;
+			spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + (Random::GenerateInt(0, 100) > 95 ? 17 : 0);
 			spark->flags = 538;
 
 			if (sign == 1)
@@ -1140,6 +1247,75 @@ void TriggerWaterfallMist(const ItemInfo& item)
 void KillAllCurrentItems(short itemNumber)
 {
 	// TODO: Reimplement this functionality.
+}
+
+void SpawnPlayerWaterSurfaceEffects(const ItemInfo& item, int waterHeight, int waterDepth)
+{
+	const auto& player = GetLaraInfo(item);
+
+	// Player underwater; return early.
+	if (player.Control.WaterStatus == WaterStatus::Underwater)
+		return;
+
+	// Get point collision.
+	auto pointColl0 = GetPointCollision(item, 0, 0, -(LARA_HEIGHT / 2));
+	auto pointColl1 = GetPointCollision(item, 0, 0, item.Animation.Velocity.y);
+
+	// In swamp; return early.
+	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl1.GetRoomNumber()))
+		return;
+
+	bool isWater0 = TestEnvironment(ENV_FLAG_WATER, pointColl0.GetRoomNumber());
+	bool isWater1 = TestEnvironment(ENV_FLAG_WATER, pointColl1.GetRoomNumber());
+
+	// Spawn splash.
+	if (!isWater0 && isWater1 &&
+		item.Animation.Velocity.y > 0.0f && SplashCount == 0 &&
+		player.Control.WaterStatus != WaterStatus::TreadWater)
+	{
+		SplashSetup.x = item.Pose.Position.x;
+		SplashSetup.y = waterHeight - 1;
+		SplashSetup.z = item.Pose.Position.z;
+		SplashSetup.innerRadius = 16;
+		SplashSetup.splashPower = item.Animation.Velocity.z;
+
+		SetupSplash(&SplashSetup, pointColl0.GetRoomNumber());
+		SplashCount = 16;
+	}
+	// Spawn ripple.
+	else if (isWater1)
+	{
+		if (Wibble & 0xF)
+			return;
+
+		if (Random::TestProbability(1 / 2000.0f) && item.Animation.ActiveState == LS_IDLE)
+			return;
+
+		int flags = (item.Animation.ActiveState == LS_IDLE) ?
+			(int)RippleFlags::LowOpacity :
+			(int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity;
+
+		SpawnRipple(
+			Vector3(item.Pose.Position.x, waterHeight - 1, item.Pose.Position.z),
+			item.RoomNumber, Random::GenerateFloat(112.0f, 128.0f),
+			flags);
+	}
+}
+
+void Splash(ItemInfo* item)
+{
+	int probedRoomNumber = GetPointCollision(*item).GetRoomNumber();
+	if (!TestEnvironment(ENV_FLAG_WATER, probedRoomNumber))
+		return;
+
+	int waterHeight = GetPointCollision(*item).GetWaterTopHeight();
+
+	SplashSetup.x = item->Pose.Position.x;
+	SplashSetup.y = waterHeight - 1;
+	SplashSetup.z = item->Pose.Position.z;
+	SplashSetup.splashPower = item->Animation.Velocity.y;
+	SplashSetup.innerRadius = 64;
+	SetupSplash(&SplashSetup, probedRoomNumber);
 }
 
 void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNumber)
@@ -1192,8 +1368,7 @@ void TriggerRocketFlame(int x, int y, int z, int xv, int yv, int zv, int itemNum
 	sptr->maxYvel = 0;
 
 	// TODO: right sprite
-	sptr->SpriteSeqID = ID_DEFAULT_SPRITES;
-	sptr->SpriteID = 0;
+	sptr->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
 	sptr->scalar = 2;
 
 	int size = (GetRandomControl() & 7) + 32;
@@ -1241,8 +1416,7 @@ void TriggerRocketFire(int x, int y, int z)
 		sptr->flags = SP_SCALE | SP_DEF | SP_EXPDEF;
 
 	// TODO: right sprite
-	sptr->SpriteSeqID = ID_DEFAULT_SPRITES;
-	sptr->SpriteID = 0;
+	sptr->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
 	sptr->scalar = 1;
 	sptr->gravity = -(GetRandomControl() & 3) - 4;
 	sptr->maxYvel = -(GetRandomControl() & 3) - 4;
@@ -1814,55 +1988,4 @@ void TriggerAttackFlame(const Vector3i& pos, const Vector3& color, int scale)
 	spark.size = Random::GenerateInt(0, 16) + scale;
 	spark.sSize = spark.size;
 	spark.dSize = spark.size / 4;
-}
-
-void SpawnPlayerWaterSurfaceEffects(const ItemInfo& item, int waterHeight, int waterDepth)
-{
-	const auto& player = GetLaraInfo(item);
-
-	// Player underwater; return early.
-	if (player.Control.WaterStatus == WaterStatus::Underwater)
-		return;
-
-	// Get point collision.
-	auto pointColl0 = GetPointCollision(item, 0, 0, -(LARA_HEIGHT / 2));
-	auto pointColl1 = GetPointCollision(item, 0, 0, item.Animation.Velocity.y);
-
-	// In swamp; return early.
-	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl1.GetRoomNumber()))
-		return;
-
-	bool isWater0 = TestEnvironment(ENV_FLAG_WATER, pointColl0.GetRoomNumber());
-	bool isWater1 = TestEnvironment(ENV_FLAG_WATER, pointColl1.GetRoomNumber());
-
-	// Spawn splash.
-	if (!isWater0 && isWater1 &&
-		item.Animation.Velocity.y > 0.0f && SplashCount == 0 &&
-		player.Control.WaterStatus != WaterStatus::TreadWater)
-	{
-		SplashSetup.Position = Vector3(item.Pose.Position.x, waterHeight - 1, item.Pose.Position.z);
-		SplashSetup.InnerRadius = 16;
-		SplashSetup.SplashPower = item.Animation.Velocity.z;
-
-		SetupSplash(&SplashSetup, pointColl0.GetRoomNumber());
-		SplashCount = 16;
-	}
-	// Spawn ripple.
-	else if (isWater1)
-	{
-		if (Wibble & 0xF)
-			return;
-
-		if (Random::TestProbability(1 / 2000.0f) && item.Animation.ActiveState == LS_IDLE)
-			return;
-
-		int flags = (item.Animation.ActiveState == LS_IDLE) ?
-			(int)RippleFlags::LowOpacity :
-			(int)RippleFlags::SlowFade | (int)RippleFlags::LowOpacity;
-
-		SpawnRipple(
-			Vector3(item.Pose.Position.x, waterHeight - 1, item.Pose.Position.z),
-			item.RoomNumber, Random::GenerateFloat(112.0f, 128.0f),
-			flags);
-	}
 }

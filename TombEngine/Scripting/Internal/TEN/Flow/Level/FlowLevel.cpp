@@ -282,7 +282,7 @@ std::string Level::GetAmbientTrack() const
 
 bool Level::GetLensFlareEnabled() const
 {
-	return LensFlare.GetEnabledStatus();
+	return LensFlare.GetEnabled();
 }
 
 int Level::GetLensFlareSunSpriteID() const
@@ -307,12 +307,12 @@ Color Level::GetLensFlareColor() const
 
 bool Level::GetStarfieldStarsEnabled() const
 {
-	return Starfield.GetStarsEnabledStatus();
+	return Starfield.GetStarsEnabled();
 }
 
 bool Level::GetStarfieldMeteorsEnabled() const
 {
-	return Starfield.GetMeteorsEnabledStatus();
+	return Starfield.GetMeteorsEnabled();
 }
 
 int Level::GetStarfieldStarCount() const

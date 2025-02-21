@@ -16,8 +16,8 @@ Activator volume.
 @pragma nostrip
 */
 
-static auto IndexError = IndexErrorMaker(Volume, ScriptReserved_Volume);
-static auto NewIndexError = NewIndexErrorMaker(Volume, ScriptReserved_Volume);
+static auto IndexError = index_error_maker(Volume, ScriptReserved_Volume);
+static auto NewIndexError = newindex_error_maker(Volume, ScriptReserved_Volume);
 
 Volume::Volume(TriggerVolume& volume) :
 	_volume(volume)
@@ -90,9 +90,9 @@ void Volume::SetName(const std::string& name)
 		return;
 
 	// Remove previous name if it exists.
-	if (_callbackSetName(name, _volume))
+	if (s_callbackSetName(name, _volume))
 	{
-		_callbackRemoveName(_volume.Name);
+		s_callbackRemoveName(_volume.Name);
 		_volume.Name = name;
 	}
 	else
@@ -145,9 +145,10 @@ bool Volume::IsMoveableInside(const Moveable& mov)
 {
 	for (const auto& entry : _volume.StateQueue)
 	{
-		if (std::holds_alternative<int>(entry.Activator))
+		// TODO: Use int, not short.
+		if (std::holds_alternative<short>(entry.Activator))
 		{
-			int id = std::get<int>(entry.Activator);
+			int id = std::get<short>(entry.Activator);
 			auto& mov2 = std::make_unique<Moveable>(id);
 
 			if (mov2.get()->GetName() == mov.GetName())

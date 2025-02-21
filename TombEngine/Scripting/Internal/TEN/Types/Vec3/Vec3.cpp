@@ -32,10 +32,6 @@ void Vec3::Register(sol::table& parent)
 		sol::meta_function::equal_to, &Vec3::IsEqualTo,
 
 		ScriptReserved_Vec3Normalize, &Vec3::Normalize,
-		ScriptReserved_Vec3Translate, sol::overload(
-			(Vec3(Vec3::*)(const Vec3&, float))(&Vec3::Translate),
-			(Vec3(Vec3::*)(const Rotation&, float))(&Vec3::Translate),
-			(Vec3(Vec3::*)(const Rotation&, const Vec3&))(&Vec3::Translate)),
 		ScriptReserved_Vec3Rotate, &Vec3::Rotate,
 		ScriptReserved_Vec3Lerp, &Vec3::Lerp,
 		ScriptReserved_Vec3Cross, &Vec3::Cross,
@@ -105,36 +101,6 @@ Vec3 Vec3::Normalize() const
 	return vector;
 }
 
-/// Get a copy of this Vec3 translated in the input Vec3 direction by the input distance.
-// @function Translate
-// @tparam Vec3 dir Direction vector. Normalized automatically to length 1.
-// @tparam float dist Distance.
-// @treturn Vec3 Translated vector.
-Vec3 Vec3::Translate(const Vec3& dir, float dist)
-{
-	return Geometry::TranslatePoint(ToVector3(), dir.ToVector3(), dist);
-}
-
-/// Get a copy of this Vec3 translated in the direction of the input Rotation object by the input distance.
-// @function Translate
-// @tparam Rotation rot Rotation object defining the direction.
-// @tparam float dist Distance.
-// @treturn Vec3 Translated vector.
-Vec3 Vec3::Translate(const Rotation& rot, float dist)
-{
-	return Geometry::TranslatePoint(ToVector3(), rot.ToEulerAngles(), dist);
-}
-
-/// Get a copy of this Vec3 translated by an offset, where the input relative offset Vec3 is rotated according to the input Rotation object.
-// @function Translate
-// @tparam Rotation rot Rotation object rotating the input relative offset vector.
-// @tparam Vec3 relOffset Relative offset vector before rotation.
-// @treturn Vec3 Translated vector.
-Vec3 Vec3::Translate(const Rotation& rot, const Vec3& relOffset)
-{
-	return Geometry::TranslatePoint(ToVector3(), rot.ToEulerAngles(), relOffset.ToVector3());
-}
-
 /// Get a copy of this Vec3 rotated by the input Rotation object.
 // @function Vec3:Rotate
 // @tparam Rotation rot Rotation object.
@@ -150,9 +116,9 @@ Vec3 Vec3::Rotate(const Rotation& rot) const
 
 /// Get the linearly interpolated Vec3 between this Vec3 and the input Vec3 according to the input interpolation alpha.
 // @function Vec3:Lerp
-// @tparam Vec3 vector Interpolation target.
+// @tparam Vec3 vector Target interpolation vector.
 // @tparam float alpha Interpolation alpha in the range [0, 1].
-// @treturn Vec3 Linearly interpolated vector.
+// @treturn Vec3 Linearly interpolated vector
 Vec3 Vec3::Lerp(const Vec3& vector, float alpha) const
 {
 	auto vector0 = ToVector3();
@@ -211,7 +177,7 @@ float Vec3::Length() const
 // @function __tostring
 std::string Vec3::ToString() const
 {
-	return "{" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + "}";
+	return "{ " + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + " }";
 }
 
 Vec3 Vec3::Add(const Vec3& vector0, const Vec3& vector1)

@@ -971,7 +971,7 @@ namespace TEN::Entities
 		{
 			obj->Initialize = InitializeJeep;
 			obj->collision = JeepPlayerCollision;
-			obj->shadowType = ShadowMode::Player;
+			obj->shadowType = ShadowMode::Lara;
 			obj->SetHitEffect(true);
 		}
 
@@ -980,7 +980,7 @@ namespace TEN::Entities
 		{
 			obj->Initialize = InitializeMotorbike;
 			obj->collision = MotorbikePlayerCollision;
-			obj->shadowType = ShadowMode::Player;
+			obj->shadowType = ShadowMode::Lara;
 			obj->SetHitEffect(true);
 		}
 	}

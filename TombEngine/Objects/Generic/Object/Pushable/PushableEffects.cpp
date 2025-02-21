@@ -4,13 +4,11 @@
 #include "Game/effects/Bubble.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/Ripple.h"
-#include "Game/effects/Splash.h"
 #include "Game/Setup.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
 
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Ripple;
-using namespace TEN::Effects::Splash;
 
 namespace TEN::Entities::Generic
 {
@@ -41,9 +39,11 @@ namespace TEN::Entities::Generic
 	{
 		auto& pushable = GetPushableInfo(pushableItem);
 
-		SplashSetup.Position = Vector3(pushableItem.Pose.Position.x, pushable.WaterSurfaceHeight - 1, pushableItem.Pose.Position.z);
-		SplashSetup.SplashPower = pushableItem.Animation.Velocity.y * 2;
-		SplashSetup.InnerRadius = 250;
+		SplashSetup.y = pushable.WaterSurfaceHeight - 1;
+		SplashSetup.x = pushableItem.Pose.Position.x;
+		SplashSetup.z = pushableItem.Pose.Position.z;
+		SplashSetup.splashPower = pushableItem.Animation.Velocity.y * 2;
+		SplashSetup.innerRadius = 250;
 
 		SetupSplash(&SplashSetup, pushableItem.RoomNumber);
 	}

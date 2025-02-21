@@ -18,7 +18,6 @@ namespace TEN::Effects::Streamer
 	{
 	private:
 		// Constants
-
 		static constexpr auto SEGMENT_COUNT_MAX = 128;
 
 	public:
@@ -56,20 +55,17 @@ namespace TEN::Effects::Streamer
 			}
 		};
 
-		// Fields
-
-		bool						 IsBroken = false;
+		// Members
+		bool IsBroken = false;
 		std::vector<StreamerSegment> Segments = {};
 
 		// Utilities
-
 		void AddSegment(const Vector3& pos, const Vector3& dir, short orient, const Vector4& color,
 						float width, float life, float vel, float scaleRate, short rot, int flags, unsigned int segmentCount);
 		void Update();
 
 	private:
 		// Helpers
-
 		StreamerSegment& GetNewSegment();
 	};
 
@@ -77,24 +73,20 @@ namespace TEN::Effects::Streamer
 	{
 	private:
 		// Constants
-
 		static constexpr auto POOL_COUNT_MAX	 = 8;
 		static constexpr auto STREAMER_COUNT_MAX = 8;
 
 	public:
 		// Members
-
 		std::unordered_map<int, std::vector<Streamer>> Pools = {}; // Key = tag.
 
 		// Utilities
-
 		void AddStreamer(int tag, const Vector3& pos, const Vector3& dir, short orient, const Vector4& color,
 						 float width, float life, float vel, float scaleRate, short rot, int flags);
 		void Update();
 
 	private:
 		// Helpers
-
 		std::vector<Streamer>& GetPool(int tag);
 		Streamer&			   GetStreamer(int tag);
 		void				   ClearInactivePools();
@@ -105,16 +97,13 @@ namespace TEN::Effects::Streamer
 	{
 	private:
 		// Constants
-
 		static constexpr auto MODULE_COUNT_MAX = 64;
 
 	public:
-		// Fields
-
+		// Members
 		std::unordered_map<int, StreamerModule> Modules = {}; // Key = item number.
 
 		// Utilities
-
 		void Spawn(int itemNumber, int tag, const Vector3& pos, const Vector3& dir, short orient, const Vector4& color,
 				   float width, float life, float vel, float scaleRate, short rot, int flags = 0);
 		void Update();
@@ -122,7 +111,6 @@ namespace TEN::Effects::Streamer
 
 	private:
 		// Helpers
-
 		StreamerModule& GetModule(int itemNumber);
 		void			ClearInactiveModules();
 	};

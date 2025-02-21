@@ -4,104 +4,71 @@
 namespace TEN::Utils
 {
 	const BitField BitField::Empty	 = BitField(0);
-	const BitField BitField::Default = BitField(DEFAULT_SIZE);
+	const BitField BitField::Default = BitField(SIZE_DEFAULT);
 
 	BitField::BitField()
 	{
-		_chunks.resize((DEFAULT_SIZE + (CHUNK_SIZE - 1)) / CHUNK_SIZE);
-		_size = DEFAULT_SIZE;
+		_bits.resize(SIZE_DEFAULT);
 	}
 
 	BitField::BitField(unsigned int size)
 	{
-		_chunks.resize((size + (CHUNK_SIZE - 1)) / CHUNK_SIZE);
-		_size = size;
+		// NOTE: Bits initialize as unset.
+		size = std::min<unsigned int>(size, SIZE_DEFAULT);
+		_bits.resize(size);
 	}
 
-	BitField::BitField(const std::initializer_list<bool>& bits)
+	BitField::BitField(unsigned int size, unsigned int packedBits)
 	{
-		_chunks.resize((bits.size() + (CHUNK_SIZE - 1)) / CHUNK_SIZE);
-		_size = (unsigned int)bits.size();
+		size = std::min<unsigned int>(size, SIZE_DEFAULT);
+		_bits.reserve(size);
 
-		unsigned int bitID = 0;
-		for (auto it = bits.begin(); it != bits.end(); it++, bitID++)
+		for (unsigned int i = 0; i < size; i++)
 		{
-			unsigned int localBitID = bitID % CHUNK_SIZE;
-			unsigned int chunkID = bitID / CHUNK_SIZE;
-
-			bool bit = *it;
-			if (bit)
-				_chunks[chunkID] |= (ChunkType)1 << localBitID;
+			unsigned int bit = unsigned int(1 << i);
+			_bits.push_back((packedBits & bit) == bit);
 		}
-	}
-
-	BitField::BitField(const std::vector<ChunkType>& bitChunks, unsigned int size)
-	{
-		_chunks = bitChunks;
-		_size = std::min(size, (unsigned int)bitChunks.size() * CHUNK_SIZE);
 	}
 
 	BitField::BitField(const std::string& bitString)
 	{
-		_chunks.resize((bitString.size() + (CHUNK_SIZE - 1)) / CHUNK_SIZE);
-		_size = (unsigned int)bitString.size();
+		_bits.reserve(bitString.size());
 
-		unsigned int bitID = 0;
-		for (char bit : bitString)
-		{
-			unsigned int i = bitID % CHUNK_SIZE;
-			unsigned int chunkID = bitID / CHUNK_SIZE;
-
-			if (bit == '1')
-				_chunks[chunkID] |= (ChunkType)1 << i;
-
-			bitID++;
-		}
+		for (const char& bit : bitString)
+			_bits.push_back(bit == '1');
 	}
 
 	unsigned int BitField::GetSize() const
 	{
-		return _size;
+		return (unsigned int)_bits.size();
 	}
 
 	unsigned int BitField::GetCount() const
 	{
 		unsigned int count = 0;
-		for (auto chunk : _chunks)
+		for (const bool& bit : _bits)
 		{
-			for (unsigned int localBitID = 0; localBitID < CHUNK_SIZE; localBitID++)
-			{
-				bool bit = bool(chunk & ((ChunkType)1 << localBitID));
-				if (bit)
-					count++;
-			}
+			if (bit)
+				count++;
 		}
 
 		return count;
 	}
 
-	const std::vector<BitField::ChunkType>& BitField::GetChunks() const
+	void BitField::Set(const std::vector<unsigned int>& indices)
 	{
-		return _chunks;
-	}
-
-	void BitField::Set(unsigned int bitID)
-	{
-		if constexpr (DEBUG_BUILD)
+		for (const unsigned int& index : indices)
 		{
-			if (!IsBitIDCorrect(bitID))
-				return;
+			if (!IsIndexCorrect(index))
+				continue;
+			
+			_bits[index] = true;
 		}
-
-		unsigned int localBitId = bitID % CHUNK_SIZE;
-		unsigned int chunkID = bitID / CHUNK_SIZE;
-		_chunks[chunkID] |= (ChunkType)1 << localBitId;
 	}
 
-	void BitField::Set(const std::vector<unsigned int>& bitIds)
+	void BitField::Set(unsigned int index)
 	{
-		for (unsigned int bitID : bitIds)
-			Set(bitID);
+		Set(std::vector<unsigned int>{ index });
 	}
 
 	void BitField::SetAll()
@@ -109,113 +76,85 @@ namespace TEN::Utils
 		Fill(true);
 	}
 
-	void BitField::Clear(unsigned int bitID)
+	void BitField::Clear(const std::vector<unsigned int>& indices)
 	{
-		if constexpr (DEBUG_BUILD)
+		for (const unsigned int& index : indices)
 		{
-			if (!IsBitIDCorrect(bitID))
-				return;
+			if (!IsIndexCorrect(index))
+				continue;
+
+			_bits[index] = false;
 		}
-
-		unsigned int localBitID = bitID % CHUNK_SIZE;
-		unsigned int chunkID = bitID / CHUNK_SIZE;
-		_chunks[chunkID] &= ~((ChunkType)1 << localBitID);
 	}
-
-	void BitField::Clear(const std::vector<unsigned int>& bitIds)
+	
+	void BitField::Clear(unsigned int index)
 	{
-		for (unsigned int bitID : bitIds)
-			Clear(bitID);
+		Clear(std::vector<unsigned int>{ index });
 	}
 
 	void BitField::ClearAll()
 	{
 		Fill(false);
 	}
-
-	void BitField::Flip(unsigned int bitID)
+	
+	void BitField::Flip(const std::vector<unsigned int>& indices)
 	{
-		if constexpr (DEBUG_BUILD)
+		for (const unsigned int& index : indices)
 		{
-			if (!IsBitIDCorrect(bitID))
-				return;
+			if (!IsIndexCorrect(index))
+				continue;
+
+			_bits[index].flip();
 		}
-
-		unsigned int localBitID = bitID % CHUNK_SIZE;
-		unsigned int chunkID = bitID / CHUNK_SIZE;
-		_chunks[chunkID] ^= (ChunkType)1 << localBitID;
 	}
-
-	void BitField::Flip(const std::vector<unsigned int>& bitIds)
+	
+	void BitField::Flip(unsigned int index)
 	{
-		for (unsigned int bitID : bitIds)
-			Flip(bitID);
+		Flip(std::vector<unsigned int>{ index });
 	}
 
 	void BitField::FlipAll()
 	{
-		for (unsigned int chunkID = 0; chunkID < _chunks.size(); chunkID++)
-			_chunks[chunkID] = ~_chunks[chunkID];
-
-		unsigned int endBitCount = _size % CHUNK_SIZE;
-		if (endBitCount > 0)
-		{
-			for (unsigned int localBitID = endBitCount; localBitID < CHUNK_SIZE; localBitID++)
-				_chunks.back() &= ~((ChunkType)1 << localBitID);
-		}
+		_bits.flip();
 	}
 
-	bool BitField::IsEmpty() const
+	bool BitField::Test(const std::vector<unsigned int>& indices, bool testAny) const
 	{
-		if (_chunks.empty())
-			return true;
-
-		for (auto chunk : _chunks)
+		for (const unsigned int& index : indices)
 		{
-			if (chunk != (ChunkType)0)
-				return false;
-		}
+			if (!IsIndexCorrect(index))
+				continue;
 
-		return true;
-	}
-
-	bool BitField::Test(unsigned int bitID) const
-	{
-		if constexpr (DEBUG_BUILD)
-		{
-			if (!IsBitIDCorrect(bitID))
-				return false;
-		}
-
-		unsigned int localBitID = bitID % CHUNK_SIZE;
-		unsigned int chunkID = bitID / CHUNK_SIZE;
-		return bool(_chunks[chunkID] & ((ChunkType)1 << localBitID));
-	}
-
-	bool BitField::Test(const std::vector<unsigned int>& bitIds, bool testAny) const
-	{
-		for (unsigned int bitID : bitIds)
-		{
+			// Test if any bits at input indices are set.
 			if (testAny)
 			{
-				if (Test(bitID))
+				if (_bits[index])
 					return true;
 			}
-			else // Test all.
+			// Test if any bits at input indices are set.
+			else
 			{
-				if (!Test(bitID))
+				if (!_bits[index])
 					return false;
 			}
 		}
 
-		return !testAny;
+		return (testAny ? false : true);
+	}
+
+	bool BitField::Test(unsigned int index) const
+	{
+		if (!IsIndexCorrect(index))
+			return false;
+
+		return _bits[index];
 	}
 
 	bool BitField::TestAny() const
 	{
-		for (auto chunk : _chunks)
+		for (const bool& bit : _bits)
 		{
-			if (chunk != 0)
+			if (bit)
 				return true;
 		}
 
@@ -224,173 +163,49 @@ namespace TEN::Utils
 
 	bool BitField::TestAll() const
 	{
-		for (unsigned int chunkID = 0; chunkID < (_chunks.size() - 1); chunkID++)
+		for (const bool& bit : _bits)
 		{
-			if (_chunks[chunkID] != (ChunkType)~0)
-				return false;
-		}
-
-		unsigned int endBitCount = _size % CHUNK_SIZE;
-		if (endBitCount > 0)
-		{
-			auto validMask = ((ChunkType)1 << endBitCount) - 1;
-			if ((_chunks.back() & validMask) != validMask)
+			if (!bit)
 				return false;
 		}
 
 		return true;
 	}
 
-	void BitField::Resize(unsigned int size)
+	unsigned int BitField::ToPackedBits() const
 	{
-		_chunks.resize((size + (CHUNK_SIZE - 1)) / CHUNK_SIZE);
-		_size = size;
-
-		unsigned int endBitCount = size % CHUNK_SIZE;
-		if (endBitCount > 0)
+		unsigned int packedBits = 0;
+		for (unsigned int i = 0; i < _bits.size(); i++)
 		{
-			for (unsigned int localBitID = endBitCount; localBitID < CHUNK_SIZE; localBitID++)
-				_chunks.back() &= ~((ChunkType)1 << localBitID);
+			if (_bits[i])
+			{
+				unsigned int bit = unsigned int(1 << i);
+				packedBits |= bit;
+			}
 		}
+
+		return packedBits;
 	}
 
 	std::string BitField::ToString() const
 	{
 		auto bitString = std::string();
-		bitString.reserve(_size);
-
-		for (unsigned int chunkID = 0; chunkID < _chunks.size(); chunkID++)
-		{
-			for (unsigned int localBitID = 0; localBitID < CHUNK_SIZE; localBitID++)
-			{
-				if (((chunkID * CHUNK_SIZE) + localBitID) >= _size)
-					break;
-
-				bool bit = _chunks[chunkID] & ((ChunkType)1 << localBitID);
-				bitString += bit ? '1' : '0';
-			}
-		}
+		for (const bool& bit : _bits)
+			bitString += bit ? '1' : '0';
 
 		return bitString;
 	}
 
-	BitField::ChunkType BitField::ToPackedBits() const
+	bool BitField::operator ==(unsigned int packedBits) const
 	{
-		if (_chunks.empty())
-			return 0;
-
-		return _chunks.front();
-	}
-
-	bool BitField::operator ==(const BitField& bitField) const
-	{
-		if (_size != bitField.GetSize())
-			return false;
-
-		for (unsigned int chunkID = 0; chunkID < _chunks.size(); chunkID++)
+		for (unsigned int i = 0; i < _bits.size(); i++)
 		{
-			if (_chunks[chunkID] != bitField.GetChunks()[chunkID])
+			unsigned int bit = unsigned int(1 << i);
+			if (_bits[i] != ((packedBits & bit) == bit))
 				return false;
 		}
 
 		return true;
-	}
-
-	bool BitField::operator !=(const BitField& bitField) const
-	{
-		return !(*this == bitField);
-	}
-
-	BitField& BitField::operator &=(const BitField& bitField)
-	{
-		for (unsigned int chunkID = 0; chunkID < std::min(_chunks.size(), bitField.GetChunks().size()); chunkID++)
-			_chunks[chunkID] &= bitField.GetChunks()[chunkID];
-
-		_chunks.resize(std::min((unsigned int)_chunks.size(), bitField.GetSize()));
-		_size = std::min(_size, bitField.GetSize());
-		return *this;
-	}
-
-	BitField& BitField::operator |=(const BitField& bitField)
-	{
-		_chunks.resize(std::max(_chunks.size(), bitField.GetChunks().size()));
-		_size = std::max(_size, bitField.GetSize());
-
-		for (unsigned int chunkID = 0; chunkID < bitField.GetChunks().size(); chunkID++)
-			_chunks[chunkID] |= bitField.GetChunks()[chunkID];
-
-		return *this;
-	}
-
-	BitField& BitField::operator ^=(const BitField& bitField)
-	{
-		_chunks.resize(std::max(_chunks.size(), bitField.GetChunks().size()));
-		_size = std::max(_size, bitField.GetSize());
-
-		for (unsigned int chunkID = 0; chunkID < std::min(_chunks.size(), bitField.GetChunks().size()); chunkID++)
-			_chunks[chunkID] ^= bitField.GetChunks()[chunkID];
-
-		return *this;
-	}
-
-	BitField BitField::operator &(const BitField& bitField) const
-	{
-		auto chunks = std::vector<ChunkType>(std::min(_chunks.size(), bitField.GetChunks().size()));
-		for (unsigned int chunkID = 0; chunkID < chunks.size(); chunkID++)
-			chunks[chunkID] = _chunks[chunkID] & bitField.GetChunks()[chunkID];
-
-		return BitField(chunks, std::min(_size, bitField.GetSize()));
-	}
-
-	BitField BitField::operator |(const BitField& bitField) const
-	{
-		auto chunks = std::vector<ChunkType>(std::max(_chunks.size(), bitField.GetChunks().size()));
-
-		for (unsigned int chunkID = 0; chunkID < _chunks.size(); chunkID++)
-			chunks[chunkID] |= _chunks[chunkID];
-
-		for (unsigned int chunkID = 0; chunkID < bitField.GetChunks().size(); chunkID++)
-			chunks[chunkID] |= bitField.GetChunks()[chunkID];
-
-		return BitField(chunks, std::max(_size, bitField.GetSize()));
-	}
-
-	BitField BitField::operator ^(const BitField& bitField) const
-	{
-		auto chunks = std::vector<ChunkType>(std::max(_chunks.size(), bitField.GetChunks().size()));
-
-		for (unsigned int chunkID = 0; chunkID < chunks.size(); chunkID++)
-		{
-			if (chunkID < _chunks.size() && chunkID < bitField.GetChunks().size())
-			{
-				chunks[chunkID] = _chunks[chunkID] ^ bitField.GetChunks()[chunkID];
-			}
-			else if (chunkID < _chunks.size())
-			{
-				chunks[chunkID] = _chunks[chunkID];
-			}
-			else if (chunkID < bitField.GetChunks().size())
-			{
-				chunks[chunkID] = bitField.GetChunks()[chunkID];
-			}
-		}
-
-		return BitField(chunks, std::max(_size, bitField.GetSize()));
-	}
-
-	BitField BitField::operator ~() const
-	{
-		auto newBitField = *this;
-		newBitField.FlipAll();
-		return newBitField;
-	}
-
-	bool BitField::operator ==(unsigned int packedBits) const
-	{
-		if (_chunks.empty())
-			return (packedBits == 0);
-
-		return (_chunks.front() == packedBits);
 	}
 	
 	bool BitField::operator !=(unsigned int packedBits) const
@@ -400,60 +215,59 @@ namespace TEN::Utils
 
 	BitField& BitField::operator =(unsigned int packedBits)
 	{
-		_chunks.resize(1);
-		_chunks.front() = packedBits;
-		_size = DEFAULT_SIZE;
+		for (unsigned int i = 0; i < _bits.size(); i++)
+		{
+			unsigned int bit = unsigned int(1 << i);
+			_bits[i] = ((packedBits & bit) == bit);
+		}
 
 		return *this;
 	}
 
 	BitField& BitField::operator &=(unsigned int packedBits)
 	{
-		_chunks.resize(1);
-		_chunks.front() &= packedBits;
-		_size = DEFAULT_SIZE;
+		for (unsigned int i = 0; i < _bits.size(); i++)
+		{
+			unsigned int bit = unsigned int(1 << i);
+			_bits[i] = (_bits[i] && (packedBits & bit) == bit);
+		}
 
 		return *this;
 	}
 
 	BitField& BitField::operator |=(unsigned int packedBits)
 	{
-		_chunks.resize(1);
-		_chunks.front() |= packedBits;
-		_size = DEFAULT_SIZE;
+		for (unsigned int i = 0; i < _bits.size(); i++)
+		{
+			if (_bits[i])
+				continue;
+
+			unsigned int bit = unsigned int(1 << i);
+			if ((packedBits & bit) == bit)
+				_bits[i] = true;
+		}
 
 		return *this;
 	}
 	
 	unsigned int BitField::operator &(unsigned int packedBits) const
 	{
-		if (_chunks.empty())
-			return 0;
-
-		return (_chunks.front() & packedBits);
+		return (ToPackedBits() & packedBits);
 	}
 
 	unsigned int BitField::operator |(unsigned int packedBits) const
 	{
-		if (_chunks.empty())
-			return packedBits;
-
-		return (_chunks.front() | packedBits);
+		return (ToPackedBits() | packedBits);
 	}
 
 	void BitField::Fill(bool value)
 	{
-		auto fillChunk = value ? ~(ChunkType)0 : (ChunkType)0;
-		std::fill(_chunks.begin(), _chunks.end(), fillChunk);
-
-		unsigned int endBitCount = _size % CHUNK_SIZE;
-		if (endBitCount > 0 && value)
-			_chunks.back() &= ((ChunkType)1 << endBitCount) - 1;
+		std::fill(_bits.begin(), _bits.end(), value);
 	}
 
-	bool BitField::IsBitIDCorrect(unsigned int bitID) const
+	bool BitField::IsIndexCorrect(unsigned int index) const
 	{
-		if (bitID >= _size)
+		if (index >= _bits.size())
 		{
 			TENLog(std::string("BitField attempted to access bit at invalid index."), LogLevel::Warning);
 			return false;

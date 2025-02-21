@@ -9,7 +9,7 @@ namespace TEN::Hud
 
 		static constexpr auto LIFE_MAX = 0.75f;
 
-		// Fields
+		// Members
 
 		bool _hasValueUpdated = false;
 

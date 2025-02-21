@@ -6,7 +6,7 @@
 	class EulerAngles
 	{
 	public:
-		// Fields (CONVENTION: X = Pitch, Y = Yaw, Z = Roll)
+		// Members (CONVENTION: X = Pitch, Y = Yaw, Z = Roll)
 
 		short x = 0;
 		short y = 0;
@@ -18,7 +18,7 @@
 
 		// Constructors
 
-		constexpr EulerAngles() = default;
+		constexpr EulerAngles() {};
 		constexpr EulerAngles(short x, short y, short z) { this->x = x; this->y = y; this->z = z; };
 				  EulerAngles(const Vector3& dir);
 				  EulerAngles(const AxisAngle& axisAngle);

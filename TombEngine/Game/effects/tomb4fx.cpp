@@ -12,7 +12,6 @@
 #include "Game/effects/Drip.h"
 #include "Game/effects/Ripple.h"
 #include "Game/effects/smoke.h"
-#include "Game/effects/Splash.h"
 #include "Game/effects/weather.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -28,7 +27,6 @@ using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
-using namespace TEN::Effects::Splash;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
 using namespace TEN::Math;
@@ -308,8 +306,7 @@ static void AttachAndCreateSpark(Particle* spark, const ItemInfo* item, int mesh
 	int v = (GetRandomControl() & 0x3F) + 192;
 
 	spark->life = spark->sLife = v / 6;
-	spark->SpriteSeqID = ID_DEFAULT_SPRITES;
-	spark->SpriteID = spriteID;
+	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + spriteID;
 
 	spark->xVel = v * (pos2.x - pos1.x) / 10;
 	spark->yVel = v * (pos2.y - pos1.y) / 10;
@@ -1134,9 +1131,11 @@ void TriggerUnderwaterExplosion(ItemInfo* item, int flag)
 			int dy = item->Pose.Position.y - waterHeight;
 			if (dy < 2048)
 			{
-				SplashSetup.Position = Vector3(item->Pose.Position.x, waterHeight, item->Pose.Position.z);
-				SplashSetup.InnerRadius = 160;
-				SplashSetup.SplashPower = 2048 - dy;
+				SplashSetup.y = waterHeight;
+				SplashSetup.x = item->Pose.Position.x;
+				SplashSetup.z = item->Pose.Position.z;
+				SplashSetup.innerRadius = 160;
+				SplashSetup.splashPower = 2048 - dy;
 
 				SetupSplash(&SplashSetup, item->RoomNumber);
 			}
@@ -1342,8 +1341,7 @@ void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned ch
 			spark->rotAdd = (GetRandomControl() & 0xF) + 16;
 
 		spark->scalar = 1;
-		spark->SpriteSeqID = ID_DEFAULT_SPRITES;
-		spark->SpriteID = SPR_UNDERWATERDUST;
+		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST;
 		spark->maxYvel = 0;
 		spark->gravity = (GetRandomControl() & 0x3F) + 64;
 		spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 32;
@@ -1443,8 +1441,7 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 	spark->flags = 2058;
 	spark->scalar = 3;
 	spark->gravity = 0;
-	spark->SpriteSeqID = ID_DEFAULT_SPRITES;
-	spark->SpriteID = SPR_BUBBLES;
+	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLES;
 	spark->maxYvel = 0;
 	int size = (GetRandomControl() & 7) + 63;
 	spark->sSize = size >> 1;

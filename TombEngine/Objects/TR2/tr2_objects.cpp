@@ -565,7 +565,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->Initialize = InitializeSpeedboat;
 		obj->collision = SpeedboatPlayerCollision;
 		obj->control = SpeedboatControl;
-		obj->shadowType = ShadowMode::Player;
+		obj->shadowType = ShadowMode::Lara;
 		obj->SetHitEffect(true);
 	}
 
@@ -575,7 +575,7 @@ static void StartVehicles(ObjectInfo* obj)
 	{
 		obj->Initialize = InitializeSkidoo;
 		obj->collision = SkidooPlayerCollision;
-		obj->shadowType = ShadowMode::Player;
+		obj->shadowType = ShadowMode::Lara;
 		obj->SetHitEffect(true);
 	}
 }

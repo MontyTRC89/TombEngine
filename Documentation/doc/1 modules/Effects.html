@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.7.2 (Developer) Lua API</title>
+    <title>TombEngine 1.7.1 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -82,7 +82,6 @@
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
-  <li>    <a href="../4 enums/Objects.HandStatus.html">Objects.HandStatus</a></li>
   <li>    <a href="../4 enums/Objects.WeaponType.html">Objects.WeaponType</a></li>
   <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
@@ -98,7 +97,6 @@
 </ul>
 <h2>5 Lua utility modules</h2>
 <ul class="nowrap">
-  <li>    <a href="../5 lua utility modules/Diary.html">Diary</a></li>
   <li>    <a href="../5 lua utility modules/EventSequence.html">EventSequence</a></li>
   <li>    <a href="../5 lua utility modules/Timer.html">Timer</a></li>
   <li>    <a href="../5 lua utility modules/Type.html">Type</a></li>
@@ -122,7 +120,7 @@
 	<td class="summary">Emit a lightning arc.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#EmitParticle">EmitParticle(pos, vel, spriteID, gravity, rotVel, startColor, endColor, blendMode, startSize, endSize, life, applyDamage, applyPoison, spriteSeqID, startRot)</a></td>
+	<td class="name" ><a href="#EmitParticle">EmitParticle(pos, velocity, spriteIndex, gravity, rot, startColor, endColor, blendMode, startSize, endSize, lifetime, damage, poison)</a></td>
 	<td class="summary">Emit a particle.</td>
 	</tr>
 	<tr>
@@ -140,10 +138,6 @@
 	<tr>
 	<td class="name" ><a href="#EmitBlood">EmitBlood(pos, count)</a></td>
 	<td class="summary">Emit blood.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#EmitAirBubble">EmitAirBubble(pos[, size][, amp])</a></td>
-	<td class="summary">Emit air bubble in a water room.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#EmitFire">EmitFire(pos, size)</a></td>
@@ -230,10 +224,14 @@
 </dd>
     <dt>
     <a name = "EmitParticle"></a>
-    <strong>EmitParticle(pos, vel, spriteID, gravity, rotVel, startColor, endColor, blendMode, startSize, endSize, life, applyDamage, applyPoison, spriteSeqID, startRot)</strong>
+    <strong>EmitParticle(pos, velocity, spriteIndex, gravity, rot, startColor, endColor, blendMode, startSize, endSize, lifetime, damage, poison)</strong>
     </dt>
     <dd>
-    Emit a particle.
+
+<p>Emit a particle. </p>
+<pre><code> See the sprite editor in WadTool for DEFAULT_SPRITES to see a list of sprite indices.
+</code></pre>
+
 
 
 
@@ -241,63 +239,59 @@
     <ul>
         <li><span class="parameter">pos</span>
             <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-         World position.
+
+
+
         </li>
-        <li><span class="parameter">vel</span>
+        <li><span class="parameter">velocity</span>
             <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-         Velocity.
+
+
+
         </li>
-        <li><span class="parameter">spriteID</span>
+        <li><span class="parameter">spriteIndex</span>
             <span class="types"><span class="type">int</span></span>
-         ID of the sprite in the sprite sequence object.
+         an index of a sprite in DEFAULT_SPRITES object.
         </li>
         <li><span class="parameter">gravity</span>
-            <span class="types"><span class="type">float</span></span>
-         Specifies if the particle will fall over time. Positive values ascend, negative values descend. Recommended range: [-1000 and 1000]. <strong>Default: 0</strong>
+            <span class="types"><span class="type">int</span></span>
+         (default 0) Specifies whether particle will fall (positive values) or ascend (negative values) over time. Clamped to [-32768, 32767], but values between -1000 and 1000 are recommended; values too high or too low (e.g. under -2000 or above 2000) will cause the velocity of the particle to "wrap around" and switch directions.
         </li>
-        <li><span class="parameter">rotVel</span>
+        <li><span class="parameter">rot</span>
             <span class="types"><span class="type">float</span></span>
-         Rotational velocity in degrees. <strong>Default: 0</strong>
+         (default 0) specifies a speed with which it will rotate (0 = no rotation, negative = anticlockwise rotation, positive = clockwise rotation).
         </li>
         <li><span class="parameter">startColor</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
-         Color at start of life. <strong>Default: Color(255, 255, 255)</strong>
+         (default Color(255, 255, 255)) color at start of life
         </li>
         <li><span class="parameter">endColor</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
-         Color to fade toward. This will finish long before the end of the particle's life due to internal math. <strong>Default: Color(255, 255, 255)</strong>
+         (default Color(255, 255, 255)) color to fade to - at the time of writing this fade will finish long before the end of the particle's life due to internal maths
         </li>
         <li><span class="parameter">blendMode</span>
             <span class="types"><a class="type" href="../4 enums/Effects.BlendID.html#">BlendID</a></span>
-         Render blend mode. <strong>TEN.Effects.BlendID.ALPHABLEND</strong>
+         (default TEN.Effects.BlendID.ALPHABLEND) How will we blend this with its surroundings?
         </li>
         <li><span class="parameter">startSize</span>
-            <span class="types"><span class="type">float</span></span>
-         Size at start of life. <strong>Default: 10</strong>
+            <span class="types"><span class="type">int</span></span>
+         (default 10) Size on spawn. A value of 15 is approximately the size of Lara's head.
         </li>
         <li><span class="parameter">endSize</span>
-            <span class="types"><span class="type">float</span></span>
-         Size at end of life. The particle will linearly shrink or grow toward this size over its lifespan. <strong>Default: 0</strong>
+            <span class="types"><span class="type">int</span></span>
+         (default 0) Size on death - the particle will linearly shrink or grow to this size during its lifespan
         </li>
-        <li><span class="parameter">life</span>
+        <li><span class="parameter">lifetime</span>
             <span class="types"><span class="type">float</span></span>
-         Lifespan in seconds. <strong>Default: 2</strong>
+         (default 2) Lifespan in seconds
         </li>
-        <li><span class="parameter">applyDamage</span>
+        <li><span class="parameter">damage</span>
             <span class="types"><span class="type">bool</span></span>
-         Specify if the particle will harm the player on collision. <strong>Default: false</strong>
+         (default false) specifies whether particle can damage Lara (does a very small amount of damage, like the small lava emitters in TR1)
         </li>
-        <li><span class="parameter">applyPoison</span>
+        <li><span class="parameter">poison</span>
             <span class="types"><span class="type">bool</span></span>
-         Specify if the particle will poison the player on collision. <strong>Default: false</strong>
-        </li>
-        <li><span class="parameter">spriteSeqID</span>
-            <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-         ID of the sprite sequence object. <strong>Default: Objects.ObjID.DEFAULT_SPRITES</strong>
-        </li>
-        <li><span class="parameter">startRot</span>
-            <span class="types"><span class="type">float</span></span>
-         Rotation at start of life. <strong>Default: random</strong>
+         (default false) specifies whether particle can poison Lara
         </li>
     </ul>
 
@@ -307,22 +301,20 @@
     <h3>Usage:</h3>
     <ul>
         <pre class="example">EmitParticle(
-	pos,
+	yourPositionVarHere,
 	Vec3(<span class="global">math</span>.random(), <span class="global">math</span>.random(), <span class="global">math</span>.random()),
-	<span class="number">22</span>, <span class="comment">-- spriteID
+	<span class="number">22</span>, <span class="comment">-- spriteIndex
 </span>	<span class="number">0</span>, <span class="comment">-- gravity
-</span>	-<span class="number">2</span>, <span class="comment">-- rotVel
+</span>	-<span class="number">2</span>, <span class="comment">-- rot
 </span>	Color(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">-- startColor
 </span>	Color(<span class="number">0</span>,  <span class="number">255</span>, <span class="number">0</span>), <span class="comment">-- endColor
 </span>	TEN.Effects.BlendID.ADDITIVE, <span class="comment">-- blendMode
 </span>	<span class="number">15</span>, <span class="comment">-- startSize
 </span>	<span class="number">50</span>, <span class="comment">-- endSize
-</span>	<span class="number">20</span>, <span class="comment">-- life
-</span>	<span class="keyword">false</span>, <span class="comment">-- applyDamage
-</span>	<span class="keyword">true</span>, <span class="comment">-- applyPoison
-</span> Objects.ObjID.DEFAULT_SPRITES, <span class="comment">-- spriteSeqID
-</span> <span class="number">180</span> <span class="comment">-- startRot
-</span> )</pre>
+</span>	<span class="number">20</span>, <span class="comment">-- lifetime
+</span>	<span class="keyword">false</span>, <span class="comment">-- damage
+</span>	<span class="keyword">true</span> <span class="comment">-- poison
+</span>	)</pre>
     </ul>
 
 </dd>
@@ -505,43 +497,11 @@
 
 </dd>
     <dt>
-    <a name = "EmitAirBubble"></a>
-    <strong>EmitAirBubble(pos[, size][, amp])</strong>
-    </dt>
-    <dd>
-    Emit air bubble in a water room.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">pos</span>
-            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-         World position where the effect will be spawned. Must be in a water room.
-        </li>
-        <li><span class="parameter">size</span>
-            <span class="types"><span class="type">float</span></span>
-         Sprite size. <strong>Default: 32</strong>
-         (<em>optional</em>)
-        </li>
-        <li><span class="parameter">amp</span>
-            <span class="types"><span class="type">float</span></span>
-         Oscillation amplitude. <strong>Default: 32</strong>
-         (<em>optional</em>)
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
     <a name = "EmitFire"></a>
     <strong>EmitFire(pos, size)</strong>
     </dt>
     <dd>
-    Emit fire for one frame.  Will not hurt player. Call this each frame if you want a continuous fire.
+    Emit fire for one frame.  Will not hurt Lara. Call this each frame if you want a continuous fire.
 
 
 

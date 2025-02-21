@@ -7,7 +7,7 @@ class EulerAngles;
 	class AxisAngle
 	{
 	private:
-		// Fields
+		// Members
 
 		Vector3 _axis  = Vector3::Backward;
 		short	_angle = 0;
@@ -19,7 +19,7 @@ class EulerAngles;
 
 		// Constructors
 
-		AxisAngle() = default;
+		AxisAngle() {};
 		AxisAngle(const Vector3& axis, short angle);
 		AxisAngle(const EulerAngles& eulers);
 		AxisAngle(const Quaternion& quat);

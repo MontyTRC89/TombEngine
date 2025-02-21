@@ -4,12 +4,9 @@
 #include "Scripting/Internal/TEN/Objects/NamedBase.h"
 
 namespace sol { class state; }
-
 enum class ReverbType;
-class Vec3;
-namespace TEN::Scripting::Types { class ScriptColor; }
-
-using namespace TEN::Scripting::Types;
+class ScriptColor;
+class Vec3; 
 
 //namespace TEN::Scripting
 //{

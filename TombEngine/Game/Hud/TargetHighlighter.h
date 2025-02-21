@@ -20,7 +20,7 @@ namespace TEN::Hud
 		static constexpr auto COLOR_GRAY	= Color(0.7f, 0.7f, 0.7f, 0.7f);
 		static constexpr auto SEGMENT_COUNT = 4;
 
-		// Fields
+		// Members
 
 		bool IsActive  = false;
 		bool IsPrimary = false;

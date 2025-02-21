@@ -11,7 +11,7 @@ struct ObjectInfo;
 	class GameBoundingBox
 	{
 	public:
-		// Fields
+		// Members
 
 		int X1 = 0;
 		int X2 = 0;
@@ -26,7 +26,7 @@ struct ObjectInfo;
 
 		// Constructors
 
-		GameBoundingBox() = default;
+		GameBoundingBox() {};
 		GameBoundingBox(float x1, float x2, float y1, float y2, float z1, float z2);
 		GameBoundingBox(GAME_OBJECT_ID objectID, int animNumber = 0, int frameNumber = 0);
 		GameBoundingBox(const ItemInfo* item);

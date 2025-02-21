@@ -50,7 +50,7 @@ namespace TEN::Hud
 		static constexpr auto DISPLAY_PICKUP_COUNT_MAX		   = 64;
 		static constexpr auto DISPLAY_PICKUP_COUNT_ARG_DEFAULT = 1;
 
-		// Fields
+		// Members
 
 		std::vector<DisplayPickup> _displayPickups = {};
 

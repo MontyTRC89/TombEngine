@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.7.2 (Developer) Lua API</title>
+    <title>TombEngine 1.7.1 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -82,7 +82,6 @@
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
-  <li>    <a href="../4 enums/Objects.HandStatus.html">Objects.HandStatus</a></li>
   <li>    <a href="../4 enums/Objects.WeaponType.html">Objects.WeaponType</a></li>
   <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
@@ -98,7 +97,6 @@
 </ul>
 <h2>5 Lua utility modules</h2>
 <ul class="nowrap">
-  <li>    <a href="../5 lua utility modules/Diary.html">Diary</a></li>
   <li>    <a href="../5 lua utility modules/EventSequence.html">EventSequence</a></li>
   <li>    <a href="../5 lua utility modules/Timer.html">Timer</a></li>
   <li>    <a href="../5 lua utility modules/Type.html">Type</a></li>
@@ -109,7 +107,7 @@
 <div id="content">
 
 <h1>Class <code>Objects.Sink</code></h1>
-<p>Represents a sink object.</p>
+<p>Sink</p>
 <p>
 
 </p>
@@ -118,28 +116,30 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#Sink:GetName">Sink:GetName()</a></td>
-	<td class="summary">Get this sink's unique string identifier.</td>
-	</tr>
-	<tr>
 	<td class="name" ><a href="#Sink:GetPosition">Sink:GetPosition()</a></td>
-	<td class="summary">Get this sink's world position.</td>
+	<td class="summary">Get the sink's position</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Sink:GetStrength">Sink:GetStrength()</a></td>
-	<td class="summary">Get this sink's strength.</td>
+	<td class="name" ><a href="#Sink:SetPosition">Sink:SetPosition(position)</a></td>
+	<td class="summary">Set the sink's position</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Sink:GetName">Sink:GetName()</a></td>
+	<td class="summary">Get the sink's unique string identifier
+ e.g.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Sink:SetName">Sink:SetName(name)</a></td>
-	<td class="summary">Set this sink's unique string identifier.</td>
+	<td class="summary">Set the sink's name (its unique string identifier)</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Sink:SetPosition">Sink:SetPosition(pos)</a></td>
-	<td class="summary">Set this sink's world position.</td>
+	<td class="name" ><a href="#Sink:GetStrength">Sink:GetStrength()</a></td>
+	<td class="summary">Get the sink's strength</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Sink:SetStrength">Sink:SetStrength(strength)</a></td>
-	<td class="summary">Set this sink's strength.</td>
+	<td class="summary">Set the strength of the sink
+ Higher numbers provide stronger currents.</td>
 	</tr>
 </table>
 
@@ -151,32 +151,11 @@
 
     <dl class="function">
     <dt>
-    <a name = "Sink:GetName"></a>
-    <strong>Sink:GetName()</strong>
-    </dt>
-    <dd>
-    Get this sink's unique string identifier.
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-        Name.
-    </ol>
-
-
-
-
-</dd>
-    <dt>
     <a name = "Sink:GetPosition"></a>
     <strong>Sink:GetPosition()</strong>
     </dt>
     <dd>
-    Get this sink's world position.
+    Get the sink's position
 
 
 
@@ -185,7 +164,7 @@
     <ol>
 
            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-        World position.
+        a copy of the sink's position
     </ol>
 
 
@@ -193,11 +172,34 @@
 
 </dd>
     <dt>
-    <a name = "Sink:GetStrength"></a>
-    <strong>Sink:GetStrength()</strong>
+    <a name = "Sink:SetPosition"></a>
+    <strong>Sink:SetPosition(position)</strong>
     </dt>
     <dd>
-    Get this sink's strength.
+    Set the sink's position
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">position</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         the new position of the sink
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Sink:GetName"></a>
+    <strong>Sink:GetName()</strong>
+    </dt>
+    <dd>
+    Get the sink's unique string identifier
+ e.g.  "strong_river_current" or "propeller_death_sink"
 
 
 
@@ -205,8 +207,8 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">int</span></span>
-        Strength.
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        the sink's name
     </ol>
 
 
@@ -218,7 +220,7 @@
     <strong>Sink:SetName(name)</strong>
     </dt>
     <dd>
-    Set this sink's unique string identifier.
+    Set the sink's name (its unique string identifier)
 
 
 
@@ -226,7 +228,7 @@
     <ul>
         <li><span class="parameter">name</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-         New name.
+         The sink's new name
         </li>
     </ul>
 
@@ -236,22 +238,21 @@
 
 </dd>
     <dt>
-    <a name = "Sink:SetPosition"></a>
-    <strong>Sink:SetPosition(pos)</strong>
+    <a name = "Sink:GetStrength"></a>
+    <strong>Sink:GetStrength()</strong>
     </dt>
     <dd>
-    Set this sink's world position.
+    Get the sink's strength
 
 
 
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">pos</span>
-            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-         New world position.
-        </li>
-    </ul>
 
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        the sink's current strength
+    </ol>
 
 
 
@@ -262,8 +263,8 @@
     <strong>Sink:SetStrength(strength)</strong>
     </dt>
     <dd>
-    Set this sink's strength.
- Higher numbers provide stronger currents. Clamped to the range [1, 32].
+    Set the strength of the sink
+ Higher numbers provide stronger currents.  Will be clamped to [1, 32].
 
 
 
@@ -271,7 +272,7 @@
     <ul>
         <li><span class="parameter">strength</span>
             <span class="types"><span class="type">int</span></span>
-         New strength.
+         The sink's new strength
         </li>
     </ul>
 

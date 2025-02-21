@@ -70,32 +70,30 @@ namespace TEN::Entities::Generic
 		{
 			if (item->TriggerFlags)
 			{
-				int targetHeight = (item->ItemFlags[0] - 16 * int(item->TriggerFlags & 0xFFFFFFF0));
-				int vel = item->TriggerFlags & 0xF;
+				int goalHeight = (item->ItemFlags[0] - 16 * (int)(item->TriggerFlags & 0xFFFFFFF0));
+				int speed = item->TriggerFlags & 0xF;
 
-				if (item->Pose.Position.y > targetHeight)
+				if (item->Pose.Position.y > goalHeight)
 				{
-					item->Pose.Position.y -= vel;
+					item->Pose.Position.y -= speed;
 				}
 				else
 				{
 					return;
 				}
 
-				int distToPortal = g_Level.Rooms[item->RoomNumber].TopHeight - item->Pose.Position.y;
-				if (distToPortal <= vel)
+				int distToPortal = *&g_Level.Rooms[item->RoomNumber].TopHeight - item->Pose.Position.y;
+				if (distToPortal <= speed)
 					UpdateBridgeItem(*item);
 
-				// HACK: Must probe slightly higher to avoid strange bug where the room number sometimes isn't
-				// updated when the platform crosses room boundaries. -- Sezz 2025.01.18
-				auto pointColl = GetPointCollision(*item, 0, 0, -CLICK(0.5f));
+				auto probe = GetPointCollision(*item);
 
-				item->Floor = pointColl.GetFloorHeight();
+				item->Floor = probe.GetFloorHeight();
 
-				if (pointColl.GetRoomNumber() != item->RoomNumber)
+				if (probe.GetRoomNumber() != item->RoomNumber)
 				{
 					UpdateBridgeItem(*item, BridgeUpdateType::Remove);
-					ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
+					ItemNewRoom(itemNumber, probe.GetRoomNumber());
 					UpdateBridgeItem(*item);
 				}
 			}

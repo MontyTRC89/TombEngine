@@ -89,89 +89,97 @@ void SaveGame::LoadHeaders()
 	}
 }
 
-static Save::EulerAngles FromEulerAngles(const EulerAngles& eulers)
+Save::Pose FromPose(const Pose& pose)
+{
+	return Save::Pose(
+		pose.Position.x,
+		pose.Position.y,
+		pose.Position.z,
+		pose.Orientation.x,
+		pose.Orientation.y,
+		pose.Orientation.z);
+}
+
+Save::EulerAngles FromEulerAngles(const EulerAngles& eulers)
 {
 	return Save::EulerAngles(eulers.x, eulers.y, eulers.z);
 }
 
-static Save::Vector2 FromVector2(const Vector2& vec)
+Save::Vector2 FromVector2(const Vector2& vec)
 {
 	return Save::Vector2(vec.x, vec.y);
 }
 
-static Save::Vector2 FromVector2i(const Vector2i& vec)
+Save::Vector2 FromVector2i(const Vector2i& vec)
 {
 	return Save::Vector2(vec.x, vec.y);
 }
 
-static Save::Vector3 FromVector3(const Vector3& vec)
+Save::Vector3 FromVector3(const Vector3& vec)
 {
 	return Save::Vector3(vec.x, vec.y, vec.z);
 }
 
-static Save::Vector3 FromVector3i(const Vector3i& vec)
+Save::Vector3 FromVector3i(const Vector3i& vec)
 {
 	return Save::Vector3(vec.x, vec.y, vec.z);
 }
 
-static Save::Vector4 FromVector4(const Vector4& vec)
+Save::Vector4 FromVector4(const Vector4& vec)
 {
 	return Save::Vector4(vec.x, vec.y, vec.z, vec.w);
 }
 
-static Save::GameVector FromGameVector(const GameVector& vec)
+Save::GameVector FromGameVector(const GameVector& vec)
 {
 	return Save::GameVector(vec.x, vec.y, vec.z, (int)vec.RoomNumber);
 }
 
-static Save::Pose FromPose(const Pose& pose)
+Pose ToPose(const Save::Pose& pose)
 {
-	return Save::Pose(FromVector3i(pose.Position), FromEulerAngles(pose.Orientation), FromVector3(pose.Scale));
+	return Pose(
+		pose.x_pos(), pose.y_pos(), pose.z_pos(),
+		(short)pose.x_rot(), (short)pose.y_rot(), (short)pose.z_rot());
 }
 
-static EulerAngles ToEulerAngles(const Save::EulerAngles* eulers)
+EulerAngles ToEulerAngles(const Save::EulerAngles* eulers)
 {
 	return EulerAngles((short)round(eulers->x()), (short)round(eulers->y()), (short)round(eulers->z()));
 }
 
-static Vector2 ToVector2(const Save::Vector2* vec)
+Vector2 ToVector2(const Save::Vector2* vec)
 {
 	return Vector2(vec->x(), vec->y());
 }
 
-static Vector2i ToVector2i(const Save::Vector2* vec)
+Vector2i ToVector2i(const Save::Vector2* vec)
 {
 	return Vector2i((int)round(vec->x()), (int)round(vec->y()));
 }
 
-static Vector3i ToVector3i(const Save::Vector3* vec)
+Vector3i ToVector3i(const Save::Vector3* vec)
 {
 	return Vector3i((int)round(vec->x()), (int)round(vec->y()), (int)round(vec->z()));
 }
 
-static Vector3 ToVector3(const Save::Vector3* vec)
+Vector3 ToVector3(const Save::Vector3* vec)
 {
 	return Vector3(vec->x(), vec->y(), vec->z());
 }
 
-static Vector4 ToVector4(const Save::Vector3* vec)
+Vector4 ToVector4(const Save::Vector3* vec)
 {
 	return Vector4(vec->x(), vec->y(), vec->z(), 1.0f);
 }
 
-static Vector4 ToVector4(const Save::Vector4* vec)
+Vector4 ToVector4(const Save::Vector4* vec)
 {
 	return Vector4(vec->x(), vec->y(), vec->z(), vec->w());
 }
 
-static GameVector ToGameVector(const Save::GameVector* vec)
+GameVector ToGameVector(const Save::GameVector* vec)
 {
 	return GameVector(vec->x(), vec->y(), vec->z(), (short)vec->room_number());
-}
-
-static Pose ToPose(const Save::Pose& pose)
-{
-	return Pose(ToVector3i(&pose.position()), ToEulerAngles(&pose.orientation()), ToVector3(&pose.scale()));
 }
 
 bool SaveGame::IsSaveGameSlotValid(int slot)
@@ -329,12 +337,12 @@ const std::vector<byte> SaveGame::Build()
 
 	std::vector<float> bubbleNodes;
 	for (int i = 0; i < Lara.Effect.BubbleNodes.size(); i++)
-		bubbleNodes.push_back(Lara.Effect.BubbleNodes[i]);
+		bubbleNodes.push_back(Lara.Effect.BubbleNodes[i] == 1);
 	auto bubbleNodesOffset = fbb.CreateVector(bubbleNodes);
 	
 	std::vector<float> dripNodes;
 	for (int i = 0; i < Lara.Effect.DripNodes.size(); i++)
-		dripNodes.push_back(Lara.Effect.DripNodes[i]);
+		dripNodes.push_back(Lara.Effect.DripNodes[i] == 1);
 	auto dripNodesOffset = fbb.CreateVector(dripNodes);
 
 	std::vector<int> subsuitVelocity{};
@@ -1046,20 +1054,16 @@ const std::vector<byte> SaveGame::Build()
 		{
 			auto& currVolume = room->TriggerVolumes[j];
 
-			auto queue = std::vector<flatbuffers::Offset<Save::VolumeState>>{};
+			std::vector<flatbuffers::Offset<Save::VolumeState>> queue;
 			for (int k = 0; k < currVolume.StateQueue.size(); k++)
 			{
 				auto& entry = currVolume.StateQueue[k];
 
 				int activator = NO_VALUE;
-				if (std::holds_alternative<int>(entry.Activator))
-				{
-					activator = std::get<int>(entry.Activator);
-				}
+				if (std::holds_alternative<short>(entry.Activator))
+					activator = std::get<short>(entry.Activator);
 				else
-				{
 					continue;
-				}
 
 				Save::VolumeStateBuilder volstate{ fbb };
 				volstate.add_status((int)entry.Status);
@@ -1152,8 +1156,7 @@ const std::vector<byte> SaveGame::Build()
 		particleInfo.add_b(particle->b);
 		particleInfo.add_col_fade_speed(particle->colFadeSpeed);
 		particleInfo.add_d_b(particle->dB);
-		particleInfo.add_sprite_index(particle->SpriteSeqID);
-		particleInfo.add_sprite_id(particle->SpriteID);
+		particleInfo.add_sprite_index(particle->spriteIndex);
 		particleInfo.add_d_g(particle->dG);
 		particleInfo.add_d_r(particle->dR);
 		particleInfo.add_d_size(particle->dSize);
@@ -1187,7 +1190,6 @@ const std::vector<byte> SaveGame::Build()
 		particleInfo.add_y_vel(particle->yVel);
 		particleInfo.add_z(particle->z);
 		particleInfo.add_z_vel(particle->zVel);
-		particleInfo.add_target_pos(&FromVector3(particle->targetPos));
 
 		particles.push_back(particleInfo.Finish());
 	}
@@ -2199,8 +2201,7 @@ static void ParseEffects(const Save::SaveGame* s)
 		particle->size = particleInfo->size();
 		particle->friction = particleInfo->friction();
 		particle->scalar = particleInfo->scalar();
-		particle->SpriteSeqID = (GAME_OBJECT_ID)particleInfo->sprite_index();
-		particle->SpriteID = particleInfo->sprite_id();
+		particle->spriteIndex = particleInfo->sprite_index();
 		particle->rotAdd = particleInfo->rot_add();
 		particle->maxYvel = particleInfo->max_y_vel();
 		particle->on = particleInfo->on();
@@ -2223,7 +2224,6 @@ static void ParseEffects(const Save::SaveGame* s)
 		particle->fxObj = particleInfo->fx_obj();
 		particle->roomNumber = particleInfo->room_number();
 		particle->nodeNumber = particleInfo->node_number();
-		particle->targetPos = ToVector3(particleInfo->target_pos());
 	}
 
 	for (int i = 0; i < s->bats()->size(); i++)

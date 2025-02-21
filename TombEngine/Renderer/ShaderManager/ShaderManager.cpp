@@ -228,7 +228,7 @@ namespace TEN::Renderer::Utils
 
 			// Set up compilation flags according to build configuration.
 			unsigned int flags = D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_PACK_MATRIX_ROW_MAJOR;
-			if constexpr (DEBUG_BUILD)
+			if constexpr (DebugBuild)
 			{
 				flags |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
 			}

@@ -13,16 +13,14 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
-using namespace TEN::Scripting::Types;
-
 /// Room object.
 // @tenclass Objects.Room
 // @pragma nostrip
 
 //namespace TEN::Scripting
 //{
-	static auto IndexError = IndexErrorMaker(Room, ScriptReserved_Volume);
-	static auto NewIndexError = NewIndexErrorMaker(Room, ScriptReserved_Volume);
+	static auto IndexError = index_error_maker(Room, ScriptReserved_Volume);
+	static auto NewIndexError = newindex_error_maker(Room, ScriptReserved_Volume);
 
 	Room::Room(ROOM_INFO& room) :
 		_room(room)
@@ -91,9 +89,9 @@ using namespace TEN::Scripting::Types;
 			return;
 
 		// Remove previous name if it already exists.
-		if (_callbackSetName(name, _room))
+		if (s_callbackSetName(name, _room))
 		{
-			_callbackRemoveName(_room.Name);
+			s_callbackRemoveName(_room.Name);
 			_room.Name = name;
 		}
 		else

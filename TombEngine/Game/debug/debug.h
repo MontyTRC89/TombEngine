@@ -9,9 +9,9 @@
 namespace TEN::Debug
 {
 #if _DEBUG
-	constexpr auto DEBUG_BUILD = true;
+	constexpr bool DebugBuild = true;
 #else
-	constexpr auto DEBUG_BUILD = false;
+	constexpr bool DebugBuild = false;
 #endif
 
 	enum class LogLevel
@@ -41,7 +41,7 @@ namespace TEN::Debug
 
 	inline void TENAssert(const bool& cond, const std::string& msg)
 	{
-		if constexpr (DEBUG_BUILD)
+		if constexpr (DebugBuild)
 		{
 			if (!cond)
 			{

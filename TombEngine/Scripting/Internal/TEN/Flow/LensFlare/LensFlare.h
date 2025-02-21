@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Objects/game_object_ids.h"
 #include "Objects/objectslist.h"
 #include "Scripting/Internal/TEN/Types/Color/Color.h"
@@ -7,20 +6,12 @@
 
 namespace sol { class state; }
 
-namespace TEN::Scripting::Types { class ScriptColor; }
-
-using namespace TEN::Scripting::Types;
-
 namespace TEN::Scripting
 {
 	class LensFlare
 	{
-	public:
-		static void Register(sol::table& parent);
-
 	private:
-		// Fields
-
+		// Members
 		int	 _sunSpriteID = SPRITE_TYPES::SPR_LENS_FLARE_3;
 		bool _isEnabled	  = false;
 
@@ -28,21 +19,20 @@ namespace TEN::Scripting
 		ScriptColor _color	  = 0;
 
 	public:
-		// Constructors
+		static void Register(sol::table& table);
 
+		// Constructors
 		LensFlare() = default;
 		LensFlare(float pitch, float yaw, const ScriptColor& color);
 
 		// Getters
-
+		bool		GetEnabled() const;
 		int			GetSunSpriteID() const;
 		float		GetPitch() const;
 		float		GetYaw() const;
 		ScriptColor GetColor() const;
-		bool		GetEnabledStatus() const;
 
 		// Setters
-
 		void SetSunSpriteID(int spriteID);
 		void SetPitch(float pitch);
 		void SetYaw(float yaw);

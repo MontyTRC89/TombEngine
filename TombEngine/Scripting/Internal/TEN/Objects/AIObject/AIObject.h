@@ -30,7 +30,7 @@ public:
 	void SetRoomNumber(short Room);
 
 	std::string GetName() const;
-	void SetName(const std::string&);
+	void SetName(std::string const &);
 
 	GAME_OBJECT_ID GetObjectID() const;
 	void SetObjectID(GAME_OBJECT_ID);

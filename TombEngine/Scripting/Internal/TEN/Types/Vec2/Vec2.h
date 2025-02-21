@@ -3,32 +3,25 @@
 namespace sol { class state; }
 namespace TEN::Math { class Vector2i; };
 
-// TODO: Vector2i methods have compiler errors.
-
 class Vec2
 {
 public:
 	static void Register(sol::table& parent);
 
-	// Fields
+	// Members
 
 	float x = 0;
 	float y = 0;
 
 	// Constructors
 
-	Vec2() = default;
 	Vec2(float x, float y);
 	Vec2(float value);
 	Vec2(const Vector2& vector);
 	//Vec2(const Vector2i& vector);
 
 	// Utilities
-
 	Vec2  Normalize() const;
-	Vec2  Translate(const Vec2& dir, float dist);
-	Vec2  Translate(float rot, float dist);
-	Vec2  Translate(float rot, const Vec2& relOffset);
 	Vec2  Rotate(float rot) const;
 	Vec2  Lerp(const Vec2& vector, float alpha) const;
 	Vec2  Cross(const Vec2& vector) const;

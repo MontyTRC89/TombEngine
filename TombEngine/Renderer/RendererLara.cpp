@@ -94,9 +94,12 @@ void Renderer::UpdateLaraAnimations(bool force)
 	for (auto& bone : playerObject.LinearizedBones)
 		bone->ExtraRotation = Quaternion::Identity;
 
-	// Set player world matrix.
-	_playerWorldMatrix = LaraItem->Pose.ToMatrix();
-	rItem.World = _playerWorldMatrix;
+	// Player world matrix.
+	auto tMatrix = Matrix::CreateTranslation(LaraItem->Pose.Position.ToVector3());
+	auto rotMatrix = LaraItem->Pose.Orientation.ToRotationMatrix();
+
+	_laraWorldMatrix = rotMatrix * tMatrix;
+	rItem.World = _laraWorldMatrix;
 
 	// Update extra head and torso rotations.
 	playerObject.LinearizedBones[LM_TORSO]->ExtraRotation = Lara.ExtraTorsoRot.ToQuaternion();

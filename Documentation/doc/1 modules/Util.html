@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.7.2 (Developer) Lua API</title>
+    <title>TombEngine 1.7.1 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -82,7 +82,6 @@
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
-  <li>    <a href="../4 enums/Objects.HandStatus.html">Objects.HandStatus</a></li>
   <li>    <a href="../4 enums/Objects.WeaponType.html">Objects.WeaponType</a></li>
   <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
@@ -98,7 +97,6 @@
 </ul>
 <h2>5 Lua utility modules</h2>
 <ul class="nowrap">
-  <li>    <a href="../5 lua utility modules/Diary.html">Diary</a></li>
   <li>    <a href="../5 lua utility modules/EventSequence.html">EventSequence</a></li>
   <li>    <a href="../5 lua utility modules/Timer.html">Timer</a></li>
   <li>    <a href="../5 lua utility modules/Type.html">Type</a></li>
@@ -120,6 +118,10 @@
 	<tr>
 	<td class="name" ><a href="#HasLineOfSight">HasLineOfSight(roomID, posA, posB)</a></td>
 	<td class="summary">Determine if there is a clear line of sight between two positions.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#CalculateDistance">CalculateDistance(posA, posB)</a></td>
+	<td class="summary">Calculate the distance between two positions.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#CalculateHorizontalDistance">CalculateHorizontalDistance(posA, posB)</a></td>
@@ -198,6 +200,38 @@
         <pre class="example"><span class="keyword">local</span> flamePlinthPos = flamePlinth:GetPosition() + Vec3(<span class="number">0</span>, flamePlinthHeight, <span class="number">0</span>);
 <span class="global">print</span>(Misc.HasLineOfSight(enemyHead:GetRoomNumber(), enemyHead:GetPosition(), flamePlinthPos))</pre>
     </ul>
+
+</dd>
+    <dt>
+    <a name = "CalculateDistance"></a>
+    <strong>CalculateDistance(posA, posB)</strong>
+    </dt>
+    <dd>
+    Calculate the distance between two positions.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">posA</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         First position.
+        </li>
+        <li><span class="parameter">posB</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         Second position.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">float</span></span>
+        Distance between two positions.
+    </ol>
+
+
+
 
 </dd>
     <dt>

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "game_object_ids.h"
 
 template <typename T, typename Enum> constexpr bool is_underlying = std::is_same_v<T, std::underlying_type_t<Enum>>;

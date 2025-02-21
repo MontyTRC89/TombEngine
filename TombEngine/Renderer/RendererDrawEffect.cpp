@@ -18,7 +18,6 @@
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
-#include "Game/effects/Splash.h"
 #include "Game/effects/Streamer.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
@@ -43,7 +42,6 @@ using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Footprint;
 using namespace TEN::Effects::Ripple;
-using namespace TEN::Effects::Splash;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Traps;
@@ -53,6 +51,7 @@ extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
 extern SMOKE_SPARKS SmokeSparks[MAX_SPARKS_SMOKE];
 extern SHOCKWAVE_STRUCT ShockWaves[MAX_SHOCKWAVE];
+extern SPLASH_STRUCT Splashes[MAX_SPLASHES];
 extern std::array<DebrisFragment, MAX_DEBRIS> DebrisFragments;
 
 namespace TEN::Renderer 
@@ -308,16 +307,9 @@ namespace TEN::Renderer
 
 					AddSpriteBillboardConstrained(
 						&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
-						center,
-						Vector4(1.0f, 1.0f, 1.0f, 0.5f),
-						PI_DIV_2, 1.0f, Vector2(4, Vector3::Distance(origin, target)), BlendMode::Additive, dir, true, view);
-
-
-					AddSpriteBillboardConstrained(
-						&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
-						center,
-						Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
-						PI_DIV_2, 1.0f, Vector2(arc.width * 8, Vector3::Distance(origin, target)), BlendMode::Additive, dir, true, view);					
+						center, Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f), PI_DIV_2, 1.0f,
+						Vector2(arc.width * 8, Vector3::Distance(origin, target)),
+						BlendMode::Additive, dir, true, view);
 				}
 			}
 		}
@@ -505,8 +497,7 @@ namespace TEN::Renderer
 				}
 
 				// Disallow sprites out of bounds.
-				int spriteIndex = Objects[particle.SpriteSeqID].meshIndex + particle.SpriteID;
-				spriteIndex = std::clamp(spriteIndex, 0, (int)_sprites.size());
+				int spriteIndex = std::clamp((int)particle.spriteIndex, 0, (int)_sprites.size());
 
 				AddSpriteBillboard(
 					&_sprites[spriteIndex],
@@ -542,22 +533,24 @@ namespace TEN::Renderer
 
 	void Renderer::PrepareSplashes(RenderView& view) 
 	{
-		constexpr auto POINT_COUNT = 9;
-		constexpr auto ALPHA	   = 360 / POINT_COUNT;
+		constexpr size_t NUM_POINTS = 9;
 
-		for (const auto& splash : SplashEffects) 
+		for (int i = 0; i < MAX_SPLASHES; i++) 
 		{
+			auto& splash = Splashes[i];
+
 			if (!splash.isActive)
 				continue;
 
 			if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Splashes rendering"))
 				return;
 
+			constexpr float alpha = 360 / NUM_POINTS;
 			byte color = (splash.life >= 32 ? 128 : (byte)((splash.life / 32.0f) * 128));
 
 			if (!splash.isRipple) 
 			{
-				if (splash.HeightSpeed < 0 && splash.height < 1024) 
+				if (splash.heightSpeed < 0 && splash.height < 1024) 
 				{
 					float multiplier = splash.height / 1024.0f;
 					color = (float)color * multiplier;
@@ -585,34 +578,33 @@ namespace TEN::Renderer
 			float z2Inner;
 			float x2Outer;
 			float z2Outer;
-			float yInner = splash.Position.y;
-			float yOuter = splash.Position.y - splash.height;
+			float yInner = splash.y;
+			float yOuter = splash.y - splash.height;
 
-			float innerRadius = Lerp(splash.PrevInnerRadius, splash.InnerRadius, GetInterpolationFactor());
-			float outerRadius = Lerp(splash.PrevOuterRadius, splash.OuterRadius, GetInterpolationFactor());
+			float innerRadius = Lerp(splash.PrevInnerRad, splash.innerRad, GetInterpolationFactor());
+			float outerRadius = Lerp(splash.PrevOuterRad, splash.outerRad, GetInterpolationFactor());
 
-			for (int i = 0; i < POINT_COUNT; i++) 
+			for (int i = 0; i < NUM_POINTS; i++) 
 			{
-				xInner = innerRadius * sin(ALPHA * i * PI / 180);
-				zInner = innerRadius * cos(ALPHA * i * PI / 180);
-				xOuter = outerRadius * sin(ALPHA * i * PI / 180);
-				zOuter = outerRadius * cos(ALPHA * i * PI / 180);
-				xInner += splash.Position.x;
-				zInner += splash.Position.z;
-				xOuter += splash.Position.x;
-				zOuter += splash.Position.z;
-				int j = (i + 1) % POINT_COUNT;
-				x2Inner = innerRadius * sin(ALPHA * j * PI / 180);
-				x2Inner += splash.Position.x;
-				z2Inner = innerRadius * cos(ALPHA * j * PI / 180);
-				z2Inner += splash.Position.z;
-				x2Outer = outerRadius * sin(ALPHA * j * PI / 180);
-				x2Outer += splash.Position.x;
-				z2Outer = outerRadius * cos(ALPHA * j * PI / 180);
-				z2Outer += splash.Position.z;
+				xInner = innerRadius * sin(alpha * i * PI / 180);
+				zInner = innerRadius * cos(alpha * i * PI / 180);
+				xOuter = outerRadius * sin(alpha * i * PI / 180);
+				zOuter = outerRadius * cos(alpha * i * PI / 180);
+				xInner += splash.x;
+				zInner += splash.z;
+				xOuter += splash.x;
+				zOuter += splash.z;
+				int j = (i + 1) % NUM_POINTS;
+				x2Inner = innerRadius * sin(alpha * j * PI / 180);
+				x2Inner += splash.x;
+				z2Inner = innerRadius * cos(alpha * j * PI / 180);
+				z2Inner += splash.z;
+				x2Outer = outerRadius * sin(alpha * j * PI / 180);
+				x2Outer += splash.x;
+				z2Outer = outerRadius * cos(alpha * j * PI / 180);
+				z2Outer += splash.z;
 
-				AddQuad(
-					&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.SpriteSeqStart + (int)splash.AnimPhase],
+				AddQuad(&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + splash.spriteSequenceStart + (int)splash.animationPhase],
 					Vector3(xOuter, yOuter, zOuter),
 					Vector3(x2Outer, yOuter, z2Outer),
 					Vector3(x2Inner, yInner, z2Inner),
@@ -870,9 +862,6 @@ namespace TEN::Renderer
 
 				p2 = Vector3::Transform(p2, rotMatrix);
 				p3 = Vector3::Transform(p3, rotMatrix);
-
-				if (shockwave->style == (int)ShockwaveStyle::Invisible)
-					return;
 
 				if (shockwave->style == (int)ShockwaveStyle::Normal)
 				{
@@ -1291,14 +1280,14 @@ namespace TEN::Renderer
 		}
 	}
 
-	Matrix Renderer::GetWorldMatrixForSprite(const RendererSpriteToDraw& sprite, RenderView& view)
+	Matrix Renderer::GetWorldMatrixForSprite(RendererSpriteToDraw* sprite, RenderView& view)
 	{
 		auto spriteMatrix = Matrix::Identity;
-		auto scaleMatrix = Matrix::CreateScale(sprite.Width * sprite.Scale, sprite.Height * sprite.Scale, sprite.Scale);
+		auto scaleMatrix = Matrix::CreateScale(sprite->Width * sprite->Scale, sprite->Height * sprite->Scale, sprite->Scale);
 
-		auto spritePos = sprite.pos;
+		auto spritePos = sprite->pos;
 
-		if (sprite.Type == SpriteType::ThreeD)
+		if (sprite->Type == SpriteType::ThreeD)
 		{
 			ReflectMatrixOptionally(spriteMatrix);
 		}
@@ -1307,23 +1296,23 @@ namespace TEN::Renderer
 			ReflectVectorOptionally(spritePos);
 		}
 
-		switch (sprite.Type)
+		switch (sprite->Type)
 		{
 		case SpriteType::Billboard:
 		{
 			auto cameraUp = Vector3(view.Camera.View._12, view.Camera.View._22, view.Camera.View._32);
-			spriteMatrix = scaleMatrix * Matrix::CreateRotationZ(sprite.Rotation) * Matrix::CreateBillboard(spritePos, Camera.pos.ToVector3(), cameraUp);
+			spriteMatrix = scaleMatrix * Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateBillboard(spritePos, Camera.pos.ToVector3(), cameraUp);
 		}
 		break;
 
 		case SpriteType::CustomBillboard:
 		{
-			auto rotMatrix = Matrix::CreateRotationY(sprite.Rotation);
+			auto rotMatrix = Matrix::CreateRotationY(sprite->Rotation);
 			auto quadForward = Vector3(0.0f, 0.0f, 1.0f);
 			spriteMatrix = scaleMatrix * Matrix::CreateConstrainedBillboard(
 				spritePos,
 				Camera.pos.ToVector3(),
-				sprite.ConstrainAxis,
+				sprite->ConstrainAxis,
 				nullptr,
 				&quadForward);
 		}
@@ -1332,7 +1321,7 @@ namespace TEN::Renderer
 		case SpriteType::LookAtBillboard:
 		{
 			auto translationMatrix = Matrix::CreateTranslation(spritePos);
-			auto rotMatrix = Matrix::CreateRotationZ(sprite.Rotation) * Matrix::CreateLookAt(Vector3::Zero, sprite.LookAtAxis, Vector3::UnitZ);
+			auto rotMatrix = Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateLookAt(Vector3::Zero, sprite->LookAtAxis, Vector3::UnitZ);
 			spriteMatrix = scaleMatrix * rotMatrix * translationMatrix;
 		}
 		break;

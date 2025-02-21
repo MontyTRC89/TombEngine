@@ -17,7 +17,7 @@ namespace TEN::Control::Volumes
 	constexpr auto CAM_SIZE = 32;
 	constexpr auto EVENT_STATE_MASK = SHRT_MAX;
 
-	bool TestVolumeContainment(const TriggerVolume& volume, const BoundingOrientedBox& box, int roomNumber)
+	bool TestVolumeContainment(const TriggerVolume& volume, const BoundingOrientedBox& box, short roomNumber)
 	{
 		float color = !volume.StateQueue.empty() ? 1.0f : 0.4f;
 
@@ -129,7 +129,7 @@ namespace TEN::Control::Volumes
 		return true;
 	}
 
-	void TestVolumes(int roomNumber, const BoundingOrientedBox& box, ActivatorFlags activatorFlag, Activator activator)
+	void TestVolumes(short roomNumber, const BoundingOrientedBox& box, ActivatorFlags activatorFlag, Activator activator)
 	{
 		if (g_GameFlow->CurrentFreezeMode != FreezeMode::None)
 			return;
@@ -152,7 +152,7 @@ namespace TEN::Control::Volumes
 				if (!volume.DetectInAdjacentRooms && currentRoomIndex != roomNumber)
 					continue;
 
-				if (volume.EventSetIndex == NO_VALUE)
+				if (volume.EventSetIndex == NO_EVENT_SET)
 					continue;
 
 				auto& set = g_Level.VolumeEventSets[volume.EventSetIndex];
@@ -233,17 +233,18 @@ namespace TEN::Control::Volumes
 		TestVolumes(camera->pos.RoomNumber, box, ActivatorFlags::Flyby, camera);
 	}
 
-	void TestVolumes(int roomNumber, MESH_INFO* mesh)
+	void TestVolumes(short roomNumber, MESH_INFO* mesh)
 	{
 		auto box = GetBoundsAccurate(*mesh, false).ToBoundingOrientedBox(mesh->pos);
 		
 		TestVolumes(roomNumber, box, ActivatorFlags::Static, mesh);
 	}
 
-	void TestVolumes(int itemNumber, const CollisionSetupData* coll)
+	void TestVolumes(short itemNumber, const CollisionSetupData* coll)
 	{
 		auto& item = g_Level.Items[itemNumber];
-		auto box = (coll != nullptr) ? ConstructRoughBox(item, *coll) : GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
+		auto box = (coll != nullptr) ?
+			ConstructRoughBox(item, *coll) : GameBoundingBox(&item).ToBoundingOrientedBox(item.Pose);
 
 		DrawDebugBox(box, Vector4(1.0f, 1.0f, 0.0f, 1.0f), RendererDebugPage::CollisionStats);
 

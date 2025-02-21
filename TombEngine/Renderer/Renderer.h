@@ -232,7 +232,7 @@ namespace TEN::Renderer
 		std::vector<TexturePair>							   _staticTextures;
 		std::vector<Texture2D>								   _spritesTextures;
 
-		Matrix _playerWorldMatrix;
+		Matrix _laraWorldMatrix;
 
 		// Preallocated pools of objects for avoiding new/delete.
 		// Items and effects are safe (can't be more than 1024 items in TR), 
@@ -509,7 +509,7 @@ namespace TEN::Renderer
 							const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3,
 							BlendMode blendMode, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);
 
-		Matrix GetWorldMatrixForSprite(const RendererSpriteToDraw& sprite, RenderView& view);
+		Matrix GetWorldMatrixForSprite(RendererSpriteToDraw* spr, RenderView& view);
 		RendererObject& GetRendererObject(GAME_OBJECT_ID id);
 		RendererMesh* GetMesh(int meshIndex);
 		Texture2D CreateDefaultNormalTexture();

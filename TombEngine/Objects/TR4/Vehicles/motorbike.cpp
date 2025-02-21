@@ -386,8 +386,7 @@ namespace TEN::Entities::Vehicles
 			sptr->flags = SP_EXPDEF | SP_DEF | SP_SCALE;
 
 		sptr->scalar = 1;
-		sptr->SpriteSeqID = ID_DEFAULT_SPRITES;
-		sptr->SpriteID = 0;
+		sptr->spriteIndex = (unsigned char)Objects[ID_DEFAULT_SPRITES].meshIndex;
 		sptr->gravity = (GetRandomControl() & 3) - 4;
 		sptr->maxYvel = (GetRandomControl() & 7) - 8;
 		size = (GetRandomControl() & 7) + (speed / 128) + 32;

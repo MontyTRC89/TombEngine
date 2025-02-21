@@ -8,59 +8,43 @@ using namespace TEN::Math;
 
 namespace TEN::Scripting
 {
-	/// Represents a 3D rotation.
-	// All angle components are in degrees clamped to the range [0.0, 360.0].
+	/// Represents a degree-based 3D rotation.
+	// All values are clamped to the range [0.0, 360.0].
 	// @tenprimitive Rotation
 	// @pragma nostrip
 
 	void Rotation::Register(sol::table& parent)
 	{
-		using ctors = sol::constructors<
-			Rotation(float, float, float)>;
-
-		// Register type.
-		parent.new_usertype<Rotation>(
-			ScriptReserved_Rotation,
-			ctors(), sol::call_constructor, ctors(),
-
-			// Meta functions
+		using ctors = sol::constructors<Rotation(float, float, float)>;
+		parent.new_usertype<Rotation>(ScriptReserved_Rotation,
+			ctors(),
+			sol::call_constructor, ctors(),
 			sol::meta_function::to_string, &Rotation::ToString,
-
-			// Utilities
-			ScriptReserved_RotationLerp, &Rotation::Lerp,
 			ScriptReserved_RotationDirection, &Rotation::Direction,
 
-			/// (float) X angle component in degrees.
+			/// (float) X angle component.
 			// @mem x
 			"x", &Rotation::x,
 
-			/// (float) Y angle component in degrees.
+			/// (float) Y angle component.
 			// @mem y
 			"y", &Rotation::y,
 
-			/// (float) Z angle component in degrees.
+			/// (float) Z angle component.
 			// @mem z
 			"z", &Rotation::z);
 	}
 
-	/// Create a Rotation object.
+	/// @tparam float x X angle component.
+	// @tparam float y Y angle component.
+	// @tparam float z Z angle component.
+	// @treturn Rotation A Rotation.
 	// @function Rotation
-	// @tparam float x X angle component in degrees.
-	// @tparam float y Y angle component in degrees.
-	// @tparam float z Z angle component in degrees.
-	// @treturn Rotation A new Rotation object.
 	Rotation::Rotation(float x, float y, float z)
 	{
 		this->x = x;
 		this->y = y;
 		this->z = z;
-	}
-
-	Rotation::Rotation(const Vector3& vec)
-	{
-		x = vec.x;
-		y = vec.y;
-		z = vec.z;
 	}
 
 	Rotation::Rotation(const EulerAngles& eulers)
@@ -70,42 +54,60 @@ namespace TEN::Scripting
 		z = TO_DEGREES(eulers.z);
 	}
 
-	/// Get the linearly interpolated Rotation between this Rotation and the input Rotation according to the input alpha.
-	// @function Lerp
-	// @tparam Rotation rot Interpolation target.
-	// @tparam float alpha Interpolation alpha in the range [0, 1].
-	// @treturn Rotation Linearly interpolated rotation.
-	Rotation Rotation::Lerp(const Rotation& rot, float alpha) const
+	Rotation::Rotation(const Vector3& vec)
 	{
-		auto orientFrom = ToEulerAngles();
-		auto orientTo = rot.ToEulerAngles();
-		return Rotation(EulerAngles::Lerp(orientFrom, orientTo, alpha));
+		x = vec.x;
+		y = vec.y;
+		z = vec.z;
 	}
 
-	/// Get the normalized direction vector of this Rotation.
-	// @function Direction
-	// @treturn Vec3 Normalized direction vector.
-	Vec3 Rotation::Direction() const
+	Rotation::Rotation(const Pose& pose)
 	{
-		auto eulers = ToEulerAngles();
-		return Vec3(eulers.ToDirection());
+		x = TO_DEGREES(pose.Orientation.x);
+		y = TO_DEGREES(pose.Orientation.y);
+		z = TO_DEGREES(pose.Orientation.z);
 	}
 
-	/// @function __tostring
-	// @tparam Rotation rot This Rotation.
-	// @treturn string A string showing the X, Y, and Z angle components of this Rotation.
-	std::string Rotation::ToString() const
+	void Rotation::StoreInPHDPos(Pose& pose) const
 	{
-		return ("{" + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + "}");
-	}
-
-	EulerAngles Rotation::ToEulerAngles() const
-	{
-		return EulerAngles(ANGLE(x), ANGLE(y), ANGLE(z));
+		pose.Orientation.x = ANGLE(x);
+		pose.Orientation.y = ANGLE(y);
+		pose.Orientation.z = ANGLE(z);
 	}
 
 	Rotation::operator Vector3() const
 	{
 		return Vector3(x, y, z);
 	};
+
+	/// Converts rotation to a direction normal.
+	// @treturn Vec3 resulting normal calculated from this rotation.
+	// @function Direction
+	Vec3 Rotation::Direction() const
+	{
+		// Convert degrees to radians.
+		float xRad = x * RADIAN;
+		float yRad = y * RADIAN;
+
+		// Calculate the direction vector.
+		float dirX = sin(yRad) * cos(xRad);
+		float dirY = -sin(xRad);
+		float dirZ = cos(yRad) * cos(xRad);
+
+		// Scale by the given distance.
+		return Vec3(dirX, dirY, dirZ);
+	}
+
+	/// @tparam Rotation rotation this Rotation.
+	// @treturn string A string showing the X, Y, and Z angle components of the Rotation.
+	// @function __tostring
+	std::string Rotation::ToString() const
+	{
+		return ("{ " + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + " }");
+	}
+
+	EulerAngles Rotation::ToEulerAngles() const
+	{
+		return EulerAngles(ANGLE(x), ANGLE(y), ANGLE(z));
+	}
 }

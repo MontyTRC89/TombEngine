@@ -155,8 +155,7 @@ namespace TEN::Entities::Creatures::TR3
 		int scale = Random::GenerateInt(256, 384);
 
 		smoke.on = true;
-		smoke.SpriteSeqID = ID_DEFAULT_SPRITES;
-		smoke.SpriteID = 0;
+		smoke.spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex;
 		smoke.blendMode = BlendMode::Additive;
 		smoke.x = pos.x + Random::GenerateInt(-64, 64);
 		smoke.y = pos.y - Random::GenerateInt(0, 32);

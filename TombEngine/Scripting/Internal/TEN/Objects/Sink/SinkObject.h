@@ -1,49 +1,31 @@
 #pragma once
-
-#include "Objects/Sink.h"
 #include "Scripting/Internal/TEN/Objects/NamedBase.h"
+#include "Objects/Sink.h"
+#include "Math/Math.h"
 
 namespace sol { class state; }
-
 class Vec3;
 
-namespace TEN::Scripting::Objects
+class Sink : public NamedBase<Sink, SinkInfo &>
 {
-	class Sink : public NamedBase<Sink, SinkInfo&>
-	{
-	public:
-		static void Register(sol::table& parent);
+public:
+	using IdentifierType = std::reference_wrapper<SinkInfo>;
+	Sink(SinkInfo& ref);
+	~Sink() = default;
 
-	private:
-		// Fields
+	Sink& operator =(const Sink& other) = delete;
+	Sink(Sink const& other) = delete;
 
-		SinkInfo& _sink;
+	static void Register(sol::table& parent);
+	Vec3 GetPos() const;
+	void SetPos(const Vec3& pos);
 
-	public:
-		// Aliases
+	int GetStrength() const;
+	void SetStrength(int strength);
 
-		using IdentifierType = std::reference_wrapper<SinkInfo>;
+	std::string GetName() const;
+	void SetName(const std::string&);
 
-		// Constructors, destructors
-
-		Sink(SinkInfo& sink);
-		Sink(const Sink& sink) = delete;
-		~Sink() = default;
-
-		// Getters
-
-		std::string GetName() const;
-		Vec3		GetPosition() const;
-		int			GetStrength() const;
-
-		// Setters
-
-		void SetName(const std::string& name);
-		void SetPosition(const Vec3& pos);
-		void SetStrength(int strength);
-
-		// Operators
-
-		Sink& operator =(const Sink& other) = delete;
-	};
-}
+private:
+	SinkInfo& m_sink;
+};

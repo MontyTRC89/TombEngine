@@ -1,6 +1,7 @@
 #pragma once
-
+#include <optional>
 #include <spdlog/fmt/fmt.h>
+#include <string>
 
 enum class ErrorMode
 {
@@ -15,8 +16,7 @@ ErrorMode GetScriptErrorMode();
 void ScriptWarn(const std::string& msg);
 bool ScriptAssert(bool cond, const std::string& msg, std::optional<ErrorMode> forceMode = std::nullopt);
 
-template <typename ... Ts>
-bool ScriptAssertF(bool cond, std::string_view str, Ts...args)
+template <typename ... Ts> bool ScriptAssertF(bool cond, std::string_view str, Ts...args)
 {
 	if (!cond)
 	{
@@ -36,8 +36,7 @@ bool ScriptAssertF(bool cond, std::string_view str, Ts...args)
 	return cond;
 }
 
-template <typename ... Ts>
-bool ScriptAssertTerminateF(bool cond, std::string_view str, Ts...args)
+template <typename ... Ts> bool ScriptAssertTerminateF(bool cond, std::string_view str, Ts...args)
 {
 	if (!cond)
 	{

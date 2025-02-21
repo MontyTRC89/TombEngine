@@ -4,10 +4,6 @@
 #include "Scripting/Internal/TEN/Types/Color/Color.h"
 #include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 
-namespace TEN::Scripting::Types { class ScriptColor; }
-
-using namespace TEN::Scripting::Types;
-
 /***
 Constants for Display String Options.
 @enum Strings.DisplayStringOption

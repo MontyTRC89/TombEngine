@@ -4,10 +4,6 @@
 
 namespace sol { class state; }
 
-namespace TEN::Scripting::Types { class ScriptColor; }
-
-using namespace TEN::Scripting::Types;
-
 struct Fog
 {
 	bool Enabled{ false };
