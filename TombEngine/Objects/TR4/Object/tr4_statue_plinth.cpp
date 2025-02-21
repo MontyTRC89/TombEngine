@@ -48,9 +48,6 @@ namespace TEN::Entities::TR4
 		item->MeshBits = 1;
 	}
 
-	//TODO frame hardcore or check how puzzle items do
-	//TODO Switch actions - Will not work as the object will rotate to face lara and break the illusion.
-
 	void StatuePlinthCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* keyHoleItem = &g_Level.Items[itemNumber];
@@ -83,17 +80,10 @@ namespace TEN::Entities::TR4
 			laraItem->Animation.ActiveState == LS_IDLE &&
 			laraItem->Animation.AnimNumber == LA_STAND_IDLE);
 
-		//bool actionActive = player->Control.IsMoving && player->Context.InteractedItem == itemNumber;
-
 		if (isActionReady && isPlayerAvailable && !keyHoleItem->ItemFlags[0])
 		{
 			if (!keyHoleItem->ItemFlags[1])
 			{
-				//bounds = GetBoundsAccurate(item);
-				//StatuePlinthBounds[0] = bounds[0];
-				//StatuePlinthBounds[1] = bounds[1];
-				//StatuePlinthBounds[4] = bounds[4] - 200;
-				//StatuePlinthBounds[5] = bounds[4] + 200;
 				y_rot = keyHoleItem->Pose.Orientation.y;
 
 				int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
@@ -119,8 +109,6 @@ namespace TEN::Entities::TR4
 				default:
 					break;
 				}
-
-				//item->pos.y_rot = l->pos.y_rot;
 
 				if (TestLaraPosition(KeyHoleBounds, keyHoleItem, laraItem))
 				{
@@ -162,275 +150,20 @@ namespace TEN::Entities::TR4
 
 		if (laraItem->Animation.AnimNumber == LA_PICKUP_PEDESTAL_HIGH && laraItem->Animation.FrameNumber == GetAnimData(LA_PICKUP_PEDESTAL_HIGH).frameBase + 45 && keyHoleItem->ItemFlags[1])
 		{
-			//room_number = item->room_number;
-			//floor = GetFloor(item->pos.x_pos, item->pos.y_pos, item->pos.z_pos, &room_number);
-			//GetHeight(floor, item->pos.x_pos, item->pos.y_pos, item->pos.z_pos);
 			TestTriggers(keyHoleItem, true, keyHoleItem->Flags & 0x3E00);
 			keyHoleItem->Flags |= TRIGGERED;
 			keyHoleItem->Status = ITEM_ACTIVE;
 			keyHoleItem->MeshBits = 255;
+			//TODO: Allow meshswap of puzzle items.
+			//keyHoleItem->Model.MeshIndex[1] = Objects[keyItem].meshIndex + 0;
+			//keyHoleItem->Model.Mutators[0].Offset = Vector3(0.0f, -896.0f, 0.0f);
 			keyHoleItem->ItemFlags[0] = 1;
 			RemoveObjectFromInventory(keyItem, 1);
 		}
 		else
 		{
-			//keyHoleItem->ItemFlags[1] = 0;
 			ObjectCollision(itemNumber, laraItem, coll);
 		}
 	}
 }
-		/*
-		if (actionActive || (isActionReady && isPlayerAvailable ))
-		{
-
-			int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
-			keyHoleItem->DisableInterpolation = true;
-			switch (quadrant)
-			{
-			case NORTH:
-				keyHoleItem->Pose.Orientation.y = ANGLE(0.0f);
-				break;
-
-			case EAST:
-				keyHoleItem->Pose.Orientation.y = ANGLE(90.0f);
-				break;
-
-			case SOUTH:
-				keyHoleItem->Pose.Orientation.y = ANGLE(180.0f);
-				break;
-
-			case WEST:
-				keyHoleItem->Pose.Orientation.y = ANGLE(270.0f);
-				break;
-
-			default:
-				break;
-			}
-
-			if (TestLaraPosition(KeyHoleBounds, keyHoleItem, laraItem))
-			{
-				//TENLog("TestLara complete", LogLevel::Error, LogConfig::All, false);
-				if (!player->Control.IsMoving)
-				{
-					if (keyHoleItem->Status != ITEM_NOT_ACTIVE)// && triggerType != TRIGGER_TYPES::SWITCH)
-					{
-						keyHoleItem->Pose.Orientation.y = y_rot;
-						return;
-					}
-
-					if (g_Gui.GetInventoryItemChosen() == NO_VALUE)
-					{
-						if (g_Gui.IsObjectInInventory(keyItem))
-						{
-							g_Gui.SetEnterInventory(keyItem);
-							keyHoleItem->Pose.Orientation.y = y_rot;
-						}
-						return;
-					}
-
-					if (g_Gui.GetInventoryItemChosen() != keyItem)
-						return;
-
-					player->Context.InteractedItem = itemNumber;
-				}
-
-				if (player->Context.InteractedItem != itemNumber)
-					return;
-
-				if (MoveLaraPosition(KeyHolePosition, keyHoleItem, laraItem))
-				{
-					keyHoleItem->Pose.Orientation.y = y_rot;
-
-					//if (triggerType = TRIGGER_TYPES::SWITCH)
-					//	keyHoleItem->ItemFlags[1] = true;
-
-					//int animNumber = abs(keyHoleItem->TriggerFlags);
-					//if (keyHoleItem->TriggerFlags <= 0)
-					//{
-					//	auto objectID = GAME_OBJECT_ID(keyItem);
-						RemoveObjectFromInventory(keyItem, 1);
-					//}
-
-					//if (keyHoleItem->TriggerFlags == 0)
-					//{
-						laraItem->Animation.AnimNumber = LA_PICKUP_PEDESTAL_HIGH;
-					//}
-					//else
-					//{
-					//	laraItem->Animation.AnimNumber = animNumber;
-					//}
-
-					laraItem->Animation.ActiveState = LS_INSERT_KEY;
-					laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
-					player->Control.IsMoving = false;
-					ResetPlayerFlex(laraItem);
-					player->Control.HandStatus = HandStatus::Busy;
-					keyHoleItem->Flags |= TRIGGERED;
-					keyHoleItem->Status = ITEM_ACTIVE;
-					keyHoleItem->MeshBits = 255;
-				}
-
-				g_Gui.SetInventoryItemChosen(NO_VALUE);
-				return;
-			}
-			//laraItem->Animation.AnimNumber == LA_PICKUP_PEDESTAL_HIGH && laraItem->Animation.FrameNumber == GetAnimData(laraItem).frameBase + 45
-			//player->Control.IsMoving && player->Context.InteractedItem == itemNumber
-			if (player->Control.IsMoving && player->Context.InteractedItem == itemNumber)
-			{
-					player->Control.IsMoving = false;
-					player->Control.HandStatus = HandStatus::Free;
-			}
-		}
-		else
-		{
-			ObjectCollision(itemNumber, laraItem, coll);
-		}
-
-		keyHoleItem->Pose.Orientation.y = y_rot;
-		return;
-	}
-	}*/
-/*
-void StatuePlinthCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
-{
-	auto* keyHoleItem = &g_Level.Items[itemNumber];
-	auto* player = GetLaraInfo(laraItem);
-
-	short* triggerIndexPtr = GetTriggerIndex(keyHoleItem);
-	short y_rot = keyHoleItem->Pose.Orientation.y;
-
-	GAME_OBJECT_ID keyItem;
-
-	//There are only 16 puzzle items. -1 is added to keep the OCB aligned with Puzzle Item number.
-	if (keyHoleItem->TriggerFlags < 17 && keyHoleItem->TriggerFlags > 0)
-	{
-		keyItem = GAME_OBJECT_ID(keyHoleItem->TriggerFlags + ID_PUZZLE_ITEM1 - 1);
-
-	}
-	else
-	{
-		keyItem = ID_PUZZLE_ITEM1;
-	}
-
-	if (triggerIndexPtr == nullptr)
-		return;
-
-	short triggerType = (*(triggerIndexPtr++) >> 8) & TRIGGER_BITS;
-
-	bool isActionReady = (IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() != NO_VALUE);
-
-	bool isPlayerAvailable = (player->Control.Look.OpticRange == 0 &&
-		laraItem->Animation.ActiveState == LS_IDLE &&
-		laraItem->Animation.AnimNumber == LA_STAND_IDLE);
-
-	bool actionActive = player->Control.IsMoving && player->Context.InteractedItem == itemNumber;
-
-	if (actionActive || (isActionReady && isPlayerAvailable))
-	{
-
-		int quadrant = GetQuadrant(LaraItem->Pose.Orientation.y);
-		keyHoleItem->DisableInterpolation = true;
-		switch (quadrant)
-		{
-		case NORTH:
-			keyHoleItem->Pose.Orientation.y = ANGLE(0.0f);
-			break;
-
-		case EAST:
-			keyHoleItem->Pose.Orientation.y = ANGLE(90.0f);
-			break;
-
-		case SOUTH:
-			keyHoleItem->Pose.Orientation.y = ANGLE(180.0f);
-			break;
-
-		case WEST:
-			keyHoleItem->Pose.Orientation.y = ANGLE(270.0f);
-			break;
-
-		default:
-			break;
-		}
-
-		if (TestLaraPosition(KeyHoleBounds, keyHoleItem, laraItem))
-		{
-			//TENLog("TestLara complete", LogLevel::Error, LogConfig::All, false);
-			if (!player->Control.IsMoving)
-			{
-				if (keyHoleItem->Status != ITEM_NOT_ACTIVE && triggerType != TRIGGER_TYPES::SWITCH)
-				{
-					keyHoleItem->Pose.Orientation.y = y_rot;
-					return;
-				}
-
-				if (g_Gui.GetInventoryItemChosen() == NO_VALUE)
-				{
-					if (g_Gui.IsObjectInInventory(keyItem))
-						g_Gui.SetEnterInventory(keyItem);
-
-					return;
-				}
-
-				if (g_Gui.GetInventoryItemChosen() != keyItem)
-					return;
-
-				player->Context.InteractedItem = itemNumber;
-			}
-
-			if (player->Context.InteractedItem != itemNumber)
-				return;
-
-			if (MoveLaraPosition(KeyHolePosition, keyHoleItem, laraItem))
-			{
-				keyHoleItem->Pose.Orientation.y = y_rot;
-
-				if (triggerType = TRIGGER_TYPES::SWITCH)
-					keyHoleItem->ItemFlags[1] = true;
-
-				//int animNumber = abs(keyHoleItem->TriggerFlags);
-				//if (keyHoleItem->TriggerFlags <= 0)
-				//{
-				//	auto objectID = GAME_OBJECT_ID(keyItem);
-				RemoveObjectFromInventory(keyItem, 1);
-				//}
-
-				//if (keyHoleItem->TriggerFlags == 0)
-				//{
-				laraItem->Animation.AnimNumber = LA_PICKUP_PEDESTAL_HIGH;
-				//}
-				//else
-				//{
-				//	laraItem->Animation.AnimNumber = animNumber;
-				//}
-
-				laraItem->Animation.ActiveState = LS_INSERT_KEY;
-				laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
-				player->Control.IsMoving = false;
-				ResetPlayerFlex(laraItem);
-				player->Control.HandStatus = HandStatus::Busy;
-				keyHoleItem->Flags |= TRIGGERED;
-				keyHoleItem->Status = ITEM_ACTIVE;
-				keyHoleItem->MeshBits = 255;
-			}
-
-			g_Gui.SetInventoryItemChosen(NO_VALUE);
-			return;
-		}
-		//laraItem->Animation.AnimNumber == LA_PICKUP_PEDESTAL_HIGH && laraItem->Animation.FrameNumber == GetAnimData(laraItem).frameBase + 45
-		if (player->Control.IsMoving && player->Context.InteractedItem == itemNumber)
-		{
-
-			player->Control.IsMoving = false;
-			player->Control.HandStatus = HandStatus::Free;
-		}
-	}
-	else
-	{
-		ObjectCollision(itemNumber, laraItem, coll);
-	}
-
-	keyHoleItem->Pose.Orientation.y = y_rot;
-	return;
-}
-}
-*/
+		
