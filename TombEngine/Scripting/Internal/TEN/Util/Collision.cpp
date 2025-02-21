@@ -86,7 +86,7 @@ namespace TEN::Scripting::Util
 			return sol::nullopt;
 
 		int height = _pointCollision.GetFloorHeight();
-		if (height != NO_VALUE)
+		if (height != NO_HEIGHT)
 			return height;
 
 		return sol::nullopt;
@@ -98,7 +98,7 @@ namespace TEN::Scripting::Util
 			return sol::nullopt;
 
 		int height = _pointCollision.GetCeilingHeight();
-		if (height != NO_VALUE)
+		if (height != NO_HEIGHT)
 			return height;
 
 		return sol::nullopt;
@@ -126,7 +126,7 @@ namespace TEN::Scripting::Util
 			return sol::nullopt;
 
 		int height = _pointCollision.GetWaterSurfaceHeight();
-		if (height != NO_VALUE)
+		if (height != NO_HEIGHT)
 			return height;
 
 		return sol::nullopt;
