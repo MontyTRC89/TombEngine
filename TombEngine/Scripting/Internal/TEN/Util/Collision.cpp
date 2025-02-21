@@ -104,20 +104,20 @@ namespace TEN::Scripting::Util
 		return sol::nullopt;
 	}
 
-	sol::optional<Vector3> ScriptCollision::GetFloorNormal()
+	sol::optional<Vec3> ScriptCollision::GetFloorNormal()
 	{
 		if (_pointCollision.IsWall())
 			return sol::nullopt;
 
-		return Vector3(_pointCollision.GetFloorNormal());
+		return Vec3(_pointCollision.GetFloorNormal());
 	}
 
-	sol::optional<Vector3> ScriptCollision::GetCeilingNormal()
+	sol::optional<Vec3> ScriptCollision::GetCeilingNormal()
 	{
 		if (_pointCollision.IsWall())
 			return sol::nullopt;
 
-		return Vector3(_pointCollision.GetCeilingNormal());
+		return Vec3(_pointCollision.GetCeilingNormal());
 	}
 
 	sol::optional<int> ScriptCollision::GetWaterSurfaceHeight()

@@ -37,10 +37,10 @@ namespace TEN::Scripting::Util
 		Vec3 GetPosition();
 		int  GetRoomNumber();
 
-		sol::optional<int>	   GetFloorHeight();
-		sol::optional<int>	   GetCeilingHeight();
-		sol::optional<Vector3> GetFloorNormal();
-		sol::optional<Vector3> GetCeilingNormal();
+		sol::optional<int>	GetFloorHeight();
+		sol::optional<int>	GetCeilingHeight();
+		sol::optional<Vec3> GetFloorNormal();
+		sol::optional<Vec3> GetCeilingNormal();
 
 		sol::optional<int> GetWaterSurfaceHeight();
 
