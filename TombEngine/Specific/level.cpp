@@ -1393,7 +1393,7 @@ bool LoadLevel(const std::string& path, bool partial)
 		InitializeNeighborRoomList();
 		GetCarriedItems();
 		GetAIPickups();
-		g_GameScriptEntities->AssignLara();
+		g_GameScriptEntities->AssignPlayer();
 		UpdateProgress(90, partial);
 
 		if (!partial)
@@ -1459,19 +1459,19 @@ void LoadSamples()
 
 	TENLog("Sample count: " + std::to_string(sampleCount), LogLevel::Info);
 
-	int uncompressedSize = 0;
-	int compressedSize = 0;
-	char* buffer = (char*)malloc(2 * 1024 * 1024);
+	std::vector<char> buffer;
+	buffer.reserve(2 * 1024 * 1024);
 
 	for (int i = 0; i < sampleCount; i++)
 	{
-		uncompressedSize = ReadInt32();
-		compressedSize = ReadInt32();
-		ReadBytes(buffer, compressedSize);
-		LoadSample(buffer, compressedSize, uncompressedSize, i);
-	}
+		int uncompressedSize = ReadInt32();
+		int compressedSize = ReadInt32();
 
-	free(buffer);
+		buffer.resize(compressedSize);
+
+		ReadBytes(buffer.data(), compressedSize);
+		LoadSample(buffer.data(), compressedSize, uncompressedSize, i);
+	}
 }
 
 void LoadBoxes()

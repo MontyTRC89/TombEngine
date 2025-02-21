@@ -1,6 +1,10 @@
 #include "framework.h"
 #include "Fog.h"
 
+#include "Scripting/Internal/TEN/Types/Color/Color.h"
+
+using namespace TEN::Scripting::Types;
+
 /***
 Distance fog.
 
