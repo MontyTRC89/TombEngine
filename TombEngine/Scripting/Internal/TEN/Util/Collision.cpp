@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "Scripting/Internal/TEN/Util/Collision.h"
+#include "Scripting/Internal/TEN/Util/FloorMaterial.h"
 
 #include "Game/collision/Point.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
@@ -35,6 +36,7 @@ namespace TEN::Scripting::Util
 			"GetFloorNormal", &ScriptCollision::GetFloorNormal,
 			"GetCeilingNormal", &ScriptCollision::GetCeilingNormal,
 			"GetWaterSurfaceHeight", &ScriptCollision::GetWaterSurfaceHeight,
+			"GetSurfaceMaterial", & ScriptCollision::GetSurfaceMaterial,
 
 			// Inquirers
 
@@ -130,6 +132,16 @@ namespace TEN::Scripting::Util
 			return height;
 
 		return sol::nullopt;
+	}
+
+	sol::optional<MaterialType> ScriptCollision::GetSurfaceMaterial()
+	{
+		if (_pointCollision.IsWall())
+			return sol::nullopt;
+		
+		auto material = (_pointCollision.GetBottomSector().GetSurfaceMaterial(_pointCollision.GetPosition().x, _pointCollision.GetPosition().z, true));
+		
+		return material;
 	}
 
 	bool ScriptCollision::IsSteepFloor()

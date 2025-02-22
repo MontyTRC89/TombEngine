@@ -41,6 +41,7 @@ namespace TEN::Scripting::Util
 		sol::optional<int>	GetCeilingHeight();
 		sol::optional<Vec3> GetFloorNormal();
 		sol::optional<Vec3> GetCeilingNormal();
+		sol::optional<MaterialType> GetSurfaceMaterial();
 
 		sol::optional<int> GetWaterSurfaceHeight();
 
@@ -50,4 +51,5 @@ namespace TEN::Scripting::Util
 		bool IsSteepCeiling();
 		bool IsWall();
     };
+
 }
