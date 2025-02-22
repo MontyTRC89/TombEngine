@@ -49,6 +49,5 @@ namespace TEN::Scripting::Util
         { "Custom7", MaterialType::Custom7 },
         { "Custom8", MaterialType::Custom8 }
 	};
-
 }
 

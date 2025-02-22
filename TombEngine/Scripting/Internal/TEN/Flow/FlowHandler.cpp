@@ -321,8 +321,8 @@ Specify which translations in the strings table correspond to which languages.
 
 	// Util
 	ScriptCollision::Register(tableFlow);
-	_handler.MakeReadOnlyTable(tableFlow, "FloorMaterialType", FLOOR_MATERIAL);
-
+	
+	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_FloorMaterialType, FLOOR_MATERIAL);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, WEATHER_TYPES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, PLAYER_TYPES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_RotationAxis, ROTATION_AXES);

@@ -51,6 +51,9 @@ namespace TEN::Scripting::Util
 		bool IsSteepFloor();
 		bool IsSteepCeiling();
 		bool IsWall();
+		bool IsClimbableWall(short angle);
+		bool IsMonkeySwing();
+		bool IsDeath();
     };
 
 }

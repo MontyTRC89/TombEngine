@@ -3,6 +3,7 @@
 #include "Scripting/Internal/TEN/Util/FloorMaterial.h"
 
 #include "Game/collision/Point.h"
+#include "Game/Lara/lara_climb.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 
@@ -42,7 +43,10 @@ namespace TEN::Scripting::Util
 
 			"IsWall", &ScriptCollision::IsWall,
 			"IsSteepFloor", &ScriptCollision::IsSteepFloor,
-			"IsSteepCeiling", &ScriptCollision::IsSteepCeiling);
+			"IsSteepCeiling", &ScriptCollision::IsSteepCeiling,
+			"IsClimbableWall", & ScriptCollision::IsClimbableWall,
+			"IsMonkeySwing", & ScriptCollision::IsMonkeySwing,
+			"IsDeathTile", & ScriptCollision::IsDeath);
 
     }
 
@@ -164,5 +168,26 @@ namespace TEN::Scripting::Util
 	bool ScriptCollision::IsWall()
 	{
 		return _pointCollision.IsWall();
+	}
+
+	bool ScriptCollision::IsClimbableWall(short angle)
+	{
+		auto check = (_pointCollision.GetBottomSector().Flags.IsWallClimbable(GetClimbDirectionFlags(angle)));
+
+		return check;
+	}
+
+	bool ScriptCollision::IsMonkeySwing()
+	{
+		auto check = (_pointCollision.GetTopSector().Flags.Monkeyswing);
+
+		return check;
+	}
+
+	bool ScriptCollision::IsDeath()
+	{
+		auto check = (_pointCollision.GetBottomSector().Flags.Death);
+
+		return check;
 	}
 }
