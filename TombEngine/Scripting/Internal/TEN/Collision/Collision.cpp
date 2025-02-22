@@ -10,8 +10,8 @@ using namespace TEN::Collision::Point;
 
 namespace TEN::Scripting::Collision
 {
-	/// Represents a collision object in the game world.
-	// Provides collision information at a given world position.
+	/// Represents collision in the game world.
+	// Provides collision information from a given world position.
 	//
 	// @tenclass Collision.Collision
 	// pragma nostrip
