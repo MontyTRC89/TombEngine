@@ -30,18 +30,17 @@ namespace TEN::Scripting::Collision
 			ctors(), sol::call_constructor, ctors(),
 
 			// Getters
-
 			"GetPosition", &ScriptCollision::GetPosition,
 			"GetRoomNumber", &ScriptCollision::GetRoomNumber,
 			"GetFloorHeight", &ScriptCollision::GetFloorHeight,
+			"GetWaterSurfaceHeight", &ScriptCollision::GetWaterSurfaceHeight,
 			"GetCeilingHeight", &ScriptCollision::GetCeilingHeight,
 			"GetFloorNormal", &ScriptCollision::GetFloorNormal,
 			"GetCeilingNormal", &ScriptCollision::GetCeilingNormal,
-			"GetWaterSurfaceHeight", &ScriptCollision::GetWaterSurfaceHeight,
-			"GetSurfaceMaterial", &ScriptCollision::GetSurfaceMaterial,
+			"GetFloorMaterialType", &ScriptCollision::GetFloorMaterialType,
+			"GetCeilingMaterialType", &ScriptCollision::GetCeilingMaterialType,
 
 			// Inquirers
-			
 			"IsSteepFloor", &ScriptCollision::IsSteepFloor,
 			"IsSteepCeiling", &ScriptCollision::IsSteepCeiling,
 			"IsInsideSolidGeometry", &ScriptCollision::IsInsideSolidGeometry,
@@ -141,13 +140,23 @@ namespace TEN::Scripting::Collision
 		return Vec3(_pointCollision.GetCeilingNormal());
 	}
 
-	sol::optional<MaterialType> ScriptCollision::GetSurfaceMaterial()
+	sol::optional<MaterialType> ScriptCollision::GetFloorMaterialType()
 	{
 		if (_pointCollision.IsWall())
 			return sol::nullopt;
 		
 		const auto& sector = _pointCollision.GetBottomSector();
 		auto material = sector.GetSurfaceMaterial(_pointCollision.GetPosition().x, _pointCollision.GetPosition().z, true);
+		return material;
+	}
+	
+	sol::optional<MaterialType> ScriptCollision::GetCeilingMaterialType()
+	{
+		if (_pointCollision.IsWall())
+			return sol::nullopt;
+		
+		const auto& sector = _pointCollision.GetTopSector();
+		auto material = sector.GetSurfaceMaterial(_pointCollision.GetPosition().x, _pointCollision.GetPosition().z, false);
 		return material;
 	}
 
