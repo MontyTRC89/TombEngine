@@ -19,6 +19,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed flickering rat emitter.
 * Fixed player model submerging into the floor while swimming underwater.
 * Fixed custom shatter sounds with custom sound IDs not playing correctly.
+* Fixed crashes with sound samples larger than 2 megabytes.
 
 ### New Features
 * Added multithreading and an option for it to flow system settings.
