@@ -43,6 +43,7 @@ namespace TEN::Scripting::Collision
 			// Inquirers
 			"IsSteepFloor", &ScriptCollision::IsSteepFloor,
 			"IsSteepCeiling", &ScriptCollision::IsSteepCeiling,
+			"IsWall", &ScriptCollision::IsWall,
 			"IsInsideSolidGeometry", &ScriptCollision::IsInsideSolidGeometry,
 			"IsClimbableWall", &ScriptCollision::IsClimbableWall,
 			"IsMonkeySwing", &ScriptCollision::IsMonkeySwing,
@@ -173,6 +174,11 @@ namespace TEN::Scripting::Collision
 			return false;
 
 		return _pointCollision.IsSteepCeiling();
+	}
+
+	bool ScriptCollision::IsWall()
+	{
+		return _pointCollision.IsWall();
 	}
 
 	bool ScriptCollision::IsInsideSolidGeometry()
