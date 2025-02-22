@@ -47,10 +47,10 @@ namespace TEN::Scripting::Collision
 
 		// Inquirers
 
-		bool IsOutOfBounds();
-		bool IsWall();
 		bool IsSteepFloor();
 		bool IsSteepCeiling();
+		bool IsWall();
+		bool IsInsideSolidGeometry();
 		bool IsClimbableWall(float headingAngle);
 		bool IsMonkeySwing();
 		bool IsDeath();

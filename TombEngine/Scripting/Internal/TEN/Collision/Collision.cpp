@@ -44,7 +44,7 @@ namespace TEN::Scripting::Collision
 			
 			"IsSteepFloor", &ScriptCollision::IsSteepFloor,
 			"IsSteepCeiling", &ScriptCollision::IsSteepCeiling,
-			"IsOutOfBounds", &ScriptCollision::IsOutOfBounds,
+			"IsInsideSolidGeometry", &ScriptCollision::IsInsideSolidGeometry,
 			"IsWall", &ScriptCollision::IsWall,
 			"IsClimbableWall", &ScriptCollision::IsClimbableWall,
 			"IsMonkeySwing", &ScriptCollision::IsMonkeySwing,
@@ -167,7 +167,12 @@ namespace TEN::Scripting::Collision
 		return _pointCollision.IsSteepCeiling();
 	}
 
-	bool ScriptCollision::IsOutOfBounds()
+	bool ScriptCollision::IsWall()
+	{
+		return _pointCollision.IsWall();
+	}
+
+	bool ScriptCollision::IsInsideSolidGeometry()
 	{
 		if (_pointCollision.IsWall() ||
 			_pointCollision.GetPosition().y > _pointCollision.GetFloorHeight() ||
@@ -177,11 +182,6 @@ namespace TEN::Scripting::Collision
 		}
 
 		return false;
-	}
-
-	bool ScriptCollision::IsWall()
-	{
-		return _pointCollision.IsWall();
 	}
 
 	bool ScriptCollision::IsClimbableWall(float headingAngle)
