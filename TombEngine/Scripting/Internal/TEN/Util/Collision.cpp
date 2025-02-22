@@ -1,6 +1,5 @@
 #include "framework.h"
 #include "Scripting/Internal/TEN/Util/Collision.h"
-#include "Scripting/Internal/TEN/Util/FloorMaterial.h"
 
 #include "Game/collision/Point.h"
 #include "Game/Lara/lara_climb.h"
@@ -111,6 +110,18 @@ namespace TEN::Scripting::Util
 		return sol::nullopt;
 	}
 
+	sol::optional<int> ScriptCollision::GetWaterSurfaceHeight()
+	{
+		if (_pointCollision.IsWall())
+			return sol::nullopt;
+
+		int height = _pointCollision.GetWaterSurfaceHeight();
+		if (height != NO_HEIGHT)
+			return height;
+
+		return sol::nullopt;
+	}
+
 	sol::optional<Vec3> ScriptCollision::GetFloorNormal()
 	{
 		if (_pointCollision.IsWall())
@@ -127,26 +138,14 @@ namespace TEN::Scripting::Util
 		return Vec3(_pointCollision.GetCeilingNormal());
 	}
 
-	sol::optional<int> ScriptCollision::GetWaterSurfaceHeight()
-	{
-		if (_pointCollision.IsWall())
-			return sol::nullopt;
-
-		int height = _pointCollision.GetWaterSurfaceHeight();
-		if (height != NO_HEIGHT)
-			return height;
-
-		return sol::nullopt;
-	}
-
 	sol::optional<MaterialType> ScriptCollision::GetSurfaceMaterial()
 	{
 		if (_pointCollision.IsWall())
 			return sol::nullopt;
 		
-		auto material = (_pointCollision.GetBottomSector().GetSurfaceMaterial(_pointCollision.GetPosition().x, _pointCollision.GetPosition().z, true));
-		
-		return (MaterialType)material;
+		const auto& sector = _pointCollision.GetBottomSector();
+		auto material = sector.GetSurfaceMaterial(_pointCollision.GetPosition().x, _pointCollision.GetPosition().z, true);
+		return material;
 	}
 
 	bool ScriptCollision::IsSteepFloor()
@@ -170,24 +169,22 @@ namespace TEN::Scripting::Util
 		return _pointCollision.IsWall();
 	}
 
-	bool ScriptCollision::IsClimbableWall(short angle)
+	bool ScriptCollision::IsClimbableWall(float headingAngle)
 	{
-		auto check = (_pointCollision.GetBottomSector().Flags.IsWallClimbable(GetClimbDirectionFlags(ANGLE(angle))));
-
-		return check;
+		const auto& sector = _pointCollision.GetBottomSector();
+		auto dirFlag = GetClimbDirectionFlags(ANGLE(headingAngle));
+		return sector.Flags.IsWallClimbable(dirFlag);
 	}
 
 	bool ScriptCollision::IsMonkeySwing()
 	{
-		auto check = (_pointCollision.GetTopSector().Flags.Monkeyswing);
-
-		return check;
+		const auto& sector = _pointCollision.GetTopSector();
+		return sector.Flags.Monkeyswing;
 	}
 
 	bool ScriptCollision::IsDeath()
 	{
-		auto check = (_pointCollision.GetBottomSector().Flags.Death);
-
-		return check;
+		const auto& sector = _pointCollision.GetBottomSector();
+		return sector.Flags.Death;
 	}
 }

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Game/collision/Point.h"
-#include "Scripting/Internal/TEN/Util/FloorMaterial.h"
 
 using namespace TEN::Collision::Point;
 
@@ -40,20 +39,19 @@ namespace TEN::Scripting::Util
 
 		sol::optional<int>	GetFloorHeight();
 		sol::optional<int>	GetCeilingHeight();
+		sol::optional<int>	GetWaterSurfaceHeight();
 		sol::optional<Vec3> GetFloorNormal();
 		sol::optional<Vec3> GetCeilingNormal();
-		sol::optional<MaterialType> GetSurfaceMaterial();
 
-		sol::optional<int> GetWaterSurfaceHeight();
+		sol::optional<MaterialType> GetSurfaceMaterial();
 
 		// Inquirers
 
 		bool IsSteepFloor();
 		bool IsSteepCeiling();
 		bool IsWall();
-		bool IsClimbableWall(short angle);
+		bool IsClimbableWall(float headingAngle);
 		bool IsMonkeySwing();
 		bool IsDeath();
     };
-
 }

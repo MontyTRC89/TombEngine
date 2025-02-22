@@ -39,7 +39,7 @@
   <li>    <a href="../1 modules/Logic.html">Logic</a></li>
   <li>    <a href="../1 modules/Objects.html">Objects</a></li>
   <li>    <a href="../1 modules/Sound.html">Sound</a></li>
-  <li>    <here>Strings</here></li>
+  <li>    <a href="../1 modules/Strings.html">Strings</a></li>
   <li>    <a href="../1 modules/Util.html">Util</a></li>
   <li>    <a href="../1 modules/View.html">View</a></li>
 </ul>
@@ -92,7 +92,7 @@
   <li>    <a href="../4 enums/Sound.SoundTrackType.html">Sound.SoundTrackType</a></li>
   <li>    <a href="../4 enums/Strings.DisplayStringOption.html">Strings.DisplayStringOption</a></li>
   <li>    <a href="../4 enums/Util.LogLevel.html">Util.LogLevel</a></li>
-  <li>    <a href="../4 enums/Collision.MaterialType.html">Collision.MaterialType</a></li>
+  <li>    <here>Collision.MaterialType</here></li>
   <li>    <a href="../4 enums/View.AlignMode.html">View.AlignMode</a></li>
   <li>    <a href="../4 enums/View.CameraType.html">View.CameraType</a></li>
   <li>    <a href="../4 enums/View.PostProcessMode.html">View.PostProcessMode</a></li>
@@ -110,26 +110,18 @@
 
 <div id="content">
 
-<h1>Table <code>Strings</code></h1>
-<p>Display strings.</p>
+<h1>Enum <code>Collision.MaterialType</code></h1>
+<p>Constants for material types.</p>
 <p>
 
 </p>
 
 
-<h2><a href="#Functions">Functions</a></h2>
+<h2><a href="#Tables">Tables</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#ShowString">ShowString(str, time, autoDelete)</a></td>
-	<td class="summary">Show some text on-screen.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#HideString">HideString(str)</a></td>
-	<td class="summary">Hide some on-screen text.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#IsStringDisplaying">IsStringDisplaying(str)</a></td>
-	<td class="summary">Checks if the string is shown</td>
+	<td class="name" ><a href="#Collision.MaterialType">Collision.MaterialType</a></td>
+	<td class="summary">Table of Collision.MaterialType constants.</td>
 	</tr>
 </table>
 
@@ -137,91 +129,48 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
 
     <dl class="function">
     <dt>
-    <a name = "ShowString"></a>
-    <strong>ShowString(str, time, autoDelete)</strong>
+    <a name = "Collision.MaterialType"></a>
+    <strong>Collision.MaterialType</strong>
     </dt>
     <dd>
-    Show some text on-screen.
 
+<p>Table of Collision.MaterialType constants. </p>
 
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">str</span>
-            <span class="types"><span class="type">DisplayString</span></span>
-         the string object to draw
-        </li>
-        <li><span class="parameter">time</span>
-            <span class="types"><span class="type">float</span></span>
-         the time in seconds for which to show the string.
-If not given, the string will have an "infinite" life, and will show
-until <a href="../1 modules/Strings.html#HideString">HideString</a> is called or until the level is finished.
-Default: nil (i.e. infinite)
-        </li>
-        <li><span class="parameter">autoDelete</span>
-            <span class="types"><span class="type">bool</span></span>
-         should be string automatically deleted after timeout is reached.
-If not given, the string will remain allocated even after timeout is reached, and can be
-shown again without re-initialization.
-Default: true
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "HideString"></a>
-    <strong>HideString(str)</strong>
-    </dt>
-    <dd>
-    Hide some on-screen text.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">str</span>
-            <span class="types"><span class="type">DisplayString</span></span>
-         the string object to hide. Must previously have been shown
-with a call to <a href="../1 modules/Strings.html#ShowString">ShowString</a>, or this function will have no effect.
-        </li>
-    </ul>
+<ul>
+    <li><code>MUD</code></li>
+    <li><code>SNOW</code></li>
+    <li><code>SNOW</code></li>
+    <li><code>SAND</code></li>
+    <li><code>GRAVEL</code></li>
+    <li><code>ICE</code></li>
+    <li><code>WATER</code></li>
+    <li><code>STONE</code></li>
+    <li><code>WOOD</code></li>
+    <li><code>METAL</code></li>
+    <li><code>MARBLE</code></li>
+    <li><code>GRASS</code></li>
+    <li><code>CONCRETE</code></li>
+    <li><code>OLD_WOOD</code></li>
+    <li><code>OLD_METAL</code></li>
+    <li><code>CUSTOM_1</code></li>
+    <li><code>CUSTOM_2</code></li>
+    <li><code>CUSTOM_3</code></li>
+    <li><code>CUSTOM_4</code></li>
+    <li><code>CUSTOM_5</code></li>
+    <li><code>CUSTOM_6</code></li>
+    <li><code>CUSTOM_7</code></li>
+    <li><code>CUSTOM_8</code></li>
+</ul>
 
 
 
 
 
-</dd>
-    <dt>
-    <a name = "IsStringDisplaying"></a>
-    <strong>IsStringDisplaying(str)</strong>
-    </dt>
-    <dd>
-    Checks if the string is shown
 
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">str</span>
-            <span class="types"><span class="type">DisplayString</span></span>
-         the string object to be checked
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">bool</span></span>
-        true if it is shown, false if it is hidden
-    </ol>
 
 
 

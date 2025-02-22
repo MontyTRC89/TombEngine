@@ -22,6 +22,7 @@
 #include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/Util/Collision.h"
+#include "Scripting/Internal/TEN/Util/MaterialTypes.h"
 #include "Sound/sound.h"
 #include "Specific/trutils.h"
 
@@ -322,7 +323,7 @@ Specify which translations in the strings table correspond to which languages.
 	// Util
 	ScriptCollision::Register(tableFlow);
 	
-	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_FloorMaterialType, FLOOR_MATERIAL);
+	_handler.MakeReadOnlyTable(tableFlow, "MaterialType", MATERIAL_TYPES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, WEATHER_TYPES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, PLAYER_TYPES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_RotationAxis, ROTATION_AXES);
