@@ -1575,7 +1575,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 			hasHit = hasHitNotByEmitter = doShatter = true;
 			doExplosion = isExplosive;
 
-			if (Statics[staticPtr->staticNumber].shatterType == ShatterType::None)
+			if (Statics[staticPtr->ObjectId].shatterType == ShatterType::None)
 				continue;
 
 			staticPtr->HitPoints -= damage;
@@ -1585,8 +1585,8 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 			if (!isExplosive)
 				continue;
 
-			TriggerExplosionSparks(staticPtr->pos.Position.x, staticPtr->pos.Position.y, staticPtr->pos.Position.z, 3, -2, 0, projectile.RoomNumber);
-			auto pose = Pose(Vector3i(staticPtr->pos.Position.x, staticPtr->pos.Position.y - 128, staticPtr->pos.Position.z), EulerAngles(0, staticPtr->pos.Orientation.y, 0));
+			TriggerExplosionSparks(staticPtr->Transform.Position.x, staticPtr->Transform.Position.y, staticPtr->Transform.Position.z, 3, -2, 0, projectile.RoomNumber);
+			auto pose = Pose(Vector3i(staticPtr->Transform.Position.x, staticPtr->Transform.Position.y - 128, staticPtr->Transform.Position.z), EulerAngles(0, staticPtr->Transform.Orientation.y, 0));
 			TriggerShockwave(&pose, 40, 176, 64, 0, 96, 128, 16, EulerAngles::Identity, 0, true, false, false, (int)ShockwaveStyle::Normal);
 		}
 

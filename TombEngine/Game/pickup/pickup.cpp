@@ -903,9 +903,9 @@ void DropPickups(ItemInfo* item)
 
 		for (auto* staticPtr : collObjects.Statics)
 		{
-			auto& object = Statics[staticPtr->staticNumber];
+			auto& object = Statics[staticPtr->ObjectId];
 
-			auto box = object.collisionBox.ToBoundingOrientedBox(staticPtr->pos);
+			auto box = object.collisionBox.ToBoundingOrientedBox(staticPtr->Transform);
 			if (box.Intersects(sphere))
 			{
 				collidedWithObject = true;
@@ -1003,16 +1003,16 @@ const GameBoundingBox* FindPlinth(ItemInfo* item)
 	
 	for (int i = 0; i < room->mesh.size(); i++)
 	{
-		auto* mesh = &room->mesh[i];
+		const auto& staticObj = room->mesh[i];
 
-		if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
+		if (!(staticObj.Flags & StaticMeshFlags::SM_VISIBLE))
 			continue;
 
-		if (item->Pose.Position.x != mesh->pos.Position.x || item->Pose.Position.z != mesh->pos.Position.z)
+		if (item->Pose.Position.x != staticObj.Transform.Position.x || item->Pose.Position.z != staticObj.Transform.Position.z)
 			continue;
 
 		const auto& bounds = GetBestFrame(*item).BoundingBox;
-		auto& bBox = GetBoundsAccurate(*mesh, false);
+		auto& bBox = GetBoundsAccurate(staticObj, false);
 
 		if (bounds.X1 <= bBox.X2 && bounds.X2 >= bBox.X1 &&
 			bounds.Z1 <= bBox.Z2 && bounds.Z2 >= bBox.Z1 &&

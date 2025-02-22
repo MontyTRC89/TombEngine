@@ -1,6 +1,7 @@
 #include "framework.h"
 
 #include "Game/effects/debris.h"
+#include "Objects/game_object_ids.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/ScriptAssert.h"
@@ -30,28 +31,39 @@ namespace TEN::Scripting
 			sol::meta_function::index, IndexError,
 			sol::meta_function::new_index, NewIndexError,
 
+			// Getters
 			ScriptReserved_StaticGetName, &Static::GetName,
-			ScriptReserved_StaticGetSlot, &Static::GetSlot,
+			ScriptReserved_StaticGetObjectId, &Static::GetObjectId,
 			ScriptReserved_StaticGetPosition, &Static::GetPosition,
 			ScriptReserved_StaticGetRotation, &Static::GetRotation,
-			ScriptReserved_StaticGetScale, &Static::GetScale, // TODO: Deprecate. Should return Vec3 converted from static.Pose.Scale.
+			ScriptReserved_StaticGetScale, &Static::GetScale,
 			ScriptReserved_StaticGetColor, &Static::GetColor,
-			ScriptReserved_StaticGetHP, &Static::GetHitPoints, // TODO: Deprecate.
+			ScriptReserved_StaticGetHitPoints, &Static::GetHitPoints,
 			ScriptReserved_StaticGetActive, &Static::GetActiveStatus, // TODO: Deprecate. Rename Lua func to GetActiveStatus.
 			ScriptReserved_StaticGetSolid, &Static::GetSolidStatus, // TODO: Deprecate. Rename Lua func to GetSolidStatus.
 
+			// Setters
 			ScriptReserved_StaticSetName, &Static::SetName,
-			ScriptReserved_StaticSetSlot, &Static::SetSlot,
+			ScriptReserved_StaticSetObjectId, &Static::SetObjectId,
 			ScriptReserved_StaticSetPosition, &Static::SetPosition,
 			ScriptReserved_StaticSetRotation, &Static::SetRotation,
-			ScriptReserved_StaticSetScale, &Static::SetScale,
+			ScriptReserved_StaticSetScale, sol::overload(
+				(void(Static::*)(const Vec3&))(&Static::SetScale),
+				(void(Static::*)(float))(&Static::SetScale)), // COMPATIBILITY
 			ScriptReserved_StaticSetColor, &Static::SetColor,
-			ScriptReserved_StaticSetHitPoints, &Static::SetHitPoints, // TODO: Deprecate. Rename Lua func to SetHitPoints.
+			ScriptReserved_StaticSetHitPoints, &Static::SetHitPoints,
 			ScriptReserved_StaticSetSolid, &Static::SetSolidStatus, // TODO: Deprecate. Rename Lua func to SetSolidStatus.
 			
+			// Utilities
 			ScriptReserved_StaticEnable, &Static::Enable,
 			ScriptReserved_StaticDisable, &Static::Disable,
-			ScriptReserved_StaticShatter, &Static::Shatter);
+			ScriptReserved_StaticShatter, &Static::Shatter,
+			
+			// COMPATIBILITY
+			"GetSlot", &Static::GetObjectId,
+			"GetHP", &Static::GetHitPoints,
+			"SetSlot", &Static::SetObjectId,
+			"SetHP", &Static::SetHitPoints);
 	}
 
 	Static::Static(MESH_INFO& staticObj) :
@@ -67,12 +79,12 @@ namespace TEN::Scripting
 		return _static.Name;
 	}
 
-	/// Get this static's slot ID.
-	// @function Static:GetSlot
-	// @treturn int Slot ID.
-	int Static::GetSlot() const
+	/// Get this static's object ID.
+	// @function Static:GetObjectID
+	// @treturn Objects.ObjID Object ID.
+	GAME_OBJECT_ID Static::GetObjectId() const
 	{
-		return _static.staticNumber;
+		return _static.ObjectId;
 	}
 
 	/// Get this static's world position.
@@ -80,7 +92,7 @@ namespace TEN::Scripting
 	// @treturn Vec3 World position.
 	Vec3 Static::GetPosition() const
 	{
-		return Vec3(_static.pos.Position);
+		return Vec3(_static.Transform.Position);
 	}
 
 	/// Get this static's world rotation.
@@ -88,15 +100,15 @@ namespace TEN::Scripting
 	// @treturn Rotation World rotation.
 	Rotation Static::GetRotation() const
 	{
-		return Rotation(_static.pos.Orientation);
+		return Rotation(_static.Transform.Orientation);
 	}
 
 	/// Get this static's world scale.
 	// @function Static:GetScale
-	// @treturn float World scale.
-	float Static::GetScale() const
+	// @treturn Vec3 World scale.
+	Vec3 Static::GetScale() const
 	{
-		return _static.scale;
+		return Vec3(_static.Transform.Scale);
 	}
 
 	/// Get this static's color.
@@ -104,11 +116,11 @@ namespace TEN::Scripting
 	// @treturn Color Color.
 	ScriptColor Static::GetColor() const
 	{
-		return ScriptColor(_static.color);
+		return ScriptColor(_static.Color);
 	}
 
 	/// Get this static's hit points. Used only with shatterable statics.
-	// @function Static:GetHP
+	// @function Static:GetHitPoints
 	// @treturn int Hit points.
 	int Static::GetHitPoints() const
 	{
@@ -120,7 +132,7 @@ namespace TEN::Scripting
 	// @treturn bool Status.  __true: visible__, __false: invisible__
 	bool Static::GetActiveStatus() const
 	{
-		return ((_static.flags & StaticMeshFlags::SM_VISIBLE) != 0);
+		return ((_static.Flags & StaticMeshFlags::SM_VISIBLE) != 0);
 	}
 
 	/// Get this static's solid collision status.
@@ -128,7 +140,7 @@ namespace TEN::Scripting
 	// @treturn bool Solid Status. __true: solid__, __false: soft__
 	bool Static::GetSolidStatus() const
 	{
-		return ((_static.flags & StaticMeshFlags::SM_SOLID) != 0);
+		return ((_static.Flags & StaticMeshFlags::SM_SOLID) != 0);
 	}
 
 	/// Set this static's unique identifier string.
@@ -151,12 +163,12 @@ namespace TEN::Scripting
 		}
 	}
 
-	/// Set this static's slot ID.
-	// @function Static:SetSlot
-	// @tparam int slotID New slot ID.
-	void Static::SetSlot(int slotID)
+	/// Set this static's object ID.
+	// @function Static:SetObjectID
+	// @tparam Objects.ObjID slotID New object ID.
+	void Static::SetObjectId(GAME_OBJECT_ID objectId)
 	{
-		_static.staticNumber = slotID;
+		_static.ObjectId = objectId;
 		_static.Dirty = true;
 	}
 
@@ -165,7 +177,7 @@ namespace TEN::Scripting
 	// @tparam Vec3 pos New world position.
 	void Static::SetPosition(const Vec3& pos)
 	{
-		_static.pos.Position = pos.ToVector3i();
+		_static.Transform.Position = pos.ToVector3i();
 		_static.Dirty = true;
 	}
 
@@ -174,16 +186,16 @@ namespace TEN::Scripting
 	// @tparam Rotation rot New rotation.
 	void Static::SetRotation(const Rotation& rot)
 	{
-		_static.pos.Orientation = rot.ToEulerAngles();
+		_static.Transform.Orientation = rot.ToEulerAngles();
 		_static.Dirty = true;
 	}
 
 	/// Set this static's world scale.
 	// @function Static:SetScale
-	// @tparam float scale New world scale.
-	void Static::SetScale(float scale)
+	// @tparam Vec3 scale New world scale.
+	void Static::SetScale(const Vec3& scale)
 	{
-		_static.scale = scale;
+		_static.Transform.Scale = scale.ToVector3();
 		_static.Dirty = true;
 	}
 
@@ -192,12 +204,12 @@ namespace TEN::Scripting
 	// @tparam Color color New color.
 	void Static::SetColor(ScriptColor const& col)
 	{
-		_static.color = col;
+		_static.Color = col;
 		_static.Dirty = true;
 	}
 
 	/// Set this static's hit points. Used only with shatterable statics.
-	// @function Static:SetHP
+	// @function Static:SetHitPoints
 	// @tparam int hitPoints New hit points.
 	void Static::SetHitPoints(int hitPoints)
 	{
@@ -211,11 +223,11 @@ namespace TEN::Scripting
 	{
 		if (status)
 		{
-			_static.flags |= StaticMeshFlags::SM_SOLID;
+			_static.Flags |= StaticMeshFlags::SM_SOLID;
 		}
 		else
 		{
-			_static.flags &= ~StaticMeshFlags::SM_SOLID;
+			_static.Flags &= ~StaticMeshFlags::SM_SOLID;
 		}
 	}
 
@@ -223,20 +235,26 @@ namespace TEN::Scripting
 	// @function Static:Enable
 	void Static::Enable()
 	{
-		_static.flags |= StaticMeshFlags::SM_VISIBLE;
+		_static.Flags |= StaticMeshFlags::SM_VISIBLE;
 	}
 
 	/// Disable this static.
 	// @function Static:Disable
 	void Static::Disable()
 	{
-		_static.flags &= ~StaticMeshFlags::SM_VISIBLE;
+		_static.Flags &= ~StaticMeshFlags::SM_VISIBLE;
 	}
 
 	/// Shatter this static.
 	// @function Static:Shatter
 	void Static::Shatter()
 	{
-		ShatterObject(nullptr, &_static, -128, _static.roomNumber, 0);
+		ShatterObject(nullptr, &_static, -128, _static.RoomNumber, 0);
+	}
+
+	void Static::SetScale(float scale)
+	{
+		_static.Transform.Scale = Vector3(scale);
+		_static.Dirty = true;
 	}
 }
