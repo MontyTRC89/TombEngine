@@ -172,7 +172,7 @@ namespace TEN::Scripting::Util
 
 	bool ScriptCollision::IsClimbableWall(short angle)
 	{
-		auto check = (_pointCollision.GetBottomSector().Flags.IsWallClimbable(GetClimbDirectionFlags(angle)));
+		auto check = (_pointCollision.GetBottomSector().Flags.IsWallClimbable(GetClimbDirectionFlags(ANGLE(angle))));
 
 		return check;
 	}
