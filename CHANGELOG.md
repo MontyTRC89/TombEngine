@@ -3,7 +3,7 @@
 The dates are in European standard format where date is presented as **YYYY-MM-DD**.
 TombEngine releases are located in this repository (alongside with Tomb Editor): https://github.com/TombEngine/TombEditorReleases
 
-## [Version 1.7.X] (link to release) - yyyy-mm-dd
+## [Version 1.8](link to release) - yyyy-mm-dd
 
 ### Bug fixes
 * Fixed bridges moving the player when the player is underwater.
@@ -35,7 +35,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added additional arguments for Sprite object slot and starting rotation value for EmitParticle function.
 * Added various Translate() methods to Vec2 and Vec3 script objects.
   
-## [Version 1.7.1] (https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.4) - 2025-04-01
+## [Version 1.7.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.4) - 2025-04-01
 
 ### Bug fixes
 * Fixed static meshes with dynamic light mode not accepting room lights.
