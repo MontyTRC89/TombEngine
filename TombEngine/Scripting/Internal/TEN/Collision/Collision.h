@@ -49,7 +49,6 @@ namespace TEN::Scripting::Collision
 
 		bool IsSteepFloor();
 		bool IsSteepCeiling();
-		bool IsWall();
 		bool IsInsideSolidGeometry();
 		bool IsClimbableWall(float headingAngle);
 		bool IsMonkeySwing();
