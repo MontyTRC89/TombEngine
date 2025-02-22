@@ -11,6 +11,8 @@
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/Collision/Collision.h"
+#include "Scripting/Internal/TEN/Collision/MaterialTypes.h"
 #include "Scripting/Internal/TEN/Flow/Enums/ErrorModes.h"
 #include "Scripting/Internal/TEN/Flow/Enums/FreezeModes.h"
 #include "Scripting/Internal/TEN/Flow/Enums/GameStatuses.h"
@@ -21,13 +23,11 @@
 #include "Scripting/Internal/TEN/Types/Time/Time.h"
 #include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
-#include "Scripting/Internal/TEN/Util/Collision.h"
-#include "Scripting/Internal/TEN/Util/MaterialTypes.h"
 #include "Sound/sound.h"
 #include "Specific/trutils.h"
 
 using namespace TEN::Scripting;
-using namespace TEN::Scripting::Util;
+using namespace TEN::Scripting::Collision;
 
 /***
 Functions that (mostly) don't directly impact in-game mechanics. Used for setup
@@ -323,7 +323,7 @@ Specify which translations in the strings table correspond to which languages.
 	// Util
 	ScriptCollision::Register(tableFlow);
 	
-	_handler.MakeReadOnlyTable(tableFlow, "MaterialType", MATERIAL_TYPES);
+	_handler.MakeReadOnlyTable(tableFlow, "MaterialType", SCRIPT_MATERIAL_TYPES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, WEATHER_TYPES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, PLAYER_TYPES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_RotationAxis, ROTATION_AXES);

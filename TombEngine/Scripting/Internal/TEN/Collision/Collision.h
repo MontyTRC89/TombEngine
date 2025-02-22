@@ -7,7 +7,7 @@ using namespace TEN::Collision::Point;
 class Moveable;
 class Vec3;
 
-namespace TEN::Scripting::Util
+namespace TEN::Scripting::Collision
 {
 	// TODO:
 	// Integrate line of sight queries (LOS).
@@ -47,9 +47,10 @@ namespace TEN::Scripting::Util
 
 		// Inquirers
 
+		bool IsOutOfBounds();
+		bool IsWall();
 		bool IsSteepFloor();
 		bool IsSteepCeiling();
-		bool IsWall();
 		bool IsClimbableWall(float headingAngle);
 		bool IsMonkeySwing();
 		bool IsDeath();

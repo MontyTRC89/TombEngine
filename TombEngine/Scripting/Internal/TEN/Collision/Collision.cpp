@@ -1,17 +1,19 @@
 #include "framework.h"
-#include "Scripting/Internal/TEN/Util/Collision.h"
+#include "Scripting/Internal/TEN/Collision/Collision.h"
 
 #include "Game/collision/Point.h"
 #include "Game/Lara/lara_climb.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 
-namespace TEN::Scripting::Util
+using namespace TEN::Collision::Point;
+
+namespace TEN::Scripting::Collision
 {
 	/// Represents a collision object in the game world.
 	// Provides collision information at a given world position.
 	//
-	// @tenclass Objects.Collision
+	// @tenclass Collision.Collision
 	// pragma nostrip
 
     void ScriptCollision::Register(sol::table& parent)
@@ -36,16 +38,17 @@ namespace TEN::Scripting::Util
 			"GetFloorNormal", &ScriptCollision::GetFloorNormal,
 			"GetCeilingNormal", &ScriptCollision::GetCeilingNormal,
 			"GetWaterSurfaceHeight", &ScriptCollision::GetWaterSurfaceHeight,
-			"GetSurfaceMaterial", & ScriptCollision::GetSurfaceMaterial,
+			"GetSurfaceMaterial", &ScriptCollision::GetSurfaceMaterial,
 
 			// Inquirers
-
-			"IsWall", &ScriptCollision::IsWall,
+			
 			"IsSteepFloor", &ScriptCollision::IsSteepFloor,
 			"IsSteepCeiling", &ScriptCollision::IsSteepCeiling,
-			"IsClimbableWall", & ScriptCollision::IsClimbableWall,
-			"IsMonkeySwing", & ScriptCollision::IsMonkeySwing,
-			"IsDeathTile", & ScriptCollision::IsDeath);
+			"IsOutOfBounds", &ScriptCollision::IsOutOfBounds,
+			"IsWall", &ScriptCollision::IsWall,
+			"IsClimbableWall", &ScriptCollision::IsClimbableWall,
+			"IsMonkeySwing", &ScriptCollision::IsMonkeySwing,
+			"IsDeathTile", &ScriptCollision::IsDeath);
 
     }
 
@@ -56,7 +59,7 @@ namespace TEN::Scripting::Util
 
 	ScriptCollision::ScriptCollision(const Moveable& mov)
 	{
-		// TODO: *MUST* pass native ItemInfo moveable to allow PointCollisionData to handle quirks associated with the way moveable's update their room numebrs.
+		// TODO: *MUST* pass native ItemInfo moveable to allow PointCollisionData to handle quirks associated with the way moveables update their room numebrs.
 		// GetPointCollision(mov.GetNativeMoveable());
 
 		_pointCollision = GetPointCollision(mov.GetPosition().ToVector3i(), mov.GetRoomNumber());
@@ -162,6 +165,18 @@ namespace TEN::Scripting::Util
 			return false;
 
 		return _pointCollision.IsSteepCeiling();
+	}
+
+	bool ScriptCollision::IsOutOfBounds()
+	{
+		if (_pointCollision.IsWall() ||
+			_pointCollision.GetPosition().y > _pointCollision.GetFloorHeight() ||
+			_pointCollision.GetPosition().y < _pointCollision.GetCeilingHeight())
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	bool ScriptCollision::IsWall()
