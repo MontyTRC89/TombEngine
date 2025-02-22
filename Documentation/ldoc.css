@@ -32,9 +32,7 @@ span.types:after { content:")"; }
 body, td, th { font-size: .95em; line-height: 1.2em;}
 p { line-height: 1.2em;}
 
-ul { margin: 10px 0 0 0px;}
-
-p { margin: 3px 0px 0px 0px; }
+p, ul { margin: 10px 0 0 0px;}
 
 strong { font-weight: bold;}
 
@@ -64,10 +62,6 @@ hr {
 blockquote { margin-left: 3em; }
 
 ul { list-style-type: disc; }
-
-ul li:not(:last-child) {
-    margin-bottom: 0.3em;
-}
 
 p.name {
     font-family: "Andale Mono", monospace;
@@ -109,11 +103,11 @@ table.index td { text-align: left; vertical-align: top; }
 #main {
     background-color: #f0f0f0;
     border-left: 2px solid #cccccc;
-    display: flex
 }
 
 #navigation {
-    width: 18em;
+    float: left;
+    width: 16em;
     vertical-align: top;
     background-color: #f0f0f0;
     overflow: visible;
@@ -147,6 +141,7 @@ table.index td { text-align: left; vertical-align: top; }
 }
 
 #content {
+    margin-left: 18em;
     padding: 2em;
     width: 900px;
     border-left: 2px solid #cccccc;
