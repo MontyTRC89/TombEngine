@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Game/collision/Point.h"
+#include "Scripting/Internal/TEN/Util/FloorMaterial.h"
 
 using namespace TEN::Collision::Point;
 

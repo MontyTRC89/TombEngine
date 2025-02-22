@@ -43,6 +43,7 @@ namespace TEN::Scripting::Util
 			"IsWall", &ScriptCollision::IsWall,
 			"IsSteepFloor", &ScriptCollision::IsSteepFloor,
 			"IsSteepCeiling", &ScriptCollision::IsSteepCeiling);
+
     }
 
 	ScriptCollision::ScriptCollision(const Vec3& pos, int roomNumber)
@@ -141,7 +142,7 @@ namespace TEN::Scripting::Util
 		
 		auto material = (_pointCollision.GetBottomSector().GetSurfaceMaterial(_pointCollision.GetPosition().x, _pointCollision.GetPosition().z, true));
 		
-		return material;
+		return (MaterialType)material;
 	}
 
 	bool ScriptCollision::IsSteepFloor()
