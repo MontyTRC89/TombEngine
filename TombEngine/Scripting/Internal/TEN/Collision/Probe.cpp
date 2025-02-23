@@ -13,7 +13,7 @@ namespace TEN::Scripting::Collision
 	/// Represents a collision probe in the game world.
 	// Provides collision information from a reference world position.
 	//
-	// @tenclass Collision.Collision
+	// @tenclass Collision.Probe
 	// pragma nostrip
 
     void ScriptProbe::Register(sol::table& parent)
