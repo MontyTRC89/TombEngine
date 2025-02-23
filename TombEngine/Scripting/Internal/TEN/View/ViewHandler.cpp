@@ -11,6 +11,7 @@
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
 #include "Scripting/Internal/TEN/Types/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/View/AlignModes.h"
 #include "Scripting/Internal/TEN/View/CameraTypes.h"
@@ -108,6 +109,24 @@ namespace TEN::Scripting::View
 	{
 		UseSpotCam = true;
 		InitializeSpotCam(flyby);
+	}
+
+	static Vec3 GetFlyByPosition(short flyby, float progress)
+	{
+		auto& result = GetCameraTransform(flyby, progress / 100.0f);
+		return Vec3(result.Position);
+	}
+
+	static Rotation GetFlyByRotation(short flyby, float progress)
+	{
+		auto& result = GetCameraTransform(flyby, progress / 100.0f);
+
+		return
+		{
+			TO_DEGREES(result.Orientation.x),
+			TO_DEGREES(result.Orientation.y),
+			TO_DEGREES(result.Orientation.z)
+		};
 	}
 
 	static void FlashScreen(TypeOrNil<ScriptColor> col, TypeOrNil<float> speed)
@@ -220,10 +239,24 @@ namespace TEN::Scripting::View
 		//@tparam Color tint value to use.
 		tableView.set_function(ScriptReserved_SetPostProcessTint, &SetPostProcessTint);
 
-		///Enable FlyBy with specific ID
+		///Play flyby sequence with specific ID
 		//@function PlayFlyBy
 		//@tparam short flyby (ID of flyby)
 		tableView.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
+
+		///Get flyby sequence's position at a specified point in time
+		//@function GetFlyByPosition
+		//@tparam short flyby (ID of flyby)
+		//@tparam float time point in time of a flyby in percent. Clamped to [0, 100].
+		//@treturn Vec3 flyby position at a specified point in time
+		tableView.set_function(ScriptReserved_GetFlyByPosition, &GetFlyByPosition);
+
+		///Get flyby sequence's rotation at a specified point in time
+		//@function GetFlyByRotation
+		//@tparam short flyby (ID of flyby)
+		//@tparam float time point in time of a flyby in percent. Clamped to [0, 100].
+		//@treturn Rotation flyby rotation at a specified point in time
+		tableView.set_function(ScriptReserved_GetFlyByRotation, &GetFlyByRotation);
 
 		/// Reset object camera back to Lara and deactivate object camera.
 		//@function ResetObjCamera

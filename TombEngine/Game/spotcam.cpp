@@ -837,3 +837,59 @@ int Spline(int x, int* knots, int nk)
 
 	return ((__int64)x * (((__int64)x * (((__int64)x * c1 >> 16) + c2) >> 16) + (k[2] >> 1) + ((-k[0] - 1) >> 1)) >> 16) + k[1];
 }
+
+Pose GetCameraTransform(int sequence, float progress)
+{
+	progress = std::clamp(progress, 0.0f, 1.0f);
+
+	// Retrieve total number of cameras in the sequence.
+	int totalCameras = CameraCnt[SpotCamRemap[sequence]];
+	if (totalCameras < 2)
+		return Pose::Zero; // Not enough cameras to interpolate.
+
+	// Find the starting index for the sequence.
+	int firstIndex = 0;
+	for (int i = 0; i < SpotCamRemap[sequence]; i++)
+		firstIndex += CameraCnt[i];
+
+	// Determine number of spline points and spline position.
+	int splinePoints = totalCameras + 2;
+	int splinePosition = (int)(progress * (float)USHRT_MAX);
+
+	std::vector<int> posX, posY, posZ, tarX, tarY, tarZ, roll;
+
+	// Extract camera properties into separate vectors for interpolation.
+	for (int i = -1; i < totalCameras + 1; i++)
+	{
+		int idx = std::clamp(firstIndex + i, firstIndex, firstIndex + totalCameras - 1);
+
+		posX.push_back(SpotCam[idx].x);
+		posY.push_back(SpotCam[idx].y);
+		posZ.push_back(SpotCam[idx].z);
+		tarX.push_back(SpotCam[idx].tx);
+		tarY.push_back(SpotCam[idx].ty);
+		tarZ.push_back(SpotCam[idx].tz);
+		roll.push_back(SpotCam[idx].roll);
+	}
+
+	// Compute spline interpolation of main flyby camera parameters.
+
+	auto position = Vector3(Spline(splinePosition, posX.data(), splinePoints),
+							Spline(splinePosition, posY.data(), splinePoints),
+							Spline(splinePosition, posZ.data(), splinePoints));
+
+	auto target = Vector3(Spline(splinePosition, tarX.data(), splinePoints),
+						  Spline(splinePosition, tarY.data(), splinePoints),
+						  Spline(splinePosition, tarZ.data(), splinePoints));
+
+	short orientZ = Spline(splinePosition, roll.data(), splinePoints);
+
+	Pose result;
+
+	result.Position = position;
+	result.Orientation = EulerAngles(target - position);
+	result.Orientation.z = orientZ;
+
+	return result;
+}
+
