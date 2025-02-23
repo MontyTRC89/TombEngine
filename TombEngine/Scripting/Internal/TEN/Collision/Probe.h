@@ -37,7 +37,7 @@ namespace TEN::Scripting::Collision
 
 		Vec3 GetPosition();
 		int  GetRoomNumber();
-
+		sol::optional<std::string>  GetRoomName();
 		sol::optional<int>			GetFloorHeight();
 		sol::optional<int>			GetCeilingHeight();
 		sol::optional<int>			GetWaterSurfaceHeight();

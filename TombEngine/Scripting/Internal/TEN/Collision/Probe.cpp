@@ -2,11 +2,13 @@
 #include "Scripting/Internal/TEN/Collision/Probe.h"
 
 #include "Game/collision/Point.h"
+#include "Game/room.h"
 #include "Game/Lara/lara_climb.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 
 using namespace TEN::Collision::Point;
+using namespace TEN::Collision::Room;
 
 namespace TEN::Scripting::Collision
 {
@@ -32,6 +34,7 @@ namespace TEN::Scripting::Collision
 			// Getters
 			"GetPosition", &ScriptProbe::GetPosition,
 			"GetRoomNumber", &ScriptProbe::GetRoomNumber,
+			"GetRoomName", & ScriptProbe::GetRoomName,
 			"GetFloorHeight", &ScriptProbe::GetFloorHeight,
 			"GetCeilingHeight", &ScriptProbe::GetCeilingHeight,
 			"GetWaterSurfaceHeight", &ScriptProbe::GetWaterSurfaceHeight,
@@ -90,6 +93,16 @@ namespace TEN::Scripting::Collision
 	int ScriptProbe::GetRoomNumber()
 	{
 		return _pointCollision.GetRoomNumber();
+	}
+
+	// TODO: Return actualy room object? Not sure on Lua API conventions.
+	/// Get the room number of this Probe.
+	// @treturn string Room name.
+	sol::optional <std::string> ScriptProbe::GetRoomName()
+	{
+		int roomNumber = _pointCollision.GetRoomNumber();
+
+		return FindRoomName(roomNumber);
 	}
 
 	/// Get the floor height at this Probe.
