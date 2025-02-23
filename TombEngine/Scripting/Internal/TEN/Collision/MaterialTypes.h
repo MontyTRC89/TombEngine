@@ -3,10 +3,10 @@
 #include "Game/collision/floordata.h"
 
 /// Constants for material types.
-// @enum Collision.MaterialType
+// @enum MaterialType
 // @pragma nostrip
 
-/// Table of Collision.MaterialType constants.
+/// Table of MaterialType constants.
 //
 // - `MUD`
 // - `SNOW`
@@ -32,7 +32,7 @@
 // - `CUSTOM_7`
 // - `CUSTOM_8`
 //
-// @table Collision.MaterialType
+// @table MaterialType
 
 namespace TEN::Scripting::Collision
 {
