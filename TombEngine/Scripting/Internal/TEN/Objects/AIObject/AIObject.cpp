@@ -14,8 +14,8 @@ AI object
 @pragma nostrip
 */
 
-static auto IndexError = index_error_maker(AIObject, ScriptReserved_AIObject);
-static auto NewIndexError = newindex_error_maker(AIObject, ScriptReserved_AIObject);
+static auto IndexError = IndexErrorMaker(AIObject, ScriptReserved_AIObject);
+static auto NewIndexError = NewIndexErrorMaker(AIObject, ScriptReserved_AIObject);
 
 AIObject::AIObject(AI_OBJECT & ref) : m_aiObject{ref}
 {};

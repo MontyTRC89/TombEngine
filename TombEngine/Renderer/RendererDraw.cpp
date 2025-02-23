@@ -2926,7 +2926,7 @@ namespace TEN::Renderer
 					rDrawSprite.Width = STAR_SIZE * star.Scale;
 					rDrawSprite.Height = STAR_SIZE * star.Scale;
 
-					_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
+					_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(rDrawSprite, renderView);
 					_stInstancedSpriteBuffer.Sprites[i].Color = Vector4(
 						star.Color.x,
 						star.Color.y,
@@ -2989,7 +2989,7 @@ namespace TEN::Renderer
 						rDrawSprite.Height = 192;
 						rDrawSprite.ConstrainAxis = meteor.Direction;
 
-						_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
+						_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(rDrawSprite, renderView);
 						_stInstancedSpriteBuffer.Sprites[i].Color = Vector4(
 							meteor.Color.x,
 							meteor.Color.y,
@@ -3093,7 +3093,7 @@ namespace TEN::Renderer
 			rDrawSprite.Height = SUN_SIZE;
 			rDrawSprite.color = renderView.LensFlaresToDraw[0].Color;
 
-			_stInstancedSpriteBuffer.Sprites[0].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
+			_stInstancedSpriteBuffer.Sprites[0].World = GetWorldMatrixForSprite(rDrawSprite, renderView);
 			_stInstancedSpriteBuffer.Sprites[0].Color = renderView.LensFlaresToDraw[0].Color;
 			_stInstancedSpriteBuffer.Sprites[0].IsBillboard = 1;
 			_stInstancedSpriteBuffer.Sprites[0].IsSoftParticle = 0;
@@ -3443,7 +3443,7 @@ namespace TEN::Renderer
 					uv2 = spr->Sprite->UV[2];
 					uv3 = spr->Sprite->UV[3];
 
-					auto world = GetWorldMatrixForSprite(currentObject->Sprite, view);
+					auto world = GetWorldMatrixForSprite(*currentObject->Sprite, view);
 					
 					Vertex v0;
 					v0.Position = Vector3::Transform(p0t, world);

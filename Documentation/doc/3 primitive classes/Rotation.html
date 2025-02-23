@@ -82,6 +82,7 @@
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
+  <li>    <a href="../4 enums/Objects.HandStatus.html">Objects.HandStatus</a></li>
   <li>    <a href="../4 enums/Objects.WeaponType.html">Objects.WeaponType</a></li>
   <li>    <a href="../4 enums/Objects.MoveableStatus.html">Objects.MoveableStatus</a></li>
   <li>    <a href="../4 enums/Objects.ObjID.html">Objects.ObjID</a></li>
@@ -97,6 +98,7 @@
 </ul>
 <h2>5 Lua utility modules</h2>
 <ul class="nowrap">
+  <li>    <a href="../5 lua utility modules/Diary.html">Diary</a></li>
   <li>    <a href="../5 lua utility modules/EventSequence.html">EventSequence</a></li>
   <li>    <a href="../5 lua utility modules/Timer.html">Timer</a></li>
   <li>    <a href="../5 lua utility modules/Type.html">Type</a></li>
@@ -107,7 +109,7 @@
 <div id="content">
 
 <h1>Primitive Class <code>Rotation</code></h1>
-<p>Represents a degree-based 3D rotation.</p>
+<p>Represents a 3D rotation.</p>
 <p> All angle components are in degrees clamped to the range [0.0, 360.0].</p>
 
 
@@ -131,6 +133,10 @@
 	<tr>
 	<td class="name" ><a href="#Rotation">Rotation(x, y, z)</a></td>
 	<td class="summary">Create a Rotation object.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Lerp">Lerp(rot, alpha)</a></td>
+	<td class="summary">Get the linearly interpolated Rotation between this Rotation and the input Rotation according to the input alpha.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Direction">Direction()</a></td>
@@ -230,6 +236,38 @@
 
            <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
         A new Rotation object.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Lerp"></a>
+    <strong>Lerp(rot, alpha)</strong>
+    </dt>
+    <dd>
+    Get the linearly interpolated Rotation between this Rotation and the input Rotation according to the input alpha.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">rot</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
+         Interpolation target.
+        </li>
+        <li><span class="parameter">alpha</span>
+            <span class="types"><span class="type">float</span></span>
+         Interpolation alpha in the range [0, 1].
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
+        Linearly interpolated rotation.
     </ol>
 
 

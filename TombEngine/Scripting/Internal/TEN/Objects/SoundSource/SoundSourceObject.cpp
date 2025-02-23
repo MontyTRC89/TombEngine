@@ -14,8 +14,8 @@ Sound source
 @pragma nostrip
 */
 
-static auto IndexError = index_error_maker(SoundSource, ScriptReserved_SoundSource);
-static auto NewIndexError = newindex_error_maker(SoundSource, ScriptReserved_SoundSource);
+static auto IndexError = IndexErrorMaker(SoundSource, ScriptReserved_SoundSource);
+static auto NewIndexError = NewIndexErrorMaker(SoundSource, ScriptReserved_SoundSource);
 
 SoundSource::SoundSource(SoundSourceInfo& ref) : m_soundSource{ref}
 {};

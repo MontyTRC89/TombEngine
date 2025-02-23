@@ -24,15 +24,16 @@
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Effects::Items;
 using namespace TEN::Math;
+using namespace TEN::Scripting::Types;
 
 /// Represents a moveable object in the game world.
-// Examples include traps, enemies, doors, pickups, and the player. See also @{Objects.LaraObject} for player-specific features.
+// Examples include the player, traps, enemies, doors, and pickups. See also @{Objects.LaraObject} for player-specific features.
 //
 // @tenclass Objects.Moveable
 // pragma nostrip
 
-static auto IndexError = index_error_maker(Moveable, ScriptReserved_Moveable);
-static auto NewIndexError = newindex_error_maker(Moveable, ScriptReserved_Moveable);
+static auto IndexError = IndexErrorMaker(Moveable, ScriptReserved_Moveable);
+static auto NewIndexError = NewIndexErrorMaker(Moveable, ScriptReserved_Moveable);
 
 /*** Used to generate a new moveable dynamically at runtime.
 For more information on each parameter, see the
@@ -41,14 +42,14 @@ most can just be ignored (see usage).
 
 	@function Moveable
 	@tparam Objects.ObjID object ID
-	@tparam string name Lua name of the item
+	@tparam string name Lua name.
 	@tparam Vec3 position position in level
 	@tparam Rotation rotation rotation rotation about x, y, and z axes (default Rotation(0, 0, 0))
 	@tparam int roomNumber the room number the moveable is in (default: calculated automatically).
 	@tparam int animNumber animation number
 	@tparam int frameNumber frame number
-	@tparam int hp HP of item
-	@tparam int OCB ocb of item
+	@tparam int hp Hit points.
+	@tparam int OCB Object code bits.
 	@tparam table AIBits table with AI bits (default { 0, 0, 0, 0, 0, 0 })
 	@treturn Moveable A new Moveable object (a wrapper around the new object)
 
@@ -58,8 +59,8 @@ most can just be ignored (see usage).
 		"test", -- name
 		Vec3(18907, 0, 21201)) -- position
 	*/
-static std::unique_ptr<Moveable> Create(GAME_OBJECT_ID objID, const std::string& name, const Vec3& pos, const TypeOrNil<Rotation>& rot, TypeOrNil<short> room,
-										TypeOrNil<int> animNumber, TypeOrNil<int> frameNumber, TypeOrNil<short> hp, TypeOrNil<short> ocb, const TypeOrNil<aiBitsType>& aiBits)
+static std::unique_ptr<Moveable> Create(GAME_OBJECT_ID objID, const std::string& name, const Vec3& pos, const TypeOrNil<Rotation>& rot, TypeOrNil<int> room,
+										TypeOrNil<int> animNumber, TypeOrNil<int> frameNumber, TypeOrNil<int> hp, TypeOrNil<int> ocb, const TypeOrNil<aiBitsType>& aiBits)
 {
 	int movID = CreateItem();
 	auto scriptMov = std::make_unique<Moveable>(movID, false);
@@ -70,32 +71,32 @@ static std::unique_ptr<Moveable> Create(GAME_OBJECT_ID objID, const std::string&
 
 		scriptMov->SetObjectID(objID);
 
-		if (std::holds_alternative<short>(room))
+		if (std::holds_alternative<int>(room))
 		{
 			scriptMov->SetPosition(pos, false);
-			scriptMov->SetRoomNumber(std::get<short>(room));
+			scriptMov->SetRoomNumber(std::get<int>(room));
 		}
 		else
 		{
 			scriptMov->SetPosition(pos, true);
 		}
 
-		scriptMov->SetRotation(USE_IF_HAVE(Rotation, rot, Rotation()));
+		scriptMov->SetRotation(ValueOr<Rotation>(rot, Rotation()));
 		scriptMov->Initialize();
 
 		if (std::holds_alternative<int>(animNumber))
 		{
 			scriptMov->SetAnimNumber(std::get<int>(animNumber), objID);
-			scriptMov->SetFrameNumber(USE_IF_HAVE(int, frameNumber, 0));
+			scriptMov->SetFrameNumber(ValueOr<int>(frameNumber, 0));
 		}
 
-		if (std::holds_alternative<short>(hp))
+		if (std::holds_alternative<int>(hp))
 		{
-			scriptMov->SetHP(std::get<short>(hp));
+			scriptMov->SetHP(std::get<int>(hp));
 		}
 
-		scriptMov->SetOcb(USE_IF_HAVE(short, ocb, 0));
-		scriptMov->SetAIBits(USE_IF_HAVE(aiBitsType, aiBits, aiBitsType{}));
+		scriptMov->SetOcb(ValueOr<int>(ocb, 0));
+		scriptMov->SetAIBits(ValueOr<aiBitsType>(aiBits, aiBitsType{}));
 		scriptMov->SetColor(ScriptColor(Vector4::One));
 		mov.CarriedItem = NO_VALUE;
 
@@ -115,7 +116,7 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 		sol::call_constructor, Create,
 		sol::meta_function::index, IndexError,
 		sol::meta_function::new_index, NewIndexError,
-		sol::meta_function::equal_to, std::equal_to<Moveable const>(),
+		sol::meta_function::equal_to, std::equal_to<const Moveable>(),
 
 		ScriptReserved_GetName, &Moveable::GetName,
 		ScriptReserved_GetObjectID, &Moveable::GetObjectID,

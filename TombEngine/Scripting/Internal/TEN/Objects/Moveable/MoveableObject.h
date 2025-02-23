@@ -11,12 +11,13 @@ enum GAME_OBJECT_ID : short;
 enum ItemStatus;
 enum class EffectType;
 class LevelFunc;
-class ScriptColor;
 class Vec3;
 struct ItemInfo;
 namespace TEN::Scripting { class Rotation; };
+namespace TEN::Scripting::Types { class ScriptColor; }
 
 using namespace TEN::Scripting;
+using namespace TEN::Scripting::Types;
 
 using aiBitsArray = std::array<int, 6>;
 using aiBitsType  = sol::as_table_t<aiBitsArray>;

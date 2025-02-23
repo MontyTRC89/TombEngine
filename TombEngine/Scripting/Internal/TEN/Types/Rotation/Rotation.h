@@ -29,7 +29,8 @@ namespace TEN::Scripting
 
 		// Utilities
 
-		Vec3 Direction() const;
+		Rotation Lerp(const Rotation& rot, float alpha) const;
+		Vec3	 Direction() const;
 
 		// Converters
 
