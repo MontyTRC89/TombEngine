@@ -823,6 +823,7 @@ void CalculateSpotCameras()
 }
 
 // Core's version. Proper decompilation by ChocolateFan
+// TODO: Replace with float-based version.
 int Spline(int x, int* knots, int nk)
 {
 	int span = x * (nk - 3) >> 16;
@@ -838,58 +839,51 @@ int Spline(int x, int* knots, int nk)
 	return ((__int64)x * (((__int64)x * (((__int64)x * c1 >> 16) + c2) >> 16) + (k[2] >> 1) + ((-k[0] - 1) >> 1)) >> 16) + k[1];
 }
 
-Pose GetCameraTransform(int sequence, float progress)
+Pose GetCameraTransform(int sequence, float alpha)
 {
-	progress = std::clamp(progress, 0.0f, 1.0f);
+	alpha = std::clamp(alpha, 0.0f, 1.0f);
 
-	// Retrieve total number of cameras in the sequence.
-	int totalCameras = CameraCnt[SpotCamRemap[sequence]];
-	if (totalCameras < 2)
+	// Retrieve camera count in sequence.
+	int cameraCount = CameraCnt[SpotCamRemap[sequence]];
+	if (cameraCount < 2)
 		return Pose::Zero; // Not enough cameras to interpolate.
 
-	// Find the starting index for the sequence.
-	int firstIndex = 0;
+	// Find first ID for sequence.
+	int firstSeqID = 0;
 	for (int i = 0; i < SpotCamRemap[sequence]; i++)
-		firstIndex += CameraCnt[i];
+		firstSeqID += CameraCnt[i];
 
 	// Determine number of spline points and spline position.
-	int splinePoints = totalCameras + 2;
-	int splinePosition = (int)(progress * (float)USHRT_MAX);
-
-	std::vector<int> posX, posY, posZ, tarX, tarY, tarZ, roll;
+	int splinePoints = cameraCount + 2;
+	int splineAlpha = int(alpha * (float)USHRT_MAX);
 
 	// Extract camera properties into separate vectors for interpolation.
-	for (int i = -1; i < totalCameras + 1; i++)
+	std::vector<int> xOrigins, yOrigins, zOrigins, xTargets, yTargets, zTargets, rolls;
+	for (int i = -1; i < (cameraCount + 1); i++)
 	{
-		int idx = std::clamp(firstIndex + i, firstIndex, firstIndex + totalCameras - 1);
+		int seqID = std::clamp(firstSeqID + i, firstSeqID, (firstSeqID + cameraCount) - 1);
 
-		posX.push_back(SpotCam[idx].x);
-		posY.push_back(SpotCam[idx].y);
-		posZ.push_back(SpotCam[idx].z);
-		tarX.push_back(SpotCam[idx].tx);
-		tarY.push_back(SpotCam[idx].ty);
-		tarZ.push_back(SpotCam[idx].tz);
-		roll.push_back(SpotCam[idx].roll);
+		xOrigins.push_back(SpotCam[seqID].x);
+		yOrigins.push_back(SpotCam[seqID].y);
+		zOrigins.push_back(SpotCam[seqID].z);
+		xTargets.push_back(SpotCam[seqID].tx);
+		yTargets.push_back(SpotCam[seqID].ty);
+		zTargets.push_back(SpotCam[seqID].tz);
+		rolls.push_back(SpotCam[seqID].roll);
 	}
 
 	// Compute spline interpolation of main flyby camera parameters.
+	auto origin = Vector3(Spline(splineAlpha, xOrigins.data(), splinePoints),
+						  Spline(splineAlpha, yOrigins.data(), splinePoints),
+						  Spline(splineAlpha, zOrigins.data(), splinePoints));
 
-	auto position = Vector3(Spline(splinePosition, posX.data(), splinePoints),
-							Spline(splinePosition, posY.data(), splinePoints),
-							Spline(splinePosition, posZ.data(), splinePoints));
+	auto target = Vector3(Spline(splineAlpha, xTargets.data(), splinePoints),
+						  Spline(splineAlpha, yTargets.data(), splinePoints),
+						  Spline(splineAlpha, zTargets.data(), splinePoints));
 
-	auto target = Vector3(Spline(splinePosition, tarX.data(), splinePoints),
-						  Spline(splinePosition, tarY.data(), splinePoints),
-						  Spline(splinePosition, tarZ.data(), splinePoints));
+	short orientZ = Spline(splineAlpha, rolls.data(), splinePoints);
 
-	short orientZ = Spline(splinePosition, roll.data(), splinePoints);
-
-	Pose result;
-
-	result.Position = position;
-	result.Orientation = EulerAngles(target - position);
-	result.Orientation.z = orientZ;
-
-	return result;
+	auto pose = Pose(origin, EulerAngles(target - origin));
+	pose.Orientation.z = orientZ;
+	return pose;
 }
-

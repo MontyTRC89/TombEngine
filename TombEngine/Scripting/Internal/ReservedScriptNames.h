@@ -347,9 +347,9 @@ static constexpr char ScriptReserved_KeyClearAll[]					= "KeyClearAll";
 
 static constexpr char ScriptReserved_FlipMap[]						= "FlipMap";
 static constexpr char ScriptReserved_GetFlipMapStatus[]				= "GetFlipMapStatus";
-static constexpr char ScriptReserved_PlayFlyBy[]					= "PlayFlyBy";
-static constexpr char ScriptReserved_GetFlyByPosition[]				= "GetFlyByPosition";
-static constexpr char ScriptReserved_GetFlyByRotation[]				= "GetFlyByRotation";
+static constexpr char ScriptReserved_PlayFlyby[]					= "PlayFlyby";
+static constexpr char ScriptReserved_GetFlybyPosition[]				= "GetFlybyPosition";
+static constexpr char ScriptReserved_GetFlybyRotation[]				= "GetFlybyRotation";
 
 static constexpr char ScriptReserved_PlayCamera[]					= "PlayCamera";
 static constexpr char ScriptReserved_ResetObjCamera[]				= "ResetObjCamera";
