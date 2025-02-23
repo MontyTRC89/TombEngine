@@ -11,8 +11,8 @@
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
-#include "Scripting/Internal/TEN/Collision/Collision.h"
 #include "Scripting/Internal/TEN/Collision/MaterialTypes.h"
+#include "Scripting/Internal/TEN/Collision/Probe.h"
 #include "Scripting/Internal/TEN/Flow/Enums/ErrorModes.h"
 #include "Scripting/Internal/TEN/Flow/Enums/FreezeModes.h"
 #include "Scripting/Internal/TEN/Flow/Enums/GameStatuses.h"
@@ -305,6 +305,9 @@ Specify which translations in the strings table correspond to which languages.
 @tparam tab table array-style table with language names
 */
 	tableFlow.set_function(ScriptReserved_SetLanguageNames, &FlowHandler::SetLanguageNames, this);
+	
+	// Collision
+	ScriptProbe::Register(tableFlow);
 
 	ScriptColor::Register(parent);
 	Rotation::Register(parent);
@@ -320,9 +323,6 @@ Specify which translations in the strings table correspond to which languages.
 	LensFlare::Register(tableFlow);
 	Starfield::Register(tableFlow);
 
-	// Util
-	ScriptCollision::Register(tableFlow);
-	
 	_handler.MakeReadOnlyTable(tableFlow, "MaterialType", SCRIPT_MATERIAL_TYPES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, WEATHER_TYPES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, PLAYER_TYPES);
