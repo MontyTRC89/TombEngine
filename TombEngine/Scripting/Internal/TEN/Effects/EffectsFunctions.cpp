@@ -15,6 +15,7 @@
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Utils/object_helper.h"
+#include "Renderer/Renderer.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptUtil.h"
@@ -39,6 +40,7 @@ using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Math;
 using namespace TEN::Scripting::Types;
+using namespace TEN::Renderer;
 
 namespace TEN::Scripting::Effects
 {
@@ -297,6 +299,11 @@ namespace TEN::Scripting::Effects
 	static void EmitBlood(const Vec3& pos, TypeOrNil<int> count)
 	{
 		TriggerBlood(pos.x, pos.y, pos.z, -1, ValueOr<int>(count, 1));
+	}
+
+	static void RotateHorizon(const Vec3& pos)
+	{
+		TEN::Renderer::Renderer::SetHorizonRotation(pos);
 	}
 
 	/// Emit air bubble in a water room.

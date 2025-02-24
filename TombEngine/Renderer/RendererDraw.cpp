@@ -2028,14 +2028,15 @@ namespace TEN::Renderer
 
 				auto& moveableObj = *_moveableObjects[ID_HORIZON];
 
-				Matrix rotationMatrix = Matrix::Identity; // Default to no rotation
-
 				if (_horizonRotation == Vector3::Zero)
 				{
+					_horizonRotation = Vector3::One;
+				}
+
 				Matrix rotationMatrix = Matrix::CreateRotationX(_horizonRotation.x) *
 					Matrix::CreateRotationY(_horizonRotation.y) *
 					Matrix::CreateRotationZ(_horizonRotation.z);
-				}
+
 				_stStatic.World = rotationMatrix * Matrix::CreateTranslation(LaraItem->Pose.Position.ToVector3());
 				_stStatic.Color = Vector4::One;
 				_stStatic.ApplyFogBulbs = 1;
@@ -3042,7 +3043,16 @@ namespace TEN::Renderer
 
 			auto& moveableObj = *_moveableObjects[ID_HORIZON];
 
-			_stStatic.World = Matrix::CreateTranslation(renderView.Camera.WorldPosition);
+			if (_horizonRotation == Vector3::Zero)
+			{
+				_horizonRotation = Vector3::One;
+			}
+
+			Matrix rotationMatrix = Matrix::CreateRotationX(_horizonRotation.x) *
+				Matrix::CreateRotationY(_horizonRotation.y) *
+				Matrix::CreateRotationZ(_horizonRotation.z);
+
+			_stStatic.World = rotationMatrix * Matrix::CreateTranslation(renderView.Camera.WorldPosition);
 			_stStatic.Color = Vector4::One;
 			_stStatic.ApplyFogBulbs = 1;
 			_cbStatic.UpdateData(_stStatic, _context.Get());
