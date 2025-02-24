@@ -22,6 +22,7 @@
 #include "Scripting/Internal/TEN/Effects/BlendIDs.h"
 #include "Scripting/Internal/TEN/Effects/EffectIDs.h"
 #include "Scripting/Internal/TEN/Types/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 #include "Sound/sound.h"
@@ -301,9 +302,14 @@ namespace TEN::Scripting::Effects
 		TriggerBlood(pos.x, pos.y, pos.z, -1, ValueOr<int>(count, 1));
 	}
 
-	static void RotateHorizon(const Vec3& pos)
+	static void RotateHorizon(const Rotation& rot)
 	{
-		TEN::Renderer::Renderer::SetHorizonRotation(pos);
+
+		auto newRot = rot.ToEulerAngles();
+
+		Vec3 data = Vec3(newRot.x,newRot.y,newRot.z);
+
+		SetHorizonRotation(data);
 	}
 
 	/// Emit air bubble in a water room.
@@ -378,6 +384,7 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_EmitFire, &EmitFire);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
 		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
+		tableEffects.set_function("RotateHorizon", &RotateHorizon);
 
 		auto handler = LuaHandler{ state };
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_BlendID, BLEND_IDS);
