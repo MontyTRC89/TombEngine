@@ -20,8 +20,8 @@ namespace TEN::Scripting::Collision
 	// @tenclass Collision.Probe
 	// pragma nostrip
 
-    void ScriptProbe::Register(sol::table& parent)
-    {
+	void ScriptProbe::Register(sol::table& parent)
+	{
 		using ctors = sol::constructors<
 			ScriptProbe(const Vec3&, int),
 			ScriptProbe(const Vec3&, int, const Vec3&, float),
@@ -53,7 +53,7 @@ namespace TEN::Scripting::Collision
 			//"IsClimbableWall", &ScriptProbe::IsClimbableWall,
 			"IsMonkeySwing", &ScriptProbe::IsMonkeySwing,
 			"IsDeathTile", &ScriptProbe::IsDeath);
-    }
+	}
 
 	/// Create a Probe at a specified world position in a room.
 	// @function Probe
