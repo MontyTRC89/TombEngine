@@ -6,6 +6,7 @@
 #include "Game/Lara/lara_climb.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
+#include "Specific/level.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Collision::Room;
@@ -95,14 +96,15 @@ namespace TEN::Scripting::Collision
 		return _pointCollision.GetRoomNumber();
 	}
 
-	// TODO: Return actualy room object? Not sure on Lua API conventions.
-	/// Get the room number of this Probe.
+	// TODO: Return actual Room object? Not sure on Lua API conventions.
+	/// Get the room name of this Probe.
 	// @treturn string Room name.
-	sol::optional <std::string> ScriptProbe::GetRoomName()
+	std::string ScriptProbe::GetRoomName()
 	{
 		int roomNumber = _pointCollision.GetRoomNumber();
+		const auto& room = g_Level.Rooms[roomNumber];
 
-		return FindRoomName(roomNumber);
+		return room.Name;
 	}
 
 	/// Get the floor height at this Probe.

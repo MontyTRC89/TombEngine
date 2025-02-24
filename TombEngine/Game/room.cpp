@@ -309,17 +309,6 @@ int FindRoomNumber(const Vector3i& pos, int startRoomNumber, bool onlyNeighbors)
 	return (startRoomNumber != NO_VALUE) ? startRoomNumber : 0;
 }
 
-std::string FindRoomName(int roomNumber)
-{
-	if (roomNumber >= 0 && roomNumber < g_Level.Rooms.size())
-	{
-		return g_Level.Rooms[roomNumber].Name;
-	}
-
-	return "Unknown Room"; // Default return value if the room number is invalid
-}
-
-
 Vector3i GetRoomCenter(int roomNumber)
 {
 	const auto& room = g_Level.Rooms[roomNumber];

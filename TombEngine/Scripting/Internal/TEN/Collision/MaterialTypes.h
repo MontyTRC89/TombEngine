@@ -3,7 +3,7 @@
 #include "Game/collision/floordata.h"
 
 /// Constants for material types.
-// @enum MaterialType
+// @enum Collision.MaterialType
 // @pragma nostrip
 
 /// Table of MaterialType constants.
@@ -32,7 +32,7 @@
 // - `CUSTOM_7`
 // - `CUSTOM_8`
 //
-// @table MaterialType
+// @table Collision.MaterialType
 
 namespace TEN::Scripting::Collision
 {
