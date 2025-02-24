@@ -314,7 +314,7 @@ namespace TEN::Renderer
 		RenderTarget2D _SMAADepthRenderTarget;
 		RenderTarget2D _SMAAEdgesRenderTarget;
 		RenderTarget2D _SMAABlendRenderTarget;
-
+		
 		// Post-process
 
 		PostProcessMode _postProcessMode = PostProcessMode::None;
@@ -658,6 +658,9 @@ namespace TEN::Renderer
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);
 		std::string GetDefaultAdapterName();
 		void SaveOldState();
+
+		// Horizon Rotation
+		Vector3 _horizonRotation = Vector3::Zero;
 
 		float						GetFramerateMultiplier() const;
 		float						GetInterpolationFactor(bool forceRawValue = false) const;
