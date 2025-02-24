@@ -117,11 +117,83 @@
 <p> pragma nostrip</p>
 
 
-<h2><a href="#Fields">Fields</a></h2>
+<h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#headingAngle">headingAngle</a></td>
+	<td class="name" ><a href="#Probe">Probe(pos, roomNumber)</a></td>
+	<td class="summary">Create a Probe at a specified world position in a room.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Probe">Probe(pos, originRoomNumber, dir, dist)</a></td>
+	<td class="summary">Create a Probe that casts from an origin world position in a room in a given direction for a specified distance.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Probe">Probe(Origin, originRoomNumber, rot, dist)</a></td>
+	<td class="summary">Create a Probe that casts from an origin world position in a room in the direction of a given Rotation for a specified distance.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Probe">Probe(Origin, originRoomNumber, rot, relOffset)</a></td>
+	<td class="summary">Create a Probe that casts from an origin world position, where a given relative offset is rotated according to a given Rotation.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetPosition">GetPosition()</a></td>
+	<td class="summary">Get the world position of this Probe.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetFloorHeight">GetFloorHeight()</a></td>
+	<td class="summary">Get the floor height at this Probe.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetCeilingHeight">GetCeilingHeight()</a></td>
+	<td class="summary">Get the ceiling height at this Probe.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetWaterSurfaceHeight">GetWaterSurfaceHeight()</a></td>
+	<td class="summary">Get the water surface height at this Probe.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetFloorNormal">GetFloorNormal()</a></td>
+	<td class="summary">Get the normal of the floor at this Probe.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetCeilingNormal">GetCeilingNormal()</a></td>
+	<td class="summary">Get the normal of the ceiling at this Probe.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetFloorMaterialType">GetFloorMaterialType()</a></td>
+	<td class="summary">Get the material type of the floor at this Probe.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetCeilingMaterialType">GetCeilingMaterialType()</a></td>
+	<td class="summary">Get the material type of the ceiling at this Probe.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#IsSteepFloor">IsSteepFloor()</a></td>
+	<td class="summary">Check if the floor at this Probe is steep.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#IsSteepCeiling">IsSteepCeiling()</a></td>
+	<td class="summary">Check if the ceiling at this Probe is steep.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#IsWall">IsWall()</a></td>
+	<td class="summary">Check if there is a wall at this Probe.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#IsInsideSolidGeometry">IsInsideSolidGeometry()</a></td>
+	<td class="summary">Check if this Probe is inside solid geometry, i.e.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#IsClimbableWall">IsClimbableWall(headingAngle)</a></td>
 	<td class="summary">Check if there is a climbable wall in the given heading angle at this Probe.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#IsMonkeySwing">IsMonkeySwing()</a></td>
+	<td class="summary">Check if there is a monkey swing at this Probe.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#IsDeath">IsDeath()</a></td>
+	<td class="summary">Check if there is a death tile at this Probe.</td>
 	</tr>
 </table>
 
@@ -129,18 +201,426 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Fields"></a>Fields</h2>
+    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
 
     <dl class="function">
     <dt>
-    <a name = "headingAngle"></a>
-    <strong>headingAngle</strong>
+    <a name = "Probe"></a>
+    <strong>Probe(pos, roomNumber)</strong>
+    </dt>
+    <dd>
+    Create a Probe at a specified world position in a room.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pos</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         World position.
+        </li>
+        <li><span class="parameter">roomNumber</span>
+            <span class="types"><span class="type">int</span></span>
+         Room number.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../2 classes/Collision.Probe.html#Probe">Probe</a></span>
+        a new Probe.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Probe"></a>
+    <strong>Probe(pos, originRoomNumber, dir, dist)</strong>
+    </dt>
+    <dd>
+    Create a Probe that casts from an origin world position in a room in a given direction for a specified distance.
+ Required to correctly traverse between rooms.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pos</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         Origin world position to cast from.
+        </li>
+        <li><span class="parameter">originRoomNumber</span>
+            <span class="types"><span class="type">int</span></span>
+         Origin's room number.
+        </li>
+        <li><span class="parameter">dir</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         Direction in which to cast.
+        </li>
+        <li><span class="parameter">dist</span>
+            <span class="types"><span class="type">float</span></span>
+         Distance to cast.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../2 classes/Collision.Probe.html#Probe">Probe</a></span>
+        a new Probe.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Probe"></a>
+    <strong>Probe(Origin, originRoomNumber, rot, dist)</strong>
+    </dt>
+    <dd>
+    Create a Probe that casts from an origin world position in a room in the direction of a given Rotation for a specified distance.
+ Required to correctly traverse between rooms.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">Origin</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         world position to cast from.
+        </li>
+        <li><span class="parameter">originRoomNumber</span>
+            <span class="types"><span class="type">int</span></span>
+         Origin's room number.
+        </li>
+        <li><span class="parameter">rot</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
+         Rotation's direction in which to cast.
+        </li>
+        <li><span class="parameter">dist</span>
+            <span class="types"><span class="type">float</span></span>
+         Distance to cast.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../2 classes/Collision.Probe.html#Probe">Probe</a></span>
+        a new Probe.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Probe"></a>
+    <strong>Probe(Origin, originRoomNumber, rot, relOffset)</strong>
+    </dt>
+    <dd>
+    Create a Probe that casts from an origin world position, where a given relative offset is rotated according to a given Rotation.
+ Required to correctly traverse between rooms.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">Origin</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         world position to cast from.
+        </li>
+        <li><span class="parameter">originRoomNumber</span>
+            <span class="types"><span class="type">int</span></span>
+         Origin's room number.
+        </li>
+        <li><span class="parameter">rot</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
+         Rotation's direction in which to cast.
+        </li>
+        <li><span class="parameter">relOffset</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         Relative offset to cast.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../2 classes/Collision.Probe.html#Probe">Probe</a></span>
+        a new Probe.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetPosition"></a>
+    <strong>GetPosition()</strong>
+    </dt>
+    <dd>
+    Get the world position of this Probe.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+        World position.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetFloorHeight"></a>
+    <strong>GetFloorHeight()</strong>
+    </dt>
+    <dd>
+    Get the floor height at this Probe.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int[opt]</span></span>
+        Floor height. <strong>nil: no floor exists.</strong>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetCeilingHeight"></a>
+    <strong>GetCeilingHeight()</strong>
+    </dt>
+    <dd>
+    Get the ceiling height at this Probe.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int[opt]</span></span>
+        Ceiling height. <strong>nil: no ceiling exists.</strong>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetWaterSurfaceHeight"></a>
+    <strong>GetWaterSurfaceHeight()</strong>
+    </dt>
+    <dd>
+    Get the water surface height at this Probe.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int[opt]</span></span>
+        Water surface height. <strong>nil: no water surface exists.</strong>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetFloorNormal"></a>
+    <strong>GetFloorNormal()</strong>
+    </dt>
+    <dd>
+    Get the normal of the floor at this Probe.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3[opt]</a></span>
+        Floor normal. <strong>nil: no floor exists.</strong>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetCeilingNormal"></a>
+    <strong>GetCeilingNormal()</strong>
+    </dt>
+    <dd>
+    Get the normal of the ceiling at this Probe.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3[opt]</a></span>
+        Ceiling normal. <strong>nil: no ceiling exists.</strong>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetFloorMaterialType"></a>
+    <strong>GetFloorMaterialType()</strong>
+    </dt>
+    <dd>
+    Get the material type of the floor at this Probe.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../4 enums/Collision.MaterialType.html#">Collision.MaterialType[opt]</a></span>
+        Floor material type. <strong>nil: no floor exists.</strong>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetCeilingMaterialType"></a>
+    <strong>GetCeilingMaterialType()</strong>
+    </dt>
+    <dd>
+    Get the material type of the ceiling at this Probe.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../4 enums/Collision.MaterialType.html#">Collision.MaterialType[opt]</a></span>
+        Ceiling material type. <strong>nil: no ceiling exists.</strong>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "IsSteepFloor"></a>
+    <strong>IsSteepFloor()</strong>
+    </dt>
+    <dd>
+    Check if the floor at this Probe is steep.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool[opt]</span></span>
+        Steep floor status. <strong>true: is a steep floor, false: isn't a steep floor, nil: no floor exists.</strong>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "IsSteepCeiling"></a>
+    <strong>IsSteepCeiling()</strong>
+    </dt>
+    <dd>
+    Check if the ceiling at this Probe is steep.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool[opt]</span></span>
+        Steep ceiling status. <strong>true: is a steep ceiling, false: isn't a steep ceiling, nil: no ceiling exists.</strong>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "IsWall"></a>
+    <strong>IsWall()</strong>
+    </dt>
+    <dd>
+    Check if there is a wall at this Probe.  Can be used to determine if a wall and ceiling exist.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        Wall status. <strong>true: is a wall, false: isn't a wall</strong>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "IsInsideSolidGeometry"></a>
+    <strong>IsInsideSolidGeometry()</strong>
+    </dt>
+    <dd>
+    Check if this Probe is inside solid geometry, i.e.  below a floor, above a ceiling, or inside a wall.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        Inside geometry status. <strong>true: is inside, false: is outside</strong>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "IsClimbableWall"></a>
+    <strong>IsClimbableWall(headingAngle)</strong>
     </dt>
     <dd>
     Check if there is a climbable wall in the given heading angle at this Probe.
 
 
 
+    <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">headingAngle</span>
             <span class="types"><span class="type">float</span></span>
@@ -148,6 +628,54 @@
         </li>
     </ul>
 
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        Climbable wall status. <strong>true: is climbable, false: isn't climbable</strong>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "IsMonkeySwing"></a>
+    <strong>IsMonkeySwing()</strong>
+    </dt>
+    <dd>
+    Check if there is a monkey swing at this Probe.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        Monkey swing status. <strong>true: is a monkey swing, false: isn't a monkey swing</strong>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "IsDeath"></a>
+    <strong>IsDeath()</strong>
+    </dt>
+    <dd>
+    Check if there is a death tile at this Probe.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        Death tile status. <strong>true: is a death tile, false: isn't a death tile</strong>
+    </ol>
 
 
 

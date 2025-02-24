@@ -50,7 +50,7 @@ namespace TEN::Scripting::Collision
 			"IsSteepCeiling", &ScriptProbe::IsSteepCeiling,
 			"IsWall", &ScriptProbe::IsWall,
 			"IsInsideSolidGeometry", &ScriptProbe::IsInsideSolidGeometry,
-			"IsClimbableWall", &ScriptProbe::IsClimbableWall,
+			//"IsClimbableWall", &ScriptProbe::IsClimbableWall,
 			"IsMonkeySwing", &ScriptProbe::IsMonkeySwing,
 			"IsDeathTile", &ScriptProbe::IsDeath);
     }
