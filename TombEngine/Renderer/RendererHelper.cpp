@@ -631,7 +631,3 @@ namespace TEN::Renderer
 			&GUID_WICPixelFormat24bppBGR, nullptr, true);
 	}
 }
-void SetHorizonRotation(const Vector3& pos)
-{
-	_horizonRotation = pos;
-}

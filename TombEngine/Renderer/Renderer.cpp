@@ -16,6 +16,7 @@ namespace TEN::Renderer
 {
 	using namespace TEN::Renderer::Structures;
 	using namespace Utils;
+
 	Renderer g_Renderer;
 
 	Renderer::Renderer() :
@@ -468,4 +469,9 @@ namespace TEN::Renderer
 	{
 		_graphicsSettingsChanged = true;
 	}
+}
+
+void SetHorizonRotation(const Vector3& pos)
+{
+	_horizonRotation = pos;
 }
