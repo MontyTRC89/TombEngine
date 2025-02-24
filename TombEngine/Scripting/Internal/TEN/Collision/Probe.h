@@ -14,7 +14,7 @@ namespace TEN::Scripting::Collision
 	// Integrate line of sight queries (LOS).
 	// Integrate moveable and static queries.
 
-    class ScriptProbe
+    class Probe
     {
     public:
         static void Register(sol::table& parent);
@@ -27,11 +27,11 @@ namespace TEN::Scripting::Collision
     public:
         // Constructors
 
-		ScriptProbe() = default;
-		ScriptProbe(const Vec3& pos, int roomNumber);
-		ScriptProbe(const Vec3& origin, int originRoomNumber, const Vec3& dir, float dist);
-		ScriptProbe(const Vec3& origin, int originRoomNumber, const Rotation& rot, float dist);
-		ScriptProbe(const Vec3& origin, int originRoomNumber, const Rotation& rot, const Vec3& relOffset);
+		Probe() = default;
+		Probe(const Vec3& pos, int roomNumber);
+		Probe(const Vec3& origin, int originRoomNumber, const Vec3& dir, float dist);
+		Probe(const Vec3& origin, int originRoomNumber, const Rotation& rot, float dist);
+		Probe(const Vec3& origin, int originRoomNumber, const Rotation& rot, const Vec3& relOffset);
 		
         // Getters
 

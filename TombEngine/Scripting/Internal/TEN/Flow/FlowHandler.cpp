@@ -307,7 +307,7 @@ Specify which translations in the strings table correspond to which languages.
 	tableFlow.set_function(ScriptReserved_SetLanguageNames, &FlowHandler::SetLanguageNames, this);
 	
 	// Collision
-	ScriptProbe::Register(tableFlow);
+	Probe::Register(tableFlow);
 
 	ScriptColor::Register(parent);
 	Rotation::Register(parent);
