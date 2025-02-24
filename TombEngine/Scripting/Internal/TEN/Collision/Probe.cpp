@@ -254,7 +254,7 @@ namespace TEN::Scripting::Collision
 		return _pointCollision.IsSteepCeiling();
 	}
 
-	/// Check if there is a wall at this Probe. Can be used to determine if a wall and ceiling exist.
+	/// Check if the Probe is inside a wall. Can be used to determine if a wall and ceiling exist.
 	// @function IsWall
 	// @treturn bool Wall status. __true: is a wall, false: isn't a wall__
 	bool ScriptProbe::IsWall()
