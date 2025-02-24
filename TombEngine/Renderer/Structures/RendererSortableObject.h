@@ -19,31 +19,24 @@ namespace TEN::Renderer::Structures
 	struct RendererSortableObject
 	{
 		RendererObjectType ObjectType;
-		int Distance;
-		Vector3 Centre;
-		RendererMesh* Mesh;
-		RendererBucket* Bucket;
-		RendererRoom* Room;
-		RendererStatic* Static;
-		RendererItem* Item;
-		RendererEffect* Effect;
-		RendererSpriteToDraw* Sprite;
-		RendererPolygon* Polygon;
-		Matrix World;
-	};
 
-	struct RendererSortedBucket
-	{
-		RendererObjectType ObjectType;
-		RendererMesh* Mesh;
-		RendererBucket* Bucket;
+		Matrix World;
+		Vector3 Centre;
+		int Distance;
+
+		BlendMode BlendMode;
+		LightMode LightMode;
+
 		RendererRoom* Room;
-		RendererStatic* Static;
-		RendererItem* Item;
-		RendererEffect* Effect;
-		RendererSpriteToDraw* Sprite;
+		RendererBucket* Bucket;
 		RendererPolygon* Polygon;
-		fast_vector<Vertex> Vertices;
-		fast_vector<int> Indices;
+
+		union
+		{
+			RendererItem* Item;
+			RendererStatic* Static;
+			RendererEffect* Effect;
+			RendererSpriteToDraw* Sprite;
+		};
 	};
 }
