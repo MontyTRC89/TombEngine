@@ -29,6 +29,7 @@
 #include "Renderer/RenderView.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/Structures/RendererSortableObject.h"
+#include "Scripting/Internal/TEN/Effects/EffectsFunctions.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/winmain.h"
@@ -41,6 +42,7 @@ using namespace TEN::Hud;
 using namespace TEN::Renderer::Structures;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::DisplaySprite;
+using namespace TEN::Scripting::Effects;
 
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
@@ -2027,16 +2029,7 @@ namespace TEN::Renderer
 				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 				auto& moveableObj = *_moveableObjects[ID_HORIZON];
-
-				/*if (_horizonRotation == Vector3::Zero)
-				{
-					_horizonRotation = Vector3::One;
-				}*/
-
-				/*Matrix rotationMatrix = Matrix::CreateRotationX(_horizonRotation.x) *
-					Matrix::CreateRotationY(_horizonRotation.y) *
-					Matrix::CreateRotationZ(_horizonRotation.z);*/
-				//rotationMatrix * 
+				 
 				_stStatic.World = Matrix::CreateTranslation(LaraItem->Pose.Position.ToVector3());
 				_stStatic.Color = Vector4::One;
 				_stStatic.ApplyFogBulbs = 1;
@@ -3043,16 +3036,11 @@ namespace TEN::Renderer
 
 			auto& moveableObj = *_moveableObjects[ID_HORIZON];
 
-			/*if (_horizonRotation == Vector3::Zero)
-			{
-				_horizonRotation = Vector3::One;
-			}
-
 			Matrix rotationMatrix = Matrix::CreateRotationX(_horizonRotation.x) *
 				Matrix::CreateRotationY(_horizonRotation.y) *
-				Matrix::CreateRotationZ(_horizonRotation.z);*/
-			//rotationMatrix*
-			_stStatic.World = Matrix::CreateTranslation(renderView.Camera.WorldPosition);
+				Matrix::CreateRotationZ(_horizonRotation.z);
+			
+			_stStatic.World = rotationMatrix * Matrix::CreateTranslation(renderView.Camera.WorldPosition);
 			_stStatic.Color = Vector4::One;
 			_stStatic.ApplyFogBulbs = 1;
 			_cbStatic.UpdateData(_stStatic, _context.Get());

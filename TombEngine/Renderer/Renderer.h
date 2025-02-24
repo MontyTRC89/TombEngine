@@ -87,10 +87,6 @@ namespace TEN::Renderer
 
 	using TexturePair = std::tuple<Texture2D, Texture2D>;
 
-	// Horizon Rotation
-	void SetHorizonRotation(const Vector3& pos);
-	Vector3 _horizonRotation = Vector3::Zero;
-
 	class Renderer
 	{
 	private:

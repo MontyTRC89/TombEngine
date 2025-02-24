@@ -470,8 +470,3 @@ namespace TEN::Renderer
 		_graphicsSettingsChanged = true;
 	}
 }
-
-void SetHorizonRotation(const Vector3& pos)
-{
-	_horizonRotation = pos;
-}

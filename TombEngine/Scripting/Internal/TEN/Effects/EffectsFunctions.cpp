@@ -15,7 +15,6 @@
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Utils/object_helper.h"
-#include "Renderer/Renderer.h"
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptUtil.h"
@@ -41,10 +40,12 @@ using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
 using namespace TEN::Math;
 using namespace TEN::Scripting::Types;
-using namespace TEN::Renderer;
 
 namespace TEN::Scripting::Effects
 {
+	// Define the global variable in exactly one place
+	Vector3 _horizonRotation = Vector3::One;
+
 	///Emit a lightning arc.
 	//@function EmitLightningArc
 	//@tparam Vec3 src
@@ -302,6 +303,7 @@ namespace TEN::Scripting::Effects
 		TriggerBlood(pos.x, pos.y, pos.z, -1, ValueOr<int>(count, 1));
 	}
 
+
 	static void RotateHorizon(const Rotation& rot)
 	{
 
@@ -309,7 +311,7 @@ namespace TEN::Scripting::Effects
 
 		Vec3 data = Vec3(newRot.x,newRot.y,newRot.z);
 
-		SetHorizonRotation(data);
+		_horizonRotation = data;
 	}
 
 	/// Emit air bubble in a water room.
@@ -391,3 +393,4 @@ namespace TEN::Scripting::Effects
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_EffectID, EFFECT_IDS);
 	}
 }
+
