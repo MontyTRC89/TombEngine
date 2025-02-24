@@ -59,7 +59,7 @@ namespace TEN::Scripting::Collision
 	// @function Probe
 	// @tparam Vec3 pos World position.
 	// @tparam int roomNumber Room number.
-	// @treturn Probe a new Probe.
+	// @treturn Probe A new Probe.
 	ScriptProbe::ScriptProbe(const Vec3& pos, int roomNumber)
 	{
 		_pointCollision = GetPointCollision(pos.ToVector3i(), roomNumber);
@@ -72,7 +72,7 @@ namespace TEN::Scripting::Collision
 	// @tparam int originRoomNumber Origin's room number.
 	// @tparam Vec3 dir Direction in which to cast.
 	// @tparam float dist Distance to cast.
-	// @treturn Probe a new Probe.
+	// @treturn Probe A new Probe.
 	ScriptProbe::ScriptProbe(const Vec3& origin, int originRoomNumber, const Vec3& dir, float dist)
 	{
 		_pointCollision = GetPointCollision(origin.ToVector3i(), originRoomNumber, dir.ToVector3(), dist);
@@ -85,7 +85,7 @@ namespace TEN::Scripting::Collision
 	// @tparam int originRoomNumber Origin's room number.
 	// @tparam Rotation rot Rotation defining the direction in which to cast.
 	// @tparam float dist Distance to cast.
-	// @treturn Probe a new Probe.
+	// @treturn Probe A new Probe.
 	ScriptProbe::ScriptProbe(const Vec3& pos, int originRoomNumber, const Rotation& rot, float dist)
 	{
 		auto dir = rot.ToEulerAngles().ToDirection();
@@ -99,7 +99,7 @@ namespace TEN::Scripting::Collision
 	// @tparam int originRoomNumber Origin's room number.
 	// @tparam Rotation rot Rotation according to which the input relative offset is rotated. 
 	// @tparam Vec3 relOffset Relative offset to cast.
-	// @treturn Probe a new Probe.
+	// @treturn Probe A new Probe.
 	ScriptProbe::ScriptProbe(const Vec3& pos, int originRoomNumber, const Rotation& rot, const Vec3& relOffset)
 	{
 		auto target = Geometry::TranslatePoint(pos.ToVector3(), rot.ToEulerAngles(), relOffset.ToVector3());
