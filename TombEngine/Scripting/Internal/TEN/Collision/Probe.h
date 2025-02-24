@@ -39,6 +39,8 @@ namespace TEN::Scripting::Collision
 		int			GetRoomNumber();
 		std::string GetRoomName();
 
+		std::unique_ptr<Room>		GetRoom();
+
 		sol::optional<int>			GetFloorHeight();
 		sol::optional<int>			GetCeilingHeight();
 		sol::optional<int>			GetWaterSurfaceHeight();

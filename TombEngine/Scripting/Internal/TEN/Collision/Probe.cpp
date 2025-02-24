@@ -2,7 +2,6 @@
 #include "Scripting/Internal/TEN/Collision/Probe.h"
 
 #include "Game/collision/Point.h"
-#include "Game/room.h"
 #include "Game/Lara/lara_climb.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
@@ -10,7 +9,6 @@
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Point;
-using namespace TEN::Collision::Room;
 
 namespace TEN::Scripting::Collision
 {
@@ -37,6 +35,7 @@ namespace TEN::Scripting::Collision
 			"GetPosition", &Probe::GetPosition,
 			"GetRoomNumber", &Probe::GetRoomNumber,
 			"GetRoomName", &Probe::GetRoomName,
+			"GetRoom", & Probe::GetRoom,
 			"GetFloorHeight", &Probe::GetFloorHeight,
 			"GetCeilingHeight", &Probe::GetCeilingHeight,
 			"GetWaterSurfaceHeight", &Probe::GetWaterSurfaceHeight,
@@ -137,6 +136,15 @@ namespace TEN::Scripting::Collision
 		const auto& room = g_Level.Rooms[roomNumber];
 
 		return room.Name;
+	}
+
+	/// Get the room object of this Probe.
+	// @function GetRoom
+	// @treturn Room[opt] Room Object
+	std::unique_ptr<Room> Probe::GetRoom()
+	{
+		int roomNumber = _pointCollision.GetRoomNumber();
+		return std::make_unique<Room>(g_Level.Rooms[roomNumber]);
 	}
 
 	/// Get the floor height at this Probe.
