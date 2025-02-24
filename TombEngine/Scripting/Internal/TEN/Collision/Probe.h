@@ -4,6 +4,7 @@
 
 using namespace TEN::Collision::Point;
 
+namespace TEN::Scripting { class Rotation; }
 class Moveable;
 class Vec3;
 

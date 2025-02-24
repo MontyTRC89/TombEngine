@@ -83,7 +83,7 @@ namespace TEN::Scripting::Collision
 	// @function Probe
 	// @tparam Vec3 Origin world position to cast from.
 	// @tparam int originRoomNumber Origin's room number.
-	// @tparam Rotation rot Rotation's direction in which to cast.
+	// @tparam Rotation rot Rotation defining the direction in which to cast.
 	// @tparam float dist Distance to cast.
 	// @treturn Probe a new Probe.
 	ScriptProbe::ScriptProbe(const Vec3& pos, int originRoomNumber, const Rotation& rot, float dist)
@@ -97,7 +97,7 @@ namespace TEN::Scripting::Collision
 	// @function Probe
 	// @tparam Vec3 Origin world position to cast from.
 	// @tparam int originRoomNumber Origin's room number.
-	// @tparam Rotation rot Rotation's direction in which to cast.
+	// @tparam Rotation rot Rotation according to which the input relative offset is rotated. 
 	// @tparam Vec3 relOffset Relative offset to cast.
 	// @treturn Probe a new Probe.
 	ScriptProbe::ScriptProbe(const Vec3& pos, int originRoomNumber, const Rotation& rot, const Vec3& relOffset)
