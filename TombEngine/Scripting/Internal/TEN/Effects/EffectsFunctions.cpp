@@ -44,7 +44,7 @@ using namespace TEN::Scripting::Types;
 namespace TEN::Scripting::Effects
 {
 	// Define the global variable in exactly one place
-	Vector3 _horizonRotation = Vector3::One;
+	Vector3 _horizonRotation = Vector3::Zero;
 
 	///Emit a lightning arc.
 	//@function EmitLightningArc
@@ -307,11 +307,16 @@ namespace TEN::Scripting::Effects
 	static void RotateHorizon(const Rotation& rot)
 	{
 
-		auto newRot = rot.ToEulerAngles();
-
-		Vec3 data = Vec3(newRot.x,newRot.y,newRot.z);
+		Vec3 data = Vec3(rot.x * RADIAN,rot.y * RADIAN,rot.z * RADIAN);
 
 		_horizonRotation = data;
+	}
+
+	Rotation GetHorizonRotation()
+	{
+
+		return Rotation(_horizonRotation.x / RADIAN, _horizonRotation.y / RADIAN, _horizonRotation.z / RADIAN);
+	
 	}
 
 	/// Emit air bubble in a water room.
@@ -386,7 +391,8 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_EmitFire, &EmitFire);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
 		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
-		tableEffects.set_function("RotateHorizon", &RotateHorizon);
+		tableEffects.set_function("SetHorizonRotation", &RotateHorizon);
+		tableEffects.set_function("GetHorizonRotation", &GetHorizonRotation);
 
 		auto handler = LuaHandler{ state };
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_BlendID, BLEND_IDS);
