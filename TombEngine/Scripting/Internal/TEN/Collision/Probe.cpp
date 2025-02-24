@@ -234,7 +234,7 @@ namespace TEN::Scripting::Collision
 
 	/// Check if the floor at this Probe is steep.
 	// @function IsSteepFloor
-	// @treturn bool[opt] Steep floor status. __true: is steep floor, false: isn't steep floor, nil: no floor exists.__
+	// @treturn bool[opt] Steep floor status. __true: is a steep floor, false: isn't a steep floor, nil: no floor exists.__
 	sol::optional<bool> ScriptProbe::IsSteepFloor()
 	{
 		if (_pointCollision.IsWall())
@@ -245,7 +245,7 @@ namespace TEN::Scripting::Collision
 
 	/// Check if the ceiling at this Probe is steep.
 	// @function IsSteepCeiling
-	// @treturn bool[opt] Steep ceiling status. __true: is steep ceiling, false: isn't steep ceiling, nil: no ceiling exists.__
+	// @treturn bool[opt] Steep ceiling status. __true: is a steep ceiling, false: isn't a steep ceiling, nil: no ceiling exists.__
 	sol::optional<bool> ScriptProbe::IsSteepCeiling()
 	{
 		if (_pointCollision.IsWall())
