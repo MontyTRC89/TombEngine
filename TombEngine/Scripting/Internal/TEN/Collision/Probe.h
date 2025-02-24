@@ -29,9 +29,9 @@ namespace TEN::Scripting::Collision
 
 		ScriptProbe() = default;
 		ScriptProbe(const Vec3& pos, int roomNumber);
-		ScriptProbe(const Vec3& pos, int roomNumber, const Vec3& dir, float dist);
-		ScriptProbe(const Vec3& pos, int roomNumber, const Rotation& rot, float dist);
-		ScriptProbe(const Vec3& pos, int roomNumber, const Rotation& rot, const Vec3& relOffset);
+		ScriptProbe(const Vec3& origin, int originRoomNumber, const Vec3& dir, float dist);
+		ScriptProbe(const Vec3& origin, int originRoomNumber, const Rotation& rot, float dist);
+		ScriptProbe(const Vec3& origin, int originRoomNumber, const Rotation& rot, const Vec3& relOffset);
 		
         // Getters
 
