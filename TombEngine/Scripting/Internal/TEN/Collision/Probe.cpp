@@ -6,6 +6,7 @@
 #include "Game/Lara/lara_climb.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Point;
@@ -24,8 +25,8 @@ namespace TEN::Scripting::Collision
 		using ctors = sol::constructors<
 			ScriptProbe(const Vec3&, int),
 			ScriptProbe(const Vec3&, int, const Vec3&, float),
-			ScriptProbe(const Vec3&, int, float, float, float, float, sol::optional<Vec3>&),
-			ScriptProbe(const Moveable& mov)>;
+			ScriptProbe(const Vec3&, int, const Rotation&, float),
+			ScriptProbe(const Vec3&, int, const Rotation&, const Vec3&)>;
 
 		// Register type.
 		parent.new_usertype<ScriptProbe>(
@@ -35,7 +36,7 @@ namespace TEN::Scripting::Collision
 			// Getters
 			"GetPosition", &ScriptProbe::GetPosition,
 			"GetRoomNumber", &ScriptProbe::GetRoomNumber,
-			"GetRoomName", & ScriptProbe::GetRoomName,
+			"GetRoomName", &ScriptProbe::GetRoomName,
 			"GetFloorHeight", &ScriptProbe::GetFloorHeight,
 			"GetCeilingHeight", &ScriptProbe::GetCeilingHeight,
 			"GetWaterSurfaceHeight", &ScriptProbe::GetWaterSurfaceHeight,
@@ -54,34 +55,64 @@ namespace TEN::Scripting::Collision
 			"IsDeathTile", &ScriptProbe::IsDeath);
     }
 
+	/// Create a Probe at a specified world position in a room.
+	// @function Probe
+	// @tparam Vec3 pos World position.
+	// @tparam int roomNumber Room number.
+	// @treturn Probe a new Probe.
 	ScriptProbe::ScriptProbe(const Vec3& pos, int roomNumber)
 	{
 		_pointCollision = GetPointCollision(pos.ToVector3i(), roomNumber);
 	}
 
-	ScriptProbe::ScriptProbe(const Moveable& mov)
+	/// Create a Probe that casts from an origin world position in a room in a given direction for a specified distance.
+	// Required to correctly traverse between rooms.
+	// @function Probe
+	// @tparam Vec3 pos Origin world position to cast from.
+	// @tparam int originRoomNumber Origin's room number.
+	// @tparam Vec3 dir Direction in which to cast.
+	// @tparam float dist Distance to cast.
+	// @treturn Probe a new Probe.
+	ScriptProbe::ScriptProbe(const Vec3& origin, int originRoomNumber, const Vec3& dir, float dist)
 	{
-		// TODO: *MUST* pass native ItemInfo moveable to allow PointCollisionData to handle quirks associated with the way moveables update their room numebrs.
-		// GetPointCollision(mov.GetNativeMoveable());
-
-		_pointCollision = GetPointCollision(mov.GetPosition().ToVector3i(), mov.GetRoomNumber());
+		_pointCollision = GetPointCollision(origin.ToVector3i(), originRoomNumber, dir.ToVector3(), dist);
 	}
 
-	ScriptProbe::ScriptProbe(const Vec3& pos, int roomNumber, const Vec3& dir, float dist)
+	/// Create a Probe that casts from an origin world position in a room in the direction of a given Rotation for a specified distance.
+	// Required to correctly traverse between rooms.
+	// @function Probe
+	// @tparam Vec3 Origin world position to cast from.
+	// @tparam int originRoomNumber Origin's room number.
+	// @tparam Rotation rot Rotation's direction in which to cast.
+	// @tparam float dist Distance to cast.
+	// @treturn Probe a new Probe.
+	ScriptProbe::ScriptProbe(const Vec3& pos, int originRoomNumber, const Rotation& rot, float dist)
 	{
-		_pointCollision = GetPointCollision(pos.ToVector3(), roomNumber, dir.ToVector3(), dist);
+		auto dir = rot.ToEulerAngles().ToDirection();
+		_pointCollision = GetPointCollision(pos.ToVector3(), originRoomNumber, dir, dist);
 	}
 
-	ScriptProbe::ScriptProbe(const Vec3& pos, int roomNumber, float headingAngle, float forward, float down, float right, sol::optional<Vec3>& axis)
+	/// Create a Probe that casts from an origin world position, where a given relative offset is rotated according to a given Rotation.
+	// Required to correctly traverse between rooms.
+	// @function Probe
+	// @tparam Vec3 Origin world position to cast from.
+	// @tparam int originRoomNumber Origin's room number.
+	// @tparam Rotation rot Rotation's direction in which to cast.
+	// @tparam Vec3 relOffset Relative offset to cast.
+	// @treturn Probe a new Probe.
+	ScriptProbe::ScriptProbe(const Vec3& pos, int originRoomNumber, const Rotation& rot, const Vec3& relOffset)
 	{
-		static const auto DEFAULT_AXIS = Vec3(0.0f, 1.0f, 0.0f);
+		auto target = Geometry::TranslatePoint(pos.ToVector3(), rot.ToEulerAngles(), relOffset.ToVector3());
+		float dist = Vector3::Distance(pos.ToVector3(), target);
 
-		short convertedAngle = ANGLE(headingAngle);
-		auto convertedAxis = axis.value_or(DEFAULT_AXIS).ToVector3();
-		_pointCollision = GetPointCollision(pos.ToVector3i(), roomNumber, convertedAngle, forward, down, right, convertedAxis);
+		auto dir = target - pos.ToVector3();
+		dir.Normalize();
+
+		_pointCollision = GetPointCollision(pos.ToVector3(), originRoomNumber, dir, dist);
 	}
 
 	/// Get the world position of this Probe.
+	// @function GetPosition
 	// @treturn Vec3 World position.
 	Vec3 ScriptProbe::GetPosition()
 	{
@@ -98,6 +129,7 @@ namespace TEN::Scripting::Collision
 
 	// TODO: Return actual Room object? Not sure on Lua API conventions.
 	/// Get the room name of this Probe.
+	// @function GetRoomName
 	// @treturn string Room name.
 	std::string ScriptProbe::GetRoomName()
 	{
@@ -108,6 +140,7 @@ namespace TEN::Scripting::Collision
 	}
 
 	/// Get the floor height at this Probe.
+	// @function GetFloorHeight
 	// @treturn int[opt] Floor height. __nil: no floor exists.__
 	sol::optional<int> ScriptProbe::GetFloorHeight()
 	{
@@ -122,6 +155,7 @@ namespace TEN::Scripting::Collision
 	}
 
 	/// Get the ceiling height at this Probe.
+	// @function GetCeilingHeight
 	// @treturn int[opt] Ceiling height. __nil: no ceiling exists.__
 	sol::optional<int> ScriptProbe::GetCeilingHeight()
 	{
@@ -136,6 +170,7 @@ namespace TEN::Scripting::Collision
 	}
 
 	/// Get the water surface height at this Probe.
+	// @function GetWaterSurfaceHeight
 	// @treturn int[opt] Water surface height. __nil: no water surface exists.__
 	sol::optional<int> ScriptProbe::GetWaterSurfaceHeight()
 	{
@@ -150,6 +185,7 @@ namespace TEN::Scripting::Collision
 	}
 
 	/// Get the normal of the floor at this Probe.
+	// @function GetFloorNormal
 	// @treturn Vec3[opt] Floor normal. __nil: no floor exists.__
 	sol::optional<Vec3> ScriptProbe::GetFloorNormal()
 	{
@@ -160,6 +196,7 @@ namespace TEN::Scripting::Collision
 	}
 
 	/// Get the normal of the ceiling at this Probe.
+	// @function GetCeilingNormal
 	// @treturn Vec3[opt] Ceiling normal. __nil: no ceiling exists.__
 	sol::optional<Vec3> ScriptProbe::GetCeilingNormal()
 	{
@@ -170,6 +207,7 @@ namespace TEN::Scripting::Collision
 	}
 
 	/// Get the material type of the floor at this Probe.
+	// @function GetFloorMaterialType
 	// @treturn Collision.MaterialType[opt] Floor material type. __nil: no floor exists.__
 	sol::optional<MaterialType> ScriptProbe::GetFloorMaterialType()
 	{
@@ -182,6 +220,7 @@ namespace TEN::Scripting::Collision
 	}
 
 	/// Get the material type of the ceiling at this Probe.
+	// @function GetCeilingMaterialType
 	// @treturn Collision.MaterialType[opt] Ceiling material type. __nil: no ceiling exists.__
 	sol::optional<MaterialType> ScriptProbe::GetCeilingMaterialType()
 	{
@@ -194,6 +233,7 @@ namespace TEN::Scripting::Collision
 	}
 
 	/// Check if the floor at this Probe is steep.
+	// @function IsSteepFloor
 	// @treturn bool[opt] Steep floor status. __true: is steep floor, false: isn't steep floor, nil: no floor exists.__
 	sol::optional<bool> ScriptProbe::IsSteepFloor()
 	{
@@ -204,6 +244,7 @@ namespace TEN::Scripting::Collision
 	}
 
 	/// Check if the ceiling at this Probe is steep.
+	// @function IsSteepCeiling
 	// @treturn bool[opt] Steep ceiling status. __true: is steep ceiling, false: isn't steep ceiling, nil: no ceiling exists.__
 	sol::optional<bool> ScriptProbe::IsSteepCeiling()
 	{
@@ -214,6 +255,7 @@ namespace TEN::Scripting::Collision
 	}
 
 	/// Check if there is a wall at this Probe. Can be used to determine if a wall and ceiling exist.
+	// @function IsWall
 	// @treturn bool Wall status. __true: is a wall, false: isn't a wall__
 	bool ScriptProbe::IsWall()
 	{
@@ -221,6 +263,7 @@ namespace TEN::Scripting::Collision
 	}
 
 	/// Check if this Probe is inside solid geometry, i.e. below a floor, above a ceiling, or inside a wall.
+	// @function IsInsideSolidGeometry
 	// @treturn bool Inside geometry status. __true: is inside, false: is outside__
 	bool ScriptProbe::IsInsideSolidGeometry()
 	{
@@ -235,6 +278,7 @@ namespace TEN::Scripting::Collision
 	}
 
 	/// Check if there is a climbable wall in the given heading angle at this Probe.
+	// @function IsClimbableWall
 	// @tparam float headingAngle Heading angle at which to check for a climbable wall.
 	// @treturn bool Climbable wall status. __true: is climbable, false: isn't climbable__
 	bool ScriptProbe::IsClimbableWall(float headingAngle)
@@ -245,6 +289,7 @@ namespace TEN::Scripting::Collision
 	}
 
 	/// Check if there is a monkey swing at this Probe.
+	// @function IsMonkeySwing
 	// @treturn bool Monkey swing status. __true: is a monkey swing, false: isn't a monkey swing__
 	bool ScriptProbe::IsMonkeySwing()
 	{
@@ -253,6 +298,7 @@ namespace TEN::Scripting::Collision
 	}
 
 	/// Check if there is a death tile at this Probe.
+	// @function IsDeath
 	// @treturn bool Death tile status. __true: is a death tile, false: isn't a death tile__
 	bool ScriptProbe::IsDeath()
 	{
