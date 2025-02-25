@@ -17,7 +17,7 @@
 //
 // @table Objects.MoveableStatus
 
-static const std::unordered_map<std::string, ItemStatus> MOVEABLE_STATUSES
+static const auto MOVEABLE_STATUSES = std::unordered_map<std::string, ItemStatus>
 {
 	{ "INACTIVE", ItemStatus::ITEM_NOT_ACTIVE },
 	{ "ACTIVE", ItemStatus::ITEM_ACTIVE },

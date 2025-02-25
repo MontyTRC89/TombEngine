@@ -67,6 +67,7 @@ static constexpr char ScriptReserved_EndReasonLoadGame[]		= "LOAD_GAME";
 static constexpr char ScriptReserved_EndReasonOther[]			= "OTHER";
 
 // Callback points
+
 static constexpr char ScriptReserved_PreStart[]			= "PRE_START";
 static constexpr char ScriptReserved_PostStart[]		= "POST_START";
 static constexpr char ScriptReserved_PreEnd[]			= "PRE_END";
@@ -367,7 +368,6 @@ static constexpr char ScriptReserved_GetCursorDisplayPosition[]		= "GetCursorDis
 static constexpr char ScriptReserved_GetMouseDisplayPosition[]		= "GetMouseDisplayPosition";
 
 // Tables
-
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";
 static constexpr char ScriptReserved_BlendID[]					= "BlendID";
 static constexpr char ScriptReserved_EffectID[]					= "EffectID";
