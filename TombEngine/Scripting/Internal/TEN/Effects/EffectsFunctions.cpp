@@ -45,6 +45,8 @@ namespace TEN::Scripting::Effects
 {
 	// Define the global variable in exactly one place
 	Vector3 _horizonRotation = Vector3::Zero;
+	Vector3 _horizonRotationOld = Vector3::Zero;
+	GAME_OBJECT_ID horizon = ID_HORIZON;
 
 	///Emit a lightning arc.
 	//@function EmitLightningArc
@@ -319,6 +321,14 @@ namespace TEN::Scripting::Effects
 	
 	}
 
+
+	static void SetHorizon(GAME_OBJECT_ID horizonObject)
+	{
+
+		horizon = horizonObject;
+
+	}
+
 	/// Emit air bubble in a water room.
 	// @function EmitAirBubble
 	// @tparam Vec3 pos World position where the effect will be spawned. Must be in a water room.
@@ -393,6 +403,7 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
 		tableEffects.set_function("SetHorizonRotation", &RotateHorizon);
 		tableEffects.set_function("GetHorizonRotation", &GetHorizonRotation);
+		tableEffects.set_function("SetHorizon", &SetHorizon);
 
 		auto handler = LuaHandler{ state };
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_BlendID, BLEND_IDS);

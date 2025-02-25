@@ -8,5 +8,7 @@ namespace TEN::Scripting::Effects
 
 	// Horizon Rotation
 	extern Vector3 _horizonRotation;
+	extern Vector3 _horizonRotationOld;
+	extern GAME_OBJECT_ID horizon;
 };
 

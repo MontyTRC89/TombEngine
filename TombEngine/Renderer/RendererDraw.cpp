@@ -3023,7 +3023,7 @@ namespace TEN::Renderer
 		}
 
 		// Draw horizon.
-		if (_moveableObjects[ID_HORIZON].has_value())
+		if (_moveableObjects[horizon].has_value())
 		{
 			SetDepthState(DepthState::None);
 			SetBlendMode(BlendMode::Opaque);
@@ -3034,12 +3034,13 @@ namespace TEN::Renderer
 
 			_shaders.Bind(Shader::Sky);
 
-			auto& moveableObj = *_moveableObjects[ID_HORIZON];
+			auto& moveableObj = *_moveableObjects[horizon];
 
-			Matrix rotationMatrix = Matrix::CreateRotationX(_horizonRotation.x) *
-				Matrix::CreateRotationY(_horizonRotation.y) *
-				Matrix::CreateRotationZ(_horizonRotation.z);
-			
+			auto rotation = Vector3::Lerp(_horizonRotationOld, _horizonRotation, GetInterpolationFactor());
+
+			Matrix rotationMatrix = Matrix::CreateRotationX(rotation.x) *
+				Matrix::CreateRotationY(rotation.y) *
+				Matrix::CreateRotationZ(rotation.z);
 			_stStatic.World = rotationMatrix * Matrix::CreateTranslation(renderView.Camera.WorldPosition);
 			_stStatic.Color = Vector4::One;
 			_stStatic.ApplyFogBulbs = 1;
@@ -3069,6 +3070,7 @@ namespace TEN::Renderer
 					_numMoveablesDrawCalls++;
 				}
 			}
+			_horizonRotationOld = _horizonRotation;
 		}
 
 		// Eventually draw the sun sprite.
