@@ -1,9 +1,12 @@
 #include "framework.h"
 #include "Scripting/Internal/TEN/Collision/Probe.h"
+#include "Scripting/Internal/TEN/Collision/MaterialTypes.h"
 
 #include "Game/collision/Point.h"
 #include "Game/Lara/lara_climb.h"
+#include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
+#include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
 #include "Specific/level.h"
@@ -49,7 +52,7 @@ namespace TEN::Scripting::Collision
 			"IsSteepCeiling", &Probe::IsSteepCeiling,
 			"IsWall", &Probe::IsWall,
 			"IsInsideSolidGeometry", &Probe::IsInsideSolidGeometry,
-			//"IsClimbableWall", &ScriptProbe::IsClimbableWall,
+			"IsClimbableWall", &Probe::IsClimbableWall,
 			"IsMonkeySwing", &Probe::IsMonkeySwing,
 			"IsDeathTile", &Probe::IsDeath);
 	}
@@ -312,5 +315,14 @@ namespace TEN::Scripting::Collision
 	{
 		const auto& sector = _pointCollision.GetBottomSector();
 		return sector.Flags.Death;
+	}
+
+	void Register(sol::state* state, sol::table& parent)
+	{
+		auto tableCollision= sol::table(state->lua_state(), sol::create);
+		parent.set("Collision", tableCollision);
+
+		auto handler = LuaHandler{ state };
+		handler.MakeReadOnlyTable(tableCollision, "MaterialType", SCRIPT_MATERIAL_TYPES);
 	}
 }

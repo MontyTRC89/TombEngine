@@ -1,9 +1,11 @@
 #pragma once
 
 #include "Game/collision/Point.h"
+#include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
 
 using namespace TEN::Collision::Point;
 
+namespace sol { class state; };
 namespace TEN::Scripting { class Rotation; }
 class Moveable;
 class Vec3;
@@ -59,4 +61,6 @@ namespace TEN::Scripting::Collision
 		bool				IsMonkeySwing();
 		bool				IsDeath();
     };
+
+	void Register(sol::state* lua, sol::table& parent);
 }

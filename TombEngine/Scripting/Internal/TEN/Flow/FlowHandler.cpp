@@ -323,7 +323,7 @@ Specify which translations in the strings table correspond to which languages.
 	LensFlare::Register(tableFlow);
 	Starfield::Register(tableFlow);
 
-	_handler.MakeReadOnlyTable(tableFlow, "MaterialType", SCRIPT_MATERIAL_TYPES);
+	//_handler.MakeReadOnlyTable(tableFlow, "MaterialType", SCRIPT_MATERIAL_TYPES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_WeatherType, WEATHER_TYPES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_LaraType, PLAYER_TYPES);
 	_handler.MakeReadOnlyTable(tableFlow, ScriptReserved_RotationAxis, ROTATION_AXES);
