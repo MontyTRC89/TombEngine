@@ -3070,7 +3070,6 @@ namespace TEN::Renderer
 					_numMoveablesDrawCalls++;
 				}
 			}
-			_horizonRotationOld = _horizonRotation;
 		}
 
 		// Eventually draw the sun sprite.

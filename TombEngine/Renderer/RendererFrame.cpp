@@ -13,6 +13,7 @@
 #include "Objects/Effects/LensFlare.h"
 #include "Renderer/RenderView.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
+#include "Scripting/Internal/TEN/Effects/EffectsFunctions.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
@@ -20,6 +21,7 @@ using namespace TEN::Entities::Effects;
 using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
 using namespace TEN::Utils;
+using namespace TEN::Scripting::Effects;
 
 namespace TEN::Renderer
 {
@@ -900,6 +902,9 @@ namespace TEN::Renderer
 			for (int j = 0; j < MAX_BONES; j++)
 				item.PrevAnimTransforms[j] = item.AnimTransforms[j];
 		}
+
+		//SAVE HORIZON OLD ROTATION
+		_horizonRotationOld = _horizonRotation;
 
 		for (auto& effect : _effects)
 		{
