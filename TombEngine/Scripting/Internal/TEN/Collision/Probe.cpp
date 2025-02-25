@@ -121,7 +121,7 @@ namespace TEN::Scripting::Collision
 		return Vec3(_pointCollision.GetPosition());
 	}
 
-	// TODO: Return actualy room object? Not sure on Lua API conventions.
+
 	/// Get the room number of this Probe.
 	// @treturn int Room number.
 	int Probe::GetRoomNumber()
@@ -129,7 +129,7 @@ namespace TEN::Scripting::Collision
 		return _pointCollision.GetRoomNumber();
 	}
 
-	// TODO: Return actual Room object? Not sure on Lua API conventions.
+	
 	/// Get the room name of this Probe.
 	// @function GetRoomName
 	// @treturn string Room name.
@@ -143,7 +143,7 @@ namespace TEN::Scripting::Collision
 
 	/// Get the room object of this Probe.
 	// @function GetRoom
-	// @treturn Room[opt] Room Object
+	// @treturn Room Room Object
 	std::unique_ptr<Room> Probe::GetRoom()
 	{
 		int roomNumber = _pointCollision.GetRoomNumber();
@@ -152,7 +152,7 @@ namespace TEN::Scripting::Collision
 
 	/// Get the floor height at this Probe.
 	// @function GetFloorHeight
-	// @treturn int[opt] Floor height. __nil: no floor exists.__
+	// @treturn int Floor height. __nil: no floor exists.__
 	sol::optional<int> Probe::GetFloorHeight()
 	{
 		if (_pointCollision.IsWall())
@@ -167,7 +167,7 @@ namespace TEN::Scripting::Collision
 
 	/// Get the ceiling height at this Probe.
 	// @function GetCeilingHeight
-	// @treturn int[opt] Ceiling height. __nil: no ceiling exists.__
+	// @treturn int Ceiling height. __nil: no ceiling exists.__
 	sol::optional<int> Probe::GetCeilingHeight()
 	{
 		if (_pointCollision.IsWall())
@@ -182,7 +182,7 @@ namespace TEN::Scripting::Collision
 
 	/// Get the water surface height at this Probe.
 	// @function GetWaterSurfaceHeight
-	// @treturn int[opt] Water surface height. __nil: no water surface exists.__
+	// @treturn int Water surface height. __nil: no water surface exists.__
 	sol::optional<int> Probe::GetWaterSurfaceHeight()
 	{
 		if (_pointCollision.IsWall())
@@ -197,7 +197,7 @@ namespace TEN::Scripting::Collision
 
 	/// Get the normal of the floor at this Probe.
 	// @function GetFloorNormal
-	// @treturn Vec3[opt] Floor normal. __nil: no floor exists.__
+	// @treturn Vec3 Floor normal. __nil: no floor exists.__
 	sol::optional<Vec3> Probe::GetFloorNormal()
 	{
 		if (_pointCollision.IsWall())
@@ -208,7 +208,7 @@ namespace TEN::Scripting::Collision
 
 	/// Get the normal of the ceiling at this Probe.
 	// @function GetCeilingNormal
-	// @treturn Vec3[opt] Ceiling normal. __nil: no ceiling exists.__
+	// @treturn Vec3 Ceiling normal. __nil: no ceiling exists.__
 	sol::optional<Vec3> Probe::GetCeilingNormal()
 	{
 		if (_pointCollision.IsWall())
@@ -219,7 +219,7 @@ namespace TEN::Scripting::Collision
 
 	/// Get the material type of the floor at this Probe.
 	// @function GetFloorMaterialType
-	// @treturn Collision.MaterialType[opt] Floor material type. __nil: no floor exists.__
+	// @treturn Collision.MaterialType Floor material type. __nil: no floor exists.__
 	sol::optional<MaterialType> Probe::GetFloorMaterialType()
 	{
 		if (_pointCollision.IsWall())
@@ -232,7 +232,7 @@ namespace TEN::Scripting::Collision
 
 	/// Get the material type of the ceiling at this Probe.
 	// @function GetCeilingMaterialType
-	// @treturn Collision.MaterialType[opt] Ceiling material type. __nil: no ceiling exists.__
+	// @treturn Collision.MaterialType Ceiling material type. __nil: no ceiling exists.__
 	sol::optional<MaterialType> Probe::GetCeilingMaterialType()
 	{
 		if (_pointCollision.IsWall())
@@ -245,7 +245,7 @@ namespace TEN::Scripting::Collision
 
 	/// Check if the floor at this Probe is steep.
 	// @function IsSteepFloor
-	// @treturn bool[opt] Steep floor status. __true: is a steep floor, false: isn't a steep floor, nil: no floor exists.__
+	// @treturn bool Steep floor status. __true: is a steep floor, false: isn't a steep floor, nil: no floor exists.__
 	sol::optional<bool> Probe::IsSteepFloor()
 	{
 		if (_pointCollision.IsWall())
@@ -256,7 +256,7 @@ namespace TEN::Scripting::Collision
 
 	/// Check if the ceiling at this Probe is steep.
 	// @function IsSteepCeiling
-	// @treturn bool[opt] Steep ceiling status. __true: is a steep ceiling, false: isn't a steep ceiling, nil: no ceiling exists.__
+	// @treturn bool Steep ceiling status. __true: is a steep ceiling, false: isn't a steep ceiling, nil: no ceiling exists.__
 	sol::optional<bool> Probe::IsSteepCeiling()
 	{
 		if (_pointCollision.IsWall())
