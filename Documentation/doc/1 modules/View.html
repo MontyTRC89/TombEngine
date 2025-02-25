@@ -168,8 +168,16 @@
 	<td class="summary">Sets the post-process tint.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#PlayFlyBy">PlayFlyBy(flyby)</a></td>
-	<td class="summary">Enable FlyBy with specific ID</td>
+	<td class="name" ><a href="#PlayFlyby">PlayFlyby(seqID)</a></td>
+	<td class="summary">Play a flyby sequence.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetFlybyPosition">GetFlybyPosition(seqID, progress)</a></td>
+	<td class="summary">Get a flyby sequence's position at a specified progress point in percent.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetFlybyRotation">GetFlybyRotation(seqID, progress)</a></td>
+	<td class="summary">Get a flyby sequence's rotation at a specified progress point in percent.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#ResetObjCamera">ResetObjCamera()</a></td>
@@ -464,22 +472,86 @@
 
 </dd>
     <dt>
-    <a name = "PlayFlyBy"></a>
-    <strong>PlayFlyBy(flyby)</strong>
+    <a name = "PlayFlyby"></a>
+    <strong>PlayFlyby(seqID)</strong>
     </dt>
     <dd>
-    Enable FlyBy with specific ID
+    Play a flyby sequence.
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">flyby</span>
-            <span class="types"><span class="type">short</span></span>
-         (ID of flyby)
+        <li><span class="parameter">seqID</span>
+            <span class="types"><span class="type">int</span></span>
+         Flyby sequence ID.
         </li>
     </ul>
 
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetFlybyPosition"></a>
+    <strong>GetFlybyPosition(seqID, progress)</strong>
+    </dt>
+    <dd>
+    Get a flyby sequence's position at a specified progress point in percent.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">seqID</span>
+            <span class="types"><span class="type">int</span></span>
+         Flyby sequence ID.
+        </li>
+        <li><span class="parameter">progress</span>
+            <span class="types"><span class="type">float</span></span>
+         Progress point in percent. Clamped to [0, 100].
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+        Position at the given progress point.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetFlybyRotation"></a>
+    <strong>GetFlybyRotation(seqID, progress)</strong>
+    </dt>
+    <dd>
+    Get a flyby sequence's rotation at a specified progress point in percent.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">seqID</span>
+            <span class="types"><span class="type">int</span></span>
+         Flyby sequence ID.
+        </li>
+        <li><span class="parameter">progress</span>
+            <span class="types"><span class="type">float</span></span>
+         Progress point in percent. Clamped to [0, 100].
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
+        Rotation at the given progress point.
+    </ol>
 
 
 
