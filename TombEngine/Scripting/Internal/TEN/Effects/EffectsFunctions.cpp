@@ -43,7 +43,7 @@ using namespace TEN::Scripting::Types;
 
 namespace TEN::Scripting::Effects
 {
-	// Define the global variable in exactly one place
+	// Initialize the global variables for Horizon Rotation and Swap
 	Vector3 _horizonRotation = Vector3::Zero;
 	Vector3 _horizonRotationOld = Vector3::Zero;
 	GAME_OBJECT_ID horizon = ID_HORIZON;
