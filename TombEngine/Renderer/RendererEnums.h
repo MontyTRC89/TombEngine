@@ -95,6 +95,12 @@ enum class BlendMode
 	DynamicWaterSurface = 13
 };
 
+enum class ShaderMaterialType
+{
+	Normal = 0,
+	Water = 1
+};
+
 enum class CullMode
 {
 	Unknown = -1,
@@ -238,7 +244,8 @@ enum class RendererPass
 	GBuffer,
 	GunFlashes,
 	RoomAmbient,
-	DynamicWaterSurfaces
+	DynamicWaterSurfaces,
+	WaterReflections
 };
 
 enum class SceneRenderMode

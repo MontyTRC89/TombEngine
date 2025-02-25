@@ -70,13 +70,10 @@ namespace TEN::Renderer::Utils
 		SsaoBlur,
 
 		// Water reflections
-		RoomsWaterReflection,
-		SSR,
-		SSRProjectHash,
-		SSRResolveHash,
-
-		WaterVertexShader,
-		WaterPixelShader,
+		RoomsWaterReflectionsVertexShader,
+		ItemsWaterReflectionsVertexShader,
+		WaterReflectionsPixelShader,
+		Water,
 
 		Count
 	};

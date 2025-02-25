@@ -507,7 +507,7 @@ namespace TEN::Renderer
 		void InterpolateCamera(float interpFactor);
 		void CopyRenderTarget(RenderTarget2D* source, RenderTarget2D* dest, RenderView& view);
 		void BlurRenderTarget(RenderTarget2D* sources, RenderView& view);
-		void RenderSimpleSceneForWaterReflections(RenderTarget2D* renderTarget, RendererWaterPlane* waterPlane, RenderView& view);
+		void RenderWaterPlanarReflections(RenderTarget2D* renderTarget, RendererWaterPlane* waterPlane, RenderView& view);
 
 		void AddSpriteBillboard(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D, float scale,
 					 Vector2 size, BlendMode blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);

@@ -146,14 +146,10 @@ namespace TEN::Renderer::Utils
 
 	void ShaderManager::LoadWaterShaders()
 	{
-		Load(Shader::RoomsWaterReflection, "Water", "WaterReflections", ShaderType::PixelAndVertex);
-		
-		Load(Shader::SSR, "Water", "SSR", ShaderType::Vertex);
-		Load(Shader::SSRProjectHash, "Water", "SSRProjectHash", ShaderType::Pixel);
-		Load(Shader::SSRResolveHash, "Water", "SSRResolveHash", ShaderType::Pixel);
-
-		Load(Shader::WaterVertexShader, "Water", "Water", ShaderType::Vertex);
-		Load(Shader::WaterPixelShader, "Water", "Water", ShaderType::Pixel);
+		Load(Shader::RoomsWaterReflectionsVertexShader, "Water", "RoomsWaterReflections", ShaderType::Vertex);
+		Load(Shader::ItemsWaterReflectionsVertexShader, "Water", "ItemsWaterReflections", ShaderType::Vertex);
+		Load(Shader::WaterReflectionsPixelShader, "Water", "WaterReflections", ShaderType::Pixel);
+		Load(Shader::Water, "Water", "Water", ShaderType::PixelAndVertex);
 	}
 
 	void ShaderManager::Bind(Shader shader, bool forceNull)

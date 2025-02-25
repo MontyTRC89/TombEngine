@@ -1800,7 +1800,7 @@ namespace TEN::Renderer
 		//RenderSimpleSceneToParaboloid(&_roomAmbientMapFront, LaraItem->Pose.Position.ToVector3(), 1);
 		//RenderSimpleSceneToParaboloid(&_roomAmbientMapBack, LaraItem->Pose.Position.ToVector3(), -1);
 		if (view.WaterPlanesToDraw.size() > 0)
-			RenderSimpleSceneForWaterReflections(&_waterReflectionsRenderTarget, &view.WaterPlanesToDraw[0], view);
+			RenderWaterPlanarReflections(&_waterReflectionsRenderTarget, &view.WaterPlanesToDraw[0], view);
 
 		// Set up vertex parameters.
 		_context->IASetInputLayout(_inputLayout.Get());
@@ -1885,7 +1885,6 @@ namespace TEN::Renderer
 		// Bind main render target again. Main depth buffer is already filled and avoids overdraw in following steps.
 		_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), _renderTarget.DepthStencilView.Get());
 
-		_context->ClearRenderTargetView(_renderTarget.RenderTargetView.Get(), Colors::Black);
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 		DoRenderPass(RendererPass::Opaque, view, true);
@@ -2294,6 +2293,11 @@ namespace TEN::Renderer
 		{
 			_shaders.Bind(Shader::GBuffer);
 			_shaders.Bind(Shader::GBufferItems);
+		}
+		else if (rendererPass == RendererPass::WaterReflections)
+		{
+			_shaders.Bind(Shader::ItemsWaterReflectionsVertexShader);
+			_shaders.Bind(Shader::WaterReflectionsPixelShader);
 		}
 		else
 		{
@@ -2741,13 +2745,6 @@ namespace TEN::Renderer
 				}
 
 				_cbShadowMap.UpdateData(_stShadowMap, _context.Get());
-				 
-				/*if (rendererPass == RendererPass::DynamicWaterSurfaces)
-				{ 
-					BindUAVRenderTargetAsTexture(TextureRegister::SSRHashBuffer, &_waterReflectionsHashBuffer);
-					BindRenderTargetAsTexture(TextureRegister::WaterReflectionMap, &_waterReflectionsRenderTarget, SamplerStateRegister::LinearWrap);
-					BindTexture(TextureRegister::WaterNormalMap, &_waterNormalMap, SamplerStateRegister::LinearWrap);
-				}*/
 
 				if (g_Configuration.EnableAmbientOcclusion)
 				{
@@ -2789,6 +2786,9 @@ namespace TEN::Renderer
 							continue;
 
 						if (bucket.NumVertices == 0)
+							continue;
+
+						if (bucket.MaterialType != ShaderMaterialType::Normal)
 							continue;
 
 						int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
@@ -3304,6 +3304,26 @@ namespace TEN::Renderer
 
 			SetBlendMode(BlendMode::DynamicWaterSurface, true);
 			SetAlphaTest(AlphaTestMode::None, 1.0f);
+			break;
+
+		case (RendererPass::WaterReflections):
+			if (blendMode != BlendMode::Opaque &&
+				blendMode != BlendMode::AlphaTest)
+			{
+				return false;
+			}
+
+			if (blendMode == BlendMode::Opaque)
+			{
+				SetBlendMode(BlendMode::Opaque);
+				SetAlphaTest(AlphaTestMode::None, 1.0f);
+			}
+			else
+			{
+				SetBlendMode(BlendMode::Opaque);
+				SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+			}
+
 			break;
 
 		default:
@@ -3824,7 +3844,7 @@ namespace TEN::Renderer
 		_gameCamera.Camera.FarPlane = _currentGameCamera.Camera.FarPlane;
 	}
 
-	void Renderer::RenderSimpleSceneForWaterReflections(RenderTarget2D* renderTarget, RendererWaterPlane* waterPlane, RenderView& view)
+	void Renderer::RenderWaterPlanarReflections(RenderTarget2D* renderTarget, RendererWaterPlane* waterPlane, RenderView& view)
 	{
 		// Reset GPU state
 		SetBlendMode(BlendMode::Opaque);
@@ -3961,16 +3981,16 @@ namespace TEN::Renderer
 			_context->ClearDepthStencilView(renderTarget->DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		}
 
-		//_context->VSSetShader(_vsRooms.Get(), nullptr, 0);
-		//_context->PSSetShader(_psRooms.Get(), nullptr, 0);
-
 		// Draw rooms
 		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
-
+		 
 		// Bind vertex and index buffer.
 		_context->IASetVertexBuffers(0, 1, _roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		_context->IASetIndexBuffer(_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+		_shaders.Bind(Shader::RoomsWaterReflectionsVertexShader);
+		_shaders.Bind(Shader::WaterReflectionsPixelShader);
 
 		for (int i = 0; i < _rooms.size(); i++)
 		{
@@ -4006,8 +4026,6 @@ namespace TEN::Renderer
 					continue;
 				}
 
-				_shaders.Bind(Shader::RoomsWaterReflection); 
-
 				SetBlendMode(bucket.BlendMode);
 				SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
@@ -4027,7 +4045,46 @@ namespace TEN::Renderer
 				_numRoomsDrawCalls++;
 			}
 		}
-		
+
+		// Draw items
+		_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+		_shaders.Bind(Shader::ItemsWaterReflectionsVertexShader);
+		_shaders.Bind(Shader::WaterReflectionsPixelShader);
+
+		for (int i = 0; i < _rooms.size(); i++)
+		{
+			int index = i;
+			RendererRoom* room = &_rooms[index];
+			ROOM_INFO* nativeRoom = &g_Level.Rooms[room->RoomNumber];
+
+			for (auto itemToDraw : room->ItemsToDraw)
+			{
+				switch (itemToDraw->ObjectID)
+				{
+				case ID_LARA:
+					DrawLara(view, RendererPass::WaterReflections);
+					continue;
+
+				case ID_WATERFALL1:
+				case ID_WATERFALL2:
+				case ID_WATERFALL3:
+				case ID_WATERFALL4:
+				case ID_WATERFALL5:
+				case ID_WATERFALL6:
+				case ID_WATERFALLSS1:
+				case ID_WATERFALLSS2:
+					DrawWaterfalls(itemToDraw, view, 10, RendererPass::WaterReflections);
+					continue;
+
+				default:
+					DrawAnimatingItem(itemToDraw, view, RendererPass::WaterReflections);
+					continue;
+				}
+			}
+		}
+
 		// Blur the render target
 
 		// Common vertex shader to all fullscreen effects
@@ -4189,8 +4246,7 @@ namespace TEN::Renderer
 		SetDepthState(DepthState::Read);
 
 		// Draw water surfaces
-		_shaders.Bind(Shader::WaterVertexShader);
-		_shaders.Bind(Shader::WaterPixelShader);
+		_shaders.Bind(Shader::Water);
 
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetInputLayout(_inputLayout.Get());
@@ -4208,7 +4264,7 @@ namespace TEN::Renderer
 		BindTexture(TextureRegister::WaterDistortionMap, &_waterDistortionMap, SamplerStateRegister::AnisotropicWrap);
 		BindTexture(TextureRegister::WaterNormalMap, &_wave1NormalMap, SamplerStateRegister::AnisotropicWrap);
 		 
-		_stWater.WaveStrength = 0.002f;
+		_stWater.WaveStrength = 0.009f;
 		_stWater.Shininess = 20.0f;
 		_stWater.KSpecular = 0.3f;
 		_stWater.LightColor = Vector3::One;
@@ -4229,7 +4285,7 @@ namespace TEN::Renderer
 			{
 				if (waterBucket.Bucket->NumVertices == 0)
 					continue;
-
+				 
 				SetScissor(waterBucket.Room->ClipBounds);
 
 				DrawIndexedTriangles(waterBucket.Bucket->NumIndices, waterBucket.Bucket->StartIndex, 0);

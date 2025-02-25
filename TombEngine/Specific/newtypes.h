@@ -19,6 +19,7 @@ struct BUCKET
 {
 	int texture;
 	BlendMode blendMode;
+	ShaderMaterialType materialType;
 	bool animated;
 	int numQuads;
 	int numTriangles;

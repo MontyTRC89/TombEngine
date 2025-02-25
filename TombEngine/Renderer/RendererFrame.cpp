@@ -155,7 +155,7 @@ namespace TEN::Renderer
 		{  
 			for (auto& bucket : roomPtr->Buckets)
 			{
-				if (bucket.BlendMode == BlendMode::DynamicWaterSurface)
+				if (bucket.MaterialType == ShaderMaterialType::Water)
 				{
 					//WaterPlane waterPlane = g_Level.WaterPlanes[bucket.WaterPlaneIndex];
 					int waterHeight = 0;
