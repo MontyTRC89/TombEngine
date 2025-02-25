@@ -31,6 +31,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### Lua API changes
 * Added Lerp() function to the Rotation object to allow linear interpolation between rotations.
 * Added diary module.
+* Added SetHorizon function to meshswap horizon.
+* Added SetHorizonRotation, GetHorizonRotation functions to rotate horizons.
 * Added Effects.EmitAirBubble() function to spawn air bubbles.
 * Added additional arguments for Sprite object slot and starting rotation value for EmitParticle function.
 * Added various Translate() methods to Vec2 and Vec3 script objects.
