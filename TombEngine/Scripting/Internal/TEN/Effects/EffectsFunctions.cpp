@@ -21,6 +21,7 @@
 #include "Scripting/Internal/TEN/Effects/BlendIDs.h"
 #include "Scripting/Internal/TEN/Effects/EffectIDs.h"
 #include "Scripting/Internal/TEN/Types/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 #include "Sound/sound.h"
@@ -42,6 +43,11 @@ using namespace TEN::Scripting::Types;
 
 namespace TEN::Scripting::Effects
 {
+	// Define the global variable in exactly one place
+	Vector3 _horizonRotation = Vector3::Zero;
+	Vector3 _horizonRotationOld = Vector3::Zero;
+	GAME_OBJECT_ID horizon = ID_HORIZON;
+
 	///Emit a lightning arc.
 	//@function EmitLightningArc
 	//@tparam Vec3 src
@@ -299,6 +305,30 @@ namespace TEN::Scripting::Effects
 		TriggerBlood(pos.x, pos.y, pos.z, -1, ValueOr<int>(count, 1));
 	}
 
+
+	static void RotateHorizon(const Rotation& rot)
+	{
+
+		Vec3 data = Vec3(rot.x * RADIAN,rot.y * RADIAN,rot.z * RADIAN);
+
+		_horizonRotation = data;
+	}
+
+	Rotation GetHorizonRotation()
+	{
+
+		return Rotation(_horizonRotation.x / RADIAN, _horizonRotation.y / RADIAN, _horizonRotation.z / RADIAN);
+	
+	}
+
+
+	static void SetHorizon(GAME_OBJECT_ID horizonObject)
+	{
+
+		horizon = horizonObject;
+
+	}
+
 	/// Emit air bubble in a water room.
 	// @function EmitAirBubble
 	// @tparam Vec3 pos World position where the effect will be spawned. Must be in a water room.
@@ -371,9 +401,13 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_EmitFire, &EmitFire);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
 		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
+		tableEffects.set_function("SetHorizonRotation", &RotateHorizon);
+		tableEffects.set_function("GetHorizonRotation", &GetHorizonRotation);
+		tableEffects.set_function("SetHorizon", &SetHorizon);
 
 		auto handler = LuaHandler{ state };
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_BlendID, BLEND_IDS);
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_EffectID, EFFECT_IDS);
 	}
 }
+

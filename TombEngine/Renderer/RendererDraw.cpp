@@ -29,6 +29,7 @@
 #include "Renderer/RenderView.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/Structures/RendererSortableObject.h"
+#include "Scripting/Internal/TEN/Effects/EffectsFunctions.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/winmain.h"
@@ -41,6 +42,7 @@ using namespace TEN::Hud;
 using namespace TEN::Renderer::Structures;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::DisplaySprite;
+using namespace TEN::Scripting::Effects;
 
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
@@ -2027,7 +2029,7 @@ namespace TEN::Renderer
 				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 				auto& moveableObj = *_moveableObjects[ID_HORIZON];
-
+				 
 				_stStatic.World = Matrix::CreateTranslation(LaraItem->Pose.Position.ToVector3());
 				_stStatic.Color = Vector4::One;
 				_stStatic.ApplyFogBulbs = 1;
@@ -3021,7 +3023,7 @@ namespace TEN::Renderer
 		}
 
 		// Draw horizon.
-		if (_moveableObjects[ID_HORIZON].has_value())
+		if (_moveableObjects[horizon].has_value())
 		{
 			SetDepthState(DepthState::None);
 			SetBlendMode(BlendMode::Opaque);
@@ -3032,9 +3034,14 @@ namespace TEN::Renderer
 
 			_shaders.Bind(Shader::Sky);
 
-			auto& moveableObj = *_moveableObjects[ID_HORIZON];
+			auto& moveableObj = *_moveableObjects[horizon];
 
-			_stStatic.World = Matrix::CreateTranslation(renderView.Camera.WorldPosition);
+			auto rotation = Vector3::Lerp(_horizonRotationOld, _horizonRotation, GetInterpolationFactor());
+
+			Matrix rotationMatrix = Matrix::CreateRotationX(rotation.x) *
+				Matrix::CreateRotationY(rotation.y) *
+				Matrix::CreateRotationZ(rotation.z);
+			_stStatic.World = rotationMatrix * Matrix::CreateTranslation(renderView.Camera.WorldPosition);
 			_stStatic.Color = Vector4::One;
 			_stStatic.ApplyFogBulbs = 1;
 			_cbStatic.UpdateData(_stStatic, _context.Get());
@@ -3063,6 +3070,7 @@ namespace TEN::Renderer
 					_numMoveablesDrawCalls++;
 				}
 			}
+			_horizonRotationOld = _horizonRotation;
 		}
 
 		// Eventually draw the sun sprite.
