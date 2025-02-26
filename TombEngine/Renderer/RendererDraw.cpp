@@ -43,6 +43,7 @@ using namespace TEN::Renderer::Structures;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Scripting::Effects;
+using namespace TEN::Effects::Environment;
 
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
@@ -3023,6 +3024,10 @@ namespace TEN::Renderer
 		}
 
 		// Draw horizon.
+		TEN::Effects::Environment::HorizonObject horizonC;
+		GAME_OBJECT_ID horizon = horizonC.GetHorizonID();
+		Vector3 _horizonRotationOld = horizonC.GetOldRotation();
+		Vector3 _horizonRotation = horizonC.GetRotation();
 		if (_moveableObjects[horizon].has_value())
 		{
 			SetDepthState(DepthState::None);

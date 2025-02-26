@@ -21,6 +21,29 @@ using namespace TEN::Math;
 
 namespace TEN::Effects::Environment 
 {
+	GAME_OBJECT_ID HorizonObject::_horizonID = ID_HORIZON;
+	Vector3 HorizonObject::_rotation = Vector3::Zero;
+	Vector3 HorizonObject::_oldRotation = Vector3::Zero;
+
+	HorizonObject::HorizonObject() {}
+
+	// Getters
+	Vector3 HorizonObject::GetRotation() const { return _rotation; }
+	Vector3 HorizonObject::GetOldRotation() const { return _oldRotation; }
+	GAME_OBJECT_ID HorizonObject::GetHorizonID() const { return _horizonID; }
+
+	// Setters
+	void HorizonObject::SetRotation(const Vector3& rotation) { _rotation = rotation; }
+	void HorizonObject::SetHorizonID(GAME_OBJECT_ID id) { _horizonID = id; }
+	void HorizonObject::SaveInterpolationData() { _oldRotation = _rotation;}
+	
+	// Reset horizon rotation
+	void HorizonObject::ResetRotation()
+	{
+		_rotation = Vector3::Zero;
+		_oldRotation = Vector3::Zero;
+	}
+
 	EnvironmentController Weather;
 
 	float WeatherParticle::Transparency() const

@@ -43,10 +43,6 @@ using namespace TEN::Scripting::Types;
 
 namespace TEN::Scripting::Effects
 {
-	// Initialize the global variables for Horizon Rotation and Swap
-	Vector3 _horizonRotation = Vector3::Zero;
-	Vector3 _horizonRotationOld = Vector3::Zero;
-	GAME_OBJECT_ID horizon = ID_HORIZON;
 
 	///Emit a lightning arc.
 	//@function EmitLightningArc
@@ -312,7 +308,8 @@ namespace TEN::Scripting::Effects
 	static void SetHorizonRotation(const Rotation& rot)
 	{
 		Vec3 data = Vec3(rot.x * RADIAN,rot.y * RADIAN,rot.z * RADIAN);
-		_horizonRotation = data;
+		TEN::Effects::Environment::HorizonObject horizon;
+		horizon.SetRotation(data);
 	}
 
 /***Returns Horizon's current rotation value.
@@ -321,7 +318,10 @@ namespace TEN::Scripting::Effects
 */
 	Rotation GetHorizonRotation()
 	{
-		return Rotation(_horizonRotation.x / RADIAN, _horizonRotation.y / RADIAN, _horizonRotation.z / RADIAN);
+		TEN::Effects::Environment::HorizonObject horizon;
+		Vector3 _horizonRotation = horizon.GetRotation();
+		Rotation rot = Rotation(_horizonRotation.x / RADIAN, _horizonRotation.y / RADIAN, _horizonRotation.z / RADIAN);
+		return rot;
 	}
 
 /***Meshswap's Horizon with a specified object slot.
@@ -330,7 +330,8 @@ namespace TEN::Scripting::Effects
 */
 	static void SetHorizon(GAME_OBJECT_ID horizonObject)
 	{
-		horizon = horizonObject;
+		TEN::Effects::Environment::HorizonObject horizon;
+		horizon.SetHorizonID(horizonObject);
 	}
 
 /// Emit air bubble in a water room.
@@ -405,9 +406,9 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_EmitFire, &EmitFire);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
 		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
-		tableEffects.set_function("SetHorizonRotation", &SetHorizonRotation);
-		tableEffects.set_function("GetHorizonRotation", &GetHorizonRotation);
-		tableEffects.set_function("SetHorizon", &SetHorizon);
+		tableEffects.set_function(ScriptReserved_SetHorizonRotation, &SetHorizonRotation);
+		tableEffects.set_function(ScriptReserved_GetHorizonRotation, &GetHorizonRotation);
+		tableEffects.set_function(ScriptReserved_SetHorizon, &SetHorizon);
 
 		auto handler = LuaHandler{ state };
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_BlendID, BLEND_IDS);

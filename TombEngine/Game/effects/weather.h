@@ -164,5 +164,29 @@ namespace TEN::Effects::Environment
 		void SpawnMeteorParticles(const ScriptInterfaceLevel& level);
 	};
 
+	class HorizonObject
+	{
+	public:
+		HorizonObject();
+
+		// Getters
+		Vector3 GetRotation() const;
+		Vector3 GetOldRotation() const;
+		GAME_OBJECT_ID GetHorizonID() const;
+
+		// Setters
+		void SetRotation(const Vector3& rotation);
+		void SetHorizonID(GAME_OBJECT_ID id);
+		void SaveInterpolationData();
+
+		// Utility
+		void ResetRotation(); // Resets horizon rotation
+
+	private:
+		static Vector3 _rotation;
+		static Vector3 _oldRotation;
+		static GAME_OBJECT_ID _horizonID;
+	};	
+
 	extern EnvironmentController Weather;
 }
