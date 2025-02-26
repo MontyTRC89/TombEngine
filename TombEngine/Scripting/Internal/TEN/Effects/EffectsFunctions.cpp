@@ -305,35 +305,39 @@ namespace TEN::Scripting::Effects
 		TriggerBlood(pos.x, pos.y, pos.z, -1, ValueOr<int>(count, 1));
 	}
 
-
-	static void RotateHorizon(const Rotation& rot)
+/***Rotate Horizon by specified rotation value.
+@function RotateHorizon
+@tparam Rotation rot Horizon's new rotation
+*/
+	static void SetHorizonRotation(const Rotation& rot)
 	{
-
 		Vec3 data = Vec3(rot.x * RADIAN,rot.y * RADIAN,rot.z * RADIAN);
-
 		_horizonRotation = data;
 	}
 
+/***Returns Horizon's current rotation value.
+@function GetHorizonRotation
+@treturn Rotation Horizon's current rotation
+*/
 	Rotation GetHorizonRotation()
 	{
-
 		return Rotation(_horizonRotation.x / RADIAN, _horizonRotation.y / RADIAN, _horizonRotation.z / RADIAN);
-	
 	}
 
-
+/***Meshswap's Horizon with a specified object slot.
+@function SetHorizon
+@tparam Objects.ObjID Object slot to meshswap horizon with.
+*/
 	static void SetHorizon(GAME_OBJECT_ID horizonObject)
 	{
-
 		horizon = horizonObject;
-
 	}
 
-	/// Emit air bubble in a water room.
-	// @function EmitAirBubble
-	// @tparam Vec3 pos World position where the effect will be spawned. Must be in a water room.
-	// @tparam[opt] float size Sprite size. __Default: 32__
-	// @tparam[opt] float amp Oscillation amplitude. __Default: 32__
+/// Emit air bubble in a water room.
+// @function EmitAirBubble
+// @tparam Vec3 pos World position where the effect will be spawned. Must be in a water room.
+// @tparam[opt] float size Sprite size. __Default: 32__
+// @tparam[opt] float amp Oscillation amplitude. __Default: 32__
 	static void EmitAirBubble(const Vec3& pos, TypeOrNil<float> size, TypeOrNil<float> amp)
 	{
 		constexpr auto DEFAULT_SIZE = 128.0f;
@@ -401,7 +405,7 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_EmitFire, &EmitFire);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
 		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
-		tableEffects.set_function("SetHorizonRotation", &RotateHorizon);
+		tableEffects.set_function("SetHorizonRotation", &SetHorizonRotation);
 		tableEffects.set_function("GetHorizonRotation", &GetHorizonRotation);
 		tableEffects.set_function("SetHorizon", &SetHorizon);
 
