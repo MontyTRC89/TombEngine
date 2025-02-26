@@ -173,11 +173,13 @@ namespace TEN::Effects::Environment
 		Vector3 GetRotation() const;
 		Vector3 GetOldRotation() const;
 		GAME_OBJECT_ID GetHorizonID() const;
+		bool GetInterpolationStatus() const;
 
 		// Setters
 		void SetRotation(const Vector3& rotation);
 		void SetHorizonID(GAME_OBJECT_ID id);
 		void SaveInterpolationData();
+		void SetInterpolation(bool value);
 
 		// Utility
 		void ResetRotation(); // Resets horizon rotation
@@ -186,6 +188,7 @@ namespace TEN::Effects::Environment
 		static Vector3 _rotation;
 		static Vector3 _oldRotation;
 		static GAME_OBJECT_ID _horizonID;
+		static bool _interpolation;
 	};	
 
 	extern EnvironmentController Weather;

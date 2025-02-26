@@ -307,9 +307,27 @@ namespace TEN::Scripting::Effects
 */
 	static void SetHorizonRotation(const Rotation& rot)
 	{
-		Vec3 data = Vec3(rot.x * RADIAN,rot.y * RADIAN,rot.z * RADIAN);
 		TEN::Effects::Environment::HorizonObject horizon;
+		constexpr auto BIG_ANGLE_THRESHOLD_DEGREES = 30.0f;
+
+		// Get current rotation in degrees
+		Vector3 _horizonRotation = horizon.GetRotation();
+		Rotation currentRotation = Rotation(_horizonRotation.x / RADIAN, _horizonRotation.y / RADIAN, _horizonRotation.z / RADIAN);
+
+		// Check if the difference in rotation exceeds the threshold
+		bool bigRotation =
+			(std::abs(rot.x - currentRotation.x) > BIG_ANGLE_THRESHOLD_DEGREES) ||
+			(std::abs(rot.y - currentRotation.y) > BIG_ANGLE_THRESHOLD_DEGREES) ||
+			(std::abs(rot.z - currentRotation.z) > BIG_ANGLE_THRESHOLD_DEGREES);
+
+		Vec3 data = Vec3(rot.x * RADIAN,rot.y * RADIAN,rot.z * RADIAN);
+
 		horizon.SetRotation(data);
+
+		if (bigRotation)
+		{
+			horizon.SetInterpolation(false);
+		}
 	}
 
 /***Returns Horizon's current rotation value.

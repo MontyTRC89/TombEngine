@@ -24,6 +24,7 @@ namespace TEN::Effects::Environment
 	GAME_OBJECT_ID HorizonObject::_horizonID = ID_HORIZON;
 	Vector3 HorizonObject::_rotation = Vector3::Zero;
 	Vector3 HorizonObject::_oldRotation = Vector3::Zero;
+	bool HorizonObject::_interpolation = false;
 
 	HorizonObject::HorizonObject() {}
 
@@ -31,11 +32,16 @@ namespace TEN::Effects::Environment
 	Vector3 HorizonObject::GetRotation() const { return _rotation; }
 	Vector3 HorizonObject::GetOldRotation() const { return _oldRotation; }
 	GAME_OBJECT_ID HorizonObject::GetHorizonID() const { return _horizonID; }
+	bool HorizonObject::GetInterpolationStatus() const { return _interpolation; }
 
 	// Setters
 	void HorizonObject::SetRotation(const Vector3& rotation) { _rotation = rotation; }
 	void HorizonObject::SetHorizonID(GAME_OBJECT_ID id) { _horizonID = id; }
 	void HorizonObject::SaveInterpolationData() { _oldRotation = _rotation;}
+	void HorizonObject::SetInterpolation(bool value)
+	{ 
+		_interpolation = value;
+	}
 	
 	// Reset horizon rotation
 	void HorizonObject::ResetRotation()

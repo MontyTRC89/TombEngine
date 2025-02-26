@@ -29,7 +29,6 @@
 #include "Renderer/RenderView.h"
 #include "Renderer/Renderer.h"
 #include "Renderer/Structures/RendererSortableObject.h"
-#include "Scripting/Internal/TEN/Effects/EffectsFunctions.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/winmain.h"
@@ -42,7 +41,6 @@ using namespace TEN::Hud;
 using namespace TEN::Renderer::Structures;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::DisplaySprite;
-using namespace TEN::Scripting::Effects;
 using namespace TEN::Effects::Environment;
 
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
@@ -3024,11 +3022,9 @@ namespace TEN::Renderer
 		}
 
 		// Draw horizon.
-		TEN::Effects::Environment::HorizonObject horizonC;
-		GAME_OBJECT_ID horizon = horizonC.GetHorizonID();
-		Vector3 _horizonRotationOld = horizonC.GetOldRotation();
-		Vector3 _horizonRotation = horizonC.GetRotation();
-		if (_moveableObjects[horizon].has_value())
+		TEN::Effects::Environment::HorizonObject horizon;
+
+		if (_moveableObjects[horizon.GetHorizonID()].has_value())
 		{
 			SetDepthState(DepthState::None);
 			SetBlendMode(BlendMode::Opaque);
@@ -3039,9 +3035,18 @@ namespace TEN::Renderer
 
 			_shaders.Bind(Shader::Sky);
 
-			auto& moveableObj = *_moveableObjects[horizon];
+			auto& moveableObj = *_moveableObjects[horizon.GetHorizonID()];
 
-			auto rotation = Vector3::Lerp(_horizonRotationOld, _horizonRotation, GetInterpolationFactor());
+			if (horizon.GetInterpolationStatus() == false)
+			{
+				// NOTE: Overwriting interpolation data before drawing.
+				horizon.SaveInterpolationData();
+
+				// Otherwise all frames until next ControlPhase will not be interpolated.
+				horizon.SetInterpolation(true);
+
+			}
+			auto rotation = Vector3::Lerp(horizon.GetOldRotation(), horizon.GetRotation(), GetInterpolationFactor());
 
 			Matrix rotationMatrix = Matrix::CreateRotationX(rotation.x) *
 				Matrix::CreateRotationY(rotation.y) *
