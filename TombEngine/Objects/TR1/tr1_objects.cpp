@@ -250,7 +250,27 @@ static void StartTrap(ObjectInfo* obj)
 		obj->shadowType = ShadowMode::All;
 		obj->SetHitEffect(true);
 	}
+	/*
+	obj = &Objects[ID_DAMOCLES_SWORD];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeDamoclesSword;
+		obj->control = ControlDamoclesSword;
+		obj->collision = CollideDamoclesSword;
+		obj->shadowType = ShadowMode::All;
+		obj->SetHitEffect(true);
+	}
 
+	obj = &Objects[ID_DAMOCLES_SWORD];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeDamoclesSword;
+		obj->control = ControlDamoclesSword;
+		obj->collision = CollideDamoclesSword;
+		obj->shadowType = ShadowMode::All;
+		obj->SetHitEffect(true);
+	}
+	*/
 	obj = &Objects[ID_SLAMMING_DOORS];
 	if (obj->loaded)
 	{
