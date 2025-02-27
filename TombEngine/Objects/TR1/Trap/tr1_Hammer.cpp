@@ -18,7 +18,7 @@ using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
 
 //OCB 0 = Default TR1 behaviour
-//OCB 1 = Retract after crashing
+//OCB 1 = Retract after crashing once
 //OCB 2 = Continuous crashing
 
 namespace TEN::Entities::Traps
@@ -75,12 +75,6 @@ namespace TEN::Entities::Traps
 
         // Sync destruction.
         backItem.Status = frontItem.Status;
-        if (backItem.Status == ITEM_DEACTIVATED)
-        {
-            KillItem(backItem.Index);
-            backItemNumber = NO_VALUE;
-            return;
-        }
 
         // Sync animation.
         SetAnimation(backItem, GetAnimNumber(frontItem), GetFrameNumber(frontItem));
@@ -95,22 +89,27 @@ namespace TEN::Entities::Traps
 	{
 		auto& item = g_Level.Items[itemNumber];
 		const auto& playerItem = *LaraItem;
-
+        
         switch (item.Animation.ActiveState) {
         case THOR_HAMMER_STATE_SET:
             if (TriggerActive(&item)) {
+                if (item.TriggerFlags == 1 && item.ItemFlags[1] == 1)
+                {
+                    item.Status = ITEM_NOT_ACTIVE;
+                    break;
 
+                }
                 if (item.TriggerFlags == 2)
                 {
                     item.Animation.TargetState = THOR_HAMMER_STATE_ACTIVE;
-                    TENLog("State ACTIVE set", LogLevel::Warning);
                     break;
                     
                 }
                 item.Animation.TargetState = THOR_HAMMER_STATE_TEASE;
             }
             else {
-               item.Status = ITEM_NOT_ACTIVE;
+                RemoveActiveItem(itemNumber);
+                item.Status = ITEM_NOT_ACTIVE;
             }
             break;
 
@@ -120,7 +119,6 @@ namespace TEN::Entities::Traps
             }
             else {
                 item.Animation.TargetState = THOR_HAMMER_STATE_SET;
-                TENLog("State 0 set", LogLevel::Warning);
             }
             break;
 
@@ -129,20 +127,20 @@ namespace TEN::Entities::Traps
         }
 
         case THOR_HAMMER_STATE_DONE: {
-            if (item.TriggerFlags > 0 )
+            if (item.TriggerFlags > 0)
             {
                 item.Animation.TargetState = THOR_HAMMER_STATE_RETRACT;
                 if (item.TriggerFlags == 1)
                 {
-                    item.Status = ITEM_NOT_ACTIVE;
-                    break;
+                    item.ItemFlags[1] = 1;
 
                 }
-                break;
             }
-
-           item.Status = ITEM_NOT_ACTIVE;
-           break;
+            else {
+                item.Status = ITEM_NOT_ACTIVE;
+                RemoveActiveItem(itemNumber);
+            }
+            break;
         }
         }
 
@@ -178,14 +176,7 @@ namespace TEN::Entities::Traps
             playerItem->Animation.Velocity.y = 0.0f;
             playerItem->Animation.Velocity.z = 0.0f;
             playerItem->Pose.Scale = Vector3(1.0f,0.1f,1.0f);
-            auto bloodBox = GameBoundingBox(playerItem).ToBoundingOrientedBox(playerItem->Pose);
-            auto bloodPos = Vector3i(Random::GeneratePointInBox(bloodBox));
 
-            auto orientToHammer = Geometry::GetOrientToPoint(playerItem->Pose.Position.ToVector3(), item.Pose.Position.ToVector3());
-            short randAngleOffset = Random::GenerateAngle(ANGLE(-11.25f), ANGLE(11.25f));
-            short bloodHeadingAngle = orientToHammer.y + randAngleOffset;
-
-            DoLotsOfBlood(bloodPos.x, bloodPos.y, bloodPos.z, playerItem->Animation.Velocity.z, bloodHeadingAngle, playerItem->RoomNumber, 20);
         }
         else if (playerItem->HitPoints > 0)
         {
