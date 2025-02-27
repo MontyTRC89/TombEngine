@@ -11,6 +11,7 @@
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
 #include "Scripting/Internal/TEN/Types/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/View/AlignModes.h"
 #include "Scripting/Internal/TEN/View/CameraTypes.h"
@@ -104,10 +105,24 @@ namespace TEN::Scripting::View
 		ObjCamera(LaraItem, 0, LaraItem, 0, false);
 	}
 
-	static void PlayFlyBy(short flyby)
+	static void PlayFlyby(int seqID)
 	{
 		UseSpotCam = true;
-		InitializeSpotCam(flyby);
+		InitializeSpotCam(seqID);
+	}
+
+	static Vec3 GetFlybyPosition(int seqID, float progress)
+	{
+		constexpr auto PROGRESS_MAX = 100.0f;
+
+		return Vec3(GetCameraTransform(seqID, progress / PROGRESS_MAX).Position);
+	}
+
+	static Rotation GetFlybyRotation(int seqID, float progress)
+	{
+		constexpr auto PROGRESS_MAX = 100.0f;
+
+		return Rotation(GetCameraTransform(seqID, progress / PROGRESS_MAX).Orientation);
 	}
 
 	static void FlashScreen(TypeOrNil<ScriptColor> col, TypeOrNil<float> speed)
@@ -220,10 +235,24 @@ namespace TEN::Scripting::View
 		//@tparam Color tint value to use.
 		tableView.set_function(ScriptReserved_SetPostProcessTint, &SetPostProcessTint);
 
-		///Enable FlyBy with specific ID
-		//@function PlayFlyBy
-		//@tparam short flyby (ID of flyby)
-		tableView.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
+		/// Play a flyby sequence.
+		// @function PlayFlyby
+		// @tparam int seqID Flyby sequence ID.
+		tableView.set_function(ScriptReserved_PlayFlyby, &PlayFlyby);
+
+		/// Get a flyby sequence's position at a specified progress point in percent.
+		// @function GetFlybyPosition
+		// @tparam int seqID Flyby sequence ID.
+		// @tparam float progress Progress point in percent. Clamped to [0, 100].
+		// @treturn Vec3 Position at the given progress point.
+		tableView.set_function(ScriptReserved_GetFlybyPosition, &GetFlybyPosition);
+
+		/// Get a flyby sequence's rotation at a specified progress point in percent.
+		// @function GetFlybyRotation
+		// @tparam int seqID Flyby sequence ID.
+		// @tparam float progress Progress point in percent. Clamped to [0, 100].
+		// @treturn Rotation Rotation at the given progress point.
+		tableView.set_function(ScriptReserved_GetFlybyRotation, &GetFlybyRotation);
 
 		/// Reset object camera back to Lara and deactivate object camera.
 		//@function ResetObjCamera
@@ -239,6 +268,9 @@ namespace TEN::Scripting::View
 		// @function GetAspectRatio
 		// @treturn float Display resolution's aspect ratio.
 		tableView.set_function(ScriptReserved_GetAspectRatio, &GetAspectRatio);
+
+		// COMPATIBILITY
+		tableView.set_function("PlayFlyBy", &PlayFlyby);
 
 		// Register types.
 		ScriptDisplaySprite::Register(*state, parent);
