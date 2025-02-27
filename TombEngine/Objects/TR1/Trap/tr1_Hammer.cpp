@@ -17,6 +17,10 @@ using namespace TEN::Collision::Point;
 using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
 
+//OCB 0 = Default TR1 behaviour
+//OCB 1 = Retract after crashing
+//OCB 2 = Continuous crashing
+
 namespace TEN::Entities::Traps
 {
     constexpr auto HAMMER_HIT_FRAME = 30;
@@ -95,6 +99,14 @@ namespace TEN::Entities::Traps
         switch (item.Animation.ActiveState) {
         case THOR_HAMMER_STATE_SET:
             if (TriggerActive(&item)) {
+
+                if (item.TriggerFlags == 2)
+                {
+                    item.Animation.TargetState = THOR_HAMMER_STATE_ACTIVE;
+                    TENLog("State ACTIVE set", LogLevel::Warning);
+                    break;
+                    
+                }
                 item.Animation.TargetState = THOR_HAMMER_STATE_TEASE;
             }
             else {
@@ -117,6 +129,19 @@ namespace TEN::Entities::Traps
         }
 
         case THOR_HAMMER_STATE_DONE: {
+            if (item.TriggerFlags > 0 )
+            {
+                item.Animation.TargetState = THOR_HAMMER_STATE_RETRACT;
+                if (item.TriggerFlags == 1)
+                {
+                    item.Status = ITEM_NOT_ACTIVE;
+                    break;
+
+                }
+                break;
+            }
+
+           item.Status = ITEM_NOT_ACTIVE;
            break;
         }
         }
@@ -152,7 +177,7 @@ namespace TEN::Entities::Traps
             SetAnimation(playerItem, LA_BOULDER_DEATH);
             playerItem->Animation.Velocity.y = 0.0f;
             playerItem->Animation.Velocity.z = 0.0f;
-
+            playerItem->Pose.Scale = Vector3(1.0f,0.1f,1.0f);
             auto bloodBox = GameBoundingBox(playerItem).ToBoundingOrientedBox(playerItem->Pose);
             auto bloodPos = Vector3i(Random::GeneratePointInBox(bloodBox));
 
