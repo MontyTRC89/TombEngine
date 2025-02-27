@@ -402,9 +402,9 @@ Vec3 Moveable::GetScale () const
 // Sets the scale of the moveable. Its only a visual effect and does not effect collision.
 // @function Moveable:SetScale
 // @tparam Vec3 new scale of the moveable 
-void Moveable::SetScale(Vec3 velocity)
+void Moveable::SetScale(Vec3 scale)
 {
-	_moveable->Pose.Scale = Vector3(velocity.x, velocity.y, velocity.z);
+	_moveable->Pose.Scale = Vector3(scale.x, scale.y, scale.z);
 }
 
 
