@@ -3144,8 +3144,6 @@ namespace TEN::Renderer
 
 	void Renderer::DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, RenderView& view, RendererPass rendererPass)
 	{
-		auto cameraPos = Camera.pos.ToVector3();
-
 		if (rendererPass == RendererPass::CollectTransparentFaces)
 		{
 			for (auto& bucket : mesh->Buckets)
@@ -3159,14 +3157,13 @@ namespace TEN::Renderer
 				{
 					for (int p = 0; p < bucket.Polygons.size(); p++)
 					{
-						auto centre = Vector3::Transform(
-							bucket.Polygons[p].Centre, itemToDraw->InterpolatedAnimTransforms[boneIndex] * itemToDraw->InterpolatedWorld);
-						int distance = (centre - cameraPos).Length();
+						auto center = Vector3::Transform(bucket.Polygons[p].Centre, itemToDraw->InterpolatedAnimTransforms[boneIndex] * itemToDraw->InterpolatedWorld);
+						int dist = Vector3::Distance(center, Camera.pos.ToVector3());
 
-						RendererSortableObject object;
+						auto object = RendererSortableObject{};
 						object.ObjectType = RendererObjectType::Moveable;
-						object.Centre = centre;
-						object.Distance = distance;
+						object.Centre = center;
+						object.Distance = dist;
 						object.BlendMode = blendMode;
 						object.Bucket = &bucket;
 						object.Item = itemToDraw;
@@ -3203,14 +3200,10 @@ namespace TEN::Renderer
 					for (int p = 0; p < passes; p++)
 					{
 						if (!SetupBlendModeAndAlphaTest(blendMode, rendererPass, p))
-						{
 							continue;
-						}
 
-						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]),
-							SamplerStateRegister::AnisotropicClamp);
-						BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]),
-							SamplerStateRegister::AnisotropicClamp);
+						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+						BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
 						DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 
