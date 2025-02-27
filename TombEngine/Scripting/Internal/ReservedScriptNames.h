@@ -450,6 +450,31 @@ constexpr char ScriptReserved_StaticSetSlot[]		= "SetSlot";
 constexpr char ScriptReserved_StaticSetSolid[]		= "SetSolid";
 constexpr char ScriptReserved_StaticShatter[]		= "Shatter";
 
+//Collision Class and Tables
+static constexpr char ScriptReserved_Collision[]				= "Collision";
+static constexpr char ScriptReserved_Probe[]					= "Probe";
+
+static constexpr char ScriptReserved_GetColPosition[]			= "GetPosition";
+static constexpr char ScriptReserved_GetColRoomNumber[]			= "GetRoomNumber";
+static constexpr char ScriptReserved_GetColRoomName[]			= "GetRoomNumber";
+static constexpr char ScriptReserved_GetColRoom[]				= "GetRoom";
+static constexpr char ScriptReserved_GetFloorHeight[]			= "GetFloorHeight";
+static constexpr char ScriptReserved_GetCeilingHeight[]			= "GetCeilingHeight";
+static constexpr char ScriptReserved_GetWaterSurfaceHeight[]	= "GetWaterSurfaceHeight";
+static constexpr char ScriptReserved_GetFloorNormal[]			= "GetFloorNormal";
+static constexpr char ScriptReserved_GetCeilingNormal[]			= "GetCeilingNormal";
+static constexpr char ScriptReserved_GetFloorMaterialType[]		= "GetFloorMaterialType";
+static constexpr char ScriptReserved_GetCeilingMaterialType[]	= "GetCeilingMaterialType";
+
+static constexpr char ScriptReserved_IsSteepFloor[]				= "IsSteepFloor";
+static constexpr char ScriptReserved_IsSteepCeiling[]			= "IsSteepCeiling";
+static constexpr char ScriptReserved_IsWall[]					= "IsWall";
+static constexpr char ScriptReserved_IsInsideSolidGeometry[]	= "IsInsideSolidGeometry";
+static constexpr char ScriptReserved_IsClimbableWall[]			= "IsClimbableWall";
+static constexpr char ScriptReserved_IsMonkeySwing[]			= "IsMonkeySwing";
+static constexpr char ScriptReserved_IsDeathTile[]				= "IsDeathTile";
+
+static constexpr char ScriptReserved_GetSectorMaterialType[]	= "MaterialType";
 // =====
 // TYPES
 // =====
