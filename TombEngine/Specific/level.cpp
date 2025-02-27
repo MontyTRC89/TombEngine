@@ -720,17 +720,17 @@ void LoadDynamicRoomData()
 		{
 			auto& mesh = room.mesh.emplace_back();
 
-			mesh.roomNumber = i;
-			mesh.pos.Position.x = ReadInt32();
-			mesh.pos.Position.y = ReadInt32();
-			mesh.pos.Position.z = ReadInt32();
-			mesh.pos.Orientation.y = ReadUInt16();
-			mesh.pos.Orientation.x = ReadUInt16();
-			mesh.pos.Orientation.z = ReadUInt16();
-			mesh.scale = ReadFloat();
-			mesh.flags = ReadUInt16();
-			mesh.color = ReadVector4();
-			mesh.staticNumber = ReadUInt16();
+			mesh.RoomNumber = i;
+			mesh.Transform.Position.x = ReadInt32();
+			mesh.Transform.Position.y = ReadInt32();
+			mesh.Transform.Position.z = ReadInt32();
+			mesh.Transform.Orientation.y = ReadUInt16();
+			mesh.Transform.Orientation.x = ReadUInt16();
+			mesh.Transform.Orientation.z = ReadUInt16();
+			mesh.Transform.Scale = Vector3(ReadFloat()); // TODO: Write Vector3 scale to level.
+			mesh.Flags = ReadUInt16();
+			mesh.Color = ReadVector4();
+			mesh.ObjectId = (GAME_OBJECT_ID)ReadUInt16();
 			mesh.HitPoints = ReadInt16();
 			mesh.Name = ReadString();
 

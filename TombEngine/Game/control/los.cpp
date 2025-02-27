@@ -289,14 +289,14 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 			{
 				if (itemNumber < 0)
 				{
-					if (Statics[mesh->staticNumber].shatterType != ShatterType::None)
+					if (Statics[mesh->ObjectId].shatterType != ShatterType::None)
 					{
 						const auto& weapon = Weapons[(int)Lara.Control.Weapon.GunType];
 						mesh->HitPoints -= weapon.Damage;
 						ShatterImpactData.impactDirection = dir;
-						ShatterImpactData.impactLocation = Vector3(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z);
+						ShatterImpactData.impactLocation = Vector3(mesh->Transform.Position.x, mesh->Transform.Position.y, mesh->Transform.Position.z);
 						ShatterObject(nullptr, mesh, 128, target2.RoomNumber, 0);
-						SoundEffect(GetShatterSound(mesh->staticNumber), (Pose*)mesh);
+						SoundEffect(GetShatterSound(mesh->ObjectId), (Pose*)mesh);
 						hitProcessed = true;
 					}
 
@@ -561,12 +561,12 @@ int ObjectOnLOS2(GameVector* origin, GameVector* target, Vector3i* vec, MESH_INF
 			{
 				auto& meshp = room.mesh[m];
 
-				if (meshp.flags & StaticMeshFlags::SM_VISIBLE)
+				if (meshp.Flags & StaticMeshFlags::SM_VISIBLE)
 				{
 					auto bounds = GetBoundsAccurate(meshp, false);
-					pose = Pose(meshp.pos.Position, EulerAngles(0, meshp.pos.Orientation.y, 0));
+					pose = Pose(meshp.Transform.Position, EulerAngles(0, meshp.Transform.Orientation.y, 0));
 
-					if (DoRayBox(*origin, *target, bounds, pose, *vec, -1 - meshp.staticNumber))
+					if (DoRayBox(*origin, *target, bounds, pose, *vec, -1 - meshp.ObjectId))
 					{
 						*mesh = &meshp;
 						target->RoomNumber = LosRooms[r];
@@ -702,15 +702,15 @@ std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber,
 		for (const auto& staticObject : g_Level.Rooms[neighborRoomNumber].mesh)
 		{
 			// Check if static is visible.
-			if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
+			if (!(staticObject.Flags & StaticMeshFlags::SM_VISIBLE))
 				continue;
 
 			// Check if static is solid (if applicable).
-			if (onlySolid && !(staticObject.flags & StaticMeshFlags::SM_SOLID))
+			if (onlySolid && !(staticObject.Flags & StaticMeshFlags::SM_SOLID))
 				continue;
 
 			// Test ray-box intersection.
-			auto box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.pos);
+			auto box = GetBoundsAccurate(staticObject, false).ToBoundingOrientedBox(staticObject.Transform);
 			float intersectDist = 0.0f;
 			if (box.Intersects(origin, dir, intersectDist))
 			{
