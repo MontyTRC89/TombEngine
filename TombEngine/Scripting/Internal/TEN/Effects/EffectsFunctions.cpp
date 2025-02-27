@@ -361,12 +361,12 @@ namespace TEN::Scripting::Effects
 	// This represents the 3D displacement applied by the engine on things like particles affected by wind.
 	// @function GetWind()
 	// @treturn Vec3 Wind vector.
-	static void EmitStreamer ()
+	static void EmitStreamer (std::string name, int tag, Vec3 pos, Vec3 dir, short orient, ScriptColor color,
+		float width, float life, float vel, float scaleRate, short rot, int flags)
 	{
-		StreamerEffect.Spawn(
-			vehicleItem.Index, (int)tagLeft,
-			positions.first, direction, orient2D, COLOR,
-			0.0f, life, vel, scaleRate, 0, (int)StreamerFlags::FadeLeft);
+		auto position = Vector3(pos.x, pos.y, pos.z);
+		auto direction = Vector3(dir.x, dir.y, dir.z);
+		StreamerEffect.Spawn(GetHash(name), tag, position, direction, orient, color, width, life, vel, scaleRate, rot, flags);
 	}
 
 	void Register(sol::state* state, sol::table& parent) 
