@@ -1,6 +1,7 @@
 #pragma once
 #include "Math/Math.h"
 #include "Objects/Effects/LensFlare.h"
+#include "Objects/game_object_ids.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 
 using namespace TEN::Entities::Effects;
@@ -98,6 +99,33 @@ namespace TEN::Effects::Environment
 		}
 	};
 
+	class HorizonObject
+	{
+	public:
+		HorizonObject();
+
+		// Getters
+		Vector3 GetRotation() const;
+		Vector3 GetOldRotation() const;
+		GAME_OBJECT_ID GetHorizonID() const;
+		bool GetInterpolationStatus() const;
+
+		// Setters
+		void SetRotation(const Vector3& rotation);
+		void SetHorizonID(GAME_OBJECT_ID id);
+		void SaveInterpolationData();
+		void SetInterpolation(bool value);
+
+		// Utility
+		void ResetRotation(); // Resets horizon rotation
+
+	private:
+		GAME_OBJECT_ID _horizonID = ID_HORIZON;
+		Vector3 _rotation = Vector3::Zero;
+		Vector3 _oldRotation = Vector3::Zero;
+		bool _interpolation = false;
+	};
+
 	class EnvironmentController
 	{
 	public:
@@ -115,6 +143,8 @@ namespace TEN::Effects::Environment
 		const std::vector<WeatherParticle>& GetParticles() const { return Particles; }
 		const std::vector<StarParticle>&	GetStars() const { return Stars; }
 		const std::vector<MeteorParticle>&	GetMeteors() const { return Meteors; }
+
+		HorizonObject HorizonObject;
 
 	private:
 		// Weather
@@ -163,33 +193,6 @@ namespace TEN::Effects::Environment
 		void SpawnWeatherParticles(const ScriptInterfaceLevel& level);
 		void SpawnMeteorParticles(const ScriptInterfaceLevel& level);
 	};
-
-	class HorizonObject
-	{
-	public:
-		HorizonObject();
-
-		// Getters
-		Vector3 GetRotation() const;
-		Vector3 GetOldRotation() const;
-		GAME_OBJECT_ID GetHorizonID() const;
-		bool GetInterpolationStatus() const;
-
-		// Setters
-		void SetRotation(const Vector3& rotation);
-		void SetHorizonID(GAME_OBJECT_ID id);
-		void SaveInterpolationData();
-		void SetInterpolation(bool value);
-
-		// Utility
-		void ResetRotation(); // Resets horizon rotation
-
-	private:
-		static Vector3 _rotation;
-		static Vector3 _oldRotation;
-		static GAME_OBJECT_ID _horizonID;
-		static bool _interpolation;
-	};	
 
 	extern EnvironmentController Weather;
 }

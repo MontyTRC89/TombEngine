@@ -21,11 +21,6 @@ using namespace TEN::Math;
 
 namespace TEN::Effects::Environment 
 {
-	GAME_OBJECT_ID HorizonObject::_horizonID = ID_HORIZON;
-	Vector3 HorizonObject::_rotation = Vector3::Zero;
-	Vector3 HorizonObject::_oldRotation = Vector3::Zero;
-	bool HorizonObject::_interpolation = false;
-
 	HorizonObject::HorizonObject() {}
 
 	// Getters

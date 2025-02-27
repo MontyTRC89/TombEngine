@@ -307,11 +307,10 @@ namespace TEN::Scripting::Effects
 */
 	static void SetHorizonRotation(const Rotation& rot)
 	{
-		TEN::Effects::Environment::HorizonObject horizon;
 		constexpr auto BIG_ANGLE_THRESHOLD_DEGREES = 30.0f;
 
 		// Get current rotation in degrees
-		Vector3 _horizonRotation = horizon.GetRotation();
+		Vector3 _horizonRotation = Weather.HorizonObject.GetRotation();
 		Rotation currentRotation = Rotation(_horizonRotation.x / RADIAN, _horizonRotation.y / RADIAN, _horizonRotation.z / RADIAN);
 
 		// Check if the difference in rotation exceeds the threshold
@@ -322,11 +321,11 @@ namespace TEN::Scripting::Effects
 
 		Vec3 data = Vec3(rot.x * RADIAN,rot.y * RADIAN,rot.z * RADIAN);
 
-		horizon.SetRotation(data);
+		Weather.HorizonObject.SetRotation(data);
 
 		if (bigRotation)
 		{
-			horizon.SetInterpolation(false);
+			Weather.HorizonObject.SetInterpolation(false);
 		}
 	}
 
@@ -336,8 +335,7 @@ namespace TEN::Scripting::Effects
 */
 	Rotation GetHorizonRotation()
 	{
-		TEN::Effects::Environment::HorizonObject horizon;
-		Vector3 _horizonRotation = horizon.GetRotation();
+		Vector3 _horizonRotation = Weather.HorizonObject.GetRotation();
 		Rotation rot = Rotation(_horizonRotation.x / RADIAN, _horizonRotation.y / RADIAN, _horizonRotation.z / RADIAN);
 		return rot;
 	}
@@ -348,8 +346,7 @@ namespace TEN::Scripting::Effects
 */
 	static void SetHorizon(GAME_OBJECT_ID horizonObject)
 	{
-		TEN::Effects::Environment::HorizonObject horizon;
-		horizon.SetHorizonID(horizonObject);
+		Weather.HorizonObject.SetHorizonID(horizonObject);
 	}
 
 /// Emit air bubble in a water room.

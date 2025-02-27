@@ -3022,9 +3022,8 @@ namespace TEN::Renderer
 		}
 
 		// Draw horizon.
-		TEN::Effects::Environment::HorizonObject horizon;
-
-		if (_moveableObjects[horizon.GetHorizonID()].has_value())
+		
+		if (_moveableObjects[Weather.HorizonObject.GetHorizonID()].has_value())
 		{
 			SetDepthState(DepthState::None);
 			SetBlendMode(BlendMode::Opaque);
@@ -3035,18 +3034,18 @@ namespace TEN::Renderer
 
 			_shaders.Bind(Shader::Sky);
 
-			auto& moveableObj = *_moveableObjects[horizon.GetHorizonID()];
+			auto& moveableObj = *_moveableObjects[Weather.HorizonObject.GetHorizonID()];
 
-			if (horizon.GetInterpolationStatus() == false)
+			if (Weather.HorizonObject.GetInterpolationStatus() == false)
 			{
 				// NOTE: Overwriting interpolation data before drawing.
-				horizon.SaveInterpolationData();
+				Weather.HorizonObject.SaveInterpolationData();
 
 				// Otherwise all frames until next ControlPhase will not be interpolated.
-				horizon.SetInterpolation(true);
+				Weather.HorizonObject.SetInterpolation(true);
 
 			}
-			auto rotation = Vector3::Lerp(horizon.GetOldRotation(), horizon.GetRotation(), GetInterpolationFactor());
+			auto rotation = Vector3::Lerp(Weather.HorizonObject.GetOldRotation(), Weather.HorizonObject.GetRotation(), GetInterpolationFactor());
 
 			Matrix rotationMatrix = Matrix::CreateRotationX(rotation.x) *
 				Matrix::CreateRotationY(rotation.y) *

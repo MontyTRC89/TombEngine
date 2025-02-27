@@ -904,8 +904,7 @@ namespace TEN::Renderer
 		}
 
 		//SAVE HORIZON INTERPOLATION DATA
-		TEN::Effects::Environment::HorizonObject horizon;
-		horizon.SaveInterpolationData();
+		Weather.HorizonObject.SaveInterpolationData();
 
 		for (auto& effect : _effects)
 		{
