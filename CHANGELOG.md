@@ -30,6 +30,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### Lua API changes
 * Added diary module.
+* Added Movebale SetScale() and GetScale() commands to set visual scale of moveables.
 * Added View.GetFlyByPosition() and View.GetFlyByRotation() functions to get flyby sequence parameters at a specified time point.
 * Added Effects.EmitAirBubble() function to spawn air bubbles.
 * Added additional arguments for Sprite object slot and starting rotation value for EmitParticle function.
