@@ -27,6 +27,7 @@ namespace TEN::Entities::Traps
         THOR_HAMMER_STATE_TEASE = 1,
         THOR_HAMMER_STATE_ACTIVE = 2,
         THOR_HAMMER_STATE_DONE = 3,
+        THOR_HAMMER_STATE_RETRACT = 4,
     };
 
     enum HammerAnim
@@ -35,6 +36,7 @@ namespace TEN::Entities::Traps
         THOR_HAMMER_ANIM_TEASE = 1,
         THOR_HAMMER_ANIM_ACTIVE = 2,
         THOR_HAMMER_ANIM_DONE = 3,
+        THOR_HAMMER_ANIM_RETRACT = 4
     };
 
 	static void InitializeHammer(ItemInfo& frontItem)
@@ -96,8 +98,7 @@ namespace TEN::Entities::Traps
                 item.Animation.TargetState = THOR_HAMMER_STATE_TEASE;
             }
             else {
-                //Item_RemoveActive(item_num);
-                item.Status = ITEM_NOT_ACTIVE;
+               item.Status = ITEM_NOT_ACTIVE;
             }
             break;
 
@@ -107,6 +108,7 @@ namespace TEN::Entities::Traps
             }
             else {
                 item.Animation.TargetState = THOR_HAMMER_STATE_SET;
+                TENLog("State 0 set", LogLevel::Warning);
             }
             break;
 
