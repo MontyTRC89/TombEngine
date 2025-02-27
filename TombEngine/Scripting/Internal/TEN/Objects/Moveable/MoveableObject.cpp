@@ -127,6 +127,7 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 		ScriptReserved_GetRoom, &Moveable::GetRoom,
 		ScriptReserved_GetRoomNumber, &Moveable::GetRoomNumber,
 		ScriptReserved_GetRotation, &Moveable::GetRotation,
+		ScriptReserved_GetScale , &Moveable::GetScale,
 		ScriptReserved_GetVelocity, &Moveable::GetVelocity,
 		ScriptReserved_GetColor, &Moveable::GetColor,
 		ScriptReserved_GetCollidable, &Moveable::GetCollidable,
@@ -153,6 +154,7 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 		ScriptReserved_SetName, &Moveable::SetName,
 		ScriptReserved_SetObjectID, &Moveable::SetObjectID,
 		ScriptReserved_SetPosition, &Moveable::SetPosition,
+		ScriptReserved_SetScale, & Moveable::SetScale,
 		ScriptReserved_SetRoomNumber, &Moveable::SetRoomNumber,
 		ScriptReserved_SetRotation, &Moveable::SetRotation,
 		ScriptReserved_SetColor, &Moveable::SetColor,
@@ -387,6 +389,24 @@ Vec3 Moveable::GetPosition() const
 {
 	return Vec3(_moveable->Pose.Position);
 }
+
+/// Get the moveables's scale
+// @function Moveable:GetScale
+// @treturn Vec3 a copy of the moveable's visual scale.
+Vec3 Moveable::GetScale () const
+{
+	return Vec3(_moveable->Pose.Scale);
+}
+
+/// Set the moveable's scale
+// Sets the scale of the moveable. Its only a visual effect and does not effect collision.
+// @function Moveable:SetScale
+// @tparam Vec3 new scale of the moveable 
+void Moveable::SetScale(Vec3 velocity)
+{
+	_moveable->Pose.Scale = Vector3(velocity.x, velocity.y, velocity.z);
+}
+
 
 /// Set the moveable's position
 // If you are moving a moveable whose behaviour involves knowledge of room geometry,
