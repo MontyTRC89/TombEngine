@@ -133,7 +133,7 @@ namespace TEN::Renderer
 				tempLensFlares.push_back(lensFlareToDraw);
 			}
 		}
-
+		   
 		std::sort(
 			tempLensFlares.begin(), tempLensFlares.end(),
 			[](const RendererLensFlare& lensFlare0, const RendererLensFlare& lensFlare1)
@@ -150,58 +150,140 @@ namespace TEN::Renderer
 		for (int i = 0; i < std::min(MAX_LENS_FLARES_DRAW, (int)tempLensFlares.size()); i++)
 			renderView.LensFlaresToDraw.push_back(tempLensFlares[i]);
 
-		// Collect water planes
+		CollectWaterPlanes(renderView);
+	}
+
+	void Renderer::CollectWaterPlanes(RenderView& renderView)
+	{
+		std::vector<RendererWaterPlane> tempWaterPlanes;
+
 		for (auto* roomPtr : renderView.RoomsToDraw)
-		{  
+		{
 			for (auto& bucket : roomPtr->Buckets)
 			{
 				if (bucket.MaterialType == ShaderMaterialType::Water)
 				{
-					//WaterPlane waterPlane = g_Level.WaterPlanes[bucket.WaterPlaneIndex];
-					int waterHeight = 0;
+					WaterPlane waterPlane = g_Level.WaterPlanes[bucket.WaterPlaneIndex];
+					int waterLevel = waterPlane.Y;
 
 					int index = -1;
-					for (int i = 0; i < renderView.WaterPlanesToDraw.size(); i++)
+					for (int i = 0; i < tempWaterPlanes.size(); i++)
 					{
-						if (renderView.WaterPlanesToDraw[i].WaterLevel == waterHeight)
+						if (tempWaterPlanes[i].WaterLevel == waterLevel)
 						{
 							index = i;
 							break;
 						}
-					}     
+					}
 
 					if (index == -1)
 					{
-						renderView.WaterPlanesToDraw.push_back(RendererWaterPlane());
-						index = (int)renderView.WaterPlanesToDraw.size() - 1;
-						    
+						tempWaterPlanes.push_back(RendererWaterPlane());
+						index = (int)tempWaterPlanes.size() - 1;
+						  
+						bool isUnderwater = (g_Level.Rooms[renderView.Camera.RoomNumber].flags & ENV_FLAG_WATER) != 0;
+
+						Vector3 normal = -Vector3::UnitY;
+
 						Vector3 cameraWorldPosition = renderView.Camera.WorldPosition;
-						cameraWorldPosition.y = waterHeight - cameraWorldPosition.y;
+						cameraWorldPosition.y = 2 * waterLevel - cameraWorldPosition.y;
 
 						Vector3 direction = renderView.Camera.WorldDirection;
-						direction.y = waterHeight - direction.y;
+						direction = direction - 2.0f * direction.Dot(normal) * normal;
 						direction.Normalize();
 
-						Vector3 up = Vector3::UnitY;
-						float roll = 0;
-
+						Vector3 up = -normal;
+					
+						float roll = 0.0f;
 						Matrix upRotation = Matrix::CreateFromYawPitchRoll(0.0f, 0.0f, roll);
 						up = Vector3::Transform(up, upRotation);
 						up.Normalize();
 
-						renderView.WaterPlanesToDraw[index].WaterLevel = waterHeight;
-						renderView.WaterPlanesToDraw[index].ReflectionViewMatrix = Matrix::CreateLookAt(cameraWorldPosition, cameraWorldPosition + 1024 * direction, up);
-						renderView.WaterPlanesToDraw[index].CameraPositionWS = cameraWorldPosition;
-						renderView.WaterPlanesToDraw[index].CameraDirectionWS = direction;
+						tempWaterPlanes[index].WaterLevel = waterLevel;
+						tempWaterPlanes[index].ReflectionViewMatrix = Matrix::CreateLookAt(cameraWorldPosition, cameraWorldPosition + 1024 * direction, up);
+						tempWaterPlanes[index].CameraPositionWS = cameraWorldPosition;
+						tempWaterPlanes[index].CameraDirectionWS = direction;
+						tempWaterPlanes[index].DrawReflections = false;
 					}
-					
+
 					RendererWaterPlaneBucket waterPlaneBucket;
 					waterPlaneBucket.Room = roomPtr;
 					waterPlaneBucket.Bucket = &bucket;
 
-					renderView.WaterPlanesToDraw[index].Buckets.push_back(waterPlaneBucket);
+					tempWaterPlanes[index].Buckets.push_back(waterPlaneBucket);
 				}
 			}
+		}
+
+		for (auto& waterPlane : tempWaterPlanes)
+		{
+			float minDistance = BLOCK(1024);
+
+			for (auto& bucket : waterPlane.Buckets)
+			{
+				Vector3 roomCenter = bucket.Room->BoundingBox.Center;
+				Vector3 cameraToRoomDirection = roomCenter - renderView.Camera.WorldPosition;
+				cameraToRoomDirection.Normalize();
+				Ray cameraToRoom = Ray(renderView.Camera.WorldPosition, cameraToRoomDirection);
+
+				float distance = 0;
+				if (cameraToRoom.Intersects(bucket.Room->BoundingBox, distance))
+				{
+					minDistance = std::min(minDistance, abs(distance));
+				}
+			}
+
+			if (minDistance <= BLOCK(32))
+			{
+				waterPlane.DrawReflections = true;
+				waterPlane.MinDistance = minDistance;
+			}
+		}
+
+		std::sort(
+			tempWaterPlanes.begin(), tempWaterPlanes.end(),
+			[&](const RendererWaterPlane& plane0, const RendererWaterPlane& plane1)
+			{
+				// Priority for planes with reflections
+				if (plane0.DrawReflections != plane1.DrawReflections)
+					return plane0.DrawReflections > plane1.DrawReflections;
+
+				auto containsRoom = [](const std::vector<RendererWaterPlaneBucket>& buckets, int targetRoomNumber) {
+					return std::any_of(buckets.begin(), buckets.end(), [&](const RendererWaterPlaneBucket& bucket) {
+						return bucket.Room->RoomNumber == targetRoomNumber;
+						});
+					};
+
+				bool plane0InCurrentRoom = containsRoom(plane0.Buckets, renderView.Camera.RoomNumber);
+				bool plane1InCurrentRoom = containsRoom(plane1.Buckets, renderView.Camera.RoomNumber);
+
+				// Priority for planes in current room
+				if (plane0InCurrentRoom != plane1InCurrentRoom)
+					return plane0InCurrentRoom > plane1InCurrentRoom;
+
+				auto isAdjacent = [](const std::vector<RendererWaterPlaneBucket>& buckets, int targetRoomNumber) {
+					return std::any_of(buckets.begin(), buckets.end(), [&](const RendererWaterPlaneBucket& bucket) {
+						return std::any_of(bucket.Room->Doors.begin(), bucket.Room->Doors.end(),
+							[&](const RendererDoor& door) {
+								return door.RoomNumber == targetRoomNumber;
+							});
+						});
+					};
+
+				// Priority to connected rooms
+				bool plane0Adjacent = isAdjacent(plane0.Buckets, renderView.Camera.RoomNumber);
+				bool plane1Adjacent = isAdjacent(plane1.Buckets, renderView.Camera.RoomNumber);
+
+				if (plane0Adjacent != plane1Adjacent)
+					return plane0Adjacent > plane1Adjacent;
+
+				// Finally, consider distance
+				return plane0.MinDistance < plane1.MinDistance;
+			});
+
+		for (int i = 0; i < std::min((int)tempWaterPlanes.size(), 8); i++)
+		{
+			renderView.WaterPlanesToDraw.push_back(tempWaterPlanes[i]);
 		}
 	}
 

@@ -56,6 +56,7 @@
 #include "Renderer/Graphics/VertexBuffer.h"
 #include "Renderer/Graphics/UAVRenderTarget2D.h"
 #include "Renderer/Graphics/Vertices/PostProcessVertex.h"
+#include "Renderer/Graphics/RenderTarget2DArray.h"
 #include "Renderer/ShaderManager/ShaderManager.h"
 #include "Renderer/Structures/RendererItem.h"
 #include "Renderer/Structures/RendererEffect.h"
@@ -350,8 +351,7 @@ namespace TEN::Renderer
 
 		// Water
 
-		RenderTarget2D _waterReflectionsRenderTarget;
-		UAVRenderTarget2D _waterReflectionsHashBuffer;
+		RenderTarget2DArray _waterReflectionsRenderTarget;
 		Texture2D _waterNormalMap;
 		RenderTarget2D _waterReflectionsTempRenderTarget;
 		Texture2D _waterDistortionMap;
@@ -386,6 +386,7 @@ namespace TEN::Renderer
 		void BindRenderTargetAsTexture(TextureRegister registerType, RenderTarget2D* target, SamplerStateRegister samplerType);
 		void BindUAVRenderTargetAsTexture(TextureRegister registerType, UAVRenderTarget2D* target);
 		void BindConstantBufferVS(ConstantBufferRegister constantBufferType, ID3D11Buffer** buffer);
+		void BindConstantBufferGS(ConstantBufferRegister constantBufferType, ID3D11Buffer** buffer);
 		void BindConstantBufferPS(ConstantBufferRegister constantBufferType, ID3D11Buffer** buffer);
 		void BuildHierarchy(RendererObject* obj);
 		void BuildHierarchyRecursive(RendererObject* obj, RendererBone* node, RendererBone* parentNode);
@@ -394,6 +395,7 @@ namespace TEN::Renderer
 		void GetVisibleRooms(short from, short to, Vector4 viewPort, bool water, int count, bool onlyRooms, RenderView& renderView);
 		void CollectMirrors(RenderView& renderView);
 		void CollectRooms(RenderView& renderView, bool onlyRooms);
+		void CollectWaterPlanes(RenderView& renderView);
 		void CollectItems(short roomNumber, RenderView& renderView);
 		void CollectStatics(short roomNumber, RenderView& renderView);
 		void CollectLights(const Vector3& pos, float radius, int roomNumber, int prevRoomNumber, bool prioritizeShadowLight, bool useCachedRoomLights, std::vector<RendererLightNode>* roomsLights, std::vector<RendererLight*>* outputLights);
@@ -507,7 +509,7 @@ namespace TEN::Renderer
 		void InterpolateCamera(float interpFactor);
 		void CopyRenderTarget(RenderTarget2D* source, RenderTarget2D* dest, RenderView& view);
 		void BlurRenderTarget(RenderTarget2D* sources, RenderView& view);
-		void RenderWaterPlanarReflections(RenderTarget2D* renderTarget, RendererWaterPlane* waterPlane, RenderView& view);
+		void RenderWaterPlanarReflections(RenderView& view);
 
 		void AddSpriteBillboard(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D, float scale,
 					 Vector2 size, BlendMode blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);

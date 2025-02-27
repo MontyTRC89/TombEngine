@@ -311,6 +311,11 @@ namespace TEN::Renderer
 		_context->VSSetConstantBuffers(static_cast<UINT>(constantBufferType), 1, buffer);
 	}
 
+	void Renderer::BindConstantBufferGS(ConstantBufferRegister constantBufferType, ID3D11Buffer** buffer)
+	{
+		_context->GSSetConstantBuffers(static_cast<UINT>(constantBufferType), 1, buffer);
+	}
+
 	void Renderer::BindConstantBufferPS(ConstantBufferRegister constantBufferType, ID3D11Buffer** buffer)
 	{
 		_context->PSSetConstantBuffers(static_cast<UINT>(constantBufferType), 1, buffer);

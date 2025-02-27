@@ -1792,6 +1792,9 @@ namespace TEN::Renderer
 		BindConstantBufferPS(ConstantBufferRegister::PostProcess, _cbPostProcessBuffer.get());
 		BindConstantBufferPS(ConstantBufferRegister::Water, _cbWater.get());
 
+		BindConstantBufferGS(ConstantBufferRegister::Camera, _cbCameraMatrices.get());
+		BindConstantBufferGS(ConstantBufferRegister::Water, _cbWater.get());
+
 		// Set up vertex parameters.
 		_context->IASetInputLayout(_inputLayout.Get());
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -1800,7 +1803,7 @@ namespace TEN::Renderer
 		//RenderSimpleSceneToParaboloid(&_roomAmbientMapFront, LaraItem->Pose.Position.ToVector3(), 1);
 		//RenderSimpleSceneToParaboloid(&_roomAmbientMapBack, LaraItem->Pose.Position.ToVector3(), -1);
 		if (view.WaterPlanesToDraw.size() > 0)
-			RenderWaterPlanarReflections(&_waterReflectionsRenderTarget, &view.WaterPlanesToDraw[0], view);
+			RenderWaterPlanarReflections(view);
 
 		// Set up vertex parameters.
 		_context->IASetInputLayout(_inputLayout.Get());
@@ -3844,16 +3847,17 @@ namespace TEN::Renderer
 		_gameCamera.Camera.FarPlane = _currentGameCamera.Camera.FarPlane;
 	}
 
-	void Renderer::RenderWaterPlanarReflections(RenderTarget2D* renderTarget, RendererWaterPlane* waterPlane, RenderView& view)
+	void Renderer::RenderWaterPlanarReflections(RenderView& view)
 	{
 		// Reset GPU state
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
 
 		// Bind and clear render target
-		_context->ClearRenderTargetView(renderTarget->RenderTargetView.Get(), Colors::Black);
-		_context->ClearDepthStencilView(renderTarget->DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-		_context->OMSetRenderTargets(1, renderTarget->RenderTargetView.GetAddressOf(), renderTarget->DepthStencilView.Get());
+		_context->ClearRenderTargetView(_waterReflectionsRenderTarget.RenderTargetView.Get(), Colors::Black);
+		_context->ClearDepthStencilView(_waterReflectionsRenderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+		
+		_context->OMSetRenderTargets(1, _waterReflectionsRenderTarget.RenderTargetView.GetAddressOf(), _waterReflectionsRenderTarget.DepthStencilView.Get());
 
 		D3D11_VIEWPORT viewport;
 		viewport.TopLeftX = 0;
@@ -3880,26 +3884,30 @@ namespace TEN::Renderer
 		CCameraMatrixBuffer cameraConstantBuffer;
 		cameraConstantBuffer.Frame = GlobalCounter;
 		cameraConstantBuffer.RefreshRate = _refreshRate;
-
-		cameraConstantBuffer.View = waterPlane->ReflectionViewMatrix;
+		cameraConstantBuffer.CameraUnderwater = (g_Level.Rooms[view.Camera.RoomNumber].flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
 		cameraConstantBuffer.Projection = view.Camera.Projection;
 		cameraConstantBuffer.InverseProjection = cameraConstantBuffer.Projection.Invert();
 		cameraConstantBuffer.ViewProjection = cameraConstantBuffer.View * cameraConstantBuffer.Projection;
 		cameraConstantBuffer.ViewSize = { (float)viewport.Width, (float)viewport.Height };
 		cameraConstantBuffer.InvViewSize = { 1.0f / viewport.Width, 1.0f / viewport.Height };
-		cameraConstantBuffer.CamDirectionWS = Vector4(waterPlane->CameraDirectionWS.x, waterPlane->CameraDirectionWS.y, waterPlane->CameraDirectionWS.z, 1.0f);
-		cameraConstantBuffer.CamPositionWS = Vector4(waterPlane->CameraPositionWS.x, waterPlane->CameraPositionWS.y, waterPlane->CameraPositionWS.z, 1.0f);
 		_cbCameraMatrices.UpdateData(cameraConstantBuffer, _context.Get());
 
-		_stWater.WaterLevel = waterPlane->WaterLevel;
+		for (int i = 0; i < view.WaterPlanesToDraw.size(); i++)
+		{
+			_stWater.WaterReflectionViews[i] = view.WaterPlanesToDraw[i].ReflectionViewMatrix;
+			_stWater.WaterLevels[i].x = view.WaterPlanesToDraw[i].WaterLevel;
+		}
 		_cbWater.UpdateData(_stWater, _context.Get());
+
+		_shaders.Bind(Shader::WaterReflectionsPixelShader);
 
 		// Draw horizon and the sky
 		auto* levelPtr = g_GameFlow->GetLevel(CurrentLevel);
 
 		if (levelPtr->Horizon)
 		{  
-			_shaders.Bind(Shader::Sky);
+			_shaders.Bind(Shader::SkyWaterReflectionsVertexShader);
+			_shaders.Bind(Shader::SkyWaterReflectionsGeometryShader);
 
 			if (Lara.Control.Look.OpticRange != 0)
 				AlterFOV(ANGLE(DEFAULT_FOV) - Lara.Control.Look.OpticRange, false);
@@ -3914,7 +3922,7 @@ namespace TEN::Renderer
 
 			_context->IASetVertexBuffers(0, 1, _skyVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 			_context->IASetIndexBuffer(_skyIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
+ 
 			SetBlendMode(BlendMode::Additive);
 
 			for (int s = 0; s < 2; s++)
@@ -3922,21 +3930,27 @@ namespace TEN::Renderer
 				for (int i = 0; i < 2; i++)
 				{
 					auto weather = TEN::Effects::Environment::Weather;
-
-					auto translation = Matrix::CreateTranslation(waterPlane->CameraPositionWS.x + weather.SkyPosition(s) - i * SKY_SIZE,
-						waterPlane->CameraPositionWS.y - 1536.0f, waterPlane->CameraPositionWS.z);
-					auto world = rotation * translation;
-
-					_stStatic.World = (rotation * translation);
-					_stStatic.Color = weather.SkyColor(s);
-					_stStatic.ApplyFogBulbs = s == 0 ? 1 : 0;
-					_cbStatic.UpdateData(_stStatic, _context.Get());
+					 
+					for (int w = 0; w < view.WaterPlanesToDraw.size(); w++)
+					{
+						auto translation = Matrix::CreateTranslation(
+							view.WaterPlanesToDraw[w].CameraPositionWS.x + weather.SkyPosition(s) - i * SKY_SIZE,
+							view.WaterPlanesToDraw[w].CameraPositionWS.y - 1536.0f, 
+							view.WaterPlanesToDraw[w].CameraPositionWS.z);
+						auto world = rotation * translation;
+						_stWater.SkyWorldMatrices[w] = world;
+					}
+					
+					_stWater.SkyColor = weather.SkyColor(s);
+					_cbWater.UpdateData(_stWater, _context.Get());
 
 					DrawIndexedTriangles(SKY_INDICES_COUNT, 0, 0);
 				}
 			}
 
-			_context->ClearDepthStencilView(renderTarget->DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
+			_context->ClearDepthStencilView(_waterReflectionsRenderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
+
+			_stWater.SkyColor = Vector4::One;
 
 			// Draw horizon.
 			if (_moveableObjects[ID_HORIZON].has_value())
@@ -3946,10 +3960,11 @@ namespace TEN::Renderer
 
 				auto& moveableObj = *_moveableObjects[ID_HORIZON];
 
-				_stStatic.World = Matrix::CreateTranslation(waterPlane->CameraPositionWS);
-				_stStatic.Color = Vector4::One;
-				_stStatic.ApplyFogBulbs = 1;
-				_cbStatic.UpdateData(_stStatic, _context.Get());
+				for (int w = 0; w < view.WaterPlanesToDraw.size(); w++)
+				{
+					_stWater.SkyWorldMatrices[w] = Matrix::CreateTranslation(view.WaterPlanesToDraw[w].CameraPositionWS);
+				}
+				_cbWater.UpdateData(_stWater, _context.Get());
 
 				for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 				{
@@ -3978,7 +3993,7 @@ namespace TEN::Renderer
 			}
 
 			// Clear just the Z-buffer to start drawing on top of horizon.
-			_context->ClearDepthStencilView(renderTarget->DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+			_context->ClearDepthStencilView(_waterReflectionsRenderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 		}
 
 		// Draw rooms
@@ -3990,7 +4005,7 @@ namespace TEN::Renderer
 		_context->IASetIndexBuffer(_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		_shaders.Bind(Shader::RoomsWaterReflectionsVertexShader);
-		_shaders.Bind(Shader::WaterReflectionsPixelShader);
+		_shaders.Bind(Shader::WaterReflectionsGeometryShader);
 
 		for (int i = 0; i < _rooms.size(); i++)
 		{
@@ -4021,7 +4036,7 @@ namespace TEN::Renderer
 					continue;
 				}
 
-				if (bucket.BlendMode == BlendMode::DynamicWaterSurface)
+				if (bucket.MaterialType == ShaderMaterialType::Water)
 				{
 					continue;
 				}
@@ -4088,7 +4103,7 @@ namespace TEN::Renderer
 		// Blur the render target
 
 		// Common vertex shader to all fullscreen effects
-		_shaders.Bind(Shader::PostProcess);
+	/*	_shaders.Bind(Shader::PostProcess);
 
 		// We draw a fullscreen triangle
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -4114,7 +4129,9 @@ namespace TEN::Renderer
 		_shaders.Bind(Shader::PostProcessVerticalBlur);
 
 		BindRenderTargetAsTexture(TextureRegister::ColorMap, &_waterReflectionsTempRenderTarget, SamplerStateRegister::PointWrap);
-		DrawTriangles(3, 0);
+		DrawTriangles(3, 0);*/
+
+		_shaders.Unbind(Shader::WaterReflectionsGeometryShader);
 
 		SetCullMode(CullMode::CounterClockwise, true);
 		SetDepthState(DepthState::Write, true);
@@ -4269,16 +4286,22 @@ namespace TEN::Renderer
 		_stWater.KSpecular = 0.3f;
 		_stWater.LightColor = Vector3::One;
 
-		//for (auto it = view.WaterPlanesToDraw.begin(); it != view.WaterPlanesToDraw.end(); it++)
-		{ 
-			RendererWaterPlane& waterPlane = view.WaterPlanesToDraw[0];
+		for (int i = 0; i < view.WaterPlanesToDraw.size(); i++)
+		{
+			_stWater.WaterLevels[i].x = view.WaterPlanesToDraw[i].WaterLevel;
+		}
 
-			BindRenderTargetAsTexture(TextureRegister::WaterReflectionTexture, &_waterReflectionsRenderTarget, SamplerStateRegister::PointWrap);
+		for (int i = 0; i < view.WaterPlanesToDraw.size(); i++)
+		{ 
+			RendererWaterPlane& waterPlane = view.WaterPlanesToDraw[i];
+
+			BindTexture(TextureRegister::WaterReflectionTexture, &_waterReflectionsRenderTarget, SamplerStateRegister::PointWrap);
 			     
 			_stWater.WaterLevel = waterPlane.WaterLevel;
 			_stWater.WaterReflectionView = waterPlane.ReflectionViewMatrix;
 			_stWater.LightPosition = Vector3(BLOCK(10), waterPlane.WaterLevel - BLOCK(10), BLOCK(10));
-
+			_stWater.WaterPlaneIndex = i;
+			 
 			_cbWater.UpdateData(_stWater, _context.Get());
 			 
 			for (auto& waterBucket : waterPlane.Buckets)

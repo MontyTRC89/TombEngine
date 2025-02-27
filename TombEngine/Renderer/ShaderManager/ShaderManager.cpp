@@ -148,8 +148,42 @@ namespace TEN::Renderer::Utils
 	{
 		Load(Shader::RoomsWaterReflectionsVertexShader, "Water", "RoomsWaterReflections", ShaderType::Vertex);
 		Load(Shader::ItemsWaterReflectionsVertexShader, "Water", "ItemsWaterReflections", ShaderType::Vertex);
+		Load(Shader::SkyWaterReflectionsVertexShader, "Water", "SkyWaterReflections", ShaderType::Vertex);
+		Load(Shader::SkyWaterReflectionsGeometryShader, "Water", "SkyWaterReflections", ShaderType::Geometry);
 		Load(Shader::WaterReflectionsPixelShader, "Water", "WaterReflections", ShaderType::Pixel);
+		Load(Shader::WaterReflectionsGeometryShader, "Water", "WaterReflections", ShaderType::Geometry);
 		Load(Shader::Water, "Water", "Water", ShaderType::PixelAndVertex);
+	}
+
+	void ShaderManager::Unbind(Shader shader)
+	{
+		int shaderIndex = (int)shader;
+
+		if (shaderIndex >= _shaders.size())
+		{
+			TENLog("Attempt to access nonexistent shader with index " + std::to_string(shaderIndex), LogLevel::Error);
+			return;
+		}
+
+		const auto& shaderObj = _shaders[shaderIndex];
+
+		if (shaderObj.Vertex.Shader != nullptr)
+			_context->VSSetShader(nullptr, nullptr, 0);
+
+		if (shaderObj.Pixel.Shader != nullptr)
+			_context->PSSetShader(nullptr, nullptr, 0);
+
+		if (shaderObj.Compute.Shader != nullptr)
+			_context->CSSetShader(nullptr, nullptr, 0);
+
+		if (shaderObj.Domain.Shader != nullptr)
+			_context->DSSetShader(nullptr, nullptr, 0);
+
+		if (shaderObj.Hull.Shader != nullptr)
+			_context->HSSetShader(nullptr, nullptr, 0);
+
+		if (shaderObj.Geometry.Shader != nullptr)
+			_context->GSSetShader(nullptr, nullptr, 0);
 	}
 
 	void ShaderManager::Bind(Shader shader, bool forceNull)
@@ -172,6 +206,15 @@ namespace TEN::Renderer::Utils
 
 		if (shaderObj.Compute.Shader != nullptr || forceNull)
 			_context->CSSetShader(shaderObj.Compute.Shader.Get(), nullptr, 0);
+
+		if (shaderObj.Domain.Shader != nullptr || forceNull)
+			_context->DSSetShader(shaderObj.Domain.Shader.Get(), nullptr, 0);
+
+		if (shaderObj.Hull.Shader != nullptr || forceNull)
+			_context->HSSetShader(shaderObj.Hull.Shader.Get(), nullptr, 0);
+
+		if (shaderObj.Geometry.Shader != nullptr || forceNull)
+			_context->GSSetShader(shaderObj.Geometry.Shader.Get(), nullptr, 0);
 	}
 
 	RendererShader ShaderManager::LoadOrCompile(const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines, bool forceRecompile)
@@ -318,6 +361,14 @@ namespace TEN::Renderer::Utils
 			loadOrCompileShader(wideFileName, "DS", funcName, "ds_5_0", rendererShader.Compute.Blob);
 			throwIfFailed(_device->CreateDomainShader(rendererShader.Domain.Blob->GetBufferPointer(), rendererShader.Compute.Blob->GetBufferSize(),
 				nullptr, rendererShader.Domain.Shader.GetAddressOf()));
+		}
+
+		// Load or compile and create domain shader.
+		if (type == ShaderType::Geometry)
+		{
+			loadOrCompileShader(wideFileName, "GS", funcName, "gs_5_0", rendererShader.Geometry.Blob);
+			throwIfFailed(_device->CreateGeometryShader(rendererShader.Geometry.Blob->GetBufferPointer(), rendererShader.Geometry.Blob->GetBufferSize(),
+				nullptr, rendererShader.Geometry.Shader.GetAddressOf()));
 		}
 
 		// Increment compile counter.

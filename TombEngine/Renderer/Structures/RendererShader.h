@@ -13,7 +13,8 @@ namespace TEN::Renderer::Structures
 		PixelAndVertex,
 		Compute,
 		Hull,
-		Domain
+		Domain,
+		Geometry
 	};
 
 	struct RendererPixelShaderAndBlob
@@ -46,6 +47,12 @@ namespace TEN::Renderer::Structures
 		ComPtr<ID3D10Blob>		   Blob = nullptr;
 	};
 
+	struct RendererGeometryShaderAndBlob
+	{
+		ComPtr<ID3D11GeometryShader> Shader = nullptr;
+		ComPtr<ID3D10Blob>			 Blob = nullptr;
+	};
+
 	struct RendererShader
 	{
 		RendererPixelShaderAndBlob	 Pixel	 = {};
@@ -53,5 +60,6 @@ namespace TEN::Renderer::Structures
 		RendererComputeShaderAndBlob Compute = {};
 		RendererHullShaderAndBlob	 Hull = {};
 		RendererDomainShaderAndBlob  Domain = {};
+		RendererGeometryShaderAndBlob Geometry = {};
 	};
 }

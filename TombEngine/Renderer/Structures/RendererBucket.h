@@ -14,6 +14,7 @@ namespace TEN::Renderer::Structures
 		bool Animated;
 		BlendMode BlendMode;
 		ShaderMaterialType MaterialType;
+		int WaterPlaneIndex;
 		int StartVertex;
 		int StartIndex;
 		int NumVertices;

@@ -17,6 +17,9 @@ namespace TEN::Renderer::Structures
 	struct RendererWaterPlane
 	{
 		int WaterLevel;
+		bool DrawReflections;
+		bool DrawReflectionsWithPriority;
+		float MinDistance;
 		Matrix ReflectionViewMatrix;
 		Vector3 CameraPositionWS;
 		Vector3 CameraDirectionWS;

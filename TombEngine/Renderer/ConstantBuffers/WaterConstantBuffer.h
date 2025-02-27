@@ -9,6 +9,12 @@ namespace TEN::Renderer::ConstantBuffers
 
 	struct alignas(16) CWaterConstantBuffer
 	{
+		Matrix WaterReflectionViews[8];
+		//--
+		Vector4 WaterLevels[8];
+		//--
+		Matrix SkyWorldMatrices[8];
+		//--
 		Matrix WaterReflectionView;
 		//--
 		Vector3 LightPosition;
@@ -20,6 +26,8 @@ namespace TEN::Renderer::ConstantBuffers
 		float MoveFactor;
 		float WaveStrength;
 		int WaterLevel;
-		float Padding;
+		int WaterPlaneIndex;
+		//--
+		Vector4 SkyColor;
 	};
 }

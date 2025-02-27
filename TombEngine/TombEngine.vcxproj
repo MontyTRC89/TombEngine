@@ -815,6 +815,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClInclude Include="Renderer\Frustum.h" />
     <ClInclude Include="Renderer\Graphics\IndexBuffer.h" />
     <ClInclude Include="Renderer\Graphics\RenderTarget2D.h" />
+    <ClInclude Include="Renderer\Graphics\RenderTarget2DArray.h" />
     <ClInclude Include="Renderer\Graphics\RenderTargetCube.h" />
     <ClInclude Include="Renderer\Graphics\Texture2D.h" />
     <ClInclude Include="Renderer\Graphics\Texture2DArray.h" />

@@ -295,6 +295,7 @@ namespace TEN::Renderer
 				bucket.Animated = levelBucket.animated;
 				bucket.BlendMode = static_cast<BlendMode>(levelBucket.blendMode);
 				bucket.MaterialType = static_cast<ShaderMaterialType>(levelBucket.materialType);
+				bucket.WaterPlaneIndex = levelBucket.waterPlaneIndex;
 				bucket.Texture = levelBucket.texture;
 				bucket.StartVertex = lastVertex;
 				bucket.StartIndex = lastIndex;

@@ -1246,6 +1246,7 @@ namespace TEN::Renderer
 			PrintDebugMessage("    Sprites: %d", _numSortedSpritesDrawCalls);
 			PrintDebugMessage("SHADOW MAP draw calls: %d", _numShadowMapDrawCalls);
 			PrintDebugMessage("DEBRIS draw calls: %d", _numDebrisDrawCalls);
+			PrintDebugMessage("Number of water planes: %d", view.WaterPlanesToDraw.size());
 
 			_spriteBatch->Begin(SpriteSortMode_Deferred, _renderStates->Opaque());
 
@@ -1304,14 +1305,6 @@ namespace TEN::Renderer
 
 			_spriteBatch->Draw(_roomAmbientMapBack.ShaderResourceView.Get(), rect);
 			thumbY += thumbWidth;
-
-			rect.left = _screenWidth - thumbWidth;
-			rect.top = thumbY;
-			rect.right = rect.left + thumbWidth;
-			rect.bottom = rect.top + thumbWidth / aspectRatio;
-
-			_spriteBatch->Draw(_waterReflectionsRenderTarget.ShaderResourceView.Get(), rect);
-			thumbY += thumbWidth / aspectRatio;
 
 			_spriteBatch->End();
 
