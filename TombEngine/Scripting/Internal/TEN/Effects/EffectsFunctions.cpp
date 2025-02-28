@@ -301,11 +301,11 @@ namespace TEN::Scripting::Effects
 		TriggerBlood(pos.x, pos.y, pos.z, -1, ValueOr<int>(count, 1));
 	}
 
-	/// Emit air bubble in a water room.
-	// @function EmitAirBubble
-	// @tparam Vec3 pos World position where the effect will be spawned. Must be in a water room.
-	// @tparam[opt] float size Sprite size. __Default: 32__
-	// @tparam[opt] float amp Oscillation amplitude. __Default: 32__
+/// Emit air bubble in a water room.
+// @function EmitAirBubble
+// @tparam Vec3 pos World position where the effect will be spawned. Must be in a water room.
+// @tparam[opt] float size Sprite size. __Default: 32__
+// @tparam[opt] float amp Oscillation amplitude. __Default: 32__
 	static void EmitAirBubble(const Vec3& pos, TypeOrNil<float> size, TypeOrNil<float> amp)
 	{
 		constexpr auto DEFAULT_SIZE = 128.0f;
@@ -357,16 +357,33 @@ namespace TEN::Scripting::Effects
 		return Vec3(Weather.Wind());
 	}
 
-	/// Get the wind vector for the current game frame.
-	// This represents the 3D displacement applied by the engine on things like particles affected by wind.
-	// @function GetWind()
-	// @treturn Vec3 Wind vector.
-	static void EmitStreamer (std::string name, int tag, Vec3 pos, Vec3 dir, short orient, ScriptColor color,
-		float width, float life, float vel, float scaleRate, short rot, int flags)
+/// Emits a streamer per frame.
+// @function EmitStreamer()
+// @tparam string name Specific name of the streamer.
+// @tparam Vec3 position position where the effect will be spawned.
+// @tparam Vec3 direction normal which indicates streamer direction.
+// @tparam[opt] short orientation Angle - a value of 90 will cause the streamer to be entirely vertical. __Default: 0__
+// @tparam[opt] Color Color of streamer. __Default: Color(255, 255, 255))__
+// @tparam[opt] float width Width of the Streamer.__Default: 1__ 
+// @tparam[opt] float lifetime Lifetime in seconds. __Default: 1__
+// @tparam[opt] float vel The speed with which the streamer should move in the direction of normal.__Default: 1__
+// @tparam[opt] float scaleRate The rate at which the streamer should scale. __Default: 1__
+// @tparam[opt] float rot Rotation of the streamer over its lifetime. __Default: 0__
+// @tparam[opt] int flags Direction of Streamer fade. __Default: Left__
+	static void EmitStreamer (std::string name, Vec3 position, Vec3 direction, TypeOrNil<short> orientation, TypeOrNil<ScriptColor> color,
+		TypeOrNil<float> width, TypeOrNil<float> life, TypeOrNil<float> velocity, TypeOrNil<float> scaleRate, TypeOrNil<short> rotation, TypeOrNil<int> flags)
 	{
-		auto position = Vector3(pos.x, pos.y, pos.z);
-		auto direction = Vector3(dir.x, dir.y, dir.z);
-		StreamerEffect.Spawn(GetHash(name), tag, position, direction, orient, color, width, life, vel, scaleRate, rot, flags);
+		auto pos = Vector3(position.x, position.y, position.z);
+		auto dir = Vector3(direction.x, direction.y, direction.z);
+		auto orient = ANGLE(ValueOr<short>(orientation, 0));
+		auto col = ValueOr<ScriptColor>(color, ScriptColor(255, 255, 255));
+		auto widthS = ValueOr<float>(width, 1);
+		auto lifetime = ValueOr<float>(life, 1);
+		auto vel = ValueOr<float>(velocity, 1);
+		auto scale = ValueOr<float>(scaleRate, 1);
+		auto rot = ANGLE(ValueOr<short>(rotation, 0));
+		int flag = ValueOr<int>(flags, 1);
+		StreamerEffect.Spawn(GetHash(name), 0, position, direction, orient, col, widthS, lifetime, vel, scale, rot, flag);
 	}
 
 	void Register(sol::state* state, sol::table& parent) 
@@ -384,7 +401,7 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_MakeExplosion, &MakeExplosion);
 		tableEffects.set_function(ScriptReserved_EmitFire, &EmitFire);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
-		tableEffects.set_function("EmitStreamer", &EmitStreamer);
+		tableEffects.set_function(ScriptReserved_EmitStreamer, &EmitStreamer);
 		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
 
 		auto handler = LuaHandler{ state };
