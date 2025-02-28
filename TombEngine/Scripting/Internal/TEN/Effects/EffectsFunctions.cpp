@@ -301,16 +301,36 @@ namespace TEN::Scripting::Effects
 		TriggerBlood(pos.x, pos.y, pos.z, -1, ValueOr<int>(count, 1));
 	}
 
-/***Rotate Horizon by specified rotation value.
-@function RotateHorizon
-@tparam Rotation rot Horizon's new rotation
+/***Changes horizon to a specified object slot.
+@function SetHorizon
+@tparam Objects.ObjID slot Object slot to meshswap horizon with.
+@tparam[opt] float speed Fade speed in units per second. A value of 1 will make the fade take one second. 0 means no fade. __Default: 0__
+*/
+	static void SetHorizon(GAME_OBJECT_ID horizonObject, TypeOrNil<float> speed)
+	{
+		if (Weather.Horizon.GetHorizonID() == horizonObject)
+			return;
+
+		if (Weather.Horizon.GetTransitionProgress() < 1.0f)
+		{
+			TENLog("Horizon is already transitioning.", LogLevel::Warning);
+			return;
+		}
+
+		Weather.Horizon.SetHorizonID(horizonObject);
+		Weather.Horizon.SetTransitionSpeed(ValueOr<float>(speed, 0.0f));
+	}
+
+/***Rotate horizon by specified rotation value.
+@function SetHorizonRotation
+@tparam Rotation rot Horizon's new rotation.
 */
 	static void SetHorizonRotation(const Rotation& rot)
 	{
 		constexpr auto BIG_ANGLE_THRESHOLD_DEGREES = 30.0f;
 
 		// Get current rotation in degrees
-		Vector3 _horizonRotation = Weather.HorizonObject.GetRotation();
+		Vector3 _horizonRotation = Weather.Horizon.GetRotation();
 		Rotation currentRotation = Rotation(_horizonRotation.x / RADIAN, _horizonRotation.y / RADIAN, _horizonRotation.z / RADIAN);
 
 		// Check if the difference in rotation exceeds the threshold
@@ -321,32 +341,18 @@ namespace TEN::Scripting::Effects
 
 		Vec3 data = Vec3(rot.x * RADIAN,rot.y * RADIAN,rot.z * RADIAN);
 
-		Weather.HorizonObject.SetRotation(data);
-
-		if (bigRotation)
-		{
-			Weather.HorizonObject.SetInterpolation(false);
-		}
+		Weather.Horizon.SetRotation(data, !bigRotation);
 	}
 
-/***Returns Horizon's current rotation value.
+/***Returns horizon's current rotation value.
 @function GetHorizonRotation
-@treturn Rotation Horizon's current rotation
+@treturn Rotation Horizon's current rotation.
 */
 	Rotation GetHorizonRotation()
 	{
-		Vector3 _horizonRotation = Weather.HorizonObject.GetRotation();
+		Vector3 _horizonRotation = Weather.Horizon.GetRotation();
 		Rotation rot = Rotation(_horizonRotation.x / RADIAN, _horizonRotation.y / RADIAN, _horizonRotation.z / RADIAN);
 		return rot;
-	}
-
-/***Meshswap's Horizon with a specified object slot.
-@function SetHorizon
-@tparam Objects.ObjID Object slot to meshswap horizon with.
-*/
-	static void SetHorizon(GAME_OBJECT_ID horizonObject)
-	{
-		Weather.HorizonObject.SetHorizonID(horizonObject);
 	}
 
 /// Emit air bubble in a water room.

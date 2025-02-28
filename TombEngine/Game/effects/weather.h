@@ -108,28 +108,36 @@ namespace TEN::Effects::Environment
 		Vector3 GetRotation() const;
 		Vector3 GetOldRotation() const;
 		GAME_OBJECT_ID GetHorizonID() const;
-		bool GetInterpolationStatus() const;
+		GAME_OBJECT_ID GetOldHorizonID() const;
+		float GetTransitionProgress() const;
+		float GetTransitionSpeed() const;
 
 		// Setters
-		void SetRotation(const Vector3& rotation);
+		void SetRotation(const Vector3& rotation, bool saveOldValue);
 		void SetHorizonID(GAME_OBJECT_ID id);
-		void SaveInterpolationData();
-		void SetInterpolation(bool value);
+		void SetOldHorizonID(GAME_OBJECT_ID id);
+		void SetTransitionProgress(float value);
+		void SetTransitionSpeed(float value);
 
 		// Utility
+		void Update();
 		void ResetRotation(); // Resets horizon rotation
 
 	private:
 		GAME_OBJECT_ID _horizonID = ID_HORIZON;
+		GAME_OBJECT_ID _oldHorizonID = ID_HORIZON;
+		float _transitionProgress = 1.0f;
+		float _transitionSpeed = 0.0f;
 		Vector3 _rotation = Vector3::Zero;
 		Vector3 _oldRotation = Vector3::Zero;
-		bool _interpolation = false;
 	};
 
 	class EnvironmentController
 	{
 	public:
 		EnvironmentController();
+
+		HorizonObject Horizon;
 
 		Vector3 Wind() { return Vector3(WindX / 2.0f, 0, WindZ / 2.0f); }
 		Vector3 FlashColor() { return FlashColorBase * sin((FlashProgress * PI) / 2.0f); }
@@ -143,8 +151,6 @@ namespace TEN::Effects::Environment
 		const std::vector<WeatherParticle>& GetParticles() const { return Particles; }
 		const std::vector<StarParticle>&	GetStars() const { return Stars; }
 		const std::vector<MeteorParticle>&	GetMeteors() const { return Meteors; }
-
-		HorizonObject HorizonObject;
 
 	private:
 		// Weather

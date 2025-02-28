@@ -903,9 +903,6 @@ namespace TEN::Renderer
 				item.PrevAnimTransforms[j] = item.AnimTransforms[j];
 		}
 
-		//SAVE HORIZON INTERPOLATION DATA
-		Weather.HorizonObject.SaveInterpolationData();
-
 		for (auto& effect : _effects)
 		{
 			effect.PrevPosition = effect.Position;

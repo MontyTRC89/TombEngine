@@ -21,31 +21,58 @@ using namespace TEN::Math;
 
 namespace TEN::Effects::Environment 
 {
+	EnvironmentController Weather;
+
 	HorizonObject::HorizonObject() {}
 
 	// Getters
 	Vector3 HorizonObject::GetRotation() const { return _rotation; }
 	Vector3 HorizonObject::GetOldRotation() const { return _oldRotation; }
 	GAME_OBJECT_ID HorizonObject::GetHorizonID() const { return _horizonID; }
-	bool HorizonObject::GetInterpolationStatus() const { return _interpolation; }
+	GAME_OBJECT_ID HorizonObject::GetOldHorizonID() const { return _oldHorizonID; }
+	float HorizonObject::GetTransitionProgress() const { return _transitionProgress; }
+	float HorizonObject::GetTransitionSpeed() const { return _transitionSpeed; }
 
 	// Setters
-	void HorizonObject::SetRotation(const Vector3& rotation) { _rotation = rotation; }
-	void HorizonObject::SetHorizonID(GAME_OBJECT_ID id) { _horizonID = id; }
-	void HorizonObject::SaveInterpolationData() { _oldRotation = _rotation;}
-	void HorizonObject::SetInterpolation(bool value)
-	{ 
-		_interpolation = value;
+	void HorizonObject::SetOldHorizonID(GAME_OBJECT_ID id) { _oldHorizonID = id; }
+	void HorizonObject::SetTransitionProgress(float value) { _transitionProgress = value; }
+	void HorizonObject::SetTransitionSpeed(float value) { _transitionSpeed = value / (float)FPS; }
+
+	void HorizonObject::SetRotation(const Vector3& rotation, bool saveOldValue)
+	{
+		if (saveOldValue)
+			_oldRotation = _rotation;
+
+		_rotation = rotation;
 	}
-	
-	// Reset horizon rotation
+
+	void HorizonObject::SetHorizonID(GAME_OBJECT_ID id)
+	{
+		_oldHorizonID = _horizonID;
+		_horizonID = id;
+		_transitionProgress = 0.0f;
+		_transitionSpeed = 0.0f;
+	}
+
+	void HorizonObject::Update()
+	{
+		if (_transitionProgress == 1.0f)
+			return;
+
+		_transitionProgress += _transitionSpeed == 0.0f ? 1.0f : _transitionSpeed;
+
+		if (_transitionProgress >= 1.0f)
+		{
+			_transitionProgress = 1.0f;
+			_oldHorizonID = _horizonID;
+		}
+	}
+
 	void HorizonObject::ResetRotation()
 	{
 		_rotation = Vector3::Zero;
 		_oldRotation = Vector3::Zero;
 	}
-
-	EnvironmentController Weather;
 
 	float WeatherParticle::Transparency() const
 	{
@@ -83,6 +110,8 @@ namespace TEN::Effects::Environment
 		SpawnWeatherParticles(level);
 		SpawnDustParticles(level);
 		SpawnMeteorParticles(level);
+
+		Horizon.Update();
 	}
 
 	void EnvironmentController::Clear()
@@ -110,6 +139,9 @@ namespace TEN::Effects::Environment
 		ResetStarField = true;
 		Stars.clear();
 		Meteors.clear();
+
+		// Clear horizon.
+		Horizon = {};
 	}
 
 	void EnvironmentController::Flash(int r, int g, int b, float speed)

@@ -3035,7 +3035,8 @@ namespace TEN::Renderer
 
 		// Draw horizon.
 		
-		if (_moveableObjects[Weather.HorizonObject.GetHorizonID()].has_value())
+		if (_moveableObjects[Weather.Horizon.GetHorizonID()].has_value() &&
+			_moveableObjects[Weather.Horizon.GetOldHorizonID()].has_value())
 		{
 			SetDepthState(DepthState::None);
 			SetBlendMode(BlendMode::Opaque);
@@ -3046,51 +3047,51 @@ namespace TEN::Renderer
 
 			_shaders.Bind(Shader::Sky);
 
-			auto& moveableObj = *_moveableObjects[Weather.HorizonObject.GetHorizonID()];
+			auto rotation = Vector3::Lerp(Weather.Horizon.GetOldRotation(), Weather.Horizon.GetRotation(), GetInterpolationFactor());
+			Matrix rotationMatrix = Matrix::CreateRotationX(rotation.x) * Matrix::CreateRotationY(rotation.y) * Matrix::CreateRotationZ(rotation.z);
 
-			if (Weather.HorizonObject.GetInterpolationStatus() == false)
+			for (bool oldHorizon : {false, true})
 			{
-				// NOTE: Overwriting interpolation data before drawing.
-				Weather.HorizonObject.SaveInterpolationData();
+				if (oldHorizon && Weather.Horizon.GetOldHorizonID() == Weather.Horizon.GetHorizonID())
+					continue;
 
-				// Otherwise all frames until next ControlPhase will not be interpolated.
-				Weather.HorizonObject.SetInterpolation(true);
+				auto alpha = Smoothstep(Weather.Horizon.GetTransitionProgress());
+				if (oldHorizon)
+					alpha = 1.0f - alpha;
 
-			}
-			auto rotation = Vector3::Lerp(Weather.HorizonObject.GetOldRotation(), Weather.HorizonObject.GetRotation(), GetInterpolationFactor());
+				_stStatic.World = rotationMatrix * Matrix::CreateTranslation(renderView.Camera.WorldPosition);
+				_stStatic.Color = Vector4(1.0f, 1.0f, 1.0f, alpha);
+				_stStatic.ApplyFogBulbs = 1;
+				_cbStatic.UpdateData(_stStatic, _context.Get());
 
-			Matrix rotationMatrix = Matrix::CreateRotationX(rotation.x) *
-				Matrix::CreateRotationY(rotation.y) *
-				Matrix::CreateRotationZ(rotation.z);
-			_stStatic.World = rotationMatrix * Matrix::CreateTranslation(renderView.Camera.WorldPosition);
-			_stStatic.Color = Vector4::One;
-			_stStatic.ApplyFogBulbs = 1;
-			_cbStatic.UpdateData(_stStatic, _context.Get());
+				auto& moveableObj = *_moveableObjects[oldHorizon ? Weather.Horizon.GetOldHorizonID() : Weather.Horizon.GetHorizonID()];
 
-			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
-			{
-				auto* meshPtr = moveableObj.ObjectMeshes[k];
-
-				for (auto& bucket : meshPtr->Buckets)
+				for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 				{
-					if (bucket.NumVertices == 0)
+					auto* meshPtr = moveableObj.ObjectMeshes[k];
+
+					for (auto& bucket : meshPtr->Buckets)
 					{
-						continue;
+						if (bucket.NumVertices == 0)
+							continue;
+
+						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+
+						// Always render horizon as alpha-blended surface.
+						SetBlendMode(GetBlendModeFromAlpha(bucket.BlendMode == BlendMode::AlphaTest ? BlendMode::AlphaBlend : bucket.BlendMode, alpha));
+						SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
+
+						// Draw vertices.
+						DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+						_numMoveablesDrawCalls++;
 					}
-
-					BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]),
-						SamplerStateRegister::AnisotropicClamp);
-
-					// Always render horizon as alpha-blended surface.
-					SetBlendMode(bucket.BlendMode == BlendMode::AlphaTest ? BlendMode::AlphaBlend : bucket.BlendMode);
-					SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
-
-					// Draw vertices.
-					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
-
-					_numMoveablesDrawCalls++;
 				}
 			}
+
+			auto& moveableObj = *_moveableObjects[Weather.Horizon.GetHorizonID()];
+
+			
 		}
 
 		// Eventually draw the sun sprite.
