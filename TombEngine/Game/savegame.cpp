@@ -12,6 +12,7 @@
 #include "Game/control/volume.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/weather.h"
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
@@ -42,6 +43,7 @@ using namespace flatbuffers;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Items;
+using namespace TEN::Effects::Environment;
 using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
@@ -1492,6 +1494,11 @@ const std::vector<byte> SaveGame::Build()
 	sgb.add_postprocess_strength(g_Renderer.GetPostProcessStrength());
 	sgb.add_postprocess_tint(&FromVector3(g_Renderer.GetPostProcessTint()));
 	sgb.add_soundtracks(soundtrackOffset);
+	sgb.add_horizon(Weather.Horizon.GetHorizonID());
+	sgb.add_old_horizon(Weather.Horizon.GetOldHorizonID());
+	sgb.add_horizon_transition_progress(Weather.Horizon.GetTransitionProgress());
+	sgb.add_horizon_transition_speed(Weather.Horizon.GetTransitionSpeed());
+	sgb.add_horizon_rotation(&FromVector3(Weather.Horizon.GetRotation()));
 	sgb.add_cd_flags(soundtrackMapOffset);
 	sgb.add_action_queue(actionQueueOffset);
 	sgb.add_flip_maps(flipMapsOffset);
@@ -2147,6 +2154,13 @@ static void ParseEffects(const Save::SaveGame* s)
 	g_Renderer.SetPostProcessMode((PostProcessMode)s->postprocess_mode());
 	g_Renderer.SetPostProcessStrength(s->postprocess_strength());
 	g_Renderer.SetPostProcessTint(ToVector3(s->postprocess_tint()));
+
+	// Restore horizon state.
+	Weather.Horizon.SetHorizonID((GAME_OBJECT_ID)s->horizon());
+	Weather.Horizon.SetOldHorizonID((GAME_OBJECT_ID)s->old_horizon());
+	Weather.Horizon.SetTransitionProgress(s->horizon_transition_progress());
+	Weather.Horizon.SetTransitionSpeed(s->horizon_transition_speed());
+	Weather.Horizon.SetRotation(ToVector3(s->horizon_rotation()), false);
 
 	// Restore soundtracks.
 	for (int i = 0; i < s->soundtracks()->size(); i++)

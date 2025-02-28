@@ -36,12 +36,14 @@ namespace TEN::Effects::Environment
 	// Setters
 	void HorizonObject::SetOldHorizonID(GAME_OBJECT_ID id) { _oldHorizonID = id; }
 	void HorizonObject::SetTransitionProgress(float value) { _transitionProgress = value; }
-	void HorizonObject::SetTransitionSpeed(float value) { _transitionSpeed = value / (float)FPS; }
+	void HorizonObject::SetTransitionSpeed(float value) { _transitionSpeed = value; }
 
 	void HorizonObject::SetRotation(const Vector3& rotation, bool saveOldValue)
 	{
 		if (saveOldValue)
 			_oldRotation = _rotation;
+		else
+			_oldRotation = rotation;
 
 		_rotation = rotation;
 	}
@@ -59,7 +61,7 @@ namespace TEN::Effects::Environment
 		if (_transitionProgress == 1.0f)
 			return;
 
-		_transitionProgress += _transitionSpeed == 0.0f ? 1.0f : _transitionSpeed;
+		_transitionProgress += _transitionSpeed == 0.0f ? 1.0f : _transitionSpeed / (float)FPS;
 
 		if (_transitionProgress >= 1.0f)
 		{
