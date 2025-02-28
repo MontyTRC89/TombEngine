@@ -3088,10 +3088,6 @@ namespace TEN::Renderer
 					}
 				}
 			}
-
-			auto& moveableObj = *_moveableObjects[Weather.Horizon.GetHorizonID()];
-
-			
 		}
 
 		// Eventually draw the sun sprite.
