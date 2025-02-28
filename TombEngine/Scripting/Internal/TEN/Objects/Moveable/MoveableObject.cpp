@@ -466,9 +466,9 @@ Rotation Moveable::GetJointRot(int jointIndex) const
 // will be mathematically equal
 // (e.g. 90 degrees = -270 degrees = 450 degrees)
 
-/// Get the moveable's rotation
+/// Get the moveable's rotation.
 // @function Moveable:GetRotation
-// @treturn Rotation a copy of the moveable's rotation
+// @treturn Rotation A copy of the moveable's rotation.
 Rotation Moveable::GetRotation() const
 {
 	return 
@@ -479,7 +479,15 @@ Rotation Moveable::GetRotation() const
 	};
 }
 
-/// Set the moveable's rotation
+/// Get the moveable's scale.
+// @function Moveable:GetScale
+// @treturn Vec3 A copy of the moveable's visual scale.
+Vec3 Moveable::GetScale() const
+{
+	return Vec3(_moveable->Pose.Scale);
+}
+
+/// Set the moveable's rotation.
 // @function Moveable:SetRotation
 // @tparam Rotation rotation The moveable's new rotation
 void Moveable::SetRotation(const Rotation& rot)
@@ -498,21 +506,13 @@ void Moveable::SetRotation(const Rotation& rot)
 		_moveable->DisableInterpolation = true;
 }
 
-/// Get the moveable's scale
-// @function Moveable:GetScale
-// @treturn Vec3 a copy of the moveable's visual scale.
-Vec3 Moveable::GetScale() const
-{
-	return Vec3(_moveable->Pose.Scale);
-}
-
 /// Set the moveable's scale
 // Sets the scale of the moveable. It's only a visual effect and does not affect collision.
 // @function Moveable:SetScale
 // @tparam Vec3 new scale of the moveable 
-void Moveable::SetScale(Vec3 scale)
+void Moveable::SetScale(const Vec3& scale)
 {
-	_moveable->Pose.Scale = Vector3(scale.x, scale.y, scale.z);
+	_moveable->Pose.Scale = scale.ToVector3();
 }
 
 /// Get current HP (hit points/health points)

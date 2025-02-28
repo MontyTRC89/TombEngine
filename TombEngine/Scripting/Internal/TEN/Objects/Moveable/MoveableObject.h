@@ -85,7 +85,7 @@ public:
 	std::unique_ptr<Room> GetRoom() const;
 	int GetRoomNumber() const;
 	void SetRotation(const Rotation& rot);
-	void SetScale(Vec3 scale);
+	void SetScale(const Vec3& scale);
 	void SetStateNumber(int stateNumber);
 	void SetAnimNumber(int animNumber, sol::optional<int> slotIndex);
 	void SetFrameNumber(int frameNumber);
