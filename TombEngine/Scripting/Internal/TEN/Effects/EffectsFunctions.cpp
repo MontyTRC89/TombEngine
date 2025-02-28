@@ -303,7 +303,7 @@ namespace TEN::Scripting::Effects
 
 /***Changes horizon to a specified object slot.
 @function SetHorizon
-@tparam Objects.ObjID slot Object slot to meshswap horizon with.
+@tparam Objects.ObjID slot Object slot to change horizon to.
 @tparam[opt] float speed Fade speed in units per second. A value of 1 will make the fade take one second. 0 means no fade. __Default: 0__
 */
 	static void SetHorizon(GAME_OBJECT_ID horizonObject, TypeOrNil<float> speed)
