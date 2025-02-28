@@ -30,8 +30,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### Lua API changes
 * Added diary module.
-* Added SetHorizon function to meshswap horizon.
-* Added SetHorizonRotation, GetHorizonRotation functions to rotate horizons.
+* Added Effects.SetHorizon(), Effects.SetHorizonRotation() and Effects.GetHorizonRotation() functions to meshswap and rotate horizon.
 * Added View.GetFlyByPosition() and View.GetFlyByRotation() functions to get flyby sequence parameters at a specified time point.
 * Added Effects.EmitAirBubble() function to spawn air bubbles.
 * Added extra arguments for sprite object slots and starting rotation value for EmitParticle function.
