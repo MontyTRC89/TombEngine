@@ -35,7 +35,10 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added Moveable:GetScale() and Movebale:SetScale() methods to set visible scale of moveables.
 * Added additional arguments for Sprite object slot and starting rotation value for EmitParticle function.
 * Added Rotation:Lerp() function to allow linear interpolation between rotations.
+* Added extra arguments for sprite object slots and starting rotation value for EmitParticle function.
 * Added various Translate() methods to Vec2 and Vec3 script objects.
+* Added Lerp() function to the Rotation object to allow linear interpolation between rotations.
+* Added alpha transparency functionality for statics and moveables by using SetColor() method.
   
 ## [Version 1.7.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.4) - 2025-04-01
 
