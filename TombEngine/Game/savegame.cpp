@@ -1189,7 +1189,7 @@ const std::vector<byte> SaveGame::Build()
 		particleInfo.add_sound(particle->sound);
 		particleInfo.add_blend_mode((int)particle->blendMode);
 		particleInfo.add_x(particle->x);
-		particleInfo.add_x_vel(particle->sSize);
+		particleInfo.add_x_vel(particle->xVel);
 		particleInfo.add_y(particle->y);
 		particleInfo.add_y_vel(particle->yVel);
 		particleInfo.add_z(particle->z);
