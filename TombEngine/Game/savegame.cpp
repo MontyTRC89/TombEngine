@@ -1149,11 +1149,13 @@ const std::vector<byte> SaveGame::Build()
 
 		Save::ParticleInfoBuilder particleInfo{ fbb };
 
+		particleInfo.add_animation_type(particle->animationType);
 		particleInfo.add_b(particle->b);
 		particleInfo.add_col_fade_speed(particle->colFadeSpeed);
 		particleInfo.add_d_b(particle->dB);
 		particleInfo.add_sprite_index(particle->SpriteSeqID);
 		particleInfo.add_sprite_id(particle->SpriteID);
+		particleInfo.add_damage(particle->damage);
 		particleInfo.add_d_g(particle->dG);
 		particleInfo.add_d_r(particle->dR);
 		particleInfo.add_d_size(particle->dSize);
@@ -1161,11 +1163,15 @@ const std::vector<byte> SaveGame::Build()
 		particleInfo.add_extras(particle->extras);
 		particleInfo.add_fade_to_black(particle->fadeToBlack);
 		particleInfo.add_flags(particle->flags);
+		particleInfo.add_framerate(particle->framerate);
 		particleInfo.add_friction(particle->friction);
 		particleInfo.add_fx_obj(particle->fxObj);
 		particleInfo.add_g(particle->g);
 		particleInfo.add_gravity(particle->gravity);
 		particleInfo.add_life(particle->life);
+		particleInfo.add_light_radius(particle->lightRadius);
+		particleInfo.add_light_flicker(particle->lightFlicker);
+		particleInfo.add_light_flicker_s(particle->lightFlickerS);
 		particleInfo.add_max_y_vel(particle->maxYvel);
 		particleInfo.add_node_number(particle->nodeNumber);
 		particleInfo.add_on(particle->on);

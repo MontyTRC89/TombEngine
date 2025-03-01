@@ -4954,6 +4954,12 @@ struct ParticleInfoT : public flatbuffers::NativeTable {
   int32_t node_number = 0;
   std::unique_ptr<TEN::Save::Vector3> target_pos{};
   int32_t sprite_id = 0;
+  int32_t damage = 0;
+  float framerate = 0.0f;
+  int32_t animation_type = 0;
+  int32_t light_radius = 0;
+  int32_t light_flicker = 0;
+  int32_t light_flicker_s = 0;
 };
 
 struct ParticleInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -4999,7 +5005,13 @@ struct ParticleInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_ROOM_NUMBER = 74,
     VT_NODE_NUMBER = 76,
     VT_TARGET_POS = 78,
-    VT_SPRITE_ID = 80
+    VT_SPRITE_ID = 80,
+    VT_DAMAGE = 82,
+    VT_FRAMERATE = 84,
+    VT_ANIMATION_TYPE = 86,
+    VT_LIGHT_RADIUS = 88,
+    VT_LIGHT_FLICKER = 90,
+    VT_LIGHT_FLICKER_S = 92
   };
   int32_t x() const {
     return GetField<int32_t>(VT_X, 0);
@@ -5118,6 +5130,24 @@ struct ParticleInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t sprite_id() const {
     return GetField<int32_t>(VT_SPRITE_ID, 0);
   }
+  int32_t damage() const {
+    return GetField<int32_t>(VT_DAMAGE, 0);
+  }
+  float framerate() const {
+    return GetField<float>(VT_FRAMERATE, 0.0f);
+  }
+  int32_t animation_type() const {
+    return GetField<int32_t>(VT_ANIMATION_TYPE, 0);
+  }
+  int32_t light_radius() const {
+    return GetField<int32_t>(VT_LIGHT_RADIUS, 0);
+  }
+  int32_t light_flicker() const {
+    return GetField<int32_t>(VT_LIGHT_FLICKER, 0);
+  }
+  int32_t light_flicker_s() const {
+    return GetField<int32_t>(VT_LIGHT_FLICKER_S, 0);
+  }
   bool Verify(flatbuffers::Verifier &verifier) const {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_X) &&
@@ -5159,6 +5189,12 @@ struct ParticleInfo FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_NODE_NUMBER) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_TARGET_POS) &&
            VerifyField<int32_t>(verifier, VT_SPRITE_ID) &&
+           VerifyField<int32_t>(verifier, VT_DAMAGE) &&
+           VerifyField<float>(verifier, VT_FRAMERATE) &&
+           VerifyField<int32_t>(verifier, VT_ANIMATION_TYPE) &&
+           VerifyField<int32_t>(verifier, VT_LIGHT_RADIUS) &&
+           VerifyField<int32_t>(verifier, VT_LIGHT_FLICKER) &&
+           VerifyField<int32_t>(verifier, VT_LIGHT_FLICKER_S) &&
            verifier.EndTable();
   }
   ParticleInfoT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
@@ -5287,6 +5323,24 @@ struct ParticleInfoBuilder {
   void add_sprite_id(int32_t sprite_id) {
     fbb_.AddElement<int32_t>(ParticleInfo::VT_SPRITE_ID, sprite_id, 0);
   }
+  void add_damage(int32_t damage) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_DAMAGE, damage, 0);
+  }
+  void add_framerate(float framerate) {
+    fbb_.AddElement<float>(ParticleInfo::VT_FRAMERATE, framerate, 0.0f);
+  }
+  void add_animation_type(int32_t animation_type) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_ANIMATION_TYPE, animation_type, 0);
+  }
+  void add_light_radius(int32_t light_radius) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_LIGHT_RADIUS, light_radius, 0);
+  }
+  void add_light_flicker(int32_t light_flicker) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_LIGHT_FLICKER, light_flicker, 0);
+  }
+  void add_light_flicker_s(int32_t light_flicker_s) {
+    fbb_.AddElement<int32_t>(ParticleInfo::VT_LIGHT_FLICKER_S, light_flicker_s, 0);
+  }
   explicit ParticleInfoBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
     start_ = fbb_.StartTable();
@@ -5338,8 +5392,20 @@ inline flatbuffers::Offset<ParticleInfo> CreateParticleInfo(
     int32_t room_number = 0,
     int32_t node_number = 0,
     const TEN::Save::Vector3 *target_pos = 0,
-    int32_t sprite_id = 0) {
+    int32_t sprite_id = 0,
+    int32_t damage = 0,
+    float framerate = 0.0f,
+    int32_t animation_type = 0,
+    int32_t light_radius = 0,
+    int32_t light_flicker = 0,
+    int32_t light_flicker_s = 0) {
   ParticleInfoBuilder builder_(_fbb);
+  builder_.add_light_flicker_s(light_flicker_s);
+  builder_.add_light_flicker(light_flicker);
+  builder_.add_light_radius(light_radius);
+  builder_.add_animation_type(animation_type);
+  builder_.add_framerate(framerate);
+  builder_.add_damage(damage);
   builder_.add_sprite_id(sprite_id);
   builder_.add_target_pos(target_pos);
   builder_.add_node_number(node_number);
@@ -9810,6 +9876,12 @@ inline void ParticleInfo::UnPackTo(ParticleInfoT *_o, const flatbuffers::resolve
   { auto _e = node_number(); _o->node_number = _e; }
   { auto _e = target_pos(); if (_e) _o->target_pos = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = sprite_id(); _o->sprite_id = _e; }
+  { auto _e = damage(); _o->damage = _e; }
+  { auto _e = framerate(); _o->framerate = _e; }
+  { auto _e = animation_type(); _o->animation_type = _e; }
+  { auto _e = light_radius(); _o->light_radius = _e; }
+  { auto _e = light_flicker(); _o->light_flicker = _e; }
+  { auto _e = light_flicker_s(); _o->light_flicker_s = _e; }
 }
 
 inline flatbuffers::Offset<ParticleInfo> ParticleInfo::Pack(flatbuffers::FlatBufferBuilder &_fbb, const ParticleInfoT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -9859,6 +9931,12 @@ inline flatbuffers::Offset<ParticleInfo> CreateParticleInfo(flatbuffers::FlatBuf
   auto _node_number = _o->node_number;
   auto _target_pos = _o->target_pos ? _o->target_pos.get() : 0;
   auto _sprite_id = _o->sprite_id;
+  auto _damage = _o->damage;
+  auto _framerate = _o->framerate;
+  auto _animation_type = _o->animation_type;
+  auto _light_radius = _o->light_radius;
+  auto _light_flicker = _o->light_flicker;
+  auto _light_flicker_s = _o->light_flicker_s;
   return TEN::Save::CreateParticleInfo(
       _fbb,
       _x,
@@ -9899,7 +9977,13 @@ inline flatbuffers::Offset<ParticleInfo> CreateParticleInfo(flatbuffers::FlatBuf
       _room_number,
       _node_number,
       _target_pos,
-      _sprite_id);
+      _sprite_id,
+      _damage,
+      _framerate,
+      _animation_type,
+      _light_radius,
+      _light_flicker,
+      _light_flicker_s);
 }
 
 inline SoundtrackT *Soundtrack::UnPack(const flatbuffers::resolver_function_t *_resolver) const {

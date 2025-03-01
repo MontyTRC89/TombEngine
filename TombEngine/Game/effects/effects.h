@@ -47,7 +47,7 @@ enum SpriteEnumFlag
 	SP_SOUND	  = (1 << 18),
 };
 
-enum class ParticleAnimType
+enum ParticleAnimType
 {
 	None,
 	OneShot,
