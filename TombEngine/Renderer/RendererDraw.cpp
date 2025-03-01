@@ -3877,10 +3877,6 @@ namespace TEN::Renderer
 
 		_context->RSSetScissorRects(1, rects);
 
-		// Opaque geometry
-		SetBlendMode(BlendMode::Opaque);
-		SetCullMode(CullMode::CounterClockwise);
-
 		CCameraMatrixBuffer cameraConstantBuffer;
 		cameraConstantBuffer.Frame = GlobalCounter;
 		cameraConstantBuffer.RefreshRate = _refreshRate;
@@ -3899,8 +3895,6 @@ namespace TEN::Renderer
 		}
 		_cbWater.UpdateData(_stWater, _context.Get());
 
-		_shaders.Bind(Shader::WaterReflectionsPixelShader);
-
 		// Draw horizon and the sky
 		auto* levelPtr = g_GameFlow->GetLevel(CurrentLevel);
 
@@ -3908,6 +3902,7 @@ namespace TEN::Renderer
 		{  
 			_shaders.Bind(Shader::SkyWaterReflectionsVertexShader);
 			_shaders.Bind(Shader::SkyWaterReflectionsGeometryShader);
+			_shaders.Bind(Shader::SkyWaterReflectionsPixelShader);
 
 			if (Lara.Control.Look.OpticRange != 0)
 				AlterFOV(ANGLE(DEFAULT_FOV) - Lara.Control.Look.OpticRange, false);
@@ -3927,10 +3922,12 @@ namespace TEN::Renderer
 
 			for (int s = 0; s < 2; s++)
 			{
+				auto weather = TEN::Effects::Environment::Weather;
+				
+				_stWater.SkyColor = weather.SkyColor(s);
+
 				for (int i = 0; i < 2; i++)
 				{
-					auto weather = TEN::Effects::Environment::Weather;
-					 
 					for (int w = 0; w < view.WaterPlanesToDraw.size(); w++)
 					{
 						auto translation = Matrix::CreateTranslation(
@@ -3940,8 +3937,7 @@ namespace TEN::Renderer
 						auto world = rotation * translation;
 						_stWater.SkyWorldMatrices[w] = world;
 					}
-					
-					_stWater.SkyColor = weather.SkyColor(s);
+
 					_cbWater.UpdateData(_stWater, _context.Get());
 
 					DrawIndexedTriangles(SKY_INDICES_COUNT, 0, 0);
@@ -4004,8 +4000,10 @@ namespace TEN::Renderer
 		_context->IASetVertexBuffers(0, 1, _roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		_context->IASetIndexBuffer(_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-		_shaders.Bind(Shader::RoomsWaterReflectionsVertexShader);
 		_shaders.Bind(Shader::WaterReflectionsGeometryShader);
+		_shaders.Bind(Shader::WaterReflectionsPixelShader);
+
+		_shaders.Bind(Shader::RoomsWaterReflectionsVertexShader);
 
 		for (int i = 0; i < _rooms.size(); i++)
 		{
@@ -4281,7 +4279,7 @@ namespace TEN::Renderer
 		BindTexture(TextureRegister::WaterDistortionMap, &_waterDistortionMap, SamplerStateRegister::AnisotropicWrap);
 		BindTexture(TextureRegister::WaterNormalMap, &_wave1NormalMap, SamplerStateRegister::AnisotropicWrap);
 		 
-		_stWater.WaveStrength = 0.009f;
+		_stWater.WaveStrength = 0.005f;
 		_stWater.Shininess = 20.0f;
 		_stWater.KSpecular = 0.3f;
 		_stWater.LightColor = Vector3::One;

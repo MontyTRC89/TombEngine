@@ -6,6 +6,8 @@
 #include "./Math.hlsli"
 #include "./VertexInput.hlsli"
 
+#define MAX_REFLECTION_TARGETS 8
+
 cbuffer WaterConstantBuffer : register(b2)
 {
     float4x4 WaterReflectionViews[8];
@@ -90,16 +92,6 @@ float3 Unproject(float2 uv)
     float4 viewPosition = position / position.w;
     
     return mul(viewPosition, InverseView).xyz;
-}
-
-float2 Project(float3 worldPos)
-{
-    float4 clipPos = mul(float4(worldPos, 1.0f), ViewProjection);
-    float2 ndc = clipPos.xy / clipPos.w;
-    ndc = ndc * 0.5f + 0.5f;
-    ndc.y = 1.0f - ndc.y;
-    
-    return ndc;
 }
 
 // Main water surface shaders
@@ -257,7 +249,7 @@ WaterReflectionsGeometryShaderInput VSInstancedStaticsWaterReflections(VertexSha
 [maxvertexcount(12)]
 void GSWaterReflections(triangle WaterReflectionsGeometryShaderInput input[3], inout TriangleStream<WaterReflectionsPixelShaderInput> outputStream)
 {
-    for (uint i = 0; i < 8; i++)
+    for (uint i = 0; i < MAX_REFLECTION_TARGETS; i++)
     {
         WaterReflectionsPixelShaderInput output;
         
@@ -279,7 +271,7 @@ void GSWaterReflections(triangle WaterReflectionsGeometryShaderInput input[3], i
 [maxvertexcount(12)]
 void GSSkyWaterReflections(triangle WaterReflectionsGeometryShaderInput input[3], inout TriangleStream<WaterReflectionsPixelShaderInput> outputStream)
 {
-    for (uint i = 0; i < 8; i++)
+    for (uint i = 0; i < MAX_REFLECTION_TARGETS; i++)
     {
         WaterReflectionsPixelShaderInput output;
         
@@ -298,6 +290,17 @@ void GSSkyWaterReflections(triangle WaterReflectionsGeometryShaderInput input[3]
         }
         outputStream.RestartStrip();
     }
+}
+
+float4 PSSkyWaterReflections(WaterReflectionsPixelShaderInput input) : SV_Target
+{
+    float4 output = ColorTexture.Sample(ColorSampler, input.UV);
+
+    DoAlphaTest(output);
+
+    output.xyz *= input.Color.xyz;
+
+    return output;
 }
 
 float4 PSWaterReflections(WaterReflectionsPixelShaderInput input) : SV_Target
