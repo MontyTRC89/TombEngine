@@ -61,57 +61,59 @@ namespace TEN::Scripting::Collision
 	/// Create a Probe at a specified world position in a room.
 	// @function Probe
 	// @tparam Vec3 pos World position.
-	// @tparam int roomNumber Room number.
+	// @tparam int roomNumber[opt] Room number. Must be used if probing a position in an overlapping room.
 	// @treturn Probe A new Probe.
-	Probe::Probe(const Vec3& pos, int roomNumber)
+	Probe::Probe(const Vec3& pos, TypeOrNil<int> roomNumber)
 	{
-		_pointCollision = GetPointCollision(pos.ToVector3i(), roomNumber);
+		auto convertedPos = pos.ToVector3i();
+		int roomNumberValue = ValueOr<int>(roomNumber, FindRoomNumber(convertedPos));
+		_pointCollision = GetPointCollision(convertedPos, roomNumberValue);
 	}
 
 	/// Create a Probe that casts from an origin world position in a room in a given direction for a specified distance.
 	// Required to correctly traverse between rooms.
 	// @function Probe
 	// @tparam Vec3 pos Origin world position to cast from.
-	// @tparam int originRoomNumber Origin's room number.
+	// @tparam int roomNumber Origin room number.
 	// @tparam Vec3 dir Direction in which to cast.
 	// @tparam float dist Distance to cast.
 	// @treturn Probe A new Probe.
-	Probe::Probe(const Vec3& origin, int originRoomNumber, const Vec3& dir, float dist)
+	Probe::Probe(const Vec3& pos, int roomNumber, const Vec3& dir, float dist)
 	{
-		_pointCollision = GetPointCollision(origin.ToVector3i(), originRoomNumber, dir.ToVector3(), dist);
+		_pointCollision = GetPointCollision(pos.ToVector3i(), roomNumber, dir.ToVector3(), dist);
 	}
 
-	/// Create a Probe that casts from an origin world position in a room in the direction of a given Rotation for a specified distance.
+	/// Create a Probe that casts from an origin world position in a room in the direction of a given rotation for a specified distance.
 	// Required to correctly traverse between rooms.
 	// @function Probe
-	// @tparam Vec3 Origin world position to cast from.
-	// @tparam int originRoomNumber Origin's room number.
+	// @tparam Vec3 pos Origin world position to cast from.
+	// @tparam int roomNumber Origin room number.
 	// @tparam Rotation rot Rotation defining the direction in which to cast.
 	// @tparam float dist Distance to cast.
 	// @treturn Probe A new Probe.
-	Probe::Probe(const Vec3& origin, int originRoomNumber, const Rotation& rot, float dist)
+	Probe::Probe(const Vec3& pos, int roomNumber, const Rotation& rot, float dist)
 	{
 		auto dir = rot.ToEulerAngles().ToDirection();
-		_pointCollision = GetPointCollision(origin.ToVector3(), originRoomNumber, dir, dist);
+		_pointCollision = GetPointCollision(pos.ToVector3(), roomNumber, dir, dist);
 	}
 
-	/// Create a Probe that casts from an origin world position, where a given relative offset is rotated according to a given Rotation.
+	/// Create a Probe that casts from an origin world position, where a given relative offset is rotated according to a given rotation.
 	// Required to correctly traverse between rooms.
 	// @function Probe
-	// @tparam Vec3 Origin world position to cast from.
-	// @tparam int originRoomNumber Origin's room number.
+	// @tparam Vec3 pos Origin world position to cast from.
+	// @tparam int roomNumber Origin room number.
 	// @tparam Rotation rot Rotation according to which the input relative offset is rotated.
 	// @tparam Vec3 relOffset Relative offset to cast.
 	// @treturn Probe A new Probe.
-	Probe::Probe(const Vec3& origin, int originRoomNumber, const Rotation& rot, const Vec3& relOffset)
+	Probe::Probe(const Vec3& pos, int roomNumber, const Rotation& rot, const Vec3& relOffset)
 	{
-		auto target = Geometry::TranslatePoint(origin.ToVector3(), rot.ToEulerAngles(), relOffset.ToVector3());
-		float dist = Vector3::Distance(origin.ToVector3(), target);
+		auto target = Geometry::TranslatePoint(pos.ToVector3(), rot.ToEulerAngles(), relOffset.ToVector3());
+		float dist = Vector3::Distance(pos.ToVector3(), target);
 
-		auto dir = target - origin.ToVector3();
+		auto dir = target - pos.ToVector3();
 		dir.Normalize();
 
-		_pointCollision = GetPointCollision(origin.ToVector3(), originRoomNumber, dir, dist);
+		_pointCollision = GetPointCollision(pos.ToVector3(), roomNumber, dir, dist);
 	}
 
 	/// Get the world position of this Probe.
@@ -272,7 +274,7 @@ namespace TEN::Scripting::Collision
 		return _pointCollision.IsWall();
 	}
 
-	/// Check if this Probe is inside solid geometry, i.e. below a floor, above a ceiling, or inside a wall.
+	/// Check if this Probe is inside solid geometry (below a floor, above a ceiling, or inside a wall).
 	// @function IsInsideSolidGeometry
 	// @treturn bool Inside geometry status. __true: is inside, false: is outside__
 	bool Probe::IsInsideSolidGeometry()
