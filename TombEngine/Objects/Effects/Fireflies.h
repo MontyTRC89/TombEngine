@@ -45,10 +45,6 @@ namespace TEN::Effects::Fireflys
 		unsigned char colFadeSpeed;
 		unsigned char fadeToBlack;
 
-		int x;
-		int y;
-		int z;
-
 		bool on;
 		int sLife;
 		int life;
@@ -72,9 +68,12 @@ namespace TEN::Effects::Fireflys
 
 		void StoreInterpolationData()
 		{
-			PrevX = x;
-			PrevY = y;
-			PrevZ = z;			
+			PrevX = Position.x;
+			PrevY = Position.y;
+			PrevZ = Position.z;
+			PrevR = r;
+			PrevG = g;
+			PrevB = b;
 		}
 	};
 
