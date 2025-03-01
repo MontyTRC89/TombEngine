@@ -381,6 +381,7 @@ table ParticleInfo {
 	light_radius: int32;
 	light_flicker: int32;
 	light_flicker_s: int32;
+	sound: int32;
 }
 
 table Soundtrack {

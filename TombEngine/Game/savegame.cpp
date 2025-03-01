@@ -1186,6 +1186,7 @@ const std::vector<byte> SaveGame::Build()
 		particleInfo.add_s_life(particle->sLife);
 		particleInfo.add_s_r(particle->sR);
 		particleInfo.add_s_size(particle->sSize);
+		particleInfo.add_sound(particle->sound);
 		particleInfo.add_blend_mode((int)particle->blendMode);
 		particleInfo.add_x(particle->x);
 		particleInfo.add_x_vel(particle->sSize);
@@ -2230,6 +2231,14 @@ static void ParseEffects(const Save::SaveGame* s)
 		particle->roomNumber = particleInfo->room_number();
 		particle->nodeNumber = particleInfo->node_number();
 		particle->targetPos = ToVector3(particleInfo->target_pos());
+		particle->animationType = (ParticleAnimType)particleInfo->animation_type();
+		particle->damage = particleInfo->damage();
+		particle->framerate = particleInfo->framerate();
+		particle->lightRadius = particleInfo->light_radius();
+		particle->lightFlicker = particleInfo->light_flicker();
+		particle->lightFlickerS = particleInfo->light_flicker_s();
+		particle->sound = particleInfo->sound();
+
 	}
 
 	for (int i = 0; i < s->bats()->size(); i++)
