@@ -18,7 +18,6 @@
 #include "Game/items.h"
 #include "Game/pickup/pickup.h"
 #include "Game/Setup.h"
-#include "Game/Debug/Debug.h"
 
 using namespace TEN::Collision::Sphere;
 using namespace TEN::Entities::Switches;
@@ -28,6 +27,8 @@ using namespace TEN::Debug;
 
 namespace TEN::Entities::TR4
 {
+	constexpr auto PLACE_PLINTHITEM_FRAME = 45;
+
 	const auto KeyHolePosition = Vector3i(0, 0, -390);
 	const ObjectCollisionBounds KeyHoleBounds =
 	{
@@ -148,7 +149,7 @@ namespace TEN::Entities::TR4
 			}
 		}
 
-		if (laraItem->Animation.AnimNumber == LA_PICKUP_PEDESTAL_HIGH && laraItem->Animation.FrameNumber == GetAnimData(LA_PICKUP_PEDESTAL_HIGH).frameBase + 45 && keyHoleItem->ItemFlags[1])
+		if (laraItem->Animation.AnimNumber == LA_PICKUP_PEDESTAL_HIGH && laraItem->Animation.FrameNumber == GetAnimData(LA_PICKUP_PEDESTAL_HIGH).frameBase + PLACE_PLINTHITEM_FRAME && keyHoleItem->ItemFlags[1])
 		{
 			TestTriggers(keyHoleItem, true, keyHoleItem->Flags & 0x3E00);
 			keyHoleItem->Flags |= TRIGGERED;
