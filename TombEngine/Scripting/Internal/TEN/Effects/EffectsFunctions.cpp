@@ -423,7 +423,7 @@ namespace TEN::Scripting::Effects
 * If you want a light that sticks around, you must call this each frame.
 @function EmitSpotLight
 @tparam Vec3 pos position of the light
-@tparam Vec3 dir direction, or a point to which spotlight should be directed to
+@tparam Vec3 dir normal which indicates light direction
 @tparam[opt] Color color (default Color(255, 255, 255))
 @tparam[opt] int radius overall radius at the endpoint of a light cone, measured in "clicks" or 256 world units (default 10)
 @tparam[opt] int falloff radius, at which light starts to fade out, measured in "clicks" (default 5)
