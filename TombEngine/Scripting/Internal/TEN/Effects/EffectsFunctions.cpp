@@ -428,8 +428,6 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
 		tableEffects.set_function(ScriptReserved_SetHorizonRotation, &SetHorizonRotation);
 		tableEffects.set_function(ScriptReserved_GetHorizonRotation, &GetHorizonRotation);
-		tableEffects.set_function(ScriptReserved_SetHorizonPosition, &SetHorizonPosition);
-		tableEffects.set_function(ScriptReserved_GetHorizonPosition, &GetHorizonPosition);
 		tableEffects.set_function(ScriptReserved_SetHorizon, &SetHorizon);
 
 		auto handler = LuaHandler{ state };
