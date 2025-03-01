@@ -36,7 +36,7 @@
 
 namespace TEN::Scripting::Collision
 {
-	static const auto SCRIPT_MATERIAL_TYPES = std::unordered_map<std::string, MaterialType>
+	static const auto MATERIAL_TYPES = std::unordered_map<std::string, MaterialType>
 	{
         { "MUD", MaterialType::Mud },
         { "SNOW", MaterialType::Snow },

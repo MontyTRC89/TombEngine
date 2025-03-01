@@ -30,7 +30,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### Lua API changes
 * Added Lerp() function to the Rotation object to allow linear interpolation between rotations.
-* Added LUA Collision class to probe room collision.
+* Added Collision.Probe class for basic collision detection.
 * Added diary module.
 * Added View.GetFlyByPosition() and View.GetFlyByRotation() functions to get flyby sequence parameters at a specified time point.
 * Added Effects.EmitAirBubble() function to spawn air bubbles.

@@ -5,7 +5,7 @@
 #include "Game/collision/Point.h"
 #include "Game/Lara/lara_climb.h"
 #include "Scripting/Internal/LuaHandler.h"
-#include <Scripting/Internal/ReservedScriptNames.h>
+#include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 #include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
@@ -36,26 +36,26 @@ namespace TEN::Scripting::Collision
 			ctors(), sol::call_constructor, ctors(),
 
 			// Getters
-			ScriptReserved_GetColPosition, &Probe::GetPosition,
-			ScriptReserved_GetColRoomNumber, &Probe::GetRoomNumber,
-			ScriptReserved_GetColRoomName, &Probe::GetRoomName,
-			ScriptReserved_GetColRoom, & Probe::GetRoom,
-			ScriptReserved_GetFloorHeight, &Probe::GetFloorHeight,
-			ScriptReserved_GetCeilingHeight, &Probe::GetCeilingHeight,
-			ScriptReserved_GetWaterSurfaceHeight, &Probe::GetWaterSurfaceHeight,
-			ScriptReserved_GetFloorNormal, &Probe::GetFloorNormal,
-			ScriptReserved_GetCeilingNormal, &Probe::GetCeilingNormal,
-			ScriptReserved_GetFloorMaterialType, &Probe::GetFloorMaterialType,
-			ScriptReserved_GetCeilingMaterialType, &Probe::GetCeilingMaterialType,
+			ScriptReserved_ProbeGetPosition, &Probe::GetPosition,
+			ScriptReserved_ProbeGetRoom, &Probe::GetRoom,
+			ScriptReserved_ProbeGetRoomName, &Probe::GetRoomName,
+			ScriptReserved_ProbeGetRoomNumber, &Probe::GetRoomNumber,
+			ScriptReserved_ProbeGetFloorHeight, &Probe::GetFloorHeight,
+			ScriptReserved_ProbeGetCeilingHeight, &Probe::GetCeilingHeight,
+			ScriptReserved_ProbeGetWaterSurfaceHeight, &Probe::GetWaterSurfaceHeight,
+			ScriptReserved_ProbeGetFloorNormal, &Probe::GetFloorNormal,
+			ScriptReserved_ProbeGetCeilingNormal, &Probe::GetCeilingNormal,
+			ScriptReserved_ProbeGetFloorMaterialType, &Probe::GetFloorMaterialType,
+			ScriptReserved_ProbeGetCeilingMaterialType, &Probe::GetCeilingMaterialType,
 
 			// Inquirers
-			ScriptReserved_IsSteepFloor, &Probe::IsSteepFloor,
-			ScriptReserved_IsSteepCeiling, &Probe::IsSteepCeiling,
-			ScriptReserved_IsWall, &Probe::IsWall,
-			ScriptReserved_IsInsideSolidGeometry, &Probe::IsInsideSolidGeometry,
-			ScriptReserved_IsClimbableWall, &Probe::IsClimbableWall,
-			ScriptReserved_IsMonkeySwing, &Probe::IsMonkeySwing,
-			ScriptReserved_IsDeathTile, &Probe::IsDeath);
+			ScriptReserved_ProbeIsSteepFloor, &Probe::IsSteepFloor,
+			ScriptReserved_ProbeIsSteepCeiling, &Probe::IsSteepCeiling,
+			ScriptReserved_ProbeIsWall, &Probe::IsWall,
+			ScriptReserved_ProbeIsInsideSolidGeometry, &Probe::IsInsideSolidGeometry,
+			ScriptReserved_ProbeIsClimbableWall, &Probe::IsClimbableWall,
+			ScriptReserved_ProbeIsMonkeySwing, &Probe::IsMonkeySwing,
+			ScriptReserved_ProbeIsDeathTile, &Probe::IsDeath);
 	}
 
 	/// Create a Probe at a specified world position in a room.
@@ -122,15 +122,15 @@ namespace TEN::Scripting::Collision
 		return Vec3(_pointCollision.GetPosition());
 	}
 
-
-	/// Get the room number of this Probe.
-	// @treturn int Room number.
-	int Probe::GetRoomNumber()
+	/// Get the Room object of this Probe.
+	// @function GetRoom
+	// @treturn Room Room object.
+	std::unique_ptr<Room> Probe::GetRoom()
 	{
-		return _pointCollision.GetRoomNumber();
+		int roomNumber = _pointCollision.GetRoomNumber();
+		return std::make_unique<Room>(g_Level.Rooms[roomNumber]);
 	}
 
-	
 	/// Get the room name of this Probe.
 	// @function GetRoomName
 	// @treturn string Room name.
@@ -142,15 +142,13 @@ namespace TEN::Scripting::Collision
 		return room.Name;
 	}
 
-	/// Get the room object of this Probe.
-	// @function GetRoom
-	// @treturn Room Room Object
-	std::unique_ptr<Room> Probe::GetRoom()
+	/// Get the room number of this Probe.
+	// @treturn int Room number.
+	int Probe::GetRoomNumber()
 	{
-		int roomNumber = _pointCollision.GetRoomNumber();
-		return std::make_unique<Room>(g_Level.Rooms[roomNumber]);
+		return _pointCollision.GetRoomNumber();
 	}
-
+	
 	/// Get the floor height at this Probe.
 	// @function GetFloorHeight
 	// @treturn int Floor height. __nil: no floor exists.__
@@ -320,12 +318,12 @@ namespace TEN::Scripting::Collision
 
 	void Register(sol::state* state, sol::table& parent)
 	{
-		auto tableCollision= sol::table(state->lua_state(), sol::create);
+		auto tableCollision = sol::table(state->lua_state(), sol::create);
 		parent.set(ScriptReserved_Collision, tableCollision);
 
 		Probe::Register(tableCollision);
 
-		auto handler = LuaHandler{ state };
-		handler.MakeReadOnlyTable(tableCollision, ScriptReserved_GetSectorMaterialType, SCRIPT_MATERIAL_TYPES);
+		auto handler = LuaHandler(state);
+		handler.MakeReadOnlyTable(tableCollision, ScriptReserved_MaterialType, MATERIAL_TYPES);
 	}
 }
