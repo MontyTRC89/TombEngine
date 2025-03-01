@@ -311,13 +311,12 @@ namespace TEN::Scripting::Effects
 		if (Weather.Horizon.GetHorizonID() == horizonObject)
 			return;
 
-		if (Weather.Horizon.GetTransitionProgress() < 1.0f)
-		{
-			TENLog("Horizon is already transitioning.", LogLevel::Warning);
-			return;
-		}
-
+		float prevTransitionProgress = Weather.Horizon.GetTransitionProgress();
 		Weather.Horizon.SetHorizonID(horizonObject);
+
+		if (prevTransitionProgress < 1.0f)
+			Weather.Horizon.SetTransitionProgress(1.0f - prevTransitionProgress);
+
 		Weather.Horizon.SetTransitionSpeed(ValueOr<float>(speed, 0.0f));
 	}
 
