@@ -323,6 +323,8 @@ namespace TEN::Scripting::Collision
 		auto tableCollision= sol::table(state->lua_state(), sol::create);
 		parent.set(ScriptReserved_Collision, tableCollision);
 
+		Probe::Register(tableCollision);
+
 		auto handler = LuaHandler{ state };
 		handler.MakeReadOnlyTable(tableCollision, ScriptReserved_GetSectorMaterialType, SCRIPT_MATERIAL_TYPES);
 	}
