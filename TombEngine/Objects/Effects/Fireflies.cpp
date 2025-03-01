@@ -17,11 +17,13 @@
 #include "Renderer/Renderer.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
-using TEN::Renderer::g_Renderer;
+#include "Game/effects/Streamer.h"
+
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
+using namespace TEN::Effects::Streamer;
 
 namespace TEN::Effects::Fireflys
 {
@@ -49,7 +51,7 @@ namespace TEN::Effects::Fireflys
         item.ItemFlags[0] = item.Index;
         item.ItemFlags[1] = item.Index;
         item.ItemFlags[5] = 0;
-        item.ItemFlags[4] = item.TriggerFlags;
+        item.ItemFlags[4] = 0;
 
         if (item.AIBits)
             item.ItemFlags[6] = true;
@@ -68,7 +70,6 @@ namespace TEN::Effects::Fireflys
         // Create new firefly.
         auto& firefly = GetNewEffect(FireflySwarm, FISH_COUNT_MAX);
 
-
         unsigned char r = 0;
         unsigned char g = 0;
         unsigned char b = 0;
@@ -80,10 +81,11 @@ namespace TEN::Effects::Fireflys
 
         firefly.SpriteSeqID = ID_DEFAULT_SPRITES;
         firefly.SpriteID = SPR_UNDERWATERDUST;
+        firefly.blendMode = BlendMode::Additive;
         firefly.scalar = 3.0f;
-        firefly.r = r;
-		firefly.g = g;
-		firefly.b = b;
+        firefly.r = firefly.rB = r;
+        firefly.g = firefly.gB = g;
+        firefly.b = firefly.bB = b;
         firefly.size = 1.0f;
         firefly.rotAng = Random::GenerateAngle(ANGLE(0.0f), ANGLE(20.0f));
         firefly.on = true;
@@ -93,17 +95,23 @@ namespace TEN::Effects::Fireflys
 
         firefly.Position = item.Pose.Position.ToVector3();
         firefly.RoomNumber = item.RoomNumber;
+
         firefly.Orientation.x = Random::GenerateAngle(START_ORIENT_CONSTRAINT.first.x, START_ORIENT_CONSTRAINT.second.x);
         firefly.Orientation.y = (item.Pose.Orientation.y + ANGLE(180.0f)) + Random::GenerateAngle(START_ORIENT_CONSTRAINT.first.y, START_ORIENT_CONSTRAINT.second.y);
         firefly.Velocity = Random::GenerateFloat(VEL_MIN, VEL_MAX);
 
-        firefly.Life = 1.0f;
+        firefly.Life = Random::GenerateInt(1, 200);
         firefly.Undulation = Random::GenerateFloat(0.0f, PI_MUL_2);
 
         firefly.LeaderItemPtr = &g_Level.Items[item.ItemFlags[0]];
+        firefly.TargetItemPtr = &g_Level.Items[item.ItemFlags[0]];
+
+        // Nummerierung der Glühwürmchen
+        firefly.Number = item.ItemFlags[4]++; //eflyCounter++;
+    }
         
 
-    }
+    
 
     void ControlFireflySwarm(short itemNumber)
     {
@@ -161,15 +169,13 @@ namespace TEN::Effects::Fireflys
         for (auto& firefly : FireflySwarm)
         {
 
-            if (firefly.Life <= 0.0f)
-                item.ItemFlags[4]--;
 
             constexpr auto SPHEROID_SEMI_MAJOR_AXIS = Vector3(CLICK(2), CLICK(2), CLICK(2));
 
            auto pos = Random::GeneratePointInSpheroid(item.StartPose.Position.ToVector3(), EulerAngles::Identity, SPHEROID_SEMI_MAJOR_AXIS);
 
-                firefly.RoomNumber = item.RoomNumber;
-                firefly.TargetItemPtr = &g_Level.Items[itemNumber];
+               // firefly.RoomNumber = item.RoomNumber;
+             //   firefly.TargetItemPtr = &g_Level.Items[itemNumber];
 
 
         }
@@ -178,20 +184,22 @@ namespace TEN::Effects::Fireflys
     void UpdateFireflySwarm()
     {
         constexpr auto FLEE_VEL = 20.0f;
+        constexpr auto ALPHA_CYCLE_DURATION = 100.0f; // Dauer eines vollständigen Alpha-Zyklus in Frames (z.B. 5 Sekunden bei 30 FPS)
+        constexpr auto ALPHA_PAUSE_DURATION = 60.0f;  // Dauer der Pause bei Alpha 1.0 in Frames (z.B. 2 Sekunden bei 30 FPS)
 
         static const auto SPHERE = BoundingSphere(Vector3::Zero, BLOCK(1 / 8.0f));
-
-
 
         if (FireflySwarm.empty())
             return;
 
-
-
         const auto& playerItem = *LaraItem;
+        static float frameCounter = 0.0f; // Zählervariable für die Frames
+
+        frameCounter += 1.0f; // Inkrementiere die Zählervariable in jedem Frame
 
         for (auto& firefly : FireflySwarm)
         {
+  
             if (firefly.Life <= 0.0f)
                 continue;
 
@@ -208,7 +216,6 @@ namespace TEN::Effects::Fireflys
             int multiplierZ = CLICK(firefly.TargetItemPtr->TriggerFlags + 2);
 
             auto SPHEROID_SEMI_MAJOR_AXIS = Vector3(multiplierX, multiplierY, multiplierZ);
-
 
             // Calculate desired position based on target object and random offsets.
             auto desiredPos = firefly.TargetItemPtr->Pose.Position + Random::GeneratePointInSpheroid(firefly.PositionTarget, EulerAngles::Identity, SPHEROID_SEMI_MAJOR_AXIS);
@@ -227,8 +234,6 @@ namespace TEN::Effects::Fireflys
             // If firefly is too far from target, increase velocity to catch up.
             if (distToTarget > FIREFLY_TARGET_DISTANCE_MAX)
                 firefly.Velocity += FIREFLY_CATCH_UP_FACTOR;
-
-            //firefly.Velocity = 0;
 
             // Translate.
             auto moveDir = firefly.Orientation.ToDirection();
@@ -284,9 +289,34 @@ namespace TEN::Effects::Fireflys
                 firefly.RoomNumber = pointColl.GetRoomNumber();
             }
 
+            // Update color values for blinking effect
+            float alphaTime = fmod(frameCounter + firefly.Life, ALPHA_CYCLE_DURATION + ALPHA_PAUSE_DURATION);
+            float alphaFactor;
+            if (alphaTime < ALPHA_CYCLE_DURATION)
+            {
+                alphaFactor = 0.5f * (1.0f + sinf((alphaTime / ALPHA_CYCLE_DURATION) * PI_MUL_2));
+            }
+            else
+            {
+                alphaFactor = 1.0f;
+            }
 
-           // firefly.Position = firefly.TargetItemPtr->Pose.Position.ToVector3();
- 
+            firefly.r = static_cast<unsigned char>(firefly.rB * alphaFactor);
+            firefly.g = static_cast<unsigned char>(firefly.gB * alphaFactor);
+            firefly.b = static_cast<unsigned char>(firefly.bB * alphaFactor);
+
+            auto posBase = firefly.Position;
+            auto rotMatrix = firefly.Orientation.ToRotationMatrix();
+            auto pos = posBase + Vector3::Transform(Vector3::Zero, rotMatrix);
+
+            auto direction0 = firefly.Orientation.ToDirection();// Geometry::RotatePoint(posBase, EulerAngles(0, 0, 0));
+
+            short orient2D = firefly.Orientation.z;
+
+            StreamerEffect.Spawn(firefly.TargetItemPtr->Index, firefly.Number, firefly.Position, direction0, orient2D, Vector4(firefly.r, firefly.g, firefly.b, 1.0f),
+                8.0f, 0.3f, 2.0f, 1.0f, 0, (int)StreamerFlags::FadeRight);
+
+      
         }
     }
 

@@ -30,9 +30,18 @@ namespace TEN::Effects::Fireflys
 		ItemInfo* TargetItemPtr = nullptr;
 		ItemInfo* LeaderItemPtr = nullptr;
 
+
+		int Number = 0;
+
+
+		unsigned char rB;
+		unsigned char gB;
+		unsigned char bB;
+
 		unsigned char r;
 		unsigned char g;
 		unsigned char b;
+		float w;
 		unsigned char colFadeSpeed;
 		unsigned char fadeToBlack;
 

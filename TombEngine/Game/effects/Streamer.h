@@ -78,8 +78,8 @@ namespace TEN::Effects::Streamer
 	private:
 		// Constants
 
-		static constexpr auto POOL_COUNT_MAX	 = 8;
-		static constexpr auto STREAMER_COUNT_MAX = 8;
+		static constexpr auto POOL_COUNT_MAX = 64;
+		static constexpr auto STREAMER_COUNT_MAX = 64;
 
 	public:
 		// Members
