@@ -58,6 +58,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/winmain.h"
+#include "Objects/Effects/Fireflies.h"
 
 using namespace std::chrono;
 using namespace TEN::Effects;
@@ -88,6 +89,7 @@ using namespace TEN::Math;
 using namespace TEN::Renderer;
 using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Effects;
+using namespace TEN::Effects::Fireflys;
 
 constexpr auto DEATH_NO_INPUT_TIMEOUT = 10 * FPS;
 constexpr auto DEATH_INPUT_TIMEOUT	  = 3 * FPS;
@@ -210,6 +212,7 @@ GameStatus GamePhase(bool insideMenu)
 	UpdateLocusts();
 	UpdateUnderwaterBloodParticles();
 	UpdateFishSwarm();
+	UpdateFireflySwarm();
 	UpdateGlobalLensFlare();
 
 	// Update HUD.

@@ -409,6 +409,7 @@ namespace TEN::Renderer
 		void PrepareFires(RenderView& view);
 		void PrepareParticles(RenderView& view);
 		void PrepareSmokes(RenderView& view);
+		void PrepareFireflys(RenderView& view);
 		void PrepareElectricity(RenderView& view);
 		void PrepareHelicalLasers(RenderView& view);
 		void PrepareBlood(RenderView& view);

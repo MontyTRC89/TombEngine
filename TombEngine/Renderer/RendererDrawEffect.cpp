@@ -35,6 +35,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
 #include "Structures/RendererSpriteBucket.h"
+#include "Objects/Effects/Fireflies.h"
 
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
@@ -48,6 +49,7 @@ using namespace TEN::Effects::Streamer;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Traps;
 using namespace TEN::Math;
+using namespace TEN::Effects::Fireflys;
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -320,6 +322,47 @@ namespace TEN::Renderer
 						PI_DIV_2, 1.0f, Vector2(arc.width * 8, Vector3::Distance(origin, target)), BlendMode::Additive, dir, true, view);					
 				}
 			}
+		}
+	}
+
+	void Renderer::PrepareFireflys(RenderView& view)
+	{
+		if (!Objects[ID_FIREFLYS].loaded)
+			return;
+
+		for (auto& firefly : FireflySwarm)
+		{
+			if (!firefly.on)
+				continue;
+
+
+			if (!CheckIfSlotExists(ID_SPARK_SPRITE, "Particle rendering"))
+				continue;
+
+			auto axis = Vector3(0,0,0);
+			axis.Normalize();
+
+			firefly.scalar = 3;
+			firefly.size = 3;
+
+			auto pos = Vector3::Lerp(
+				Vector3(firefly.PrevX, firefly.PrevY, firefly.PrevZ),
+				Vector3(firefly.Position.x, firefly.Position.y, firefly.Position.z),
+				GetInterpolationFactor());
+
+			pos = Vector3(firefly.Position.x, firefly.Position.y, firefly.Position.z);
+
+			// Disallow sprites out of bounds.
+			int spriteIndex = Objects[firefly.SpriteSeqID].meshIndex + firefly.SpriteID;
+			spriteIndex = std::clamp(spriteIndex, 0, (int)_sprites.size());
+
+			AddSpriteBillboard(
+				&_sprites[spriteIndex],
+				pos,
+				Color(firefly.r / (float)UCHAR_MAX, firefly.g / (float)UCHAR_MAX, firefly.b / (float)UCHAR_MAX, 1.0f),
+				TO_RAD(firefly.rotAng << 4), firefly.scalar,
+				Vector2(firefly.size, firefly.size),
+				firefly.blendMode, true, view);
 		}
 	}
 
