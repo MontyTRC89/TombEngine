@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Game/collision/Point.h"
+#include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
 
 using namespace TEN::Collision::Point;
