@@ -20,7 +20,7 @@ namespace TEN::Scripting::Collision
 	// Provides collision information from a reference world position.
 	//
 	// @tenclass Collision.Probe
-	// pragma nostrip
+	// @pragma nostrip
 
 	void Probe::Register(sol::table& parent)
 	{
