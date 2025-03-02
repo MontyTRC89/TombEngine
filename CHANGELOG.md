@@ -32,6 +32,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added diary module.
 * Added View.GetFlyByPosition() and View.GetFlyByRotation() functions to get flyby sequence parameters at a specified time point.
 * Added Effects.EmitAirBubble() function to spawn air bubbles.
+* Added Effects.EmitStreamer() function to emit streamers.
 * Added Moveable:GetScale() and Movebale:SetScale() methods to set visible scale of moveables.
 * Added Rotation:Lerp() function to allow linear interpolation between rotations.
 * Added various Translate() methods to Vec2 and Vec3 script objects.
