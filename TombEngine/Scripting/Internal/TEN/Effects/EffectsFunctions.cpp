@@ -362,18 +362,18 @@ This represents the 3D displacement applied by the engine on things like particl
 
 /***Emits a streamer per frame.
 @function EmitStreamer
-@tparam Moveable mov Moveable object to spawn streamers from.
-@tparam[opt] int Id A moveable object can have upto 8 streamer. Define each streamer separately. Value should be from (0-7). __Default: 0__
-@tparam Vec3 position position where the effect will be spawned.
-@tparam Vec3 direction normal which indicates streamer direction.
-@tparam[opt] short orientation Angle - a value of 90 will cause the streamer to be entirely vertical. __Default: 0__
-@tparam[opt] Color color Color of streamer. __Default: Color(255, 255, 255))__
-@tparam[opt] float width Width of the Streamer.__Default: 1__ 
-@tparam[opt] float life Lifetime in seconds. __Default: 1__
-@tparam[opt] float velocity The speed with which the streamer should move in the direction of normal.__Default: 1__
-@tparam[opt] float scaleRate The rate at which the streamer should scale. __Default: 1__
-@tparam[opt] float rotation Rotation of the streamer over its lifetime. __Default: 0__
-@tparam[opt] Effects.StreamerFeatherType featherType Direction of Streamer fade. __Default: Left__
+@tparam Moveable mov Moveable object from which to spawn streamers..
+@tparam[opt] int Id The Id of the streamer (0-7). Each Moveable object can have up to 8 streamers, and each streamer needs to be defined separately. __Default: 0__
+@tparam Vec3 position The position where the effect will be spawned.
+@tparam Vec3 direction The normal indicating the direction of the streamer.
+@tparam[opt] short orientation The angle of the streamer. A value of 90 will make the streamer entirely vertical. __Default: 0__
+@tparam[opt] Color color The color of streamer. __Default: Color(255, 255, 255))__
+@tparam[opt] float width The width of the streamer.__Default: 1__ 
+@tparam[opt] float life The lifetime of the streamer in seconds. __Default: 1__
+@tparam[opt] float velocity The speed at which the streamer moves in the direction of the normal.__Default: 1__
+@tparam[opt] float scaleRate The rate at which the streamer scales. __Default: 1__
+@tparam[opt] float rotation The rotation of the streamer over its lifetime. __Default: 0__
+@tparam[opt] Effects.StreamerFeatherType featherType The direction of the streamer's fade. __Default: Center__
 @tparam[opt] Effects.BlendID blendMode Render blend mode. __TEN.Effects.BlendID.ALPHABLEND__*/
 	static void EmitStreamer (const Moveable& mov, TypeOrNil<int> Id, Vec3 position, Vec3 direction, TypeOrNil<short> orientation, TypeOrNil<ScriptColor> color,
 		TypeOrNil<float> width, TypeOrNil<float> life, TypeOrNil<float> velocity, TypeOrNil<float> scaleRate, TypeOrNil<short> rotation, TypeOrNil<StreamerFeatherType> featherType, TypeOrNil<BlendMode> blendMode)
