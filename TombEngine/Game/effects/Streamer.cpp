@@ -5,6 +5,7 @@
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Math/Math.h"
+#include "Renderer/RendererEnums.h"
 #include "Specific/clock.h"
 
 using namespace TEN::Math;
@@ -27,25 +28,36 @@ namespace TEN::Effects::Streamer
 		if (Color.w > 0.0f)
 			Color.w = EaseInOutSine(0.0f, OpacityMax, Life / LifeMax);
 
-		// TODO: Not working.
+		// TODO: Not working. Make it work. -- Sezz 2025.03.02
 		// Update orientation.
 		Orientation.SetAngle(Orientation.GetAngle() + Rotation);
 		
 		// Update vertices.
-		TransformVertices(Velocity, ScaleRate);
+		TransformVertices(Velocity, ExpRate);
 
 		// Update life.
 		Life -= 1.0f;
 	}
 
-	void Streamer::StreamerSegment::TransformVertices(float vel, float scaleRate)
+	void Streamer::StreamerSegment::TransformVertices(float vel, float expRate)
 	{
-		// Apply expansion.
-		if (scaleRate != 0.0f)
+		// Apply expansion/contraction.
+		if (expRate != 0.0f)
 		{
-			auto dir = Orientation.ToDirection();
-			Vertices[0] = Geometry::TranslatePoint(Vertices[0], -dir, scaleRate);
-			Vertices[1] = Geometry::TranslatePoint(Vertices[1], dir, scaleRate);
+			float distSqr = Vector3::DistanceSquared(Vertices[0], Vertices[1]);
+			if (expRate < 0.0f && distSqr <= SQUARE(abs(expRate)))
+			{
+				auto center = (Vertices[0] + Vertices[1]) / 2;
+				Vertices[0] =
+				Vertices[1] = center;
+			}
+			else
+			{
+
+				auto dir = Orientation.ToDirection();
+				Vertices[0] = Geometry::TranslatePoint(Vertices[0], -dir, expRate);
+				Vertices[1] = Geometry::TranslatePoint(Vertices[1], dir, expRate);
+			}
 		}
 
 		// Apply directional velocity.
@@ -57,8 +69,34 @@ namespace TEN::Effects::Streamer
 		}
 	}
 
+	Streamer::Streamer(StreamerFeatherType featherType, BlendMode blendMode)
+	{
+		_featherType = featherType;
+		_blendMode = blendMode;
+	}
+
+	const std::vector<Streamer::StreamerSegment>& Streamer::GetSegments() const
+	{
+		return _segments;
+	}
+
+	StreamerFeatherType Streamer::GetFeatherType() const
+	{
+		return _featherType;
+	}
+
+	BlendMode Streamer::GetBlendMode() const
+	{
+		return _blendMode;
+	}
+
+	bool Streamer::IsBroken() const
+	{
+		return _isBroken;
+	}
+
 	void Streamer::AddSegment(const Vector3& pos, const Vector3& dir, short orient, const Vector4& color,
-							  float width, float life, float vel, float scaleRate, short rot, int flags, unsigned int segmentCount)
+							  float width, float life, float vel, float expRate, short rot, unsigned int segmentCount)
 	{
 		constexpr auto FADE_IN_COEFF = 3.0f;
 
@@ -76,61 +114,66 @@ namespace TEN::Effects::Streamer
 		segment.LifeMax = lifeMax;
 		segment.OpacityMax = opacityMax;
 		segment.Velocity = vel;
-		segment.ScaleRate = scaleRate;
+		segment.ExpRate = expRate;
 		segment.Rotation = rot;
-		segment.Flags = flags;
 		segment.InitializeVertices(pos, width);
 	}
 
 	void Streamer::Update()
 	{
-		if (Segments.empty())
+		if (_segments.empty())
 			return;
 
-		// If streamer was broken, set bool flag to track it.
-		const auto& newestSegment = Segments.back();
+		// Set flag to track if streamer was broken.
+		const auto& newestSegment = _segments.back();
 		if (newestSegment.Life != newestSegment.LifeMax)
-			IsBroken = true;
+			_isBroken = true;
 
 		// Update segments.
-		for (auto& segment : Segments)
+		for (auto& segment : _segments)
 			segment.Update();
 
-		ClearInactiveEffects(Segments);
+		ClearInactiveEffects(_segments);
 	}
 
 	Streamer::StreamerSegment& Streamer::GetNewSegment()
 	{
-		TENAssert(Segments.size() <= SEGMENT_COUNT_MAX, "Streamer segment count overflow.");
+		TENAssert(_segments.size() <= SEGMENT_COUNT_MAX, "Streamer segment count overflow.");
 
 		// Clear oldest segment if vector is full.
-		if (Segments.size() == SEGMENT_COUNT_MAX)
-			Segments.erase(Segments.begin());
+		if (_segments.size() == SEGMENT_COUNT_MAX)
+			_segments.erase(_segments.begin());
 
 		// Add and return new segment.
-		return Segments.emplace_back();
+		return _segments.emplace_back();
 	}
 
-	void StreamerModule::AddStreamer(int tag, const Vector3& pos, const Vector3& dir, short orient, const Vector4& color,
-									 float width, float life, float vel, float scaleRate, short rot, int flags)
+	const std::unordered_map<int, std::vector<Streamer>>& StreamerGroup::GetPools() const
 	{
-		TENAssert(Pools.size() <= POOL_COUNT_MAX, "Streamer pool count overflow.");
+		return _pools;
+	}
+
+	void StreamerGroup::AddStreamer(int tag, const Vector3& pos, const Vector3& dir, short orient, const Vector4& color,
+									float width, float life, float vel, float expRate, short rot,
+									StreamerFeatherType featherType, BlendMode blendMode)
+	{
+		TENAssert(_pools.size() <= POOL_COUNT_MAX, "Streamer pool count overflow.");
 
 		// Return early if pool map is full and element with tag key doesn't already exist.
-		if (Pools.size() == POOL_COUNT_MAX && !Pools.count(tag))
+		if (_pools.size() == POOL_COUNT_MAX && !_pools.count(tag))
 			return;
 
-		// Get and extend streamer with new segment.
-		auto& streamer = GetStreamer(tag);
-		streamer.AddSegment(pos, dir, orient, color, width, life, vel, scaleRate, rot, flags, (unsigned int)streamer.Segments.size());
+		// Get new streamer iteration or extend existing streamer iteration with new segment.
+		auto& streamer = GetStreamerIteration(tag, featherType, blendMode);
+		streamer.AddSegment(pos, dir, orient, color, width, life, vel, expRate, rot, (unsigned int)streamer.GetSegments().size());
 	}
 
-	void StreamerModule::Update()
+	void StreamerGroup::Update()
 	{
-		if (Pools.empty())
+		if (_pools.empty())
 			return;
 
-		for (auto& [tag, pool] : Pools)
+		for (auto& [tag, pool] : _pools)
 		{
 			for (auto& streamer : pool)
 				streamer.Update();
@@ -141,15 +184,15 @@ namespace TEN::Effects::Streamer
 		ClearInactivePools();
 	}
 
-	std::vector<Streamer>& StreamerModule::GetPool(int tag)
+	std::vector<Streamer>& StreamerGroup::GetPool(int tag)
 	{
 		// Get pool at tag key.
-		Pools.insert({ tag, {} });
-		auto& pool = Pools.at(tag);
+		_pools.insert({ tag, {} });
+		auto& pool = _pools.at(tag);
 		return pool;
 	}
 
-	Streamer& StreamerModule::GetStreamer(int tag)
+	Streamer& StreamerGroup::GetStreamerIteration(int tag, StreamerFeatherType featherType, BlendMode blendMode)
 	{
 		auto& pool = GetPool(tag);
 		TENAssert(pool.size() <= STREAMER_COUNT_MAX, "Streamer pool size overflow.");
@@ -158,7 +201,7 @@ namespace TEN::Effects::Streamer
 		if (!pool.empty())
 		{
 			auto& streamer = pool.back();
-			if (!streamer.IsBroken)
+			if (!streamer.IsBroken())
 				return streamer;
 		}
 
@@ -167,17 +210,17 @@ namespace TEN::Effects::Streamer
 			pool.erase(pool.begin());
 
 		// Add and return new streamer iteration.
-		return pool.emplace_back();
+		return pool.emplace_back(Streamer(featherType, blendMode));
 	}
 
-	void StreamerModule::ClearInactivePools()
+	void StreamerGroup::ClearInactivePools()
 	{
-		for (auto it = Pools.begin(); it != Pools.end();)
+		for (auto it = _pools.begin(); it != _pools.end();)
 		{
 			const auto& pool = it->second;
 			if (pool.empty())
 			{
-				it = Pools.erase(it);
+				it = _pools.erase(it);
 				continue;
 			}
 			
@@ -185,43 +228,49 @@ namespace TEN::Effects::Streamer
 		}
 	}
 
-	void StreamerModule::ClearInactiveStreamers(int tag)
+	void StreamerGroup::ClearInactiveStreamers(int tag)
 	{
-		auto& pool = Pools.at(tag);
+		auto& pool = _pools.at(tag);
 
 		pool.erase(
 			std::remove_if(
 				pool.begin(), pool.end(),
 				[](const auto& streamer)
 				{
-					return streamer.Segments.empty();
+					return streamer.GetSegments().empty();
 				}),
 			pool.end());
 	}
 
-	void StreamerEffectController::Spawn(int itemNumber, int tag, const Vector3& pos, const Vector3& direction, short orient, const Vector4& color,
-										 float width, float life, float vel, float scaleRate, short rot, int flags)
+	const std::unordered_map<int, StreamerGroup>& StreamerEffectController::GetGroups() const
 	{
-		TENAssert(Modules.size() <= MODULE_COUNT_MAX, "Streamer module count overflow.");
+		return _groups;
+	}
 
-		// Return early if module map is full and element with itemNumber key doesn't already exist.
-		if (Modules.size() == MODULE_COUNT_MAX && !Modules.count(itemNumber))
+	void StreamerEffectController::Spawn(int itemNumber, int tag, const Vector3& pos, const Vector3& dir, short orient, const Vector4& color,
+										 float width, float life, float vel, float expRate, short rot,
+										 StreamerFeatherType featherType, BlendMode blendMode)
+	{
+		TENAssert(_groups.size() <= GROUP_COUNT_MAX, "Streamer group count overflow.");
+
+		// Return early if group map is full and element with itemNumber key doesn't already exist.
+		if (_groups.size() == GROUP_COUNT_MAX && !_groups.count(itemNumber))
 			return;
 
-		// Get module and extend streamer within pool.
-		auto& module = GetModule(itemNumber);
-		module.AddStreamer(tag, pos, direction, orient, color, width, life, vel, scaleRate, rot, flags);
+		// Get group and extend streamer within pool.
+		auto& group = GetGroup(itemNumber);
+		group.AddStreamer(tag, pos, dir, orient, color, width, life, vel, expRate, rot, featherType, blendMode);
 	}
 
 	void StreamerEffectController::Update()
 	{
-		if (Modules.empty())
+		if (_groups.empty())
 			return;
 
-		for (auto& [itemNumber, module] : Modules)
-			module.Update();
+		for (auto& [itemNumber, group] : _groups)
+			group.Update();
 
-		ClearInactiveModules();
+		ClearInactiveGroups();
 	}
 
 	void StreamerEffectController::Clear()
@@ -229,22 +278,22 @@ namespace TEN::Effects::Streamer
 		*this = {};
 	}
 
-	StreamerModule& StreamerEffectController::GetModule(int itemNumber)
+	StreamerGroup& StreamerEffectController::GetGroup(int itemNumber)
 	{
-		// Get module at itemNumber key.
-		Modules.insert({ itemNumber, {} });
-		auto& module = Modules.at(itemNumber);
-		return module;
+		// Get group at itemNumber key.
+		_groups.insert({ itemNumber, {} });
+		auto& group = _groups.at(itemNumber);
+		return group;
 	}
 
-	void StreamerEffectController::ClearInactiveModules()
+	void StreamerEffectController::ClearInactiveGroups()
 	{
-		for (auto it = Modules.begin(); it != Modules.end();)
+		for (auto it = _groups.begin(); it != _groups.end();)
 		{
-			const auto& module = it->second;
-			if (module.Pools.empty())
+			const auto& group = it->second;
+			if (group.GetPools().empty())
 			{
-				it = Modules.erase(it);
+				it = _groups.erase(it);
 				continue;
 			}
 			

@@ -38,12 +38,11 @@ namespace TEN::Entities::TR4
 
 	static void SpawnWraithTails(const ItemInfo& item)
 	{
-		constexpr auto OFFSET	  = Vector3(0.0f, -10.0f, -50.0f);
-		constexpr auto WIDTH	  = 8.0f;
-		constexpr auto LIFE_MAX	  = 0.5f;
-		constexpr auto VEL		  = 4.0f;
-		constexpr auto SCALE_RATE = 1.0f;
-		constexpr auto FLAGS	  = (int)StreamerFlags::FadeRight;
+		constexpr auto OFFSET	= Vector3(0.0f, -10.0f, -50.0f);
+		constexpr auto WIDTH	= 8.0f;
+		constexpr auto LIFE_MAX = 0.5f;
+		constexpr auto VEL		= 4.0f;
+		constexpr auto EXP_RATE = 1.0f;
 
 		enum class TailTag
 		{
@@ -73,29 +72,32 @@ namespace TEN::Entities::TR4
 		auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
 		auto pos = posBase + Vector3::Transform(OFFSET, rotMatrix);
 
-		auto direction0 = Geometry::RotatePoint(posBase, EulerAngles(ANGLE(50.0f), 0, 0));
-		auto direction1 = Geometry::RotatePoint(posBase, EulerAngles(ANGLE(-50.0f), 0, 0));
-		auto direction2 = Geometry::RotatePoint(posBase, EulerAngles(0, ANGLE(50.0f), 0));
+		auto dir0 = Geometry::RotatePoint(posBase, EulerAngles(ANGLE(50.0f), 0, 0));
+		auto dir1 = Geometry::RotatePoint(posBase, EulerAngles(ANGLE(-50.0f), 0, 0));
+		auto dir2 = Geometry::RotatePoint(posBase, EulerAngles(0, ANGLE(50.0f), 0));
 
 		short orient2D = item.Pose.Orientation.z;
 
 		// Spawn first tail.
 		StreamerEffect.Spawn(
 			item.Index, (int)TailTag::First,
-			pos, direction0, orient2D, color,
-			WIDTH, LIFE_MAX, VEL, SCALE_RATE, 0, FLAGS);
+			pos, dir0, orient2D, color,
+			WIDTH, LIFE_MAX, VEL, EXP_RATE, 0,
+			StreamerFeatherType::Center, BlendMode::Additive);
 
 		// Spawn second tail.
 		StreamerEffect.Spawn(
 			item.Index, (int)TailTag::Second,
-			pos, direction1, orient2D, color,
-			WIDTH, LIFE_MAX, VEL, SCALE_RATE, 0, FLAGS);
+			pos, dir1, orient2D, color,
+			WIDTH, LIFE_MAX, VEL, EXP_RATE, 0,
+			StreamerFeatherType::Center, BlendMode::Additive);
 
 		// Spawn third tail.
 		StreamerEffect.Spawn(
 			item.Index, (int)TailTag::Third,
-			pos, direction2, orient2D, color,
-			WIDTH, LIFE_MAX, VEL, SCALE_RATE, 0, FLAGS);
+			pos, dir2, orient2D, color,
+			WIDTH, LIFE_MAX, VEL, EXP_RATE, 0,
+			StreamerFeatherType::Center, BlendMode::Additive);
 	}
 
 	static void WraithWallEffect(Vector3i pos, short yRot, int objectNumber)

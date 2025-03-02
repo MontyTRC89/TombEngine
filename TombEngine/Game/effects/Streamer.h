@@ -1,5 +1,7 @@
 #pragma once
+
 #include "Math/Math.h"
+#include "Renderer/RendererEnums.h"
 
 using namespace TEN::Math;
 
@@ -7,11 +9,12 @@ struct ItemInfo;
 
 namespace TEN::Effects::Streamer
 {
-	enum class StreamerFlags
+	enum class StreamerFeatherType
 	{
-		FadeLeft		  = 1 << 0,
-		FadeRight		  = 1 << 1,
-		BlendModeAdditive = 1 << 2
+		None,
+		Center,
+		Left,
+		Right
 	};
 
 	class Streamer
@@ -21,32 +24,29 @@ namespace TEN::Effects::Streamer
 
 		static constexpr auto SEGMENT_COUNT_MAX = 128;
 
-	public:
 		struct StreamerSegment
 		{
 			static constexpr auto VERTEX_COUNT = 2;
 
-			AxisAngle Orientation = AxisAngle::Identity;
-			Vector4	  Color		  = Vector4::Zero;
+			std::array<Vector3, VERTEX_COUNT> Vertices	  = {};
+			AxisAngle						  Orientation = AxisAngle::Identity; // TODO: Interpolate?
+			Vector4							  Color		  = Vector4::Zero;
 
 			float Life		 = 0.0f;
 			float LifeMax	 = 0.0f;
 			float OpacityMax = 0.0f;
 			float Velocity	 = 0.0f;
-			float ScaleRate	 = 0.0f;
+			float ExpRate	 = 0.0f;
 			short Rotation	 = 0;
-			int	  Flags		 = 0;
 
-			std::array<Vector3, VERTEX_COUNT> Vertices = {};
-
-			Vector4 PrevColor = Vector4::Zero;
 			std::array<Vector3, VERTEX_COUNT> PrevVertices = {};
+			Vector4							  PrevColor	   = Vector4::Zero;
 
 			void InitializeVertices(const Vector3& pos, float width);
 			void Update();
 
 		private:
-			void TransformVertices(float vel, float scaleRate);
+			void TransformVertices(float vel, float expRate);
 
 			void StoreInterpolationData()
 			{
@@ -58,13 +58,31 @@ namespace TEN::Effects::Streamer
 
 		// Fields
 
-		bool						 IsBroken = false;
-		std::vector<StreamerSegment> Segments = {};
+		std::vector<StreamerSegment> _segments	  = {};
+		StreamerFeatherType			 _featherType = StreamerFeatherType::None;
+		BlendMode					 _blendMode	  = BlendMode::AlphaBlend;
+		bool						 _isBroken	  = false;
+
+
+	public:
+		// Constructors
+		
+		Streamer(StreamerFeatherType featherType, BlendMode blendMode);
+
+		// Getters
+		
+		const std::vector<StreamerSegment>& GetSegments() const;
+		StreamerFeatherType					GetFeatherType() const;
+		BlendMode							GetBlendMode() const;
+
+		// Inquirers
+		
+		bool IsBroken() const;
 
 		// Utilities
 
 		void AddSegment(const Vector3& pos, const Vector3& dir, short orient, const Vector4& color,
-						float width, float life, float vel, float scaleRate, short rot, int flags, unsigned int segmentCount);
+						float width, float life, float vel, float expRate, short rot, unsigned int segmentCount);
 		void Update();
 
 	private:
@@ -73,30 +91,36 @@ namespace TEN::Effects::Streamer
 		StreamerSegment& GetNewSegment();
 	};
 
-	class StreamerModule
+	class StreamerGroup
 	{
 	private:
 		// Constants
 
-		static constexpr auto POOL_COUNT_MAX = 64;
-		static constexpr auto STREAMER_COUNT_MAX = 64;
+		static constexpr auto POOL_COUNT_MAX	 = 64;
+		static constexpr auto STREAMER_COUNT_MAX = 4;
+
+		// Fields
+
+		std::unordered_map<int, std::vector<Streamer>> _pools = {}; // Key = tag.
 
 	public:
-		// Members
 
-		std::unordered_map<int, std::vector<Streamer>> Pools = {}; // Key = tag.
+		// Getters
+
+		const std::unordered_map<int, std::vector<Streamer>>& GetPools() const;
 
 		// Utilities
 
 		void AddStreamer(int tag, const Vector3& pos, const Vector3& dir, short orient, const Vector4& color,
-						 float width, float life, float vel, float scaleRate, short rot, int flags);
+						 float width, float life, float vel, float expRate, short rot,
+						 StreamerFeatherType featherType, BlendMode blendMode);
 		void Update();
 
 	private:
 		// Helpers
 
 		std::vector<Streamer>& GetPool(int tag);
-		Streamer&			   GetStreamer(int tag);
+		Streamer&			   GetStreamerIteration(int tag, StreamerFeatherType featherType, BlendMode blendMode);
 		void				   ClearInactivePools();
 		void				   ClearInactiveStreamers(int tag);
 	};
@@ -106,25 +130,30 @@ namespace TEN::Effects::Streamer
 	private:
 		// Constants
 
-		static constexpr auto MODULE_COUNT_MAX = 64;
+		static constexpr auto GROUP_COUNT_MAX = 64;
 
-	public:
 		// Fields
 
-		std::unordered_map<int, StreamerModule> Modules = {}; // Key = item number.
+		std::unordered_map<int, StreamerGroup> _groups = {}; // Key = item number.
+
+	public:
+		// Getters
+		
+		const std::unordered_map<int, StreamerGroup>& GetGroups() const;
 
 		// Utilities
 
 		void Spawn(int itemNumber, int tag, const Vector3& pos, const Vector3& dir, short orient, const Vector4& color,
-				   float width, float life, float vel, float scaleRate, short rot, int flags = 0);
+				   float width, float life, float vel, float expRate, short rot,
+				   StreamerFeatherType featherType = StreamerFeatherType::None, BlendMode blendMode = BlendMode::AlphaBlend);
 		void Update();
 		void Clear();
 
 	private:
 		// Helpers
 
-		StreamerModule& GetModule(int itemNumber);
-		void			ClearInactiveModules();
+		StreamerGroup& GetGroup(int itemNumber);
+		void		   ClearInactiveGroups();
 	};
 
 	extern StreamerEffectController StreamerEffect;
