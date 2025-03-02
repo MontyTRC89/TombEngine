@@ -12,6 +12,7 @@
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 #include "Scripting/Internal/TEN/Objects/Static/StaticObject.h"
+#include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
 #include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/Util/LevelLog.h"
@@ -185,6 +186,16 @@ namespace TEN::Scripting::Util
 	{
 		return posA.Distance(posB);
 	}
+	/// Draw an object in screenspace based on provided parameters.
+	// @function DrawObjectIn2D
+	// @tparam Vec2 Display space position in percent.
+	static void DrawItemIn2D(int objectNumber, Vec2 pos2D, Rotation orient, float scale1, float opacity, int meshbits)
+	{
+		auto angle = orient.ToEulerAngles();
+		auto pos = pos2D.ToVector2();
+		g_Renderer.DrawObjectIn2DSpace(objectNumber, pos, angle, scale1, opacity, meshbits);
+	}
+
 
 	void Register(sol::state* state, sol::table& parent)
 	{
@@ -198,6 +209,7 @@ namespace TEN::Scripting::Util
 		tableUtil.set_function(ScriptReserved_PickStatic, &PickStatic);
 		tableUtil.set_function(ScriptReserved_PercentToScreen, &PercentToScreen);
 		tableUtil.set_function(ScriptReserved_ScreenToPercent, &ScreenToPercent);
+		tableUtil.set_function(ScriptReserved_DrawObject2D, &DrawItemIn2D);
 		tableUtil.set_function(ScriptReserved_PrintLog, &PrintLog);
 
 		// COMPATIBILITY
