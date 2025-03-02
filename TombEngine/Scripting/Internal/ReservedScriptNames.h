@@ -372,6 +372,7 @@ static constexpr char ScriptReserved_GetMouseDisplayPosition[]		= "GetMouseDispl
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";
 static constexpr char ScriptReserved_BlendID[]					= "BlendID";
 static constexpr char ScriptReserved_EffectID[]					= "EffectID";
+static constexpr char ScriptReserved_StreamerFeatherType[]		= "StreamerFeatherType";
 static constexpr char ScriptReserved_ActionID[]					= "ActionID";
 static constexpr char ScriptReserved_CameraType[]				= "CameraType";
 static constexpr char ScriptReserved_PostProcessMode[]			= "PostProcessMode";

@@ -21,6 +21,9 @@
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Effects/BlendIDs.h"
 #include "Scripting/Internal/TEN/Effects/EffectIDs.h"
+#include "Scripting/Internal/TEN/Effects/FeatherType.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
+#include "Scripting/Internal/TEN/Objects/ObjectsHandler.h"
 #include "Scripting/Internal/TEN/Types/Color/Color.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
@@ -359,7 +362,8 @@ namespace TEN::Scripting::Effects
 
 /// Emits a streamer per frame.
 // @function EmitStreamer()
-// @tparam string name Specific name of the streamer.
+// @tparam Moveable mov Moveable object to spawn streamers from.
+// @tparam[opt] int Id A moveable object can have upto 8 streamer. Define each streamer separately. Value should be from (0-7). __Default: 0__
 // @tparam Vec3 position position where the effect will be spawned.
 // @tparam Vec3 direction normal which indicates streamer direction.
 // @tparam[opt] short orientation Angle - a value of 90 will cause the streamer to be entirely vertical. __Default: 0__
@@ -370,20 +374,23 @@ namespace TEN::Scripting::Effects
 // @tparam[opt] float scaleRate The rate at which the streamer should scale. __Default: 1__
 // @tparam[opt] float rot Rotation of the streamer over its lifetime. __Default: 0__
 // @tparam[opt] int flags Direction of Streamer fade. __Default: Left__
-	static void EmitStreamer (std::string name, Vec3 position, Vec3 direction, TypeOrNil<short> orientation, TypeOrNil<ScriptColor> color,
-		TypeOrNil<float> width, TypeOrNil<float> life, TypeOrNil<float> velocity, TypeOrNil<float> scaleRate, TypeOrNil<short> rotation, TypeOrNil<int> flags)
+	static void EmitStreamer (Moveable* mov, TypeOrNil<int> count, Vec3 position, Vec3 direction, TypeOrNil<short> orientation, TypeOrNil<ScriptColor> color,
+		TypeOrNil<float> width, TypeOrNil<float> life, TypeOrNil<float> velocity, TypeOrNil<float> scaleRate, TypeOrNil<short> rotation, TypeOrNil<StreamerFeatherType> featherType, TypeOrNil<BlendMode> blendMode)
 	{
+		int id = mov->GetIndex();
 		auto pos = Vector3(position.x, position.y, position.z);
 		auto dir = Vector3(direction.x, direction.y, direction.z);
-		auto orient = ANGLE(ValueOr<short>(orientation, 0));
-		auto col = ValueOr<ScriptColor>(color, ScriptColor(255, 255, 255));
-		auto widthS = ValueOr<float>(width, 1);
-		auto lifetime = ValueOr<float>(life, 1);
-		auto vel = ValueOr<float>(velocity, 1);
-		auto scale = ValueOr<float>(scaleRate, 1);
-		auto rot = ANGLE(ValueOr<short>(rotation, 0));
-		int flag = ValueOr<int>(flags, 1);
-		StreamerEffect.Spawn(GetHash(name), 0, position, direction, orient, col, widthS, lifetime, vel, scale, rot, flag);
+		auto convertedCount = std::clamp(ValueOr<int>(count, 0), 0, 7);
+		auto convertedOrient = ANGLE(ValueOr<short>(orientation, 0));
+		auto convertedColor = ValueOr<ScriptColor>(color, ScriptColor(255, 255, 255));
+		auto convertedWidth = ValueOr<float>(width, 1);
+		auto convertedLifetime = ValueOr<float>(life, 1);
+		auto convertedVelocity = ValueOr<float>(velocity, 1);
+		auto convertedScale = ValueOr<float>(scaleRate, 1);
+		auto convertedRotation = ANGLE(ValueOr<short>(rotation, 0));
+		auto convertedFeatherType = ValueOr<StreamerFeatherType>(featherType, StreamerFeatherType::Center);
+		auto convertedBlendMode = ValueOr<BlendMode>(blendMode, BlendMode::AlphaBlend);
+		StreamerEffect.Spawn(id, convertedCount, position, direction, convertedOrient, convertedColor, convertedWidth, convertedLifetime, convertedVelocity, convertedScale, convertedRotation, convertedFeatherType, convertedBlendMode);
 	}
 
 	void Register(sol::state* state, sol::table& parent) 
@@ -407,5 +414,6 @@ namespace TEN::Scripting::Effects
 		auto handler = LuaHandler{ state };
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_BlendID, BLEND_IDS);
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_EffectID, EFFECT_IDS);
+		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_StreamerFeatherType, STREAMER_FEATHER_TYPE);
 	}
 }
