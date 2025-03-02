@@ -354,6 +354,37 @@ namespace TEN::Scripting::Effects
 		return rot;
 	}
 
+/***Set Position of horizon at specified value.
+@function SetHorizonPosition
+@tparam Vec3 pos Horizon's new position.
+*/
+	static void SetHorizonPosition(const Vec3& pos)
+	{
+		constexpr auto BIG_DISTANCE_THRESHOLD = 1024.0f;
+
+		// Get current rotation in degrees
+		Vector3 _horizonPosition = Weather.Horizon.GetPosition();
+		
+		// Check if the difference in rotation exceeds the threshold
+		bool bigDistance =
+			(std::abs(pos.x - _horizonPosition.x) > BIG_DISTANCE_THRESHOLD) ||
+			(std::abs(pos.y - _horizonPosition.y) > BIG_DISTANCE_THRESHOLD) ||
+			(std::abs(pos.z - _horizonPosition.z) > BIG_DISTANCE_THRESHOLD);
+
+		Weather.Horizon.SetPosition(pos, !bigDistance);
+	}
+
+/***Returns horizon's current rotation value.
+@function GetHorizonRotation
+@treturn Rotation Horizon's current rotation.
+*/
+	Rotation GetHorizonPosition()
+	{
+		Vector3 _horizonPosition = Weather.Horizon.GetPosition();
+		Vec3 position = Vec3(_horizonPosition.x, _horizonPosition.y, _horizonPosition.z);
+		return position;
+	}
+
 /// Emit air bubble in a water room.
 // @function EmitAirBubble
 // @tparam Vec3 pos World position where the effect will be spawned. Must be in a water room.

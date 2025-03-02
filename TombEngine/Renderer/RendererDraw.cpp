@@ -1933,6 +1933,7 @@ namespace TEN::Renderer
 
 	void Renderer::RenderSimpleSceneToParaboloid(RenderTarget2D* renderTarget, Vector3 position, int emisphere)
 	{
+		//TODO Update the Horizon Draw code here once Paraboloids are required.  TrainWreck Feb 2, 2025.
 		// Reset GPU state
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
@@ -3048,7 +3049,9 @@ namespace TEN::Renderer
 			_shaders.Bind(Shader::Sky);
 
 			auto rotation = Vector3::Lerp(Weather.Horizon.GetOldRotation(), Weather.Horizon.GetRotation(), GetInterpolationFactor());
+			auto position = Vector3::Lerp(Weather.Horizon.GetOldPosition(), Weather.Horizon.GetPosition(), GetInterpolationFactor());
 			Matrix rotationMatrix = Matrix::CreateRotationX(rotation.x) * Matrix::CreateRotationY(rotation.y) * Matrix::CreateRotationZ(rotation.z);
+			Matrix translationMatrix = Matrix::CreateTranslation(position);
 
 			for (bool oldHorizon : {false, true})
 			{
@@ -3059,7 +3062,7 @@ namespace TEN::Renderer
 				if (oldHorizon)
 					alpha = 1.0f - alpha;
 
-				_stStatic.World = rotationMatrix * Matrix::CreateTranslation(renderView.Camera.WorldPosition);
+				_stStatic.World = translationMatrix * rotationMatrix * Matrix::CreateTranslation(renderView.Camera.WorldPosition);
 				_stStatic.Color = Vector4(1.0f, 1.0f, 1.0f, alpha);
 				_stStatic.ApplyFogBulbs = 1;
 				_cbStatic.UpdateData(_stStatic, _context.Get());

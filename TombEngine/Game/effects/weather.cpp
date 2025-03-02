@@ -28,6 +28,8 @@ namespace TEN::Effects::Environment
 	// Getters
 	Vector3 HorizonObject::GetRotation() const { return _rotation; }
 	Vector3 HorizonObject::GetOldRotation() const { return _oldRotation; }
+	Vector3 HorizonObject::GetRotation() const { return _rotation; }
+	Vector3 HorizonObject::GetOldRotation() const { return _oldRotation; }
 	GAME_OBJECT_ID HorizonObject::GetHorizonID() const { return _horizonID; }
 	GAME_OBJECT_ID HorizonObject::GetOldHorizonID() const { return _oldHorizonID; }
 	float HorizonObject::GetTransitionProgress() const { return _transitionProgress; }
@@ -46,6 +48,16 @@ namespace TEN::Effects::Environment
 			_oldRotation = rotation;
 
 		_rotation = rotation;
+	}
+
+	void HorizonObject::SetPosition(const Vector3& position, bool saveOldValue)
+	{
+		if (saveOldValue)
+			_oldPosition = _position;
+		else
+			_oldPosition = position;
+
+		_position = position;
 	}
 
 	void HorizonObject::SetHorizonID(GAME_OBJECT_ID id)
@@ -74,6 +86,12 @@ namespace TEN::Effects::Environment
 	{
 		_rotation = Vector3::Zero;
 		_oldRotation = Vector3::Zero;
+	}
+
+	void HorizonObject::ResetPosition()
+	{
+		_position = Vector3::Zero;
+		_oldPosition = Vector3::Zero;
 	}
 
 	float WeatherParticle::Transparency() const

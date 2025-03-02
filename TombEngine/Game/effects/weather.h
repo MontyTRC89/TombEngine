@@ -107,6 +107,8 @@ namespace TEN::Effects::Environment
 		// Getters
 		Vector3 GetRotation() const;
 		Vector3 GetOldRotation() const;
+		Vector3 GetPosition() const;
+		Vector3 GetOldPosition() const;
 		GAME_OBJECT_ID GetHorizonID() const;
 		GAME_OBJECT_ID GetOldHorizonID() const;
 		float GetTransitionProgress() const;
@@ -114,6 +116,7 @@ namespace TEN::Effects::Environment
 
 		// Setters
 		void SetRotation(const Vector3& rotation, bool saveOldValue);
+		void SetPosition(const Vector3& position, bool saveOldValue);
 		void SetHorizonID(GAME_OBJECT_ID id);
 		void SetOldHorizonID(GAME_OBJECT_ID id);
 		void SetTransitionProgress(float value);
@@ -122,6 +125,7 @@ namespace TEN::Effects::Environment
 		// Utility
 		void Update();
 		void ResetRotation(); // Resets horizon rotation
+		void ResetPosition(); // Resets horizon position
 
 	private:
 		GAME_OBJECT_ID _horizonID = ID_HORIZON;
@@ -130,6 +134,8 @@ namespace TEN::Effects::Environment
 		float _transitionSpeed = 0.0f;
 		Vector3 _rotation = Vector3::Zero;
 		Vector3 _oldRotation = Vector3::Zero;
+		Vector3 _position = Vector3::Zero;
+		Vector3 _oldPosition = Vector3::Zero;
 	};
 
 	class EnvironmentController
