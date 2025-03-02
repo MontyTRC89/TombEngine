@@ -374,10 +374,10 @@ namespace TEN::Scripting::Effects
 // @tparam[opt] float scaleRate The rate at which the streamer should scale. __Default: 1__
 // @tparam[opt] float rot Rotation of the streamer over its lifetime. __Default: 0__
 // @tparam[opt] int flags Direction of Streamer fade. __Default: Left__
-	static void EmitStreamer (Moveable* mov, TypeOrNil<int> count, Vec3 position, Vec3 direction, TypeOrNil<short> orientation, TypeOrNil<ScriptColor> color,
+	static void EmitStreamer (const Moveable& mov, TypeOrNil<int> count, Vec3 position, Vec3 direction, TypeOrNil<short> orientation, TypeOrNil<ScriptColor> color,
 		TypeOrNil<float> width, TypeOrNil<float> life, TypeOrNil<float> velocity, TypeOrNil<float> scaleRate, TypeOrNil<short> rotation, TypeOrNil<StreamerFeatherType> featherType, TypeOrNil<BlendMode> blendMode)
 	{
-		int id = mov->GetIndex();
+		int id = mov.GetIndex();
 		auto pos = Vector3(position.x, position.y, position.z);
 		auto dir = Vector3(direction.x, direction.y, direction.z);
 		auto convertedCount = std::clamp(ValueOr<int>(count, 0), 0, 7);
