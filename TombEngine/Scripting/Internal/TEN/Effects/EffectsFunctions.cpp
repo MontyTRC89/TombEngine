@@ -351,36 +351,37 @@ namespace TEN::Scripting::Effects
 		Camera.bounce = -str;
 	}
 
-	/// Get the wind vector for the current game frame.
-	// This represents the 3D displacement applied by the engine on things like particles affected by wind.
-	// @function GetWind()
-	// @treturn Vec3 Wind vector.
+/***Get the wind vector for the current game frame.
+This represents the 3D displacement applied by the engine on things like particles affected by wind.
+@function GetWind
+@treturn Vec3 Wind vector.*/
 	static Vec3 GetWind()
 	{
 		return Vec3(Weather.Wind());
 	}
 
-/// Emits a streamer per frame.
-// @function EmitStreamer()
-// @tparam Moveable mov Moveable object to spawn streamers from.
-// @tparam[opt] int Id A moveable object can have upto 8 streamer. Define each streamer separately. Value should be from (0-7). __Default: 0__
-// @tparam Vec3 position position where the effect will be spawned.
-// @tparam Vec3 direction normal which indicates streamer direction.
-// @tparam[opt] short orientation Angle - a value of 90 will cause the streamer to be entirely vertical. __Default: 0__
-// @tparam[opt] Color Color of streamer. __Default: Color(255, 255, 255))__
-// @tparam[opt] float width Width of the Streamer.__Default: 1__ 
-// @tparam[opt] float lifetime Lifetime in seconds. __Default: 1__
-// @tparam[opt] float vel The speed with which the streamer should move in the direction of normal.__Default: 1__
-// @tparam[opt] float scaleRate The rate at which the streamer should scale. __Default: 1__
-// @tparam[opt] float rot Rotation of the streamer over its lifetime. __Default: 0__
-// @tparam[opt] int flags Direction of Streamer fade. __Default: Left__
-	static void EmitStreamer (const Moveable& mov, TypeOrNil<int> count, Vec3 position, Vec3 direction, TypeOrNil<short> orientation, TypeOrNil<ScriptColor> color,
+/***Emits a streamer per frame.
+@function EmitStreamer
+@tparam Moveable mov Moveable object to spawn streamers from.
+@tparam[opt] int Id A moveable object can have upto 8 streamer. Define each streamer separately. Value should be from (0-7). __Default: 0__
+@tparam Vec3 position position where the effect will be spawned.
+@tparam Vec3 direction normal which indicates streamer direction.
+@tparam[opt] short orientation Angle - a value of 90 will cause the streamer to be entirely vertical. __Default: 0__
+@tparam[opt] Color color Color of streamer. __Default: Color(255, 255, 255))__
+@tparam[opt] float width Width of the Streamer.__Default: 1__ 
+@tparam[opt] float life Lifetime in seconds. __Default: 1__
+@tparam[opt] float velocity The speed with which the streamer should move in the direction of normal.__Default: 1__
+@tparam[opt] float scaleRate The rate at which the streamer should scale. __Default: 1__
+@tparam[opt] float rotation Rotation of the streamer over its lifetime. __Default: 0__
+@tparam[opt] Effects.StreamerFeatherType featherType Direction of Streamer fade. __Default: Left__
+@tparam[opt] Effects.BlendID blendMode Render blend mode. __TEN.Effects.BlendID.ALPHABLEND__*/
+	static void EmitStreamer (const Moveable& mov, TypeOrNil<int> Id, Vec3 position, Vec3 direction, TypeOrNil<short> orientation, TypeOrNil<ScriptColor> color,
 		TypeOrNil<float> width, TypeOrNil<float> life, TypeOrNil<float> velocity, TypeOrNil<float> scaleRate, TypeOrNil<short> rotation, TypeOrNil<StreamerFeatherType> featherType, TypeOrNil<BlendMode> blendMode)
 	{
 		int id = mov.GetIndex();
-		auto pos = Vector3(position.x, position.y, position.z);
-		auto dir = Vector3(direction.x, direction.y, direction.z);
-		auto convertedCount = std::clamp(ValueOr<int>(count, 0), 0, 7);
+		auto pos = position.ToVector3();
+		auto dir = direction.ToVector3();
+		auto convertedCount = std::clamp(ValueOr<int>(Id, 0), 0, 7);
 		auto convertedOrient = ANGLE(ValueOr<short>(orientation, 0));
 		auto convertedColor = ValueOr<ScriptColor>(color, ScriptColor(255, 255, 255));
 		auto convertedWidth = ValueOr<float>(width, 1);
