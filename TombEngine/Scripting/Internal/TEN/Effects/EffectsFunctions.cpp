@@ -374,9 +374,9 @@ namespace TEN::Scripting::Effects
 		Weather.Horizon.SetPosition(pos, !bigDistance);
 	}
 
-/***Returns horizon's current rotation value.
-@function GetHorizonRotation
-@treturn Rotation Horizon's current rotation.
+/***Returns horizon's current position value.
+@function GetHorizonPosition
+@treturn Vec3 Horizon's current position.
 */
 	Rotation GetHorizonPosition()
 	{
