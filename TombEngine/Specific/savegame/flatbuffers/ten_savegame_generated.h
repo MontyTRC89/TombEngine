@@ -7535,6 +7535,7 @@ struct SaveGameT : public flatbuffers::NativeTable {
   float horizon_transition_progress = 0.0f;
   float horizon_transition_speed = 0.0f;
   std::unique_ptr<TEN::Save::Vector3> horizon_rotation{};
+  std::unique_ptr<TEN::Save::Vector3> horizon_position{};
   int32_t postprocess_mode = 0;
   float postprocess_strength = 0.0f;
   std::unique_ptr<TEN::Save::Vector3> postprocess_tint{};
@@ -7605,30 +7606,31 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_HORIZON_TRANSITION_PROGRESS = 76,
     VT_HORIZON_TRANSITION_SPEED = 78,
     VT_HORIZON_ROTATION = 80,
-    VT_POSTPROCESS_MODE = 82,
-    VT_POSTPROCESS_STRENGTH = 84,
-    VT_POSTPROCESS_TINT = 86,
-    VT_ROPE = 88,
-    VT_PENDULUM = 90,
-    VT_ALTERNATE_PENDULUM = 92,
-    VT_VOLUMES = 94,
-    VT_GLOBAL_EVENT_SETS = 96,
-    VT_VOLUME_EVENT_SETS = 98,
-    VT_SCRIPT_VARS = 100,
-    VT_CALLBACKS_PRE_START = 102,
-    VT_CALLBACKS_POST_START = 104,
-    VT_CALLBACKS_PRE_END = 106,
-    VT_CALLBACKS_POST_END = 108,
-    VT_CALLBACKS_PRE_SAVE = 110,
-    VT_CALLBACKS_POST_SAVE = 112,
-    VT_CALLBACKS_PRE_LOAD = 114,
-    VT_CALLBACKS_POST_LOAD = 116,
-    VT_CALLBACKS_PRE_LOOP = 118,
-    VT_CALLBACKS_POST_LOOP = 120,
-    VT_CALLBACKS_PRE_USEITEM = 122,
-    VT_CALLBACKS_POST_USEITEM = 124,
-    VT_CALLBACKS_PRE_FREEZE = 126,
-    VT_CALLBACKS_POST_FREEZE = 128
+    VT_HORIZON_POSITION = 82,
+    VT_POSTPROCESS_MODE = 84,
+    VT_POSTPROCESS_STRENGTH = 86,
+    VT_POSTPROCESS_TINT = 88,
+    VT_ROPE = 90,
+    VT_PENDULUM = 92,
+    VT_ALTERNATE_PENDULUM = 94,
+    VT_VOLUMES = 96,
+    VT_GLOBAL_EVENT_SETS = 98,
+    VT_VOLUME_EVENT_SETS = 100,
+    VT_SCRIPT_VARS = 102,
+    VT_CALLBACKS_PRE_START = 104,
+    VT_CALLBACKS_POST_START = 106,
+    VT_CALLBACKS_PRE_END = 108,
+    VT_CALLBACKS_POST_END = 110,
+    VT_CALLBACKS_PRE_SAVE = 112,
+    VT_CALLBACKS_POST_SAVE = 114,
+    VT_CALLBACKS_PRE_LOAD = 116,
+    VT_CALLBACKS_POST_LOAD = 118,
+    VT_CALLBACKS_PRE_LOOP = 120,
+    VT_CALLBACKS_POST_LOOP = 122,
+    VT_CALLBACKS_PRE_USEITEM = 124,
+    VT_CALLBACKS_POST_USEITEM = 126,
+    VT_CALLBACKS_PRE_FREEZE = 128,
+    VT_CALLBACKS_POST_FREEZE = 130
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -7746,6 +7748,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const TEN::Save::Vector3 *horizon_rotation() const {
     return GetStruct<const TEN::Save::Vector3 *>(VT_HORIZON_ROTATION);
+  }
+  const TEN::Save::Vector3 *horizon_position() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_HORIZON_POSITION);
   }
   int32_t postprocess_mode() const {
     return GetField<int32_t>(VT_POSTPROCESS_MODE, 0);
@@ -7898,6 +7903,7 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<float>(verifier, VT_HORIZON_TRANSITION_PROGRESS) &&
            VerifyField<float>(verifier, VT_HORIZON_TRANSITION_SPEED) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_HORIZON_ROTATION) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_HORIZON_POSITION) &&
            VerifyField<int32_t>(verifier, VT_POSTPROCESS_MODE) &&
            VerifyField<float>(verifier, VT_POSTPROCESS_STRENGTH) &&
            VerifyField<TEN::Save::Vector3>(verifier, VT_POSTPROCESS_TINT) &&
@@ -8088,6 +8094,9 @@ struct SaveGameBuilder {
   void add_horizon_rotation(const TEN::Save::Vector3 *horizon_rotation) {
     fbb_.AddStruct(SaveGame::VT_HORIZON_ROTATION, horizon_rotation);
   }
+  void add_horizon_position(const TEN::Save::Vector3 *horizon_position) {
+    fbb_.AddStruct(SaveGame::VT_HORIZON_POSITION, horizon_position);
+  }
   void add_postprocess_mode(int32_t postprocess_mode) {
     fbb_.AddElement<int32_t>(SaveGame::VT_POSTPROCESS_MODE, postprocess_mode, 0);
   }
@@ -8212,6 +8221,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     float horizon_transition_progress = 0.0f,
     float horizon_transition_speed = 0.0f,
     const TEN::Save::Vector3 *horizon_rotation = 0,
+    const TEN::Save::Vector3 *horizon_position = 0,
     int32_t postprocess_mode = 0,
     float postprocess_strength = 0.0f,
     const TEN::Save::Vector3 *postprocess_tint = 0,
@@ -8261,6 +8271,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
   builder_.add_postprocess_tint(postprocess_tint);
   builder_.add_postprocess_strength(postprocess_strength);
   builder_.add_postprocess_mode(postprocess_mode);
+  builder_.add_horizon_position(horizon_position);
   builder_.add_horizon_rotation(horizon_rotation);
   builder_.add_horizon_transition_speed(horizon_transition_speed);
   builder_.add_horizon_transition_progress(horizon_transition_progress);
@@ -8349,6 +8360,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     float horizon_transition_progress = 0.0f,
     float horizon_transition_speed = 0.0f,
     const TEN::Save::Vector3 *horizon_rotation = 0,
+    const TEN::Save::Vector3 *horizon_position = 0,
     int32_t postprocess_mode = 0,
     float postprocess_strength = 0.0f,
     const TEN::Save::Vector3 *postprocess_tint = 0,
@@ -8450,6 +8462,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       horizon_transition_progress,
       horizon_transition_speed,
       horizon_rotation,
+      horizon_position,
       postprocess_mode,
       postprocess_strength,
       postprocess_tint,
@@ -10766,6 +10779,7 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = horizon_transition_progress(); _o->horizon_transition_progress = _e; }
   { auto _e = horizon_transition_speed(); _o->horizon_transition_speed = _e; }
   { auto _e = horizon_rotation(); if (_e) _o->horizon_rotation = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = horizon_position(); if (_e) _o->horizon_position = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = postprocess_mode(); _o->postprocess_mode = _e; }
   { auto _e = postprocess_strength(); _o->postprocess_strength = _e; }
   { auto _e = postprocess_tint(); if (_e) _o->postprocess_tint = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
@@ -10839,6 +10853,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _horizon_transition_progress = _o->horizon_transition_progress;
   auto _horizon_transition_speed = _o->horizon_transition_speed;
   auto _horizon_rotation = _o->horizon_rotation ? _o->horizon_rotation.get() : 0;
+  auto _horizon_position = _o->horizon_position ? _o->horizon_position.get() : 0;
   auto _postprocess_mode = _o->postprocess_mode;
   auto _postprocess_strength = _o->postprocess_strength;
   auto _postprocess_tint = _o->postprocess_tint ? _o->postprocess_tint.get() : 0;
@@ -10904,6 +10919,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _horizon_transition_progress,
       _horizon_transition_speed,
       _horizon_rotation,
+      _horizon_position,
       _postprocess_mode,
       _postprocess_strength,
       _postprocess_tint,

@@ -577,6 +577,7 @@ table SaveGame {
 	horizon_transition_progress: float;
 	horizon_transition_speed: float;
 	horizon_rotation: Vector3;
+	horizon_position: Vector3;
 	postprocess_mode: int32;
 	postprocess_strength: float;
 	postprocess_tint: Vector3;

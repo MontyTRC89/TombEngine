@@ -1499,6 +1499,7 @@ const std::vector<byte> SaveGame::Build()
 	sgb.add_horizon_transition_progress(Weather.Horizon.GetTransitionProgress());
 	sgb.add_horizon_transition_speed(Weather.Horizon.GetTransitionSpeed());
 	sgb.add_horizon_rotation(&FromVector3(Weather.Horizon.GetRotation()));
+	sgb.add_horizon_position(&FromVector3(Weather.Horizon.GetPosition()));
 	sgb.add_cd_flags(soundtrackMapOffset);
 	sgb.add_action_queue(actionQueueOffset);
 	sgb.add_flip_maps(flipMapsOffset);
@@ -2161,6 +2162,7 @@ static void ParseEffects(const Save::SaveGame* s)
 	Weather.Horizon.SetTransitionProgress(s->horizon_transition_progress());
 	Weather.Horizon.SetTransitionSpeed(s->horizon_transition_speed());
 	Weather.Horizon.SetRotation(ToVector3(s->horizon_rotation()), false);
+	Weather.Horizon.SetPosition(ToVector3(s->horizon_position()), false);
 
 	// Restore soundtracks.
 	for (int i = 0; i < s->soundtracks()->size(); i++)
