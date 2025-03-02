@@ -72,30 +72,30 @@ namespace TEN::Entities::TR4
 		auto rotMatrix = item.Pose.Orientation.ToRotationMatrix();
 		auto pos = posBase + Vector3::Transform(OFFSET, rotMatrix);
 
-		auto direction0 = Geometry::RotatePoint(posBase, EulerAngles(ANGLE(50.0f), 0, 0));
-		auto direction1 = Geometry::RotatePoint(posBase, EulerAngles(ANGLE(-50.0f), 0, 0));
-		auto direction2 = Geometry::RotatePoint(posBase, EulerAngles(0, ANGLE(50.0f), 0));
+		auto dir0 = Geometry::RotatePoint(posBase, EulerAngles(ANGLE(50.0f), 0, 0));
+		auto dir1 = Geometry::RotatePoint(posBase, EulerAngles(ANGLE(-50.0f), 0, 0));
+		auto dir2 = Geometry::RotatePoint(posBase, EulerAngles(0, ANGLE(50.0f), 0));
 
 		short orient2D = item.Pose.Orientation.z;
 
 		// Spawn first tail.
 		StreamerEffect.Spawn(
 			item.Index, (int)TailTag::First,
-			pos, direction0, orient2D, color,
+			pos, dir0, orient2D, color,
 			WIDTH, LIFE_MAX, VEL, EXP_RATE, 0,
 			StreamerFeatherType::Center, BlendMode::Additive);
 
 		// Spawn second tail.
 		StreamerEffect.Spawn(
 			item.Index, (int)TailTag::Second,
-			pos, direction1, orient2D, color,
+			pos, dir1, orient2D, color,
 			WIDTH, LIFE_MAX, VEL, EXP_RATE, 0,
 			StreamerFeatherType::Center, BlendMode::Additive);
 
 		// Spawn third tail.
 		StreamerEffect.Spawn(
 			item.Index, (int)TailTag::Third,
-			pos, direction2, orient2D, color,
+			pos, dir2, orient2D, color,
 			WIDTH, LIFE_MAX, VEL, EXP_RATE, 0,
 			StreamerFeatherType::Center, BlendMode::Additive);
 	}

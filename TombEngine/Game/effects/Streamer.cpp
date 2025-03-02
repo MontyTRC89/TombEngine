@@ -247,7 +247,7 @@ namespace TEN::Effects::Streamer
 		return _groups;
 	}
 
-	void StreamerEffectController::Spawn(int itemNumber, int tag, const Vector3& pos, const Vector3& direction, short orient, const Vector4& color,
+	void StreamerEffectController::Spawn(int itemNumber, int tag, const Vector3& pos, const Vector3& dir, short orient, const Vector4& color,
 										 float width, float life, float vel, float expRate, short rot,
 										 StreamerFeatherType featherType, BlendMode blendMode)
 	{
@@ -259,7 +259,7 @@ namespace TEN::Effects::Streamer
 
 		// Get group and extend streamer within pool.
 		auto& group = GetGroup(itemNumber);
-		group.AddStreamer(tag, pos, direction, orient, color, width, life, vel, expRate, rot, featherType, blendMode);
+		group.AddStreamer(tag, pos, dir, orient, color, width, life, vel, expRate, rot, featherType, blendMode);
 	}
 
 	void StreamerEffectController::Update()
