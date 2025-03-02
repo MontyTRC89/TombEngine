@@ -349,6 +349,7 @@ namespace TEN::Renderer
 			auto axis = Vector3(0,0,0);
 			axis.Normalize();
 
+
 			firefly.scalar = 3;
 			firefly.size = 3;
 
@@ -370,6 +371,7 @@ namespace TEN::Renderer
 				TO_RAD(firefly.rotAng << 4), firefly.scalar,
 				Vector2(firefly.size, firefly.size),
 				firefly.blendMode, true, view);
+
 		}
 	}
 

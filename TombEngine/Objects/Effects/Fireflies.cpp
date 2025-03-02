@@ -73,24 +73,42 @@ namespace TEN::Effects::Fireflys
         // Create new firefly.
         auto& firefly = GetNewEffect(FireflySwarm, MAX_FIREFLIES);
 
-        unsigned char r = 0;
-        unsigned char g = 0;
-        unsigned char b = 0;
+        unsigned char r = 255;
+        unsigned char g = 255;
+        unsigned char b = 255;
 
-        float brightnessShift = Random::GenerateFloat(-0.1f, 0.1f);
-        r = std::clamp(item.Model.Color.x / 2.0f + brightnessShift, 0.0f, 1.0f) * UCHAR_MAX;
-        g = std::clamp(item.Model.Color.y / 2.0f + brightnessShift, 0.0f, 1.0f) * UCHAR_MAX;
-        b = std::clamp(item.Model.Color.z / 2.0f + brightnessShift, 0.0f, 1.0f) * UCHAR_MAX;
+        if (item.TriggerFlags >= 0)
+        {
 
-        firefly.SpriteSeqID = ID_DEFAULT_SPRITES;
-        firefly.SpriteID = SPR_UNDERWATERDUST;
-        firefly.blendMode = BlendMode::Additive;
-        firefly.scalar = 3.0f;
+            float brightnessShift = Random::GenerateFloat(-0.1f, 0.1f);
+            r = std::clamp(item.Model.Color.x / 2.0f + brightnessShift, 0.0f, 1.0f) * UCHAR_MAX;
+            g = std::clamp(item.Model.Color.y / 2.0f + brightnessShift, 0.0f, 1.0f) * UCHAR_MAX;
+            b = std::clamp(item.Model.Color.z / 2.0f + brightnessShift, 0.0f, 1.0f) * UCHAR_MAX;
+
+            firefly.SpriteSeqID = ID_FIREFLY_SPRITES;
+            firefly.SpriteID = 0;
+            firefly.blendMode = BlendMode::Additive;
+            firefly.scalar = 3.0f;
+            firefly.size = 1.0f;
+        }
+        else
+        {
+            firefly.SpriteSeqID = ID_FIREFLY_SPRITES;
+            firefly.SpriteID = 1;
+            firefly.blendMode = BlendMode::Subtractive;
+            firefly.scalar = 1.2f;
+            firefly.size = 1.2f;
+
+        }
+
+        firefly.Orientation.x = Random::GenerateAngle(START_ORIENT_CONSTRAINT.first.x, START_ORIENT_CONSTRAINT.second.x);
+        firefly.Orientation.y = (item.Pose.Orientation.y + ANGLE(180.0f)) + Random::GenerateAngle(START_ORIENT_CONSTRAINT.first.y, START_ORIENT_CONSTRAINT.second.y);
+       
         firefly.r = firefly.rB = r;
         firefly.g = firefly.gB = g;
         firefly.b = firefly.bB = b;
-        firefly.size = 1.0f;
-        firefly.rotAng = Random::GenerateAngle(ANGLE(0.0f), ANGLE(20.0f));
+        
+        firefly.rotAng = ANGLE(0.0f);
         firefly.on = true;
 
         firefly.IsLethal = false;
@@ -176,7 +194,8 @@ namespace TEN::Effects::Fireflys
         for (auto& firefly : FireflySwarm)
         {
            firefly.RoomNumber = item.RoomNumber;
-           firefly.TargetItemPtr = &g_Level.Items[itemNumber];
+          // firefly.LeaderItemPtr = &g_Level.Items[item.ItemFlags[0]];
+           //firefly.TargetItemPtr = &g_Level.Items[item.ItemFlags[0]];
         }
     }
 
@@ -210,9 +229,9 @@ namespace TEN::Effects::Fireflys
 
             int multipler = firefly.TargetItemPtr->TriggerFlags;
 
-            int multiplierX = CLICK(firefly.TargetItemPtr->TriggerFlags + 2);
-            int multiplierY = CLICK(firefly.TargetItemPtr->TriggerFlags + 4);
-            int multiplierZ = CLICK(firefly.TargetItemPtr->TriggerFlags + 2);
+            int multiplierX = CLICK(firefly.TargetItemPtr->TriggerFlags * 2);
+            int multiplierY = CLICK(firefly.TargetItemPtr->TriggerFlags * 4);
+            int multiplierZ = CLICK(firefly.TargetItemPtr->TriggerFlags * 2);
 
             auto SPHEROID_SEMI_MAJOR_AXIS = Vector3(multiplierX, multiplierY, multiplierZ);
 
@@ -242,6 +261,8 @@ namespace TEN::Effects::Fireflys
 
             auto orientTo = Geometry::GetOrientToPoint(firefly.Position, desiredPos.ToVector3());
             firefly.Orientation.Lerp(orientTo, 0.1f);
+
+            
 
             for (const auto& otherFirefly : FireflySwarm)
             {
@@ -285,6 +306,8 @@ namespace TEN::Effects::Fireflys
                 }
             }
 
+
+
             auto pointColl = GetPointCollision(firefly.Position, firefly.RoomNumber);
 
             // Update firefly room number.
@@ -318,14 +341,27 @@ namespace TEN::Effects::Fireflys
 
             short orient2D =  firefly.Orientation.z;
 
-            SpawnDynamicLight(firefly.Position.x, firefly.Position.y, firefly.Position.z, 2, firefly.r, firefly.g, firefly.b);
+
             
-         if (firefly.TargetItemPtr->ItemFlags[6] = 1)
-             SpawnDynamicLight(firefly.Position.x, firefly.Position.y, firefly.Position.z, 2, firefly.r, firefly.g, firefly.b);
+            if (firefly.TargetItemPtr->ItemFlags[6] = 1 && firefly.TargetItemPtr->TriggerFlags >= 0)
+            {
 
 
-            StreamerEffect.Spawn(firefly.TargetItemPtr->Index, firefly.Number, pos, direction0, orient2D, Vector4(firefly.r / (float)UCHAR_MAX, firefly.g / (float)UCHAR_MAX, firefly.b / (float)UCHAR_MAX, 1.0f),
-                0.0f, 0.11f, 20.0f, 0.1f, 0.0f, (int)StreamerFlags::BlendModeAdditive);      
+                SpawnDynamicLight(firefly.Position.x, firefly.Position.y, firefly.Position.z, 2, firefly.r, firefly.g, firefly.b);
+
+                StreamerEffect.Spawn(firefly.TargetItemPtr->Index, firefly.Number, pos, direction0, orient2D, Vector4(firefly.r / (float)UCHAR_MAX, firefly.g / (float)UCHAR_MAX, firefly.b / (float)UCHAR_MAX, 1.0f),
+                 0.0f, 0.11f, 20.0f, 0.1f, 0.0f, StreamerFeatherType::None, BlendMode::Additive);
+            }
+            else if (firefly.TargetItemPtr->TriggerFlags < 0)
+            {
+                StreamerEffect.Spawn(firefly.TargetItemPtr->Index, firefly.Number, pos, direction0, orient2D, Vector4((firefly.r / 3) / (float)UCHAR_MAX, (firefly.g / 3) / (float)UCHAR_MAX, (firefly.b / 3) / (float)UCHAR_MAX, 0.2f),
+                    0.0f, 0.6f, 0.0f, 0.4f, 0.0f, StreamerFeatherType::None, BlendMode::Subtractive);
+
+               // firefly.r = 0;//static_cast<unsigned char>(firefly.rB / alphaFactor);
+                //firefly.g = 0;// static_cast<unsigned char>(firefly.gB / alphaFactor);
+               // firefly.b = 0;//static_cast<unsigned char>(firefly.bB / alphaFactor);
+
+            }
         }
     }
 
