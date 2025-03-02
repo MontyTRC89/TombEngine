@@ -360,7 +360,7 @@ namespace TEN::Scripting::Effects
 */
 	static void SetHorizonPosition(const Vec3& pos)
 	{
-		constexpr auto BIG_DISTANCE_THRESHOLD = 1024.0f;
+		constexpr auto BIG_DISTANCE_THRESHOLD = 30.0f;
 
 		// Get current rotation in degrees
 		Vector3 _horizonPosition = Weather.Horizon.GetPosition();

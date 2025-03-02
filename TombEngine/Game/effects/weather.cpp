@@ -28,8 +28,8 @@ namespace TEN::Effects::Environment
 	// Getters
 	Vector3 HorizonObject::GetRotation() const { return _rotation; }
 	Vector3 HorizonObject::GetOldRotation() const { return _oldRotation; }
-	Vector3 HorizonObject::GetRotation() const { return _rotation; }
-	Vector3 HorizonObject::GetOldRotation() const { return _oldRotation; }
+	Vector3 HorizonObject::GetPosition() const { return _position; }
+	Vector3 HorizonObject::GetOldPosition() const { return _oldPosition; }
 	GAME_OBJECT_ID HorizonObject::GetHorizonID() const { return _horizonID; }
 	GAME_OBJECT_ID HorizonObject::GetOldHorizonID() const { return _oldHorizonID; }
 	float HorizonObject::GetTransitionProgress() const { return _transitionProgress; }
