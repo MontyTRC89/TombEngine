@@ -39,8 +39,8 @@ namespace TEN::Effects::Streamer
 			float ExpRate	 = 0.0f;
 			short Rotation	 = 0;
 
-			Vector4							  PrevColor	   = Vector4::Zero;
 			std::array<Vector3, VERTEX_COUNT> PrevVertices = {};
+			Vector4							  PrevColor	   = Vector4::Zero;
 
 			void InitializeVertices(const Vector3& pos, float width);
 			void Update();
@@ -58,11 +58,10 @@ namespace TEN::Effects::Streamer
 
 		// Fields
 
-		std::vector<StreamerSegment> _segments = {};
-
-		StreamerFeatherType	_featherType = StreamerFeatherType::None;
-		BlendMode			_blendMode	 = BlendMode::AlphaBlend;
-		bool				_isBroken	 = false;
+		std::vector<StreamerSegment> _segments	  = {};
+		StreamerFeatherType			 _featherType = StreamerFeatherType::None;
+		BlendMode					 _blendMode	  = BlendMode::AlphaBlend;
+		bool						 _isBroken	  = false;
 
 
 	public:
