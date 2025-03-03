@@ -38,11 +38,12 @@ namespace TEN::Entities::TR4
 
 	static void SpawnWraithTails(const ItemInfo& item)
 	{
-		constexpr auto OFFSET	= Vector3(0.0f, -10.0f, -50.0f);
-		constexpr auto WIDTH	= 8.0f;
-		constexpr auto LIFE_MAX = 0.5f;
-		constexpr auto VEL		= 4.0f;
-		constexpr auto EXP_RATE = 1.0f;
+		constexpr auto OFFSET	 = Vector3(0.0f, -10.0f, -50.0f);
+		constexpr auto COLOR_END = Color(0.0f, 0.0f, 0.0f, 0.0f);
+		constexpr auto WIDTH	 = 8.0f;
+		constexpr auto LIFE_MAX	 = 0.5f;
+		constexpr auto VEL		 = 4.0f;
+		constexpr auto EXP_RATE	 = 1.0f;
 
 		enum class TailTag
 		{
@@ -51,20 +52,20 @@ namespace TEN::Entities::TR4
 			Third
 		};
 
-		auto color = Vector4::Zero;
+		auto colorStart = Vector4::Zero;
 		switch (item.ObjectNumber)
 		{
 		default:
 		case ID_WRAITH1:
-			color = Vector4(1.0f, 0.6f, 0.0f, 1.0f);
+			colorStart = Vector4(1.0f, 0.6f, 0.0f, 1.0f);
 			break;
 
 		case ID_WRAITH2:
-			color = Vector4(0.0f, 0.5f, 1.0f, 1.0f);
+			colorStart = Vector4(0.0f, 0.5f, 1.0f, 1.0f);
 			break;
 
 		case ID_WRAITH3:
-			color = Vector4(1.0f);
+			colorStart = Vector4(1.0f);
 			break;
 		}
 
@@ -81,21 +82,21 @@ namespace TEN::Entities::TR4
 		// Spawn first tail.
 		StreamerEffect.Spawn(
 			item.Index, (int)TailTag::First,
-			pos, dir0, orient2D, color,
+			pos, dir0, orient2D, colorStart, COLOR_END,
 			WIDTH, LIFE_MAX, VEL, EXP_RATE, 0,
 			StreamerFeatherType::Center, BlendMode::Additive);
 
 		// Spawn second tail.
 		StreamerEffect.Spawn(
 			item.Index, (int)TailTag::Second,
-			pos, dir1, orient2D, color,
+			pos, dir1, orient2D, colorStart, COLOR_END,
 			WIDTH, LIFE_MAX, VEL, EXP_RATE, 0,
 			StreamerFeatherType::Center, BlendMode::Additive);
 
 		// Spawn third tail.
 		StreamerEffect.Spawn(
 			item.Index, (int)TailTag::Third,
-			pos, dir2, orient2D, color,
+			pos, dir2, orient2D, colorStart, COLOR_END,
 			WIDTH, LIFE_MAX, VEL, EXP_RATE, 0,
 			StreamerFeatherType::Center, BlendMode::Additive);
 	}

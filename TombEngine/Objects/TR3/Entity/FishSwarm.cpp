@@ -45,7 +45,7 @@ namespace TEN::Entities::Creatures::TR3
 	constexpr auto FISH_CATCH_UP_FACTOR			 = 0.2f;
 	constexpr auto FISH_TARGET_DISTANCE_MAX		 = SQUARE(BLOCK(0.01f));
 	constexpr auto FISH_BASE_SEPARATION_DISTANCE = 210.0f;
-	constexpr auto FISH_UPDATE_INTERVAL_TIME	 = 0.2f;
+	constexpr auto FISH_UPDATE_INTERVAL_TIME	 = 6;
 
 	std::vector<FishData> FishSwarm = {};
 
