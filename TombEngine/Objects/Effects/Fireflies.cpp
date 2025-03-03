@@ -49,7 +49,15 @@ namespace TEN::Effects::Fireflys
         item.HitPoints = DEFAULT_FIREFLY_COUNT;
         item.ItemFlags[FirefliesItemFlags::TargetItemPtr] = item.Index;
         item.ItemFlags[FirefliesItemFlags::Light] = 1;
+
         item.ItemFlags[FirefliesItemFlags::TriggerFlags] = item.TriggerFlags;
+
+		if (item.TriggerFlags < -8)
+			item.ItemFlags[FirefliesItemFlags::TriggerFlags] = -8;
+		
+        if (item.TriggerFlags > 8)
+            item.ItemFlags[FirefliesItemFlags::TriggerFlags] = 8;
+       
         item.ItemFlags[FirefliesItemFlags::Spawncounter] = 0;
         item.ItemFlags[FirefliesItemFlags::FliesEffect] = 0;
     }
@@ -295,17 +303,21 @@ namespace TEN::Effects::Fireflys
 
             short orient2D =  firefly.Orientation.z;
             
-            if (firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::Light] = 1 && firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::TriggerFlags] >= 0)
+            if (firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::Light] == 1 && firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::TriggerFlags] >= 0)
             {
                 SpawnDynamicLight(firefly.Position.x, firefly.Position.y, firefly.Position.z, 2, firefly.r, firefly.g, firefly.b);
 
-                StreamerEffect.Spawn(firefly.TargetItemPtr->Index, firefly.Number, pos, direction0, orient2D, Vector4(firefly.r / (float)UCHAR_MAX, firefly.g / (float)UCHAR_MAX, firefly.b / (float)UCHAR_MAX, 1.0f),
+                StreamerEffect.Spawn(firefly.TargetItemPtr->Index, firefly.Number, pos, direction0, orient2D, 
+                    Vector4(firefly.r / (float)UCHAR_MAX, firefly.g / (float)UCHAR_MAX, firefly.b / (float)UCHAR_MAX, 1.0f),
+                    Vector4::Zero,
                  0.0f, 0.11f, 20.0f, 0.1f, 0.0f, StreamerFeatherType::None, BlendMode::Additive);
             }
             else if (firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::TriggerFlags] < 0)
             {
-                StreamerEffect.Spawn(firefly.TargetItemPtr->Index, firefly.Number, pos, direction0, orient2D, Vector4((firefly.r / 3) / (float)UCHAR_MAX, (firefly.g / 3) / (float)UCHAR_MAX, (firefly.b / 3) / (float)UCHAR_MAX, 0.2f),
-                 0.0f, 0.6f, 0.0f, 0.4f, 0.0f, StreamerFeatherType::None, BlendMode::Subtractive);
+                StreamerEffect.Spawn(firefly.TargetItemPtr->Index, firefly.Number, pos, direction0, orient2D, 
+                    Vector4((firefly.r / 2) / (float)UCHAR_MAX, (firefly.g / 2) / (float)UCHAR_MAX, (firefly.b / 2) / (float)UCHAR_MAX, 0.2f),
+                    Vector4((firefly.r / 3) / (float)UCHAR_MAX, (firefly.g / 3) / (float)UCHAR_MAX, (firefly.b / 3) / (float)UCHAR_MAX, 0.2f),
+                    0.0f, 0.6f, 0.0f, 0.2f, 0.0f, StreamerFeatherType::None, BlendMode::Subtractive);
             }
         }
     }
