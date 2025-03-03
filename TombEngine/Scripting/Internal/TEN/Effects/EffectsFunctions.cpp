@@ -304,11 +304,11 @@ namespace TEN::Scripting::Effects
 		TriggerBlood(pos.x, pos.y, pos.z, -1, ValueOr<int>(count, 1));
 	}
 
-/// Emit air bubble in a water room.
-// @function EmitAirBubble
-// @tparam Vec3 pos World position where the effect will be spawned. Must be in a water room.
-// @tparam[opt] float size Sprite size. __Default: 32__
-// @tparam[opt] float amp Oscillation amplitude. __Default: 32__
+	/// Emit air bubble in a water room.
+	// @function EmitAirBubble
+	// @tparam Vec3 pos World position where the effect will be spawned. Must be in a water room.
+	// @tparam[opt] float size Sprite size. __Default: 32__
+	// @tparam[opt] float amp Oscillation amplitude. __Default: 32__
 	static void EmitAirBubble(const Vec3& pos, TypeOrNil<float> size, TypeOrNil<float> amp)
 	{
 		constexpr auto DEFAULT_SIZE = 128.0f;
@@ -328,36 +328,6 @@ namespace TEN::Scripting::Effects
 	static void EmitFire(const Vec3& pos, TypeOrNil<float> size)
 	{
 		AddFire(pos.x, pos.y, pos.z, FindRoomNumber(Vector3i(pos.x, pos.y, pos.z)), ValueOr<float>(size, 1));
-	}
-
-/***Make an explosion. Does not hurt Lara
-@function MakeExplosion 
-@tparam Vec3 pos
-@tparam float size (default 512.0) this will not be the size of the sprites, but rather the distance between the origin and any additional sprites
-@tparam bool shockwave (default false) if true, create a very faint white shockwave which will not hurt Lara
-*/
-	static void MakeExplosion(Vec3 pos, TypeOrNil<float> size, TypeOrNil<bool> shockwave)
-	{
-		TriggerExplosion(Vector3(pos.x, pos.y, pos.z), ValueOr<float>(size, 512.0f), true, false, ValueOr<bool>(shockwave, false), FindRoomNumber(Vector3i(pos.x, pos.y, pos.z)));
-	}
-
-/***Make an earthquake
-@function MakeEarthquake 
-@tparam int strength (default 100) How strong should the earthquake be? Increasing this value also increases the lifespan of the earthquake.
-*/
-	static void Earthquake(TypeOrNil<int> strength)
-	{
-		int str = ValueOr<int>(strength, 100);
-		Camera.bounce = -str;
-	}
-
-/***Get the wind vector for the current game frame.
-This represents the 3D displacement applied by the engine on things like particles affected by wind.
-@function GetWind
-@treturn Vec3 Wind vector.*/
-	static Vec3 GetWind()
-	{
-		return Vec3(Weather.Wind());
 	}
 
 	/// Emit an extending streamer effect.
@@ -401,6 +371,36 @@ This represents the 3D displacement applied by the engine on things like particl
 			movID, convertedTag, convertedPos, convertedDir, convertedRot, convertedStartColor, convertedEndColor,
 			convertedWidth, convertedLife, convertedVel, convertedExpRate, convertedRotRate,
 			convertedFeatherID, convertedBlendID);
+	}
+
+/***Make an explosion. Does not hurt Lara
+@function MakeExplosion 
+@tparam Vec3 pos
+@tparam float size (default 512.0) this will not be the size of the sprites, but rather the distance between the origin and any additional sprites
+@tparam bool shockwave (default false) if true, create a very faint white shockwave which will not hurt Lara
+*/
+	static void MakeExplosion(Vec3 pos, TypeOrNil<float> size, TypeOrNil<bool> shockwave)
+	{
+		TriggerExplosion(Vector3(pos.x, pos.y, pos.z), ValueOr<float>(size, 512.0f), true, false, ValueOr<bool>(shockwave, false), FindRoomNumber(Vector3i(pos.x, pos.y, pos.z)));
+	}
+
+/***Make an earthquake
+@function MakeEarthquake 
+@tparam int strength (default 100) How strong should the earthquake be? Increasing this value also increases the lifespan of the earthquake.
+*/
+	static void Earthquake(TypeOrNil<int> strength)
+	{
+		int str = ValueOr<int>(strength, 100);
+		Camera.bounce = -str;
+	}
+
+	/// Get the wind vector for the current game frame.
+	// This represents the 3D displacement applied by the engine on things like particles affected by wind.
+	// @function GetWind
+	// @treturn Vec3 Wind vector.
+	static Vec3 GetWind()
+	{
+		return Vec3(Weather.Wind());
 	}
 
 	void Register(sol::state* state, sol::table& parent) 
