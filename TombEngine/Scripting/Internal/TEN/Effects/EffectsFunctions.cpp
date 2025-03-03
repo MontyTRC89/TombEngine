@@ -366,14 +366,14 @@ This represents the 3D displacement applied by the engine on things like particl
 	// @tparam int[opt] tag Numeric tag with which to associate the effect on the moveable. __default: 0__
 	// @tparam Vec3 pos World position.
 	// @tparam Vec3 dir Direction vector of movement velocity.
-	// @tparam[opt] float rot Start rotation. __default: 0__
+	// @tparam[opt] float rot Start rotation in degrees. __default: 0__
 	// @tparam[opt] Color startColor Color at the start of life. __default: Color(255, 255, 255))__
 	// @tparam[opt] Color endColor Color at the end of life. __default: Color(0, 0, 0))__
-	// @tparam[opt] float width Width. __default: 0__
+	// @tparam[opt] float width Width in world units. __default: 0__
 	// @tparam[opt] float life Lifetime in seconds. __default: 1__
-	// @tparam[opt] float vel Movement velocity in seconds. __default: 0__
-	// @tparam[opt] float expRate Width expansion rate in seconds. With a negative value, the width will contract toward 0. __default: 0__
-	// @tparam[opt] float rotRate Rotation rate in seconds. __default: 0__
+	// @tparam[opt] float vel Movement velocity in world units per second. __default: 0__
+	// @tparam[opt] float expRate Width expansion rate in world units per second. With a negative value, the width will contract toward 0. __default: 0__
+	// @tparam[opt] float rotRate Rotation rate in degrees per second. __default: 0__
 	// @tparam[opt] Effects.FeatherID featherID Edge feathering ID. __default: Effects.FeatherID.NONE__
 	// @tparam[opt] Effects.BlendID blendID Renderer blend ID. __Effects.BlendID.ALPHA_BLEND__
 	static void EmitStreamer(const Moveable& mov, TypeOrNil<int> tag, const Vec3& pos, const Vec3& dir, TypeOrNil<float> rot, TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor,
