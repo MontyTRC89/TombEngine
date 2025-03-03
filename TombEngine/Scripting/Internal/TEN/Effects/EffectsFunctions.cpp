@@ -408,6 +408,10 @@ This represents the 3D displacement applied by the engine on things like particl
 		auto tableEffects = sol::table(state->lua_state(), sol::create);
 		parent.set(ScriptReserved_Effects, tableEffects);
 
+		// Getters
+		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
+
+		// Utilities
 		tableEffects.set_function(ScriptReserved_EmitLightningArc, &EmitLightningArc);
 		tableEffects.set_function(ScriptReserved_EmitParticle, &EmitParticle);
 		tableEffects.set_function(ScriptReserved_EmitShockwave, &EmitShockwave);
@@ -415,15 +419,15 @@ This represents the 3D displacement applied by the engine on things like particl
 		tableEffects.set_function(ScriptReserved_EmitSpotLight, &EmitSpotLight);
 		tableEffects.set_function(ScriptReserved_EmitBlood, &EmitBlood);
 		tableEffects.set_function(ScriptReserved_EmitAirBubble, &EmitAirBubble);
-		tableEffects.set_function(ScriptReserved_MakeExplosion, &MakeExplosion);
 		tableEffects.set_function(ScriptReserved_EmitFire, &EmitFire);
-		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
 		tableEffects.set_function(ScriptReserved_EmitStreamer, &EmitStreamer);
-		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
+		tableEffects.set_function(ScriptReserved_MakeExplosion, &MakeExplosion);
+		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
 
+		// Enums
 		auto handler = LuaHandler{ state };
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_BlendID, BLEND_IDS);
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_EffectID, EFFECT_IDS);
-		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_StreamerFeatherType, FEATHER_IDS);
+		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_FeatherID, FEATHER_IDS);
 	}
 }

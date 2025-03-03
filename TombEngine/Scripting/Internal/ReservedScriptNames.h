@@ -310,17 +310,6 @@ static constexpr char ScriptReserved_HandleEvent[]					= "HandleEvent";
 static constexpr char ScriptReserved_EnableEvent[]					= "EnableEvent";
 static constexpr char ScriptReserved_DisableEvent[]					= "DisableEvent";
 
-static constexpr char ScriptReserved_EmitParticle[]					= "EmitParticle";
-static constexpr char ScriptReserved_EmitLightningArc[]				= "EmitLightningArc";
-static constexpr char ScriptReserved_EmitShockwave[]				= "EmitShockwave";
-static constexpr char ScriptReserved_EmitLight[]					= "EmitLight";
-static constexpr char ScriptReserved_EmitSpotLight[]				= "EmitSpotLight";
-static constexpr char ScriptReserved_EmitBlood[]					= "EmitBlood";
-static constexpr char ScriptReserved_EmitAirBubble[]				= "EmitAirBubble";
-static constexpr char ScriptReserved_EmitFire[]						= "EmitFire";
-static constexpr char ScriptReserved_MakeExplosion[]				= "MakeExplosion";
-static constexpr char ScriptReserved_MakeEarthquake[]				= "MakeEarthquake";
-static constexpr char ScriptReserved_EmitStreamer[]					= "EmitStreamer";
 static constexpr char ScriptReserved_GetWind[]		        		= "GetWind";
 static constexpr char ScriptReserved_Vibrate[]						= "Vibrate";
 static constexpr char ScriptReserved_FlashScreen[]					= "FlashScreen";
@@ -372,7 +361,6 @@ static constexpr char ScriptReserved_GetMouseDisplayPosition[]		= "GetMouseDispl
 static constexpr char ScriptReserved_ObjID[]					= "ObjID";
 static constexpr char ScriptReserved_BlendID[]					= "BlendID";
 static constexpr char ScriptReserved_EffectID[]					= "EffectID";
-static constexpr char ScriptReserved_StreamerFeatherType[]		= "StreamerFeatherType";
 static constexpr char ScriptReserved_ActionID[]					= "ActionID";
 static constexpr char ScriptReserved_CameraType[]				= "CameraType";
 static constexpr char ScriptReserved_PostProcessMode[]			= "PostProcessMode";
@@ -399,6 +387,24 @@ static constexpr char ScriptReserved_LogLevelError[]	= "ERROR";
 
 // Internal
 static constexpr char ScriptReserved_LaraObject[] = "LaraObject";
+
+// =======
+// EFFECTS
+// =======
+
+constexpr char ScriptReserved_EmitAirBubble[]		= "EmitAirBubble";
+constexpr char ScriptReserved_EmitBlood[]			= "EmitBlood";
+constexpr char ScriptReserved_EmitFire[]			= "EmitFire";
+constexpr char ScriptReserved_EmitLight[]			= "EmitLight";
+constexpr char ScriptReserved_EmitLightningArc[]	= "EmitLightningArc";
+constexpr char ScriptReserved_EmitParticle[]		= "EmitParticle";
+constexpr char ScriptReserved_EmitShockwave[]		= "EmitShockwave";
+constexpr char ScriptReserved_EmitSpotLight[]		= "EmitSpotLight";
+constexpr char ScriptReserved_EmitStreamer[]		= "EmitStreamer";
+constexpr char ScriptReserved_MakeEarthquake[]		= "MakeEarthquake";
+constexpr char ScriptReserved_MakeExplosion[]		= "MakeExplosion";
+
+constexpr char ScriptReserved_FeatherID[] = "FeatherID";
 
 // =======
 // OBJECTS
