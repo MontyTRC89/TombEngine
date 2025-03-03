@@ -630,4 +630,26 @@ namespace TEN::Renderer
 		SaveWICTextureToFile(_context.Get(), _backBuffer.Texture.Get(), GUID_ContainerFormatPng, TEN::Utils::ToWString(screenPath).c_str(),
 			&GUID_WICPixelFormat24bppBGR, nullptr, true);
 	}
+
+	void Renderer::Queue2DDrawObject(int objectNumber, Vector2 pos2D, EulerAngles orient, float scale, float opacity, int meshBits)
+	{
+		drawQueue2D.push_back({ objectNumber, pos2D, orient, scale, opacity, meshBits });
+	}
+
+	void Renderer::Process2DDrawQueue()
+	{
+		for (const auto& request : drawQueue2D)
+		{
+			DrawObjectIn2DSpace(
+				request.objectNumber,
+				request.pos2D,
+				request.orient,
+				request.scale,
+				request.opacity,
+				request.meshBits
+			);
+		}
+
+		drawQueue2D.clear(); // Clear queue after rendering
+	}
 }

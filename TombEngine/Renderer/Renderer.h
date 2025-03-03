@@ -87,6 +87,16 @@ namespace TEN::Renderer
 
 	using TexturePair = std::tuple<Texture2D, Texture2D>;
 
+	struct DrawRequest2D
+	{
+		int objectNumber;
+		Vector2 pos2D;
+		EulerAngles orient;
+		float scale;
+		float opacity;
+		int meshBits;
+	};
+
 	class Renderer
 	{
 	private:
@@ -240,6 +250,9 @@ namespace TEN::Renderer
 
 		std::vector<RendererItem> _items;
 		std::vector<RendererEffect> _effects;
+
+		//2D Object Drawing List
+		std::vector<DrawRequest2D> drawQueue2D;
 
 		// Debug variables
 
@@ -598,6 +611,9 @@ namespace TEN::Renderer
 			return _staticObjects[Statics.GetIndex(objectNumber)].value();
 		}
 
+		//2D Drawing via LUA functions
+		void Process2DDrawQueue();
+
 	public:
 		Renderer();
 		~Renderer();
@@ -689,6 +705,9 @@ namespace TEN::Renderer
 		void			SetPostProcessTint(Vector3 color);
 
 		void			SetGraphicsSettingsChanged();
+
+		//2D Drawing via LUA functions
+		void Queue2DDrawObject(int objectNumber, Vector2 pos2D, EulerAngles orient, float scale, float opacity, int meshBits);
 	};
 
 	extern Renderer g_Renderer;

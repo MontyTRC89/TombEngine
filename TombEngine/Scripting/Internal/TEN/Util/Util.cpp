@@ -193,7 +193,7 @@ namespace TEN::Scripting::Util
 	{
 		auto angle = orient.ToEulerAngles();
 		auto pos = pos2D.ToVector2();
-		g_Renderer.DrawObjectIn2DSpace(objectNumber, pos, angle, scale1, opacity, meshbits);
+		g_Renderer.Queue2DDrawObject(objectNumber, pos, angle, scale1, opacity, meshbits);
 	}
 
 

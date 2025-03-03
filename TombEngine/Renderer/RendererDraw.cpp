@@ -1896,6 +1896,9 @@ namespace TEN::Renderer
 		DrawLines3D(view);
 		DrawTriangles3D(view);
 
+		//Placeholder
+		Process2DDrawQueue();
+
 		// Draw HUD.
 		ClearDrawPhaseDisplaySprites();
 
