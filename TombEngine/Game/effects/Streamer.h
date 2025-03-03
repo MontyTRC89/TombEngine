@@ -22,7 +22,8 @@ namespace TEN::Effects::Streamer
 	private:
 		// Constants
 
-		static constexpr auto SEGMENT_COUNT_MAX = 128;
+		static constexpr auto SEGMENT_COUNT_MAX			  = 128;
+		static constexpr auto SEGMENT_SPAWN_INTERVAL_TIME = 3;
 
 		struct StreamerSegment
 		{
@@ -34,11 +35,11 @@ namespace TEN::Effects::Streamer
 			Vector4							  ColorStart  = Vector4::Zero;
 			Vector4							  ColorEnd	  = Vector4::Zero;
 
-			int	  Life		 = 0; // Time in game frames.
-			int	  LifeMax	 = 0; // Time in game frames.
-			float Velocity	 = 0.0f;
-			float ExpRate	 = 0.0f;
-			short Rotation	 = 0;
+			int	  Life	   = 0; // Time in game frames.
+			int	  LifeMax  = 0; // Time in game frames.
+			float Velocity = 0.0f;
+			float ExpRate  = 0.0f;
+			short Rotation = 0;
 
 			std::array<Vector3, VERTEX_COUNT> PrevVertices = {};
 			Vector4							  PrevColor	   = Vector4::Zero;
@@ -59,10 +60,11 @@ namespace TEN::Effects::Streamer
 
 		// Fields
 
-		std::vector<StreamerSegment> _segments	  = {};
-		StreamerFeatherType			 _featherType = StreamerFeatherType::None;
-		BlendMode					 _blendMode	  = BlendMode::AlphaBlend;
-		bool						 _isBroken	  = false;
+		std::vector<StreamerSegment> _segments				 = {};
+		int							 _segmentSpawnTimeOffset = 0; // Time in game frames.
+		StreamerFeatherType			 _featherType			 = StreamerFeatherType::None;
+		BlendMode					 _blendMode				 = BlendMode::AlphaBlend;
+		bool						 _isBroken				 = false;
 
 
 	public:
@@ -82,14 +84,14 @@ namespace TEN::Effects::Streamer
 
 		// Utilities
 
-		void AddSegment(const Vector3& pos, const Vector3& dir, short orient, const Color& colorStart, const Color& colorEnd,
-						float width, float life, float vel, float expRate, short rot, unsigned int segmentCount);
+		void Extend(const Vector3& pos, const Vector3& dir, short orient, const Color& colorStart, const Color& colorEnd,
+					float width, float life, float vel, float expRate, short rot, unsigned int segmentCount);
 		void Update();
 
 	private:
 		// Helpers
 
-		StreamerSegment& GetNewSegment();
+		StreamerSegment& GetSegment();
 	};
 
 	class StreamerGroup

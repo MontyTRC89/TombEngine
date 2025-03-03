@@ -2,6 +2,7 @@
 #include "Game/effects/Streamer.h"
 
 #include "Game/collision/collide_room.h"
+#include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/items.h"
 #include "Math/Math.h"
@@ -74,6 +75,7 @@ namespace TEN::Effects::Streamer
 
 	Streamer::Streamer(StreamerFeatherType featherType, BlendMode blendMode)
 	{
+		_segmentSpawnTimeOffset = GlobalCounter % SEGMENT_SPAWN_INTERVAL_TIME;
 		_featherType = featherType;
 		_blendMode = blendMode;
 	}
@@ -98,17 +100,17 @@ namespace TEN::Effects::Streamer
 		return _isBroken;
 	}
 
-	void Streamer::AddSegment(const Vector3& pos, const Vector3& dir, short orient, const Color& colorStart, const Color& colorEnd,
-							  float width, float life, float vel, float expRate, short rot, unsigned int segmentCount)
+	void Streamer::Extend(const Vector3& pos, const Vector3& dir, short orient, const Color& colorStart, const Color& colorEnd,
+						  float width, float life, float vel, float expRate, short rot, unsigned int segmentCount)
 	{
 		constexpr auto FADE_IN_COEFF = 3.0f;
 
-		auto& segment = GetNewSegment();
+		auto& segment = GetSegment();
 
 		// Avoid creating "clipped" streamers by clamping max life according to max segment count.
 		int lifeMax = (int)std::min(round(life * FPS), (float)SEGMENT_COUNT_MAX);
 
-		float alpha = ((float)segmentCount / (float)lifeMax) * FADE_IN_COEFF;
+		float alpha = (float(segmentCount + SEGMENT_SPAWN_INTERVAL_TIME) / (float)lifeMax) * FADE_IN_COEFF;
 		float opacityMax = EaseInOutSine(colorEnd.w, colorStart.w, alpha);
 
 		segment.Orientation = AxisAngle(dir, orient);
@@ -140,9 +142,13 @@ namespace TEN::Effects::Streamer
 		ClearInactiveEffects(_segments);
 	}
 
-	Streamer::StreamerSegment& Streamer::GetNewSegment()
+	Streamer::StreamerSegment& Streamer::GetSegment()
 	{
 		TENAssert(_segments.size() <= SEGMENT_COUNT_MAX, "Streamer segment count overflow.");
+
+		// Return newest segment.
+		if (!_segments.empty() && TestGlobalTimeInterval(SEGMENT_SPAWN_INTERVAL_TIME, _segmentSpawnTimeOffset))
+			return _segments.back();
 
 		// Clear oldest segment if vector is full.
 		if (_segments.size() == SEGMENT_COUNT_MAX)
@@ -167,9 +173,9 @@ namespace TEN::Effects::Streamer
 		if (_pools.size() == POOL_COUNT_MAX && !_pools.count(tag))
 			return;
 
-		// Get new streamer iteration or extend existing streamer iteration with new segment.
+		// Get and extend streamer iteration.
 		auto& streamer = GetStreamerIteration(tag, featherType, blendMode);
-		streamer.AddSegment(pos, dir, orient, colorStart, colorEnd, width, life, vel, expRate, rot, (unsigned int)streamer.GetSegments().size());
+		streamer.Extend(pos, dir, orient, colorStart, colorEnd, width, life, vel, expRate, rot, (unsigned int)streamer.GetSegments().size());
 	}
 
 	void StreamerGroup::Update()
@@ -261,7 +267,7 @@ namespace TEN::Effects::Streamer
 		if (_groups.size() == GROUP_COUNT_MAX && !_groups.count(itemNumber))
 			return;
 
-		// Get group and extend streamer within pool.
+		// Add new or extend existing streamer.
 		auto& group = GetGroup(itemNumber);
 		group.AddStreamer(tag, pos, dir, orient, colorStart, colorEnd, width, life, vel, expRate, rot, featherType, blendMode);
 	}
