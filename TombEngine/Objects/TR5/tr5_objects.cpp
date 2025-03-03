@@ -802,7 +802,6 @@ static void StartObject(ObjectInfo *obj)
 	{
 		obj->Initialize = InitializeFireflySwarm;
 		obj->control = ControlFireflySwarm;
-		obj->intelligent = true;
 		obj->drawRoutine = NULL;
 	}
 

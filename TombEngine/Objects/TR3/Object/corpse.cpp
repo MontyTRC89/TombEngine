@@ -70,9 +70,8 @@ namespace TEN::Entities::TR3
 		AddActiveItem(itemNumber);
 		item.Status = ITEM_ACTIVE;
 
-		item.ItemFlags[0] = item.Index;
-		item.ItemFlags[2] = item.Index;
-		item.ItemFlags[3] = -1;
+		item.ItemFlags[FirefliesItemFlags::TargetItemPtr] = item.Index;
+		item.ItemFlags[FirefliesItemFlags::TriggerFlags] = -1;
 		item.HitPoints = 16;
 	}
 
@@ -106,14 +105,14 @@ namespace TEN::Entities::TR3
 				ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 			}
 
-			//Remove fly effect when in water.
+			// Remove fly effect when in water.
 			if (isWater || isSwamp)
 			{
-				item.ItemFlags[6] = 1;
+				item.ItemFlags[FirefliesItemFlags::FliesEffect] = 1;
 			}
 			else
 			{
-				item.ItemFlags[6] = 0;
+				item.ItemFlags[FirefliesItemFlags::FliesEffect] = 0;
 			}
 
 			pointColl = GetPointCollision(item);
@@ -158,10 +157,10 @@ namespace TEN::Entities::TR3
 		if (!TriggerActive(&item))
 		return;
 
-		//Spawn fly effect.
+		// Spawn fly effect.
 		if (item.HitPoints != NOT_TARGETABLE)
 		{
-			int fireflyCount = item.HitPoints - item.ItemFlags[5];
+			int fireflyCount = item.HitPoints - item.ItemFlags[FirefliesItemFlags::Spawncounter];
 
 			if (fireflyCount < 0)
 			{
@@ -173,9 +172,9 @@ namespace TEN::Entities::TR3
 						firefly.Life = 0.0f;
 						firefly.on = false;
 						firefliesToTurnOff--;
+
 						if (firefliesToTurnOff == 0)
 							break;
-
 					}
 				}
 			}
@@ -187,12 +186,9 @@ namespace TEN::Entities::TR3
 				}
 			}
 
-			item.ItemFlags[5] = item.HitPoints;
+			item.ItemFlags[FirefliesItemFlags::Spawncounter] = item.HitPoints;
 			item.HitPoints = NOT_TARGETABLE;
 		}
-
-	
-
 	}
 
 	void HitCorpse(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)

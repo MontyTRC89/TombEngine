@@ -6,17 +6,23 @@ using namespace TEN::Math;
 
 namespace TEN::Effects::Fireflys
 {
-	constexpr auto FISH_COUNT_MAX = 512;
+	enum FirefliesItemFlags
+	{
+		TargetItemPtr,
+		None,
+		Light,
+		TriggerFlags,
+		Empty,
+		Spawncounter,
+		FliesEffect
+	};
 
 	struct FireflyData
 	{
-		int	 MeshIndex	  = 0;
-		bool IsPatrolling = false;
-
 		int SpriteSeqID = ID_DEFAULT_SPRITES;
 		int SpriteID = SPR_UNDERWATERDUST;
+		BlendMode blendMode;
 		unsigned int scalar;
-
 
 		Vector3		Position	   = Vector3::Zero;
 		int			RoomNumber	   = 0;
@@ -24,46 +30,29 @@ namespace TEN::Effects::Fireflys
 		EulerAngles Orientation	   = EulerAngles::Identity;
 		float		Velocity	   = 0.0f;
 
-		float Life		 = 0.0f;
-
 		ItemInfo* TargetItemPtr = nullptr;
 		ItemInfo* LeaderItemPtr = nullptr;
 
-
+		float Life = 0.0f;
 		int Number = 0;
-
 
 		unsigned char rB;
 		unsigned char gB;
 		unsigned char bB;
-
 		unsigned char r;
 		unsigned char g;
 		unsigned char b;
-		float w;
-		unsigned char colFadeSpeed;
-		unsigned char fadeToBlack;
 
 		bool on;
-		int sLife;
-		int life;
-
-		float sSize;
-		float dSize;
 		float size;
-
 		short rotAng;
 
 		int PrevX;
 		int PrevY;
 		int PrevZ;
-	
 		byte PrevR;
 		byte PrevG;
 		byte PrevB;
-		byte PrevScalar;
-
-		BlendMode blendMode;
 
 		void StoreInterpolationData()
 		{
@@ -80,7 +69,6 @@ namespace TEN::Effects::Fireflys
 
 	void InitializeFireflySwarm(short itemNumber);
 	void ControlFireflySwarm(short itemNumber);
-
 	void UpdateFireflySwarm();
 	void ClearFireflySwarm();
 	void SpawnFireflySwarm(ItemInfo& item, int TriggerFlags);
