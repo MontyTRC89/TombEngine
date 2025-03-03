@@ -110,7 +110,7 @@ namespace TEN::Effects::Streamer
 		// Avoid creating "clipped" streamers by clamping max life according to max segment count.
 		int lifeMax = (int)std::min(round(life * FPS), (float)SEGMENT_COUNT_MAX);
 
-		float alpha = (float(segmentCount + SEGMENT_SPAWN_INTERVAL_TIME) / (float)lifeMax) * FADE_IN_COEFF;
+		float alpha = (float(segmentCount * SEGMENT_SPAWN_INTERVAL_TIME) / (float)lifeMax) * FADE_IN_COEFF;
 		float opacityMax = EaseInOutSine(colorEnd.w, colorStart.w, alpha);
 
 		segment.Orientation = AxisAngle(dir, orient);
