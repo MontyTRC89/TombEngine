@@ -367,36 +367,37 @@ This represents the 3D displacement applied by the engine on things like particl
 	// @tparam Vec3 pos World position.
 	// @tparam Vec3 dir Direction vector of movement velocity.
 	// @tparam[opt] float rot Start rotation. __default: 0__
-	// @tparam[opt] Color color Color. __default: Color(255, 255, 255))__
-	// @tparam[opt] float width Width. __default: 0__ 
+	// @tparam[opt] Color startColor Color at the start of life. __default: Color(255, 255, 255))__
+	// @tparam[opt] Color endColor Color at the end of life. __default: Color(0, 0, 0))__
+	// @tparam[opt] float width Width. __default: 0__
 	// @tparam[opt] float life Lifetime in seconds. __default: 1__
-	// @tparam[opt] float vel Movement velocity. __default: 0__
-	// @tparam[opt] float expRate Width expansion rate. __default: 0__
-	// @tparam[opt] float rotRate Rotation rate. __default: 0__
+	// @tparam[opt] float vel Movement velocity in seconds. __default: 0__
+	// @tparam[opt] float expRate Width expansion rate in seconds. With a negative value, the width will contract toward 0. __default: 0__
+	// @tparam[opt] float rotRate Rotation rate in seconds. __default: 0__
 	// @tparam[opt] Effects.FeatherID featherID Edge feathering ID. __default: Effects.FeatherID.NONE__
 	// @tparam[opt] Effects.BlendID blendID Renderer blend ID. __Effects.BlendID.ALPHA_BLEND__
-	static void EmitStreamer (const Moveable& mov, int tag, const Vec3& pos, const Vec3& dir, TypeOrNil<float> rot, TypeOrNil<ScriptColor> color,
-							  TypeOrNil<float> width, TypeOrNil<float> life, TypeOrNil<float> vel, TypeOrNil<float> expRate, TypeOrNil<float> rotRate,
-							  TypeOrNil<StreamerFeatherType> featherID, TypeOrNil<BlendMode> blendID)
+	static void EmitStreamer(const Moveable& mov, int tag, const Vec3& pos, const Vec3& dir, TypeOrNil<float> rot, TypeOrNil<ScriptColor> color,
+							 TypeOrNil<float> width, TypeOrNil<float> life, TypeOrNil<float> vel, TypeOrNil<float> expRate, TypeOrNil<float> rotRate,
+							 TypeOrNil<StreamerFeatherType> featherID, TypeOrNil<BlendMode> blendID)
 	{
 		int movID = mov.GetIndex();
 		auto convertedPos = pos.ToVector3();
 		auto convertedDir = dir.ToVector3();
 		auto convertedRot = ANGLE(ValueOr<float>(rot, 0));
-		auto convertedColor = ValueOr<ScriptColor>(color, ScriptColor(255, 255, 255));
-		// TODO: Add start and end colours to the main effect.
+		auto convertedStartColor = ValueOr<ScriptColor>(color, ScriptColor(255, 255, 255));
+		//auto convertedEndColor = ValueOr<ScriptColor>(color, ScriptColor(0, 0, 0));
 
 		auto convertedWidth = ValueOr<float>(width, 0.0f);
 		auto convertedLife = ValueOr<float>(life, 1.0f);
-		auto convertedVel = ValueOr<float>(vel, 0.0f); // TODO: Per second.
-		auto convertedExpRate = ValueOr<float>(expRate, 0.0f); // TODO: Per second.
-		auto convertedRotRate = ANGLE(ValueOr<short>(rotRate, 0)); // TODO: Per second.
+		auto convertedVel = ValueOr<float>(vel, 0.0f) / (float)FPS;
+		auto convertedExpRate = ValueOr<float>(expRate, 0.0f) / (float)FPS;
+		auto convertedRotRate = ANGLE(ValueOr<float>(rotRate, 0)) / (float)FPS;
 
 		auto convertedFeatherType = ValueOr<StreamerFeatherType>(featherID, StreamerFeatherType::None);
 		auto convertedBlendMode = ValueOr<BlendMode>(blendID, BlendMode::AlphaBlend);
 
 		StreamerEffect.Spawn(
-			movID, tag, convertedPos, convertedDir, convertedRot, convertedColor,
+			movID, tag, convertedPos, convertedDir, convertedRot, convertedStartColor, //convertedEndColor,
 			convertedWidth, convertedLife, convertedVel, convertedExpRate, convertedRotRate,
 			convertedFeatherType, convertedBlendMode);
 	}
