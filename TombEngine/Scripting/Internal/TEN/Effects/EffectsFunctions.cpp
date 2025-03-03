@@ -394,13 +394,13 @@ This represents the 3D displacement applied by the engine on things like particl
 		auto convertedExpRate = ValueOr<float>(expRate, 0.0f) / (float)FPS;
 		auto convertedRotRate = ANGLE(ValueOr<float>(rotRate, 0)) / (float)FPS;
 
-		auto convertedFeatherType = ValueOr<StreamerFeatherType>(featherID, StreamerFeatherType::None);
-		auto convertedBlendMode = ValueOr<BlendMode>(blendID, BlendMode::AlphaBlend);
+		auto convertedFeatherID = ValueOr<StreamerFeatherType>(featherID, StreamerFeatherType::None);
+		auto convertedBlendID = ValueOr<BlendMode>(blendID, BlendMode::AlphaBlend);
 
 		StreamerEffect.Spawn(
 			movID, convertedTag, convertedPos, convertedDir, convertedRot, convertedStartColor, convertedEndColor,
 			convertedWidth, convertedLife, convertedVel, convertedExpRate, convertedRotRate,
-			convertedFeatherType, convertedBlendMode);
+			convertedFeatherID, convertedBlendID);
 	}
 
 	void Register(sol::state* state, sol::table& parent) 
