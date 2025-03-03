@@ -355,7 +355,8 @@ namespace TEN::Entities::Vehicles
 
 	void SpawnVehicleWake(const ItemInfo& vehicleItem, const Vector3& relOffset, int waterHeight, bool isUnderwater)
 	{
-		constexpr auto COLOR			   = Vector4(0.75f);
+		constexpr auto COLOR_START		   = Color(0.75f, 0.75f, 0.75f, 0.75f);
+		constexpr auto COLOR_END		   = Color(0.0f, 0.0f, 0.0f, 0.0f);
 		constexpr auto LIFE_MAX			   = 2.5f;
 		constexpr auto VEL_ABS			   = 4.0f;
 		constexpr auto EXP_RATE_ON_WATER   = 6.0f;
@@ -382,14 +383,14 @@ namespace TEN::Entities::Vehicles
 		// Spawn left wake.
 		StreamerEffect.Spawn(
 			vehicleItem.Index, (int)tagLeft,
-			positions.first, dir, orient2D, COLOR,
+			positions.first, dir, orient2D, COLOR_START, COLOR_END,
 			0.0f, life, vel, expRate, 0,
 			StreamerFeatherType::Right, BlendMode::Additive);
 
 		// Spawn right wake.
 		StreamerEffect.Spawn(
 			vehicleItem.Index, (int)tagRight,
-			positions.second, dir, orient2D, COLOR,
+			positions.second, dir, orient2D, COLOR_START, COLOR_END,
 			0.0f, life, vel, expRate, 0,
 			StreamerFeatherType::Left, BlendMode::Additive);
 	}
