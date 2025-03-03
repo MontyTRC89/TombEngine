@@ -9,10 +9,8 @@ namespace TEN::Effects::Fireflys
 	enum FirefliesItemFlags
 	{
 		TargetItemPtr,
-		None,
 		Light,
 		TriggerFlags,
-		Empty,
 		Spawncounter,
 		FliesEffect
 	};

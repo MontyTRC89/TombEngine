@@ -48,7 +48,7 @@ namespace TEN::Effects::Fireflys
 
         item.HitPoints = DEFAULT_FIREFLY_COUNT;
         item.ItemFlags[FirefliesItemFlags::TargetItemPtr] = item.Index;
-        item.ItemFlags[FirefliesItemFlags::Light] = 1;
+        item.ItemFlags[FirefliesItemFlags::Light] = 1; // 0 = Turn off light effect, 1 = turn on light (DEFAULT).
 
         item.ItemFlags[FirefliesItemFlags::TriggerFlags] = item.TriggerFlags;
 

@@ -56,13 +56,13 @@ namespace TEN::Entities::TR3
 
 		if (item.TriggerFlags == 1)
 		{
-			item.ItemFlags[1] = (int)CorpseFlag::Hang;
+			item.ItemFlags[5] = (int)CorpseFlag::Hang;
 			item.Animation.AnimNumber = object.animIndex + CORPSE_ANIM_HANG;
 			item.Animation.ActiveState = CORPSE_STATE_HANG;
 		}
 		else
 		{
-			item.ItemFlags[1] = (int)CorpseFlag::Grounded;
+			item.ItemFlags[5] = (int)CorpseFlag::Grounded;
 			item.Animation.AnimNumber = object.animIndex + CORPSE_ANIM_GROUNDED;
 			item.Animation.ActiveState = CORPSE_STATE_GROUNDED;
 		}
@@ -80,7 +80,7 @@ namespace TEN::Entities::TR3
 		auto& item = g_Level.Items[itemNumber];
 		const auto& object = Objects[item.ObjectNumber];
 
-		if (item.ItemFlags[1] == (int)CorpseFlag::Fall)
+		if (item.ItemFlags[5] == (int)CorpseFlag::Fall)
 		{
 			bool isWater = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item.RoomNumber);
 			bool isSwamp = TestEnvironment(RoomEnvFlags::ENV_FLAG_SWAMP, item.RoomNumber);
@@ -136,7 +136,7 @@ namespace TEN::Entities::TR3
 				item.Animation.AnimNumber = object.animIndex + CORPSE_ANIM_LAND;
 				AlignEntityToSurface(&item, Vector2(object.radius));
 
-				item.ItemFlags[1] = (int)CorpseFlag::Grounded;
+				item.ItemFlags[5] = (int)CorpseFlag::Grounded;
 				return;
 			}
 			else
@@ -204,9 +204,9 @@ namespace TEN::Entities::TR3
 		{
 			DoBloodSplat(pos->x, pos->y, pos->z, Random::GenerateInt(4, 8), source.Pose.Orientation.y, pos->RoomNumber);
 
-			if (target.ItemFlags[1] == (int)CorpseFlag::Hang)
+			if (target.ItemFlags[5] == (int)CorpseFlag::Hang)
 			{
-				target.ItemFlags[1] = (int)CorpseFlag::Fall;
+				target.ItemFlags[5] = (int)CorpseFlag::Fall;
 				target.Animation.AnimNumber = object.animIndex + CORPSE_ANIM_FALL;
 				target.Animation.ActiveState = CORPSE_STATE_FALL;
 			}
