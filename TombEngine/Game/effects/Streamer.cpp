@@ -24,9 +24,12 @@ namespace TEN::Effects::Streamer
 	{
 		StoreInterpolationData();
 
-		// Update opacity.
-		if (Color.w > 0.0f)
-			Color.w = EaseInOutSine(0.0f, OpacityMax, Life / LifeMax);
+		// Update color.
+		float alpha = (float)Life / (float)LifeMax;
+		Color.x = EaseInOutSine(ColorEnd.x, ColorStart.x, alpha);
+		Color.y = EaseInOutSine(ColorEnd.y, ColorStart.y, alpha);
+		Color.z = EaseInOutSine(ColorEnd.z, ColorStart.z, alpha);
+		Color.w = EaseInOutSine(ColorEnd.w, ColorStart.w, alpha);
 
 		// TODO: Not working. Make it work. -- Sezz 2025.03.02
 		// Update orientation.
@@ -36,7 +39,7 @@ namespace TEN::Effects::Streamer
 		TransformVertices(Velocity, ExpRate);
 
 		// Update life.
-		Life -= 1.0f;
+		Life--;
 	}
 
 	void Streamer::StreamerSegment::TransformVertices(float vel, float expRate)
@@ -95,24 +98,25 @@ namespace TEN::Effects::Streamer
 		return _isBroken;
 	}
 
-	void Streamer::AddSegment(const Vector3& pos, const Vector3& dir, short orient, const Vector4& color,
+	void Streamer::AddSegment(const Vector3& pos, const Vector3& dir, short orient, const Color& colorStart, const Color& colorEnd,
 							  float width, float life, float vel, float expRate, short rot, unsigned int segmentCount)
 	{
 		constexpr auto FADE_IN_COEFF = 3.0f;
 
 		auto& segment = GetNewSegment();
 
-		// Avoid "clipped" streamers by clamping max life according to max segment count.
-		float lifeMax = std::min(round(life * FPS), (float)SEGMENT_COUNT_MAX);
+		// Avoid creating "clipped" streamers by clamping max life according to max segment count.
+		int lifeMax = (int)std::min(round(life * FPS), (float)SEGMENT_COUNT_MAX);
 
-		float alpha = (segmentCount / lifeMax) * FADE_IN_COEFF;
-		float opacityMax = EaseInOutSine(0.0f, color.w, alpha);
+		float alpha = ((float)segmentCount / (float)lifeMax) * FADE_IN_COEFF;
+		float opacityMax = EaseInOutSine(colorEnd.w, colorStart.w, alpha);
 
 		segment.Orientation = AxisAngle(dir, orient);
-		segment.Color = Vector4(color.x, color.y, color.z, opacityMax);
+		segment.Color =
+		segment.ColorStart = Vector4(colorStart.x, colorStart.y, colorStart.z, opacityMax);
+		segment.ColorEnd = colorEnd;
 		segment.Life =
 		segment.LifeMax = lifeMax;
-		segment.OpacityMax = opacityMax;
 		segment.Velocity = vel;
 		segment.ExpRate = expRate;
 		segment.Rotation = rot;
@@ -153,7 +157,7 @@ namespace TEN::Effects::Streamer
 		return _pools;
 	}
 
-	void StreamerGroup::AddStreamer(int tag, const Vector3& pos, const Vector3& dir, short orient, const Vector4& color,
+	void StreamerGroup::AddStreamer(int tag, const Vector3& pos, const Vector3& dir, short orient, const Color& colorStart, const Color& colorEnd,
 									float width, float life, float vel, float expRate, short rot,
 									StreamerFeatherType featherType, BlendMode blendMode)
 	{
@@ -165,7 +169,7 @@ namespace TEN::Effects::Streamer
 
 		// Get new streamer iteration or extend existing streamer iteration with new segment.
 		auto& streamer = GetStreamerIteration(tag, featherType, blendMode);
-		streamer.AddSegment(pos, dir, orient, color, width, life, vel, expRate, rot, (unsigned int)streamer.GetSegments().size());
+		streamer.AddSegment(pos, dir, orient, colorStart, colorEnd, width, life, vel, expRate, rot, (unsigned int)streamer.GetSegments().size());
 	}
 
 	void StreamerGroup::Update()
@@ -247,7 +251,7 @@ namespace TEN::Effects::Streamer
 		return _groups;
 	}
 
-	void StreamerEffectController::Spawn(int itemNumber, int tag, const Vector3& pos, const Vector3& dir, short orient, const Vector4& color,
+	void StreamerEffectController::Spawn(int itemNumber, int tag, const Vector3& pos, const Vector3& dir, short orient, const Color& colorStart, const Color& colorEnd,
 										 float width, float life, float vel, float expRate, short rot,
 										 StreamerFeatherType featherType, BlendMode blendMode)
 	{
@@ -259,7 +263,7 @@ namespace TEN::Effects::Streamer
 
 		// Get group and extend streamer within pool.
 		auto& group = GetGroup(itemNumber);
-		group.AddStreamer(tag, pos, dir, orient, color, width, life, vel, expRate, rot, featherType, blendMode);
+		group.AddStreamer(tag, pos, dir, orient, colorStart, colorEnd, width, life, vel, expRate, rot, featherType, blendMode);
 	}
 
 	void StreamerEffectController::Update()
