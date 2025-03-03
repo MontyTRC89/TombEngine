@@ -63,7 +63,7 @@
 <h2>3 Primitive Classes</h2>
 <ul class="nowrap">
   <li>    <a href="../3 primitive classes/Flow.Fog.html">Flow.Fog</a></li>
-  <li>    <here>Flow.InventoryItem</here></li>
+  <li>    <a href="../3 primitive classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
   <li>    <a href="../3 primitive classes/Flow.LensFlare.html">Flow.LensFlare</a></li>
   <li>    <a href="../3 primitive classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
   <li>    <a href="../3 primitive classes/Flow.Starfield.html">Flow.Starfield</a></li>
@@ -77,7 +77,7 @@
 <ul class="nowrap">
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
-  <li>    <a href="../4 enums/Effects.FeatherID.html">Effects.FeatherID</a></li>
+  <li>    <here>Effects.FeatherID</here></li>
   <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
   <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
@@ -109,18 +109,18 @@
 
 <div id="content">
 
-<h1>Primitive Class <code>Flow.InventoryItem</code></h1>
-<p>Represents the properties of an object as it appears in the inventory.</p>
+<h1>Enum <code>Effects.FeatherID</code></h1>
+<p>Constants for feather IDs.</p>
 <p>
 
 </p>
 
 
-<h2><a href="#Functions">Functions</a></h2>
+<h2><a href="#Tables">Tables</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#InventoryItem">InventoryItem(nameKey, objectID, yOffset, scale, rot, axis, meshBits, action)</a></td>
-	<td class="summary">Create an InventoryItem.</td>
+	<td class="name" ><a href="#Effects.FeatherID">Effects.FeatherID</a></td>
+	<td class="summary">Table of Effects.FeatherID constants.</td>
 	</tr>
 </table>
 
@@ -128,78 +128,30 @@
 <br/>
 
 
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
 
     <dl class="function">
     <dt>
-    <a name = "InventoryItem"></a>
-    <strong>InventoryItem(nameKey, objectID, yOffset, scale, rot, axis, meshBits, action)</strong>
+    <a name = "Effects.FeatherID"></a>
+    <strong>Effects.FeatherID</strong>
     </dt>
     <dd>
-    Create an InventoryItem.
+
+<p>Table of Effects.FeatherID constants.
+ To be used with <a href="../1 modules/Effects.html#EmitStreamer">Effects.EmitStreamer</a> function.</p>
+
+<ul>
+    <li><code>NONE</code></li>
+    <li><code>CENTER</code></li>
+    <li><code>LEFT</code></li>
+    <li><code>RIGHT</code></li>
+</ul>
 
 
 
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">nameKey</span>
-            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-         key for the item's (localised) name.<br />
-Corresponds to an entry in strings.lua.
-        </li>
-        <li><span class="parameter">objectID</span>
-            <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-         object ID of the inventory object to change
-        </li>
-        <li><span class="parameter">yOffset</span>
-            <span class="types"><span class="type">float</span></span>
-         y-axis offset (positive values move the item down).<br />
-A value of about 100 will cause the item to display directly below its usual position.
-        </li>
-        <li><span class="parameter">scale</span>
-            <span class="types"><span class="type">float</span></span>
-         item size (1 being standard size).<br />
-A value of 0.5 will cause the item to render at half the size,
-and a value of 2 will cause the item to render at twice the size.
-        </li>
-        <li><span class="parameter">rot</span>
-            <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
-         rotation around x, y, and z axes
-        </li>
-        <li><span class="parameter">axis</span>
-            <span class="types"><span class="type">RotationAxis</span></span>
-         Axis to rotate around when the item is observed at in the inventory.<br />
-Note that this is entirely separate from the <code>rot</code> field described above.
-Must one of the following:</p>
-<pre><code>X
-Y
-Z
-</code></pre>
-<p>e.g. <code>myItem.rotAxisWhenCurrent = RotationAxis.X</code>
-        </li>
-        <li><span class="parameter">meshBits</span>
-            <span class="types"><span class="type">int</span></span>
-         <strong>Not currently implemented</strong> (will have no effect regardless of what you set it to)
-        </li>
-        <li><span class="parameter">action</span>
-            <span class="types"><span class="type">ItemAction</span></span>
-         is this usable, equippable, combineable or examinable?<br/>
-Must be one of:</p>
-<pre><code>EQUIP
-USE
-COMBINE
-EXAMINE
-</code></pre>
-<p>e.g. <code>myItem.action = ItemAction.EXAMINE</code>
-        </li>
-    </ul>
 
-    <h3>Returns:</h3>
-    <ol>
 
-           <span class="types"><a class="type" href="../3 primitive classes/Flow.InventoryItem.html#InventoryItem">InventoryItem</a></span>
-        an InventoryItem
-    </ol>
+
 
 
 

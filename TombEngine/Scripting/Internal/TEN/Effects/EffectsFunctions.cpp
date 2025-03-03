@@ -10,6 +10,7 @@
 #include "Game/effects/Electricity.h"
 #include "Game/effects/explosion.h"
 #include "Game/effects/spark.h"
+#include "Game/effects/Streamer.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/Setup.h"
@@ -20,6 +21,9 @@
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Effects/BlendIDs.h"
 #include "Scripting/Internal/TEN/Effects/EffectIDs.h"
+#include "Scripting/Internal/TEN/Effects/FeatherIDs.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
+#include "Scripting/Internal/TEN/Objects/ObjectsHandler.h"
 #include "Scripting/Internal/TEN/Types/Color/Color.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
@@ -37,6 +41,7 @@ using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
 using namespace TEN::Effects::Spark;
+using namespace TEN::Effects::Streamer;
 using namespace TEN::Math;
 using namespace TEN::Scripting::Types;
 
@@ -325,6 +330,49 @@ namespace TEN::Scripting::Effects
 		AddFire(pos.x, pos.y, pos.z, FindRoomNumber(Vector3i(pos.x, pos.y, pos.z)), ValueOr<float>(size, 1));
 	}
 
+	/// Emit an extending streamer effect.
+	// @function EmitStreamer
+	// @tparam Moveable mov Moveable object with which to associate the effect.
+	// @tparam int[opt] tag Numeric tag with which to associate the effect on the moveable. __default: 0__
+	// @tparam Vec3 pos World position.
+	// @tparam Vec3 dir Direction vector of movement velocity.
+	// @tparam[opt] float rot Start rotation in degrees. __default: 0__
+	// @tparam[opt] Color startColor Color at the start of life. __default: Color(255, 255, 255, 255))__
+	// @tparam[opt] Color endColor Color at the end of life. __default: Color(0, 0, 0, 0))__
+	// @tparam[opt] float width Width in world units. __default: 0__
+	// @tparam[opt] float life Lifetime in seconds. __default: 1__
+	// @tparam[opt] float vel Movement velocity in world units per second. __default: 0__
+	// @tparam[opt] float expRate Width expansion rate in world units per second. __default: 0__
+	// @tparam[opt] float rotRate Rotation rate in degrees per second. __default: 0__
+	// @tparam[opt] Effects.FeatherID featherID Edge feathering ID. __default: Effects.FeatherID.NONE__
+	// @tparam[opt] Effects.BlendID blendID Renderer blend ID. __Effects.BlendID.ALPHA_BLEND__
+	static void EmitStreamer(const Moveable& mov, TypeOrNil<int> tag, const Vec3& pos, const Vec3& dir, TypeOrNil<float> rot, TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor,
+							 TypeOrNil<float> width, TypeOrNil<float> life, TypeOrNil<float> vel, TypeOrNil<float> expRate, TypeOrNil<float> rotRate,
+							 TypeOrNil<StreamerFeatherType> featherID, TypeOrNil<BlendMode> blendID)
+	{
+		int movID = mov.GetIndex();
+		int convertedTag = ValueOr<int>(tag, 0);
+		auto convertedPos = pos.ToVector3();
+		auto convertedDir = dir.ToVector3();
+		auto convertedRot = ANGLE(ValueOr<float>(rot, 0));
+		auto convertedStartColor = ValueOr<ScriptColor>(startColor, ScriptColor(255, 255, 255, 255));
+		auto convertedEndColor = ValueOr<ScriptColor>(endColor, ScriptColor(0, 0, 0, 0));
+
+		auto convertedWidth = ValueOr<float>(width, 0.0f);
+		auto convertedLife = ValueOr<float>(life, 1.0f);
+		auto convertedVel = ValueOr<float>(vel, 0.0f) / (float)FPS;
+		auto convertedExpRate = ValueOr<float>(expRate, 0.0f) / (float)FPS;
+		auto convertedRotRate = ANGLE(ValueOr<float>(rotRate, 0.0f) / (float)FPS);
+
+		auto convertedFeatherID = ValueOr<StreamerFeatherType>(featherID, StreamerFeatherType::None);
+		auto convertedBlendID = ValueOr<BlendMode>(blendID, BlendMode::AlphaBlend);
+
+		StreamerEffect.Spawn(
+			movID, convertedTag, convertedPos, convertedDir, convertedRot, convertedStartColor, convertedEndColor,
+			convertedWidth, convertedLife, convertedVel, convertedExpRate, convertedRotRate,
+			convertedFeatherID, convertedBlendID);
+	}
+
 /***Make an explosion. Does not hurt Lara
 @function MakeExplosion 
 @tparam Vec3 pos
@@ -348,7 +396,7 @@ namespace TEN::Scripting::Effects
 
 	/// Get the wind vector for the current game frame.
 	// This represents the 3D displacement applied by the engine on things like particles affected by wind.
-	// @function GetWind()
+	// @function GetWind
 	// @treturn Vec3 Wind vector.
 	static Vec3 GetWind()
 	{
@@ -360,6 +408,10 @@ namespace TEN::Scripting::Effects
 		auto tableEffects = sol::table(state->lua_state(), sol::create);
 		parent.set(ScriptReserved_Effects, tableEffects);
 
+		// Getters
+		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
+
+		// Utilities
 		tableEffects.set_function(ScriptReserved_EmitLightningArc, &EmitLightningArc);
 		tableEffects.set_function(ScriptReserved_EmitParticle, &EmitParticle);
 		tableEffects.set_function(ScriptReserved_EmitShockwave, &EmitShockwave);
@@ -367,13 +419,15 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_EmitSpotLight, &EmitSpotLight);
 		tableEffects.set_function(ScriptReserved_EmitBlood, &EmitBlood);
 		tableEffects.set_function(ScriptReserved_EmitAirBubble, &EmitAirBubble);
-		tableEffects.set_function(ScriptReserved_MakeExplosion, &MakeExplosion);
 		tableEffects.set_function(ScriptReserved_EmitFire, &EmitFire);
+		tableEffects.set_function(ScriptReserved_EmitStreamer, &EmitStreamer);
+		tableEffects.set_function(ScriptReserved_MakeExplosion, &MakeExplosion);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
-		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
 
+		// Enums
 		auto handler = LuaHandler{ state };
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_BlendID, BLEND_IDS);
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_EffectID, EFFECT_IDS);
+		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_FeatherID, FEATHER_IDS);
 	}
 }
