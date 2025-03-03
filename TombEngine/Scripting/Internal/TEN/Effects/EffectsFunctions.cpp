@@ -362,7 +362,7 @@ namespace TEN::Scripting::Effects
 		auto convertedLife = ValueOr<float>(life, 1.0f);
 		auto convertedVel = ValueOr<float>(vel, 0.0f) / (float)FPS;
 		auto convertedExpRate = ValueOr<float>(expRate, 0.0f) / (float)FPS;
-		auto convertedRotRate = ANGLE(ValueOr<float>(rotRate, 0) / (float)FPS);
+		auto convertedRotRate = ANGLE(ValueOr<float>(rotRate, 0.0f) / (float)FPS);
 
 		auto convertedFeatherID = ValueOr<StreamerFeatherType>(featherID, StreamerFeatherType::None);
 		auto convertedBlendID = ValueOr<BlendMode>(blendID, BlendMode::AlphaBlend);
