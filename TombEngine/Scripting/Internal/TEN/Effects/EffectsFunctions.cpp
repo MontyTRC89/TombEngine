@@ -372,7 +372,7 @@ This represents the 3D displacement applied by the engine on things like particl
 	// @tparam[opt] float width Width in world units. __default: 0__
 	// @tparam[opt] float life Lifetime in seconds. __default: 1__
 	// @tparam[opt] float vel Movement velocity in world units per second. __default: 0__
-	// @tparam[opt] float expRate Width expansion rate in world units per second. With a negative value, the width will contract toward 0. __default: 0__
+	// @tparam[opt] float expRate Width expansion rate in world units per second. __default: 0__
 	// @tparam[opt] float rotRate Rotation rate in degrees per second. __default: 0__
 	// @tparam[opt] Effects.FeatherID featherID Edge feathering ID. __default: Effects.FeatherID.NONE__
 	// @tparam[opt] Effects.BlendID blendID Renderer blend ID. __Effects.BlendID.ALPHA_BLEND__
