@@ -337,8 +337,8 @@ namespace TEN::Scripting::Effects
 	// @tparam Vec3 pos World position.
 	// @tparam Vec3 dir Direction vector of movement velocity.
 	// @tparam[opt] float rot Start rotation in degrees. __default: 0__
-	// @tparam[opt] Color startColor Color at the start of life. __default: Color(255, 255, 255))__
-	// @tparam[opt] Color endColor Color at the end of life. __default: Color(0, 0, 0))__
+	// @tparam[opt] Color startColor Color at the start of life. __default: Color(255, 255, 255, 255))__
+	// @tparam[opt] Color endColor Color at the end of life. __default: Color(0, 0, 0, 0))__
 	// @tparam[opt] float width Width in world units. __default: 0__
 	// @tparam[opt] float life Lifetime in seconds. __default: 1__
 	// @tparam[opt] float vel Movement velocity in world units per second. __default: 0__
@@ -355,8 +355,8 @@ namespace TEN::Scripting::Effects
 		auto convertedPos = pos.ToVector3();
 		auto convertedDir = dir.ToVector3();
 		auto convertedRot = ANGLE(ValueOr<float>(rot, 0));
-		auto convertedStartColor = ValueOr<ScriptColor>(startColor, ScriptColor(255, 255, 255));
-		auto convertedEndColor = ValueOr<ScriptColor>(endColor, ScriptColor(0, 0, 0));
+		auto convertedStartColor = ValueOr<ScriptColor>(startColor, ScriptColor(255, 255, 255, 255));
+		auto convertedEndColor = ValueOr<ScriptColor>(endColor, ScriptColor(0, 0, 0, 0));
 
 		auto convertedWidth = ValueOr<float>(width, 0.0f);
 		auto convertedLife = ValueOr<float>(life, 1.0f);
