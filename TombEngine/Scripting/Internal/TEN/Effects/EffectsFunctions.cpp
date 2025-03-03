@@ -376,7 +376,7 @@ This represents the 3D displacement applied by the engine on things like particl
 	// @tparam[opt] float rotRate Rotation rate in seconds. __default: 0__
 	// @tparam[opt] Effects.FeatherID featherID Edge feathering ID. __default: Effects.FeatherID.NONE__
 	// @tparam[opt] Effects.BlendID blendID Renderer blend ID. __Effects.BlendID.ALPHA_BLEND__
-	static void EmitStreamer(const Moveable& mov, TypeOrNil<int> tag, const Vec3& pos, const Vec3& dir, TypeOrNil<float> rot, TypeOrNil<ScriptColor> color,
+	static void EmitStreamer(const Moveable& mov, TypeOrNil<int> tag, const Vec3& pos, const Vec3& dir, TypeOrNil<float> rot, TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor,
 							 TypeOrNil<float> width, TypeOrNil<float> life, TypeOrNil<float> vel, TypeOrNil<float> expRate, TypeOrNil<float> rotRate,
 							 TypeOrNil<StreamerFeatherType> featherID, TypeOrNil<BlendMode> blendID)
 	{
@@ -385,8 +385,8 @@ This represents the 3D displacement applied by the engine on things like particl
 		auto convertedPos = pos.ToVector3();
 		auto convertedDir = dir.ToVector3();
 		auto convertedRot = ANGLE(ValueOr<float>(rot, 0));
-		auto convertedStartColor = ValueOr<ScriptColor>(color, ScriptColor(255, 255, 255));
-		//auto convertedEndColor = ValueOr<ScriptColor>(color, ScriptColor(0, 0, 0));
+		auto convertedStartColor = ValueOr<ScriptColor>(startColor, ScriptColor(255, 255, 255));
+		auto convertedEndColor = ValueOr<ScriptColor>(endColor, ScriptColor(0, 0, 0));
 
 		auto convertedWidth = ValueOr<float>(width, 0.0f);
 		auto convertedLife = ValueOr<float>(life, 1.0f);
@@ -398,7 +398,7 @@ This represents the 3D displacement applied by the engine on things like particl
 		auto convertedBlendMode = ValueOr<BlendMode>(blendID, BlendMode::AlphaBlend);
 
 		StreamerEffect.Spawn(
-			movID, convertedTag, convertedPos, convertedDir, convertedRot, convertedStartColor, //convertedEndColor,
+			movID, convertedTag, convertedPos, convertedDir, convertedRot, convertedStartColor, convertedEndColor,
 			convertedWidth, convertedLife, convertedVel, convertedExpRate, convertedRotRate,
 			convertedFeatherType, convertedBlendMode);
 	}
