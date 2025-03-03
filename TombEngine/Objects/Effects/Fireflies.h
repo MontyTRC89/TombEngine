@@ -12,7 +12,7 @@ namespace TEN::Effects::Fireflys
 	{
 		int	 MeshIndex	  = 0;
 		bool IsPatrolling = false;
-		bool IsLethal	  = false;
+
 		int SpriteSeqID = ID_DEFAULT_SPRITES;
 		int SpriteID = SPR_UNDERWATERDUST;
 		unsigned int scalar;
@@ -25,7 +25,6 @@ namespace TEN::Effects::Fireflys
 		float		Velocity	   = 0.0f;
 
 		float Life		 = 0.0f;
-		float Undulation = 0.0f;
 
 		ItemInfo* TargetItemPtr = nullptr;
 		ItemInfo* LeaderItemPtr = nullptr;
@@ -84,4 +83,5 @@ namespace TEN::Effects::Fireflys
 
 	void UpdateFireflySwarm();
 	void ClearFireflySwarm();
+	void SpawnFireflySwarm(ItemInfo& item, int TriggerFlags);
 }

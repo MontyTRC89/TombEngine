@@ -37,32 +37,38 @@ namespace TEN::Effects::Fireflys
     constexpr auto FIREFLY_FLEE_DISTANCE = BLOCK(0.7);
     constexpr auto FIREFLY_RETURN_DISTANCE = BLOCK(4);
     constexpr auto MAX_FIREFLIES = 64;
+    constexpr auto DEFAULT_FIREFLY_COUNT = 24;
+    constexpr auto FIREFLY_RISE_UP_FACTOR = 200;
+
+    enum FirefliesItemFlags
+    {
+        LeaderItemPtr,
+        Nothing,
+        TargetItemPtr,
+        TriggerFlags,
+        Sound
+    };
 
     std::vector<FireflyData> FireflySwarm = {};
     std::unordered_map<int, int> nextFireflyNumberMap; //Numbering the Fireflies for Streamer effect
 
     void InitializeFireflySwarm(short itemNumber)
     {
-        constexpr auto DEFAULT_FIREFLY_COUNT = 24;
+ 
 
         auto& item = g_Level.Items[itemNumber];
 
         item.StartPose.Position = item.Pose.Position;
         item.Animation.Velocity.z = Random::GenerateFloat(32.0f, 160.0f);
         item.HitPoints = DEFAULT_FIREFLY_COUNT;
-        item.ItemFlags[0] = item.Index;
-        item.ItemFlags[1] = item.Index;
+        item.ItemFlags[FirefliesItemFlags::LeaderItemPtr] = item.Index;
+        item.ItemFlags[2] = item.Index;
+        item.ItemFlags[3] = item.TriggerFlags;
         item.ItemFlags[5] = 0;
-        item.ItemFlags[4] = 0;
-        item.ItemFlags[6] = 1;
-
-        if (item.AIBits)
-            item.ItemFlags[6] = true;
-
-        item.HitPoints = 16;
+        item.ItemFlags[6] = 0;
     }
 
-    static void SpawnFireflySwarm(ItemInfo& item)
+  void SpawnFireflySwarm(ItemInfo& item, int TriggerFlags)
     {
         constexpr auto VEL_MAX = 34.0f;
         constexpr auto VEL_MIN = 6.0f;
@@ -77,7 +83,7 @@ namespace TEN::Effects::Fireflys
         unsigned char g = 255;
         unsigned char b = 255;
 
-        if (item.TriggerFlags >= 0)
+        if (TriggerFlags >= 0)
         {
 
             float brightnessShift = Random::GenerateFloat(-0.1f, 0.1f);
@@ -110,8 +116,6 @@ namespace TEN::Effects::Fireflys
         
         firefly.rotAng = ANGLE(0.0f);
         firefly.on = true;
-
-        firefly.IsLethal = false;
  
         firefly.Position = item.Pose.Position.ToVector3();
         firefly.RoomNumber = item.RoomNumber;
@@ -119,7 +123,6 @@ namespace TEN::Effects::Fireflys
         firefly.Velocity = Random::GenerateFloat(VEL_MIN, VEL_MAX);
 
         firefly.Life = Random::GenerateInt(1, 200);
-        firefly.Undulation = Random::GenerateFloat(0.0f, PI_MUL_2);
 
         firefly.LeaderItemPtr = &g_Level.Items[item.ItemFlags[0]];
         firefly.TargetItemPtr = &g_Level.Items[item.ItemFlags[0]];
@@ -170,7 +173,7 @@ namespace TEN::Effects::Fireflys
             {
                 for (int i = 0; i < fireflyCount; i++)
                 {
-                    SpawnFireflySwarm(item);
+                    SpawnFireflySwarm(item, item.TriggerFlags);
                 }
             }
 
@@ -189,7 +192,7 @@ namespace TEN::Effects::Fireflys
         auto& playerRoom = g_Level.Rooms[playerItem.RoomNumber];
 
         // Circle around target item.
-        item.ItemFlags[1] = item.ItemFlags[0];
+        item.ItemFlags[2] = item.ItemFlags[FirefliesItemFlags::LeaderItemPtr];
 
         for (auto& firefly : FireflySwarm)
         {
@@ -221,22 +224,31 @@ namespace TEN::Effects::Fireflys
             if (firefly.Life <= 0.0f || !firefly.on)
                 continue;
 
+            if (firefly.TargetItemPtr->ItemFlags[6])
+            {
+                firefly.r = 0;
+                firefly.g = 0;
+                firefly.b = 0;
+
+                continue;
+            }
+
             firefly.StoreInterpolationData();
 
             auto& leaderItem = *firefly.LeaderItemPtr;
 
             firefly.PositionTarget = Random::GeneratePointInSphere(SPHERE);
 
-            int multipler = firefly.TargetItemPtr->TriggerFlags;
 
-            int multiplierX = CLICK(firefly.TargetItemPtr->TriggerFlags * 2);
-            int multiplierY = CLICK(firefly.TargetItemPtr->TriggerFlags * 4);
-            int multiplierZ = CLICK(firefly.TargetItemPtr->TriggerFlags * 2);
+            int multiplierX = CLICK(firefly.TargetItemPtr->ItemFlags[3] * 2);
+            int multiplierY = CLICK(firefly.TargetItemPtr->ItemFlags[3] * 4);
+            int multiplierZ = CLICK(firefly.TargetItemPtr->ItemFlags[3] * 2);
 
             auto SPHEROID_SEMI_MAJOR_AXIS = Vector3(multiplierX, multiplierY, multiplierZ);
 
+            auto itemPos = Vector3i(firefly.TargetItemPtr->Pose.Position.x, firefly.TargetItemPtr->Pose.Position.y - FIREFLY_RISE_UP_FACTOR, firefly.TargetItemPtr->Pose.Position.z);
             // Calculate desired position based on target object and random offsets.
-            auto desiredPos = firefly.TargetItemPtr->Pose.Position + Random::GeneratePointInSpheroid(firefly.PositionTarget, EulerAngles::Identity, SPHEROID_SEMI_MAJOR_AXIS);
+            auto desiredPos = itemPos + Random::GeneratePointInSpheroid(firefly.PositionTarget, EulerAngles::Identity, SPHEROID_SEMI_MAJOR_AXIS);
             auto dir = desiredPos - firefly.Position;
 
             auto dirs = dir.ToVector3();
@@ -343,7 +355,7 @@ namespace TEN::Effects::Fireflys
 
 
             
-            if (firefly.TargetItemPtr->ItemFlags[6] = 1 && firefly.TargetItemPtr->TriggerFlags >= 0)
+            if (firefly.TargetItemPtr->ItemFlags[6] = 1 && firefly.TargetItemPtr->ItemFlags[3] >= 0)
             {
 
 
@@ -352,7 +364,7 @@ namespace TEN::Effects::Fireflys
                 StreamerEffect.Spawn(firefly.TargetItemPtr->Index, firefly.Number, pos, direction0, orient2D, Vector4(firefly.r / (float)UCHAR_MAX, firefly.g / (float)UCHAR_MAX, firefly.b / (float)UCHAR_MAX, 1.0f),
                  0.0f, 0.11f, 20.0f, 0.1f, 0.0f, StreamerFeatherType::None, BlendMode::Additive);
             }
-            else if (firefly.TargetItemPtr->TriggerFlags < 0)
+            else if (firefly.TargetItemPtr->ItemFlags[3] < 0)
             {
                 StreamerEffect.Spawn(firefly.TargetItemPtr->Index, firefly.Number, pos, direction0, orient2D, Vector4((firefly.r / 3) / (float)UCHAR_MAX, (firefly.g / 3) / (float)UCHAR_MAX, (firefly.b / 3) / (float)UCHAR_MAX, 0.2f),
                     0.0f, 0.6f, 0.0f, 0.4f, 0.0f, StreamerFeatherType::None, BlendMode::Subtractive);
@@ -362,6 +374,10 @@ namespace TEN::Effects::Fireflys
                // firefly.b = 0;//static_cast<unsigned char>(firefly.bB / alphaFactor);
 
             }
+
+            //Lift Position y slightly up so that the fireflies are not directly on the floor.
+            //firefly.TargetItemPtr->Pose.Position.y -= FIREFLY_RISE_UP_FACTOR;
+
         }
     }
 

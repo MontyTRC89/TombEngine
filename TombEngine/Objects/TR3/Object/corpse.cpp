@@ -17,6 +17,7 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Objects/Effects/Fireflies.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
@@ -25,9 +26,13 @@ using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Splash;
 using namespace TEN::Math;
+using namespace TEN::Effects::Fireflys;
 
 namespace TEN::Entities::TR3
 {
+	constexpr auto FLY_EFFECT_MAX_WIDTH = -1;
+	constexpr auto LANDING_BUFFER = 150;
+
 	enum CorpseState
 	{
 		CORPSE_STATE_GROUNDED = 0,
@@ -64,6 +69,11 @@ namespace TEN::Entities::TR3
 
 		AddActiveItem(itemNumber);
 		item.Status = ITEM_ACTIVE;
+
+		item.ItemFlags[0] = item.Index;
+		item.ItemFlags[2] = item.Index;
+		item.ItemFlags[3] = -1;
+		item.HitPoints = 16;
 	}
 
 	void ControlCorpse(short itemNumber)
@@ -74,13 +84,15 @@ namespace TEN::Entities::TR3
 		if (item.ItemFlags[1] == (int)CorpseFlag::Fall)
 		{
 			bool isWater = TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item.RoomNumber);
+			bool isSwamp = TestEnvironment(RoomEnvFlags::ENV_FLAG_SWAMP, item.RoomNumber);
+
 			float verticalVelCoeff = isWater ? 81.0f : 1.0f;
 			
 			auto pointColl = GetPointCollision(item);
 			if (item.RoomNumber != pointColl.GetRoomNumber())
 			{
 				if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, pointColl.GetRoomNumber()) &&
-					!TestEnvironment(RoomEnvFlags::ENV_FLAG_WATER, item.RoomNumber))
+					!isWater)
 				{
 					int waterHeight = pointColl.GetWaterTopHeight();
 					SplashSetup.Position = Vector3(item.Pose.Position.x, waterHeight - 1, item.Pose.Position.z);
@@ -94,10 +106,20 @@ namespace TEN::Entities::TR3
 				ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
 			}
 
+			//Remove fly effect when in water.
+			if (isWater || isSwamp)
+			{
+				item.ItemFlags[6] = 1;
+			}
+			else
+			{
+				item.ItemFlags[6] = 0;
+			}
+
 			pointColl = GetPointCollision(item);
 			item.Animation.IsAirborne = true;
 
-			if (pointColl.GetFloorHeight() < item.Pose.Position.y)
+			if (pointColl.GetFloorHeight() < item.Pose.Position.y + LANDING_BUFFER)
 			{
 				if (!isWater)
 				{
@@ -134,17 +156,43 @@ namespace TEN::Entities::TR3
 		AnimateItem(&item);
 
 		if (!TriggerActive(&item))
-			return;
+		return;
 
-		int meshCount = object.nmeshes;
-		for (int i = 0; i < meshCount; i++)
+		//Spawn fly effect.
+		if (item.HitPoints != NOT_TARGETABLE)
 		{
-			if (Random::TestProbability(1 / 72.0f))
+			int fireflyCount = item.HitPoints - item.ItemFlags[5];
+
+			if (fireflyCount < 0)
 			{
-				auto pos = GetJointPosition(&item, i).ToVector3();
-				SpawnCorpseEffect(pos);
+				int firefliesToTurnOff = -fireflyCount;
+				for (auto& firefly : FireflySwarm)
+				{
+					if (firefly.LeaderItemPtr == &item && firefly.Life > 0.0f)
+					{
+						firefly.Life = 0.0f;
+						firefly.on = false;
+						firefliesToTurnOff--;
+						if (firefliesToTurnOff == 0)
+							break;
+
+					}
+				}
 			}
+			else if (fireflyCount > 0)
+			{
+				for (int i = 0; i < fireflyCount; i++)
+				{
+					SpawnFireflySwarm(item, FLY_EFFECT_MAX_WIDTH);
+				}
+			}
+
+			item.ItemFlags[5] = item.HitPoints;
+			item.HitPoints = NOT_TARGETABLE;
 		}
+
+	
+
 	}
 
 	void HitCorpse(ItemInfo& target, ItemInfo& source, std::optional<GameVector> pos, int damage, bool isExplosive, int jointIndex)
