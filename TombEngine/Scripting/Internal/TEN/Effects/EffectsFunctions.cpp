@@ -21,7 +21,7 @@
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Effects/BlendIDs.h"
 #include "Scripting/Internal/TEN/Effects/EffectIDs.h"
-#include "Scripting/Internal/TEN/Effects/FeatherType.h"
+#include "Scripting/Internal/TEN/Effects/FeatherIDs.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 #include "Scripting/Internal/TEN/Objects/ObjectsHandler.h"
 #include "Scripting/Internal/TEN/Types/Color/Color.h"
@@ -360,38 +360,45 @@ This represents the 3D displacement applied by the engine on things like particl
 		return Vec3(Weather.Wind());
 	}
 
-/***Emits a streamer per frame.
-@function EmitStreamer
-@tparam Moveable mov Moveable object from which to spawn streamers..
-@tparam[opt] int Id The Id of the streamer (0-7). Each Moveable object can have up to 8 streamers, and each streamer needs to be defined separately. __Default: 0__
-@tparam Vec3 position The position where the effect will be spawned.
-@tparam Vec3 direction The normal indicating the direction of the streamer.
-@tparam[opt] short orientation The angle of the streamer. A value of 90 will make the streamer entirely vertical. __Default: 0__
-@tparam[opt] Color color The color of streamer. __Default: Color(255, 255, 255))__
-@tparam[opt] float width The width of the streamer.__Default: 1__ 
-@tparam[opt] float life The lifetime of the streamer in seconds. __Default: 1__
-@tparam[opt] float velocity The speed at which the streamer moves in the direction of the normal.__Default: 1__
-@tparam[opt] float scaleRate The rate at which the streamer scales. __Default: 1__
-@tparam[opt] float rotation The rotation of the streamer over its lifetime. __Default: 0__
-@tparam[opt] Effects.StreamerFeatherType featherType The direction of the streamer's fade. __Default: Center__
-@tparam[opt] Effects.BlendID blendMode Render blend mode. __TEN.Effects.BlendID.ALPHABLEND__*/
-	static void EmitStreamer (const Moveable& mov, TypeOrNil<int> Id, Vec3 position, Vec3 direction, TypeOrNil<short> orientation, TypeOrNil<ScriptColor> color,
-		TypeOrNil<float> width, TypeOrNil<float> life, TypeOrNil<float> velocity, TypeOrNil<float> scaleRate, TypeOrNil<short> rotation, TypeOrNil<StreamerFeatherType> featherType, TypeOrNil<BlendMode> blendMode)
+	/// Emit an extending streamer effect.
+	// @function EmitStreamer
+	// @tparam Moveable mov Moveable object with which to associate the effect.
+	// @tparam int tag Numeric tag with which to associate the effect on the moveable.
+	// @tparam Vec3 pos World position.
+	// @tparam Vec3 dir Direction vector of movement velocity.
+	// @tparam[opt] float rot Start rotation. __default: 0__
+	// @tparam[opt] Color color Color. __default: Color(255, 255, 255))__
+	// @tparam[opt] float width Width. __default: 0__ 
+	// @tparam[opt] float life Lifetime in seconds. __default: 1__
+	// @tparam[opt] float vel Movement velocity. __default: 0__
+	// @tparam[opt] float expRate Width expansion rate. __default: 0__
+	// @tparam[opt] float rotRate Rotation rate. __default: 0__
+	// @tparam[opt] Effects.FeatherID featherID Edge feathering ID. __default: Effects.FeatherID.NONE__
+	// @tparam[opt] Effects.BlendID blendID Renderer blend ID. __Effects.BlendID.ALPHA_BLEND__
+	static void EmitStreamer (const Moveable& mov, int tag, const Vec3& pos, const Vec3& dir, TypeOrNil<float> rot, TypeOrNil<ScriptColor> color,
+							  TypeOrNil<float> width, TypeOrNil<float> life, TypeOrNil<float> vel, TypeOrNil<float> expRate, TypeOrNil<float> rotRate,
+							  TypeOrNil<StreamerFeatherType> featherID, TypeOrNil<BlendMode> blendID)
 	{
-		int id = mov.GetIndex();
-		auto pos = position.ToVector3();
-		auto dir = direction.ToVector3();
-		auto convertedCount = std::clamp(ValueOr<int>(Id, 0), 0, 7);
-		auto convertedOrient = ANGLE(ValueOr<short>(orientation, 0));
+		int movID = mov.GetIndex();
+		auto convertedPos = pos.ToVector3();
+		auto convertedDir = dir.ToVector3();
+		auto convertedRot = ANGLE(ValueOr<float>(rot, 0));
 		auto convertedColor = ValueOr<ScriptColor>(color, ScriptColor(255, 255, 255));
-		auto convertedWidth = ValueOr<float>(width, 1);
-		auto convertedLifetime = ValueOr<float>(life, 1);
-		auto convertedVelocity = ValueOr<float>(velocity, 1);
-		auto convertedScale = ValueOr<float>(scaleRate, 1);
-		auto convertedRotation = ANGLE(ValueOr<short>(rotation, 0));
-		auto convertedFeatherType = ValueOr<StreamerFeatherType>(featherType, StreamerFeatherType::Center);
-		auto convertedBlendMode = ValueOr<BlendMode>(blendMode, BlendMode::AlphaBlend);
-		StreamerEffect.Spawn(id, convertedCount, position, direction, convertedOrient, convertedColor, convertedWidth, convertedLifetime, convertedVelocity, convertedScale, convertedRotation, convertedFeatherType, convertedBlendMode);
+		// TODO: Add start and end colours to the main effect.
+
+		auto convertedWidth = ValueOr<float>(width, 0.0f);
+		auto convertedLife = ValueOr<float>(life, 1.0f);
+		auto convertedVel = ValueOr<float>(vel, 0.0f); // TODO: Per second.
+		auto convertedExpRate = ValueOr<float>(expRate, 0.0f); // TODO: Per second.
+		auto convertedRotRate = ANGLE(ValueOr<short>(rotRate, 0)); // TODO: Per second.
+
+		auto convertedFeatherType = ValueOr<StreamerFeatherType>(featherID, StreamerFeatherType::None);
+		auto convertedBlendMode = ValueOr<BlendMode>(blendID, BlendMode::AlphaBlend);
+
+		StreamerEffect.Spawn(
+			movID, tag, convertedPos, convertedDir, convertedRot, convertedColor,
+			convertedWidth, convertedLife, convertedVel, convertedExpRate, convertedRotRate,
+			convertedFeatherType, convertedBlendMode);
 	}
 
 	void Register(sol::state* state, sol::table& parent) 
@@ -415,6 +422,6 @@ This represents the 3D displacement applied by the engine on things like particl
 		auto handler = LuaHandler{ state };
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_BlendID, BLEND_IDS);
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_EffectID, EFFECT_IDS);
-		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_StreamerFeatherType, STREAMER_FEATHER_TYPE);
+		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_StreamerFeatherType, FEATHER_IDS);
 	}
 }
