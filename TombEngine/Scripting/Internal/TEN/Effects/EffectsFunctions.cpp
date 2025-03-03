@@ -363,7 +363,7 @@ This represents the 3D displacement applied by the engine on things like particl
 	/// Emit an extending streamer effect.
 	// @function EmitStreamer
 	// @tparam Moveable mov Moveable object with which to associate the effect.
-	// @tparam int tag Numeric tag with which to associate the effect on the moveable.
+	// @tparam int[opt] tag Numeric tag with which to associate the effect on the moveable. __default: 0__
 	// @tparam Vec3 pos World position.
 	// @tparam Vec3 dir Direction vector of movement velocity.
 	// @tparam[opt] float rot Start rotation. __default: 0__
@@ -376,11 +376,12 @@ This represents the 3D displacement applied by the engine on things like particl
 	// @tparam[opt] float rotRate Rotation rate in seconds. __default: 0__
 	// @tparam[opt] Effects.FeatherID featherID Edge feathering ID. __default: Effects.FeatherID.NONE__
 	// @tparam[opt] Effects.BlendID blendID Renderer blend ID. __Effects.BlendID.ALPHA_BLEND__
-	static void EmitStreamer(const Moveable& mov, int tag, const Vec3& pos, const Vec3& dir, TypeOrNil<float> rot, TypeOrNil<ScriptColor> color,
+	static void EmitStreamer(const Moveable& mov, TypeOrNil<int> tag, const Vec3& pos, const Vec3& dir, TypeOrNil<float> rot, TypeOrNil<ScriptColor> color,
 							 TypeOrNil<float> width, TypeOrNil<float> life, TypeOrNil<float> vel, TypeOrNil<float> expRate, TypeOrNil<float> rotRate,
 							 TypeOrNil<StreamerFeatherType> featherID, TypeOrNil<BlendMode> blendID)
 	{
 		int movID = mov.GetIndex();
+		int convertedTag = ValueOr<int>(tag, 0);
 		auto convertedPos = pos.ToVector3();
 		auto convertedDir = dir.ToVector3();
 		auto convertedRot = ANGLE(ValueOr<float>(rot, 0));
@@ -397,7 +398,7 @@ This represents the 3D displacement applied by the engine on things like particl
 		auto convertedBlendMode = ValueOr<BlendMode>(blendID, BlendMode::AlphaBlend);
 
 		StreamerEffect.Spawn(
-			movID, tag, convertedPos, convertedDir, convertedRot, convertedStartColor, //convertedEndColor,
+			movID, convertedTag, convertedPos, convertedDir, convertedRot, convertedStartColor, //convertedEndColor,
 			convertedWidth, convertedLife, convertedVel, convertedExpRate, convertedRotRate,
 			convertedFeatherType, convertedBlendMode);
 	}
