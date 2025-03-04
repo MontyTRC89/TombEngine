@@ -623,8 +623,8 @@ namespace TEN::Renderer
 
 		auto now = std::chrono::system_clock::now();
 		auto duration = now.time_since_epoch();
-		auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(
-			duration)
+		auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>
+			(duration)
 			.count();
 
 		auto nameFile = buffer + std::to_string(milliseconds).substr(7, 12) + ".png";
