@@ -460,7 +460,7 @@ table FireflyData {
 	orientation: EulerAngles;
 	velocity: float;
 	target_item_number: int32;
-	leader_item_number: int32;
+	z_vel: float;
 	life: float;
 	number: int32;
 	d_r: int32;

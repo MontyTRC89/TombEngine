@@ -6397,7 +6397,7 @@ struct FireflyDataT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::EulerAngles> orientation{};
   float velocity = 0.0f;
   int32_t target_item_number = 0;
-  int32_t leader_item_number = 0;
+  float z_vel = 0.0f;
   float life = 0.0f;
   int32_t number = 0;
   int32_t d_r = 0;
@@ -6426,7 +6426,7 @@ struct FireflyData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_ORIENTATION = 18,
     VT_VELOCITY = 20,
     VT_TARGET_ITEM_NUMBER = 22,
-    VT_LEADER_ITEM_NUMBER = 24,
+    VT_Z_VEL = 24,
     VT_LIFE = 26,
     VT_NUMBER = 28,
     VT_D_R = 30,
@@ -6469,8 +6469,8 @@ struct FireflyData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t target_item_number() const {
     return GetField<int32_t>(VT_TARGET_ITEM_NUMBER, 0);
   }
-  int32_t leader_item_number() const {
-    return GetField<int32_t>(VT_LEADER_ITEM_NUMBER, 0);
+  float z_vel() const {
+    return GetField<float>(VT_Z_VEL, 0.0f);
   }
   float life() const {
     return GetField<float>(VT_LIFE, 0.0f);
@@ -6517,7 +6517,7 @@ struct FireflyData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<TEN::Save::EulerAngles>(verifier, VT_ORIENTATION) &&
            VerifyField<float>(verifier, VT_VELOCITY) &&
            VerifyField<int32_t>(verifier, VT_TARGET_ITEM_NUMBER) &&
-           VerifyField<int32_t>(verifier, VT_LEADER_ITEM_NUMBER) &&
+           VerifyField<float>(verifier, VT_Z_VEL) &&
            VerifyField<float>(verifier, VT_LIFE) &&
            VerifyField<int32_t>(verifier, VT_NUMBER) &&
            VerifyField<int32_t>(verifier, VT_D_R) &&
@@ -6570,8 +6570,8 @@ struct FireflyDataBuilder {
   void add_target_item_number(int32_t target_item_number) {
     fbb_.AddElement<int32_t>(FireflyData::VT_TARGET_ITEM_NUMBER, target_item_number, 0);
   }
-  void add_leader_item_number(int32_t leader_item_number) {
-    fbb_.AddElement<int32_t>(FireflyData::VT_LEADER_ITEM_NUMBER, leader_item_number, 0);
+  void add_z_vel(float z_vel) {
+    fbb_.AddElement<float>(FireflyData::VT_Z_VEL, z_vel, 0.0f);
   }
   void add_life(float life) {
     fbb_.AddElement<float>(FireflyData::VT_LIFE, life, 0.0f);
@@ -6629,7 +6629,7 @@ inline flatbuffers::Offset<FireflyData> CreateFireflyData(
     const TEN::Save::EulerAngles *orientation = 0,
     float velocity = 0.0f,
     int32_t target_item_number = 0,
-    int32_t leader_item_number = 0,
+    float z_vel = 0.0f,
     float life = 0.0f,
     int32_t number = 0,
     int32_t d_r = 0,
@@ -6652,7 +6652,7 @@ inline flatbuffers::Offset<FireflyData> CreateFireflyData(
   builder_.add_d_r(d_r);
   builder_.add_number(number);
   builder_.add_life(life);
-  builder_.add_leader_item_number(leader_item_number);
+  builder_.add_z_vel(z_vel);
   builder_.add_target_item_number(target_item_number);
   builder_.add_velocity(velocity);
   builder_.add_orientation(orientation);
@@ -10572,7 +10572,7 @@ inline void FireflyData::UnPackTo(FireflyDataT *_o, const flatbuffers::resolver_
   { auto _e = orientation(); if (_e) _o->orientation = std::unique_ptr<TEN::Save::EulerAngles>(new TEN::Save::EulerAngles(*_e)); }
   { auto _e = velocity(); _o->velocity = _e; }
   { auto _e = target_item_number(); _o->target_item_number = _e; }
-  { auto _e = leader_item_number(); _o->leader_item_number = _e; }
+  { auto _e = z_vel(); _o->z_vel = _e; }
   { auto _e = life(); _o->life = _e; }
   { auto _e = number(); _o->number = _e; }
   { auto _e = d_r(); _o->d_r = _e; }
@@ -10604,7 +10604,7 @@ inline flatbuffers::Offset<FireflyData> CreateFireflyData(flatbuffers::FlatBuffe
   auto _orientation = _o->orientation ? _o->orientation.get() : 0;
   auto _velocity = _o->velocity;
   auto _target_item_number = _o->target_item_number;
-  auto _leader_item_number = _o->leader_item_number;
+  auto _z_vel = _o->z_vel;
   auto _life = _o->life;
   auto _number = _o->number;
   auto _d_r = _o->d_r;
@@ -10628,7 +10628,7 @@ inline flatbuffers::Offset<FireflyData> CreateFireflyData(flatbuffers::FlatBuffe
       _orientation,
       _velocity,
       _target_item_number,
-      _leader_item_number,
+      _z_vel,
       _life,
       _number,
       _d_r,

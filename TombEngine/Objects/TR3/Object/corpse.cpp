@@ -167,7 +167,7 @@ namespace TEN::Entities::TR3
 				int firefliesToTurnOff = -fireflyCount;
 				for (auto& firefly : FireflySwarm)
 				{
-					if (firefly.LeaderItemPtr == &item && firefly.Life > 0.0f)
+					if (firefly.TargetItemPtr == &item && firefly.Life > 0.0f)
 					{
 						firefly.Life = 0.0f;
 						firefly.on = false;

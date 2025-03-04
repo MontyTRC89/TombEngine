@@ -935,7 +935,7 @@ const std::vector<byte> SaveGame::Build()
 		fireflySave.add_orientation(&FromEulerAngles(firefly.Orientation));
 		fireflySave.add_velocity(firefly.Velocity);
 		fireflySave.add_target_item_number((firefly.TargetItemPtr == nullptr) ? -1 : firefly.TargetItemPtr->Index);
-		fireflySave.add_leader_item_number((firefly.LeaderItemPtr == nullptr) ? -1 : firefly.LeaderItemPtr->Index);
+		fireflySave.add_z_vel(firefly.zVel);
 		fireflySave.add_life(firefly.Life);
 		fireflySave.add_number(firefly.Number);
 		fireflySave.add_d_r(firefly.rB);
@@ -2230,7 +2230,7 @@ static void ParseEffects(const Save::SaveGame* s)
 		firefly.Orientation = ToEulerAngles(fireflySave->orientation());
 		firefly.Velocity = fireflySave->velocity();
 		firefly.TargetItemPtr = (fireflySave->target_item_number() == -1) ? nullptr : &g_Level.Items[fireflySave->target_item_number()];
-		firefly.LeaderItemPtr = (fireflySave->leader_item_number() == -1) ? nullptr : &g_Level.Items[fireflySave->leader_item_number()];
+		firefly.zVel = fireflySave->z_vel();
 		firefly.Life = fireflySave->life();
 		firefly.Number = fireflySave->number();
 		firefly.rB = fireflySave->d_r();

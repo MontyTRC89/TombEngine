@@ -33,7 +33,7 @@ namespace TEN::Effects::Fireflys
     constexpr auto FIREFLY_BASE_SEPARATION_DISTANCE = 10.0f;
     constexpr auto FIREFLY_FLEE_DISTANCE = BLOCK(0.7);
     constexpr auto FIREFLY_RETURN_DISTANCE = BLOCK(4);
-    constexpr auto MAX_FIREFLIES = 64;
+    constexpr auto MAX_FIREFLIES = 92;
     constexpr auto DEFAULT_FIREFLY_COUNT = 24;
     constexpr auto FIREFLY_RISE_UP_FACTOR = 200;
 
@@ -108,10 +108,9 @@ namespace TEN::Effects::Fireflys
         firefly.RoomNumber = item.RoomNumber;
         firefly.Orientation = item.Pose.Orientation;
         firefly.Velocity = Random::GenerateFloat(VEL_MIN, VEL_MAX);
+        firefly.zVel = 0.3f;
 
         firefly.Life = Random::GenerateInt(1, 200);
-
-        firefly.LeaderItemPtr = &g_Level.Items[item.ItemFlags[FirefliesItemFlags::TargetItemPtr]];
         firefly.TargetItemPtr = &g_Level.Items[item.ItemFlags[FirefliesItemFlags::TargetItemPtr]];
 
         int& nextFireflyNumber = nextFireflyNumberMap[item.Index];
@@ -134,7 +133,7 @@ namespace TEN::Effects::Fireflys
                 int firefliesToTurnOff = -fireflyCount;
                 for (auto& firefly : FireflySwarm)
                 {
-                    if (firefly.LeaderItemPtr == &item && firefly.Life > 0.0f)
+                    if (firefly.TargetItemPtr == &item && firefly.Life > 0.0f)
                     {
                         firefly.Life = 0.0f;
                         firefly.on = false;
@@ -163,11 +162,11 @@ namespace TEN::Effects::Fireflys
             {
                 auto posBase = firefly.Position;
                 auto rotMatrix = firefly.Orientation.ToRotationMatrix();
-                auto pos = posBase + Vector3::Transform(Vector3(0, 0, 0), rotMatrix);
+                auto pos = posBase + Vector3::Transform(Vector3(0, 0, 30), rotMatrix);
 
-                auto direction0 = Geometry::RotatePoint(posBase, EulerAngles(0, 0, 0));
+                auto direction0 = Geometry::RotatePoint(posBase, EulerAngles::Identity);
                 
-                short orient2D = firefly.Orientation.z;
+                short orient2D = firefly.Orientation.z; //+ ANGLE(90.0f);
                 
                 if (firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::Light] == 1 && firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::TriggerFlags] >= 0)
                 {               
@@ -176,7 +175,7 @@ namespace TEN::Effects::Fireflys
                    StreamerEffect.Spawn(firefly.TargetItemPtr->Index, firefly.Number, pos, direction0, orient2D,
                        Vector4(firefly.r / (float)UCHAR_MAX, firefly.g / (float)UCHAR_MAX, firefly.b / (float)UCHAR_MAX, 1.0f),
                        Vector4::Zero,
-                       0.0f, 0.11f, 20.0f, 0.1f, 0.0f, StreamerFeatherType::None, BlendMode::Additive);                    
+                       6.0f - (firefly.zVel / 14), ((firefly.Velocity / 14 ) + firefly.zVel) / (float)UCHAR_MAX, 0.0f, -0.1f, 90.0f, StreamerFeatherType::None, BlendMode::Additive);
                 }
 
                 else if (firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::TriggerFlags] < 0)
@@ -222,8 +221,6 @@ namespace TEN::Effects::Fireflys
 
             firefly.StoreInterpolationData();
 
-            auto& leaderItem = *firefly.LeaderItemPtr;
-
             firefly.PositionTarget = Random::GeneratePointInSphere(SPHERE);
 
             int multiplierX = CLICK(firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::TriggerFlags] * 2);
@@ -260,6 +257,22 @@ namespace TEN::Effects::Fireflys
             auto orientTo = Geometry::GetOrientToPoint(firefly.Position, desiredPos.ToVector3());
             firefly.Orientation.Lerp(orientTo, 0.1f);
 
+            // Update color values for blinking effect.
+            float alphaTime = fmod(frameCounter + firefly.Life, ALPHA_CYCLE_DURATION + ALPHA_PAUSE_DURATION);
+            float alphaFactor;
+            if (alphaTime < ALPHA_CYCLE_DURATION)
+            {
+                alphaFactor = 0.5f * (1.0f + sinf((alphaTime / ALPHA_CYCLE_DURATION) * PI_MUL_2));
+            }
+            else
+            {
+                alphaFactor = 1.0f;
+            }
+
+            firefly.r = static_cast<unsigned char>(firefly.rB * alphaFactor);
+            firefly.g = static_cast<unsigned char>(firefly.gB * alphaFactor);
+            firefly.b = static_cast<unsigned char>(firefly.bB * alphaFactor);
+
                 for (const auto& otherFirefly : FireflySwarm)
                 {
                     if (&firefly == &otherFirefly)
@@ -286,11 +299,14 @@ namespace TEN::Effects::Fireflys
                         firefly.Orientation.Lerp(orientTo, 0.05f);
 
                         firefly.Velocity -= std::min(FLEE_VEL, firefly.TargetItemPtr->Animation.Velocity.z - 1.0f);
-                    }
-                    else if (distToPlayer > FIREFLY_RETURN_DISTANCE)
-                    {
-                        // Return to the leader item.
-                        firefly.TargetItemPtr = firefly.LeaderItemPtr;
+
+                        if (firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::Light] == 1 && firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::TriggerFlags] >= 0)
+                        {
+                            if (firefly.zVel == 0.3f || firefly.zVel > 30.0f)
+                            {
+                                firefly.zVel = 40.0f;
+                            }
+                        }                        
                     }
 
                     if (distToOtherFirefly < FIREFLY_BASE_SEPARATION_DISTANCE)
@@ -311,21 +327,16 @@ namespace TEN::Effects::Fireflys
                 firefly.RoomNumber = pointColl.GetRoomNumber();
             }
 
-            // Update color values for blinking effect.
-            float alphaTime = fmod(frameCounter + firefly.Life, ALPHA_CYCLE_DURATION + ALPHA_PAUSE_DURATION);
-            float alphaFactor;
-            if (alphaTime < ALPHA_CYCLE_DURATION)
+            if (firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::Light] == 1 && firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::TriggerFlags] >= 0)
             {
-                alphaFactor = 0.5f * (1.0f + sinf((alphaTime / ALPHA_CYCLE_DURATION) * PI_MUL_2));
-            }
-            else
-            {
-                alphaFactor = 1.0f;
-            }
+                if (Random::TestProbability(1.0f / 700.0f))
+                    firefly.zVel = 100.0f;
 
-            firefly.r = static_cast<unsigned char>(firefly.rB * alphaFactor);
-            firefly.g = static_cast<unsigned char>(firefly.gB * alphaFactor);
-            firefly.b = static_cast<unsigned char>(firefly.bB * alphaFactor);
+                if (firefly.zVel > 1.0f)
+                    firefly.zVel -= 2.0f;
+                if (firefly.zVel <= 1.0f)
+                    firefly.zVel = 0.3f;
+            }
         }
     }
 

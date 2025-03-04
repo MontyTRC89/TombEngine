@@ -29,8 +29,8 @@ namespace TEN::Effects::Fireflys
 		float		Velocity	   = 0.0f;
 
 		ItemInfo* TargetItemPtr = nullptr;
-		ItemInfo* LeaderItemPtr = nullptr;
 
+		float zVel;
 		float Life = 0.0f;
 		int Number = 0;
 
