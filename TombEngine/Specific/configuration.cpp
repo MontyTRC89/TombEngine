@@ -268,14 +268,16 @@ bool SaveConfiguration()
 		return false;
 	}
 
+	if (g_Configuration.Bindings.empty())
+		g_Configuration.Bindings = BindingManager::DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
+
 	// Set Input binding keys.
-	g_Configuration.Bindings.resize((int)In::Count);
-	for (int i = 0; i < (int)In::Count; i++)
+	for (int i = 0; i < (int)InputActionID::Count; i++)
 	{
 		char buffer[9];
 		sprintf(buffer, "Action%d", i);
 
-		if (SetDWORDRegKey(inputKey, buffer, g_Configuration.Bindings[i]) != ERROR_SUCCESS)
+		if (SetDWORDRegKey(inputKey, buffer, g_Configuration.Bindings.at((InputActionID)i)) != ERROR_SUCCESS)
 		{
 			RegCloseKey(rootKey);
 			RegCloseKey(graphicsKey);
@@ -465,13 +467,16 @@ bool LoadConfiguration()
 			return false;
 		}
 
-		for (int i = 0; i < (int)In::Count; i++)
+		for (int i = 0; i < (int)InputActionID::Count; i++)
 		{
-			DWORD tempAction = 0;
+			DWORD tempKeyID = 0;
 			char buffer[9];
 			sprintf(buffer, "Action%d", i);
 
-			if (GetDWORDRegKey(inputKey, buffer, &tempAction, Bindings[0][i]) != ERROR_SUCCESS)
+			auto actionID = (InputActionID)i;
+			int boundKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Default, actionID);
+
+			if (GetDWORDRegKey(inputKey, buffer, &tempKeyID, boundKeyID) != ERROR_SUCCESS)
 			{
 				RegCloseKey(rootKey);
 				RegCloseKey(graphicsKey);
@@ -481,16 +486,16 @@ bool LoadConfiguration()
 				return false;
 			}
 
-			g_Configuration.Bindings.push_back(tempAction);
-			Bindings[1][i] = tempAction;
+			g_Configuration.Bindings.insert({ (InputActionID)i, tempKeyID });
+			g_Bindings.SetKeyBinding(InputDeviceID::Custom, actionID, tempKeyID);
 		}
 
 		RegCloseKey(inputKey);
 	}
+	// Input key doesn't exist; use default bindings.
 	else
 	{
-		// "Input" key does not exist; use default bindings.
-		g_Configuration.Bindings = Bindings[0];
+		g_Configuration.Bindings = g_Bindings.GetBindingProfile(InputDeviceID::Default);
 	}
 
 	RegCloseKey(rootKey);
@@ -502,10 +507,10 @@ bool LoadConfiguration()
 	g_Configuration.ScreenWidth = screenWidth;
 	g_Configuration.ScreenHeight = screenHeight;
 	g_Configuration.EnableWindowedMode = enableWindowedMode;
-	g_Configuration.ShadowType = ShadowMode(shadowMode);
+	g_Configuration.ShadowType = (ShadowMode)shadowMode;
 	g_Configuration.ShadowBlobsMax = shadowBlobsMax;
 	g_Configuration.EnableCaustics = enableCaustics;
-	g_Configuration.AntialiasingMode = AntialiasingMode(antialiasingMode);
+	g_Configuration.AntialiasingMode = (AntialiasingMode)antialiasingMode;
 	g_Configuration.ShadowMapSize = shadowMapSize;
 	g_Configuration.EnableAmbientOcclusion = enableAmbientOcclusion;
 	g_Configuration.EnableHighFramerate = enableHighFramerate;
@@ -581,7 +586,6 @@ LONG GetBoolRegKey(HKEY hKey, LPCSTR strValueName, bool* bValue, bool bDefaultVa
 
 	return nError;
 }
-
 
 LONG GetStringRegKey(HKEY hKey, LPCSTR strValueName, char** strValue, char* strDefaultValue)
 {

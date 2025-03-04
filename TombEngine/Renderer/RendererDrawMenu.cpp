@@ -12,6 +12,7 @@
 #include "Math/Math.h"
 #include "Scripting/Internal/TEN/Flow//Level/FlowLevel.h"
 #include "Specific/configuration.h"
+#include "Specific/Input/InputAction.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
@@ -315,8 +316,11 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int index = Bindings[1][k] ? Bindings[1][k] : Bindings[0][k];
-						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
+						int defaultKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Default, (InputActionID)k);
+						int userKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Custom, (InputActionID)k);
+
+						int key = userKeyID ? userKeyID : defaultKeyID;
+						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
 					if (k < (GeneralActionStrings.size() - 1))
@@ -365,8 +369,11 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int index = Bindings[1][baseIndex + k] ? Bindings[1][baseIndex + k] : Bindings[0][baseIndex + k];
-						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
+						int defaultKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Default, (InputActionID)(baseIndex + k));
+						int userKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Custom, (InputActionID)(baseIndex + k));
+
+						int key = userKeyID ? userKeyID : defaultKeyID;
+						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
 					if (k < (VehicleActionStrings.size() - 1))
@@ -421,8 +428,11 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int index = Bindings[1][baseIndex + k] ? Bindings[1][baseIndex + k] : Bindings[0][baseIndex + k];
-						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
+						int defaultKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Default, (InputActionID)(baseIndex + k));
+						int userKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Custom, (InputActionID)(baseIndex + k));
+
+						int key = userKeyID ? userKeyID : defaultKeyID;
+						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
 					if (k < (QuickActionStrings.size() - 1))
@@ -470,8 +480,11 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int index = Bindings[1][baseIndex + k] ? Bindings[1][baseIndex + k] : Bindings[0][baseIndex + k];
-						AddString(MenuRightSideEntry, y, g_KeyNames[index].c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
+						int defaultKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Default, (InputActionID)(baseIndex + k));
+						int userKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Custom, (InputActionID)(baseIndex + k));
+
+						int key = userKeyID ? userKeyID : defaultKeyID;
+						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
 					}
 
 					if (k < (MenuActionStrings.size() - 1))
@@ -1347,7 +1360,7 @@ namespace TEN::Renderer
 			auto heldActions = BitField((int)In::Count);
 			auto releasedActions = BitField((int)In::Count);
 
-			for (const auto& action : ActionMap)
+			for (const auto& [actionID, action] : ActionMap)
 			{
 				if (action.IsClicked())
 					clickedActions.Set((int)action.GetID());
@@ -1363,9 +1376,9 @@ namespace TEN::Renderer
 			PrintDebugMessage(("Clicked actions: " + clickedActions.ToString()).c_str());
 			PrintDebugMessage(("Held actions: " + heldActions.ToString()).c_str());
 			PrintDebugMessage(("Released actions: " + releasedActions.ToString()).c_str());
-			PrintDebugMessage("Move axes: %.3f, %.3f", AxisMap[(int)InputAxis::Move].x, AxisMap[(int)InputAxis::Move].y);
-			PrintDebugMessage("Camera axes: %.3f, %.3f", AxisMap[(int)InputAxis::Camera].x, AxisMap[(int)InputAxis::Camera].y);
-			PrintDebugMessage("Mouse axes: %.3f, %.3f", AxisMap[(int)InputAxis::Mouse].x, AxisMap[(int)InputAxis::Mouse].y);
+			PrintDebugMessage("Move axes: %.3f, %.3f", AxisMap[InputAxisID::Move].x, AxisMap[InputAxisID::Move].y);
+			PrintDebugMessage("Camera axes: %.3f, %.3f", AxisMap[InputAxisID::Camera].x, AxisMap[InputAxisID::Camera].y);
+			PrintDebugMessage("Mouse axes: %.3f, %.3f", AxisMap[InputAxisID::Mouse].x, AxisMap[InputAxisID::Mouse].y);
 			PrintDebugMessage("Cursor pos: %.3f, %.3f", GetMouse2DPosition().x, GetMouse2DPosition().y);
 		}
 			break;
