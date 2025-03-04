@@ -112,6 +112,22 @@ WaterPixelShaderInput VSWater(VertexShaderInput input)
     return output;
 }
 
+float FresnelSchlick(float3 viewDir)
+{
+    // Indici di rifrazione
+    const float n_air = 1.0;
+    const float n_water = 1.33;
+
+    // Calcolo di F0
+    float F0 = pow((n_water - n_air) / (n_water + n_air), 2.0);
+
+    // Calcolo di cosTheta (dot product tra normale e direzione della vista)
+    float cosTheta = abs(viewDir.y); // Poiché la normale all'acqua è (0, -1, 0)
+
+    // Formula di Schlick
+    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+}
+
 float4 PSWater(WaterPixelShaderInput input) : SV_Target
 {
     float4 output;
@@ -178,15 +194,16 @@ float4 PSWater(WaterPixelShaderInput input) : SV_Target
     
     // Fresnel
     float3 viewDirection = normalize(CamPositionWS - input.WorldPosition.xyz);
-    float fresnel = pow(dot(viewDirection, float3(0.0f, -1.0f, 0.0f)), 1.5f);
+    float fresnel = FresnelSchlick(viewDirection); // pow(dot(viewDirection, float3(0.0f, -1.0f, 0.0f)), 1.5f);
      
+    // Underwater color extinction
     float3 groundPosition = Unproject(refractionTexCoord);
     float distance = abs(WaterLevels[WaterPlaneIndex] - groundPosition.y);
-    float t = smoothstep(0.0, 2048.0, distance); // Graduale aumento fino a 1024
-    float extinction = 0.4 * t; // A 1024m è 50% tinta, 50% colore vero
+    float t = smoothstep(0.0, 2048.0, distance);  
+    float extinction = 0.4 * t; 
     float3 underwaterColor = lerp(refractedColor, float3(0.0, 0.5, 0.7), extinction);
-    //ComputeReflectionFade(float3(0, -1, 0), CamDirectionWS);
     
+    // TODO: fix reflections underwater, this is a development hack
     if (CameraUnderwater == 1)
     {
         fresnel = 0.0f;
