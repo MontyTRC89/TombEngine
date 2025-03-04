@@ -124,7 +124,7 @@ namespace TEN::Effects::Fireflys
 
         if (!TriggerActive(&item))
             return;
-   
+
         if (item.HitPoints != NOT_TARGETABLE)
         {
             int fireflyCount = item.HitPoints - item.ItemFlags[FirefliesItemFlags::Spawncounter];
@@ -133,15 +133,15 @@ namespace TEN::Effects::Fireflys
             {
                 int firefliesToTurnOff = -fireflyCount;
                 for (auto& firefly : FireflySwarm)
-                {                 
+                {
                     if (firefly.LeaderItemPtr == &item && firefly.Life > 0.0f)
                     {
                         firefly.Life = 0.0f;
                         firefly.on = false;
-                        firefliesToTurnOff--;   
+                        firefliesToTurnOff--;
 
                         if (firefliesToTurnOff == 0)
-                            break;                       
+                            break;
                     }
                 }
             }
@@ -155,6 +155,38 @@ namespace TEN::Effects::Fireflys
 
             item.ItemFlags[FirefliesItemFlags::Spawncounter] = item.HitPoints;
             item.HitPoints = NOT_TARGETABLE;
+        }
+
+        for (auto& firefly : FireflySwarm)
+        {
+            if (firefly.TargetItemPtr == &item)
+            {
+                auto posBase = firefly.Position;
+                auto rotMatrix = firefly.Orientation.ToRotationMatrix();
+                auto pos = posBase + Vector3::Transform(Vector3(0, 0, 0), rotMatrix);
+
+                auto direction0 = Geometry::RotatePoint(posBase, EulerAngles(0, 0, 0));
+                
+                short orient2D = firefly.Orientation.z;
+                
+                if (firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::Light] == 1 && firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::TriggerFlags] >= 0)
+                {               
+                   SpawnDynamicLight(firefly.Position.x, firefly.Position.y, firefly.Position.z, 2, firefly.r, firefly.g, firefly.b);
+
+                   StreamerEffect.Spawn(firefly.TargetItemPtr->Index, firefly.Number, pos, direction0, orient2D,
+                       Vector4(firefly.r / (float)UCHAR_MAX, firefly.g / (float)UCHAR_MAX, firefly.b / (float)UCHAR_MAX, 1.0f),
+                       Vector4::Zero,
+                       0.0f, 0.11f, 20.0f, 0.1f, 0.0f, StreamerFeatherType::None, BlendMode::Additive);                    
+                }
+
+                else if (firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::TriggerFlags] < 0)
+                {                      
+                    StreamerEffect.Spawn(firefly.TargetItemPtr->Index, firefly.Number, pos, direction0, orient2D,        
+                        Vector4((firefly.r / 2) / (float)UCHAR_MAX, (firefly.g / 2) / (float)UCHAR_MAX, (firefly.b / 2) / (float)UCHAR_MAX, 0.2f),   
+                        Vector4((firefly.r / 3) / (float)UCHAR_MAX, (firefly.g / 3) / (float)UCHAR_MAX, (firefly.b / 3) / (float)UCHAR_MAX, 0.2f),     
+                        0.0f, 0.4f, 0.0f, 0.2f, 0.0f, StreamerFeatherType::None, BlendMode::Subtractive);             
+                }                   
+            }
         }
     }
 
@@ -228,47 +260,47 @@ namespace TEN::Effects::Fireflys
             auto orientTo = Geometry::GetOrientToPoint(firefly.Position, desiredPos.ToVector3());
             firefly.Orientation.Lerp(orientTo, 0.1f);
 
-            for (const auto& otherFirefly : FireflySwarm)
-            {
-                if (&firefly == &otherFirefly)
-                    continue;
-
-                float distToOtherFirefly = Vector3i::Distance(firefly.Position, otherFirefly.Position);
-                float distToPlayer = Vector3i::Distance(firefly.Position, playerItem.Pose.Position);
-
-                // If player is too close, flee.
-                if (distToPlayer < FIREFLY_FLEE_DISTANCE && playerItem.Animation.ActiveState != 2)
+                for (const auto& otherFirefly : FireflySwarm)
                 {
-                    auto separationDir = firefly.Position - playerItem.Pose.Position.ToVector3();
-                    separationDir.Normalize();
+                    if (&firefly == &otherFirefly)
+                        continue;
 
-                    // Reduce the Y component of the escape direction.
-                    separationDir.y *= Random::GenerateFloat(0.0f, 0.4f);
+                    float distToOtherFirefly = Vector3i::Distance(firefly.Position, otherFirefly.Position);
+                    float distToPlayer = Vector3i::Distance(firefly.Position, playerItem.Pose.Position);
 
-                    // Normalize the direction again to get the length of the vector.
-                    separationDir.Normalize();
+                    // If player is too close, flee.
+                    if (distToPlayer < FIREFLY_FLEE_DISTANCE && playerItem.Animation.ActiveState != 2)
+                    {
+                        auto separationDir = firefly.Position - playerItem.Pose.Position.ToVector3();
+                        separationDir.Normalize();
 
-                    firefly.Position += separationDir * FLEE_VEL;
+                        // Reduce the Y component of the escape direction.
+                        separationDir.y *= Random::GenerateFloat(0.0f, 0.4f);
 
-                    auto orientTo = Geometry::GetOrientToPoint(firefly.Position, separationDir);
-                    firefly.Orientation.Lerp(orientTo, 0.05f);
+                        // Normalize the direction again to get the length of the vector.
+                        separationDir.Normalize();
 
-                    firefly.Velocity -= std::min(FLEE_VEL, firefly.TargetItemPtr->Animation.Velocity.z - 1.0f);
+                        firefly.Position += separationDir * FLEE_VEL;
+
+                        auto orientTo = Geometry::GetOrientToPoint(firefly.Position, separationDir);
+                        firefly.Orientation.Lerp(orientTo, 0.05f);
+
+                        firefly.Velocity -= std::min(FLEE_VEL, firefly.TargetItemPtr->Animation.Velocity.z - 1.0f);
+                    }
+                    else if (distToPlayer > FIREFLY_RETURN_DISTANCE)
+                    {
+                        // Return to the leader item.
+                        firefly.TargetItemPtr = firefly.LeaderItemPtr;
+                    }
+
+                    if (distToOtherFirefly < FIREFLY_BASE_SEPARATION_DISTANCE)
+                    {
+                        auto separationDir = firefly.Position - otherFirefly.Position;
+                        separationDir.Normalize();
+
+                        firefly.Position += separationDir * (FIREFLY_BASE_SEPARATION_DISTANCE - distToOtherFirefly);
+                    }
                 }
-                else if (distToPlayer > FIREFLY_RETURN_DISTANCE )
-                {
-                    // Return to the leader item.
-                    firefly.TargetItemPtr = firefly.LeaderItemPtr;
-                }
-
-                if (distToOtherFirefly < FIREFLY_BASE_SEPARATION_DISTANCE)
-                {
-                    auto separationDir = firefly.Position - otherFirefly.Position;
-                    separationDir.Normalize();
-
-                    firefly.Position += separationDir * (FIREFLY_BASE_SEPARATION_DISTANCE - distToOtherFirefly);
-                }
-            }
 
             auto pointColl = GetPointCollision(firefly.Position, firefly.RoomNumber);
 
@@ -294,31 +326,6 @@ namespace TEN::Effects::Fireflys
             firefly.r = static_cast<unsigned char>(firefly.rB * alphaFactor);
             firefly.g = static_cast<unsigned char>(firefly.gB * alphaFactor);
             firefly.b = static_cast<unsigned char>(firefly.bB * alphaFactor);
-
-            auto posBase = firefly.Position;
-            auto rotMatrix = firefly.Orientation.ToRotationMatrix();
-            auto pos = posBase + Vector3::Transform(Vector3(0,0,0), rotMatrix);
-
-            auto direction0 =  Geometry::RotatePoint(posBase, EulerAngles(0, 0, 0));
-
-            short orient2D =  firefly.Orientation.z;
-            
-            if (firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::Light] == 1 && firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::TriggerFlags] >= 0)
-            {
-                SpawnDynamicLight(firefly.Position.x, firefly.Position.y, firefly.Position.z, 2, firefly.r, firefly.g, firefly.b);
-
-                StreamerEffect.Spawn(firefly.TargetItemPtr->Index, firefly.Number, pos, direction0, orient2D, 
-                    Vector4(firefly.r / (float)UCHAR_MAX, firefly.g / (float)UCHAR_MAX, firefly.b / (float)UCHAR_MAX, 1.0f),
-                    Vector4::Zero,
-                 0.0f, 0.11f, 20.0f, 0.1f, 0.0f, StreamerFeatherType::None, BlendMode::Additive);
-            }
-            else if (firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::TriggerFlags] < 0)
-            {
-                StreamerEffect.Spawn(firefly.TargetItemPtr->Index, firefly.Number, pos, direction0, orient2D, 
-                    Vector4((firefly.r / 2) / (float)UCHAR_MAX, (firefly.g / 2) / (float)UCHAR_MAX, (firefly.b / 2) / (float)UCHAR_MAX, 0.2f),
-                    Vector4((firefly.r / 3) / (float)UCHAR_MAX, (firefly.g / 3) / (float)UCHAR_MAX, (firefly.b / 3) / (float)UCHAR_MAX, 0.2f),
-                    0.0f, 0.6f, 0.0f, 0.2f, 0.0f, StreamerFeatherType::None, BlendMode::Subtractive);
-            }
         }
     }
 
