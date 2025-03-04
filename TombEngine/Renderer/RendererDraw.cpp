@@ -4004,22 +4004,19 @@ namespace TEN::Renderer
 		_shaders.Bind(Shader::WaterReflectionsPixelShader);
 
 		_shaders.Bind(Shader::RoomsWaterReflectionsVertexShader);
-
+		 
 		for (int i = 0; i < _rooms.size(); i++)
 		{
 			int index = i;
 			RendererRoom* room = &_rooms[index];
 			ROOM_INFO* nativeRoom = &g_Level.Rooms[room->RoomNumber];
-
-			cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[_rooms[i].RoomNumber].flags & ENV_FLAG_WATER;
-			_cbCameraMatrices.UpdateData(cameraConstantBuffer, _context.Get());
-
+   
 			_stRoom.Caustics = 0;
 			_stRoom.AmbientColor = room->AmbientLight;
 			_stRoom.NumRoomLights = 0;
 			_stRoom.Water = (nativeRoom->flags & ENV_FLAG_WATER) != 0 ? 1 : 0;
 			_cbRoom.UpdateData(_stRoom, _context.Get());
-
+			  
 			for (auto& bucket : room->Buckets)
 			{
 				if (bucket.NumVertices == 0)
@@ -4141,7 +4138,7 @@ namespace TEN::Renderer
 		_context->IASetIndexBuffer(_staticsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		_shaders.Bind(Shader::InstancedStaticsWaterReflectionsVertexShader);
-		 
+		  
 		for (auto it = instancedStaticsMap.begin(); it != instancedStaticsMap.end(); it++)
 		{
 			auto statics = it->second;
