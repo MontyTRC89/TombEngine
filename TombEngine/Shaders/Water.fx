@@ -365,7 +365,7 @@ float4 PSBlurWaterReflections(WaterReflectionsPixelShaderInput input) : SV_Targe
 {
     float3 color = float3(0, 0, 0);
     float weightSum = 0.0;
-    int blurFactor = 5;
+    int blurFactor = 3;
 	
     for (int i = -blurFactor; i <= blurFactor; i++)
     {

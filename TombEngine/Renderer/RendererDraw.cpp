@@ -3856,7 +3856,7 @@ namespace TEN::Renderer
 		// Bind and clear render target
 		_context->ClearRenderTargetView(_waterReflectionsRenderTarget.RenderTargetView.Get(), Colors::Black);
 		_context->ClearDepthStencilView(_waterReflectionsRenderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-		
+
 		_context->OMSetRenderTargets(1, _waterReflectionsRenderTarget.RenderTargetView.GetAddressOf(), _waterReflectionsRenderTarget.DepthStencilView.Get());
 
 		D3D11_VIEWPORT viewport;
@@ -3899,7 +3899,7 @@ namespace TEN::Renderer
 		auto* levelPtr = g_GameFlow->GetLevel(CurrentLevel);
 
 		if (levelPtr->Horizon)
-		{  
+		{
 			_shaders.Bind(Shader::SkyWaterReflectionsVertexShader);
 			_shaders.Bind(Shader::SkyWaterReflectionsGeometryShader);
 			_shaders.Bind(Shader::SkyWaterReflectionsPixelShader);
@@ -3917,13 +3917,13 @@ namespace TEN::Renderer
 
 			_context->IASetVertexBuffers(0, 1, _skyVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 			_context->IASetIndexBuffer(_skyIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
- 
+
 			SetBlendMode(BlendMode::Additive);
 
 			for (int s = 0; s < 2; s++)
 			{
 				auto weather = TEN::Effects::Environment::Weather;
-				
+
 				_stWater.SkyColor = weather.SkyColor(s);
 
 				for (int i = 0; i < 2; i++)
@@ -3932,7 +3932,7 @@ namespace TEN::Renderer
 					{
 						auto translation = Matrix::CreateTranslation(
 							view.WaterPlanesToDraw[w].CameraPositionWS.x + weather.SkyPosition(s) - i * SKY_SIZE,
-							view.WaterPlanesToDraw[w].CameraPositionWS.y - 1536.0f, 
+							view.WaterPlanesToDraw[w].CameraPositionWS.y - 1536.0f,
 							view.WaterPlanesToDraw[w].CameraPositionWS.z);
 						auto world = rotation * translation;
 						_stWater.SkyWorldMatrices[w] = world;
@@ -3995,7 +3995,7 @@ namespace TEN::Renderer
 		// Draw rooms
 		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
-		 
+
 		// Bind vertex and index buffer.
 		_context->IASetVertexBuffers(0, 1, _roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		_context->IASetIndexBuffer(_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
@@ -4010,13 +4010,6 @@ namespace TEN::Renderer
 			int index = i;
 			RendererRoom* room = &_rooms[index];
 			ROOM_INFO* nativeRoom = &g_Level.Rooms[room->RoomNumber];
-
-			// Avoid drawing of too far rooms... Environment map is tiny, blurred, so very far rooms would not contribute to the
-			// final pixel colors
-			if (Vector3::Distance(room->BoundingBox.Center, LaraItem->Pose.Position.ToVector3()) >= BLOCK(40))
-			{
-				//continue;
-			}
 
 			cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[_rooms[i].RoomNumber].flags & ENV_FLAG_WATER;
 			_cbCameraMatrices.UpdateData(cameraConstantBuffer, _context.Get());
@@ -4064,7 +4057,6 @@ namespace TEN::Renderer
 		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		_shaders.Bind(Shader::ItemsWaterReflectionsVertexShader);
-		_shaders.Bind(Shader::WaterReflectionsPixelShader);
 
 		for (int i = 0; i < _rooms.size(); i++)
 		{
@@ -4094,6 +4086,119 @@ namespace TEN::Renderer
 				default:
 					DrawAnimatingItem(itemToDraw, view, RendererPass::WaterReflections);
 					continue;
+				}
+			}
+		}
+
+		// Draw statics
+		std::map<int, std::vector<RendererStatic*>> instancedStaticsMap;
+
+		for (int i = 0; i < _rooms.size(); i++)
+		{
+			int index = i;
+			RendererRoom* room = &_rooms[index];
+			ROOM_INFO* nativeRoom = &g_Level.Rooms[room->RoomNumber];
+
+			for (int i = 0; i < room->Statics.size(); i++)
+			{
+				auto* mesh = &room->Statics[i];
+				auto* nativeMesh = &nativeRoom->mesh[i];
+
+				if (nativeMesh->Dirty || _invalidateCache)
+				{
+					mesh->ObjectNumber = nativeMesh->staticNumber;
+					mesh->Color = nativeMesh->color;
+					mesh->OriginalSphere = Statics[mesh->ObjectNumber].visibilityBox.ToLocalBoundingSphere();
+					mesh->Pose = nativeMesh->pos;
+					mesh->Scale = nativeMesh->scale;
+					mesh->Update();
+
+					nativeMesh->Dirty = false;
+				}
+
+				if (!(nativeMesh->flags & StaticMeshFlags::SM_VISIBLE))
+					continue;
+
+				if (!_staticObjects[Statics.GetIndex(mesh->ObjectNumber)].has_value())
+					continue;
+
+				auto& obj = GetStaticRendererObject(mesh->ObjectNumber);
+
+				if (obj.ObjectMeshes.empty())
+					continue;
+
+				// At this point, we are sure that we must draw the static mesh
+				if (instancedStaticsMap.find(mesh->ObjectNumber) == instancedStaticsMap.end())
+				{
+					std::vector<RendererStatic*> vec;
+					instancedStaticsMap.insert(std::pair<int, std::vector<RendererStatic*>>(mesh->ObjectNumber, std::vector<RendererStatic*>()));
+				}
+				instancedStaticsMap[mesh->ObjectNumber].push_back(mesh);
+			}
+		}
+
+		_context->IASetVertexBuffers(0, 1, _staticsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+		_context->IASetIndexBuffer(_staticsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+		_shaders.Bind(Shader::InstancedStaticsWaterReflectionsVertexShader);
+		 
+		for (auto it = instancedStaticsMap.begin(); it != instancedStaticsMap.end(); it++)
+		{
+			auto statics = it->second;
+
+			auto* refStatic = statics[0];
+			auto& refStaticObj = GetStaticRendererObject(refStatic->ObjectNumber);
+			if (refStaticObj.ObjectMeshes.size() == 0)
+				continue;
+
+			auto* refMesh = refStaticObj.ObjectMeshes[0];
+
+			int staticsCount = (int)statics.size();
+			int bucketSize = INSTANCED_STATIC_MESH_BUCKET_SIZE;
+			int baseStaticIndex = 0;
+
+			while (baseStaticIndex < staticsCount)
+			{
+				int instancesCount = 0;
+				int max = std::min(baseStaticIndex + bucketSize, staticsCount);
+
+				for (int s = baseStaticIndex; s < max; s++)
+				{
+					auto* current = statics[s];
+					auto* room = &_rooms[current->RoomNumber];
+					auto world = current->World;
+
+					_stInstancedStaticMeshBuffer.StaticMeshes[instancesCount].World = world;
+					_stInstancedStaticMeshBuffer.StaticMeshes[instancesCount].Color = current->Color;
+					_stInstancedStaticMeshBuffer.StaticMeshes[instancesCount].Ambient = room->AmbientLight;
+
+					instancesCount++;
+				}
+
+				baseStaticIndex += bucketSize;
+
+				if (instancesCount > 0)
+				{
+					_cbInstancedStaticMeshBuffer.UpdateData(_stInstancedStaticMeshBuffer, _context.Get());
+
+					for (const auto& bucket : refMesh->Buckets)
+					{
+						if (bucket.NumVertices == 0)
+							continue;
+
+						if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, RendererPass::WaterReflections, 0))
+							continue;
+
+						BindTexture(TextureRegister::ColorMap,
+							&std::get<0>(_staticTextures[bucket.Texture]),
+							SamplerStateRegister::AnisotropicClamp);
+						BindTexture(TextureRegister::NormalMap,
+							&std::get<1>(_staticTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+
+						DrawIndexedInstancedTriangles(bucket.NumIndices, instancesCount, bucket.StartIndex, 0);
+
+						_numInstancedStaticsDrawCalls++;
+					}
 				}
 			}
 		}

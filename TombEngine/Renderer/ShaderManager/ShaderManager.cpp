@@ -148,6 +148,7 @@ namespace TEN::Renderer::Utils
 	{
 		Load(Shader::RoomsWaterReflectionsVertexShader, "Water", "RoomsWaterReflections", ShaderType::Vertex);
 		Load(Shader::ItemsWaterReflectionsVertexShader, "Water", "ItemsWaterReflections", ShaderType::Vertex);
+		Load(Shader::InstancedStaticsWaterReflectionsVertexShader, "Water", "InstancedStaticsWaterReflections", ShaderType::Vertex);
 		Load(Shader::WaterReflectionsPixelShader, "Water", "WaterReflections", ShaderType::Pixel);
 		Load(Shader::WaterReflectionsGeometryShader, "Water", "WaterReflections", ShaderType::Geometry);
 		Load(Shader::SkyWaterReflectionsVertexShader, "Water", "SkyWaterReflections", ShaderType::Vertex);

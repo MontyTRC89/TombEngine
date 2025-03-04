@@ -73,6 +73,7 @@ namespace TEN::Renderer::Utils
 		SkyWaterReflectionsVertexShader,
 		RoomsWaterReflectionsVertexShader,
 		ItemsWaterReflectionsVertexShader,
+		InstancedStaticsWaterReflectionsVertexShader,
 		SkyWaterReflectionsGeometryShader,
 		WaterReflectionsGeometryShader,
 		SkyWaterReflectionsPixelShader,
