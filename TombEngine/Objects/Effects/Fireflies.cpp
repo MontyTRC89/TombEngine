@@ -102,6 +102,10 @@ namespace TEN::Effects::Fireflys
         firefly.b = firefly.bB = b;
         
         firefly.rotAng = ANGLE(0.0f);
+
+        if (item.TriggerFlags > 8)
+        firefly.rotAng = ANGLE(90.0f);
+
         firefly.on = true;
  
         firefly.Position = item.Pose.Position.ToVector3();
@@ -175,7 +179,7 @@ namespace TEN::Effects::Fireflys
                    StreamerEffect.Spawn(firefly.TargetItemPtr->Index, firefly.Number, pos, direction0, orient2D,
                        Vector4(firefly.r / (float)UCHAR_MAX, firefly.g / (float)UCHAR_MAX, firefly.b / (float)UCHAR_MAX, 1.0f),
                        Vector4::Zero,
-                       6.0f - (firefly.zVel / 14), ((firefly.Velocity / 14 ) + firefly.zVel) / (float)UCHAR_MAX, 0.0f, -0.1f, 90.0f, StreamerFeatherType::None, BlendMode::Additive);
+                       6.3f - (firefly.zVel / 12), ((firefly.Velocity / 8 ) + firefly.zVel * 3) / (float)UCHAR_MAX, 0.0f, -0.1f, 90.0f, StreamerFeatherType::None, BlendMode::Additive);
                 }
 
                 else if (firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::TriggerFlags] < 0)
@@ -300,13 +304,18 @@ namespace TEN::Effects::Fireflys
 
                         firefly.Velocity -= std::min(FLEE_VEL, firefly.TargetItemPtr->Animation.Velocity.z - 1.0f);
 
-                        if (firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::Light] == 1 && firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::TriggerFlags] >= 0)
+                        if (Random::TestProbability(1.0f / 700.0f) && 
+                            firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::Light] == 1 && 
+                            firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::TriggerFlags] >= 0)
                         {
-                            if (firefly.zVel == 0.3f || firefly.zVel > 30.0f)
+                            if (firefly.zVel == 0.3f)
                             {
-                                firefly.zVel = 40.0f;
+                                firefly.zVel = 50.0f;
                             }
-                        }                        
+                        }           
+
+                        if (firefly.zVel > 50.0f)
+                            firefly.zVel = 0.3f;
                     }
 
                     if (distToOtherFirefly < FIREFLY_BASE_SEPARATION_DISTANCE)
@@ -329,7 +338,7 @@ namespace TEN::Effects::Fireflys
 
             if (firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::Light] == 1 && firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::TriggerFlags] >= 0)
             {
-                if (Random::TestProbability(1.0f / 700.0f))
+                if (Random::TestProbability(1.0f / (700.0f - (float)(firefly.TargetItemPtr->ItemFlags[FirefliesItemFlags::Spawncounter] * 2))))
                     firefly.zVel = 100.0f;
 
                 if (firefly.zVel > 1.0f)
