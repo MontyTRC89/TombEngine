@@ -619,14 +619,21 @@ namespace TEN::Renderer
 
 		time(&rawtime);
 		auto time = localtime(&rawtime);
-		strftime(buffer, sizeof(buffer), "/TEN-%d-%m-%Y-%H-%M-%S.png", time);
+		strftime(buffer, sizeof(buffer), "/TEN-%Y%m%d_", time);
 
+		auto now = std::chrono::system_clock::now();
+		auto duration = now.time_since_epoch();
+		auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(
+			duration)
+			.count();
+
+		auto nameFile = buffer + std::to_string(milliseconds).substr(7, 12) + ".png";
 		auto screenPath = g_GameFlow->GetGameDir() + "Screenshots";
 
 		if (!std::filesystem::is_directory(screenPath))
 			std::filesystem::create_directory(screenPath);
 
-		screenPath += buffer;
+		screenPath += nameFile;
 		SaveWICTextureToFile(_context.Get(), _backBuffer.Texture.Get(), GUID_ContainerFormatPng, TEN::Utils::ToWString(screenPath).c_str(),
 			&GUID_WICPixelFormat24bppBGR, nullptr, true);
 	}
