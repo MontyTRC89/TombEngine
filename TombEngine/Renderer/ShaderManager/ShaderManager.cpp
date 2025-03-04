@@ -146,10 +146,17 @@ namespace TEN::Renderer::Utils
 
 	void ShaderManager::LoadWaterShaders()
 	{
+		auto defines = std::vector<D3D10_SHADER_MACRO>{};
+		defines.push_back({ "CAMERA_UNDERWATER", nullptr });
+		
+		auto null = D3D10_SHADER_MACRO{ nullptr, nullptr };
+		defines.push_back(null);
+
 		Load(Shader::RoomsWaterReflectionsVertexShader, "Water", "RoomsWaterReflections", ShaderType::Vertex);
 		Load(Shader::ItemsWaterReflectionsVertexShader, "Water", "ItemsWaterReflections", ShaderType::Vertex);
 		Load(Shader::InstancedStaticsWaterReflectionsVertexShader, "Water", "InstancedStaticsWaterReflections", ShaderType::Vertex);
-		Load(Shader::WaterReflectionsPixelShader, "Water", "WaterReflections", ShaderType::Pixel);
+		Load(Shader::WaterReflectionsCameraAboveWaterPixelShader, "Water", "WaterReflections", ShaderType::Pixel);
+		Load(Shader::WaterReflectionsCameraBelowWaterPixelShader, "Water", "WaterReflections", ShaderType::Pixel, defines.data());
 		Load(Shader::WaterReflectionsGeometryShader, "Water", "WaterReflections", ShaderType::Geometry);
 		Load(Shader::SkyWaterReflectionsVertexShader, "Water", "SkyWaterReflections", ShaderType::Vertex);
 		Load(Shader::SkyWaterReflectionsGeometryShader, "Water", "SkyWaterReflections", ShaderType::Geometry);
@@ -157,7 +164,8 @@ namespace TEN::Renderer::Utils
 		Load(Shader::BlurWaterReflectionsVertexShader, "Water", "BlurWaterReflections", ShaderType::Vertex);
 		Load(Shader::BlurWaterReflectionsGeometryShader, "Water", "BlurWaterReflections", ShaderType::Geometry);
 		Load(Shader::BlurWaterReflectionsPixelShader, "Water", "BlurWaterReflections", ShaderType::Pixel);
-		Load(Shader::Water, "Water", "Water", ShaderType::PixelAndVertex);
+		Load(Shader::WaterCameraAboveWater, "Water", "Water", ShaderType::PixelAndVertex);
+		Load(Shader::WaterCameraBelowWater, "Water", "Water", ShaderType::PixelAndVertex, defines.data());
 	}
 
 	void ShaderManager::Unbind(Shader shader)

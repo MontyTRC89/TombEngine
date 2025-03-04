@@ -2287,20 +2287,15 @@ namespace TEN::Renderer
 	{
 		unsigned int stride = sizeof(Vertex);
 		unsigned int offset = 0;
-
+ 
 		_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
+		 
 		// Set shaders.
 		if (rendererPass == RendererPass::GBuffer)
 		{
 			_shaders.Bind(Shader::GBuffer);
 			_shaders.Bind(Shader::GBufferItems);
-		}
-		else if (rendererPass == RendererPass::WaterReflections)
-		{
-			_shaders.Bind(Shader::ItemsWaterReflectionsVertexShader);
-			_shaders.Bind(Shader::WaterReflectionsPixelShader);
 		}
 		else
 		{
@@ -4001,7 +3996,9 @@ namespace TEN::Renderer
 		_context->IASetIndexBuffer(_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 		_shaders.Bind(Shader::WaterReflectionsGeometryShader);
-		_shaders.Bind(Shader::WaterReflectionsPixelShader);
+	
+		bool isUnderwater = (g_Level.Rooms[view.Camera.RoomNumber].flags & ENV_FLAG_WATER) != 0;
+		_shaders.Bind(isUnderwater ? Shader::WaterReflectionsCameraBelowWaterPixelShader : Shader::WaterReflectionsCameraAboveWaterPixelShader);
 
 		_shaders.Bind(Shader::RoomsWaterReflectionsVertexShader);
 		 
@@ -4353,7 +4350,8 @@ namespace TEN::Renderer
 		SetDepthState(DepthState::Read);
 
 		// Draw water surfaces
-		_shaders.Bind(Shader::Water);
+		bool isUnderwater = (g_Level.Rooms[view.Camera.RoomNumber].flags & ENV_FLAG_WATER) != 0;
+		_shaders.Bind(isUnderwater ? Shader::WaterCameraBelowWater :  Shader::WaterCameraAboveWater);
 
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetInputLayout(_inputLayout.Get());

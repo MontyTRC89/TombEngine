@@ -7,7 +7,8 @@
 #include "./VertexInput.hlsli"
 #include "./PostProcessVertexInput.hlsli"
 
-#define MAX_REFLECTION_TARGETS 8
+#define MAX_REFLECTION_TARGETS      8
+#define BORDERS_BIAS                0.008f
 
 cbuffer WaterConstantBuffer : register(b2)
 {
@@ -112,91 +113,80 @@ WaterPixelShaderInput VSWater(VertexShaderInput input)
     return output;
 }
 
-float FresnelSchlick(float3 viewDir)
-{
-    // Indici di rifrazione
-    const float n_air = 1.0;
-    const float n_water = 1.33;
-
-    // Calcolo di F0
-    float F0 = pow((n_water - n_air) / (n_water + n_air), 2.0);
-
-    // Calcolo di cosTheta (dot product tra normale e direzione della vista)
-    float cosTheta = abs(viewDir.y); // Poiché la normale all'acqua è (0, -1, 0)
-
-    // Formula di Schlick
-    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
-}
-
+#ifdef CAMERA_UNDERWATER
 float ComputeTotalInternalReflection(float3 viewDir)
 {
     const float n_air = 1.0;
     const float n_water = 1.33;
-
-    float sinThetaC = n_air / n_water; // sin(θc)
-    float cosThetaC = sqrt(1.0 - sinThetaC * sinThetaC); // cos(θc)
-
-    float cosThetaV = abs(viewDir.y); // Coseno dell'angolo di incidenza
-
-    // Transizione morbida, ma invertita rispetto alla formula precedente
+    float sinThetaC = n_air / n_water;
+    float cosThetaC = sqrt(1.0 - sinThetaC * sinThetaC);
+    float cosThetaV = abs(viewDir.y);
     return smoothstep(cosThetaC + 0.1, cosThetaC - 0.1, cosThetaV);
 }
+#else
+float FresnelSchlick(float3 viewDir)
+{
+    const float n_air = 1.0;
+    const float n_water = 1.33;
+    float F0 = pow((n_water - n_air) / (n_water + n_air), 2.0);
+    float cosTheta = abs(viewDir.y);
+    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+}
+#endif
 
 float4 PSWater(WaterPixelShaderInput input) : SV_Target
 {
     float4 output;
     
     // Refraction
-    float4 refractionTexCoord;
-    refractionTexCoord = input.PositionCopy;
-
-    // Normalized device coordinates
-    refractionTexCoord.xy /= refractionTexCoord.w;
-
-    // Adjust offset
-    refractionTexCoord.x = 0.5f * refractionTexCoord.x + 0.5f;
-    refractionTexCoord.y = -0.5f * refractionTexCoord.y + 0.5f;
+    float4 refractionUV = input.PositionCopy;
+    refractionUV.xy /= refractionUV.w;
+    refractionUV.x = 0.5f * refractionUV.x + 0.5f;
+    refractionUV.y = -0.5f * refractionUV.y + 0.5f;
 
     // Reflection
-    float4 reflectionTexCoord;
-    reflectionTexCoord = input.ReflectedPosition;
-
-    // Normalized device coordinates
-    reflectionTexCoord.xy /= reflectionTexCoord.w;
-
-    // Adjust offset
-    reflectionTexCoord.x = 0.5f * reflectionTexCoord.x + 0.5f;
-    reflectionTexCoord.y = -0.5f * reflectionTexCoord.y + 0.5f;
+    float4 reflectionUV = input.ReflectedPosition;
+    reflectionUV.xy /= reflectionUV.w;
+    reflectionUV.x = 0.5f * reflectionUV.x + 0.5f;
+    reflectionUV.y = -0.5f * reflectionUV.y + 0.5f;
     
-    float2 oldRefractionUV = refractionTexCoord.xy;
+    // Store old refraction UV for using them in the case we are near the borders
+    float2 oldRefractionUV = refractionUV.xy;
     
-    // Distor refraction UVs
-    float2 temp = frac(input.WorldPosition.xyz / 8192.0f).xz;
-    
-    float2 distortion = (WaterDistortionMapTexture.Sample(WaterDistortionMapSampler, temp).xy * 2.0 - 1.0) * WaveStrength;
-
+    // Distor refraction UV
+    float time = Frame / 1200.0f;
+    float2 mappedUV = frac(input.WorldPosition.xyz / 8192.0f).xz;
+    float2 distortion = (WaterDistortionMapTexture.Sample(WaterDistortionMapSampler, mappedUV).xy * 2.0 - 1.0) * WaveStrength;
     float2 distortedTexCoords = WaterDistortionMapTexture.Sample(WaterDistortionMapSampler,
-        float2(temp.x + Frame / 1200.0f, temp.y)) * 0.001;
-    distortedTexCoords = temp + float2(distortedTexCoords.x, distortedTexCoords.y + Frame / 1200.0f);
+        float2(mappedUV.x + time, mappedUV.y)) * 0.001;
+    distortedTexCoords = mappedUV + float2(distortedTexCoords.x, distortedTexCoords.y + time);
     float2 totalDistortion = (WaterDistortionMapTexture.Sample(WaterDistortionMapSampler, distortedTexCoords).rg * 2.0 - 1.0) * WaveStrength;
     
-    refractionTexCoord.xy += totalDistortion;
-    reflectionTexCoord.xy += totalDistortion;
+    refractionUV.xy += totalDistortion;
+    refractionUV.xy += totalDistortion;
     
-    float3 worldPosition = Unproject(refractionTexCoord.xy);
-    if (worldPosition.y < WaterLevels[WaterPlaneIndex].x || 
-        refractionTexCoord.x < 0.01f || refractionTexCoord.x > 0.99f ||
-        refractionTexCoord.y < 0.01f || refractionTexCoord.y > 0.99f)
+    // Reconstruct world position for avoiding sampling wrong refraction color
+    float3 worldPosition = Unproject(refractionUV.xy);
+    
+#ifdef CAMERA_UNDERWATER
+    if (worldPosition.y > WaterLevels[WaterPlaneIndex].x || 
+#else
+    if (worldPosition.y < WaterLevels[WaterPlaneIndex].x ||
+#endif
+        refractionUV.x < BORDERS_BIAS || refractionUV.x > (1.0f - BORDERS_BIAS) ||
+        refractionUV.y < BORDERS_BIAS || refractionUV.y > (1.0f - BORDERS_BIAS))
     {
-        refractionTexCoord.xy = oldRefractionUV;
+        refractionUV.xy = oldRefractionUV;
     }
     
-    float3 refractedColor = WaterRefractionTexture.Sample(WaterRefractionSampler, refractionTexCoord.xy);
-    float3 reflectedColor = WaterReflectionTexture.Sample(WaterReflectionSampler, float3(reflectionTexCoord.xy, WaterPlaneIndex));
+    // Sample refraction and reflections colors
+    float3 refractedColor = WaterRefractionTexture.Sample(WaterRefractionSampler, refractionUV.xy);
+    float3 reflectedColor = WaterReflectionTexture.Sample(WaterReflectionSampler, float3(reflectionUV.xy, WaterPlaneIndex));
     
+    // Specular highlights
     float3 lightDirection = normalize(input.WorldPosition.xyz - LightPosition);
     float3 halfVector = normalize(lightDirection + CamDirectionWS.xyz);
-    
+ 
     float4 normalMapColor = WaterNormalMapTexture.Sample(WaterNormalMapSampler, distortedTexCoords);
     float3 normal = float3(normalMapColor.r * 2.0 - 1.0, normalMapColor.b, normalMapColor.g * 2.0 - 1.0);
     normal = normalize(normal);
@@ -208,26 +198,18 @@ float4 PSWater(WaterPixelShaderInput input) : SV_Target
     
     // Fresnel
     float3 viewDirection = normalize(CamPositionWS - input.WorldPosition.xyz);
-    float fresnel = 0.0f;
-        // TODO: fix reflections underwater, this is a development hack
-    if (CameraUnderwater == 1)
-    {
-        fresnel = ComputeTotalInternalReflection(viewDirection);
-    }
-    else
-    {
-        fresnel = FresnelSchlick(viewDirection); // pow(dot(viewDirection, float3(0.0f, -1.0f, 0.0f)), 1.5f);
-    
-    }
+#ifdef CAMERA_UNDERWATER
+        float fresnel = ComputeTotalInternalReflection(viewDirection);
+#else
+        float fresnel = FresnelSchlick(viewDirection);
+#endif
     
     // Underwater color extinction
-    float3 groundPosition = Unproject(refractionTexCoord);
+    float3 groundPosition = Unproject(refractionUV);
     float distance = abs(WaterLevels[WaterPlaneIndex] - groundPosition.y);
     float t = smoothstep(0.0, 2048.0, distance);  
     float extinction = 0.4 * t; 
     float3 underwaterColor = lerp(refractedColor, float3(0.0, 0.5, 0.7), extinction);
-    
-
     
     // Final calculation
     output = lerp(float4(underwaterColor, 1.0f), float4(reflectedColor, 1.0f), fresnel) + float4(specularLight, 0.0);
@@ -388,20 +370,17 @@ float4 PSWaterReflections(WaterReflectionsPixelShaderInput input) : SV_Target
 
     float wl = WaterLevels[input.RTIndex].x;
     
-    if (CameraUnderwater)
-    {
+#ifdef CAMERA_UNDERWATER
         if (input.WorldPosition.y <= wl)
         {
             discard;
         }
-    }
-    else
-    {
+#else
         if (input.WorldPosition.y >= wl)
         {
             discard;
         }
-    }
+#endif
     
     DoAlphaTest(output);
 

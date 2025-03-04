@@ -77,11 +77,13 @@ namespace TEN::Renderer::Utils
 		SkyWaterReflectionsGeometryShader,
 		WaterReflectionsGeometryShader,
 		SkyWaterReflectionsPixelShader,
-		WaterReflectionsPixelShader,
+		WaterReflectionsCameraAboveWaterPixelShader,
 		BlurWaterReflectionsVertexShader,
 		BlurWaterReflectionsGeometryShader,
 		BlurWaterReflectionsPixelShader,
-		Water,
+		WaterCameraAboveWater,
+		WaterCameraBelowWater,
+		WaterReflectionsCameraBelowWaterPixelShader,
 
 		Count
 	};

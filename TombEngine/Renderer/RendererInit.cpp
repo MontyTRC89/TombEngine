@@ -570,6 +570,11 @@ namespace TEN::Renderer
 
 		Utils::throwIfFailed(res);
 
+		D3D11_FEATURE_DATA_D3D11_OPTIONS options = {};
+		_device->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS, &options, sizeof(options));
+		UINT maxRenderTargets = D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT;
+		TENLog("Max supported render targets: " + std::to_string(maxRenderTargets));
+
 		// Initialize shader manager.
 		_shaders.Initialize(_device, _context);
 	}
