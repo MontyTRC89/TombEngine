@@ -5,6 +5,7 @@
 #include "./Blending.hlsli"
 #include "./Math.hlsli"
 #include "./VertexInput.hlsli"
+#include "./PostProcessVertexInput.hlsli"
 
 #define MAX_REFLECTION_TARGETS 8
 
@@ -44,9 +45,11 @@ struct WaterPixelShaderInput
 
 struct WaterReflectionsGeometryShaderInput
 {
+    float4 Position : SV_POSITION;
     float3 WorldPosition : WORLDPOSITION;
     float2 UV : TEXCOORD0;
     float4 Color : COLOR;
+    float4 PositionCopy : TEXCOORD1;
     uint InstanceID : SV_InstanceID;
 };
 
@@ -200,6 +203,7 @@ WaterReflectionsGeometryShaderInput VSRoomsWaterReflections(VertexShaderInput in
 {
     WaterReflectionsGeometryShaderInput output;
 
+    output.PositionCopy = output.Position = float4(0.0f, 0.0f, 0.0f, 0.0f);
     output.WorldPosition = input.Position;
     output.Color = input.Color;
     output.UV = input.UV;
@@ -211,7 +215,8 @@ WaterReflectionsGeometryShaderInput VSRoomsWaterReflections(VertexShaderInput in
 WaterReflectionsGeometryShaderInput VSSkyWaterReflections(VertexShaderInput input)
 {
     WaterReflectionsGeometryShaderInput output;
-
+    
+    output.PositionCopy = output.Position = float4(0.0f, 0.0f, 0.0f, 0.0f);
     output.WorldPosition = input.Position;
     output.Color = input.Color;
     output.UV = input.UV;
@@ -226,6 +231,7 @@ WaterReflectionsGeometryShaderInput VSItemsWaterReflections(VertexShaderInput in
     
     float4x4 world = mul(Bones[input.Bone], World);
     
+    output.PositionCopy = output.Position = float4(0.0f, 0.0f, 0.0f, 0.0f);
     output.WorldPosition = mul(float4(input.Position, 1.0f), world);
     output.Color = input.Color;
     output.UV = input.UV;
@@ -238,10 +244,24 @@ WaterReflectionsGeometryShaderInput VSInstancedStaticsWaterReflections(VertexSha
 {
     WaterReflectionsGeometryShaderInput output;
     
+    output.PositionCopy = output.Position = float4(0.0f, 0.0f, 0.0f, 0.0f);
     output.WorldPosition = mul(float4(input.Position, 1.0f), StaticMeshes[InstanceID].World);
     output.Color = input.Color;
     output.UV = input.UV;
     output.InstanceID = InstanceID;
+    
+    return output;
+}
+
+WaterReflectionsGeometryShaderInput VSBlurWaterReflections(PostProcessVertexShaderInput input)
+{
+    WaterReflectionsGeometryShaderInput output;
+    
+    output.PositionCopy = output.Position = float4(input.Position, 1.0f);
+    output.WorldPosition = float3(0.0f, 0.0f, 0.0f);
+    output.Color = input.Color;
+    output.UV = input.UV;
+    output.InstanceID = 0;
     
     return output;
 }
@@ -292,6 +312,28 @@ void GSSkyWaterReflections(triangle WaterReflectionsGeometryShaderInput input[3]
     }
 }
 
+[maxvertexcount(12)]
+void GSBlurWaterReflections(triangle WaterReflectionsGeometryShaderInput input[3], inout TriangleStream<WaterReflectionsPixelShaderInput> outputStream)
+{
+    for (uint i = 0; i < MAX_REFLECTION_TARGETS; i++)
+    {
+        WaterReflectionsPixelShaderInput output;
+        
+        for (int j = 0; j < 3; j++)
+        {
+            output.Position = input[j].Position;
+            output.PositionCopy = output.Position;
+            output.UV = input[j].UV;
+            output.Color = input[j].Color;
+            output.WorldPosition = input[j].WorldPosition;
+            output.RTIndex = i;
+            output.InstanceID = input[j].InstanceID;
+            outputStream.Append(output);
+        }
+        outputStream.RestartStrip();
+    }
+}
+
 float4 PSSkyWaterReflections(WaterReflectionsPixelShaderInput input) : SV_Target
 {
     float4 output = ColorTexture.Sample(ColorSampler, input.UV);
@@ -317,4 +359,21 @@ float4 PSWaterReflections(WaterReflectionsPixelShaderInput input) : SV_Target
     output.xyz *= input.Color.xyz;
 
     return output;
+}
+
+float4 PSBlurWaterReflections(WaterReflectionsPixelShaderInput input) : SV_Target
+{
+    float3 color = float3(0, 0, 0);
+    float weightSum = 0.0;
+    int blurFactor = 5;
+	
+    for (int i = -blurFactor; i <= blurFactor; i++)
+    {
+        float weight = exp(-0.5 * (i / (float) blurFactor) * (i / (float) blurFactor)); // Gaussian weight
+        float2 offset = float2(i * InvViewSize.x, 0.0);
+        color += WaterReflectionTexture.Sample(WaterReflectionSampler, float3(input.UV + offset, input.RTIndex)).rgb * weight;
+        weightSum += weight;
+    }
+
+    return float4(color / weightSum, 1.0);
 }

@@ -1,13 +1,7 @@
 #include "./CBPostProcess.hlsli"
 #include "./CBCamera.hlsli"
 #include "./Math.hlsli"
-
-struct VertexShaderInput
-{
-    float3 Position: POSITION0;
-    float2 UV: TEXCOORD0;
-    float4 Color: COLOR0;
-};
+#include "./PostProcessVertexInput.hlsli"
 
 struct PixelShaderInput
 {
@@ -23,7 +17,7 @@ SamplerState ColorSampler : register(s0);
 static const float Weights[9] = { 0.05, 0.09, 0.12, 0.15, 0.18, 0.15, 0.12, 0.09, 0.05 };
 static const int Offset[9] = { -4, -3, -2, -1, 0, 1, 2, 3, 4 };
 
-PixelShaderInput VS(VertexShaderInput input)
+PixelShaderInput VS(PostProcessVertexShaderInput input)
 {
     PixelShaderInput output;
 

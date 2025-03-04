@@ -476,9 +476,9 @@ namespace TEN::Renderer
 		_normalsRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN);
 		_SSAORenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN);
 		_SSAOBlurredRenderTarget = RenderTarget2D(_device.Get(), w, h, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_UNKNOWN);
-		_waterReflectionsRenderTarget = RenderTarget2DArray(_device.Get(), w / SSR_DOWNSCALE_FACTOR, h / SSR_DOWNSCALE_FACTOR, 6, DXGI_FORMAT_R8G8B8A8_UNORM,  DXGI_FORMAT_D32_FLOAT);
-		_waterReflectionsTempRenderTarget = RenderTarget2D(_device.Get(), w / SSR_DOWNSCALE_FACTOR, h / SSR_DOWNSCALE_FACTOR, DXGI_FORMAT_R8G8B8A8_UNORM, false, DXGI_FORMAT_D32_FLOAT);
-		        
+		_waterReflectionsRenderTarget = RenderTarget2DArray(_device.Get(), w / WATER_REFLECTIONS_DOWNSCALE_FACTOR, h / WATER_REFLECTIONS_DOWNSCALE_FACTOR, 6, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_D32_FLOAT);
+		_waterReflectionsBlurredRenderTarget = RenderTarget2DArray(_device.Get(), w / WATER_REFLECTIONS_DOWNSCALE_FACTOR, h / WATER_REFLECTIONS_DOWNSCALE_FACTOR, 6, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_D32_FLOAT);
+
 		// Initialize sprite and primitive batches
 		_spriteBatch = std::make_unique<SpriteBatch>(_context.Get());
 		_primitiveBatch = std::make_unique<PrimitiveBatch<Vertex>>(_context.Get());

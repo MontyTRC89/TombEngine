@@ -3862,8 +3862,8 @@ namespace TEN::Renderer
 		D3D11_VIEWPORT viewport;
 		viewport.TopLeftX = 0;
 		viewport.TopLeftY = 0;
-		viewport.Width = _screenWidth / SSR_DOWNSCALE_FACTOR;
-		viewport.Height = _screenHeight / SSR_DOWNSCALE_FACTOR;
+		viewport.Width = _screenWidth / WATER_REFLECTIONS_DOWNSCALE_FACTOR;
+		viewport.Height = _screenHeight / WATER_REFLECTIONS_DOWNSCALE_FACTOR;
 		viewport.MinDepth = 0;
 		viewport.MaxDepth = 1;
 
@@ -4098,12 +4098,11 @@ namespace TEN::Renderer
 			}
 		}
 
-		// Blur the render target
-
-		// Common vertex shader to all fullscreen effects
-	/*	_shaders.Bind(Shader::PostProcess);
-
-		// We draw a fullscreen triangle
+		// Blur the render target (only horizontally)
+		_shaders.Bind(Shader::BlurWaterReflectionsVertexShader);
+		_shaders.Bind(Shader::BlurWaterReflectionsGeometryShader);
+		_shaders.Bind(Shader::BlurWaterReflectionsPixelShader);
+		 
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetInputLayout(_fullscreenTriangleInputLayout.Get());
 		   
@@ -4113,23 +4112,14 @@ namespace TEN::Renderer
 		_context->IASetVertexBuffers(0, 1, _fullscreenTriangleVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 
 		float clearColor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
-		_context->ClearRenderTargetView(_waterReflectionsTempRenderTarget.RenderTargetView.Get(), clearColor);
-		_context->OMSetRenderTargets(1, _waterReflectionsTempRenderTarget.RenderTargetView.GetAddressOf(), nullptr);
+		_context->ClearRenderTargetView(_waterReflectionsBlurredRenderTarget.RenderTargetView.Get(), clearColor);
+		_context->OMSetRenderTargets(1, _waterReflectionsBlurredRenderTarget.RenderTargetView.GetAddressOf(), nullptr);
 
-		_shaders.Bind(Shader::PostProcessHorizontalBlur);
-
-		BindRenderTargetAsTexture(TextureRegister::ColorMap, renderTarget, SamplerStateRegister::PointWrap);
+		BindTexture(TextureRegister::WaterReflectionTexture, &_waterReflectionsRenderTarget, SamplerStateRegister::PointWrap);
 		DrawTriangles(3, 0);
 
-		_context->ClearRenderTargetView(renderTarget->RenderTargetView.Get(), clearColor);
-		_context->OMSetRenderTargets(1, renderTarget->RenderTargetView.GetAddressOf(), nullptr);
-
-		_shaders.Bind(Shader::PostProcessVerticalBlur);
-
-		BindRenderTargetAsTexture(TextureRegister::ColorMap, &_waterReflectionsTempRenderTarget, SamplerStateRegister::PointWrap);
-		DrawTriangles(3, 0);*/
-
-		_shaders.Unbind(Shader::WaterReflectionsGeometryShader);
+		// Reset the GPU
+		_shaders.Unbind(Shader::BlurWaterReflectionsGeometryShader);
 
 		SetCullMode(CullMode::CounterClockwise, true);
 		SetDepthState(DepthState::Write, true);
@@ -4149,8 +4139,8 @@ namespace TEN::Renderer
 		D3D11_VIEWPORT viewport;
 		viewport.TopLeftX = 0;
 		viewport.TopLeftY = 0;
-		viewport.Width = _screenWidth / SSR_DOWNSCALE_FACTOR;
-		viewport.Height = _screenHeight / SSR_DOWNSCALE_FACTOR;
+		viewport.Width = _screenWidth / WATER_REFLECTIONS_DOWNSCALE_FACTOR;
+		viewport.Height = _screenHeight / WATER_REFLECTIONS_DOWNSCALE_FACTOR;
 		viewport.MinDepth = 0;
 		viewport.MaxDepth = 1;
 
@@ -4275,6 +4265,7 @@ namespace TEN::Renderer
 		  
 		BindRenderTargetAsTexture(TextureRegister::WaterRefractionTexture, &_postProcessRenderTarget[0], SamplerStateRegister::PointWrap);
 		BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::PointWrap);
+		BindTexture(TextureRegister::WaterReflectionTexture, &_waterReflectionsBlurredRenderTarget, SamplerStateRegister::PointWrap);
 
 		BindTexture(TextureRegister::WaterDistortionMap, &_waterDistortionMap, SamplerStateRegister::AnisotropicWrap);
 		BindTexture(TextureRegister::WaterNormalMap, &_wave1NormalMap, SamplerStateRegister::AnisotropicWrap);
@@ -4293,8 +4284,6 @@ namespace TEN::Renderer
 		{ 
 			RendererWaterPlane& waterPlane = view.WaterPlanesToDraw[i];
 
-			BindTexture(TextureRegister::WaterReflectionTexture, &_waterReflectionsRenderTarget, SamplerStateRegister::PointWrap);
-			     
 			_stWater.WaterLevel = waterPlane.WaterLevel;
 			_stWater.WaterReflectionView = waterPlane.ReflectionViewMatrix;
 			_stWater.LightPosition = Vector3(BLOCK(10), waterPlane.WaterLevel - BLOCK(10), BLOCK(10));

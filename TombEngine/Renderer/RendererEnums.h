@@ -67,7 +67,7 @@ constexpr auto MAX_LENS_FLARES_DRAW = 8;
 constexpr auto ROOM_AMBIENT_MAP_SIZE = 64;
 constexpr auto MAX_ROOM_AMBIENT_MAPS = 10;
 
-constexpr auto SSR_DOWNSCALE_FACTOR = 4;
+constexpr auto WATER_REFLECTIONS_DOWNSCALE_FACTOR = 4;
 
 enum class LightType
 {
@@ -182,8 +182,6 @@ enum class TextureRegister
 	EnvironmentMapFront = 7,
 	EnvironmentMapBack = 8,
 	SSAO = 9,
-	WaterReflectionMap = 10,
-	SSRHashBuffer = 11,
 	WaterNormalMap = 12,
 	WaterRefractionTexture = 13,
 	WaterReflectionTexture = 14,

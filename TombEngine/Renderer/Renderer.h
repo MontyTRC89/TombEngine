@@ -352,8 +352,8 @@ namespace TEN::Renderer
 		// Water
 
 		RenderTarget2DArray _waterReflectionsRenderTarget;
+		RenderTarget2DArray _waterReflectionsBlurredRenderTarget;
 		Texture2D _waterNormalMap;
-		RenderTarget2D _waterReflectionsTempRenderTarget;
 		Texture2D _waterDistortionMap;
 		Texture2D _wave0NormalMap;
 		Texture2D _wave1NormalMap;
