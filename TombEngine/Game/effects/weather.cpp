@@ -9,7 +9,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/savegame.h"
 #include "Game/Setup.h"
-#include "Math.h"
+#include "Math/Math.h"
 #include "Objects/game_object_ids.h"
 #include "Sound/sound.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
@@ -19,79 +19,109 @@ using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Math;
 
-namespace TEN::Effects::Environment 
+namespace TEN::Effects::Environment
 {
 	EnvironmentController Weather;
 
-	HorizonObject::HorizonObject() {}
-
-	// Getters
-	Vector3 HorizonObject::GetRotation() const { return _rotation; }
-	Vector3 HorizonObject::GetOldRotation() const { return _oldRotation; }
-	Vector3 HorizonObject::GetPosition() const { return _position; }
-	Vector3 HorizonObject::GetOldPosition() const { return _oldPosition; }
-	GAME_OBJECT_ID HorizonObject::GetHorizonID() const { return _horizonID; }
-	GAME_OBJECT_ID HorizonObject::GetOldHorizonID() const { return _oldHorizonID; }
-	float HorizonObject::GetTransitionProgress() const { return _transitionProgress; }
-	float HorizonObject::GetTransitionSpeed() const { return _transitionSpeed; }
-
-	// Setters
-	void HorizonObject::SetOldHorizonID(GAME_OBJECT_ID id) { _oldHorizonID = id; }
-	void HorizonObject::SetTransitionProgress(float value) { _transitionProgress = value; }
-	void HorizonObject::SetTransitionSpeed(float value) { _transitionSpeed = value; }
-
-	void HorizonObject::SetRotation(const Vector3& rotation, bool saveOldValue)
+	HorizonObject::HorizonObject(GAME_OBJECT_ID objectID, GAME_OBJECT_ID prevObjectID,
+								 const Vector3& pos, const Vector3& prevPos, const EulerAngles& orient, const EulerAngles& prevOrient,
+								 int transitionTime, int transitionTimeMax)
 	{
-		if (saveOldValue)
-			_oldRotation = _rotation;
-		else
-			_oldRotation = rotation;
+		_objectID = objectID;
+		_position = pos;
+		_orientation = orient;
+		_transitionTime = transitionTime;
+		_transitionTimeMax = transitionTimeMax;
 
-		_rotation = rotation;
+		_prevObjectID = prevObjectID;
+		_prevPosition = prevPos;
+		_prevOrientation = prevOrient;
 	}
 
-	void HorizonObject::SetPosition(const Vector3& position, bool saveOldValue)
+	GAME_OBJECT_ID HorizonObject::GetObjectID() const
 	{
-		if (saveOldValue)
-			_oldPosition = _position;
-		else
-			_oldPosition = position;
-
-		_position = position;
+		return _objectID;
 	}
 
-	void HorizonObject::SetHorizonID(GAME_OBJECT_ID id)
+	const Vector3& HorizonObject::GetPosition() const
 	{
-		_oldHorizonID = _horizonID;
-		_horizonID = id;
-		_transitionProgress = 0.0f;
-		_transitionSpeed = 0.0f;
+		return _position;
+	}
+
+	const EulerAngles& HorizonObject::GetOrientation() const
+	{
+		return _orientation;
+	}
+
+	int HorizonObject::GetTransitionTime() const
+	{
+		return _transitionTime;
+	}
+
+	int HorizonObject::GetTransitionTimeMax() const
+	{
+		return _transitionTimeMax;
+	}
+
+	float HorizonObject::GetTransitionAlpha() const
+	{
+		// No transition; return early.
+		if (_transitionTimeMax == 0)
+			return 1.0f;
+
+		// Calculate and return transition alpha.
+		return Smoothstep((float)_transitionTime / (float)_transitionTimeMax);
+	}
+
+	GAME_OBJECT_ID HorizonObject::GetPrevObjectID() const
+	{
+		return _prevObjectID;
+	}
+
+	const Vector3& HorizonObject::GetPrevPosition() const
+	{
+		return _prevPosition;
+	}
+
+	const EulerAngles& HorizonObject::GetPrevOrientation() const
+	{
+		return _prevOrientation;
+	}
+
+	void HorizonObject::SetObjectID(GAME_OBJECT_ID objectID, float transitionSpeedInSecs)
+	{
+		_prevObjectID = _objectID;
+		_objectID = objectID;
+		_transitionTime = 0;
+		_transitionTimeMax = (int)round(transitionSpeedInSecs / (float)FPS);
+	}
+
+	void HorizonObject::SetPosition(const Vector3& pos)
+	{
+		_prevPosition = pos;
+		_position = pos;
+	}
+
+	void HorizonObject::SetOrientation(const EulerAngles& orient, bool storePrevOrient)
+	{
+		_prevOrientation = storePrevOrient ? _orientation : orient;
+		_orientation = orient;
 	}
 
 	void HorizonObject::Update()
 	{
-		if (_transitionProgress == 1.0f)
+		// No transition; return early.
+		if (_transitionTimeMax == 0)
 			return;
 
-		_transitionProgress += _transitionSpeed == 0.0f ? 1.0f : _transitionSpeed / (float)FPS;
-
-		if (_transitionProgress >= 1.0f)
+		// Update transition.
+		_transitionTime++;
+		if (_transitionTime > _transitionTimeMax)
 		{
-			_transitionProgress = 1.0f;
-			_oldHorizonID = _horizonID;
+			_transitionTime = 0;
+			_transitionTimeMax = 0;
+			_prevObjectID = _objectID;
 		}
-	}
-
-	void HorizonObject::ResetRotation()
-	{
-		_rotation = Vector3::Zero;
-		_oldRotation = Vector3::Zero;
-	}
-
-	void HorizonObject::ResetPosition()
-	{
-		_position = Vector3::Zero;
-		_oldPosition = Vector3::Zero;
 	}
 
 	float WeatherParticle::Transparency() const

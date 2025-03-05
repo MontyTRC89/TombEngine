@@ -1,5 +1,5 @@
 #pragma once
-#include "Math/Math.h"
+
 #include "Objects/Effects/LensFlare.h"
 #include "Objects/game_object_ids.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
@@ -101,49 +101,100 @@ namespace TEN::Effects::Environment
 
 	class HorizonObject
 	{
+	private:
+		GAME_OBJECT_ID _objectID		  = GAME_OBJECT_ID::ID_HORIZON;
+		Vector3		   _position		  = Vector3::Zero;
+		EulerAngles	   _orientation		  = EulerAngles::Identity;
+		int			   _transitionTime	  = 0; // Time in game frames.
+		int			   _transitionTimeMax = 0; // Time in game frames.
+
+		GAME_OBJECT_ID _prevObjectID	= GAME_OBJECT_ID::ID_HORIZON;
+		Vector3		   _prevPosition	= Vector3::Zero;
+		EulerAngles	   _prevOrientation = EulerAngles::Identity;
+
 	public:
-		HorizonObject();
+		// Constructors
+		
+		HorizonObject() = default;
+		HorizonObject(GAME_OBJECT_ID objectID, GAME_OBJECT_ID prevObjectID,
+					  const Vector3& pos, const Vector3& prevPos, const EulerAngles& orient, const EulerAngles& prevOrient,
+					  int transitionTime, int transitionTimeMax);
 
 		// Getters
-		Vector3 GetRotation() const;
-		Vector3 GetOldRotation() const;
-		Vector3 GetPosition() const;
-		Vector3 GetOldPosition() const;
-		GAME_OBJECT_ID GetHorizonID() const;
-		GAME_OBJECT_ID GetOldHorizonID() const;
-		float GetTransitionProgress() const;
-		float GetTransitionSpeed() const;
+		
+		GAME_OBJECT_ID	   GetObjectID() const;
+		const Vector3&	   GetPosition() const;
+		const EulerAngles& GetOrientation() const;
+		int				   GetTransitionTime() const;
+		int				   GetTransitionTimeMax() const;
+
+		float GetTransitionAlpha() const;
+
+		GAME_OBJECT_ID	   GetPrevObjectID() const;
+		const Vector3&	   GetPrevPosition() const;
+		const EulerAngles& GetPrevOrientation() const;
 
 		// Setters
-		void SetRotation(const Vector3& rotation, bool saveOldValue);
-		void SetPosition(const Vector3& position, bool saveOldValue);
-		void SetHorizonID(GAME_OBJECT_ID id);
-		void SetOldHorizonID(GAME_OBJECT_ID id);
-		void SetTransitionProgress(float value);
-		void SetTransitionSpeed(float value);
 
-		// Utility
+		void SetObjectID(GAME_OBJECT_ID objectID, float transitionTimeInSecs = 0.0f);
+		void SetPosition(const Vector3& pos);
+		void SetOrientation(const EulerAngles& orient, bool storePrevOrient);
+
+		// Utilities
+
 		void Update();
-		void ResetRotation(); // Resets horizon rotation
-		void ResetPosition(); // Resets horizon position
-
-	private:
-		GAME_OBJECT_ID _horizonID = ID_HORIZON;
-		GAME_OBJECT_ID _oldHorizonID = ID_HORIZON;
-		float _transitionProgress = 1.0f;
-		float _transitionSpeed = 0.0f;
-		Vector3 _rotation = Vector3::Zero;
-		Vector3 _oldRotation = Vector3::Zero;
-		Vector3 _position = Vector3::Zero;
-		Vector3 _oldPosition = Vector3::Zero;
 	};
 
 	class EnvironmentController
 	{
-	public:
-		EnvironmentController();
+	private:
+		// Weather
 
-		HorizonObject Horizon;
+		std::vector<WeatherParticle> Particles = {};
+
+		// Sky
+
+		Vector4 SkyCurrentColor[2]	  = {};
+		short	SkyCurrentPosition[2] = {};
+
+		// Wind
+
+		int WindX		= 0;
+		int WindZ		= 0;
+		int WindAngle	= 0;
+		int WindDAngle	= 0;
+		int WindCurrent = 0;
+
+		// Flash fader
+
+		Vector3 FlashColorBase = Vector3::Zero;
+		float	FlashSpeed	   = 1.0f;
+		float	FlashProgress  = 0.0f;
+
+		// Lightning
+
+		int	 StormCount		= 0;
+		int	 StormRand		= 0;
+		int	 StormTimer		= 0;
+		byte StormSkyColor	= 1;
+		byte StormSkyColor2 = 1;
+
+		// Starfield
+
+		std::vector<StarParticle>	Stars		   = {};
+		std::vector<MeteorParticle> Meteors		   = {};
+		bool						ResetStarField = true;
+
+		// Lens flare
+
+		LensFlare GlobalLensFlare = {};
+
+	public:
+		// Horizon
+
+		HorizonObject Horizon = HorizonObject();
+
+		EnvironmentController();
 
 		Vector3 Wind() { return Vector3(WindX / 2.0f, 0, WindZ / 2.0f); }
 		Vector3 FlashColor() { return FlashColorBase * sin((FlashProgress * PI) / 2.0f); }
@@ -159,47 +210,13 @@ namespace TEN::Effects::Environment
 		const std::vector<MeteorParticle>&	GetMeteors() const { return Meteors; }
 
 	private:
-		// Weather
-		std::vector<WeatherParticle> Particles = {};
-
-		// Sky
-		Vector4 SkyCurrentColor[2]	  = {};
-		short	SkyCurrentPosition[2] = {};
-
-		// Wind
-		int WindX = 0;
-		int WindZ = 0;
-		int WindAngle = 0;
-		int WindDAngle = 0;
-		int WindCurrent = 0;
-
-		// Flash fader
-		Vector3 FlashColorBase = Vector3::Zero;
-		float	FlashSpeed	   = 1.0f;
-		float	FlashProgress  = 0.0f;
-
-		// Lightning
-		int	 StormCount		= 0;
-		int	 StormRand		= 0;
-		int	 StormTimer		= 0;
-		byte StormSkyColor	= 1;
-		byte StormSkyColor2 = 1;
-
-		// Starfield
-		std::vector<StarParticle>	Stars	= {};
-		std::vector<MeteorParticle> Meteors = {};
-		bool ResetStarField = true;
-
-		// Lens flare
-		LensFlare GlobalLensFlare = {};
-
-		void UpdateStarfield(const ScriptInterfaceLevel& level);
+		void UpdateWeather(const ScriptInterfaceLevel& level);
 		void UpdateSky(const ScriptInterfaceLevel& level);
-		void UpdateStorm(const ScriptInterfaceLevel& level);
 		void UpdateWind(const ScriptInterfaceLevel& level);
 		void UpdateFlash(const ScriptInterfaceLevel& level);
-		void UpdateWeather(const ScriptInterfaceLevel& level);
 		void UpdateLightning();
+		void UpdateStarfield(const ScriptInterfaceLevel& level);
+		void UpdateStorm(const ScriptInterfaceLevel& level);
 
 		void SpawnDustParticles(const ScriptInterfaceLevel& level);
 		void SpawnWeatherParticles(const ScriptInterfaceLevel& level);

@@ -291,105 +291,20 @@ namespace TEN::Scripting::Effects
 		SpawnDynamicSpotLight(pos.ToVector3(), dir.ToVector3(), color, rad, fallOff, dist, ValueOr<bool>(castShadows, false), GetHash(ValueOr<std::string>(name, std::string())));
 	}
 
-/***Emit blood.
-@function EmitBlood
-@tparam Vec3 pos
-@tparam int count (default 1) "amount" of blood. Higher numbers won't add more blood but will make it more "flickery", with higher numbers turning it into a kind of red orb.
-*/
+	/// Emit blood.
+	// @function EmitBlood
+	// @tparam Vec3 pos
+	// @tparam int count Sprite count. __default: 1__
 	static void EmitBlood(const Vec3& pos, TypeOrNil<int> count)
 	{
 		TriggerBlood(pos.x, pos.y, pos.z, -1, ValueOr<int>(count, 1));
 	}
 
-/***Changes horizon to a specified object slot.
-@function SetHorizon
-@tparam Objects.ObjID slot Object slot to change horizon to.
-@tparam[opt] float speed Fade speed in units per second. A value of 1 will make the fade take one second. 0 means no fade. __Default: 0__
-*/
-	static void SetHorizon(GAME_OBJECT_ID horizonObject, TypeOrNil<float> speed)
-	{
-		if (Weather.Horizon.GetHorizonID() == horizonObject)
-			return;
-
-		float prevTransitionProgress = Weather.Horizon.GetTransitionProgress();
-		Weather.Horizon.SetHorizonID(horizonObject);
-
-		if (prevTransitionProgress < 1.0f)
-			Weather.Horizon.SetTransitionProgress(1.0f - prevTransitionProgress);
-
-		Weather.Horizon.SetTransitionSpeed(ValueOr<float>(speed, 0.0f));
-	}
-
-/***Rotate horizon by specified rotation value.
-@function SetHorizonRotation
-@tparam Rotation rot Horizon's new rotation.
-*/
-	static void SetHorizonRotation(const Rotation& rot)
-	{
-		constexpr auto BIG_ANGLE_THRESHOLD_DEGREES = 30.0f;
-
-		// Get current rotation in degrees
-		Vector3 _horizonRotation = Weather.Horizon.GetRotation();
-		Rotation currentRotation = Rotation(_horizonRotation.x / RADIAN, _horizonRotation.y / RADIAN, _horizonRotation.z / RADIAN);
-
-		// Check if the difference in rotation exceeds the threshold
-		bool bigRotation =
-			(std::abs(rot.x - currentRotation.x) > BIG_ANGLE_THRESHOLD_DEGREES) ||
-			(std::abs(rot.y - currentRotation.y) > BIG_ANGLE_THRESHOLD_DEGREES) ||
-			(std::abs(rot.z - currentRotation.z) > BIG_ANGLE_THRESHOLD_DEGREES);
-
-		Vec3 data = Vec3(rot.x * RADIAN,rot.y * RADIAN,rot.z * RADIAN);
-
-		Weather.Horizon.SetRotation(data, !bigRotation);
-	}
-
-/***Returns horizon's current rotation value.
-@function GetHorizonRotation
-@treturn Rotation Horizon's current rotation.
-*/
-	Rotation GetHorizonRotation()
-	{
-		Vector3 _horizonRotation = Weather.Horizon.GetRotation();
-		Rotation rot = Rotation(_horizonRotation.x / RADIAN, _horizonRotation.y / RADIAN, _horizonRotation.z / RADIAN);
-		return rot;
-	}
-
-/***Set Position of horizon at specified value.
-@function SetHorizonPosition
-@tparam Vec3 pos Horizon's new position.
-*/
-	static void SetHorizonPosition(const Vec3& pos)
-	{
-		constexpr auto BIG_DISTANCE_THRESHOLD = 30.0f;
-
-		// Get current rotation in degrees
-		Vector3 _horizonPosition = Weather.Horizon.GetPosition();
-		
-		// Check if the difference in rotation exceeds the threshold
-		bool bigDistance =
-			(std::abs(pos.x - _horizonPosition.x) > BIG_DISTANCE_THRESHOLD) ||
-			(std::abs(pos.y - _horizonPosition.y) > BIG_DISTANCE_THRESHOLD) ||
-			(std::abs(pos.z - _horizonPosition.z) > BIG_DISTANCE_THRESHOLD);
-
-		Weather.Horizon.SetPosition(pos, !bigDistance);
-	}
-
-/***Returns horizon's current position value.
-@function GetHorizonPosition
-@treturn Vec3 Horizon's current position.
-*/
-	Rotation GetHorizonPosition()
-	{
-		Vector3 _horizonPosition = Weather.Horizon.GetPosition();
-		Vec3 position = Vec3(_horizonPosition.x, _horizonPosition.y, _horizonPosition.z);
-		return position;
-	}
-
-/// Emit air bubble in a water room.
-// @function EmitAirBubble
-// @tparam Vec3 pos World position where the effect will be spawned. Must be in a water room.
-// @tparam[opt] float size Sprite size. __Default: 32__
-// @tparam[opt] float amp Oscillation amplitude. __Default: 32__
+	/// Emit an air bubble in a water room.
+	// @function EmitAirBubble
+	// @tparam Vec3 pos World position where the effect will be spawned. Must be in a water room.
+	// @tparam[opt] float size Sprite size. __Default: 32__
+	// @tparam[opt] float amp Oscillation amplitude. __Default: 32__
 	static void EmitAirBubble(const Vec3& pos, TypeOrNil<float> size, TypeOrNil<float> amp)
 	{
 		constexpr auto DEFAULT_SIZE = 128.0f;
@@ -441,11 +356,72 @@ namespace TEN::Scripting::Effects
 		return Vec3(Weather.Wind());
 	}
 
+	/// Get the horizon's world position.
+	// @function GetHorizonPosition
+	// @treturn Vec3 Position.
+	static Rotation GetHorizonPosition()
+	{
+		return Vec3(Weather.Horizon.GetPosition());
+	}
+
+	/// Get the horizon's rotation.
+	// @function GetHorizonRotation
+	// @treturn Rotation Rotation.
+	static Rotation GetHorizonRotation()
+	{
+		return Rotation(Weather.Horizon.GetOrientation());
+	}
+
+	/// Set the horizon's slot object ID with an optional transision.
+	// @function SetHorizon
+	// @tparam Objects.ObjID New slot object ID.
+	// @tparam[opt] float speed Transition speed in seconds. __default: 0__
+	static void SetHorizonObjectID(GAME_OBJECT_ID objectID, TypeOrNil<float> speed)
+	{
+		// Same slot object ID; return early.
+		if (Weather.Horizon.GetObjectID() == objectID)
+		{
+			TENLog("Horizon attempted to transition to the same slot object.", LogLevel::Warning);
+			return;
+		}
+
+		// Set new object ID with transition.
+		float convertedSpeed = ValueOr<float>(speed, 0.0f);
+		Weather.Horizon.SetObjectID(objectID, convertedSpeed);
+	}
+	
+	/// Set the horizon's world position.
+	// @function SetHorizonPosition
+	// @tparam Vec3 pos New world position.
+	static void SetHorizonPosition(const Vec3& pos)
+	{
+		Weather.Horizon.SetPosition(pos);
+	}
+
+	/// Set the horizon's rotation.
+	// @function SetHorizonRotation
+	// @tparam Rotation rot New rotation.
+	static void SetHorizonRotation(const Rotation& rot)
+	{
+		constexpr auto ORIENT_INTERP_ANGLE_MAX = ANGLE(30.0f);
+
+		auto orient = rot.ToEulerAngles();
+		auto orientDelta = orient - Weather.Horizon.GetOrientation();
+
+		// Check if orientation delta exceeds threshold.
+		bool storePrevOrient = abs(orientDelta.x) <= ORIENT_INTERP_ANGLE_MAX ||
+							   abs(orientDelta.y) <= ORIENT_INTERP_ANGLE_MAX ||
+							   abs(orientDelta.z) <= ORIENT_INTERP_ANGLE_MAX;
+
+		Weather.Horizon.SetOrientation(orient, storePrevOrient);
+	}
+
 	void Register(sol::state* state, sol::table& parent) 
 	{
 		auto tableEffects = sol::table(state->lua_state(), sol::create);
 		parent.set(ScriptReserved_Effects, tableEffects);
 
+		// Emitters
 		tableEffects.set_function(ScriptReserved_EmitLightningArc, &EmitLightningArc);
 		tableEffects.set_function(ScriptReserved_EmitParticle, &EmitParticle);
 		tableEffects.set_function(ScriptReserved_EmitShockwave, &EmitShockwave);
@@ -453,19 +429,21 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_EmitSpotLight, &EmitSpotLight);
 		tableEffects.set_function(ScriptReserved_EmitBlood, &EmitBlood);
 		tableEffects.set_function(ScriptReserved_EmitAirBubble, &EmitAirBubble);
-		tableEffects.set_function(ScriptReserved_MakeExplosion, &MakeExplosion);
 		tableEffects.set_function(ScriptReserved_EmitFire, &EmitFire);
+
+		tableEffects.set_function(ScriptReserved_MakeExplosion, &MakeExplosion);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
 		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
-		tableEffects.set_function(ScriptReserved_SetHorizonRotation, &SetHorizonRotation);
-		tableEffects.set_function(ScriptReserved_GetHorizonRotation, &GetHorizonRotation);
-		tableEffects.set_function(ScriptReserved_SetHorizonPosition, &SetHorizonPosition);
-		tableEffects.set_function(ScriptReserved_GetHorizonPosition, &GetHorizonPosition);
-		tableEffects.set_function(ScriptReserved_SetHorizon, &SetHorizon);
 
-		auto handler = LuaHandler{ state };
+		// Horizon
+		tableEffects.set_function(ScriptReserved_GetHorizonPosition, &GetHorizonPosition);
+		tableEffects.set_function(ScriptReserved_GetHorizonRotation, &GetHorizonRotation);
+		tableEffects.set_function(ScriptReserved_SetHorizonObjectID, &SetHorizonObjectID);
+		tableEffects.set_function(ScriptReserved_SetHorizonPosition, &SetHorizonPosition);
+		tableEffects.set_function(ScriptReserved_SetHorizonRotation, &SetHorizonRotation);
+
+		auto handler = LuaHandler(state);
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_BlendID, BLEND_IDS);
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_EffectID, EFFECT_IDS);
 	}
 }
-

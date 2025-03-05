@@ -572,12 +572,16 @@ table SaveGame {
 	action_queue: [int32];
 	soundtracks: [Soundtrack];
 	cd_flags: [int32];
-	horizon: int32;
-	old_horizon: int32;
-	horizon_transition_progress: float;
-	horizon_transition_speed: float;
-	horizon_rotation: Vector3;
+
+	horizon_object_id: int32;
 	horizon_position: Vector3;
+	horizon_orientation: EulerAngles;
+	horizon_transition_time: int32;
+	horizon_transition_time_max: int32;
+	horizon_prev_object_id: int32;
+	horizon_prev_position: Vector3;
+	horizon_prev_orientation: EulerAngles;
+
 	postprocess_mode: int32;
 	postprocess_strength: float;
 	postprocess_tint: Vector3;

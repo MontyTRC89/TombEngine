@@ -320,11 +320,13 @@ static constexpr char ScriptReserved_EmitAirBubble[]				= "EmitAirBubble";
 static constexpr char ScriptReserved_EmitFire[]						= "EmitFire";
 static constexpr char ScriptReserved_MakeExplosion[]				= "MakeExplosion";
 static constexpr char ScriptReserved_MakeEarthquake[]				= "MakeEarthquake";
-static constexpr char ScriptReserved_SetHorizon[]					= "SetHorizon";
-static constexpr char ScriptReserved_SetHorizonRotation[]			= "SetHorizonRotation";
-static constexpr char ScriptReserved_GetHorizonRotation[]			= "GetHorizonRotation";
-static constexpr char ScriptReserved_SetHorizonPosition[]			= "SetHorizonPosition";
-static constexpr char ScriptReserved_GetHorizonPosition[]			= "GetHorizonPosition";
+
+constexpr char ScriptReserved_GetHorizonPosition[]			= "GetHorizonPosition";
+constexpr char ScriptReserved_GetHorizonRotation[]			= "GetHorizonRotation";
+constexpr char ScriptReserved_SetHorizonObjectID[]			= "SetHorizonObjectID";
+constexpr char ScriptReserved_SetHorizonPosition[]			= "SetHorizonPosition";
+constexpr char ScriptReserved_SetHorizonRotation[]			= "SetHorizonRotation";
+
 static constexpr char ScriptReserved_GetWind[]						= "GetWind";
 static constexpr char ScriptReserved_Vibrate[]						= "Vibrate";
 static constexpr char ScriptReserved_FlashScreen[]					= "FlashScreen";

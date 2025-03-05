@@ -143,7 +143,7 @@
 	</tr>
 	<tr>
 	<td class="name" ><a href="#EmitAirBubble">EmitAirBubble(pos[, size][, amp])</a></td>
-	<td class="summary">Emit air bubble in a water room.</td>
+	<td class="summary">Emit an air bubble in a water room.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#EmitFire">EmitFire(pos, size)</a></td>
@@ -160,6 +160,26 @@
 	<tr>
 	<td class="name" ><a href="#GetWind">GetWind()</a></td>
 	<td class="summary">Get the wind vector for the current game frame.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetHorizonPosition">GetHorizonPosition()</a></td>
+	<td class="summary">Get the horizon's world position.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetHorizonRotation">GetHorizonRotation()</a></td>
+	<td class="summary">Get the horizon's rotation.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetHorizon">SetHorizon(New[, speed])</a></td>
+	<td class="summary">Set the horizon's slot object ID with an optional transision.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetHorizonPosition">SetHorizonPosition(pos)</a></td>
+	<td class="summary">Set the horizon's world position.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetHorizonRotation">SetHorizonRotation(rot)</a></td>
+	<td class="summary">Set the horizon's rotation.</td>
 	</tr>
 </table>
 
@@ -495,7 +515,7 @@
         </li>
         <li><span class="parameter">count</span>
             <span class="types"><span class="type">int</span></span>
-         (default 1) "amount" of blood. Higher numbers won't add more blood but will make it more "flickery", with higher numbers turning it into a kind of red orb.
+         Sprite count. <strong>default: 1</strong>
         </li>
     </ul>
 
@@ -509,7 +529,7 @@
     <strong>EmitAirBubble(pos[, size][, amp])</strong>
     </dt>
     <dd>
-    Emit air bubble in a water room.
+    Emit an air bubble in a water room.
 
 
 
@@ -635,6 +655,119 @@
            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
         Wind vector.
     </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetHorizonPosition"></a>
+    <strong>GetHorizonPosition()</strong>
+    </dt>
+    <dd>
+    Get the horizon's world position.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+        Position.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetHorizonRotation"></a>
+    <strong>GetHorizonRotation()</strong>
+    </dt>
+    <dd>
+    Get the horizon's rotation.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
+        Rotation.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetHorizon"></a>
+    <strong>SetHorizon(New[, speed])</strong>
+    </dt>
+    <dd>
+    Set the horizon's slot object ID with an optional transision.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">New</span>
+            <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
+         slot object ID.
+        </li>
+        <li><span class="parameter">speed</span>
+            <span class="types"><span class="type">float</span></span>
+         Transition speed in seconds. <strong>default: 0</strong>
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetHorizonPosition"></a>
+    <strong>SetHorizonPosition(pos)</strong>
+    </dt>
+    <dd>
+    Set the horizon's world position.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pos</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         New world position.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetHorizonRotation"></a>
+    <strong>SetHorizonRotation(rot)</strong>
+    </dt>
+    <dd>
+    Set the horizon's rotation.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">rot</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
+         New rotation.
+        </li>
+    </ul>
+
 
 
 

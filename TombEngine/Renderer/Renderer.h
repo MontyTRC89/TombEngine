@@ -314,7 +314,7 @@ namespace TEN::Renderer
 		RenderTarget2D _SMAADepthRenderTarget;
 		RenderTarget2D _SMAAEdgesRenderTarget;
 		RenderTarget2D _SMAABlendRenderTarget;
-		
+
 		// Post-process
 
 		PostProcessMode _postProcessMode = PostProcessMode::None;

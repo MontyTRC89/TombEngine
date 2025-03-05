@@ -33,15 +33,13 @@
 #include "Specific/level.h"
 #include "Specific/winmain.h"
 
-using namespace std::chrono;
 using namespace TEN::Effects::Hair;
-using namespace TEN::Entities::Creatures::TR3;
-using namespace TEN::Entities::Generic;
 using namespace TEN::Hud;
-using namespace TEN::Renderer::Structures;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::DisplaySprite;
-using namespace TEN::Effects::Environment;
+using namespace TEN::Entities::Creatures::TR3;
+using namespace TEN::Entities::Generic;
+using namespace TEN::Renderer::Structures;
 
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
@@ -1983,7 +1981,7 @@ namespace TEN::Renderer
 		view.FillConstantBuffer(cameraConstantBuffer);
 		_cbCameraMatrices.UpdateData(cameraConstantBuffer, _context.Get());
 
-		// Draw horizon and the sky
+		// Draw horizon and sky.
 		auto* levelPtr = g_GameFlow->GetLevel(CurrentLevel);
 
 		if (levelPtr->Horizon)
@@ -2028,31 +2026,26 @@ namespace TEN::Renderer
 			_context->ClearDepthStencilView(renderTarget->DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 
 			// Draw horizon.
-			if (_moveableObjects[ID_HORIZON].has_value())
+			if (_moveableObjects[ID_HORIZON].has_value()) // TODO: Should use stored horizon object ID?
 			{
 				_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-				auto& moveableObj = *_moveableObjects[ID_HORIZON];
-				 
+				const auto& moveableObj = *_moveableObjects[ID_HORIZON]; // TODO: Should use stored horizon object ID?
+
 				_stStatic.World = Matrix::CreateTranslation(LaraItem->Pose.Position.ToVector3());
 				_stStatic.Color = Vector4::One;
 				_stStatic.ApplyFogBulbs = 1;
 				_cbStatic.UpdateData(_stStatic, _context.Get());
 
-				for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+				for (const auto* mesh : moveableObj.ObjectMeshes)
 				{
-					auto* meshPtr = moveableObj.ObjectMeshes[k];
-
-					for (auto& bucket : meshPtr->Buckets)
+					for (const auto& bucket : mesh->Buckets)
 					{
 						if (bucket.NumVertices == 0)
-						{
 							continue;
-						}
 
-						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]),
-							SamplerStateRegister::AnisotropicClamp);
+						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
 						// Always render horizon as alpha-blended surface.
 						SetBlendMode(bucket.BlendMode == BlendMode::AlphaTest ? BlendMode::AlphaBlend : bucket.BlendMode);
@@ -2073,8 +2066,8 @@ namespace TEN::Renderer
 		_shaders.Bind(Shader::RoomAmbient);
 
 		// Draw rooms
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
+		unsigned int stride = sizeof(Vertex);
+		unsigned int offset = 0;
 
 		// Bind vertex and index buffer.
 		_context->IASetVertexBuffers(0, 1, _roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -2083,8 +2076,8 @@ namespace TEN::Renderer
 		for (int i = 0; i < _rooms.size(); i++)
 		{
 			int index = i;
-			RendererRoom* room = &_rooms[index];
-			ROOM_INFO* nativeRoom = &g_Level.Rooms[room->RoomNumber];
+			auto* room = &_rooms[index];
+			auto* nativeRoom = &g_Level.Rooms[room->RoomNumber];
 
 			// Avoid drawing of too far rooms... Environment map is tiny, blurred, so very far rooms would not contribute to the
 			// final pixel colors
@@ -2105,9 +2098,7 @@ namespace TEN::Renderer
 			for (auto& bucket : room->Buckets)
 			{
 				if (bucket.NumVertices == 0)
-				{
 					continue;
-				}
 
 				SetBlendMode(bucket.BlendMode);
 				SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
@@ -3035,9 +3026,8 @@ namespace TEN::Renderer
 		}
 
 		// Draw horizon.
-		
-		if (_moveableObjects[Weather.Horizon.GetHorizonID()].has_value() &&
-			_moveableObjects[Weather.Horizon.GetOldHorizonID()].has_value())
+		if (_moveableObjects[Weather.Horizon.GetObjectID()].has_value() &&
+			_moveableObjects[Weather.Horizon.GetPrevObjectID()].has_value())
 		{
 			SetDepthState(DepthState::None);
 			SetBlendMode(BlendMode::Opaque);
@@ -3048,32 +3038,31 @@ namespace TEN::Renderer
 
 			_shaders.Bind(Shader::Sky);
 
-			auto rotation = Vector3::Lerp(Weather.Horizon.GetOldRotation(), Weather.Horizon.GetRotation(), GetInterpolationFactor());
-			auto position = Vector3::Lerp(Weather.Horizon.GetOldPosition(), Weather.Horizon.GetPosition(), GetInterpolationFactor());
-			Matrix rotationMatrix = Matrix::CreateRotationX(rotation.x) * Matrix::CreateRotationY(rotation.y) * Matrix::CreateRotationZ(rotation.z);
-			Matrix translationMatrix = Matrix::CreateTranslation(position);
+			auto pos = Vector3::Lerp(Weather.Horizon.GetPrevPosition(), Weather.Horizon.GetPosition(), GetInterpolationFactor());
+			auto orient = EulerAngles::Lerp(Weather.Horizon.GetPrevOrientation(), Weather.Horizon.GetOrientation(), GetInterpolationFactor());
+			auto rotMatrix = orient.ToRotationMatrix();
+			auto translationMatrix = Matrix::CreateTranslation(pos);
 
-			for (bool oldHorizon : {false, true})
+			auto cameraMatrix = Matrix::CreateTranslation(renderView.Camera.WorldPosition);
+
+			for (bool isPrevHorizon : { false, true })
 			{
-				if (oldHorizon && Weather.Horizon.GetOldHorizonID() == Weather.Horizon.GetHorizonID())
+				if (isPrevHorizon && Weather.Horizon.GetPrevObjectID() == Weather.Horizon.GetObjectID())
 					continue;
 
-				auto alpha = Smoothstep(Weather.Horizon.GetTransitionProgress());
-				if (oldHorizon)
+				float alpha = Weather.Horizon.GetTransitionAlpha();
+				if (isPrevHorizon)
 					alpha = 1.0f - alpha;
 
-				_stStatic.World = translationMatrix * rotationMatrix * Matrix::CreateTranslation(renderView.Camera.WorldPosition);
-				_stStatic.Color = Vector4(1.0f, 1.0f, 1.0f, alpha);
+				_stStatic.World = translationMatrix * rotMatrix * cameraMatrix;
+				_stStatic.Color = Color(1.0f, 1.0f, 1.0f, alpha);
 				_stStatic.ApplyFogBulbs = 1;
 				_cbStatic.UpdateData(_stStatic, _context.Get());
 
-				auto& moveableObj = *_moveableObjects[oldHorizon ? Weather.Horizon.GetOldHorizonID() : Weather.Horizon.GetHorizonID()];
-
-				for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+				const auto& moveableObj = *_moveableObjects[isPrevHorizon ? Weather.Horizon.GetPrevObjectID() : Weather.Horizon.GetObjectID()];
+				for (const auto* mesh : moveableObj.ObjectMeshes)
 				{
-					auto* meshPtr = moveableObj.ObjectMeshes[k];
-
-					for (auto& bucket : meshPtr->Buckets)
+					for (const auto& bucket : mesh->Buckets)
 					{
 						if (bucket.NumVertices == 0)
 							continue;
@@ -3081,7 +3070,7 @@ namespace TEN::Renderer
 						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
 						// Always render horizon as alpha-blended surface.
-						SetBlendMode(GetBlendModeFromAlpha(bucket.BlendMode == BlendMode::AlphaTest ? BlendMode::AlphaBlend : bucket.BlendMode, alpha));
+						SetBlendMode(GetBlendModeFromAlpha((bucket.BlendMode == BlendMode::AlphaTest) ? BlendMode::AlphaBlend : bucket.BlendMode, alpha));
 						SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 						// Draw vertices.

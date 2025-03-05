@@ -1494,12 +1494,16 @@ const std::vector<byte> SaveGame::Build()
 	sgb.add_postprocess_strength(g_Renderer.GetPostProcessStrength());
 	sgb.add_postprocess_tint(&FromVector3(g_Renderer.GetPostProcessTint()));
 	sgb.add_soundtracks(soundtrackOffset);
-	sgb.add_horizon(Weather.Horizon.GetHorizonID());
-	sgb.add_old_horizon(Weather.Horizon.GetOldHorizonID());
-	sgb.add_horizon_transition_progress(Weather.Horizon.GetTransitionProgress());
-	sgb.add_horizon_transition_speed(Weather.Horizon.GetTransitionSpeed());
-	sgb.add_horizon_rotation(&FromVector3(Weather.Horizon.GetRotation()));
+
+	sgb.add_horizon_object_id(Weather.Horizon.GetObjectID());
 	sgb.add_horizon_position(&FromVector3(Weather.Horizon.GetPosition()));
+	sgb.add_horizon_orientation(&FromEulerAngles(Weather.Horizon.GetOrientation()));
+	sgb.add_horizon_transition_time(Weather.Horizon.GetTransitionTime());
+	sgb.add_horizon_transition_time_max(Weather.Horizon.GetTransitionTimeMax());
+	sgb.add_horizon_prev_object_id(Weather.Horizon.GetPrevObjectID());
+	sgb.add_horizon_prev_position(&FromVector3(Weather.Horizon.GetPrevPosition()));
+	sgb.add_horizon_prev_orientation(&FromEulerAngles(Weather.Horizon.GetOrientation()));
+
 	sgb.add_cd_flags(soundtrackMapOffset);
 	sgb.add_action_queue(actionQueueOffset);
 	sgb.add_flip_maps(flipMapsOffset);
@@ -2156,13 +2160,11 @@ static void ParseEffects(const Save::SaveGame* s)
 	g_Renderer.SetPostProcessStrength(s->postprocess_strength());
 	g_Renderer.SetPostProcessTint(ToVector3(s->postprocess_tint()));
 
-	// Restore horizon state.
-	Weather.Horizon.SetHorizonID((GAME_OBJECT_ID)s->horizon());
-	Weather.Horizon.SetOldHorizonID((GAME_OBJECT_ID)s->old_horizon());
-	Weather.Horizon.SetTransitionProgress(s->horizon_transition_progress());
-	Weather.Horizon.SetTransitionSpeed(s->horizon_transition_speed());
-	Weather.Horizon.SetRotation(ToVector3(s->horizon_rotation()), false);
-	Weather.Horizon.SetPosition(ToVector3(s->horizon_position()), false);
+	// Restore horizon.
+	Weather.Horizon = HorizonObject(
+		(GAME_OBJECT_ID)s->horizon_object_id(), (GAME_OBJECT_ID)s->horizon_prev_object_id(),
+		ToVector3(s->horizon_position()), ToVector3(s->horizon_prev_position()), ToEulerAngles(s->horizon_orientation()), ToEulerAngles(s->horizon_prev_orientation()),
+		s->horizon_transition_time(), s->horizon_transition_time_max());
 
 	// Restore soundtracks.
 	for (int i = 0; i < s->soundtracks()->size(); i++)
