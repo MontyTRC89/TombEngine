@@ -57,7 +57,7 @@ Util.GenerateTimeFormattedString = function (time, timerFormat, errorFormat)
 		local formattedString = table.concat(result, ":")
 
     	if timerFormat.deciseconds then
-        	local deciseconds = string.sub(string.format("%02d", time.c), 1, -2)
+        	local deciseconds = math.floor(time.c / 10)
 			return (index == 1) and deciseconds or formattedString .. "." .. deciseconds
     	end
     	return formattedString
