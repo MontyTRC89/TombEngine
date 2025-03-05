@@ -339,7 +339,7 @@ namespace TEN::Scripting::Collision
 		DrawDebugTarget(pos, Quaternion::Identity, TARGET_RADIUS, COLOR, DEBUG_PAGE);
 
 		// Preview floor position.
-		if (_pointCollision.GetFloorHeight() != NO_HEIGHT);
+		if (_pointCollision.GetFloorHeight() != NO_HEIGHT)
 		{
 			auto floorPos = Vector3(pos.x, _pointCollision.GetFloorHeight(), pos.z);
 			DrawDebugTarget(floorPos, Quaternion::Identity, TARGET_RADIUS, COLOR, DEBUG_PAGE);
@@ -347,7 +347,7 @@ namespace TEN::Scripting::Collision
 		}
 		
 		// Preview ceiling position.
-		if (_pointCollision.GetCeilingHeight() != NO_HEIGHT);
+		if (_pointCollision.GetCeilingHeight() != NO_HEIGHT)
 		{
 			auto ceilPos = Vector3(pos.x, _pointCollision.GetCeilingHeight(), pos.z);
 			DrawDebugTarget(ceilPos, Quaternion::Identity, TARGET_RADIUS, COLOR, DEBUG_PAGE);
@@ -355,7 +355,7 @@ namespace TEN::Scripting::Collision
 		}
 
 		// Preview water surface position.
-		if (_pointCollision.GetWaterSurfaceHeight() != NO_HEIGHT);
+		if (_pointCollision.GetWaterSurfaceHeight() != NO_HEIGHT)
 		{
 			auto waterSurfacePos = Vector3(pos.x, _pointCollision.GetWaterSurfaceHeight(), pos.z);
 			DrawDebugTarget(waterSurfacePos, Quaternion::Identity, TARGET_RADIUS, COLOR, DEBUG_PAGE);
