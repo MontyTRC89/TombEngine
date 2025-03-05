@@ -1,6 +1,7 @@
 #pragma once
-#include "Math/Math.h"
+
 #include "Objects/Effects/LensFlare.h"
+#include "Objects/game_object_ids.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 
 using namespace TEN::Entities::Effects;
@@ -98,9 +99,101 @@ namespace TEN::Effects::Environment
 		}
 	};
 
+	class HorizonObject
+	{
+	private:
+		GAME_OBJECT_ID _objectID		  = GAME_OBJECT_ID::ID_HORIZON;
+		Vector3		   _position		  = Vector3::Zero;
+		EulerAngles	   _orientation		  = EulerAngles::Identity;
+		int			   _transitionTime	  = 0; // Time in game frames.
+		int			   _transitionTimeMax = 0; // Time in game frames.
+
+		GAME_OBJECT_ID _prevObjectID	= GAME_OBJECT_ID::ID_HORIZON;
+		Vector3		   _prevPosition	= Vector3::Zero;
+		EulerAngles	   _prevOrientation = EulerAngles::Identity;
+
+	public:
+		// Constructors
+		
+		HorizonObject() = default;
+		HorizonObject(GAME_OBJECT_ID objectID, GAME_OBJECT_ID prevObjectID,
+					  const Vector3& pos, const Vector3& prevPos, const EulerAngles& orient, const EulerAngles& prevOrient,
+					  int transitionTime, int transitionTimeMax);
+
+		// Getters
+		
+		GAME_OBJECT_ID	   GetObjectID() const;
+		const Vector3&	   GetPosition() const;
+		const EulerAngles& GetOrientation() const;
+		int				   GetTransitionTime() const;
+		int				   GetTransitionTimeMax() const;
+
+		float GetTransitionAlpha() const;
+
+		GAME_OBJECT_ID	   GetPrevObjectID() const;
+		const Vector3&	   GetPrevPosition() const;
+		const EulerAngles& GetPrevOrientation() const;
+
+		// Setters
+
+		void SetObjectID(GAME_OBJECT_ID objectID, float transitionTimeInSecs = 0.0f);
+		void SetPosition(const Vector3& pos);
+		void SetOrientation(const EulerAngles& orient, bool storePrevOrient);
+
+		// Utilities
+
+		void Update();
+	};
+
 	class EnvironmentController
 	{
+	private:
+		// Weather
+
+		std::vector<WeatherParticle> Particles = {};
+
+		// Sky
+
+		Vector4 SkyCurrentColor[2]	  = {};
+		short	SkyCurrentPosition[2] = {};
+
+		// Wind
+
+		int WindX		= 0;
+		int WindZ		= 0;
+		int WindAngle	= 0;
+		int WindDAngle	= 0;
+		int WindCurrent = 0;
+
+		// Flash fader
+
+		Vector3 FlashColorBase = Vector3::Zero;
+		float	FlashSpeed	   = 1.0f;
+		float	FlashProgress  = 0.0f;
+
+		// Lightning
+
+		int	 StormCount		= 0;
+		int	 StormRand		= 0;
+		int	 StormTimer		= 0;
+		byte StormSkyColor	= 1;
+		byte StormSkyColor2 = 1;
+
+		// Starfield
+
+		std::vector<StarParticle>	Stars		   = {};
+		std::vector<MeteorParticle> Meteors		   = {};
+		bool						ResetStarField = true;
+
+		// Lens flare
+
+		LensFlare GlobalLensFlare = {};
+
 	public:
+		// Horizon
+
+		HorizonObject Horizon = HorizonObject();
+
 		EnvironmentController();
 
 		Vector3 Wind() { return Vector3(WindX / 2.0f, 0, WindZ / 2.0f); }
@@ -117,47 +210,13 @@ namespace TEN::Effects::Environment
 		const std::vector<MeteorParticle>&	GetMeteors() const { return Meteors; }
 
 	private:
-		// Weather
-		std::vector<WeatherParticle> Particles = {};
-
-		// Sky
-		Vector4 SkyCurrentColor[2]	  = {};
-		short	SkyCurrentPosition[2] = {};
-
-		// Wind
-		int WindX = 0;
-		int WindZ = 0;
-		int WindAngle = 0;
-		int WindDAngle = 0;
-		int WindCurrent = 0;
-
-		// Flash fader
-		Vector3 FlashColorBase = Vector3::Zero;
-		float	FlashSpeed	   = 1.0f;
-		float	FlashProgress  = 0.0f;
-
-		// Lightning
-		int	 StormCount		= 0;
-		int	 StormRand		= 0;
-		int	 StormTimer		= 0;
-		byte StormSkyColor	= 1;
-		byte StormSkyColor2 = 1;
-
-		// Starfield
-		std::vector<StarParticle>	Stars	= {};
-		std::vector<MeteorParticle> Meteors = {};
-		bool ResetStarField = true;
-
-		// Lens flare
-		LensFlare GlobalLensFlare = {};
-
-		void UpdateStarfield(const ScriptInterfaceLevel& level);
+		void UpdateWeather(const ScriptInterfaceLevel& level);
 		void UpdateSky(const ScriptInterfaceLevel& level);
-		void UpdateStorm(const ScriptInterfaceLevel& level);
 		void UpdateWind(const ScriptInterfaceLevel& level);
 		void UpdateFlash(const ScriptInterfaceLevel& level);
-		void UpdateWeather(const ScriptInterfaceLevel& level);
 		void UpdateLightning();
+		void UpdateStarfield(const ScriptInterfaceLevel& level);
+		void UpdateStorm(const ScriptInterfaceLevel& level);
 
 		void SpawnDustParticles(const ScriptInterfaceLevel& level);
 		void SpawnWeatherParticles(const ScriptInterfaceLevel& level);

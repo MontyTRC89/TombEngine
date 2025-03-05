@@ -9,6 +9,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
 #include "Game/spotcam.h"
+#include "Game/effects/weather.h"
 #include "Math/Math.h"
 #include "Objects/Effects/LensFlare.h"
 #include "Renderer/RenderView.h"
@@ -16,8 +17,9 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
-using namespace TEN::Entities::Effects;
 using namespace TEN::Collision::Sphere;
+using namespace TEN::Effects::Environment;
+using namespace TEN::Entities::Effects;
 using namespace TEN::Math;
 using namespace TEN::Utils;
 

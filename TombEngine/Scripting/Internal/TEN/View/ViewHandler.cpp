@@ -166,12 +166,12 @@ namespace TEN::Scripting::View
 
 		///Do a full-screen fade-in from black.
 		//@function FadeIn
-		//@tparam float speed (default 1.0). Speed in "amount" per second. A value of 1 will make the fade take one second.
+		//@tparam float speed (default 1.0). Speed in units per second. A value of 1 will make the fade take one second.
 		tableView.set_function(ScriptReserved_FadeIn, &FadeIn);
 
 		///Do a full-screen fade-to-black. The screen will remain black until a call to FadeIn.
 		//@function FadeOut
-		//@tparam float speed (default 1.0). Speed in "amount" per second. A value of 1 will make the fade take one second.
+		//@tparam float speed (default 1.0). Speed in units per second. A value of 1 will make the fade take one second.
 		tableView.set_function(ScriptReserved_FadeOut, &FadeOut);
 
 		///Check if fade out is complete and screen is completely black.
@@ -261,7 +261,7 @@ namespace TEN::Scripting::View
 		/// Flash screen.
 		//@function FlashScreen
 		//@tparam Color color (default Color(255, 255, 255))
-		//@tparam float speed (default 1.0). Speed in "amount" per second. Value of 1 will make flash take one second. Clamped to [0.005, 1.0].
+		//@tparam float speed (default 1.0). Speed in units per second. Value of 1 will make flash take one second. Clamped to [0.005, 1.0].
 		tableView.set_function(ScriptReserved_FlashScreen, &FlashScreen);
 
 		/// Get the display resolution's aspect ratio.

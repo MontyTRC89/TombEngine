@@ -12,6 +12,7 @@
 #include "Game/control/volume.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/weather.h"
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
@@ -42,6 +43,7 @@ using namespace flatbuffers;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Items;
+using namespace TEN::Effects::Environment;
 using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
@@ -1492,6 +1494,16 @@ const std::vector<byte> SaveGame::Build()
 	sgb.add_postprocess_strength(g_Renderer.GetPostProcessStrength());
 	sgb.add_postprocess_tint(&FromVector3(g_Renderer.GetPostProcessTint()));
 	sgb.add_soundtracks(soundtrackOffset);
+
+	sgb.add_horizon_object_id(Weather.Horizon.GetObjectID());
+	sgb.add_horizon_position(&FromVector3(Weather.Horizon.GetPosition()));
+	sgb.add_horizon_orientation(&FromEulerAngles(Weather.Horizon.GetOrientation()));
+	sgb.add_horizon_transition_time(Weather.Horizon.GetTransitionTime());
+	sgb.add_horizon_transition_time_max(Weather.Horizon.GetTransitionTimeMax());
+	sgb.add_horizon_prev_object_id(Weather.Horizon.GetPrevObjectID());
+	sgb.add_horizon_prev_position(&FromVector3(Weather.Horizon.GetPrevPosition()));
+	sgb.add_horizon_prev_orientation(&FromEulerAngles(Weather.Horizon.GetOrientation()));
+
 	sgb.add_cd_flags(soundtrackMapOffset);
 	sgb.add_action_queue(actionQueueOffset);
 	sgb.add_flip_maps(flipMapsOffset);
@@ -2147,6 +2159,12 @@ static void ParseEffects(const Save::SaveGame* s)
 	g_Renderer.SetPostProcessMode((PostProcessMode)s->postprocess_mode());
 	g_Renderer.SetPostProcessStrength(s->postprocess_strength());
 	g_Renderer.SetPostProcessTint(ToVector3(s->postprocess_tint()));
+
+	// Restore horizon.
+	Weather.Horizon = HorizonObject(
+		(GAME_OBJECT_ID)s->horizon_object_id(), (GAME_OBJECT_ID)s->horizon_prev_object_id(),
+		ToVector3(s->horizon_position()), ToVector3(s->horizon_prev_position()), ToEulerAngles(s->horizon_orientation()), ToEulerAngles(s->horizon_prev_orientation()),
+		s->horizon_transition_time(), s->horizon_transition_time_max());
 
 	// Restore soundtracks.
 	for (int i = 0; i < s->soundtracks()->size(); i++)

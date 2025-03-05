@@ -21,6 +21,7 @@
 #include "Scripting/Internal/TEN/Effects/BlendIDs.h"
 #include "Scripting/Internal/TEN/Effects/EffectIDs.h"
 #include "Scripting/Internal/TEN/Types/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 #include "Sound/sound.h"
@@ -42,6 +43,7 @@ using namespace TEN::Scripting::Types;
 
 namespace TEN::Scripting::Effects
 {
+
 	///Emit a lightning arc.
 	//@function EmitLightningArc
 	//@tparam Vec3 src
@@ -289,17 +291,16 @@ namespace TEN::Scripting::Effects
 		SpawnDynamicSpotLight(pos.ToVector3(), dir.ToVector3(), color, rad, fallOff, dist, ValueOr<bool>(castShadows, false), GetHash(ValueOr<std::string>(name, std::string())));
 	}
 
-/***Emit blood.
-@function EmitBlood
-@tparam Vec3 pos
-@tparam int count (default 1) "amount" of blood. Higher numbers won't add more blood but will make it more "flickery", with higher numbers turning it into a kind of red orb.
-*/
+	/// Emit blood.
+	// @function EmitBlood
+	// @tparam Vec3 pos
+	// @tparam int count Sprite count. __default: 1__
 	static void EmitBlood(const Vec3& pos, TypeOrNil<int> count)
 	{
 		TriggerBlood(pos.x, pos.y, pos.z, -1, ValueOr<int>(count, 1));
 	}
 
-	/// Emit air bubble in a water room.
+	/// Emit an air bubble in a water room.
 	// @function EmitAirBubble
 	// @tparam Vec3 pos World position where the effect will be spawned. Must be in a water room.
 	// @tparam[opt] float size Sprite size. __Default: 32__
@@ -355,11 +356,72 @@ namespace TEN::Scripting::Effects
 		return Vec3(Weather.Wind());
 	}
 
+	/// Get the horizon's world position.
+	// @function GetHorizonPosition
+	// @treturn Vec3 Position.
+	static Rotation GetHorizonPosition()
+	{
+		return Vec3(Weather.Horizon.GetPosition());
+	}
+
+	/// Get the horizon's rotation.
+	// @function GetHorizonRotation
+	// @treturn Rotation Rotation.
+	static Rotation GetHorizonRotation()
+	{
+		return Rotation(Weather.Horizon.GetOrientation());
+	}
+
+	/// Set the horizon's slot object ID with an optional transision.
+	// @function SetHorizon
+	// @tparam Objects.ObjID New slot object ID.
+	// @tparam[opt] float speed Transition speed in seconds. __default: 0__
+	static void SetHorizonObjectID(GAME_OBJECT_ID objectID, TypeOrNil<float> speed)
+	{
+		// Same slot object ID; return early.
+		if (Weather.Horizon.GetObjectID() == objectID)
+		{
+			TENLog("Horizon attempted to transition to the same slot object.", LogLevel::Warning);
+			return;
+		}
+
+		// Set new object ID with transition.
+		float convertedSpeed = ValueOr<float>(speed, 0.0f);
+		Weather.Horizon.SetObjectID(objectID, convertedSpeed);
+	}
+	
+	/// Set the horizon's world position.
+	// @function SetHorizonPosition
+	// @tparam Vec3 pos New world position.
+	static void SetHorizonPosition(const Vec3& pos)
+	{
+		Weather.Horizon.SetPosition(pos);
+	}
+
+	/// Set the horizon's rotation.
+	// @function SetHorizonRotation
+	// @tparam Rotation rot New rotation.
+	static void SetHorizonRotation(const Rotation& rot)
+	{
+		constexpr auto ORIENT_INTERP_ANGLE_MAX = ANGLE(30.0f);
+
+		auto orient = rot.ToEulerAngles();
+		auto orientDelta = orient - Weather.Horizon.GetOrientation();
+
+		// Check if orientation delta exceeds threshold.
+		bool storePrevOrient = abs(orientDelta.x) <= ORIENT_INTERP_ANGLE_MAX ||
+							   abs(orientDelta.y) <= ORIENT_INTERP_ANGLE_MAX ||
+							   abs(orientDelta.z) <= ORIENT_INTERP_ANGLE_MAX;
+
+		Weather.Horizon.SetOrientation(orient, storePrevOrient);
+	}
+
 	void Register(sol::state* state, sol::table& parent) 
 	{
 		auto tableEffects = sol::table(state->lua_state(), sol::create);
 		parent.set(ScriptReserved_Effects, tableEffects);
 
+		// Emitters
 		tableEffects.set_function(ScriptReserved_EmitLightningArc, &EmitLightningArc);
 		tableEffects.set_function(ScriptReserved_EmitParticle, &EmitParticle);
 		tableEffects.set_function(ScriptReserved_EmitShockwave, &EmitShockwave);
@@ -367,12 +429,20 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_EmitSpotLight, &EmitSpotLight);
 		tableEffects.set_function(ScriptReserved_EmitBlood, &EmitBlood);
 		tableEffects.set_function(ScriptReserved_EmitAirBubble, &EmitAirBubble);
-		tableEffects.set_function(ScriptReserved_MakeExplosion, &MakeExplosion);
 		tableEffects.set_function(ScriptReserved_EmitFire, &EmitFire);
+
+		tableEffects.set_function(ScriptReserved_MakeExplosion, &MakeExplosion);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
 		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
 
-		auto handler = LuaHandler{ state };
+		// Horizon
+		tableEffects.set_function(ScriptReserved_GetHorizonPosition, &GetHorizonPosition);
+		tableEffects.set_function(ScriptReserved_GetHorizonRotation, &GetHorizonRotation);
+		tableEffects.set_function(ScriptReserved_SetHorizonObjectID, &SetHorizonObjectID);
+		tableEffects.set_function(ScriptReserved_SetHorizonPosition, &SetHorizonPosition);
+		tableEffects.set_function(ScriptReserved_SetHorizonRotation, &SetHorizonRotation);
+
+		auto handler = LuaHandler(state);
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_BlendID, BLEND_IDS);
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_EffectID, EFFECT_IDS);
 	}

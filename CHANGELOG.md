@@ -31,6 +31,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### Lua API changes
 * Added Collision.Probe class for basic collision detection.
 * Added diary module.
+* Added Effects.SetHorizon(), Effects.SetHorizonPosition(), Effects.GetHorizonPosition(), Effects.SetHorizonRotation() and Effects.GetHorizonRotation() functions to meshswap, move and rotate horizon.
 * Added View.GetFlyByPosition() and View.GetFlyByRotation() functions to get flyby sequence parameters at a specified time point.
 * Added Effects.EmitAirBubble() function to spawn air bubbles.
 * Added Moveable:GetScale() and Movebale:SetScale() methods to set visible scale of moveables.
