@@ -18,7 +18,6 @@
 #include "Renderer/Renderer.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
-#include "Objects/Effects/Fireflies.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Entities::TR3;

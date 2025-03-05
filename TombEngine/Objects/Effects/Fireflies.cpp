@@ -32,7 +32,6 @@ namespace TEN::Effects::Fireflies
     constexpr auto FIREFLY_TARGET_DISTANCE_MAX = SQUARE(BLOCK(1.0f));
     constexpr auto FIREFLY_BASE_SEPARATION_DISTANCE = 10.0f;
     constexpr auto FIREFLY_FLEE_DISTANCE = BLOCK(0.7);
-    constexpr auto FIREFLY_RETURN_DISTANCE = BLOCK(4);
     constexpr auto MAX_FIREFLIES = 92;
     constexpr auto DEFAULT_FIREFLY_COUNT = 20;
     constexpr auto FIREFLY_RISE_UP_FACTOR = 200;

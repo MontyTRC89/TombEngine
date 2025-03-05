@@ -332,7 +332,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::PrepareFireflys(RenderView& view)
+	void Renderer::PrepareFireflies(RenderView& view)
 	{
 		if (!Objects[ID_FIREFLY_EMITTER].loaded)
 			return;
