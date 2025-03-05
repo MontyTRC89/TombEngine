@@ -49,7 +49,7 @@ using namespace TEN::Effects::Streamer;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Traps;
 using namespace TEN::Math;
-using namespace TEN::Effects::Fireflys;
+using namespace TEN::Effects::Fireflies;
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -334,7 +334,7 @@ namespace TEN::Renderer
 
 	void Renderer::PrepareFireflys(RenderView& view)
 	{
-		if (!Objects[ID_FIREFLYS].loaded)
+		if (!Objects[ID_FIREFLY_EMITTER].loaded)
 			return;
 
 		for (auto& firefly : FireflySwarm)

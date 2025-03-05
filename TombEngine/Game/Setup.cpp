@@ -200,7 +200,7 @@ void InitializeSpecialEffects()
 
 	TEN::Entities::TR4::ClearBeetleSwarm();
 	TEN::Entities::Creatures::TR3::ClearFishSwarm();
-	TEN::Effects::Fireflys::ClearFireflySwarm();
+	TEN::Effects::Fireflies::ClearFireflySwarm();
 }
 
 void CustomObjects()

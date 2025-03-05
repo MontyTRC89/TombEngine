@@ -81,7 +81,7 @@ using namespace TEN::Effects::WaterfallEmitter;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::Traps;
-using namespace TEN::Effects::Fireflys;
+using namespace TEN::Effects::Fireflies;
 
 static void StartEntity(ObjectInfo *obj)
 {
@@ -797,7 +797,7 @@ static void StartObject(ObjectInfo *obj)
 		obj->control = ControlEmberEmitter;
 	}
 
-	obj = &Objects[ID_FIREFLYS];
+	obj = &Objects[ID_FIREFLY_EMITTER];
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeFireflySwarm;

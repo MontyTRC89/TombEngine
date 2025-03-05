@@ -30,7 +30,7 @@ using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Footprint;
 using namespace TEN::Effects::Hair;
 using namespace TEN::Entities::Creatures::TR3;
-using namespace TEN::Effects::Fireflys;
+using namespace TEN::Effects::Fireflies;
 
 int FlipEffect;
 

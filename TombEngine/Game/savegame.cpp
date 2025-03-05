@@ -43,7 +43,7 @@ using namespace flatbuffers;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Items;
-using namespace TEN::Effects::Fireflys;
+using namespace TEN::Effects::Fireflies;
 using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;

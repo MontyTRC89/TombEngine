@@ -26,7 +26,7 @@ using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Splash;
 using namespace TEN::Math;
-using namespace TEN::Effects::Fireflys;
+using namespace TEN::Effects::Fireflies;
 
 namespace TEN::Entities::TR3
 {

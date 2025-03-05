@@ -4,7 +4,7 @@
 
 using namespace TEN::Math;
 
-namespace TEN::Effects::Fireflys
+namespace TEN::Effects::Fireflies
 {
 	enum FirefliesItemFlags
 	{
@@ -69,5 +69,5 @@ namespace TEN::Effects::Fireflys
 	void ControlFireflySwarm(short itemNumber);
 	void UpdateFireflySwarm();
 	void ClearFireflySwarm();
-	void SpawnFireflySwarm(ItemInfo& item, int TriggerFlags);
+	void SpawnFireflySwarm(ItemInfo& item, int triggerFlags);
 }

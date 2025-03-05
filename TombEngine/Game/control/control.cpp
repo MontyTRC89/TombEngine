@@ -89,7 +89,7 @@ using namespace TEN::Math;
 using namespace TEN::Renderer;
 using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Effects;
-using namespace TEN::Effects::Fireflys;
+using namespace TEN::Effects::Fireflies;
 
 constexpr auto DEATH_NO_INPUT_TIMEOUT = 10 * FPS;
 constexpr auto DEATH_INPUT_TIMEOUT	  = 3 * FPS;
