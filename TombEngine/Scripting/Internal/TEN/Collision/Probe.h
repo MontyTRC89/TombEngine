@@ -60,6 +60,10 @@ namespace TEN::Scripting::Collision
 		bool				IsClimbableWall(float headingAngle);
 		bool				IsMonkeySwing();
 		bool				IsDeath();
+
+		// Utilities
+
+		void Preview();
     };
 
 	void Register(sol::state* lua, sol::table& parent);

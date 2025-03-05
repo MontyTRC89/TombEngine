@@ -475,6 +475,7 @@ constexpr char ScriptReserved_ProbeIsMonkeySwing[]			= "IsMonkeySwing";
 constexpr char ScriptReserved_ProbeIsSteepCeiling[]			= "IsSteepCeiling";
 constexpr char ScriptReserved_ProbeIsSteepFloor[]			= "IsSteepFloor";
 constexpr char ScriptReserved_ProbeIsWall[]					= "IsWall";
+constexpr char ScriptReserved_ProbePreview[]				= "Preview";
 
 constexpr char ScriptReserved_MaterialType[]				= "MaterialType";
 

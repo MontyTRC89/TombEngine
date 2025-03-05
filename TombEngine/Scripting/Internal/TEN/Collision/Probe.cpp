@@ -56,7 +56,10 @@ namespace TEN::Scripting::Collision
 			ScriptReserved_ProbeIsInsideSolidGeometry, &Probe::IsInsideSolidGeometry,
 			ScriptReserved_ProbeIsClimbableWall, &Probe::IsClimbableWall,
 			ScriptReserved_ProbeIsMonkeySwing, &Probe::IsMonkeySwing,
-			ScriptReserved_ProbeIsDeathTile, &Probe::IsDeath);
+			ScriptReserved_ProbeIsDeathTile, &Probe::IsDeath,
+			
+			// Utilities
+			ScriptReserved_ProbePreview, &Probe::Preview);
 	}
 
 	/// Create a Probe at a specified world position in a room.
@@ -154,7 +157,7 @@ namespace TEN::Scripting::Collision
 	
 	/// Get the floor height at this Probe.
 	// @function GetFloorHeight
-	// @treturn int Floor height. __nil: no floor exists.__
+	// @treturn int Floor height. __nil: no floor exists__
 	sol::optional<int> Probe::GetFloorHeight()
 	{
 		if (_pointCollision.IsWall())
@@ -169,7 +172,7 @@ namespace TEN::Scripting::Collision
 
 	/// Get the ceiling height at this Probe.
 	// @function GetCeilingHeight
-	// @treturn int Ceiling height. __nil: no ceiling exists.__
+	// @treturn int Ceiling height. __nil: no ceiling exists__
 	sol::optional<int> Probe::GetCeilingHeight()
 	{
 		if (_pointCollision.IsWall())
@@ -184,7 +187,7 @@ namespace TEN::Scripting::Collision
 
 	/// Get the water surface height at this Probe.
 	// @function GetWaterSurfaceHeight
-	// @treturn int Water surface height. __nil: no water surface exists.__
+	// @treturn int Water surface height. __nil: no water surface exists__
 	sol::optional<int> Probe::GetWaterSurfaceHeight()
 	{
 		if (_pointCollision.IsWall())
@@ -199,7 +202,7 @@ namespace TEN::Scripting::Collision
 
 	/// Get the normal of the floor at this Probe.
 	// @function GetFloorNormal
-	// @treturn Vec3 Floor normal. __nil: no floor exists.__
+	// @treturn Vec3 Floor normal. __nil: no floor exists__
 	sol::optional<Vec3> Probe::GetFloorNormal()
 	{
 		if (_pointCollision.IsWall())
@@ -210,7 +213,7 @@ namespace TEN::Scripting::Collision
 
 	/// Get the normal of the ceiling at this Probe.
 	// @function GetCeilingNormal
-	// @treturn Vec3 Ceiling normal. __nil: no ceiling exists.__
+	// @treturn Vec3 Ceiling normal. __nil: no ceiling exists__
 	sol::optional<Vec3> Probe::GetCeilingNormal()
 	{
 		if (_pointCollision.IsWall())
@@ -221,7 +224,7 @@ namespace TEN::Scripting::Collision
 
 	/// Get the material type of the floor at this Probe.
 	// @function GetFloorMaterialType
-	// @treturn Collision.MaterialType Floor material type. __nil: no floor exists.__
+	// @treturn Collision.MaterialType Floor material type. __nil: no floor exists__
 	sol::optional<MaterialType> Probe::GetFloorMaterialType()
 	{
 		if (_pointCollision.IsWall())
@@ -234,7 +237,7 @@ namespace TEN::Scripting::Collision
 
 	/// Get the material type of the ceiling at this Probe.
 	// @function GetCeilingMaterialType
-	// @treturn Collision.MaterialType Ceiling material type. __nil: no ceiling exists.__
+	// @treturn Collision.MaterialType Ceiling material type. __nil: no ceiling exists__
 	sol::optional<MaterialType> Probe::GetCeilingMaterialType()
 	{
 		if (_pointCollision.IsWall())
@@ -247,7 +250,7 @@ namespace TEN::Scripting::Collision
 
 	/// Check if the floor at this Probe is steep.
 	// @function IsSteepFloor
-	// @treturn bool Steep floor status. __true: is a steep floor, false: isn't a steep floor, nil: no floor exists.__
+	// @treturn bool Steep floor status. __true: is a steep floor, false: isn't a steep floor, nil: no floor exists__
 	sol::optional<bool> Probe::IsSteepFloor()
 	{
 		if (_pointCollision.IsWall())
@@ -258,7 +261,7 @@ namespace TEN::Scripting::Collision
 
 	/// Check if the ceiling at this Probe is steep.
 	// @function IsSteepCeiling
-	// @treturn bool Steep ceiling status. __true: is a steep ceiling, false: isn't a steep ceiling, nil: no ceiling exists.__
+	// @treturn bool Steep ceiling status. __true: is a steep ceiling, false: isn't a steep ceiling, nil: no ceiling exists__
 	sol::optional<bool> Probe::IsSteepCeiling()
 	{
 		if (_pointCollision.IsWall())
@@ -275,7 +278,7 @@ namespace TEN::Scripting::Collision
 		return _pointCollision.IsWall();
 	}
 
-	/// Check if this Probe is inside solid geometry (below a floor, above a ceiling, or inside a wall).
+	/// Check if this Probe is inside solid geometry (below a floor, above a ceiling, inside a bridge, or inside a wall).
 	// @function IsInsideSolidGeometry
 	// @treturn bool Inside geometry status. __true: is inside, false: is outside__
 	bool Probe::IsInsideSolidGeometry()
@@ -293,7 +296,7 @@ namespace TEN::Scripting::Collision
 	/// Check if there is a climbable wall in the given heading angle at this Probe.
 	// @function IsClimbableWall
 	// @tparam float headingAngle Heading angle at which to check for a climbable wall.
-	// @treturn bool Climbable wall status. __true: is climbable, false: isn't climbable__
+	// @treturn bool Climbable wall status. __true: is climbable wall, false: isn't climbable__
 	bool Probe::IsClimbableWall(float headingAngle)
 	{
 		const auto& sector = _pointCollision.GetBottomSector();
@@ -301,32 +304,72 @@ namespace TEN::Scripting::Collision
 		return sector.Flags.IsWallClimbable(dirFlag);
 	}
 
-	/// Check if there is a monkey swing at this Probe.
+	/// Check if there is a monkey swing sector at this Probe.
 	// @function IsMonkeySwing
-	// @treturn bool Monkey swing status. __true: is a monkey swing, false: isn't a monkey swing__
+	// @treturn bool Monkey swing sector status. __true: is a monkey swing, false: isn't a monkey swing__
 	bool Probe::IsMonkeySwing()
 	{
 		const auto& sector = _pointCollision.GetTopSector();
 		return sector.Flags.Monkeyswing;
 	}
 
-	/// Check if there is a death tile at this Probe.
+	/// Check if there is a death sector at this Probe.
 	// @function IsDeath
-	// @treturn bool Death tile status. __true: is a death tile, false: isn't a death tile__
+	// @treturn bool Death sector status. __true: is a death sector, false: isn't a death sector__
 	bool Probe::IsDeath()
 	{
 		const auto& sector = _pointCollision.GetBottomSector();
 		return sector.Flags.Death;
 	}
 
+	/// Preview this Probe in the Collision Stats debug page.
+	// @function Preview
+	void Probe::Preview()
+	{
+		constexpr auto TARGET_RADIUS = 100.0f;
+		constexpr auto SPHERE_RADIUS = TARGET_RADIUS * 0.6f;
+		constexpr auto COLOR		 = Color(1.0f, 1.0f, 1.0f, 0.4f);
+
+		auto pos = _pointCollision.GetPosition().ToVector3();
+
+		// Preview probe position.
+		auto sphere = BoundingSphere(pos, SPHERE_RADIUS);
+		DrawDebugSphere(sphere, COLOR, RendererDebugPage::CollisionStats, false);
+		DrawDebugTarget(pos, Quaternion::Identity, TARGET_RADIUS, COLOR, RendererDebugPage::CollisionStats);
+
+		// Preview floor position.
+		if (_pointCollision.GetFloorHeight() != NO_HEIGHT);
+		{
+			auto floorPos = Vector3(pos.x, _pointCollision.GetFloorHeight(), pos.z);
+			DrawDebugTarget(floorPos, Quaternion::Identity, TARGET_RADIUS, COLOR, RendererDebugPage::CollisionStats);
+			DrawDebugLine(pos, floorPos, COLOR, RendererDebugPage::CollisionStats);
+		}
+		
+		// Preview ceiling position.
+		if (_pointCollision.GetCeilingHeight() != NO_HEIGHT);
+		{
+			auto ceilPos = Vector3(pos.x, _pointCollision.GetCeilingHeight(), pos.z);
+			DrawDebugTarget(ceilPos, Quaternion::Identity, TARGET_RADIUS, COLOR, RendererDebugPage::CollisionStats);
+			DrawDebugLine(pos, ceilPos, COLOR, RendererDebugPage::CollisionStats);
+		}
+
+		// Preview water surface position.
+		if (_pointCollision.GetWaterSurfaceHeight() != NO_HEIGHT);
+		{
+			auto waterSurfacePos = Vector3(pos.x, _pointCollision.GetWaterSurfaceHeight(), pos.z);
+			DrawDebugTarget(waterSurfacePos, Quaternion::Identity, TARGET_RADIUS, COLOR, RendererDebugPage::CollisionStats);
+			DrawDebugLine(pos, waterSurfacePos, COLOR, RendererDebugPage::CollisionStats);
+		}
+	}
+
 	void Register(sol::state* state, sol::table& parent)
 	{
-		auto tableCollision = sol::table(state->lua_state(), sol::create);
-		parent.set(ScriptReserved_Collision, tableCollision);
+		auto collTable = sol::table(state->lua_state(), sol::create);
+		parent.set(ScriptReserved_Collision, collTable);
 
-		Probe::Register(tableCollision);
+		Probe::Register(collTable);
 
 		auto handler = LuaHandler(state);
-		handler.MakeReadOnlyTable(tableCollision, ScriptReserved_MaterialType, MATERIAL_TYPES);
+		handler.MakeReadOnlyTable(collTable, ScriptReserved_MaterialType, MATERIAL_TYPES);
 	}
 }
