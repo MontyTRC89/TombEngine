@@ -29,7 +29,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
   - You must use this version: https://github.com/TombEngine/Resources/raw/refs/heads/main/Wad2%20Objects/Interactables/TEN_Waterfall_Emitter.wad2
 
 ### Lua API changes
-* Added Lerp() function to the Rotation object to allow linear interpolation between rotations.
 * Added Collision.Probe class for basic collision detection.
 * Added diary module.
 * Added View.GetFlyByPosition() and View.GetFlyByRotation() functions to get flyby sequence parameters at a specified time point.
