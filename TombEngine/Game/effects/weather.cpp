@@ -98,7 +98,7 @@ namespace TEN::Effects::Environment
 
 	void HorizonObject::SetPosition(const Vector3& pos)
 	{
-		_prevPosition = pos;
+		_prevPosition = _position;
 		_position = pos;
 	}
 
