@@ -329,36 +329,37 @@ namespace TEN::Scripting::Collision
 		constexpr auto TARGET_RADIUS = 100.0f;
 		constexpr auto SPHERE_RADIUS = TARGET_RADIUS * 0.6f;
 		constexpr auto COLOR		 = Color(1.0f, 1.0f, 1.0f, 0.4f);
+		constexpr auto DEBUG_PAGE	 = RendererDebugPage::CollisionStats;
 
 		auto pos = _pointCollision.GetPosition().ToVector3();
 
 		// Preview probe position.
 		auto sphere = BoundingSphere(pos, SPHERE_RADIUS);
-		DrawDebugSphere(sphere, COLOR, RendererDebugPage::CollisionStats, false);
-		DrawDebugTarget(pos, Quaternion::Identity, TARGET_RADIUS, COLOR, RendererDebugPage::CollisionStats);
+		DrawDebugSphere(sphere, COLOR, DEBUG_PAGE, false);
+		DrawDebugTarget(pos, Quaternion::Identity, TARGET_RADIUS, COLOR, DEBUG_PAGE);
 
 		// Preview floor position.
 		if (_pointCollision.GetFloorHeight() != NO_HEIGHT);
 		{
 			auto floorPos = Vector3(pos.x, _pointCollision.GetFloorHeight(), pos.z);
-			DrawDebugTarget(floorPos, Quaternion::Identity, TARGET_RADIUS, COLOR, RendererDebugPage::CollisionStats);
-			DrawDebugLine(pos, floorPos, COLOR, RendererDebugPage::CollisionStats);
+			DrawDebugTarget(floorPos, Quaternion::Identity, TARGET_RADIUS, COLOR, DEBUG_PAGE);
+			DrawDebugLine(pos, floorPos, COLOR, DEBUG_PAGE);
 		}
 		
 		// Preview ceiling position.
 		if (_pointCollision.GetCeilingHeight() != NO_HEIGHT);
 		{
 			auto ceilPos = Vector3(pos.x, _pointCollision.GetCeilingHeight(), pos.z);
-			DrawDebugTarget(ceilPos, Quaternion::Identity, TARGET_RADIUS, COLOR, RendererDebugPage::CollisionStats);
-			DrawDebugLine(pos, ceilPos, COLOR, RendererDebugPage::CollisionStats);
+			DrawDebugTarget(ceilPos, Quaternion::Identity, TARGET_RADIUS, COLOR, DEBUG_PAGE);
+			DrawDebugLine(pos, ceilPos, COLOR, DEBUG_PAGE);
 		}
 
 		// Preview water surface position.
 		if (_pointCollision.GetWaterSurfaceHeight() != NO_HEIGHT);
 		{
 			auto waterSurfacePos = Vector3(pos.x, _pointCollision.GetWaterSurfaceHeight(), pos.z);
-			DrawDebugTarget(waterSurfacePos, Quaternion::Identity, TARGET_RADIUS, COLOR, RendererDebugPage::CollisionStats);
-			DrawDebugLine(pos, waterSurfacePos, COLOR, RendererDebugPage::CollisionStats);
+			DrawDebugTarget(waterSurfacePos, Quaternion::Identity, TARGET_RADIUS, COLOR, DEBUG_PAGE);
+			DrawDebugLine(pos, waterSurfacePos, COLOR, DEBUG_PAGE);
 		}
 	}
 
