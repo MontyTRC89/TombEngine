@@ -29,7 +29,7 @@ namespace TEN::Entities::Traps
 
 	constexpr auto MOVING_LASER_DAMAGE = 100;
     constexpr int PAUSE_FRAMES = 30;
-    constexpr float MAX_SPEED_THRESHOLD = 0.8f;
+    constexpr float MAX_SPEED_THRESHOLD = 0.9f;
     constexpr float MIN_SPEED = 1.0f;
     constexpr float ACCELERATION = 8.0f;
 
@@ -37,7 +37,7 @@ namespace TEN::Entities::Traps
 	{
 		auto& item = g_Level.Items[itemNumber];
         item.ItemFlags[Direction] = 1;
-        item.ItemFlags[Speed] = 4;
+        item.ItemFlags[Speed] = 10;
         item.ItemFlags[SpeedCalc] = MIN_SPEED;
         item.Pose.Translate(item.Pose.Orientation, -CLICK(1)); //Offset by one click to make it dangerous at the edges of the block.
 	}
