@@ -20,31 +20,26 @@ using namespace TEN::Collision::Sphere;
 namespace TEN::Entities::Traps
 {
     enum MovingLaser {
-    Offset,
     Speed,
-    StartPositionX,
-    StartPositionY,
-    StartPositionZ,
-    Damage,
     PauseCounter,
-    PauseFrames
+    Direction,
+    DistanceTravelled,
+    SpeedCalc
     };
 
 	constexpr auto MOVING_LASER_DAMAGE = 100;
-    constexpr float maxSpeed = 128.0f;
-    constexpr float minSpeed = 1.0f;
-    constexpr float acceleration = 32.0f;
-    constexpr float wallThreshold = 512.0f;
-    constexpr int pauseFrames = 30;
+    constexpr int PAUSE_FRAMES = 30;
+    constexpr float MAX_SPEED_THRESHOLD = 0.8f;
+    constexpr float MIN_SPEED = 1.0f;
+    constexpr float ACCELERATION = 8.0f;
 
 	void InitializeMovingLaser(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-        item.ItemFlags[Offset] = 1;
-        item.ItemFlags[StartPositionX] = item.Pose.Position.x;
-        item.ItemFlags[StartPositionY] = item.Pose.Position.y;
-        item.ItemFlags[StartPositionZ] = item.Pose.Position.z;
-        
+        item.ItemFlags[Direction] = 1;
+        item.ItemFlags[Speed] = 4;
+        item.ItemFlags[SpeedCalc] = MIN_SPEED;
+        item.Pose.Translate(item.Pose.Orientation, -CLICK(1)); //Offset by one click to make it dangerous at the edges of the block.
 	}
 
 	void ControlMovingLaser(short itemNumber)
@@ -53,88 +48,49 @@ namespace TEN::Entities::Traps
 
 		if (!TriggerActive(&item))
 			return;
-        
-        auto multiplier = 0;
 
-        if (item.TriggerFlags)
-        multiplier = item.TriggerFlags;
-
-        float moveDistance = CLICK(1) * multiplier;
-
-        if (!item.ItemFlags[Damage])
-            item.ItemFlags[Damage] = MOVING_LASER_DAMAGE;
-
+        float moveDistance = (BLOCK(1) * item.TriggerFlags) + CLICK(2); //Use OCB to calculate the distance and add 2 clicks.
+                
+        float distancePerFrame = (static_cast<float>(CLICK(1)) * item.ItemFlags[Speed]) / FPS; // Calculate distance per frame
+               
         item.Animation.ActiveState = 0;
         SpawnDynamicLight(item.Pose.Position.x, item.Pose.Position.y - 64, item.Pose.Position.z, (GetRandomControl() % 2) + 8, (GetRandomControl() % 4) + 24, GetRandomControl() % 4, GetRandomControl() % 2);
         item.MeshBits = -1 - (GetRandomControl() & 0x14); // To make lasers flicker
 
-        if (multiplier > 0)
+        if (item.TriggerFlags == 0)
         {
-            if (!item.ItemFlags[PauseFrames])
-                item.ItemFlags[PauseFrames] = pauseFrames;
+            AnimateItem(&item);
+            return;
+        }
+        
+        if (item.ItemFlags[PauseCounter] > 0)
+        {
+            item.ItemFlags[PauseCounter]--;
 
-            auto startPosition = Vector3(item.ItemFlags[StartPositionX], item.ItemFlags[StartPositionY], item.ItemFlags[StartPositionZ]);
-
-            float forwardX = std::sin(item.Pose.Orientation.y);
-            float forwardZ = std::cos(item.Pose.Orientation.y);
-
-            // Direction of movement, 1 for forward, -1 for backward
-            int direction = item.ItemFlags[Offset];
-
-            // Create a unit vector representing the forward direction
-            Vector3 forwardDirection = Vector3(forwardX, 0.0f, forwardZ);
- 
-            // Calculate the target position by adding the direction vector scaled by moveDistance
-            Vector3 targetPosition = startPosition + forwardDirection * moveDistance * direction;
-
-            // Move towards the target position
-            Vector3 directionToTarget = targetPosition - item.Pose.Position.ToVector3();
-            float distanceToTarget = directionToTarget.Length();
-
-            // Normalize the direction
-            directionToTarget.Normalize();
-
-            float speed = item.ItemFlags[Speed] > 0 ? item.ItemFlags[Speed] : minSpeed;
-
-            // Handle 30-frame pause at the destination
-            if (item.ItemFlags[PauseCounter] > 0)
+            if (item.ItemFlags[PauseCounter] == 0) 
             {
-                item.ItemFlags[PauseCounter]--;
-                AnimateItem(&item);
-                return; // Skip movement during the pause
+                item.ItemFlags[Direction] *= -1;
+                item.ItemFlags[DistanceTravelled] = 0;
+                item.ItemFlags[SpeedCalc] = MIN_SPEED;
             }
 
-            // Slow down if near a wall
-            if (distanceToTarget < wallThreshold && speed > minSpeed)
-                speed = std::max(minSpeed, (speed - acceleration)); // Gradual slowdown
-            else if (distanceToTarget >= wallThreshold && speed < maxSpeed)
-                speed = std::min(static_cast<float>(maxSpeed), (speed + acceleration)); // Gradual speed increase
+            AnimateItem(&item);
+            return;
+        }
 
-            // Move the laser based on speed and direction
-            item.Pose.Position.x += directionToTarget.x * speed * direction;
-            item.Pose.Position.z += directionToTarget.z * speed * direction;
+        item.Pose.Translate(item.Pose.Orientation, (item.ItemFlags[Direction] * item.ItemFlags[SpeedCalc]));
+        
+        item.ItemFlags[DistanceTravelled] += distancePerFrame;
 
-            // Calculate total distance moved from the start position
-            Vector3 currentPosition = item.Pose.Position.ToVector3();
-            float distanceTraveled = (currentPosition - startPosition).Length();
+        if (item.ItemFlags[DistanceTravelled] < (moveDistance * MAX_SPEED_THRESHOLD))
+            item.ItemFlags[SpeedCalc] = std::min(distancePerFrame, item.ItemFlags[SpeedCalc] + ACCELERATION);
+        else
+            item.ItemFlags[SpeedCalc] = std::max(MIN_SPEED, item.ItemFlags[SpeedCalc] - ACCELERATION);
 
-            // Reverse direction when reaching target position
-            if (distanceToTarget < 256.0f || distanceTraveled > moveDistance)
-            {
-                // Start pause and reset speed
-                item.ItemFlags[PauseCounter] = item.ItemFlags[PauseFrames];
-                item.ItemFlags[Offset] = -direction;
-                item.ItemFlags[Speed] = minSpeed;
 
-                // Update start position
-                item.ItemFlags[StartPositionX] = item.Pose.Position.x;
-                item.ItemFlags[StartPositionY] = item.Pose.Position.y;
-                item.ItemFlags[StartPositionZ] = item.Pose.Position.z;
-            }
-
-            // Store the updated speed
-            item.ItemFlags[Speed] = speed;
-
+        if (item.ItemFlags[DistanceTravelled] >= moveDistance)
+        {
+            item.ItemFlags[PauseCounter] = PAUSE_FRAMES;
         }
 
         // Update room if necessary
@@ -166,7 +122,7 @@ namespace TEN::Entities::Traps
 		// Damage entity.
 		if (TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 		{
-			DoDamage(playerItem, item.ItemFlags[Damage]);
+			DoDamage(playerItem, MOVING_LASER_DAMAGE);
 			DoLotsOfBlood(playerItem->Pose.Position.x, playerItem->Pose.Position.y + CLICK(3), playerItem->Pose.Position.z, 4, playerItem->Pose.Orientation.y, playerItem->RoomNumber, 3);
 			playerItem->TouchBits.ClearAll();
 		}
