@@ -96,7 +96,8 @@ void RGBAColor8Byte::SetA(byte v)
 
 RGBAColor8Byte::operator Color() const
 {
-	return Color(ByteComponentToFloat(r), ByteComponentToFloat(g), ByteComponentToFloat(b));
+	// Alpha exists on normalized range [0.0f, 1.0f], unlike color components which exist on range [0.0f, 2.0f].
+	return Color(ByteComponentToFloat(r), ByteComponentToFloat(g), ByteComponentToFloat(b), ByteComponentToFloat(a) / 2.0f);
 }
 
 RGBAColor8Byte::operator Vector3() const
@@ -106,7 +107,8 @@ RGBAColor8Byte::operator Vector3() const
 
 RGBAColor8Byte::operator Vector4() const
 {
-	return Vector4(ByteComponentToFloat(r), ByteComponentToFloat(g), ByteComponentToFloat(b), ByteComponentToFloat(a));
+	// Alpha exists on normalized range [0.0f, 1.0f], unlike color components which exist on range [0.0f, 2.0f].
+	return Vector4(ByteComponentToFloat(r), ByteComponentToFloat(g), ByteComponentToFloat(b), ByteComponentToFloat(a) / 2.0f);
 }
 
 RGBAColor8Byte::operator D3DCOLOR() const

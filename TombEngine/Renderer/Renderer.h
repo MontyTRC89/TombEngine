@@ -574,9 +574,17 @@ namespace TEN::Renderer
 		static inline bool IsSortedBlendMode(BlendMode blendMode)
 		{
 			return !(blendMode == BlendMode::Opaque ||
-				blendMode == BlendMode::AlphaTest ||
-				blendMode == BlendMode::Additive ||
-				blendMode == BlendMode::FastAlphaBlend);
+					 blendMode == BlendMode::AlphaTest ||
+					 blendMode == BlendMode::Additive ||
+					 blendMode == BlendMode::FastAlphaBlend);
+		}
+
+		static inline BlendMode GetBlendModeFromAlpha(BlendMode blendMode, float alpha)
+		{
+			if (alpha < ALPHA_BLEND_THRESHOLD && (blendMode == BlendMode::Opaque || blendMode == BlendMode::FastAlphaBlend))
+				return BlendMode::AlphaBlend;
+
+			return blendMode;
 		}
 
 		inline RendererObject& GetStaticRendererObject(short objectNumber)
