@@ -579,6 +579,8 @@ void InitializeScripting(int levelIndex, bool loadGame)
 
 void DeInitializeScripting(int levelIndex, GameStatus reason)
 {
+	g_GameFlow->LoadFlowScript();
+
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
 

@@ -31,6 +31,7 @@
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "Renderer/Renderer.h"
+#include "Scripting/Internal/TEN/Flow//Level/FlowLevel.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
@@ -1088,6 +1089,33 @@ const std::vector<byte> SaveGame::Build()
 	auto staticMeshesOffset = fbb.CreateVector(staticMeshes);
 	auto volumesOffset = fbb.CreateVector(volumes);
 
+	// Level state
+	auto* level = (Level*)g_GameFlow->GetLevel(CurrentLevel);
+	Save::LevelDataBuilder levelData { fbb };
+	levelData.add_fog_enabled(level->Fog.Enabled);
+	levelData.add_fog_color(level->Fog.GetColor());
+	levelData.add_fog_min_distance(level->Fog.MinDistance);
+	levelData.add_fog_max_distance(level->Fog.MaxDistance);
+	levelData.add_lensflare_color(level->LensFlare.GetColor());
+	levelData.add_lensflare_pitch(level->LensFlare.GetPitch());
+	levelData.add_lensflare_yaw(level->LensFlare.GetYaw());
+	levelData.add_lensflare_sprite_id(level->LensFlare.GetSunSpriteID());
+	levelData.add_level_far_view(level->LevelFarView);
+	levelData.add_sky_layer_1_color(level->GetSkyLayerColor(0));
+	levelData.add_sky_layer_2_color(level->GetSkyLayerColor(1));
+	levelData.add_sky_layer_1_enabled(level->GetSkyLayerEnabled(0));
+	levelData.add_sky_layer_2_enabled(level->GetSkyLayerEnabled(1));
+	levelData.add_sky_layer_1_speed(level->GetSkyLayerSpeed(0));
+	levelData.add_sky_layer_2_speed(level->GetSkyLayerSpeed(1));
+	levelData.add_starfield_meteor_count(level->Starfield.GetMeteorCount());
+	levelData.add_starfield_meteor_spawn_density(level->Starfield.GetMeteorSpawnDensity());
+	levelData.add_starfield_meteor_velocity(level->Starfield.GetMeteorVelocity());
+	levelData.add_starfield_star_count(level->Starfield.GetStarCount());
+	levelData.add_storm_enabled(level->Storm);
+	levelData.add_weather_type((int)level->Weather);
+	levelData.add_weather_strength(level->WeatherStrength);
+	auto levelDataOffset = levelData.Finish();
+
 	// Global event sets
 	std::vector<flatbuffers::Offset<Save::EventSet>> globalEventSets{};
 	for (int j = 0; j < g_Level.GlobalEventSets.size(); j++)
@@ -1479,6 +1507,7 @@ const std::vector<byte> SaveGame::Build()
 	sgb.add_header(headerOffset);
 	sgb.add_level(levelStatisticsOffset);
 	sgb.add_game(gameStatisticsOffset);
+	sgb.add_level_data(levelDataOffset);
 	sgb.add_secret_bits(SaveGame::Statistics.SecretBits);
 	sgb.add_camera(cameraOffset);
 	sgb.add_lara(laraOffset);
@@ -1742,6 +1771,37 @@ static void ParseStatistics(const Save::SaveGame* s, bool isHub)
 
 static void ParseLua(const Save::SaveGame* s, bool hubMode)
 {
+	// Global level data
+
+	auto* level = (Level*)g_GameFlow->GetLevel(CurrentLevel);
+
+	level->Fog.Enabled = s->level_data()->fog_enabled();
+	level->Fog.MaxDistance = s->level_data()->fog_max_distance();
+	level->Fog.MinDistance = s->level_data()->fog_min_distance();
+	level->Fog.SetColor(s->level_data()->fog_color());
+
+	level->Layer1.Enabled = s->level_data()->sky_layer_1_enabled();
+	level->Layer1.CloudSpeed = s->level_data()->sky_layer_1_speed();
+	level->Layer1.SetColor(s->level_data()->sky_layer_1_color());
+
+	level->Layer2.Enabled = s->level_data()->sky_layer_2_enabled();
+	level->Layer2.CloudSpeed = s->level_data()->sky_layer_2_speed();
+	level->Layer2.SetColor(s->level_data()->sky_layer_2_color());
+
+	level->LensFlare.SetSunSpriteID(s->level_data()->lensflare_sprite_id());
+	level->LensFlare.SetPitch(s->level_data()->lensflare_pitch());
+	level->LensFlare.SetYaw(s->level_data()->lensflare_yaw());
+	level->LensFlare.SetColor(s->level_data()->lensflare_color());
+
+	level->Starfield.SetStarCount(s->level_data()->starfield_star_count());
+	level->Starfield.SetMeteorCount(s->level_data()->starfield_meteor_count());
+	level->Starfield.SetMeteorSpawnDensity(s->level_data()->starfield_meteor_spawn_density());
+	level->Starfield.SetMeteorVelocity(s->level_data()->starfield_meteor_velocity());
+
+	level->Storm = s->level_data()->storm_enabled();
+	level->Weather = (WeatherType)s->level_data()->weather_type();
+	level->WeatherStrength = s->level_data()->weather_strength();
+
 	// Event sets
 
 	if (g_Level.VolumeEventSets.size() == s->volume_event_sets()->size())
@@ -1769,6 +1829,8 @@ static void ParseLua(const Save::SaveGame* s, bool hubMode)
 			}
 		}
 	}
+
+	// Variables
 
 	auto loadedVars = std::vector<SavedVar>{};
 
@@ -1854,6 +1916,8 @@ static void ParseLua(const Save::SaveGame* s, bool hubMode)
 	}
 
 	g_GameScript->SetVariables(loadedVars, hubMode);
+
+	// Callbacks
 
 	auto populateCallbackVecs = [&s](auto callbackFunc)
 	{

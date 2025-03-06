@@ -29,14 +29,17 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
   - You must use this version: https://github.com/TombEngine/Resources/raw/refs/heads/main/Wad2%20Objects/Interactables/TEN_Waterfall_Emitter.wad2
 
 ### Lua API changes
+* Added Collision.Probe class for basic collision detection.
 * Added diary module.
 * Added Effects.SetHorizon(), Effects.SetHorizonPosition(), Effects.GetHorizonPosition(), Effects.SetHorizonRotation() and Effects.GetHorizonRotation() functions to meshswap, move and rotate horizon.
 * Added View.GetFlyByPosition() and View.GetFlyByRotation() functions to get flyby sequence parameters at a specified time point.
 * Added Effects.EmitAirBubble() function to spawn air bubbles.
-* Added extra arguments for sprite object slots and starting rotation value for EmitParticle function.
+* Added Moveable:GetScale() and Movebale:SetScale() methods to set visible scale of moveables.
+* Added Rotation:Lerp() function to allow linear interpolation between rotations.
 * Added various Translate() methods to Vec2 and Vec3 script objects.
-* Added Lerp() function to the Rotation object to allow linear interpolation between rotations.
 * Added alpha transparency functionality for statics and moveables by using SetColor() method.
+* Added extra arguments for sprite object slots and starting rotation value for EmitParticle function.
+* Added ability to save Flow.Level fields to a savegame, such as fog or sky color.
   
 ## [Version 1.7.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.4) - 2025-04-01
 
