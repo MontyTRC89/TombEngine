@@ -548,19 +548,19 @@ struct LevelDataT : public flatbuffers::NativeTable {
   int32_t weather_type = 0;
   float weather_strength = 0.0f;
   bool fog_enabled = false;
-  std::unique_ptr<TEN::Save::Vector3> fog_color{};
+  int32_t fog_color = 0;
   int32_t fog_min_distance = 0;
   int32_t fog_max_distance = 0;
   bool sky_layer_1_enabled = false;
-  std::unique_ptr<TEN::Save::Vector3> sky_layer_1_color{};
+  int32_t sky_layer_1_color = 0;
   int32_t sky_layer_1_speed = 0;
   bool sky_layer_2_enabled = false;
-  std::unique_ptr<TEN::Save::Vector3> sky_layer_2_color{};
+  int32_t sky_layer_2_color = 0;
   int32_t sky_layer_2_speed = 0;
   int32_t lensflare_sprite_id = 0;
   float lensflare_pitch = 0.0f;
   float lensflare_yaw = 0.0f;
-  std::unique_ptr<TEN::Save::Vector3> lensflare_color{};
+  int32_t lensflare_color = 0;
   int32_t starfield_star_count = 0;
   int32_t starfield_meteor_count = 0;
   int32_t starfield_meteor_spawn_density = 0;
@@ -610,8 +610,8 @@ struct LevelData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool fog_enabled() const {
     return GetField<uint8_t>(VT_FOG_ENABLED, 0) != 0;
   }
-  const TEN::Save::Vector3 *fog_color() const {
-    return GetStruct<const TEN::Save::Vector3 *>(VT_FOG_COLOR);
+  int32_t fog_color() const {
+    return GetField<int32_t>(VT_FOG_COLOR, 0);
   }
   int32_t fog_min_distance() const {
     return GetField<int32_t>(VT_FOG_MIN_DISTANCE, 0);
@@ -622,8 +622,8 @@ struct LevelData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool sky_layer_1_enabled() const {
     return GetField<uint8_t>(VT_SKY_LAYER_1_ENABLED, 0) != 0;
   }
-  const TEN::Save::Vector3 *sky_layer_1_color() const {
-    return GetStruct<const TEN::Save::Vector3 *>(VT_SKY_LAYER_1_COLOR);
+  int32_t sky_layer_1_color() const {
+    return GetField<int32_t>(VT_SKY_LAYER_1_COLOR, 0);
   }
   int32_t sky_layer_1_speed() const {
     return GetField<int32_t>(VT_SKY_LAYER_1_SPEED, 0);
@@ -631,8 +631,8 @@ struct LevelData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   bool sky_layer_2_enabled() const {
     return GetField<uint8_t>(VT_SKY_LAYER_2_ENABLED, 0) != 0;
   }
-  const TEN::Save::Vector3 *sky_layer_2_color() const {
-    return GetStruct<const TEN::Save::Vector3 *>(VT_SKY_LAYER_2_COLOR);
+  int32_t sky_layer_2_color() const {
+    return GetField<int32_t>(VT_SKY_LAYER_2_COLOR, 0);
   }
   int32_t sky_layer_2_speed() const {
     return GetField<int32_t>(VT_SKY_LAYER_2_SPEED, 0);
@@ -646,8 +646,8 @@ struct LevelData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   float lensflare_yaw() const {
     return GetField<float>(VT_LENSFLARE_YAW, 0.0f);
   }
-  const TEN::Save::Vector3 *lensflare_color() const {
-    return GetStruct<const TEN::Save::Vector3 *>(VT_LENSFLARE_COLOR);
+  int32_t lensflare_color() const {
+    return GetField<int32_t>(VT_LENSFLARE_COLOR, 0);
   }
   int32_t starfield_star_count() const {
     return GetField<int32_t>(VT_STARFIELD_STAR_COUNT, 0);
@@ -668,19 +668,19 @@ struct LevelData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_WEATHER_TYPE) &&
            VerifyField<float>(verifier, VT_WEATHER_STRENGTH) &&
            VerifyField<uint8_t>(verifier, VT_FOG_ENABLED) &&
-           VerifyField<TEN::Save::Vector3>(verifier, VT_FOG_COLOR) &&
+           VerifyField<int32_t>(verifier, VT_FOG_COLOR) &&
            VerifyField<int32_t>(verifier, VT_FOG_MIN_DISTANCE) &&
            VerifyField<int32_t>(verifier, VT_FOG_MAX_DISTANCE) &&
            VerifyField<uint8_t>(verifier, VT_SKY_LAYER_1_ENABLED) &&
-           VerifyField<TEN::Save::Vector3>(verifier, VT_SKY_LAYER_1_COLOR) &&
+           VerifyField<int32_t>(verifier, VT_SKY_LAYER_1_COLOR) &&
            VerifyField<int32_t>(verifier, VT_SKY_LAYER_1_SPEED) &&
            VerifyField<uint8_t>(verifier, VT_SKY_LAYER_2_ENABLED) &&
-           VerifyField<TEN::Save::Vector3>(verifier, VT_SKY_LAYER_2_COLOR) &&
+           VerifyField<int32_t>(verifier, VT_SKY_LAYER_2_COLOR) &&
            VerifyField<int32_t>(verifier, VT_SKY_LAYER_2_SPEED) &&
            VerifyField<int32_t>(verifier, VT_LENSFLARE_SPRITE_ID) &&
            VerifyField<float>(verifier, VT_LENSFLARE_PITCH) &&
            VerifyField<float>(verifier, VT_LENSFLARE_YAW) &&
-           VerifyField<TEN::Save::Vector3>(verifier, VT_LENSFLARE_COLOR) &&
+           VerifyField<int32_t>(verifier, VT_LENSFLARE_COLOR) &&
            VerifyField<int32_t>(verifier, VT_STARFIELD_STAR_COUNT) &&
            VerifyField<int32_t>(verifier, VT_STARFIELD_METEOR_COUNT) &&
            VerifyField<int32_t>(verifier, VT_STARFIELD_METEOR_SPAWN_DENSITY) &&
@@ -711,8 +711,8 @@ struct LevelDataBuilder {
   void add_fog_enabled(bool fog_enabled) {
     fbb_.AddElement<uint8_t>(LevelData::VT_FOG_ENABLED, static_cast<uint8_t>(fog_enabled), 0);
   }
-  void add_fog_color(const TEN::Save::Vector3 *fog_color) {
-    fbb_.AddStruct(LevelData::VT_FOG_COLOR, fog_color);
+  void add_fog_color(int32_t fog_color) {
+    fbb_.AddElement<int32_t>(LevelData::VT_FOG_COLOR, fog_color, 0);
   }
   void add_fog_min_distance(int32_t fog_min_distance) {
     fbb_.AddElement<int32_t>(LevelData::VT_FOG_MIN_DISTANCE, fog_min_distance, 0);
@@ -723,8 +723,8 @@ struct LevelDataBuilder {
   void add_sky_layer_1_enabled(bool sky_layer_1_enabled) {
     fbb_.AddElement<uint8_t>(LevelData::VT_SKY_LAYER_1_ENABLED, static_cast<uint8_t>(sky_layer_1_enabled), 0);
   }
-  void add_sky_layer_1_color(const TEN::Save::Vector3 *sky_layer_1_color) {
-    fbb_.AddStruct(LevelData::VT_SKY_LAYER_1_COLOR, sky_layer_1_color);
+  void add_sky_layer_1_color(int32_t sky_layer_1_color) {
+    fbb_.AddElement<int32_t>(LevelData::VT_SKY_LAYER_1_COLOR, sky_layer_1_color, 0);
   }
   void add_sky_layer_1_speed(int32_t sky_layer_1_speed) {
     fbb_.AddElement<int32_t>(LevelData::VT_SKY_LAYER_1_SPEED, sky_layer_1_speed, 0);
@@ -732,8 +732,8 @@ struct LevelDataBuilder {
   void add_sky_layer_2_enabled(bool sky_layer_2_enabled) {
     fbb_.AddElement<uint8_t>(LevelData::VT_SKY_LAYER_2_ENABLED, static_cast<uint8_t>(sky_layer_2_enabled), 0);
   }
-  void add_sky_layer_2_color(const TEN::Save::Vector3 *sky_layer_2_color) {
-    fbb_.AddStruct(LevelData::VT_SKY_LAYER_2_COLOR, sky_layer_2_color);
+  void add_sky_layer_2_color(int32_t sky_layer_2_color) {
+    fbb_.AddElement<int32_t>(LevelData::VT_SKY_LAYER_2_COLOR, sky_layer_2_color, 0);
   }
   void add_sky_layer_2_speed(int32_t sky_layer_2_speed) {
     fbb_.AddElement<int32_t>(LevelData::VT_SKY_LAYER_2_SPEED, sky_layer_2_speed, 0);
@@ -747,8 +747,8 @@ struct LevelDataBuilder {
   void add_lensflare_yaw(float lensflare_yaw) {
     fbb_.AddElement<float>(LevelData::VT_LENSFLARE_YAW, lensflare_yaw, 0.0f);
   }
-  void add_lensflare_color(const TEN::Save::Vector3 *lensflare_color) {
-    fbb_.AddStruct(LevelData::VT_LENSFLARE_COLOR, lensflare_color);
+  void add_lensflare_color(int32_t lensflare_color) {
+    fbb_.AddElement<int32_t>(LevelData::VT_LENSFLARE_COLOR, lensflare_color, 0);
   }
   void add_starfield_star_count(int32_t starfield_star_count) {
     fbb_.AddElement<int32_t>(LevelData::VT_STARFIELD_STAR_COUNT, starfield_star_count, 0);
@@ -780,19 +780,19 @@ inline flatbuffers::Offset<LevelData> CreateLevelData(
     int32_t weather_type = 0,
     float weather_strength = 0.0f,
     bool fog_enabled = false,
-    const TEN::Save::Vector3 *fog_color = 0,
+    int32_t fog_color = 0,
     int32_t fog_min_distance = 0,
     int32_t fog_max_distance = 0,
     bool sky_layer_1_enabled = false,
-    const TEN::Save::Vector3 *sky_layer_1_color = 0,
+    int32_t sky_layer_1_color = 0,
     int32_t sky_layer_1_speed = 0,
     bool sky_layer_2_enabled = false,
-    const TEN::Save::Vector3 *sky_layer_2_color = 0,
+    int32_t sky_layer_2_color = 0,
     int32_t sky_layer_2_speed = 0,
     int32_t lensflare_sprite_id = 0,
     float lensflare_pitch = 0.0f,
     float lensflare_yaw = 0.0f,
-    const TEN::Save::Vector3 *lensflare_color = 0,
+    int32_t lensflare_color = 0,
     int32_t starfield_star_count = 0,
     int32_t starfield_meteor_count = 0,
     int32_t starfield_meteor_spawn_density = 0,
@@ -8734,19 +8734,19 @@ inline void LevelData::UnPackTo(LevelDataT *_o, const flatbuffers::resolver_func
   { auto _e = weather_type(); _o->weather_type = _e; }
   { auto _e = weather_strength(); _o->weather_strength = _e; }
   { auto _e = fog_enabled(); _o->fog_enabled = _e; }
-  { auto _e = fog_color(); if (_e) _o->fog_color = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = fog_color(); _o->fog_color = _e; }
   { auto _e = fog_min_distance(); _o->fog_min_distance = _e; }
   { auto _e = fog_max_distance(); _o->fog_max_distance = _e; }
   { auto _e = sky_layer_1_enabled(); _o->sky_layer_1_enabled = _e; }
-  { auto _e = sky_layer_1_color(); if (_e) _o->sky_layer_1_color = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = sky_layer_1_color(); _o->sky_layer_1_color = _e; }
   { auto _e = sky_layer_1_speed(); _o->sky_layer_1_speed = _e; }
   { auto _e = sky_layer_2_enabled(); _o->sky_layer_2_enabled = _e; }
-  { auto _e = sky_layer_2_color(); if (_e) _o->sky_layer_2_color = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = sky_layer_2_color(); _o->sky_layer_2_color = _e; }
   { auto _e = sky_layer_2_speed(); _o->sky_layer_2_speed = _e; }
   { auto _e = lensflare_sprite_id(); _o->lensflare_sprite_id = _e; }
   { auto _e = lensflare_pitch(); _o->lensflare_pitch = _e; }
   { auto _e = lensflare_yaw(); _o->lensflare_yaw = _e; }
-  { auto _e = lensflare_color(); if (_e) _o->lensflare_color = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = lensflare_color(); _o->lensflare_color = _e; }
   { auto _e = starfield_star_count(); _o->starfield_star_count = _e; }
   { auto _e = starfield_meteor_count(); _o->starfield_meteor_count = _e; }
   { auto _e = starfield_meteor_spawn_density(); _o->starfield_meteor_spawn_density = _e; }
@@ -8766,19 +8766,19 @@ inline flatbuffers::Offset<LevelData> CreateLevelData(flatbuffers::FlatBufferBui
   auto _weather_type = _o->weather_type;
   auto _weather_strength = _o->weather_strength;
   auto _fog_enabled = _o->fog_enabled;
-  auto _fog_color = _o->fog_color ? _o->fog_color.get() : 0;
+  auto _fog_color = _o->fog_color;
   auto _fog_min_distance = _o->fog_min_distance;
   auto _fog_max_distance = _o->fog_max_distance;
   auto _sky_layer_1_enabled = _o->sky_layer_1_enabled;
-  auto _sky_layer_1_color = _o->sky_layer_1_color ? _o->sky_layer_1_color.get() : 0;
+  auto _sky_layer_1_color = _o->sky_layer_1_color;
   auto _sky_layer_1_speed = _o->sky_layer_1_speed;
   auto _sky_layer_2_enabled = _o->sky_layer_2_enabled;
-  auto _sky_layer_2_color = _o->sky_layer_2_color ? _o->sky_layer_2_color.get() : 0;
+  auto _sky_layer_2_color = _o->sky_layer_2_color;
   auto _sky_layer_2_speed = _o->sky_layer_2_speed;
   auto _lensflare_sprite_id = _o->lensflare_sprite_id;
   auto _lensflare_pitch = _o->lensflare_pitch;
   auto _lensflare_yaw = _o->lensflare_yaw;
-  auto _lensflare_color = _o->lensflare_color ? _o->lensflare_color.get() : 0;
+  auto _lensflare_color = _o->lensflare_color;
   auto _starfield_star_count = _o->starfield_star_count;
   auto _starfield_meteor_count = _o->starfield_meteor_count;
   auto _starfield_meteor_spawn_density = _o->starfield_meteor_spawn_density;

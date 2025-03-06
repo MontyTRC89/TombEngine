@@ -14,22 +14,22 @@ table LevelData {
 	weather_strength: float;
 	
 	fog_enabled: bool;
-	fog_color: Vector3;
+	fog_color: int32;
 	fog_min_distance: int32;
 	fog_max_distance: int32;
 
 	sky_layer_1_enabled: bool;
-	sky_layer_1_color: Vector3;
+	sky_layer_1_color: int32;
 	sky_layer_1_speed: int32;
 
 	sky_layer_2_enabled: bool;
-	sky_layer_2_color: Vector3;
+	sky_layer_2_color: int32;
 	sky_layer_2_speed: int32;
 
 	lensflare_sprite_id: int32;
 	lensflare_pitch: float;
 	lensflare_yaw: float;
-	lensflare_color: Vector3;
+	lensflare_color: int32;
 
 	starfield_star_count: int32;
 	starfield_meteor_count: int32;

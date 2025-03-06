@@ -1091,16 +1091,16 @@ const std::vector<byte> SaveGame::Build()
 	auto* level = (Level*)g_GameFlow->GetLevel(CurrentLevel);
 	Save::LevelDataBuilder levelData { fbb };
 	levelData.add_fog_enabled(level->Fog.Enabled);
-	levelData.add_fog_color(&Save::Vector3(level->Fog.R, level->Fog.G, level->Fog.B));
+	levelData.add_fog_color(level->Fog.GetColor());
 	levelData.add_fog_min_distance(level->Fog.MinDistance);
 	levelData.add_fog_max_distance(level->Fog.MaxDistance);
-	levelData.add_lensflare_color(&FromVector3(level->LensFlare.GetColor()));
+	levelData.add_lensflare_color(level->LensFlare.GetColor());
 	levelData.add_lensflare_pitch(level->LensFlare.GetPitch());
 	levelData.add_lensflare_yaw(level->LensFlare.GetYaw());
 	levelData.add_lensflare_sprite_id(level->LensFlare.GetSunSpriteID());
 	levelData.add_level_far_view(level->LevelFarView);
-	levelData.add_sky_layer_1_color(&FromVector3(level->GetSkyLayerColor(0)));
-	levelData.add_sky_layer_2_color(&FromVector3(level->GetSkyLayerColor(1)));
+	levelData.add_sky_layer_1_color(level->GetSkyLayerColor(0));
+	levelData.add_sky_layer_2_color(level->GetSkyLayerColor(1));
 	levelData.add_sky_layer_1_enabled(level->GetSkyLayerEnabled(0));
 	levelData.add_sky_layer_2_enabled(level->GetSkyLayerEnabled(1));
 	levelData.add_sky_layer_1_speed(level->GetSkyLayerSpeed(0));
@@ -1763,29 +1763,28 @@ static void ParseLua(const Save::SaveGame* s, bool hubMode)
 
 	auto* level = (Level*)g_GameFlow->GetLevel(CurrentLevel);
 
-	level->Fog.R = (byte)s->level_data()->fog_color()->x();
-	level->Fog.G = (byte)s->level_data()->fog_color()->y();
-	level->Fog.B = (byte)s->level_data()->fog_color()->z();
 	level->Fog.Enabled = s->level_data()->fog_enabled();
 	level->Fog.MaxDistance = s->level_data()->fog_max_distance();
 	level->Fog.MinDistance = s->level_data()->fog_min_distance();
+	level->Fog.SetColor(s->level_data()->fog_color());
 
 	level->Layer1.Enabled = s->level_data()->sky_layer_1_enabled();
 	level->Layer1.CloudSpeed = s->level_data()->sky_layer_1_speed();
-	level->Layer1.R = (byte)s->level_data()->sky_layer_1_color()->x();
-	level->Layer1.G = (byte)s->level_data()->sky_layer_1_color()->y();
-	level->Layer1.B = (byte)s->level_data()->sky_layer_1_color()->z();
+	level->Layer1.SetColor(s->level_data()->sky_layer_1_color());
 
 	level->Layer2.Enabled = s->level_data()->sky_layer_2_enabled();
 	level->Layer2.CloudSpeed = s->level_data()->sky_layer_2_speed();
-	level->Layer2.R = (byte)s->level_data()->sky_layer_2_color()->x();
-	level->Layer2.G = (byte)s->level_data()->sky_layer_2_color()->y();
-	level->Layer2.B = (byte)s->level_data()->sky_layer_2_color()->z();
+	level->Layer2.SetColor(s->level_data()->sky_layer_2_color());
 
-	level->LensFlare.SetColor(ToVector3(s->level_data()->lensflare_color()));
 	level->LensFlare.SetSunSpriteID(s->level_data()->lensflare_sprite_id());
 	level->LensFlare.SetPitch(s->level_data()->lensflare_pitch());
 	level->LensFlare.SetYaw(s->level_data()->lensflare_yaw());
+	level->LensFlare.SetColor(s->level_data()->lensflare_color());
+
+	level->Starfield.SetStarCount(s->level_data()->starfield_star_count());
+	level->Starfield.SetMeteorCount(s->level_data()->starfield_meteor_count());
+	level->Starfield.SetMeteorSpawnDensity(s->level_data()->starfield_meteor_spawn_density());
+	level->Starfield.SetMeteorVelocity(s->level_data()->starfield_meteor_velocity());
 
 	level->Storm = s->level_data()->storm_enabled();
 	level->Weather = (WeatherType)s->level_data()->weather_type();
