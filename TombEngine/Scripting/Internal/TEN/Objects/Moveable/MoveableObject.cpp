@@ -81,13 +81,13 @@ static std::unique_ptr<Moveable> Create(GAME_OBJECT_ID objID, const std::string&
 			scriptMov->SetPosition(pos, true);
 		}
 
-		scriptMov->SetRotation(USE_IF_HAVE(Rotation, rot, Rotation()));
+		scriptMov->SetRotation(ValueOr<Rotation>(rot, Rotation()));
 		scriptMov->Initialize();
 
 		if (std::holds_alternative<int>(animNumber))
 		{
 			scriptMov->SetAnimNumber(std::get<int>(animNumber), objID);
-			scriptMov->SetFrameNumber(USE_IF_HAVE(int, frameNumber, 0));
+			scriptMov->SetFrameNumber(ValueOr<int>(frameNumber, 0));
 		}
 
 		if (std::holds_alternative<int>(hp))
@@ -95,8 +95,8 @@ static std::unique_ptr<Moveable> Create(GAME_OBJECT_ID objID, const std::string&
 			scriptMov->SetHP(std::get<int>(hp));
 		}
 
-		scriptMov->SetOcb(USE_IF_HAVE(int, ocb, 0));
-		scriptMov->SetAIBits(USE_IF_HAVE(aiBitsType, aiBits, aiBitsType{}));
+		scriptMov->SetOcb(ValueOr<int>(ocb, 0));
+		scriptMov->SetAIBits(ValueOr<aiBitsType>(aiBits, aiBitsType{}));
 		scriptMov->SetColor(ScriptColor(Vector4::One));
 		mov.CarriedItem = NO_VALUE;
 
@@ -127,6 +127,7 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 		ScriptReserved_GetRoom, &Moveable::GetRoom,
 		ScriptReserved_GetRoomNumber, &Moveable::GetRoomNumber,
 		ScriptReserved_GetRotation, &Moveable::GetRotation,
+		ScriptReserved_GetScale, &Moveable::GetScale,
 		ScriptReserved_GetVelocity, &Moveable::GetVelocity,
 		ScriptReserved_GetColor, &Moveable::GetColor,
 		ScriptReserved_GetCollidable, &Moveable::GetCollidable,
@@ -153,6 +154,7 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 		ScriptReserved_SetName, &Moveable::SetName,
 		ScriptReserved_SetObjectID, &Moveable::SetObjectID,
 		ScriptReserved_SetPosition, &Moveable::SetPosition,
+		ScriptReserved_SetScale, &Moveable::SetScale,
 		ScriptReserved_SetRoomNumber, &Moveable::SetRoomNumber,
 		ScriptReserved_SetRotation, &Moveable::SetRotation,
 		ScriptReserved_SetColor, &Moveable::SetColor,
@@ -380,7 +382,7 @@ bool Moveable::SetName(const std::string& id)
 	return true;
 }
 
-/// Get the object's position
+/// Get the moveable's position
 // @function Moveable:GetPosition
 // @treturn Vec3 a copy of the moveable's position
 Vec3 Moveable::GetPosition() const
@@ -464,9 +466,9 @@ Rotation Moveable::GetJointRot(int jointIndex) const
 // will be mathematically equal
 // (e.g. 90 degrees = -270 degrees = 450 degrees)
 
-/// Get the moveable's rotation
+/// Get the moveable's rotation.
 // @function Moveable:GetRotation
-// @treturn Rotation a copy of the moveable's rotation
+// @treturn Rotation A copy of the moveable's rotation.
 Rotation Moveable::GetRotation() const
 {
 	return 
@@ -477,7 +479,15 @@ Rotation Moveable::GetRotation() const
 	};
 }
 
-/// Set the moveable's rotation
+/// Get the moveable's visual scale.
+// @function Moveable:GetScale
+// @treturn Vec3 A copy of the moveable's visual scale.
+Vec3 Moveable::GetScale() const
+{
+	return Vec3(_moveable->Pose.Scale);
+}
+
+/// Set the moveable's rotation.
 // @function Moveable:SetRotation
 // @tparam Rotation rotation The moveable's new rotation
 void Moveable::SetRotation(const Rotation& rot)
@@ -494,6 +504,14 @@ void Moveable::SetRotation(const Rotation& rot)
 
 	if (bigRotation)
 		_moveable->DisableInterpolation = true;
+}
+
+/// Set the moveable's visual scale. Does not affect collision.
+// @function Moveable:SetScale
+// @tparam Vec3 scale New visual scale.
+void Moveable::SetScale(const Vec3& scale)
+{
+	_moveable->Pose.Scale = scale.ToVector3();
 }
 
 /// Get current HP (hit points/health points)
