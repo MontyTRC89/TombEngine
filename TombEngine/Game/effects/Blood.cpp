@@ -41,12 +41,12 @@ namespace TEN::Effects::Blood
 		constexpr auto SOUND_PITCH_MAX = 4.0f;
 		constexpr auto SOUND_VOL	   = 1.0f;
 
-		if (Life <= 0.0f)
+		if (Life <= 0)
 			return;
 
 		// Update opacity.
 		if (Life <= LifeStartFading)
-			Opacity = Lerp(1.0f, 0.0f, 1.0f - (Life / std::round(LIFE_START_FADING * FPS)));
+			Opacity = Lerp(1.0f, 0.0f, 1.0f - ((float)Life / std::round(LIFE_START_FADING * FPS)));
 
 		// Update color.
 		Color.w = Opacity;
@@ -66,12 +66,12 @@ namespace TEN::Effects::Blood
 		// Deactivate on wall hit.
 		if (pointColl.IsWall())
 		{
-			Life = 0.0f;
+			Life = 0;
 		}
 		// Spawn underwater blood.
 		else if (TestEnvironment(ENV_FLAG_WATER, RoomNumber))
 		{
-			Life = 0.0f;
+			Life = 0;
 
 			float size = Size * 5;
 			UnderwaterBloodCloudEffect.Spawn(Position, RoomNumber, size);
@@ -79,20 +79,20 @@ namespace TEN::Effects::Blood
 		// Spawn stain on floor.
 		else if (Position.y >= pointColl.GetFloorHeight() && Position.y <= (pointColl.GetFloorHeight() + Velocity.y))
 		{
-			Life = 0.0f;
+			Life = 0;
 			BloodStainEffect.Spawn(*this, pointColl, true);
 			SoundEffect(SOUND_ID, &Pose(Vector3i(Position)), SoundEnvironment::Always, Random::GenerateFloat(SOUND_PITCH_MIN, SOUND_PITCH_MAX), SOUND_VOL);
 		}
 		// Spawn stain on ceiling.
 		else if (Position.y <= pointColl.GetCeilingHeight() && Position.y >= (pointColl.GetCeilingHeight() + Velocity.y))
 		{
-			Life = 0.0f;
+			Life = 0;
 			BloodStainEffect.Spawn(*this, pointColl, false);
 			SoundEffect(SOUND_ID, &Pose(Vector3i(Position)), SoundEnvironment::Always,	Random::GenerateFloat(SOUND_PITCH_MIN, SOUND_PITCH_MAX), SOUND_VOL);
 		}
 
 		// Update life.
-		Life -= 1.0f;
+		Life--;
 	}
 
 	const std::vector<BloodDripEffectParticle>& BloodDripEffectController::GetParticles()
@@ -115,8 +115,8 @@ namespace TEN::Effects::Blood
 		part.Size = size;
 		part.Velocity = vel;
 		part.Color = BLOOD_COLOR_RED;
-		part.Life = std::round(lifeInSec * FPS);
-		part.LifeStartFading = std::round(BloodDripEffectParticle::LIFE_START_FADING * FPS);
+		part.Life = (int)std::round(lifeInSec * FPS);
+		part.LifeStartFading = (int)std::round(BloodDripEffectParticle::LIFE_START_FADING * FPS);
 		part.Opacity = 0.8f;
 		part.Gravity = Random::GenerateFloat(GRAVITY_MIN, GRAVITY_MAX);
 	}
@@ -141,15 +141,15 @@ namespace TEN::Effects::Blood
 	{
 		constexpr auto ABS_SURF_HEIGHT_BOUND = CLICK(0.5f);
 
-		if (Life <= 0.0f)
+		if (Life <= 0)
 			return;
 
 		// Update delay time.
-		if (DelayTime > 0.0f)
+		if (DelayTime > 0)
 		{
-			DelayTime -= 1.0f;
-			if (DelayTime < 0.0f)
-				DelayTime = 0.0f;
+			DelayTime--;
+			if (DelayTime < 0)
+				DelayTime = 0;
 
 			return;
 		}
@@ -182,17 +182,17 @@ namespace TEN::Effects::Blood
 		// Update opacity.
 		if (Life <= LifeStartFading)
 		{
-			float alpha = 1.0f - (Life / std::round(BloodStainEffectParticle::LIFE_START_FADING * FPS));
+			float alpha = 1.0f - ((float)Life / std::round(BloodStainEffectParticle::LIFE_START_FADING * FPS));
 			Opacity = Lerp(OpacityMax, 0.0f, alpha);
 		}
 
 		// Update color.
-		float alpha = 1.0f - (Life / std::round(BloodStainEffectParticle::LIFE_MAX * FPS));
+		float alpha = 1.0f - ((float)Life / std::round(BloodStainEffectParticle::LIFE_MAX * FPS));
 		Color = Vector4::Lerp(ColorStart, ColorEnd, alpha);
 		Color.w = Opacity;
 
 		// Update life.
-		Life -= 1.0f;
+		Life--;
 		if (TestGlobalTimeInterval(COLL_CHECK_TIME_INTERVAL, CollCheckTimeOffset))
 		{
 			// TODO: Better handling of moving surfaces.
@@ -201,7 +201,7 @@ namespace TEN::Effects::Blood
 			if ((IsOnFloor && abs(pointColl.GetFloorHeight() - Position.y) > ABS_SURF_HEIGHT_BOUND) ||
 				(!IsOnFloor && abs(pointColl.GetCeilingHeight() - Position.y) > ABS_SURF_HEIGHT_BOUND))
 			{
-				Life = 0.0f;
+				Life = 0;
 			}
 		}
 	}
@@ -292,14 +292,14 @@ namespace TEN::Effects::Blood
 		part.ColorStart = BLOOD_COLOR_RED;
 		part.ColorEnd = BLOOD_COLOR_BROWN;
 		part.Vertices = part.GetVertices();
-		part.Life = std::round(BloodStainEffectParticle::LIFE_MAX * FPS);
-		part.LifeStartFading = std::round(BloodStainEffectParticle::LIFE_START_FADING * FPS);
+		part.Life = (int)std::round(BloodStainEffectParticle::LIFE_MAX * FPS);
+		part.LifeStartFading = (int)std::round(BloodStainEffectParticle::LIFE_START_FADING * FPS);
 		part.Size = 0.0f;
 		part.SizeMax = size;
 		part.Scalar = scalar;
 		part.Opacity =
 		part.OpacityMax = OPACITY_MAX;
-		part.DelayTime = std::round(delayInSec * FPS);
+		part.DelayTime = (int)std::round(delayInSec * FPS);
 	}
 
 	void BloodStainEffectController::Spawn(const BloodDripEffectParticle& drip, PointCollisionData& pointColl, bool isOnFloor)
@@ -382,7 +382,7 @@ namespace TEN::Effects::Blood
 		part.Position = Random::GeneratePointOnSphere(sphere);
 		part.RoomNumber = roomNumber;
 		part.Color = BLOOD_COLOR_RED;
-		part.Life = 1.0f;
+		part.Life = 1;
 		part.Size = size;
 	}
 
@@ -409,7 +409,7 @@ namespace TEN::Effects::Blood
 
 	void BloodMistEffectParticle::Update()
 	{
-		if (Life <= 0.0f)
+		if (Life <= 0)
 			return;
 
 		// Update velocity.
@@ -421,14 +421,14 @@ namespace TEN::Effects::Blood
 		Orientation2D += Rotation;
 
 		// Update size.
-		Size = Lerp(SizeMin, SizeMax, 1.0f - (Life / LifeMax));
+		Size = Lerp(SizeMin, SizeMax, 1.0f - ((float)Life / (float)LifeMax));
 
 		// Update opacity.
-		Opacity = Lerp(OpacityMax, 0.0f, 1.0f - (Life / LifeMax));
+		Opacity = Lerp(OpacityMax, 0.0f, 1.0f - ((float)Life / (float)LifeMax));
 		Color.w = Opacity;
 
 		// Update life.
-		Life -= 1.0f;
+		Life--;
 	}
 
 	const std::vector<BloodMistEffectParticle>& BloodMistEffectController::GetParticles()
@@ -439,8 +439,8 @@ namespace TEN::Effects::Blood
 	void BloodMistEffectController::Spawn(const Vector3& pos, int roomNumber, const Vector3& dir, unsigned int count)
 	{
 		constexpr auto COUNT_MAX		  = 256;
-		constexpr auto LIFE_MAX			  = 1.0f;
-		constexpr auto LIFE_MIN			  = 0.5f;
+		constexpr auto LIFE_MAX			  = 1.0f; // Life in seconds.
+		constexpr auto LIFE_MIN			  = 0.5f; // Life in seconds.
 		constexpr auto VEL_MAX			  = 16.0f;
 		constexpr auto MIST_SIZE_MAX	  = 128.0f;
 		constexpr auto MIST_SIZE_MIN	  = 64.0f;
@@ -471,7 +471,7 @@ namespace TEN::Effects::Blood
 			part.Velocity = Random::GenerateDirectionInCone(dir, CONE_SEMIANGLE) * Random::GenerateFloat(0.0f, VEL_MAX);
 			part.Color = BLOOD_COLOR_RED;
 			part.Life =
-			part.LifeMax = std::round(Random::GenerateFloat(LIFE_MIN, LIFE_MAX) * FPS);
+			part.LifeMax = (int)std::round(Random::GenerateFloat(LIFE_MIN, LIFE_MAX) * FPS);
 			part.Size = Random::GenerateFloat(MIST_SIZE_MIN, MIST_SIZE_MAX);
 			part.SizeMax = part.Size * MIST_SIZE_MAX_MULT;
 			part.SizeMin = part.Size;
@@ -508,7 +508,7 @@ namespace TEN::Effects::Blood
 	{
 		constexpr auto PART_SIZE_MAX = BLOCK(0.25f);
 
-		if (Life <= 0.0f)
+		if (Life <= 0)
 			return;
 
 		// Update size.
@@ -518,7 +518,7 @@ namespace TEN::Effects::Blood
 		// Update life.
 		if (Init == 0.0f)
 		{
-			Life -= 3.0f;
+			Life -= 3;
 		}
 		else if (Init < Life)
 		{
@@ -546,7 +546,7 @@ namespace TEN::Effects::Blood
 			part.SpriteID = 0;
 			part.Position = Random::GeneratePointInSphere(sphere);
 			part.RoomNumber = roomNumber;
-			part.Life = std::round(Random::GenerateFloat(LIFE_MIN, LIFE_MAX) * FPS);
+			part.Life = (int)std::round(Random::GenerateFloat(LIFE_MIN, LIFE_MAX) * FPS);
 			part.Init = 1.0f;
 			part.Size = size;
 		}
@@ -570,7 +570,7 @@ namespace TEN::Effects::Blood
 
 	void SpawnBloodSplatEffect(const Vector3& pos, int roomNumber, const Vector3& dir, const Vector3& baseVel, unsigned int count)
 	{
-		constexpr auto DRIP_LIFE		   = 2.0f;
+		constexpr auto DRIP_LIFE		   = 2.0f; // Life in seconds.
 		constexpr auto DRIP_SIZE_MAX	   = BLOCK(1 / 64.0f);
 		constexpr auto DRIP_SIZE_MIN	   = DRIP_SIZE_MAX / 2;
 		constexpr auto DRIP_VEL_MAX		   = BLOCK(1 / 32.0f);

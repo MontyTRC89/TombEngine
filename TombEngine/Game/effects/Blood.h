@@ -13,7 +13,7 @@ namespace TEN::Effects::Blood
 {
 	struct BloodDripEffectParticle
 	{
-		static constexpr auto LIFE_START_FADING = 0.5f;
+		static constexpr auto LIFE_START_FADING = 0.5f; // Time in seconds.
 
 		GAME_OBJECT_ID SpriteSeqID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
 		int			   SpriteID	   = 0;
@@ -23,8 +23,8 @@ namespace TEN::Effects::Blood
 		Vector3 Velocity   = Vector3::Zero;
 		Vector4 Color	   = Vector4::Zero;
 
-		float Life			  = 0.0f;
-		float LifeStartFading = 0.0f;
+		int	  Life			  = 0; // Time in game frames.
+		int	  LifeStartFading = 0; // Time in game frames.
 		float Size			  = 0.0f;
 		float Opacity		  = 0.0f;
 		float Gravity		  = 0.0f;
@@ -35,7 +35,7 @@ namespace TEN::Effects::Blood
 	class BloodDripEffectController
 	{
 	private:
-		// Members
+		// Fields
 
 		std::vector<BloodDripEffectParticle> _particles;
 
@@ -56,11 +56,11 @@ namespace TEN::Effects::Blood
 
 	struct BloodStainEffectParticle
 	{
-		static constexpr auto LIFE_MAX				   = 5.0f * 60.0f;
-		static constexpr auto LIFE_START_FADING		   = 15.0f;
+		static constexpr auto LIFE_MAX				   = 5.0f * 60.0f; // Time in seconds.
+		static constexpr auto LIFE_START_FADING		   = 15.0f;		   // Time in seconds.
+		static constexpr auto COLL_CHECK_TIME_INTERVAL = 0.5f;		   // Time in seconds.
 		static constexpr auto SURFACE_OFFSET		   = 4;
 		static constexpr auto VERTEX_COUNT			   = 4;
-		static constexpr auto COLL_CHECK_TIME_INTERVAL = 0.5f;
 
 		GAME_OBJECT_ID SpriteSeqID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
 		int			   SpriteID	   = 0;
@@ -75,14 +75,14 @@ namespace TEN::Effects::Blood
 
 		std::array<Vector3, VERTEX_COUNT> Vertices = {};
 
-		float Life			  = 0.0f;
-		float LifeStartFading = 0.0f;
+		int	  Life			  = 0; // Time in game frames.
+		int	  LifeStartFading = 0; // Time in game frames.
 		float Size			  = 0.0f;
 		float SizeMax		  = 0.0f;
 		float Scalar		  = 0.0f;
 		float Opacity		  = 0.0f;
 		float OpacityMax	  = 0.0f;
-		float DelayTime		  = 0.0f;
+		int	  DelayTime		  = 0;
 
 		bool  IsOnFloor			  = false;
 		float CollCheckTimeOffset = 0.0f;
@@ -96,7 +96,7 @@ namespace TEN::Effects::Blood
 	class BloodStainEffectController
 	{
 	private:
-		// Members
+		// Fields
 
 		std::vector<BloodStainEffectParticle> _particles = {};
 
@@ -126,7 +126,7 @@ namespace TEN::Effects::Blood
 		int		RoomNumber = 0;
 		Vector4	Color	   = Vector4::Zero;
 
-		float Life = 0.0f;
+		int	  Life = 0; // Time in game frames.
 		float Size = 0.0f;
 
 		void Update();
@@ -135,7 +135,7 @@ namespace TEN::Effects::Blood
 	class BloodBillboardEffectController
 	{
 	private:
-		// Members
+		// Fields
 
 		std::vector<BloodBillboardEffectParticle> _particles = {};
 
@@ -165,8 +165,8 @@ namespace TEN::Effects::Blood
 		Vector3 Velocity	  = Vector3::Zero;
 		Vector4 Color		  = Vector4::Zero;
 		
-		float Life		 = 0.0f;
-		float LifeMax	 = 0.0f;
+		int	  Life		 = 0; // Time in game frames.
+		int	  LifeMax	 = 0; // Time in game frames.
 		float Size		 = 0.0f;
 		float SizeMax	 = 0.0f;
 		float SizeMin	 = 0.0f;
@@ -182,7 +182,7 @@ namespace TEN::Effects::Blood
 	class BloodMistEffectController
 	{
 	private:
-		// Members
+		// Fields
 
 		std::vector<BloodMistEffectParticle> _particles = {};
 
@@ -211,7 +211,7 @@ namespace TEN::Effects::Blood
 		int		RoomNumber = 0;
 		Vector4 Color	   = Vector4::Zero;
 
-		float Life	  = 0.0f;
+		int   Life	  = 0; // Time in game frames.
 		float Init	  = 0.0f;
 		float Size	  = 0.0f;
 		float Opacity = 0.0f;
@@ -222,7 +222,7 @@ namespace TEN::Effects::Blood
 	class UnderwaterBloodCloudEffectController
 	{
 	private:
-		// Members
+		// Fields
 
 		std::vector<UnderwaterBloodCloudEffectParticle> _particles;
 
