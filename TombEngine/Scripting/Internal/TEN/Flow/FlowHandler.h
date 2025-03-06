@@ -11,6 +11,7 @@
 #include "Scripting/Internal/TEN/Flow/Level/FlowLevel.h"
 #include "Scripting/Internal/TEN/Flow/Settings/Settings.h"
 #include "Scripting/Internal/TEN/Flow/Statistics/Statistics.h"
+#include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
 
 class FlowHandler : public ScriptInterfaceFlowHandler
 {

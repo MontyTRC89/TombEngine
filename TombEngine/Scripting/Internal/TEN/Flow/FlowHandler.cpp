@@ -414,6 +414,8 @@ void FlowHandler::LoadFlowScript()
 {
 	TENLog("Loading gameflow script, strings, and settings...", LogLevel::Info);
 
+	Levels.clear();
+
 	_handler.ExecuteScript(_gameDir + "Scripts/Gameflow.lua");
 	_handler.ExecuteScript(_gameDir + "Scripts/SystemStrings.lua", true);
 	_handler.ExecuteScript(_gameDir + "Scripts/Strings.lua", true);

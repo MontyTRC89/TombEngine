@@ -38,6 +38,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added various Translate() methods to Vec2 and Vec3 script objects.
 * Added alpha transparency functionality for statics and moveables by using SetColor() method.
 * Added extra arguments for sprite object slots and starting rotation value for EmitParticle function.
+* Added ability to save Flow.Level fields to a savegame, such as fog or sky color.
   
 ## [Version 1.7.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.4) - 2025-04-01
 
