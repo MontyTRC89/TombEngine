@@ -712,6 +712,8 @@ void LoadDynamicRoomData()
 		room.meshEffect = ReadInt32();
 		room.reverbType = (ReverbType)ReadInt32();
 		room.flipNumber = ReadInt32();
+		room.FloorWaterPlaneIndex = ReadInt32();
+		room.CeilingWaterPlaneIndex = ReadInt32();
 
 		int staticCount = ReadCount();
 		room.mesh.resize(0);
