@@ -4321,6 +4321,7 @@ struct LaraT : public flatbuffers::NativeTable {
   int32_t location_pad = 0;
   std::unique_ptr<TEN::Save::ArmInfoT> right_arm{};
   std::unique_ptr<TEN::Save::PlayerStatusDataT> status{};
+  std::unique_ptr<TEN::Save::PlayerSkinT> skin{};
   std::unique_ptr<TEN::Save::EulerAngles> target_arm_orient{};
   int32_t target_entity_number = 0;
   std::unique_ptr<TEN::Save::TorchDataT> torch{};
@@ -4349,10 +4350,11 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_LOCATION_PAD = 32,
     VT_RIGHT_ARM = 34,
     VT_STATUS = 36,
-    VT_TARGET_ARM_ORIENT = 38,
-    VT_TARGET_ENTITY_NUMBER = 40,
-    VT_TORCH = 42,
-    VT_WEAPONS = 44
+    VT_SKIN = 38,
+    VT_TARGET_ARM_ORIENT = 40,
+    VT_TARGET_ENTITY_NUMBER = 42,
+    VT_TORCH = 44,
+    VT_WEAPONS = 46
   };
   const TEN::Save::PlayerContextData *context() const {
     return GetPointer<const TEN::Save::PlayerContextData *>(VT_CONTEXT);
@@ -4405,6 +4407,9 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   const TEN::Save::PlayerStatusData *status() const {
     return GetPointer<const TEN::Save::PlayerStatusData *>(VT_STATUS);
   }
+  const TEN::Save::PlayerSkin *skin() const {
+    return GetPointer<const TEN::Save::PlayerSkin *>(VT_SKIN);
+  }
   const TEN::Save::EulerAngles *target_arm_orient() const {
     return GetStruct<const TEN::Save::EulerAngles *>(VT_TARGET_ARM_ORIENT);
   }
@@ -4445,6 +4450,8 @@ struct Lara FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            verifier.VerifyTable(right_arm()) &&
            VerifyOffset(verifier, VT_STATUS) &&
            verifier.VerifyTable(status()) &&
+           VerifyOffset(verifier, VT_SKIN) &&
+           verifier.VerifyTable(skin()) &&
            VerifyField<TEN::Save::EulerAngles>(verifier, VT_TARGET_ARM_ORIENT) &&
            VerifyField<int32_t>(verifier, VT_TARGET_ENTITY_NUMBER) &&
            VerifyOffset(verifier, VT_TORCH) &&
@@ -4514,6 +4521,9 @@ struct LaraBuilder {
   void add_status(flatbuffers::Offset<TEN::Save::PlayerStatusData> status) {
     fbb_.AddOffset(Lara::VT_STATUS, status);
   }
+  void add_skin(flatbuffers::Offset<TEN::Save::PlayerSkin> skin) {
+    fbb_.AddOffset(Lara::VT_SKIN, skin);
+  }
   void add_target_arm_orient(const TEN::Save::EulerAngles *target_arm_orient) {
     fbb_.AddStruct(Lara::VT_TARGET_ARM_ORIENT, target_arm_orient);
   }
@@ -4556,6 +4566,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
     int32_t location_pad = 0,
     flatbuffers::Offset<TEN::Save::ArmInfo> right_arm = 0,
     flatbuffers::Offset<TEN::Save::PlayerStatusData> status = 0,
+    flatbuffers::Offset<TEN::Save::PlayerSkin> skin = 0,
     const TEN::Save::EulerAngles *target_arm_orient = 0,
     int32_t target_entity_number = 0,
     flatbuffers::Offset<TEN::Save::TorchData> torch = 0,
@@ -4565,6 +4576,7 @@ inline flatbuffers::Offset<Lara> CreateLara(
   builder_.add_torch(torch);
   builder_.add_target_entity_number(target_entity_number);
   builder_.add_target_arm_orient(target_arm_orient);
+  builder_.add_skin(skin);
   builder_.add_status(status);
   builder_.add_right_arm(right_arm);
   builder_.add_location_pad(location_pad);
@@ -4609,6 +4621,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
     int32_t location_pad = 0,
     flatbuffers::Offset<TEN::Save::ArmInfo> right_arm = 0,
     flatbuffers::Offset<TEN::Save::PlayerStatusData> status = 0,
+    flatbuffers::Offset<TEN::Save::PlayerSkin> skin = 0,
     const TEN::Save::EulerAngles *target_arm_orient = 0,
     int32_t target_entity_number = 0,
     flatbuffers::Offset<TEN::Save::TorchData> torch = 0,
@@ -4633,6 +4646,7 @@ inline flatbuffers::Offset<Lara> CreateLaraDirect(
       location_pad,
       right_arm,
       status,
+      skin,
       target_arm_orient,
       target_entity_number,
       torch,
@@ -9681,6 +9695,7 @@ inline void Lara::UnPackTo(LaraT *_o, const flatbuffers::resolver_function_t *_r
   { auto _e = location_pad(); _o->location_pad = _e; }
   { auto _e = right_arm(); if (_e) _o->right_arm = std::unique_ptr<TEN::Save::ArmInfoT>(_e->UnPack(_resolver)); }
   { auto _e = status(); if (_e) _o->status = std::unique_ptr<TEN::Save::PlayerStatusDataT>(_e->UnPack(_resolver)); }
+  { auto _e = skin(); if (_e) _o->skin = std::unique_ptr<TEN::Save::PlayerSkinT>(_e->UnPack(_resolver)); }
   { auto _e = target_arm_orient(); if (_e) _o->target_arm_orient = std::unique_ptr<TEN::Save::EulerAngles>(new TEN::Save::EulerAngles(*_e)); }
   { auto _e = target_entity_number(); _o->target_entity_number = _e; }
   { auto _e = torch(); if (_e) _o->torch = std::unique_ptr<TEN::Save::TorchDataT>(_e->UnPack(_resolver)); }
@@ -9712,6 +9727,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
   auto _location_pad = _o->location_pad;
   auto _right_arm = _o->right_arm ? CreateArmInfo(_fbb, _o->right_arm.get(), _rehasher) : 0;
   auto _status = _o->status ? CreatePlayerStatusData(_fbb, _o->status.get(), _rehasher) : 0;
+  auto _skin = _o->skin ? CreatePlayerSkin(_fbb, _o->skin.get(), _rehasher) : 0;
   auto _target_arm_orient = _o->target_arm_orient ? _o->target_arm_orient.get() : 0;
   auto _target_entity_number = _o->target_entity_number;
   auto _torch = _o->torch ? CreateTorchData(_fbb, _o->torch.get(), _rehasher) : 0;
@@ -9735,6 +9751,7 @@ inline flatbuffers::Offset<Lara> CreateLara(flatbuffers::FlatBufferBuilder &_fbb
       _location_pad,
       _right_arm,
       _status,
+      _skin,
       _target_arm_orient,
       _target_entity_number,
       _torch,

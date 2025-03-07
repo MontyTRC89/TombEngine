@@ -1327,6 +1327,7 @@ struct LaraInfo
 	PlayerStatusData	Status	  = {};
 	PlayerEffectData	Effect	  = {};
 	PlayerInventoryData Inventory = {};
+	PlayerSkinData Skin = {};
 
 	// TODO: Move to PlayerControlData.
 	FlareData		  Flare = {};
