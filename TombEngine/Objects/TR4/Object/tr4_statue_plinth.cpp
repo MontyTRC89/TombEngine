@@ -132,24 +132,12 @@ namespace TEN::Entities::TR4
 				ResetPlayerFlex(laraItem);
 				player->Control.HandStatus = HandStatus::Busy;
 				g_Gui.SetInventoryItemChosen(NO_VALUE);
-				return;
-			}
-		}
-		else if (keyHoleItem->ItemFlags[1])
-		{
-			if (g_Gui.GetInventoryItemChosen() == keyItem)
-			{
-				laraItem->Animation.AnimNumber = LA_PICKUP_PEDESTAL_HIGH;
-				laraItem->Animation.FrameNumber = GetAnimData(LA_PICKUP_PEDESTAL_HIGH).frameBase;
-				laraItem->Animation.ActiveState = LS_INSERT_KEY;
-				ResetPlayerFlex(laraItem);
-				player->Control.HandStatus = HandStatus::Busy;
-				g_Gui.SetInventoryItemChosen(NO_VALUE);
+				keyHoleItem->ItemFlags[2] = 1;
 				return;
 			}
 		}
 
-		if (laraItem->Animation.AnimNumber == LA_PICKUP_PEDESTAL_HIGH && laraItem->Animation.FrameNumber == GetAnimData(LA_PICKUP_PEDESTAL_HIGH).frameBase + PLACE_PLINTHITEM_FRAME && keyHoleItem->ItemFlags[1])
+		if (laraItem->Animation.AnimNumber == LA_PICKUP_PEDESTAL_HIGH && laraItem->Animation.FrameNumber == GetAnimData(LA_PICKUP_PEDESTAL_HIGH).frameBase + PLACE_PLINTHITEM_FRAME && keyHoleItem->ItemFlags[2])
 		{
 			TestTriggers(keyHoleItem, true, keyHoleItem->Flags & 0x3E00);
 			keyHoleItem->Flags |= TRIGGERED;
@@ -163,6 +151,7 @@ namespace TEN::Entities::TR4
 		}
 		else
 		{
+			keyHoleItem->ItemFlags[1] = 0;
 			ObjectCollision(itemNumber, laraItem, coll);
 		}
 	}
