@@ -23,7 +23,8 @@ namespace TEN::Entities::Traps
     Speed,
     PauseCounter,
     Direction,
-    DistanceTravelled
+    DistanceTravelled,
+    SpeedCalc
     };
 
 	constexpr auto MOVING_LASER_DAMAGE = 100;
@@ -37,6 +38,7 @@ namespace TEN::Entities::Traps
 		auto& item = g_Level.Items[itemNumber];
         item.ItemFlags[Direction] = 1;
         item.ItemFlags[Speed] = 10;
+        item.ItemFlags[SpeedCalc] = MIN_SPEED;
         item.Pose.Translate(item.Pose.Orientation, -CLICK(1)); //Offset by one click to make it dangerous at the edges of the block.
 	}
 
@@ -69,15 +71,22 @@ namespace TEN::Entities::Traps
             {
                 item.ItemFlags[Direction] *= -1;
                 item.ItemFlags[DistanceTravelled] = 0;
+                item.ItemFlags[SpeedCalc] = MIN_SPEED;
             }
 
             AnimateItem(&item);
             return;
         }
 
-        item.Pose.Translate(item.Pose.Orientation, (item.ItemFlags[Direction] * distancePerFrame));
+        item.Pose.Translate(item.Pose.Orientation, (item.ItemFlags[Direction] * item.ItemFlags[SpeedCalc]));
         
         item.ItemFlags[DistanceTravelled] += distancePerFrame;
+
+        if (item.ItemFlags[DistanceTravelled] < (moveDistance * MAX_SPEED_THRESHOLD))
+            item.ItemFlags[SpeedCalc] = std::min(distancePerFrame, item.ItemFlags[SpeedCalc] + ACCELERATION);
+        else
+            item.ItemFlags[SpeedCalc] = std::max(MIN_SPEED, item.ItemFlags[SpeedCalc] - ACCELERATION);
+
 
         if (item.ItemFlags[DistanceTravelled] >= moveDistance)
         {
