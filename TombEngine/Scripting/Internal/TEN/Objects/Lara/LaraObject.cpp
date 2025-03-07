@@ -404,6 +404,7 @@ void LaraObject::SetSkin(GAME_OBJECT_ID skin, GAME_OBJECT_ID skinJoints, GAME_OB
 	lara->Skin.SkinJoints = skinJoints;
 	lara->Skin.HairPrimary = hair1;
 	lara->Skin.HairSecondary = hair2;
+
 }
 
 void LaraObject::Register(sol::table& parent)

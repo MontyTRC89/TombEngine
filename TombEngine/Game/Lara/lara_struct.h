@@ -1314,10 +1314,10 @@ struct PlayerInventoryData
 
 struct PlayerSkinData
 {
-	GAME_OBJECT_ID Skin = ID_LARA_SKIN;
-	GAME_OBJECT_ID SkinJoints = ID_LARA_SKIN_JOINTS;
-	GAME_OBJECT_ID HairPrimary = ID_HAIR_PRIMARY;
-	GAME_OBJECT_ID HairSecondary = ID_HAIR_SECONDARY;
+	GAME_OBJECT_ID Skin;
+	GAME_OBJECT_ID SkinJoints;
+	GAME_OBJECT_ID HairPrimary;
+	GAME_OBJECT_ID HairSecondary;
 };
 
 struct LaraInfo

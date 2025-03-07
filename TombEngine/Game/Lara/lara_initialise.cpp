@@ -104,10 +104,11 @@ void InitializeLaraMeshes(ItemInfo* item)
 {
 	auto& player = GetLaraInfo(*item);
 
-	player.Skin.Skin = ID_LARA_SKIN;
-	player.Skin.SkinJoints = ID_LARA_SKIN_JOINTS;
-	player.Skin.HairPrimary = ID_HAIR_PRIMARY;
-	player.Skin.HairSecondary = ID_HAIR_SECONDARY;
+	//Set Skin Defaults.
+	Lara.Skin.Skin = ID_LARA_SKIN;
+	Lara.Skin.SkinJoints = ID_LARA_SKIN_JOINTS;
+	Lara.Skin.HairPrimary = ID_HAIR_PRIMARY;
+	Lara.Skin.HairSecondary = ID_HAIR_SECONDARY;
 
 	TENLog("Failed to create Lara Skin."+ Lara.Skin.Skin, LogLevel::Warning);
 

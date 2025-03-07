@@ -484,7 +484,7 @@ namespace TEN::Renderer
 		);
 
 		TENLog("Preparing object data...", LogLevel::Info);
-			 
+
 		bool isSkinPresent = false;
 
 		totalVertices = 0;
@@ -708,7 +708,7 @@ namespace TEN::Renderer
 					{
 						bool isYoung = (g_GameFlow->GetLevel(CurrentLevel)->GetLaraType() == LaraType::Young);
 						bool isSecond = isYoung && MoveablesIds[i] == Lara.Skin.HairSecondary;
-						const auto& skinObj = GetRendererObject(Lara.Skin.SkinJoints);
+						const auto& skinObj = GetRendererObject(Lara.Skin.Skin);
 						const auto& settings = g_GameFlow->GetSettings()->Hair;
 
 						for (int j = 0; j < obj->nmeshes; j++)
