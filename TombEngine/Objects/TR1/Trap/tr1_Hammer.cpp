@@ -171,11 +171,18 @@ namespace TEN::Entities::Traps
 
         if (item.Animation.ActiveState == THOR_HAMMER_STATE_ACTIVE && (item.Animation.FrameNumber - GetAnimData(item).frameBase) <= HAMMER_HIT_FRAME)
         {
-            DoDamage(playerItem, INT_MAX);
-            SetAnimation(playerItem, LA_BOULDER_DEATH);
+            auto pointColl = GetPointCollision(*playerItem);
+            int floorHeight = pointColl.GetFloorHeight();
+            playerItem->Pose.Position.y = floorHeight;
+            playerItem-> Animation.IsAirborne = false;
             playerItem->Animation.Velocity.y = 0.0f;
             playerItem->Animation.Velocity.z = 0.0f;
-            playerItem->Pose.Scale = Vector3(1.0f,0.1f,1.0f);
+            playerItem->Pose.Scale = Vector3(1.0f, 0.1f, 1.0f);
+
+            DoDamage(playerItem, INT_MAX);
+            SetAnimation(playerItem, LA_BOULDER_DEATH);
+
+            
 
         }
         else if (playerItem->HitPoints > 0)
