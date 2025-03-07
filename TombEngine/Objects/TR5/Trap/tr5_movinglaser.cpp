@@ -40,17 +40,17 @@ namespace TEN::Entities::Traps
         item.Pose.Translate(item.Pose.Orientation, -CLICK(1)); //Offset by one click to make it dangerous at the edges of the block.
 	}
 
-	void ControlMovingLaser(short itemNumber)
-	{
-		auto& item = g_Level.Items[itemNumber];
+    void ControlMovingLaser(short itemNumber)
+    {
+        auto& item = g_Level.Items[itemNumber];
 
-		if (!TriggerActive(&item))
-			return;
+        if (!TriggerActive(&item))
+            return;
 
         float moveDistance = (BLOCK(1) * item.TriggerFlags) + CLICK(2); //Use OCB to calculate the distance and add 2 clicks.
-                
+
         float distancePerFrame = (static_cast<float>(CLICK(1)) * item.ItemFlags[Speed]) / FPS; // Calculate distance per frame
-               
+
         item.Animation.ActiveState = 0;
         SpawnDynamicLight(item.Pose.Position.x, item.Pose.Position.y - 64, item.Pose.Position.z, (GetRandomControl() % 2) + 8, (GetRandomControl() % 4) + 24, GetRandomControl() % 4, GetRandomControl() % 2);
         item.MeshBits = -1 - (GetRandomControl() & 0x14); // To make lasers flicker
@@ -60,12 +60,12 @@ namespace TEN::Entities::Traps
             AnimateItem(&item);
             return;
         }
-        
+
         if (item.ItemFlags[PauseCounter] > 0)
         {
             item.ItemFlags[PauseCounter]--;
 
-            if (item.ItemFlags[PauseCounter] == 0) 
+            if (item.ItemFlags[PauseCounter] == 0)
             {
                 item.ItemFlags[Direction] *= -1;
                 item.ItemFlags[DistanceTravelled] = 0;
@@ -76,12 +76,18 @@ namespace TEN::Entities::Traps
         }
 
         item.Pose.Translate(item.Pose.Orientation, (item.ItemFlags[Direction] * distancePerFrame));
-        
+
         item.ItemFlags[DistanceTravelled] += distancePerFrame;
 
         if (item.ItemFlags[DistanceTravelled] >= moveDistance)
         {
             item.ItemFlags[PauseCounter] = PAUSE_FRAMES;
+        }
+
+        if (item.ItemFlags[PauseCounter] == 0)
+        {
+            //377 sound is TR4_Binoculars_Zoom
+            SoundEffect(377, &item.Pose, SoundEnvironment::Always);
         }
 
         // Update room if necessary
