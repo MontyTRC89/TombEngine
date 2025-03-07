@@ -33,8 +33,8 @@ namespace TEN::Entities::TR4
 	const ObjectCollisionBounds KeyHoleBounds =
 	{
 		GameBoundingBox(
-			-BLOCK(0.5f), BLOCK(0.5f),
-			-BLOCK(0.5f), BLOCK(0.5f),
+			-CLICK(1), CLICK(1),
+			-BLOCK(0.5f), 0,
 			-BLOCK(0.5f), 0),
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
@@ -56,6 +56,9 @@ namespace TEN::Entities::TR4
 
 		short* triggerIndexPtr = GetTriggerIndex(keyHoleItem);
 		short y_rot;
+
+		if (!keyHoleItem->ItemFlags[0])
+			keyHoleItem->ItemFlags[0] = PLACE_PLINTHITEM_FRAME;
 
 		GAME_OBJECT_ID keyItem;
 
@@ -81,7 +84,7 @@ namespace TEN::Entities::TR4
 			laraItem->Animation.ActiveState == LS_IDLE &&
 			laraItem->Animation.AnimNumber == LA_STAND_IDLE);
 
-		if (isActionReady && isPlayerAvailable && !keyHoleItem->ItemFlags[0])
+		if (isActionReady && isPlayerAvailable && !keyHoleItem->ItemFlags[3])
 		{
 			if (!keyHoleItem->ItemFlags[1])
 			{
@@ -137,7 +140,7 @@ namespace TEN::Entities::TR4
 			}
 		}
 
-		if (laraItem->Animation.AnimNumber == LA_PICKUP_PEDESTAL_HIGH && laraItem->Animation.FrameNumber == GetAnimData(LA_PICKUP_PEDESTAL_HIGH).frameBase + PLACE_PLINTHITEM_FRAME && keyHoleItem->ItemFlags[2])
+		if (laraItem->Animation.AnimNumber == LA_PICKUP_PEDESTAL_HIGH && laraItem->Animation.FrameNumber == GetAnimData(LA_PICKUP_PEDESTAL_HIGH).frameBase + keyHoleItem->ItemFlags[0] && keyHoleItem->ItemFlags[2])
 		{
 			TestTriggers(keyHoleItem, true, keyHoleItem->Flags & 0x3E00);
 			keyHoleItem->Flags |= TRIGGERED;
@@ -146,7 +149,7 @@ namespace TEN::Entities::TR4
 			//TODO: Allow meshswap of puzzle items.
 			//keyHoleItem->Model.MeshIndex[1] = Objects[keyItem].meshIndex + 0;
 			//keyHoleItem->Model.Mutators[0].Offset = Vector3(0.0f, -896.0f, 0.0f);
-			keyHoleItem->ItemFlags[0] = 1;
+			keyHoleItem->ItemFlags[3] = 1;
 			RemoveObjectFromInventory(keyItem, 1);
 		}
 		else
