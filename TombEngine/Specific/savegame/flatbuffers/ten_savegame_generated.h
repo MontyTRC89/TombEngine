@@ -41,6 +41,10 @@ struct WeaponInfo;
 struct WeaponInfoBuilder;
 struct WeaponInfoT;
 
+struct PlayerSkin;
+struct PlayerSkinBuilder;
+struct PlayerSkinT;
+
 struct ArmInfo;
 struct ArmInfoBuilder;
 struct ArmInfoT;
@@ -2007,6 +2011,97 @@ struct WeaponInfo::Traits {
 };
 
 flatbuffers::Offset<WeaponInfo> CreateWeaponInfo(flatbuffers::FlatBufferBuilder &_fbb, const WeaponInfoT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
+struct PlayerSkinT : public flatbuffers::NativeTable {
+  typedef PlayerSkin TableType;
+  uint32_t skin = 0;
+  uint32_t skin_joints = 0;
+  uint32_t hair_primary = 0;
+  uint32_t hair_secondary = 0;
+};
+
+struct PlayerSkin FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef PlayerSkinT NativeTableType;
+  typedef PlayerSkinBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_SKIN = 4,
+    VT_SKIN_JOINTS = 6,
+    VT_HAIR_PRIMARY = 8,
+    VT_HAIR_SECONDARY = 10
+  };
+  uint32_t skin() const {
+    return GetField<uint32_t>(VT_SKIN, 0);
+  }
+  uint32_t skin_joints() const {
+    return GetField<uint32_t>(VT_SKIN_JOINTS, 0);
+  }
+  uint32_t hair_primary() const {
+    return GetField<uint32_t>(VT_HAIR_PRIMARY, 0);
+  }
+  uint32_t hair_secondary() const {
+    return GetField<uint32_t>(VT_HAIR_SECONDARY, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<uint32_t>(verifier, VT_SKIN) &&
+           VerifyField<uint32_t>(verifier, VT_SKIN_JOINTS) &&
+           VerifyField<uint32_t>(verifier, VT_HAIR_PRIMARY) &&
+           VerifyField<uint32_t>(verifier, VT_HAIR_SECONDARY) &&
+           verifier.EndTable();
+  }
+  PlayerSkinT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(PlayerSkinT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<PlayerSkin> Pack(flatbuffers::FlatBufferBuilder &_fbb, const PlayerSkinT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct PlayerSkinBuilder {
+  typedef PlayerSkin Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_skin(uint32_t skin) {
+    fbb_.AddElement<uint32_t>(PlayerSkin::VT_SKIN, skin, 0);
+  }
+  void add_skin_joints(uint32_t skin_joints) {
+    fbb_.AddElement<uint32_t>(PlayerSkin::VT_SKIN_JOINTS, skin_joints, 0);
+  }
+  void add_hair_primary(uint32_t hair_primary) {
+    fbb_.AddElement<uint32_t>(PlayerSkin::VT_HAIR_PRIMARY, hair_primary, 0);
+  }
+  void add_hair_secondary(uint32_t hair_secondary) {
+    fbb_.AddElement<uint32_t>(PlayerSkin::VT_HAIR_SECONDARY, hair_secondary, 0);
+  }
+  explicit PlayerSkinBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<PlayerSkin> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<PlayerSkin>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<PlayerSkin> CreatePlayerSkin(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    uint32_t skin = 0,
+    uint32_t skin_joints = 0,
+    uint32_t hair_primary = 0,
+    uint32_t hair_secondary = 0) {
+  PlayerSkinBuilder builder_(_fbb);
+  builder_.add_hair_secondary(hair_secondary);
+  builder_.add_hair_primary(hair_primary);
+  builder_.add_skin_joints(skin_joints);
+  builder_.add_skin(skin);
+  return builder_.Finish();
+}
+
+struct PlayerSkin::Traits {
+  using type = PlayerSkin;
+  static auto constexpr Create = CreatePlayerSkin;
+};
+
+flatbuffers::Offset<PlayerSkin> CreatePlayerSkin(flatbuffers::FlatBufferBuilder &_fbb, const PlayerSkinT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
 struct ArmInfoT : public flatbuffers::NativeTable {
   typedef ArmInfo TableType;
@@ -8803,6 +8898,41 @@ inline flatbuffers::Offset<WeaponInfo> CreateWeaponInfo(flatbuffers::FlatBufferB
       _frame_number,
       _active_state,
       _target_state);
+}
+
+inline PlayerSkinT *PlayerSkin::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<PlayerSkinT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void PlayerSkin::UnPackTo(PlayerSkinT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = skin(); _o->skin = _e; }
+  { auto _e = skin_joints(); _o->skin_joints = _e; }
+  { auto _e = hair_primary(); _o->hair_primary = _e; }
+  { auto _e = hair_secondary(); _o->hair_secondary = _e; }
+}
+
+inline flatbuffers::Offset<PlayerSkin> PlayerSkin::Pack(flatbuffers::FlatBufferBuilder &_fbb, const PlayerSkinT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreatePlayerSkin(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<PlayerSkin> CreatePlayerSkin(flatbuffers::FlatBufferBuilder &_fbb, const PlayerSkinT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const PlayerSkinT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _skin = _o->skin;
+  auto _skin_joints = _o->skin_joints;
+  auto _hair_primary = _o->hair_primary;
+  auto _hair_secondary = _o->hair_secondary;
+  return TEN::Save::CreatePlayerSkin(
+      _fbb,
+      _skin,
+      _skin_joints,
+      _hair_primary,
+      _hair_secondary);
 }
 
 inline ArmInfoT *ArmInfo::UnPack(const flatbuffers::resolver_function_t *_resolver) const {

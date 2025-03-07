@@ -107,6 +107,13 @@ table WeaponInfo {
 	target_state: uint32;
 }
 
+table PlayerSkin {
+	skin: uint32;
+	skin_joints: uint32;
+	hair_primary: uint32;
+	hair_secondary: uint32;
+}
+
 table ArmInfo {
 	anim_number: int32;
 	frame_number: int32;
