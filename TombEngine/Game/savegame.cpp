@@ -586,6 +586,7 @@ const std::vector<byte> SaveGame::Build()
 	lara.add_location(Lara.Location);
 	lara.add_location_pad(Lara.LocationPad);
 	lara.add_right_arm(rightArmOffset);
+	lara.add_skin(playerSkinOffset);
 	lara.add_status(statusOffset);
 	lara.add_collision(collisionOffset);
 	lara.add_target_arm_orient(&FromEulerAngles(Lara.TargetArmOrient));

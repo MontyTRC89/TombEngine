@@ -1273,13 +1273,7 @@ struct PlayerEffectData
 	std::array<float, NUM_LARA_MESHES> BubbleNodes = {};
 };
 
-struct PlayerSkinData
-{
-	GAME_OBJECT_ID Skin = ID_LARA_SKIN;
-	GAME_OBJECT_ID SkinJoints = ID_LARA_SKIN_JOINTS;
-	GAME_OBJECT_ID HairPrimary	 = ID_HAIR_PRIMARY;
-	GAME_OBJECT_ID HairSecondary = ID_HAIR_SECONDARY;
-};
+
 
 struct PlayerInventoryData
 {
@@ -1316,6 +1310,14 @@ struct PlayerInventoryData
 	int KeysCombo[NUM_KEYS * 2]			= {};
 	int PickupsCombo[NUM_PICKUPS * 2]	= {};
 	int ExaminesCombo[NUM_EXAMINES * 2] = {};
+};
+
+struct PlayerSkinData
+{
+	GAME_OBJECT_ID Skin = ID_LARA_SKIN;
+	GAME_OBJECT_ID SkinJoints = ID_LARA_SKIN_JOINTS;
+	GAME_OBJECT_ID HairPrimary = ID_HAIR_PRIMARY;
+	GAME_OBJECT_ID HairSecondary = ID_HAIR_SECONDARY;
 };
 
 struct LaraInfo
