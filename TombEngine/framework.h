@@ -2,13 +2,18 @@
 
 #include <algorithm>
 #include <array>
+#include <atomic>
 #include <d3d11.h>
+#include <d3dcompiler.h>
 #include <deque>
+#include <filesystem>
+#include <fstream>
 #include <functional>
 #include <future>
 #include <map>
 #include <memory>
 #include <optional>
+#include <regex>
 #include <set>
 #include <SimpleMath.h>
 #include <sol.hpp>
@@ -16,6 +21,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
+#include <queue>
 #include <vector>
 
 using namespace DirectX;

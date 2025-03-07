@@ -5,8 +5,8 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
-#include "Scripting/Internal/TEN/Rotation/Rotation.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Specific/level.h"
 
 /***
@@ -16,8 +16,8 @@ Activator volume.
 @pragma nostrip
 */
 
-static auto IndexError = index_error_maker(Volume, ScriptReserved_Volume);
-static auto NewIndexError = newindex_error_maker(Volume, ScriptReserved_Volume);
+static auto IndexError = IndexErrorMaker(Volume, ScriptReserved_Volume);
+static auto NewIndexError = NewIndexErrorMaker(Volume, ScriptReserved_Volume);
 
 Volume::Volume(TriggerVolume& volume) :
 	_volume(volume)
@@ -90,9 +90,9 @@ void Volume::SetName(const std::string& name)
 		return;
 
 	// Remove previous name if it exists.
-	if (s_callbackSetName(name, _volume))
+	if (_callbackSetName(name, _volume))
 	{
-		s_callbackRemoveName(_volume.Name);
+		_callbackRemoveName(_volume.Name);
 		_volume.Name = name;
 	}
 	else
@@ -145,10 +145,9 @@ bool Volume::IsMoveableInside(const Moveable& mov)
 {
 	for (const auto& entry : _volume.StateQueue)
 	{
-		// TODO: Use int, not short.
-		if (std::holds_alternative<short>(entry.Activator))
+		if (std::holds_alternative<int>(entry.Activator))
 		{
-			int id = std::get<short>(entry.Activator);
+			int id = std::get<int>(entry.Activator);
 			auto& mov2 = std::make_unique<Moveable>(id);
 
 			if (mov2.get()->GetName() == mov.GetName())

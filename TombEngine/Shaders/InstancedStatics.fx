@@ -4,6 +4,7 @@
 #include "./VertexEffects.hlsli"
 #include "./VertexInput.hlsli"
 #include "./Blending.hlsli"
+#include "./Shadows.hlsli"
 
 #define INSTANCED_STATIC_MESH_BUCKET_SIZE 100
 
@@ -124,9 +125,13 @@ PixelShaderOutput PS(PixelShaderInput input)
 			input.FogBulbs.w) :
 		StaticLight(input.Color.xyz, tex.xyz, input.FogBulbs.w);
 
+	color = DoShadow(input.WorldPosition, normal, color, -0.5f);
+	color = DoBlobShadows(input.WorldPosition, color);
+
 	output.Color = float4(color * occlusion, tex.w);
 	output.Color = DoFogBulbsForPixel(output.Color, float4(input.FogBulbs.xyz, 1.0f));
 	output.Color = DoDistanceFogForPixel(output.Color, FogColor, input.DistanceFog);
+	output.Color.w *= input.Color.w;
 
 	return output;
 }

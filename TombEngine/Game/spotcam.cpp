@@ -56,6 +56,7 @@ int NumberSpotcams;
 
 bool CheckTrigger = false;
 bool UseSpotCam = false;
+bool SpotcamSwitched = false;
 bool SpotcamDontDrawLara = false;
 bool SpotcamOverlay = false;
 
@@ -471,11 +472,11 @@ void CalculateSpotCameras()
 	if ((s->flags & SCF_DISABLE_BREAKOUT) || !lookPressed)
 	{
 		// Disable interpolation if camera traveled too far.
-		auto p1 = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
-		auto p2 = Vector3(cpx, cpy, cpz);
-		auto dist = Vector3::Distance(p1, p2);
+		auto origin = Vector3(Camera.pos.x, Camera.pos.y, Camera.pos.z);
+		auto target = Vector3(cpx, cpy, cpz);
+		float dist = Vector3::Distance(origin, target);
 
-		if (dist > CLICK(1))
+		if (dist > BLOCK(0.25f))
 			Camera.DisableInterpolation = true;
 
 		Camera.pos.x = cpx;
@@ -493,9 +494,10 @@ void CalculateSpotCameras()
 			Camera.target.x = ctx;
 			Camera.target.y = cty;
 			Camera.target.z = ctz;
+			CalculateBounce(false);
 		}
 
-		auto outsideRoom = IsRoomOutside(cpx, cpy, cpz);
+		int outsideRoom = IsRoomOutside(cpx, cpy, cpz);
 		if (outsideRoom == NO_VALUE)
 		{
 			// HACK: Sometimes actual camera room number desyncs from room number derived using floordata functions.
@@ -658,10 +660,7 @@ void CalculateSpotCameras()
 				SpotcamPaused = 0;
 
 				if (LastCamera >= CurrentSplineCamera)
-				{
-					Camera.DisableInterpolation = true;
 					return;
-				}
 
 				if (s->flags & SCF_LOOP_SEQUENCE)
 				{
@@ -692,13 +691,14 @@ void CalculateSpotCameras()
 
 					SetCinematicBars(0.0f, SPOTCAM_CINEMATIC_BARS_SPEED);
 
-					Camera.DisableInterpolation = true;
 					UseSpotCam = false;
-					Lara.Control.IsLocked = false;
 					CheckTrigger = false;
+					Lara.Control.IsLocked = false;
+					Lara.Control.Look.IsUsingBinoculars = false;
 					Camera.oldType = CameraType::Fixed;
 					Camera.type = CameraType::Chase;
 					Camera.speed = 1;
+					Camera.DisableInterpolation = true;
 
 					if (s->flags & SCF_CUT_TO_LARA_CAM)
 					{
@@ -823,6 +823,7 @@ void CalculateSpotCameras()
 }
 
 // Core's version. Proper decompilation by ChocolateFan
+// TODO: Replace with float-based version.
 int Spline(int x, int* knots, int nk)
 {
 	int span = x * (nk - 3) >> 16;
@@ -836,4 +837,53 @@ int Spline(int x, int* knots, int nk)
 	int c2 = 2 * k[2] - 2 * k[1] - (k[1] >> 1) - (k[3] >> 1) + k[0];
 
 	return ((__int64)x * (((__int64)x * (((__int64)x * c1 >> 16) + c2) >> 16) + (k[2] >> 1) + ((-k[0] - 1) >> 1)) >> 16) + k[1];
+}
+
+Pose GetCameraTransform(int sequence, float alpha)
+{
+	alpha = std::clamp(alpha, 0.0f, 1.0f);
+
+	// Retrieve camera count in sequence.
+	int cameraCount = CameraCnt[SpotCamRemap[sequence]];
+	if (cameraCount < 2)
+		return Pose::Zero; // Not enough cameras to interpolate.
+
+	// Find first ID for sequence.
+	int firstSeqID = 0;
+	for (int i = 0; i < SpotCamRemap[sequence]; i++)
+		firstSeqID += CameraCnt[i];
+
+	// Determine number of spline points and spline position.
+	int splinePoints = cameraCount + 2;
+	int splineAlpha = int(alpha * (float)USHRT_MAX);
+
+	// Extract camera properties into separate vectors for interpolation.
+	std::vector<int> xOrigins, yOrigins, zOrigins, xTargets, yTargets, zTargets, rolls;
+	for (int i = -1; i < (cameraCount + 1); i++)
+	{
+		int seqID = std::clamp(firstSeqID + i, firstSeqID, (firstSeqID + cameraCount) - 1);
+
+		xOrigins.push_back(SpotCam[seqID].x);
+		yOrigins.push_back(SpotCam[seqID].y);
+		zOrigins.push_back(SpotCam[seqID].z);
+		xTargets.push_back(SpotCam[seqID].tx);
+		yTargets.push_back(SpotCam[seqID].ty);
+		zTargets.push_back(SpotCam[seqID].tz);
+		rolls.push_back(SpotCam[seqID].roll);
+	}
+
+	// Compute spline interpolation of main flyby camera parameters.
+	auto origin = Vector3(Spline(splineAlpha, xOrigins.data(), splinePoints),
+						  Spline(splineAlpha, yOrigins.data(), splinePoints),
+						  Spline(splineAlpha, zOrigins.data(), splinePoints));
+
+	auto target = Vector3(Spline(splineAlpha, xTargets.data(), splinePoints),
+						  Spline(splineAlpha, yTargets.data(), splinePoints),
+						  Spline(splineAlpha, zTargets.data(), splinePoints));
+
+	short orientZ = Spline(splineAlpha, rolls.data(), splinePoints);
+
+	auto pose = Pose(origin, EulerAngles(target - origin));
+	pose.Orientation.z = orientZ;
+	return pose;
 }

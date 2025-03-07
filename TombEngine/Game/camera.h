@@ -1,6 +1,7 @@
 #pragma once
 #include "Game/items.h"
 #include "Math/Math.h"
+#include "Specific/Clock.h"
 
 struct CollisionInfo;
 
@@ -14,8 +15,7 @@ enum class CameraType
 	Fixed,
 	Look,
 	Combat,
-	Heavy,
-	Object
+	Heavy
 };
 
 struct CAMERA_INFO
@@ -53,12 +53,6 @@ struct CAMERA_INFO
 	bool DisableInterpolation = false;
 };
 
-struct ObjectCameraInfo
-{
-	GameVector LastAngle;
-	bool ItemCameraOn;
-};
-
 enum CAMERA_FLAGS
 {
 	CF_NONE			 = 0,
@@ -67,7 +61,7 @@ enum CAMERA_FLAGS
 	CF_CHASE_OBJECT	 = 3,
 };
 
-constexpr auto FADE_SCREEN_SPEED = 16.0f / 255.0f;
+constexpr auto FADE_SCREEN_SPEED = 2.0f / FPS;
 constexpr auto DEFAULT_FOV = 80.0f;
 
 extern CAMERA_INFO Camera;
@@ -104,8 +98,8 @@ void BounceCamera(ItemInfo* item, short bounce, short maxDistance);
 void BinocularCamera(ItemInfo* item);
 void ConfirmCameraTargetPos();
 void CalculateCamera(const CollisionInfo& coll);
+void CalculateBounce(bool binocularMode);
 void RumbleScreen();
-bool CalculateDeathCamera();
 bool TestBoundsCollideCamera(const GameBoundingBox& bounds, const Pose& pose, short radius);
 void ItemPushCamera(GameBoundingBox* bounds, Pose* pos, short radius);
 void ItemsCollideCamera();

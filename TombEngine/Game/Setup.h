@@ -9,10 +9,6 @@ struct CollisionInfo;
 struct ItemInfo;
 
 constexpr auto DEFAULT_RADIUS = 10;
-constexpr auto GRAVITY		  = 6.0f;
-constexpr auto SWAMP_GRAVITY  = GRAVITY / 3.0f;
-
-constexpr auto MAX_STATICS = 1000;
 
 enum JointRotationFlags
 {
@@ -39,11 +35,10 @@ enum class LotType
 	HumanPlusJump,
 	HumanPlusJumpAndMonkey,
 	Flyer,
-	Blockable,	   // For large creatures such as trex and shiva.
-	Spider,		   // Only 2 block vault allowed.
-	Ape,		   // Only 2 block vault allowed.
-	SnowmobileGun, // Only 1 block vault allowed and 4 block drop max.
-	EnemyJeep
+	Blockable,	  // For large creatures such as trex and shiva.
+	Spider,		  // Only 2 block vault allowed.
+	Ape,		  // Only 2 block vault allowed.
+	SnowmobileGun // Only 1 block vault allowed and 4 block drop max.
 };
 
 enum class HitEffect
@@ -70,6 +65,7 @@ enum class ShatterType
 	Explode
 };
 
+// TODO: All fields to PascalCase.
 struct ObjectInfo
 {
 	bool loaded = false; // IsLoaded
@@ -89,13 +85,14 @@ struct ObjectInfo
 	int pivotLength;
 	int radius;
 
-	int HitPoints;
-	bool intelligent;	// IsIntelligent
-	bool waterCreature; // IsWaterCreature
-	bool nonLot;		// IsNonLot
-	bool isPickup;		// IsPickup
-	bool isPuzzleHole;	// IsReceptacle
-	bool usingDrawAnimatingItem;
+	int	 HitPoints				= 0;
+	bool AlwaysActive			= false;
+	bool intelligent			= false;
+	bool waterCreature			= false;
+	bool nonLot					= false;
+	bool isPickup				= false;
+	bool isPuzzleHole			= false;
+	bool usingDrawAnimatingItem = false;
 
 	DWORD explodableMeshbits;
 
@@ -115,15 +112,13 @@ class ObjectHandler
 {
 private:
 	ObjectInfo _objects[ID_NUMBER_OBJECTS];
+	ObjectInfo& GetFirstAvailableObject();
 
 public:
 	void Initialize();
 	bool CheckID(GAME_OBJECT_ID objectID, bool isSilent = false);
 
 	ObjectInfo& operator [](int objectID);
-
-private:
-	ObjectInfo& GetFirstAvailableObject();
 };
 
 struct StaticInfo
@@ -134,10 +129,35 @@ struct StaticInfo
 	GameBoundingBox collisionBox;
 	ShatterType shatterType;
 	int shatterSound;
+	int ObjectNumber;
+};
+
+class StaticHandler
+{
+private:
+	static constexpr auto LUT_SIZE = 256;
+
+	std::vector<StaticInfo> _statics = {};
+	std::vector<int>		_lut	 = {};
+
+public:
+	void Initialize();
+	int  GetIndex(int staticID);
+
+	StaticInfo& operator [](int staticID);
+
+	// Iterators
+
+	auto begin() { return _statics.begin(); }			// Non-const begin
+	auto end() { return _statics.end(); }				// Non-const end
+	auto begin() const { return _statics.cbegin(); }	// Const begin
+	auto end() const { return _statics.cend(); }		// Const end
+	auto cbegin() const { return _statics.cbegin(); }	// Explicit const begin
+	auto cend() const { return _statics.cend(); }		// Explicit const end
 };
 
 extern ObjectHandler Objects;
-extern StaticInfo StaticObjects[MAX_STATICS];
+extern StaticHandler Statics;
 
 void InitializeGameFlags();
 void InitializeSpecialEffects();

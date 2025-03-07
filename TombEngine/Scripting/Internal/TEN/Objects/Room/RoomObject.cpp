@@ -5,13 +5,15 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
-#include "Scripting/Internal/TEN/Color/Color.h"
 #include "Scripting/Internal/TEN/Objects/Room/RoomFlags.h"
 #include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Types/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"
+
+using namespace TEN::Scripting::Types;
 
 /// Room object.
 // @tenclass Objects.Room
@@ -19,8 +21,8 @@
 
 //namespace TEN::Scripting
 //{
-	static auto IndexError = index_error_maker(Room, ScriptReserved_Volume);
-	static auto NewIndexError = newindex_error_maker(Room, ScriptReserved_Volume);
+	static auto IndexError = IndexErrorMaker(Room, ScriptReserved_Volume);
+	static auto NewIndexError = NewIndexErrorMaker(Room, ScriptReserved_Volume);
 
 	Room::Room(ROOM_INFO& room) :
 		_room(room)
@@ -89,9 +91,9 @@
 			return;
 
 		// Remove previous name if it already exists.
-		if (s_callbackSetName(name, _room))
+		if (_callbackSetName(name, _room))
 		{
-			s_callbackRemoveName(_room.Name);
+			_callbackRemoveName(_room.Name);
 			_room.Name = name;
 		}
 		else

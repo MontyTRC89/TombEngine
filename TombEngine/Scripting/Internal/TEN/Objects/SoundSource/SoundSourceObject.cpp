@@ -5,7 +5,8 @@
 #include "Sound/sound.h"
 #include "Scripting/Internal/ScriptAssert.h"
 #include "Scripting/Internal/ScriptUtil.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
+
 /***
 Sound source
 
@@ -13,8 +14,8 @@ Sound source
 @pragma nostrip
 */
 
-static auto IndexError = index_error_maker(SoundSource, ScriptReserved_SoundSource);
-static auto NewIndexError = newindex_error_maker(SoundSource, ScriptReserved_SoundSource);
+static auto IndexError = IndexErrorMaker(SoundSource, ScriptReserved_SoundSource);
+static auto NewIndexError = NewIndexErrorMaker(SoundSource, ScriptReserved_SoundSource);
 
 SoundSource::SoundSource(SoundSourceInfo& ref) : m_soundSource{ref}
 {};
@@ -81,10 +82,10 @@ void SoundSource::SetName(std::string const& id)
 		return;
 	}
 
-	if (s_callbackSetName(id, m_soundSource))
+	if (_callbackSetName(id, m_soundSource))
 	{
 		// remove the old name if we have one
-		s_callbackRemoveName(m_soundSource.Name);
+		_callbackRemoveName(m_soundSource.Name);
 		m_soundSource.Name = id;
 	}
 	else

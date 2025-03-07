@@ -73,7 +73,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->nonLot = true; // NOTE: Doesn't move to reach the player, only throws projectiles.
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
-		obj->SetHitEffect();
+		obj->SetHitEffect(HitEffect::NonExplosive);
 	}
 
 	obj = &Objects[ID_TIGER];
@@ -300,7 +300,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->LotType = LotType::Human;
 		obj->SetBoneRotationFlags(6, ROT_X | ROT_Y);
 		obj->SetBoneRotationFlags(13, ROT_Y);
-		obj->SetHitEffect();
+		obj->SetHitEffect(HitEffect::NonExplosive);
 	}
 
 	obj = &Objects[ID_CIVVY];
@@ -365,7 +365,7 @@ static void StartEntity(ObjectInfo* obj)
 		obj->pivotLength = 50;
 		obj->SetBoneRotationFlags(4, ROT_Y);		 // Puna quest object.
 		obj->SetBoneRotationFlags(7, ROT_X | ROT_Y); // Head.
-		obj->SetHitEffect();
+		obj->SetHitEffect(HitEffect::NonExplosive);
 	}
 	
 	obj = &Objects[ID_WASP_MUTANT];
@@ -535,7 +535,7 @@ static void StartVehicles(ObjectInfo* obj)
 	{
 		obj->Initialize = InitializeQuadBike;
 		obj->collision = QuadBikePlayerCollision;
-		obj->shadowType = ShadowMode::Lara;
+		obj->shadowType = ShadowMode::Player;
 		obj->SetHitEffect(true);
 	}
 
@@ -546,7 +546,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->control = RubberBoatControl;
 		obj->collision = RubberBoatPlayerCollision;
 		obj->drawRoutine = DrawRubberBoat;
-		obj->shadowType = ShadowMode::Lara;
+		obj->shadowType = ShadowMode::Player;
 		obj->SetHitEffect(true);
 
 	}
@@ -556,7 +556,7 @@ static void StartVehicles(ObjectInfo* obj)
 	{
 		obj->Initialize = InitializeKayak;
 		obj->collision = KayakPlayerCollision;
-		obj->shadowType = ShadowMode::Lara;
+		obj->shadowType = ShadowMode::Player;
 		obj->SetHitEffect(true);
 
 	}
@@ -566,7 +566,7 @@ static void StartVehicles(ObjectInfo* obj)
 	{
 		obj->Initialize = InitializeMinecart;
 		obj->collision = MinecartPlayerCollision;
-		obj->shadowType = ShadowMode::Lara;
+		obj->shadowType = ShadowMode::Player;
 		obj->SetHitEffect(true);
 
 	}
@@ -576,7 +576,7 @@ static void StartVehicles(ObjectInfo* obj)
 	{
 		obj->Initialize = BigGunInitialize;
 		obj->collision = BigGunCollision;
-		obj->shadowType = ShadowMode::Lara;
+		obj->shadowType = ShadowMode::Player;
 		obj->SetHitEffect(true);
 	}
 
@@ -586,7 +586,7 @@ static void StartVehicles(ObjectInfo* obj)
 		obj->Initialize = InitializeUPV;
 		obj->control = UPVEffects;
 		obj->collision = UPVPlayerCollision;
-		obj->shadowType = ShadowMode::Lara;
+		obj->shadowType = ShadowMode::Player;
 		obj->SetHitEffect(true);
 	}
 }

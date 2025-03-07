@@ -1,10 +1,16 @@
 #include "framework.h"
 #include "SkyLayer.h"
 
+#include "Scripting/Internal/TEN/Types/Color/Color.h"
+
+namespace TEN::Scripting::Types { class ScriptColor; }
+
+using namespace TEN::Scripting::Types;
+
 /*** Describes a layer of moving clouds.
 As seen in TR4's City of the Dead.
 
-@tenclass Flow.SkyLayer
+@tenprimitive Flow.SkyLayer
 @pragma nostrip
 */
 

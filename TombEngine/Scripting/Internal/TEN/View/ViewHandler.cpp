@@ -9,12 +9,13 @@
 #include "Scripting/Internal/LuaHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptUtil.h"
-#include "Scripting/Internal/TEN/Color/Color.h"
-#include "Scripting/Internal/TEN/DisplaySprite/ScriptDisplaySprite.h"
 #include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
-#include "Scripting/Internal/TEN/Vec3/Vec3.h"
+#include "Scripting/Internal/TEN/Types/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/View/AlignModes.h"
 #include "Scripting/Internal/TEN/View/CameraTypes.h"
+#include "Scripting/Internal/TEN/View/DisplaySprite/ScriptDisplaySprite.h"
 #include "Scripting/Internal/TEN/View/ScaleModes.h"
 #include "Scripting/Internal/TEN/View/PostProcessEffects.h"
 #include "Specific/clock.h"
@@ -35,12 +36,12 @@ namespace TEN::Scripting::View
 {
 	static void FadeOut(TypeOrNil<float> speed)
 	{
-		SetScreenFadeOut(USE_IF_HAVE(float, speed, 1.0f) / (float)FPS);
+		SetScreenFadeOut(ValueOr<float>(speed, 1.0f) / (float)FPS);
 	}
 
 	static void FadeIn(TypeOrNil<float> speed)
 	{
-		SetScreenFadeIn(USE_IF_HAVE(float, speed, 1.0f) / (float)FPS);
+		SetScreenFadeIn(ValueOr<float>(speed, 1.0f) / (float)FPS);
 	}
 
 	static bool FadeOutComplete()
@@ -52,8 +53,8 @@ namespace TEN::Scripting::View
 	{
 		// divide by 200 so that a percentage of 100 means that each
 		// bar takes up half the screen
-		float heightProportion = USE_IF_HAVE(float, height, 30) / 200.0f;
-		float speedProportion = USE_IF_HAVE(float, speed, 30) / 200.0f;
+		float heightProportion = ValueOr<float>(height, 30) / 200.0f;
+		float speedProportion = ValueOr<float>(speed, 30) / 200.0f;
 		SetCinematicBars(heightProportion, speedProportion / float(FPS));
 	}
 
@@ -67,9 +68,21 @@ namespace TEN::Scripting::View
 		return TO_DEGREES(GetCurrentFOV());
 	}
 
-	static CameraType GetCameraType()
+	static ScriptCameraType GetCameraType()
 	{
-		return Camera.oldType;
+		if (UseSpotCam)
+			return ScriptCameraType::Flyby;
+
+		if (Lara.Control.Look.IsUsingLasersight)
+			return ScriptCameraType::Lasersight;
+
+		if (Lara.Control.Look.IsUsingBinoculars)
+			return ScriptCameraType::Binoculars;
+
+		if (Camera.oldType == CameraType::Heavy)
+			return ScriptCameraType::Fixed;
+
+		return (ScriptCameraType)Camera.oldType;
 	}
 	
 	static Vec3 GetCameraPosition()
@@ -92,16 +105,30 @@ namespace TEN::Scripting::View
 		ObjCamera(LaraItem, 0, LaraItem, 0, false);
 	}
 
-	static void PlayFlyBy(short flyby)
+	static void PlayFlyby(int seqID)
 	{
 		UseSpotCam = true;
-		InitializeSpotCam(flyby);
+		InitializeSpotCam(seqID);
+	}
+
+	static Vec3 GetFlybyPosition(int seqID, float progress)
+	{
+		constexpr auto PROGRESS_MAX = 100.0f;
+
+		return Vec3(GetCameraTransform(seqID, progress / PROGRESS_MAX).Position);
+	}
+
+	static Rotation GetFlybyRotation(int seqID, float progress)
+	{
+		constexpr auto PROGRESS_MAX = 100.0f;
+
+		return Rotation(GetCameraTransform(seqID, progress / PROGRESS_MAX).Orientation);
 	}
 
 	static void FlashScreen(TypeOrNil<ScriptColor> col, TypeOrNil<float> speed)
 	{
-		auto color = USE_IF_HAVE(ScriptColor, col, ScriptColor(255, 255, 255));
-		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), (USE_IF_HAVE(float, speed, 1.0)) / (float)FPS);
+		auto color = ValueOr<ScriptColor>(col, ScriptColor(255, 255, 255));
+		Weather.Flash(color.GetR(), color.GetG(), color.GetB(), (ValueOr<float>(speed, 1.0)) / (float)FPS);
 	}
 
 	static float GetAspectRatio()
@@ -117,7 +144,7 @@ namespace TEN::Scripting::View
 
 	static void SetPostProcessStrength(TypeOrNil<float> strength)
 	{
-		g_Renderer.SetPostProcessStrength(std::clamp((float)USE_IF_HAVE(float, strength, 1.0), 0.0f, 1.0f));
+		g_Renderer.SetPostProcessStrength(std::clamp((float)ValueOr<float>(strength, 1.0), 0.0f, 1.0f));
 	}
 
 	static void SetPostProcessTint(const ScriptColor& color)
@@ -172,11 +199,21 @@ namespace TEN::Scripting::View
 		//@treturn View.CameraType value used by the Main Camera.
 		//@usage
 		//LevelFuncs.OnLoop = function() 
-		//	if (View.GetCameraType() == CameraType.Combat) then
+		//	if (View.GetCameraType() == CameraType.COMBAT) then
 		//		--Do your Actions here.
 		//	end
 		//end
 		tableView.set_function(ScriptReserved_GetCameraType, &GetCameraType);
+
+		///Gets current camera position.
+		//@function GetCameraPosition
+		//@treturn Vec3 current camera position
+		tableView.set_function(ScriptReserved_GetCameraPosition, &GetCameraPosition);
+
+		///Gets current camera target.
+		//@function GetCameraTarget
+		//@treturn Vec3 current camera target
+		tableView.set_function(ScriptReserved_GetCameraTarget, &GetCameraTarget);
 
 		///Gets current room where camera is positioned.
 		//@function GetCameraRoom
@@ -198,20 +235,24 @@ namespace TEN::Scripting::View
 		//@tparam Color tint value to use.
 		tableView.set_function(ScriptReserved_SetPostProcessTint, &SetPostProcessTint);
 
-		///Gets current camera position.
-		//@function GetCameraPosition
-		//@treturn Vec3 current camera position
-		tableView.set_function(ScriptReserved_GetCameraPosition, &GetCameraPosition);
+		/// Play a flyby sequence.
+		// @function PlayFlyby
+		// @tparam int seqID Flyby sequence ID.
+		tableView.set_function(ScriptReserved_PlayFlyby, &PlayFlyby);
 
-		///Gets current camera target.
-		//@function GetCameraTarget
-		//@treturn Vec3 current camera target
-		tableView.set_function(ScriptReserved_GetCameraTarget, &GetCameraTarget);
+		/// Get a flyby sequence's position at a specified progress point in percent.
+		// @function GetFlybyPosition
+		// @tparam int seqID Flyby sequence ID.
+		// @tparam float progress Progress point in percent. Clamped to [0, 100].
+		// @treturn Vec3 Position at the given progress point.
+		tableView.set_function(ScriptReserved_GetFlybyPosition, &GetFlybyPosition);
 
-		///Enable FlyBy with specific ID
-		//@function PlayFlyBy
-		//@tparam short flyby (ID of flyby)
-		tableView.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
+		/// Get a flyby sequence's rotation at a specified progress point in percent.
+		// @function GetFlybyRotation
+		// @tparam int seqID Flyby sequence ID.
+		// @tparam float progress Progress point in percent. Clamped to [0, 100].
+		// @treturn Rotation Rotation at the given progress point.
+		tableView.set_function(ScriptReserved_GetFlybyRotation, &GetFlybyRotation);
 
 		/// Reset object camera back to Lara and deactivate object camera.
 		//@function ResetObjCamera
@@ -227,6 +268,9 @@ namespace TEN::Scripting::View
 		// @function GetAspectRatio
 		// @treturn float Display resolution's aspect ratio.
 		tableView.set_function(ScriptReserved_GetAspectRatio, &GetAspectRatio);
+
+		// COMPATIBILITY
+		tableView.set_function("PlayFlyBy", &PlayFlyby);
 
 		// Register types.
 		ScriptDisplaySprite::Register(*state, parent);

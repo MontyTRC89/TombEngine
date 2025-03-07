@@ -520,7 +520,7 @@ enum LaraAnim
 	LA_CRAWL_BACK_TO_IDLE_RIGHT = 277,								// Crawl back > crawl idle, right foot first
 	LA_REMOVE_PUZZLE = 278,											// Remove puzzle item > idle
 	LA_CRAWL_BACK_TO_IDLE_LEFT = 279,								// Crawl back > crawl idle, left foot first
-	LA_CRAWL_BACK_TO_IDLE_LEFT_END = 280,							// Unused.
+	LA_REMOVE_PUZZLE_UNDERWATER = 280,								// Remove puzzle item > underwater idle
 	LA_CRAWL_TURN_LEFT_TO_IDLE_EARLY = 281,							// Crawl rotate left > crawl idle, early opportunity
 	LA_CRAWL_TURN_RIGHT_TO_IDLE_EARLY = 282,						// Crawl rotate right > crawl idle, early opportunity
 	LA_MONKEY_TURN_LEFT_TO_IDLE_EARLY = 283,						// Turn left on monkey swing > monkey swing idle, 1st opportunity
@@ -828,7 +828,6 @@ enum LaraAnim
 	NUM_LARA_ANIMS
 
 	// TRASHED ANIMS (reuse slots before going any higher and remove entries from this list when you do):
-	// 280,
 	// 368, 370,
 	// 442
 };
@@ -1146,29 +1145,6 @@ struct TorchData
 	TorchState State = TorchState::Holding;
 };
 
-// TODO: Troye's abandoned dairy feature.
-constexpr int MAX_DIARY_PAGES			 = 64;
-constexpr int MAX_DIARY_STRINGS_PER_PAGE = 8;
-
-struct DiaryString
-{
-	Vector2i Position = Vector2i::Zero;
-	int		 StringID = 0;
-};
-
-struct DiaryPage
-{
-	DiaryString	Strings[MAX_DIARY_STRINGS_PER_PAGE] = {};
-};
-
-struct DiaryInfo
-{
-	bool		 Present				= false;
-	DiaryPage	 Pages[MAX_DIARY_PAGES] = {};
-	unsigned int NumPages				= 0;
-	unsigned int CurrentPage			= 0;
-};
-
 struct LaraCountData
 {
 	unsigned int Pose			= 0;
@@ -1302,8 +1278,6 @@ struct PlayerInventoryData
 	bool IsBusy	 = false;
 	bool OldBusy = false;
 
-	DiaryInfo Diary = {};
-
 	byte BeetleLife;
 	int BeetleComponents; // BeetleComponentFlags enum
 	byte SmallWaterskin;  // 1 = has waterskin, 2 = has waterskin with 1 liter, etc. max value is 4 (has skin + 3 = 4)
@@ -1315,6 +1289,11 @@ struct PlayerInventoryData
 	int TotalFlares;
 	unsigned int TotalSecrets;
 
+	bool HasLoad	   = false;
+	bool HasSave	   = false;
+	bool HasStopwatch  = false;
+	bool HasCompass	   = false;
+	bool HasDiary	   = false;
 	bool HasBinoculars = false;
 	bool HasCrowbar	   = false;
 	bool HasTorch	   = false;
