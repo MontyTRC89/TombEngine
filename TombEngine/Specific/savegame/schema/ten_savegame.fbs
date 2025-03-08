@@ -10,6 +10,7 @@ table LevelData {
 	level_far_view: int32;
 
 	storm_enabled: bool;
+	rumble_enabled: bool;
 	weather_type: int32;
 	weather_strength: float;
 	

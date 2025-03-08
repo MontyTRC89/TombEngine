@@ -1131,6 +1131,7 @@ const std::vector<byte> SaveGame::Build()
 	levelData.add_horizon2_transparency(level->Horizon2.GetTransparency());
 
 	levelData.add_storm_enabled(level->Storm);
+	levelData.add_rumble_enabled(level->Rumble);
 	levelData.add_weather_type((int)level->Weather);
 	levelData.add_weather_strength(level->WeatherStrength);
 
@@ -1822,6 +1823,7 @@ static void ParseLua(const Save::SaveGame* s, bool hubMode)
 	level->Horizon2.SetTransparency(s->level_data()->horizon2_transparency());
 
 	level->Storm = s->level_data()->storm_enabled();
+	level->Rumble = s->level_data()->rumble_enabled();
 	level->Weather = (WeatherType)s->level_data()->weather_type();
 	level->WeatherStrength = s->level_data()->weather_strength();
 

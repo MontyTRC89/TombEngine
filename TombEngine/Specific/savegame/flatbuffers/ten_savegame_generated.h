@@ -545,6 +545,7 @@ struct LevelDataT : public flatbuffers::NativeTable {
   typedef LevelData TableType;
   int32_t level_far_view = 0;
   bool storm_enabled = false;
+  bool rumble_enabled = false;
   int32_t weather_type = 0;
   float weather_strength = 0.0f;
   bool fog_enabled = false;
@@ -584,42 +585,46 @@ struct LevelData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_LEVEL_FAR_VIEW = 4,
     VT_STORM_ENABLED = 6,
-    VT_WEATHER_TYPE = 8,
-    VT_WEATHER_STRENGTH = 10,
-    VT_FOG_ENABLED = 12,
-    VT_FOG_COLOR = 14,
-    VT_FOG_MIN_DISTANCE = 16,
-    VT_FOG_MAX_DISTANCE = 18,
-    VT_SKY_LAYER_1_ENABLED = 20,
-    VT_SKY_LAYER_1_COLOR = 22,
-    VT_SKY_LAYER_1_SPEED = 24,
-    VT_SKY_LAYER_2_ENABLED = 26,
-    VT_SKY_LAYER_2_COLOR = 28,
-    VT_SKY_LAYER_2_SPEED = 30,
-    VT_HORIZON1_ENABLED = 32,
-    VT_HORIZON1_OBJECT_ID = 34,
-    VT_HORIZON1_POSITION = 36,
-    VT_HORIZON1_ORIENTATION = 38,
-    VT_HORIZON1_TRANSPARENCY = 40,
-    VT_HORIZON2_ENABLED = 42,
-    VT_HORIZON2_OBJECT_ID = 44,
-    VT_HORIZON2_POSITION = 46,
-    VT_HORIZON2_ORIENTATION = 48,
-    VT_HORIZON2_TRANSPARENCY = 50,
-    VT_LENSFLARE_SPRITE_ID = 52,
-    VT_LENSFLARE_PITCH = 54,
-    VT_LENSFLARE_YAW = 56,
-    VT_LENSFLARE_COLOR = 58,
-    VT_STARFIELD_STAR_COUNT = 60,
-    VT_STARFIELD_METEOR_COUNT = 62,
-    VT_STARFIELD_METEOR_SPAWN_DENSITY = 64,
-    VT_STARFIELD_METEOR_VELOCITY = 66
+    VT_RUMBLE_ENABLED = 8,
+    VT_WEATHER_TYPE = 10,
+    VT_WEATHER_STRENGTH = 12,
+    VT_FOG_ENABLED = 14,
+    VT_FOG_COLOR = 16,
+    VT_FOG_MIN_DISTANCE = 18,
+    VT_FOG_MAX_DISTANCE = 20,
+    VT_SKY_LAYER_1_ENABLED = 22,
+    VT_SKY_LAYER_1_COLOR = 24,
+    VT_SKY_LAYER_1_SPEED = 26,
+    VT_SKY_LAYER_2_ENABLED = 28,
+    VT_SKY_LAYER_2_COLOR = 30,
+    VT_SKY_LAYER_2_SPEED = 32,
+    VT_HORIZON1_ENABLED = 34,
+    VT_HORIZON1_OBJECT_ID = 36,
+    VT_HORIZON1_POSITION = 38,
+    VT_HORIZON1_ORIENTATION = 40,
+    VT_HORIZON1_TRANSPARENCY = 42,
+    VT_HORIZON2_ENABLED = 44,
+    VT_HORIZON2_OBJECT_ID = 46,
+    VT_HORIZON2_POSITION = 48,
+    VT_HORIZON2_ORIENTATION = 50,
+    VT_HORIZON2_TRANSPARENCY = 52,
+    VT_LENSFLARE_SPRITE_ID = 54,
+    VT_LENSFLARE_PITCH = 56,
+    VT_LENSFLARE_YAW = 58,
+    VT_LENSFLARE_COLOR = 60,
+    VT_STARFIELD_STAR_COUNT = 62,
+    VT_STARFIELD_METEOR_COUNT = 64,
+    VT_STARFIELD_METEOR_SPAWN_DENSITY = 66,
+    VT_STARFIELD_METEOR_VELOCITY = 68
   };
   int32_t level_far_view() const {
     return GetField<int32_t>(VT_LEVEL_FAR_VIEW, 0);
   }
   bool storm_enabled() const {
     return GetField<uint8_t>(VT_STORM_ENABLED, 0) != 0;
+  }
+  bool rumble_enabled() const {
+    return GetField<uint8_t>(VT_RUMBLE_ENABLED, 0) != 0;
   }
   int32_t weather_type() const {
     return GetField<int32_t>(VT_WEATHER_TYPE, 0);
@@ -715,6 +720,7 @@ struct LevelData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_LEVEL_FAR_VIEW) &&
            VerifyField<uint8_t>(verifier, VT_STORM_ENABLED) &&
+           VerifyField<uint8_t>(verifier, VT_RUMBLE_ENABLED) &&
            VerifyField<int32_t>(verifier, VT_WEATHER_TYPE) &&
            VerifyField<float>(verifier, VT_WEATHER_STRENGTH) &&
            VerifyField<uint8_t>(verifier, VT_FOG_ENABLED) &&
@@ -761,6 +767,9 @@ struct LevelDataBuilder {
   }
   void add_storm_enabled(bool storm_enabled) {
     fbb_.AddElement<uint8_t>(LevelData::VT_STORM_ENABLED, static_cast<uint8_t>(storm_enabled), 0);
+  }
+  void add_rumble_enabled(bool rumble_enabled) {
+    fbb_.AddElement<uint8_t>(LevelData::VT_RUMBLE_ENABLED, static_cast<uint8_t>(rumble_enabled), 0);
   }
   void add_weather_type(int32_t weather_type) {
     fbb_.AddElement<int32_t>(LevelData::VT_WEATHER_TYPE, weather_type, 0);
@@ -867,6 +876,7 @@ inline flatbuffers::Offset<LevelData> CreateLevelData(
     flatbuffers::FlatBufferBuilder &_fbb,
     int32_t level_far_view = 0,
     bool storm_enabled = false,
+    bool rumble_enabled = false,
     int32_t weather_type = 0,
     float weather_strength = 0.0f,
     bool fog_enabled = false,
@@ -929,6 +939,7 @@ inline flatbuffers::Offset<LevelData> CreateLevelData(
   builder_.add_sky_layer_2_enabled(sky_layer_2_enabled);
   builder_.add_sky_layer_1_enabled(sky_layer_1_enabled);
   builder_.add_fog_enabled(fog_enabled);
+  builder_.add_rumble_enabled(rumble_enabled);
   builder_.add_storm_enabled(storm_enabled);
   return builder_.Finish();
 }
@@ -8841,6 +8852,7 @@ inline void LevelData::UnPackTo(LevelDataT *_o, const flatbuffers::resolver_func
   (void)_resolver;
   { auto _e = level_far_view(); _o->level_far_view = _e; }
   { auto _e = storm_enabled(); _o->storm_enabled = _e; }
+  { auto _e = rumble_enabled(); _o->rumble_enabled = _e; }
   { auto _e = weather_type(); _o->weather_type = _e; }
   { auto _e = weather_strength(); _o->weather_strength = _e; }
   { auto _e = fog_enabled(); _o->fog_enabled = _e; }
@@ -8883,6 +8895,7 @@ inline flatbuffers::Offset<LevelData> CreateLevelData(flatbuffers::FlatBufferBui
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const LevelDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _level_far_view = _o->level_far_view;
   auto _storm_enabled = _o->storm_enabled;
+  auto _rumble_enabled = _o->rumble_enabled;
   auto _weather_type = _o->weather_type;
   auto _weather_strength = _o->weather_strength;
   auto _fog_enabled = _o->fog_enabled;
@@ -8917,6 +8930,7 @@ inline flatbuffers::Offset<LevelData> CreateLevelData(flatbuffers::FlatBufferBui
       _fbb,
       _level_far_view,
       _storm_enabled,
+      _rumble_enabled,
       _weather_type,
       _weather_strength,
       _fog_enabled,
