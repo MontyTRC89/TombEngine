@@ -659,7 +659,7 @@ void CombatCamera(ItemInfo* item)
 
 	auto pointColl = GetPointCollision(Vector3i(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z), Camera.target.RoomNumber);
 	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl.GetRoomNumber()))
-		Camera.target.y = g_Level.Rooms[pointColl.GetRoomNumber()].Position.y - CLICK(1);
+		Camera.target.y = g_Level.Rooms[pointColl.GetRoomNumber()].TopHeight - CLICK(1);
 
 	pointColl = GetPointCollision(Camera.target.ToVector3i(), Camera.target.RoomNumber);
 	Camera.target.RoomNumber = pointColl.GetRoomNumber();
