@@ -17,177 +17,176 @@ using namespace TEN::Collision::Point;
 using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
 
-//OCB 0 = Default TR1 behaviour
-//OCB 1 = Retract after crashing once
-//OCB 2 = Continuous crashing
+// NOTES:
+// ItemFlags[0] = Default behavior.
+// ItemFlags[1] = Retract after striking once.
+// ItemFlags[2] = Strike continuously.
 
 namespace TEN::Entities::Traps
 {
-    constexpr auto HAMMER_HIT_FRAME = 30;
+	constexpr auto HAMMER_HIT_FRAME = 30;
 
-    enum HammerState
-    {
-        THOR_HAMMER_STATE_SET = 0,
-        THOR_HAMMER_STATE_TEASE = 1,
-        THOR_HAMMER_STATE_ACTIVE = 2,
-        THOR_HAMMER_STATE_DONE = 3,
-        THOR_HAMMER_STATE_RETRACT = 4,
-    };
+	enum HammerState
+	{
+		HAMMER_STATE_IDLE = 0,
+		HAMMER_STATE_UNSTABLE = 1,
+		HAMMER_STATE_FALL_START = 2,
+		HAMMER_STATE_FALL_END = 3,
+		HAMMER_STATE_RETRACT = 4
+	};
 
-    enum HammerAnim
-    {
-        THOR_HAMMER_ANIM_SET = 0,
-        THOR_HAMMER_ANIM_TEASE = 1,
-        THOR_HAMMER_ANIM_ACTIVE = 2,
-        THOR_HAMMER_ANIM_DONE = 3,
-        THOR_HAMMER_ANIM_RETRACT = 4
-    };
+	enum HammerAnim
+	{
+		HAMMER_ANIM_IDLE = 0,
+		HAMMER_ANIM_UNSTABLE = 1,
+		HAMMER_ANIM_FALL_START = 2,
+		HAMMER_ANIM_FALL_END = 3,
+		HAMMER_ANIM_RETRACT = 4
+	};
 
-	static void InitializeHammer(ItemInfo& frontItem)
-    {
-        int backItemNumber = SpawnItem(frontItem, ID_HAMMER_BLOCK);
+	void InitializeHammer(short itemNumber)
+	{
+		auto& headItem = g_Level.Items[itemNumber];
 
-        if (backItemNumber == NO_VALUE)
-        {
-            TENLog("Failed to create hammer handle segment.", LogLevel::Warning);
-            return;
-        }
+		int backItemNumber = SpawnItem(headItem, ID_HAMMER_HEAD);
+		if (backItemNumber == NO_VALUE)
+		{
+			TENLog("Failed to create hammer handle moveable.", LogLevel::Warning);
+			return;
+		}
 
-        auto& backItem = g_Level.Items[backItemNumber];
+		auto& handleItem = g_Level.Items[backItemNumber];
 
-        // Store hammer segment item number.
-        frontItem.ItemFlags[0] = backItemNumber;
-        backItem.ItemFlags[0] = NO_VALUE;
-    }
+		// Store hammer handle item number.
+		headItem.ItemFlags[0] = backItemNumber;
+		handleItem.ItemFlags[0] = NO_VALUE;
+	}
 
-    void InitializeHandle(short itemNumber)
-    {
-        auto& item = g_Level.Items[itemNumber];
+	static void SyncHammerHandle(ItemInfo& headItem)
+	{
+		int handleItemNumber = headItem.ItemFlags[0];
+		auto& handleItem = g_Level.Items[handleItemNumber];
 
-        // Initialize back body segment.
-        InitializeHammer(item);
-    }
+		// Sync item status.
+		handleItem.Status = headItem.Status;
 
-    static void SyncHammerSegment(ItemInfo& frontItem)
-    {
-        short& backItemNumber = frontItem.ItemFlags[0];
-        auto& backItem = g_Level.Items[backItemNumber];
+		// Sync animation.
+		SetAnimation(handleItem, GetAnimNumber(headItem), GetFrameNumber(headItem));
 
-        // Sync destruction.
-        backItem.Status = frontItem.Status;
+		// Sync position.
+		handleItem.Pose = headItem.Pose;
+		if (handleItem.RoomNumber != headItem.RoomNumber)
+			ItemNewRoom(handleItem.Index, headItem.RoomNumber);
+	}
 
-        // Sync animation.
-        SetAnimation(backItem, GetAnimNumber(frontItem), GetFrameNumber(frontItem));
-
-        // Sync position.
-        backItem.Pose = frontItem.Pose;
-        if (backItem.RoomNumber != frontItem.RoomNumber)
-            ItemNewRoom(backItem.Index, frontItem.RoomNumber);
-    }
-
-	void ControlHandle(short itemNumber)
+	void ControlHammer(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
 		const auto& playerItem = *LaraItem;
-        
-        switch (item.Animation.ActiveState) {
-        case THOR_HAMMER_STATE_SET:
-            if (TriggerActive(&item)) {
-                if (item.TriggerFlags == 1 && item.ItemFlags[1] == 1)
-                {
-                    item.Status = ITEM_NOT_ACTIVE;
-                    break;
+		
+		switch (item.Animation.ActiveState)
+		{
+		case HAMMER_STATE_IDLE:
+			if (TriggerActive(&item))
+			{
+				if (item.TriggerFlags == 1 && item.ItemFlags[1] == 1)
+				{
+					item.Status = ITEM_NOT_ACTIVE;
+					break;
 
-                }
-                if (item.TriggerFlags == 2)
-                {
-                    item.Animation.TargetState = THOR_HAMMER_STATE_ACTIVE;
-                    break;
-                    
-                }
-                item.Animation.TargetState = THOR_HAMMER_STATE_TEASE;
-            }
-            else {
-                RemoveActiveItem(itemNumber);
-                item.Status = ITEM_NOT_ACTIVE;
-            }
-            break;
+				}
 
-        case THOR_HAMMER_STATE_TEASE:
-            if (TriggerActive(&item)) {
-                item.Animation.TargetState = THOR_HAMMER_STATE_ACTIVE;
-            }
-            else {
-                item.Animation.TargetState = THOR_HAMMER_STATE_SET;
-            }
-            break;
+				if (item.TriggerFlags == 2)
+				{
+					item.Animation.TargetState = HAMMER_STATE_FALL_START;
+					break;
+					
+				}
 
-        case THOR_HAMMER_STATE_ACTIVE: {
-            break;
-        }
+				item.Animation.TargetState = HAMMER_STATE_UNSTABLE;
+			}
+			else
+			{
+				RemoveActiveItem(itemNumber);
+				item.Status = ITEM_NOT_ACTIVE;
+			}
 
-        case THOR_HAMMER_STATE_DONE: {
-            if (item.TriggerFlags > 0)
-            {
-                item.Animation.TargetState = THOR_HAMMER_STATE_RETRACT;
-                if (item.TriggerFlags == 1)
-                {
-                    item.ItemFlags[1] = 1;
+			break;
 
-                }
-            }
-            else {
-                item.Status = ITEM_NOT_ACTIVE;
-                RemoveActiveItem(itemNumber);
-            }
-            break;
-        }
-        }
+		case HAMMER_STATE_UNSTABLE:
+			if (TriggerActive(&item))
+			{
+				item.Animation.TargetState = HAMMER_STATE_FALL_START;
+			}
+			else
+			{
+				item.Animation.TargetState = HAMMER_STATE_IDLE;
+			}
 
-        AnimateItem(&item);
-        SyncHammerSegment(item);
+			break;
+
+		case HAMMER_STATE_FALL_START:
+			break;
+
+		case HAMMER_STATE_FALL_END:
+			if (item.TriggerFlags > 0)
+			{
+				item.Animation.TargetState = HAMMER_STATE_RETRACT;
+
+				if (item.TriggerFlags == 1)
+				{
+					item.ItemFlags[1] = 1;
+				}
+			}
+			else
+			{
+				item.Status = ITEM_NOT_ACTIVE;
+				RemoveActiveItem(itemNumber);
+			}
+
+			break;
+		}
+
+		AnimateItem(&item);
+		SyncHammerHandle(item);
 	}
 	
-    void CollideHandle(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
-    {
-        auto& item = g_Level.Items[itemNumber];
+	void CollideHammer(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
+	{
+		auto& item = g_Level.Items[itemNumber];
 
-        if (!TestBoundsCollide(&item, laraItem, coll->Setup.Radius))
-            return;
+		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
+			return;
 
-        if (coll->Setup.EnableObjectPush)
-            ItemPushItem(&item, laraItem, coll, false, 1);
-    }
+		if (!HandleItemSphereCollision(item, *playerItem))
+			return;
 
-    void CollideHammer(short itemNumber, ItemInfo * playerItem, CollisionInfo * coll)
-    {
-        auto& item = g_Level.Items[itemNumber];
+		if (item.Animation.ActiveState == HAMMER_STATE_FALL_START && (item.Animation.FrameNumber - GetAnimData(item).frameBase) <= HAMMER_HIT_FRAME)
+		{
+			auto pointColl = GetPointCollision(*playerItem);
 
-        if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
-            return;
+			playerItem->Pose.Position.y = pointColl.GetFloorHeight();
+			playerItem->Pose.Scale = Vector3(1.0f, 0.1f, 1.0f);
+			playerItem->Animation.Velocity = Vector3::Zero;
+			playerItem-> Animation.IsAirborne = false;
 
-        if (!HandleItemSphereCollision(item, *playerItem))
-            return;
+			DoDamage(playerItem, INT_MAX);
+			SetAnimation(playerItem, LA_BOULDER_DEATH);
+		}
+		else if (playerItem->HitPoints > 0)
+		{
+			ItemPushItem(&item, playerItem, coll, false, 1);
+		}
+	}
 
-        if (item.Animation.ActiveState == THOR_HAMMER_STATE_ACTIVE && (item.Animation.FrameNumber - GetAnimData(item).frameBase) <= HAMMER_HIT_FRAME)
-        {
-            auto pointColl = GetPointCollision(*playerItem);
-            int floorHeight = pointColl.GetFloorHeight();
-            playerItem->Pose.Position.y = floorHeight;
-            playerItem-> Animation.IsAirborne = false;
-            playerItem->Animation.Velocity.y = 0.0f;
-            playerItem->Animation.Velocity.z = 0.0f;
-            playerItem->Pose.Scale = Vector3(1.0f, 0.1f, 1.0f);
+	void CollideHammerHandle(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
+	{
+		auto& item = g_Level.Items[itemNumber];
 
-            DoDamage(playerItem, INT_MAX);
-            SetAnimation(playerItem, LA_BOULDER_DEATH);
+		if (!TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
+			return;
 
-            
-
-        }
-        else if (playerItem->HitPoints > 0)
-        {
-            ItemPushItem(&item, playerItem, coll, false, 1);
-        }
+		if (coll->Setup.EnableObjectPush)
+			ItemPushItem(&item, playerItem, coll, false, 1);
 	}
 }

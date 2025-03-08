@@ -27,7 +27,7 @@
 // Traps
 #include "Objects/TR1/Trap/DamoclesSword.h"
 #include "Objects/TR1/Trap/ElectricBall.h"
-#include "Objects/TR1/Trap/tr1_Hammer.h"
+#include "Objects/TR1/Trap/Hammer.h"
 #include "Objects/TR1/Trap/SlammingDoors.h"
 #include "Objects/TR1/Trap/SwingingBlade.h"
 
@@ -252,11 +252,11 @@ static void StartTrap(ObjectInfo* obj)
 		obj->SetHitEffect(true);
 	}
 	
-	obj = &Objects[ID_HAMMER_BLOCK];
+	obj = &Objects[ID_HAMMER_HANDLE];
 	if (obj->loaded)
 	{
 		CheckIfSlotExists(ID_HAMMER_HANDLE, "ID_HAMMER_HANDLE");
-		obj->collision = CollideHammer;
+		obj->collision = CollideHammerHandle;
 		obj->shadowType = ShadowMode::All;
 		obj->SetHitEffect(true);
 	}
@@ -264,10 +264,10 @@ static void StartTrap(ObjectInfo* obj)
 	obj = &Objects[ID_HAMMER_HANDLE];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_HAMMER_BLOCK, "ID_HAMMER_BLOCK");
-		obj->Initialize = InitializeHandle;
-		obj->control = ControlHandle;
-		obj->collision = CollideHandle;
+		CheckIfSlotExists(ID_HAMMER_HEAD, "ID_HAMMER_HEAD");
+		obj->Initialize = InitializeHammer;
+		obj->control = ControlHammer;
+		obj->collision = CollideHammer;
 		obj->shadowType = ShadowMode::All;
 		obj->SetHitEffect(true);
 	}
