@@ -1984,7 +1984,7 @@ namespace TEN::Renderer
 		// Draw horizon and sky.
 		auto* levelPtr = g_GameFlow->GetLevel(CurrentLevel);
 
-		if (levelPtr->Horizon)
+		if (levelPtr->GetHorizonEnabled(0) || levelPtr->GetHorizonEnabled(1))
 		{
 			_shaders.Bind(Shader::RoomAmbientSky);
 
@@ -2026,12 +2026,12 @@ namespace TEN::Renderer
 			_context->ClearDepthStencilView(renderTarget->DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 
 			// Draw horizon.
-			if (_moveableObjects[ID_HORIZON].has_value()) // TODO: Should use stored horizon object ID?
+			if (_moveableObjects[ID_HORIZON].has_value()) // FIXME: Replace with same function as in the main pipeline!
 			{
 				_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-				const auto& moveableObj = *_moveableObjects[ID_HORIZON]; // TODO: Should use stored horizon object ID?
+				const auto& moveableObj = *_moveableObjects[ID_HORIZON]; // FIXME: Replace with same function as in the main pipeline!
 
 				_stStatic.World = Matrix::CreateTranslation(LaraItem->Pose.Position.ToVector3());
 				_stStatic.Color = Vector4::One;
@@ -2843,7 +2843,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		if (!levelPtr->Horizon || !anyOutsideRooms)
+		if ((!levelPtr->GetHorizonEnabled(0) && !levelPtr->GetHorizonEnabled(1)) || !anyOutsideRooms)
 			return;
 
 		if (Lara.Control.Look.OpticRange != 0)
@@ -2863,21 +2863,21 @@ namespace TEN::Renderer
 
 		SetBlendMode(BlendMode::Additive);
 
-		for (int s = 0; s < 2; s++)
+		for (int layer = 0; layer < 2; layer++)
 		{
 			for (int i = 0; i < 2; i++)
 			{
 				auto weather = TEN::Effects::Environment::Weather;
 
 				auto translation = Matrix::CreateTranslation(
-					renderView.Camera.WorldPosition.x + weather.SkyPosition(s) - i * SKY_SIZE,
+					renderView.Camera.WorldPosition.x + weather.SkyPosition(layer) - i * SKY_SIZE,
 					renderView.Camera.WorldPosition.y - 1536.0f, 
 					renderView.Camera.WorldPosition.z);
 				auto world = rotation * translation;
 
 				_stStatic.World = (rotation * translation);
-				_stStatic.Color = weather.SkyColor(s);
-				_stStatic.ApplyFogBulbs = s == 0 ? 1 : 0;
+				_stStatic.Color = weather.SkyColor(layer);
+				_stStatic.ApplyFogBulbs = layer == 0 ? 1 : 0;
 				_cbStatic.UpdateData(_stStatic, _context.Get());
 
 				DrawIndexedTriangles(SKY_INDICES_COUNT, 0, 0);
@@ -3026,9 +3026,12 @@ namespace TEN::Renderer
 		}
 
 		// Draw horizon.
-		if (_moveableObjects[Weather.Horizon.GetObjectID()].has_value() &&
-			_moveableObjects[Weather.Horizon.GetPrevObjectID()].has_value())
+
+		for (int layer = 0; layer < 2; layer++)
 		{
+			if (!levelPtr->GetHorizonEnabled(layer))
+				continue;
+
 			SetDepthState(DepthState::None);
 			SetBlendMode(BlendMode::Opaque);
 			SetCullMode(CullMode::CounterClockwise);
@@ -3038,46 +3041,37 @@ namespace TEN::Renderer
 
 			_shaders.Bind(Shader::Sky);
 
-			auto pos = Vector3::Lerp(Weather.Horizon.GetPrevPosition(), Weather.Horizon.GetPosition(), GetInterpolationFactor());
-			auto orient = EulerAngles::Lerp(Weather.Horizon.GetPrevOrientation(), Weather.Horizon.GetOrientation(), GetInterpolationFactor());
+			auto pos = Vector3::Lerp(levelPtr->GetHorizonPrevPosition(layer), levelPtr->GetHorizonPosition(layer), GetInterpolationFactor());
+			auto orient = EulerAngles::Lerp(levelPtr->GetHorizonPrevOrientation(layer), levelPtr->GetHorizonOrientation(layer), GetInterpolationFactor());
 			auto rotMatrix = orient.ToRotationMatrix();
 			auto translationMatrix = Matrix::CreateTranslation(pos);
-
 			auto cameraMatrix = Matrix::CreateTranslation(renderView.Camera.WorldPosition);
 
-			for (bool isPrevHorizon : { false, true })
+			float alpha = levelPtr->GetHorizonTransparency(layer);
+
+			_stStatic.World = rotMatrix * translationMatrix * cameraMatrix;
+			_stStatic.Color = Color(1.0f, 1.0f, 1.0f, alpha);
+			_stStatic.ApplyFogBulbs = 1;
+			_cbStatic.UpdateData(_stStatic, _context.Get());
+
+			const auto& moveableObj = *_moveableObjects[levelPtr->GetHorizonObjectID(layer)];
+			for (const auto* mesh : moveableObj.ObjectMeshes)
 			{
-				if (isPrevHorizon && Weather.Horizon.GetPrevObjectID() == Weather.Horizon.GetObjectID())
-					continue;
-
-				float alpha = Weather.Horizon.GetTransitionAlpha();
-				if (isPrevHorizon)
-					alpha = 1.0f - alpha;
-
-				_stStatic.World = translationMatrix * rotMatrix * cameraMatrix;
-				_stStatic.Color = Color(1.0f, 1.0f, 1.0f, alpha);
-				_stStatic.ApplyFogBulbs = 1;
-				_cbStatic.UpdateData(_stStatic, _context.Get());
-
-				const auto& moveableObj = *_moveableObjects[isPrevHorizon ? Weather.Horizon.GetPrevObjectID() : Weather.Horizon.GetObjectID()];
-				for (const auto* mesh : moveableObj.ObjectMeshes)
+				for (const auto& bucket : mesh->Buckets)
 				{
-					for (const auto& bucket : mesh->Buckets)
-					{
-						if (bucket.NumVertices == 0)
-							continue;
+					if (bucket.NumVertices == 0)
+						continue;
 
-						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+					BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
-						// Always render horizon as alpha-blended surface.
-						SetBlendMode(GetBlendModeFromAlpha((bucket.BlendMode == BlendMode::AlphaTest) ? BlendMode::AlphaBlend : bucket.BlendMode, alpha));
-						SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
+					// Always render horizon as alpha-blended surface.
+					SetBlendMode(GetBlendModeFromAlpha((bucket.BlendMode == BlendMode::AlphaTest) ? BlendMode::AlphaBlend : bucket.BlendMode, alpha));
+					SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
-						// Draw vertices.
-						DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+					// Draw vertices.
+					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 
-						_numMoveablesDrawCalls++;
-					}
+					_numMoveablesDrawCalls++;
 				}
 			}
 		}

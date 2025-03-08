@@ -27,9 +27,6 @@ private:
 	void PrepareInventoryObjects();
 
 public:
-	int FogInDistance  = 0;
-	int FogOutDistance = 0;
-
 	bool LevelSelect = true;
 	bool HomeLevel	 = false;
 	bool LoadSave	 = true;

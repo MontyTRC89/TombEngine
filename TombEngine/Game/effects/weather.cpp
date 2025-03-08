@@ -160,8 +160,6 @@ namespace TEN::Effects::Environment
 		SpawnWeatherParticles(level);
 		SpawnDustParticles(level);
 		SpawnMeteorParticles(level);
-
-		Horizon.Update();
 	}
 
 	void EnvironmentController::Clear()
@@ -189,9 +187,6 @@ namespace TEN::Effects::Environment
 		ResetStarField = true;
 		Stars.clear();
 		Meteors.clear();
-
-		// Clear horizon.
-		Horizon = {};
 	}
 
 	void EnvironmentController::Flash(int r, int g, int b, float speed)
