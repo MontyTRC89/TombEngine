@@ -1,9 +1,9 @@
 #pragma once
 
-#include "framework.h"
 #include "Objects/game_object_ids.h"
-#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
+#include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 
 namespace TEN::Scripting
 {
@@ -15,18 +15,16 @@ namespace TEN::Scripting
 		private:
 			// Fields
 
-			bool			_enabled = false;
-			GAME_OBJECT_ID	_objectID = GAME_OBJECT_ID::ID_HORIZON;
+			bool			_enabled	  = false;
+			GAME_OBJECT_ID	_objectID	  = GAME_OBJECT_ID::ID_HORIZON;
+			Vec3			_position	  = {};
+			Rotation		_rotation	  = {};
+			float			_scale		  = 1.0f;
 			float			_transparency = 1.0f;
 
-			Vec3			_position = Vector3::Zero;
-			Vec3			_prevPosition = Vector3::Zero;
-
-			Rotation		_rotation = {};
-			Rotation		_prevRotation = {};
-
-			float			_scale = 1.0f;
-			float			_prevScale = 1.0f;
+			Vec3	 _prevPosition = {};
+			Rotation _prevRotation = {};
+			float	 _prevScale	   = 1.0f;
 
 		public:
 			// Constructors
@@ -50,8 +48,8 @@ namespace TEN::Scripting
 			
 			void SetEnabled(bool value);
 			void SetObjectID(GAME_OBJECT_ID objectID);
-			void SetPosition(const Vec3& pos, sol::optional<bool> disableInterpolation);
-			void SetRotation(const Rotation& orient, sol::optional<bool> disableInterpolation);
+			void SetPosition(const Vec3& pos, TypeOrNil<bool> disableInterpolation);
+			void SetRotation(const Rotation& orient, TypeOrNil<bool> disableInterpolation);
 			void SetTransparency(float value);
 	};
 }

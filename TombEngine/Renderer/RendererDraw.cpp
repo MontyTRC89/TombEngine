@@ -1931,7 +1931,8 @@ namespace TEN::Renderer
 
 	void Renderer::RenderSimpleSceneToParaboloid(RenderTarget2D* renderTarget, Vector3 position, int emisphere)
 	{
-		//TODO Update the Horizon Draw code here once Paraboloids are required.  TrainWreck Feb 2, 2025.
+		// TODO: Update the horizon draw code here once paraboloids are required. TrainWreck Feb 2, 2025.
+		
 		// Reset GPU state
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
@@ -3026,7 +3027,6 @@ namespace TEN::Renderer
 		}
 
 		// Draw horizon.
-
 		for (int layer = 0; layer < 2; layer++)
 		{
 			if (!levelPtr->GetHorizonEnabled(layer))

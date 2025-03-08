@@ -399,6 +399,54 @@ static constexpr char ScriptReserved_LogLevelError[]	= "ERROR";
 // Internal
 static constexpr char ScriptReserved_LaraObject[] = "LaraObject";
 
+// =========
+// COLLISION
+// =========
+
+constexpr char ScriptReserved_Collision[]					= "Collision";
+
+constexpr char ScriptReserved_Probe[]						= "Probe";
+constexpr char ScriptReserved_ProbeGetCeilingHeight[]		= "GetCeilingHeight";
+constexpr char ScriptReserved_ProbeGetCeilingMaterialType[]	= "GetCeilingMaterialType";
+constexpr char ScriptReserved_ProbeGetCeilingNormal[]		= "GetCeilingNormal";
+constexpr char ScriptReserved_ProbeGetFloorHeight[]			= "GetFloorHeight";
+constexpr char ScriptReserved_ProbeGetFloorMaterialType[]	= "GetFloorMaterialType";
+constexpr char ScriptReserved_ProbeGetFloorNormal[]			= "GetFloorNormal";
+constexpr char ScriptReserved_ProbeGetPosition[]			= "GetPosition";
+constexpr char ScriptReserved_ProbeGetRoom[]				= "GetRoom";
+constexpr char ScriptReserved_ProbeGetRoomName[]			= "GetRoomName";
+constexpr char ScriptReserved_ProbeGetRoomNumber[]			= "GetRoomNumber";
+constexpr char ScriptReserved_ProbeGetWaterSurfaceHeight[]	= "GetWaterSurfaceHeight";
+constexpr char ScriptReserved_ProbeIsClimbableWall[]		= "IsClimbableWall";
+constexpr char ScriptReserved_ProbeIsDeathTile[]			= "IsDeathTile";
+constexpr char ScriptReserved_ProbeIsInsideSolidGeometry[]	= "IsInsideSolidGeometry";
+constexpr char ScriptReserved_ProbeIsMonkeySwing[]			= "IsMonkeySwing";
+constexpr char ScriptReserved_ProbeIsSteepCeiling[]			= "IsSteepCeiling";
+constexpr char ScriptReserved_ProbeIsSteepFloor[]			= "IsSteepFloor";
+constexpr char ScriptReserved_ProbeIsWall[]					= "IsWall";
+constexpr char ScriptReserved_ProbePreview[]				= "Preview";
+
+constexpr char ScriptReserved_MaterialType[]				= "MaterialType";
+
+// ====
+// FLOW
+// ====
+
+// Horizon
+
+constexpr char ScriptReserved_Horizon[]					= "Horizon";
+constexpr char ScriptReserved_HorizonGetEnabled[]		= "GetEnabled";
+constexpr char ScriptReserved_HorizonGetObjectID[]		= "GetObjectID";
+constexpr char ScriptReserved_HorizonGetPosition[]		= "GetPosition";
+constexpr char ScriptReserved_HorizonGetRotation[]		= "GetRotation";
+constexpr char ScriptReserved_HorizonGetTransparency[]	= "GetTransparency";
+constexpr char ScriptReserved_HorizonSetEnabled[]		= "SetEnabled";
+constexpr char ScriptReserved_HorizonSetObjectID[]		= "SetObjectID";
+constexpr char ScriptReserved_HorizonSetPosition[]		= "SetPosition";
+constexpr char ScriptReserved_HorizonSetRotation[]		= "SetRotation";
+constexpr char ScriptReserved_HorizonSetTransparency[]	= "SetTransparency";
+
+
 // =======
 // OBJECTS
 // =======
@@ -450,35 +498,6 @@ constexpr char ScriptReserved_StaticSetScale[]		= "SetScale";
 constexpr char ScriptReserved_StaticSetSlot[]		= "SetSlot";
 constexpr char ScriptReserved_StaticSetSolid[]		= "SetSolid";
 constexpr char ScriptReserved_StaticShatter[]		= "Shatter";
-
-// =========
-// COLLISION
-// =========
-
-constexpr char ScriptReserved_Collision[]					= "Collision";
-
-constexpr char ScriptReserved_Probe[]						= "Probe";
-constexpr char ScriptReserved_ProbeGetCeilingHeight[]		= "GetCeilingHeight";
-constexpr char ScriptReserved_ProbeGetCeilingMaterialType[]	= "GetCeilingMaterialType";
-constexpr char ScriptReserved_ProbeGetCeilingNormal[]		= "GetCeilingNormal";
-constexpr char ScriptReserved_ProbeGetFloorHeight[]			= "GetFloorHeight";
-constexpr char ScriptReserved_ProbeGetFloorMaterialType[]	= "GetFloorMaterialType";
-constexpr char ScriptReserved_ProbeGetFloorNormal[]			= "GetFloorNormal";
-constexpr char ScriptReserved_ProbeGetPosition[]			= "GetPosition";
-constexpr char ScriptReserved_ProbeGetRoom[]				= "GetRoom";
-constexpr char ScriptReserved_ProbeGetRoomName[]			= "GetRoomName";
-constexpr char ScriptReserved_ProbeGetRoomNumber[]			= "GetRoomNumber";
-constexpr char ScriptReserved_ProbeGetWaterSurfaceHeight[]	= "GetWaterSurfaceHeight";
-constexpr char ScriptReserved_ProbeIsClimbableWall[]		= "IsClimbableWall";
-constexpr char ScriptReserved_ProbeIsDeathTile[]			= "IsDeathTile";
-constexpr char ScriptReserved_ProbeIsInsideSolidGeometry[]	= "IsInsideSolidGeometry";
-constexpr char ScriptReserved_ProbeIsMonkeySwing[]			= "IsMonkeySwing";
-constexpr char ScriptReserved_ProbeIsSteepCeiling[]			= "IsSteepCeiling";
-constexpr char ScriptReserved_ProbeIsSteepFloor[]			= "IsSteepFloor";
-constexpr char ScriptReserved_ProbeIsWall[]					= "IsWall";
-constexpr char ScriptReserved_ProbePreview[]				= "Preview";
-
-constexpr char ScriptReserved_MaterialType[]				= "MaterialType";
 
 // =====
 // TYPES
