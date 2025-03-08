@@ -261,7 +261,7 @@ static void StartTrap(ObjectInfo* obj)
 		obj->SetHitEffect(true);
 	}
 
-	obj = &Objects[ID_HAMMER_HANDLE];
+	obj = &Objects[ID_HAMMER_HEAD];
 	if (obj->loaded)
 	{
 		CheckIfSlotExists(ID_HAMMER_HEAD, "ID_HAMMER_HEAD");
