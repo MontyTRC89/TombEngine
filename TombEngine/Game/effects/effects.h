@@ -108,6 +108,7 @@ struct NODEOFFSET_INFO
 	unsigned char gotIt;
 };
 
+// TODO: Refactor this entire struct.
 struct Particle
 {
 	bool on;
@@ -126,8 +127,8 @@ struct Particle
 	short yVel;
 	short zVel;
 
-	short rotAng;
-	short rotAdd;
+	short rotAng; // TODO: Due to legacy conventions, assigned values must be shifted >> 4.
+	short rotAdd; // TODO: Due to legacy conventions, assigned values must be shifted >> 4.
 
 	short gravity;
 	unsigned short flags; // SP_enum

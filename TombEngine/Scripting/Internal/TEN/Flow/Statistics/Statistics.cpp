@@ -18,7 +18,7 @@ namespace TEN::Scripting
 		parent.new_usertype<Statistics>(
 			ScriptReserved_Statistics, sol::constructors<Statistics()>(),
 			sol::call_constructor, sol::constructors<Statistics()>(),
-			sol::meta_function::new_index, newindex_error_maker(Statistics, ScriptReserved_Statistics),
+			sol::meta_function::new_index, NewIndexErrorMaker(Statistics, ScriptReserved_Statistics),
 
 			/*** Ammo hits.
 			@tfield int ammoHits amount of successful enemy hits.

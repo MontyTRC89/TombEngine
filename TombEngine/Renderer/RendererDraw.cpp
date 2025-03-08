@@ -128,27 +128,28 @@ namespace TEN::Renderer
 
 	void Renderer::RenderShadowMap(RendererItem* item, RenderView& renderView)
 	{
-		// Doesn't cast shadow
+		// Doesn't cast shadow.
 		if (_moveableObjects[item->ObjectID].value().ShadowType == ShadowMode::None)
 			return;
 
-		// Only render for Lara if such setting is active
-		if (g_Configuration.ShadowType == ShadowMode::Lara && _moveableObjects[item->ObjectID].value().ShadowType != ShadowMode::Lara)
+		// Only render for player if such setting is active.
+		if (g_Configuration.ShadowType == ShadowMode::Player && _moveableObjects[item->ObjectID].value().ShadowType != ShadowMode::Player)
 			return;
 
-		// No shadow light found
+		// No shadow light found.
 		if (_shadowLight == nullptr)
 			return;
 
-		// Shadow light found but type is incorrect
+		// Shadow light found but type is incorrect.
 		if (_shadowLight->Type != LightType::Point && _shadowLight->Type != LightType::Spot)
 			return;
 
-		// Reset GPU state
+		// Reset GPU state.
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
 
-		auto shadowLightPos = _shadowLight->Hash == 0 ? _shadowLight->Position :
+		auto shadowLightPos = (_shadowLight->Hash == 0) ?
+			_shadowLight->Position :
 			Vector3::Lerp(_shadowLight->PrevPosition, _shadowLight->Position, GetInterpolationFactor());
 
 		for (int step = 0; step < 6; step++)
@@ -185,7 +186,7 @@ namespace TEN::Renderer
 
 			auto projection = Matrix::CreatePerspectiveFieldOfView(90.0f * PI / 180.0f, 1.0f, 16.0f, _shadowLight->Out);
 
-			CCameraMatrixBuffer shadowProjection;
+			auto shadowProjection = CCameraMatrixBuffer{};
 			shadowProjection.ViewProjection = view * projection;
 			_cbCameraMatrices.UpdateData(shadowProjection, _context.Get());
 			BindConstantBufferVS(ConstantBufferRegister::Camera, _cbCameraMatrices.get());
@@ -194,7 +195,7 @@ namespace TEN::Renderer
 
 			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
-			RendererObject& obj = GetRendererObject((GAME_OBJECT_ID)item->ObjectID);
+			auto& obj = GetRendererObject((GAME_OBJECT_ID)item->ObjectID);
 
 			_stItem.World = item->InterpolatedWorld;
 			_stItem.Color = item->Color;
@@ -225,7 +226,7 @@ namespace TEN::Renderer
 					if (bucket.BlendMode != BlendMode::Opaque && bucket.BlendMode != BlendMode::AlphaTest)
 						continue;
 
-					// Draw vertices
+					// Draw vertices.
 					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 
 					_numShadowMapDrawCalls++;
@@ -234,7 +235,7 @@ namespace TEN::Renderer
 
 			if (item->ObjectID == ID_LARA)
 			{
-				RendererRoom& room = _rooms[item->RoomNumber];
+				auto& room = _rooms[item->RoomNumber];
 
 				DrawLaraHolsters(item, &room, renderView, RendererPass::ShadowMap);
 				DrawLaraJoints(item, &room, renderView, RendererPass::ShadowMap);
@@ -485,7 +486,8 @@ namespace TEN::Renderer
 
 				if (rat->On)
 				{
-					RendererMesh* mesh = GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
+					int index = (GlobalCounter + i) % Objects[ID_RATS_EMITTER].nmeshes;
+					auto* mesh = GetMesh(Objects[ID_RATS_EMITTER].meshIndex + index);
 
 					for (int j = 0; j < mesh->Buckets.size(); j++)
 					{
@@ -503,8 +505,9 @@ namespace TEN::Renderer
 								object.ObjectType = RendererObjectType::MoveableAsStatic;
 								object.Centre = centre;
 								object.Distance = distance;
+								object.BlendMode = bucket.BlendMode;
 								object.Bucket = &bucket;
-								object.Mesh = mesh;
+								object.LightMode = mesh->LightMode;
 								object.Polygon = &bucket.Polygons[p];
 								object.World = rat->Transform;
 								object.Room = &_rooms[rat->RoomNumber];
@@ -561,7 +564,8 @@ namespace TEN::Renderer
 
 					if (rat->On)
 					{
-						const auto& mesh = *GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
+						int index = (GlobalCounter + i) % Objects[ID_RATS_EMITTER].nmeshes;
+						const auto& mesh = *GetMesh(Objects[ID_RATS_EMITTER].meshIndex + index);
 
 						auto world = rat->Transform;
 						ReflectMatrixOptionally(world);
@@ -629,8 +633,9 @@ namespace TEN::Renderer
 						object.ObjectType = RendererObjectType::MoveableAsStatic;
 						object.Centre = center;
 						object.Distance = dist;
+						object.BlendMode = bucket.BlendMode;
 						object.Bucket = &bucket;
-						object.Mesh = &mesh;
+						object.LightMode = mesh.LightMode;
 						object.Polygon = &poly;
 						object.World = worldMatrix;
 						object.Room = &_rooms[fish.RoomNumber];
@@ -746,8 +751,9 @@ namespace TEN::Renderer
 						object.ObjectType = RendererObjectType::MoveableAsStatic;
 						object.Centre = centre;
 						object.Distance = dist;
+						object.BlendMode = bucket.BlendMode;
 						object.Bucket = &bucket;
-						object.Mesh = &mesh;
+						object.LightMode = mesh.LightMode;
 						object.Polygon = &bucket.Polygons[p];
 						object.World = transformMatrix;
 						object.Room = &_rooms[bat.RoomNumber];
@@ -867,8 +873,9 @@ namespace TEN::Renderer
 						object.ObjectType = RendererObjectType::MoveableAsStatic;
 						object.Centre = centre;
 						object.Distance = dist;
+						object.BlendMode = bucket.BlendMode;
 						object.Bucket = &bucket;
-						object.Mesh = &mesh;
+						object.LightMode = mesh.LightMode;
 						object.Polygon = &bucket.Polygons[p];
 						object.World = transformMatrix;
 						object.Room = &_rooms[beetle.RoomNumber];
@@ -996,8 +1003,9 @@ namespace TEN::Renderer
 						object.ObjectType = RendererObjectType::MoveableAsStatic;
 						object.Centre = centre;
 						object.Distance = dist;
+						object.BlendMode = bucket.BlendMode;
 						object.Bucket = &bucket;
-						object.Mesh = &mesh;
+						object.LightMode = mesh.LightMode;
 						object.Polygon = &bucket.Polygons[p];
 						object.World = transformMatrix;
 						object.Room = &_rooms[locust.roomNumber];
@@ -2535,6 +2543,9 @@ namespace TEN::Renderer
 						if (IgnoreReflectionPassForRoom(current->RoomNumber))
 							continue;
 
+						if (current->Color.w < ALPHA_BLEND_THRESHOLD)
+							continue;
+
 						auto world = current->World;
 						ReflectMatrixOptionally(world);
 
@@ -2605,7 +2616,9 @@ namespace TEN::Renderer
 						if (bucket.NumVertices == 0)
 							continue;
 
-						if (IsSortedBlendMode(bucket.BlendMode))
+						auto blendMode = GetBlendModeFromAlpha(bucket.BlendMode, statics[i]->Color.w);
+
+						if (IsSortedBlendMode(blendMode) || statics[i]->Color.w < ALPHA_BLEND_THRESHOLD)
 						{
 							for (int p = 0; p < bucket.Polygons.size(); p++)
 							{
@@ -2616,7 +2629,8 @@ namespace TEN::Renderer
 								object.Static = statics[i];
 								object.Centre = Vector3::Transform(bucket.Polygons[p].Centre, statics[i]->World);
 								object.Distance = Vector3::Distance(object.Centre, view.Camera.WorldPosition);
-								object.Mesh = refMesh;
+								object.BlendMode = blendMode;
+								object.LightMode = refMesh->LightMode;
 								object.Polygon = &bucket.Polygons[p];
 								object.Room = &_rooms[object.Static->RoomNumber];
 
@@ -2660,6 +2674,7 @@ namespace TEN::Renderer
 									object.ObjectType = RendererObjectType::Room;
 									object.Centre = bucket.Centre;
 									object.Distance = Vector3::Distance(view.Camera.WorldPosition, bucket.Polygons[p].Centre);
+									object.BlendMode = bucket.BlendMode;
 									object.Bucket = &bucket;
 									object.Room = room;
 									object.Polygon = &bucket.Polygons[p];
@@ -2922,7 +2937,7 @@ namespace TEN::Renderer
 					rDrawSprite.Width = STAR_SIZE * star.Scale;
 					rDrawSprite.Height = STAR_SIZE * star.Scale;
 
-					_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
+					_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(rDrawSprite, renderView);
 					_stInstancedSpriteBuffer.Sprites[i].Color = Vector4(
 						star.Color.x,
 						star.Color.y,
@@ -2985,7 +3000,7 @@ namespace TEN::Renderer
 						rDrawSprite.Height = 192;
 						rDrawSprite.ConstrainAxis = meteor.Direction;
 
-						_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
+						_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(rDrawSprite, renderView);
 						_stInstancedSpriteBuffer.Sprites[i].Color = Vector4(
 							meteor.Color.x,
 							meteor.Color.y,
@@ -3089,7 +3104,7 @@ namespace TEN::Renderer
 			rDrawSprite.Height = SUN_SIZE;
 			rDrawSprite.color = renderView.LensFlaresToDraw[0].Color;
 
-			_stInstancedSpriteBuffer.Sprites[0].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
+			_stInstancedSpriteBuffer.Sprites[0].World = GetWorldMatrixForSprite(rDrawSprite, renderView);
 			_stInstancedSpriteBuffer.Sprites[0].Color = renderView.LensFlaresToDraw[0].Color;
 			_stInstancedSpriteBuffer.Sprites[0].IsBillboard = 1;
 			_stInstancedSpriteBuffer.Sprites[0].IsSoftParticle = 0;
@@ -3129,35 +3144,33 @@ namespace TEN::Renderer
 
 	void Renderer::DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, RenderView& view, RendererPass rendererPass)
 	{
-		auto cameraPos = Camera.pos.ToVector3();
-
 		if (rendererPass == RendererPass::CollectTransparentFaces)
 		{
-			for (int j = 0; j < mesh->Buckets.size(); j++)
+			for (auto& bucket : mesh->Buckets)
 			{
-				auto& bucket = mesh->Buckets[j];
+				if (bucket.NumVertices == 0)
+					continue;
 
-				if (rendererPass == RendererPass::CollectTransparentFaces)
+				auto blendMode = GetBlendModeFromAlpha(bucket.BlendMode, itemToDraw->Color.w);
+
+				if (IsSortedBlendMode(blendMode))
 				{
-					if (IsSortedBlendMode(bucket.BlendMode))
+					for (int p = 0; p < bucket.Polygons.size(); p++)
 					{
-						for (int p = 0; p < bucket.Polygons.size(); p++)
-						{
-							auto centre = Vector3::Transform(
-								bucket.Polygons[p].Centre, itemToDraw->InterpolatedAnimTransforms[boneIndex] * itemToDraw->InterpolatedWorld);
-							int distance = (centre - cameraPos).Length();
+						auto center = Vector3::Transform(bucket.Polygons[p].Centre, itemToDraw->InterpolatedAnimTransforms[boneIndex] * itemToDraw->InterpolatedWorld);
+						int dist = Vector3::Distance(center, Camera.pos.ToVector3());
 
-							RendererSortableObject object;
-							object.ObjectType = RendererObjectType::Moveable;
-							object.Centre = centre;
-							object.Distance = distance;
-							object.Bucket = &bucket;
-							object.Item = itemToDraw;
-							object.Mesh = mesh;
-							object.Polygon = &bucket.Polygons[p];
+						auto object = RendererSortableObject{};
+						object.ObjectType = RendererObjectType::Moveable;
+						object.Centre = center;
+						object.Distance = dist;
+						object.BlendMode = blendMode;
+						object.Bucket = &bucket;
+						object.Item = itemToDraw;
+						object.LightMode = mesh->LightMode;
+						object.Polygon = &bucket.Polygons[p];
 
-							view.TransparentObjectsToDraw.push_back(object);
-						}
+						view.TransparentObjectsToDraw.push_back(object);
 					}
 				}
 			}
@@ -3168,6 +3181,8 @@ namespace TEN::Renderer
 			{
 				if (bucket.NumVertices == 0)
 					continue;
+
+				auto blendMode = GetBlendModeFromAlpha(bucket.BlendMode, itemToDraw->Color.w);
 				
 				if (rendererPass == RendererPass::ShadowMap)
 				{
@@ -3180,19 +3195,15 @@ namespace TEN::Renderer
 				}
 				else
 				{
-					int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
+					int passes = rendererPass == RendererPass::Opaque && blendMode == BlendMode::AlphaTest ? 2 : 1;
 
 					for (int p = 0; p < passes; p++)
 					{
-						if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
-						{
+						if (!SetupBlendModeAndAlphaTest(blendMode, rendererPass, p))
 							continue;
-						}
 
-						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]),
-							SamplerStateRegister::AnisotropicClamp);
-						BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]),
-							SamplerStateRegister::AnisotropicClamp);
+						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+						BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
 						DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 
@@ -3303,7 +3314,7 @@ namespace TEN::Renderer
 					view.TransparentObjectsToDraw[i].ObjectType == object->ObjectType &&
 					view.TransparentObjectsToDraw[i].Room->RoomNumber == object->Room->RoomNumber &&
 					view.TransparentObjectsToDraw[i].Bucket->Texture == object->Bucket->Texture &&
-					view.TransparentObjectsToDraw[i].Bucket->BlendMode == object->Bucket->BlendMode &&
+					view.TransparentObjectsToDraw[i].BlendMode == object->BlendMode &&
 					_sortedPolygonsIndices.size() + (view.TransparentObjectsToDraw[i].Polygon->Shape == 0 ? 6 : 3) < MAX_TRANSPARENT_VERTICES)
 				{
 					auto* currentObject = &view.TransparentObjectsToDraw[i];
@@ -3327,7 +3338,7 @@ namespace TEN::Renderer
 					view.TransparentObjectsToDraw[i].ObjectType == object->ObjectType &&
 					view.TransparentObjectsToDraw[i].Item->ItemNumber == object->Item->ItemNumber &&
 					view.TransparentObjectsToDraw[i].Bucket->Texture == object->Bucket->Texture &&
-					view.TransparentObjectsToDraw[i].Bucket->BlendMode == object->Bucket->BlendMode &&
+					view.TransparentObjectsToDraw[i].BlendMode == object->BlendMode &&
 					_sortedPolygonsIndices.size() + (view.TransparentObjectsToDraw[i].Polygon->Shape == 0 ? 6 : 3) < MAX_TRANSPARENT_VERTICES)
 				{
 					auto* currentObject = &view.TransparentObjectsToDraw[i];
@@ -3352,7 +3363,7 @@ namespace TEN::Renderer
 					view.TransparentObjectsToDraw[i].Static->RoomNumber == object->Static->RoomNumber &&
 					view.TransparentObjectsToDraw[i].Static->IndexInRoom == object->Static->IndexInRoom &&
 					view.TransparentObjectsToDraw[i].Bucket->Texture == object->Bucket->Texture &&
-					view.TransparentObjectsToDraw[i].Bucket->BlendMode == object->Bucket->BlendMode &&
+					view.TransparentObjectsToDraw[i].BlendMode == object->BlendMode &&
 					_sortedPolygonsIndices.size() + (view.TransparentObjectsToDraw[i].Polygon->Shape == 0 ? 6 : 3) < MAX_TRANSPARENT_VERTICES)
 				{
 					auto* currentObject = &view.TransparentObjectsToDraw[i];
@@ -3376,7 +3387,7 @@ namespace TEN::Renderer
 					view.TransparentObjectsToDraw[i].ObjectType == object->ObjectType &&
 					view.TransparentObjectsToDraw[i].Room->RoomNumber == object->Room->RoomNumber &&
 					view.TransparentObjectsToDraw[i].Bucket->Texture == object->Bucket->Texture &&
-					view.TransparentObjectsToDraw[i].Bucket->BlendMode == object->Bucket->BlendMode &&
+					view.TransparentObjectsToDraw[i].BlendMode == object->BlendMode &&
 					_sortedPolygonsIndices.size() + (view.TransparentObjectsToDraw[i].Polygon->Shape == 0 ? 6 : 3) < MAX_TRANSPARENT_VERTICES)
 				{
 					auto* currentObject = &view.TransparentObjectsToDraw[i];
@@ -3439,7 +3450,7 @@ namespace TEN::Renderer
 					uv2 = spr->Sprite->UV[2];
 					uv3 = spr->Sprite->UV[3];
 
-					auto world = GetWorldMatrixForSprite(currentObject->Sprite, view);
+					auto world = GetWorldMatrixForSprite(*currentObject->Sprite, view);
 					
 					Vertex v0;
 					v0.Position = Vector3::Transform(p0t, world);
@@ -3509,7 +3520,7 @@ namespace TEN::Renderer
 		if (objectInfo->Bucket->Animated != 0)
 			_shaders.Bind(Shader::RoomsAnimated);
 
-		SetBlendMode(objectInfo->Bucket->BlendMode);
+		SetBlendMode(objectInfo->BlendMode);
 		SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 		// Draw geometry
@@ -3570,7 +3581,7 @@ namespace TEN::Renderer
 
 		SetDepthState(DepthState::Read);
 		SetCullMode(CullMode::CounterClockwise);
-		SetBlendMode(objectInfo->Bucket->BlendMode);
+		SetBlendMode(objectInfo->BlendMode);
 		SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 		_shaders.Bind(Shader::Items);
@@ -3627,7 +3638,7 @@ namespace TEN::Renderer
 
 		SetDepthState(DepthState::Read);
 		SetCullMode(CullMode::CounterClockwise);
-		SetBlendMode(objectInfo->Bucket->BlendMode);
+		SetBlendMode(objectInfo->BlendMode);
 		SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 		BindTexture(TextureRegister::ColorMap, &std::get<0>(_staticTextures[objectInfo->Bucket->Texture]),
@@ -3659,13 +3670,13 @@ namespace TEN::Renderer
 
 		_stStatic.Color = Vector4::One;
 		_stStatic.AmbientLight = objectInfo->Room->AmbientLight;
-		_stStatic.LightMode = (int)objectInfo->Mesh->LightMode;
+		_stStatic.LightMode = (int)objectInfo->LightMode;
 		BindStaticLights(objectInfo->Room->LightsToDraw);
 		_cbStatic.UpdateData(_stStatic, _context.Get());
 
 		SetDepthState(DepthState::Read);
 		SetCullMode(CullMode::CounterClockwise);
-		SetBlendMode(objectInfo->Bucket->BlendMode);
+		SetBlendMode(objectInfo->BlendMode);
 		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
 		BindTexture(TextureRegister::ColorMap, &std::get<0>(_staticTextures[objectInfo->Bucket->Texture]),

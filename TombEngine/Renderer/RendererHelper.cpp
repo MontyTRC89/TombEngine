@@ -458,7 +458,7 @@ namespace TEN::Renderer
 		if (itemNumber == LaraItem->Index)
 		{
 			auto& object = *_moveableObjects[ID_LARA];
-			*outMatrix = object.AnimationTransforms[jointIndex] * _laraWorldMatrix;
+			*outMatrix = object.AnimationTransforms[jointIndex] * _playerWorldMatrix;
 		}
 		else
 		{

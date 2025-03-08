@@ -29,12 +29,13 @@ constexpr auto MAX_DYNAMIC_LIGHTS = 1024;
 constexpr auto ITEM_LIGHT_COLLECTION_RADIUS = BLOCK(1);
 constexpr auto CAMERA_LIGHT_COLLECTION_RADIUS = BLOCK(4);
 
-constexpr auto MAX_TRANSPARENT_FACES = 16384;
-constexpr auto MAX_TRANSPARENT_VERTICES = (MAX_TRANSPARENT_FACES * 6);
+constexpr auto MAX_TRANSPARENT_FACES		  = 16384;
+constexpr auto MAX_TRANSPARENT_VERTICES		  = MAX_TRANSPARENT_FACES * 6;
 constexpr auto MAX_TRANSPARENT_FACES_PER_ROOM = 16384;
-constexpr auto TRANSPARENT_BUCKET_SIZE = (3840 * 16);
-constexpr auto ALPHA_TEST_THRESHOLD = 0.5f;
-constexpr auto FAST_ALPHA_BLEND_THRESHOLD = 0.5f;
+constexpr auto TRANSPARENT_BUCKET_SIZE		  = 3840 * 16;
+constexpr auto ALPHA_TEST_THRESHOLD			  = 0.5f;
+constexpr auto ALPHA_BLEND_THRESHOLD		  = 1.0f - EPSILON;
+constexpr auto FAST_ALPHA_BLEND_THRESHOLD	  = 0.5f;
 
 constexpr auto MAX_BONES = 32;
 
@@ -103,7 +104,7 @@ enum class CullMode
 enum class ShadowMode
 {
 	None,
-	Lara,
+	Player,
 	All
 };
 

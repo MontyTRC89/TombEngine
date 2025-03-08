@@ -631,7 +631,7 @@ namespace TEN::Entities::Creatures::TR3
 				sphere = BoundingSphere(item.Pose.Position.ToVector3() + Vector3(0.0f, -CLICK(2), 0.0f), BLOCK(1 / 16.0f));
 				shockwavePos = Pose(Random::GeneratePointInSphere(sphere), item.Pose.Orientation);
 
-				auto pos = Pose(item.Pose.Position, 0, 0, 0);
+				auto pos = Pose(item.Pose.Position, EulerAngles::Identity);
 
 				SpawnSophiaSparks(shockwavePos.Position.ToVector3(), Vector3(SOPHIALEIGH_EFFECT_COLOR.x * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.y * UCHAR_MAX, SOPHIALEIGH_EFFECT_COLOR.z * UCHAR_MAX), 5, 2);
 				TriggerShockwave(&shockwavePos, SOPHIALEIGH_SHOCKWAVE_INNER_SIZE, SOPHIALEIGH_SHOCKWAVE_OUTER_SIZE, SOPHIALEIGH_SHOCKWAVE_SPEED,

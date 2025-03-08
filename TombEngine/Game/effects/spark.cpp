@@ -106,6 +106,7 @@ namespace TEN::Effects::Spark
 
 		sptr = {};
 		sptr.on = true;
+		sptr.dynamic = NO_VALUE;
 		sptr.sR = colorStart.x * 0.33f * UCHAR_MAX;
 		sptr.sG = colorStart.y * 0.33f * UCHAR_MAX;
 		sptr.sB = colorStart.z * 0.33f * UCHAR_MAX;
