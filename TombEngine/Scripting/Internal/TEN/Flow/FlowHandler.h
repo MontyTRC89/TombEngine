@@ -11,7 +11,6 @@
 #include "Scripting/Internal/TEN/Flow/Level/FlowLevel.h"
 #include "Scripting/Internal/TEN/Flow/Settings/Settings.h"
 #include "Scripting/Internal/TEN/Flow/Statistics/Statistics.h"
-#include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
 
 class FlowHandler : public ScriptInterfaceFlowHandler
 {
@@ -28,9 +27,6 @@ private:
 	void PrepareInventoryObjects();
 
 public:
-	int FogInDistance  = 0;
-	int FogOutDistance = 0;
-
 	bool LevelSelect = true;
 	bool HomeLevel	 = false;
 	bool LoadSave	 = true;

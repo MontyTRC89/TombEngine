@@ -53,6 +53,7 @@
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
+#include "Scripting/Internal/TEN/Flow/Level/FlowLevel.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
@@ -217,7 +218,7 @@ GameStatus GamePhase(bool insideMenu)
 	UpdateFadeScreenAndCinematicBars();
 
 	// Rumble screen (like in submarine level of TRC).
-	if (g_GameFlow->GetLevel(CurrentLevel)->Rumble)
+	if (g_GameFlow->GetLevel(CurrentLevel)->GetRumbleEnabled())
 		RumbleScreen();
 
 	DoFlipEffect(FlipEffect, LaraItem);
@@ -579,11 +580,13 @@ void InitializeScripting(int levelIndex, bool loadGame)
 
 void DeInitializeScripting(int levelIndex, GameStatus reason)
 {
+	// Reload gameflow script to clear level script variables.
 	g_GameFlow->LoadFlowScript();
 
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
 
+	// If level index is 0, it means we are in a title level and game variables should be cleared.
 	if (levelIndex == 0)
 		g_GameScript->ResetScripts(true);
 }
@@ -700,6 +703,13 @@ void SetupInterpolation()
 {
 	for (auto& item : g_Level.Items)
 		item.DisableInterpolation = false;
+
+	// HACK: Remove after ScriptInterfaceFlowHandler is deprecated.
+	auto* level = (Level*)g_GameFlow->GetLevel(CurrentLevel);
+	level->Horizon1.SetPosition(level->Horizon1.GetPosition(), true);
+	level->Horizon2.SetPosition(level->Horizon2.GetPosition(), true);
+	level->Horizon1.SetRotation(level->Horizon1.GetRotation(), true);
+	level->Horizon2.SetRotation(level->Horizon2.GetRotation(), true);
 }
 
 void HandleControls(bool isTitle)

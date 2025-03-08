@@ -317,6 +317,7 @@ Specify which translations in the strings table correspond to which languages.
 	InventoryItem::Register(tableFlow);
 	Settings::Register(tableFlow);
 	Fog::Register(tableFlow);
+	Horizon::Register(tableFlow);
 	LensFlare::Register(tableFlow);
 	Starfield::Register(tableFlow);
 

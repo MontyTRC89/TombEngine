@@ -244,7 +244,7 @@ void Moveable::Initialize()
 
 /// Retrieve the object ID
 // @function Moveable:GetObjectID
-// @treturn int a number representing the ID of the object
+// @treturn Objects.ObjID a number representing the ID of the object
 GAME_OBJECT_ID Moveable::GetObjectID() const
 {
 	return _moveable->ObjectNumber;

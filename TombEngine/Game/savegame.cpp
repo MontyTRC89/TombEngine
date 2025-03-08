@@ -1092,28 +1092,48 @@ const std::vector<byte> SaveGame::Build()
 	// Level state
 	auto* level = (Level*)g_GameFlow->GetLevel(CurrentLevel);
 	Save::LevelDataBuilder levelData { fbb };
+
+	levelData.add_level_far_view(level->LevelFarView);
+
 	levelData.add_fog_enabled(level->Fog.Enabled);
 	levelData.add_fog_color(level->Fog.GetColor());
 	levelData.add_fog_min_distance(level->Fog.MinDistance);
 	levelData.add_fog_max_distance(level->Fog.MaxDistance);
+
+	levelData.add_sky_layer_1_enabled(level->GetSkyLayerEnabled(0));
+	levelData.add_sky_layer_1_color(level->GetSkyLayerColor(0));
+	levelData.add_sky_layer_1_speed(level->GetSkyLayerSpeed(0));
+
+	levelData.add_sky_layer_2_enabled(level->GetSkyLayerEnabled(1));
+	levelData.add_sky_layer_2_color(level->GetSkyLayerColor(1));
+	levelData.add_sky_layer_2_speed(level->GetSkyLayerSpeed(1));
+
 	levelData.add_lensflare_color(level->LensFlare.GetColor());
 	levelData.add_lensflare_pitch(level->LensFlare.GetPitch());
 	levelData.add_lensflare_yaw(level->LensFlare.GetYaw());
 	levelData.add_lensflare_sprite_id(level->LensFlare.GetSunSpriteID());
-	levelData.add_level_far_view(level->LevelFarView);
-	levelData.add_sky_layer_1_color(level->GetSkyLayerColor(0));
-	levelData.add_sky_layer_2_color(level->GetSkyLayerColor(1));
-	levelData.add_sky_layer_1_enabled(level->GetSkyLayerEnabled(0));
-	levelData.add_sky_layer_2_enabled(level->GetSkyLayerEnabled(1));
-	levelData.add_sky_layer_1_speed(level->GetSkyLayerSpeed(0));
-	levelData.add_sky_layer_2_speed(level->GetSkyLayerSpeed(1));
+
 	levelData.add_starfield_meteor_count(level->Starfield.GetMeteorCount());
 	levelData.add_starfield_meteor_spawn_density(level->Starfield.GetMeteorSpawnDensity());
 	levelData.add_starfield_meteor_velocity(level->Starfield.GetMeteorVelocity());
 	levelData.add_starfield_star_count(level->Starfield.GetStarCount());
+
+	levelData.add_horizon1_enabled(level->Horizon1.GetEnabled());
+	levelData.add_horizon1_object_id(level->Horizon1.GetObjectID());
+	levelData.add_horizon1_position(&FromVector3(level->GetHorizonPosition(0)));
+	levelData.add_horizon1_orientation(&FromEulerAngles(level->GetHorizonOrientation(0)));
+	levelData.add_horizon1_transparency(level->Horizon1.GetTransparency());
+
+	levelData.add_horizon2_enabled(level->Horizon2.GetEnabled());
+	levelData.add_horizon2_object_id(level->Horizon2.GetObjectID());
+	levelData.add_horizon2_position(&FromVector3(level->GetHorizonPosition(1)));
+	levelData.add_horizon2_orientation(&FromEulerAngles(level->GetHorizonOrientation(1)));
+	levelData.add_horizon2_transparency(level->Horizon2.GetTransparency());
+
 	levelData.add_storm_enabled(level->Storm);
 	levelData.add_weather_type((int)level->Weather);
 	levelData.add_weather_strength(level->WeatherStrength);
+
 	auto levelDataOffset = levelData.Finish();
 
 	// Global event sets
@@ -1524,15 +1544,6 @@ const std::vector<byte> SaveGame::Build()
 	sgb.add_postprocess_tint(&FromVector3(g_Renderer.GetPostProcessTint()));
 	sgb.add_soundtracks(soundtrackOffset);
 
-	sgb.add_horizon_object_id(Weather.Horizon.GetObjectID());
-	sgb.add_horizon_position(&FromVector3(Weather.Horizon.GetPosition()));
-	sgb.add_horizon_orientation(&FromEulerAngles(Weather.Horizon.GetOrientation()));
-	sgb.add_horizon_transition_time(Weather.Horizon.GetTransitionTime());
-	sgb.add_horizon_transition_time_max(Weather.Horizon.GetTransitionTimeMax());
-	sgb.add_horizon_prev_object_id(Weather.Horizon.GetPrevObjectID());
-	sgb.add_horizon_prev_position(&FromVector3(Weather.Horizon.GetPrevPosition()));
-	sgb.add_horizon_prev_orientation(&FromEulerAngles(Weather.Horizon.GetOrientation()));
-
 	sgb.add_cd_flags(soundtrackMapOffset);
 	sgb.add_action_queue(actionQueueOffset);
 	sgb.add_flip_maps(flipMapsOffset);
@@ -1797,6 +1808,18 @@ static void ParseLua(const Save::SaveGame* s, bool hubMode)
 	level->Starfield.SetMeteorCount(s->level_data()->starfield_meteor_count());
 	level->Starfield.SetMeteorSpawnDensity(s->level_data()->starfield_meteor_spawn_density());
 	level->Starfield.SetMeteorVelocity(s->level_data()->starfield_meteor_velocity());
+
+	level->Horizon1.SetEnabled(s->level_data()->horizon1_enabled());
+	level->Horizon1.SetObjectID((GAME_OBJECT_ID)s->level_data()->horizon1_object_id());
+	level->Horizon1.SetPosition(ToVector3(s->level_data()->horizon1_position()), true);
+	level->Horizon1.SetRotation(ToEulerAngles(s->level_data()->horizon1_orientation()), true);
+	level->Horizon1.SetTransparency(s->level_data()->horizon1_transparency());
+
+	level->Horizon2.SetEnabled(s->level_data()->horizon2_enabled());
+	level->Horizon2.SetObjectID((GAME_OBJECT_ID)s->level_data()->horizon2_object_id());
+	level->Horizon2.SetPosition(ToVector3(s->level_data()->horizon2_position()), true);
+	level->Horizon2.SetRotation(ToEulerAngles(s->level_data()->horizon2_orientation()), true);
+	level->Horizon2.SetTransparency(s->level_data()->horizon2_transparency());
 
 	level->Storm = s->level_data()->storm_enabled();
 	level->Weather = (WeatherType)s->level_data()->weather_type();
@@ -2223,12 +2246,6 @@ static void ParseEffects(const Save::SaveGame* s)
 	g_Renderer.SetPostProcessMode((PostProcessMode)s->postprocess_mode());
 	g_Renderer.SetPostProcessStrength(s->postprocess_strength());
 	g_Renderer.SetPostProcessTint(ToVector3(s->postprocess_tint()));
-
-	// Restore horizon.
-	Weather.Horizon = HorizonObject(
-		(GAME_OBJECT_ID)s->horizon_object_id(), (GAME_OBJECT_ID)s->horizon_prev_object_id(),
-		ToVector3(s->horizon_position()), ToVector3(s->horizon_prev_position()), ToEulerAngles(s->horizon_orientation()), ToEulerAngles(s->horizon_prev_orientation()),
-		s->horizon_transition_time(), s->horizon_transition_time_max());
 
 	// Restore soundtracks.
 	for (int i = 0; i < s->soundtracks()->size(); i++)

@@ -99,52 +99,6 @@ namespace TEN::Effects::Environment
 		}
 	};
 
-	class HorizonObject
-	{
-	private:
-		GAME_OBJECT_ID _objectID		  = GAME_OBJECT_ID::ID_HORIZON;
-		Vector3		   _position		  = Vector3::Zero;
-		EulerAngles	   _orientation		  = EulerAngles::Identity;
-		int			   _transitionTime	  = 0; // Time in game frames.
-		int			   _transitionTimeMax = 0; // Time in game frames.
-
-		GAME_OBJECT_ID _prevObjectID	= GAME_OBJECT_ID::ID_HORIZON;
-		Vector3		   _prevPosition	= Vector3::Zero;
-		EulerAngles	   _prevOrientation = EulerAngles::Identity;
-
-	public:
-		// Constructors
-		
-		HorizonObject() = default;
-		HorizonObject(GAME_OBJECT_ID objectID, GAME_OBJECT_ID prevObjectID,
-					  const Vector3& pos, const Vector3& prevPos, const EulerAngles& orient, const EulerAngles& prevOrient,
-					  int transitionTime, int transitionTimeMax);
-
-		// Getters
-		
-		GAME_OBJECT_ID	   GetObjectID() const;
-		const Vector3&	   GetPosition() const;
-		const EulerAngles& GetOrientation() const;
-		int				   GetTransitionTime() const;
-		int				   GetTransitionTimeMax() const;
-
-		float GetTransitionAlpha() const;
-
-		GAME_OBJECT_ID	   GetPrevObjectID() const;
-		const Vector3&	   GetPrevPosition() const;
-		const EulerAngles& GetPrevOrientation() const;
-
-		// Setters
-
-		void SetObjectID(GAME_OBJECT_ID objectID, float transitionTimeInSecs = 0.0f);
-		void SetPosition(const Vector3& pos);
-		void SetOrientation(const EulerAngles& orient, bool storePrevOrient);
-
-		// Utilities
-
-		void Update();
-	};
-
 	class EnvironmentController
 	{
 	private:
@@ -190,10 +144,6 @@ namespace TEN::Effects::Environment
 		LensFlare GlobalLensFlare = {};
 
 	public:
-		// Horizon
-
-		HorizonObject Horizon = HorizonObject();
-
 		EnvironmentController();
 
 		Vector3 Wind() { return Vector3(WindX / 2.0f, 0, WindZ / 2.0f); }

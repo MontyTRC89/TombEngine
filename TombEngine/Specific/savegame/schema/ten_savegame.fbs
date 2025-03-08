@@ -26,6 +26,18 @@ table LevelData {
 	sky_layer_2_color: int32;
 	sky_layer_2_speed: int32;
 
+	horizon1_enabled: bool;
+	horizon1_object_id: int32;
+	horizon1_position: Vector3;
+	horizon1_orientation: EulerAngles;
+	horizon1_transparency: float;
+
+	horizon2_enabled: bool;
+	horizon2_object_id: int32;
+	horizon2_position: Vector3;
+	horizon2_orientation: EulerAngles;
+	horizon2_transparency: float;
+
 	lensflare_sprite_id: int32;
 	lensflare_pitch: float;
 	lensflare_yaw: float;
@@ -604,15 +616,6 @@ table SaveGame {
 	action_queue: [int32];
 	soundtracks: [Soundtrack];
 	cd_flags: [int32];
-
-	horizon_object_id: int32;
-	horizon_position: Vector3;
-	horizon_orientation: EulerAngles;
-	horizon_transition_time: int32;
-	horizon_transition_time_max: int32;
-	horizon_prev_object_id: int32;
-	horizon_prev_position: Vector3;
-	horizon_prev_orientation: EulerAngles;
 
 	postprocess_mode: int32;
 	postprocess_strength: float;

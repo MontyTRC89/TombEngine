@@ -23,107 +23,6 @@ namespace TEN::Effects::Environment
 {
 	EnvironmentController Weather;
 
-	HorizonObject::HorizonObject(GAME_OBJECT_ID objectID, GAME_OBJECT_ID prevObjectID,
-								 const Vector3& pos, const Vector3& prevPos, const EulerAngles& orient, const EulerAngles& prevOrient,
-								 int transitionTime, int transitionTimeMax)
-	{
-		_objectID = objectID;
-		_position = pos;
-		_orientation = orient;
-		_transitionTime = transitionTime;
-		_transitionTimeMax = transitionTimeMax;
-
-		_prevObjectID = prevObjectID;
-		_prevPosition = prevPos;
-		_prevOrientation = prevOrient;
-	}
-
-	GAME_OBJECT_ID HorizonObject::GetObjectID() const
-	{
-		return _objectID;
-	}
-
-	const Vector3& HorizonObject::GetPosition() const
-	{
-		return _position;
-	}
-
-	const EulerAngles& HorizonObject::GetOrientation() const
-	{
-		return _orientation;
-	}
-
-	int HorizonObject::GetTransitionTime() const
-	{
-		return _transitionTime;
-	}
-
-	int HorizonObject::GetTransitionTimeMax() const
-	{
-		return _transitionTimeMax;
-	}
-
-	float HorizonObject::GetTransitionAlpha() const
-	{
-		// No transition; return early.
-		if (_transitionTimeMax == 0)
-			return 1.0f;
-
-		// Calculate and return transition alpha.
-		return Smoothstep((float)_transitionTime / (float)_transitionTimeMax);
-	}
-
-	GAME_OBJECT_ID HorizonObject::GetPrevObjectID() const
-	{
-		return _prevObjectID;
-	}
-
-	const Vector3& HorizonObject::GetPrevPosition() const
-	{
-		return _prevPosition;
-	}
-
-	const EulerAngles& HorizonObject::GetPrevOrientation() const
-	{
-		return _prevOrientation;
-	}
-
-	void HorizonObject::SetObjectID(GAME_OBJECT_ID objectID, float transitionSpeedInSecs)
-	{
-		_prevObjectID = _objectID;
-		_objectID = objectID;
-		_transitionTime = 0;
-		_transitionTimeMax = (int)round(transitionSpeedInSecs / (float)FPS);
-	}
-
-	void HorizonObject::SetPosition(const Vector3& pos)
-	{
-		_prevPosition = pos;
-		_position = pos;
-	}
-
-	void HorizonObject::SetOrientation(const EulerAngles& orient, bool storePrevOrient)
-	{
-		_prevOrientation = storePrevOrient ? _orientation : orient;
-		_orientation = orient;
-	}
-
-	void HorizonObject::Update()
-	{
-		// No transition; return early.
-		if (_transitionTimeMax == 0)
-			return;
-
-		// Update transition.
-		_transitionTime++;
-		if (_transitionTime > _transitionTimeMax)
-		{
-			_transitionTime = 0;
-			_transitionTimeMax = 0;
-			_prevObjectID = _objectID;
-		}
-	}
-
 	float WeatherParticle::Transparency() const
 	{
 		float result = WEATHER_PARTICLE_OPACITY;
@@ -160,8 +59,6 @@ namespace TEN::Effects::Environment
 		SpawnWeatherParticles(level);
 		SpawnDustParticles(level);
 		SpawnMeteorParticles(level);
-
-		Horizon.Update();
 	}
 
 	void EnvironmentController::Clear()
@@ -189,9 +86,6 @@ namespace TEN::Effects::Environment
 		ResetStarField = true;
 		Stars.clear();
 		Meteors.clear();
-
-		// Clear horizon.
-		Horizon = {};
 	}
 
 	void EnvironmentController::Flash(int r, int g, int b, float speed)
