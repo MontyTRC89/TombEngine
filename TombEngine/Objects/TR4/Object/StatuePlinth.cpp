@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "tr4_statue_plinth.h"
+#include "Objects/TR4/Object/StatuePlinth.h"
 
 #include "Specific/level.h"
 #include "Game/Collision/Sphere.h"

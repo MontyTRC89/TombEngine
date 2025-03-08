@@ -43,6 +43,7 @@
 #include "Objects/TR4/Entity/tr4_setha.h"
 
 // Objects
+#include "Objects/TR4/Object/StatuePlinth.h"
 #include "Objects/TR4/Object/WraithTrap.h"
 #include "Objects/TR4/Object/tr4_element_puzzle.h"
 #include "Objects/TR4/Object/tr4_mapper.h"
@@ -51,7 +52,6 @@
 #include "Objects/TR4/Object/tr4_clockwork_beetle.h"
 #include "Objects/TR4/Object/tr4_obelisk.h"
 #include "Objects/TR4/Object/tr4_scales.h"
-#include "Objects/TR4/Object/tr4_statue_plinth.h"
 
 // Switches
 
