@@ -18,9 +18,9 @@ using namespace TEN::Collision::Sphere;
 using namespace TEN::Math;
 
 // NOTES:
-// ItemFlags[0] = Default behavior.
-// ItemFlags[1] = Retract after striking once.
-// ItemFlags[2] = Strike continuously.
+// OCB0 = Default behavior.
+// OCB1 = Retract after striking once.
+// OCB2 = Strike continuously.
 
 namespace TEN::Entities::Traps
 {
