@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR1/Trap/tr1_hammer.h"
+#include "Objects/TR1/Trap/Hammer.h"
 
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
