@@ -168,7 +168,7 @@ namespace TEN::Entities::Traps
 			playerItem->Pose.Position.y = pointColl.GetFloorHeight();
 			playerItem->Pose.Scale = Vector3(1.0f, 0.1f, 1.0f);
 			playerItem->Animation.Velocity = Vector3::Zero;
-			playerItem-> Animation.IsAirborne = false;
+			playerItem->Animation.IsAirborne = false;
 
 			DoDamage(playerItem, INT_MAX);
 			SetAnimation(playerItem, LA_BOULDER_DEATH);
