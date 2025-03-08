@@ -479,7 +479,7 @@ Rotation Moveable::GetRotation() const
 	};
 }
 
-/// Get the moveable's scale.
+/// Get the moveable's visual scale.
 // @function Moveable:GetScale
 // @treturn Vec3 A copy of the moveable's visual scale.
 Vec3 Moveable::GetScale() const
@@ -506,10 +506,9 @@ void Moveable::SetRotation(const Rotation& rot)
 		_moveable->DisableInterpolation = true;
 }
 
-/// Set the moveable's scale
-// Sets the scale of the moveable. It's only a visual effect and does not affect collision.
+/// Set the moveable's visual scale. Does not affect collision.
 // @function Moveable:SetScale
-// @tparam Vec3 new scale of the moveable 
+// @tparam Vec3 scale New visual scale.
 void Moveable::SetScale(const Vec3& scale)
 {
 	_moveable->Pose.Scale = scale.ToVector3();
