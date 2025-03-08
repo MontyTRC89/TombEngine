@@ -385,6 +385,7 @@ static constexpr char ScriptReserved_EndReason[]				= "EndReason";
 static constexpr char ScriptReserved_EventType[]				= "EventType";
 static constexpr char ScriptReserved_AlignMode[]				= "AlignMode";
 static constexpr char ScriptReserved_ScaleMode[]				= "ScaleMode";
+static constexpr char ScriptReserved_ParticleAnimationType[]	= "ParticleAnimationType";
 
 static constexpr char ScriptReserved_LevelVars[]	= "LevelVars";
 static constexpr char ScriptReserved_GameVars[]		= "GameVars";

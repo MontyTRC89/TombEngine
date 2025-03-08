@@ -221,7 +221,7 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 	case ParticleAnimType::Loop:  // Frames loop sequentially
 	{
 		float frameDuration = frameRate > 0 ? 1.0f / frameRate : 1.0f / totalFrames;  // Duration per frame
-		int currentFrame = static_cast<int>(particleAge / frameDuration) % totalFrames;  // Wrap frames
+		int currentFrame = (int)(particleAge / frameDuration) % totalFrames;  // Wrap frames
 		particle.SpriteID = currentFrame;
 		break;
 	}
@@ -229,7 +229,7 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 	case ParticleAnimType::OneShot:  // Frames play once, then freeze on the last frame
 	{
 		float totalDuration = frameRate > 0 ? totalFrames / frameRate : particle.sLife;
-		int currentFrame = static_cast<int>(particleAge / (totalDuration / totalFrames));
+		int currentFrame = (int)(particleAge / (totalDuration / totalFrames));
 		if (currentFrame >= totalFrames)
 			currentFrame = totalFrames - 1;  // Clamp to the last frame
 		particle.SpriteID = currentFrame;
@@ -240,7 +240,7 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 	{
 		float frameDuration = frameRate > 0 ? 1.0f / frameRate : 1.0f / totalFrames;
 		int totalFrameSteps = totalFrames * 2 - 2;  // Forward and backward frames (avoiding double-count of last frame)
-		int step = static_cast<int>(particleAge / frameDuration) % totalFrameSteps;
+		int step = (int)(particleAge / frameDuration) % totalFrameSteps;
 		int currentFrame = step < totalFrames ? step : totalFrames - (step - totalFrames) - 1;
 		particle.SpriteID = currentFrame;
 		break;
@@ -248,7 +248,7 @@ void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	Part
 
 	case ParticleAnimType::LifetimeSpread:  // Distribute all frames evenly over lifetime
 	{
-		int currentFrame = static_cast<int>(normalizedAge * totalFrames);
+		int currentFrame = (int)(normalizedAge * totalFrames);
 		if (currentFrame >= totalFrames)
 			currentFrame = totalFrames - 1;  // Clamp to the last frame
 		particle.SpriteID = currentFrame;
