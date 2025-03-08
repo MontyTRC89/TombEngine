@@ -4,7 +4,6 @@
 #include "Game/animation.h"
 #include "Game/collision/collide_room.h"
 #include "Game/collision/collide_item.h"
-#include "Game/collision/Sphere.h"
 #include "Game/control/control.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/tomb4fx.h"
@@ -14,13 +13,10 @@
 #include "Game/Lara/lara_helpers.h"
 #include "Game/pickup/pickup.h"
 #include "Game/Setup.h"
-#include "Objects/Generic/Switches/generic_switch.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 
-using namespace TEN::Collision::Sphere;
-using namespace TEN::Entities::Switches;
 using namespace TEN::Gui;
 using namespace TEN::Input;
 
