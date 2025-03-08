@@ -400,12 +400,10 @@ constexpr char ScriptReserved_EmitParticle[]		= "EmitParticle";
 constexpr char ScriptReserved_EmitShockwave[]		= "EmitShockwave";
 constexpr char ScriptReserved_EmitSpotLight[]		= "EmitSpotLight";
 constexpr char ScriptReserved_EmitStreamer[]		= "EmitStreamer";
-static constexpr char ScriptReserved_GetWind[] = "GetWind";
-
+static constexpr char ScriptReserved_GetWind[]		= "GetWind";
 constexpr char ScriptReserved_MakeEarthquake[]		= "MakeEarthquake";
 constexpr char ScriptReserved_MakeExplosion[]		= "MakeExplosion";
-
-constexpr char ScriptReserved_FeatherID[] = "FeatherID";
+constexpr char ScriptReserved_FeatherID[]			= "StreamerFeatherMode";
 
 // =======
 // OBJECTS
