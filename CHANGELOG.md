@@ -13,7 +13,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed incorrect handling of dynamic light shadows.
 * Fixed ricochet flashes after using explosive weapons.
 * Fixed incorrect flare draw in crawl state.
-* Fixed starfield remaining active in the next level if next level does not have a starfield specified.
+* Fixed starfield remaining active in the next level if it does not have a starfield specified.
 * Fixed wetness player attribute not being preserved in savegames.
 * Fixed invisible HK ammo in the inventory.
 * Fixed flickering rat emitter.
@@ -29,8 +29,9 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
   - You must use this version: https://github.com/TombEngine/Resources/raw/refs/heads/main/Wad2%20Objects/Interactables/TEN_Waterfall_Emitter.wad2
 
 ### Lua API changes
+
 * Implemented advanced particles allowing animations and other effects.
-* Added Lerp() function to the Rotation object to allow linear interpolation between rotations.
+* Added Collision.Probe class for basic room collision detection.
 * Added diary module.
 * Added View.GetFlyByPosition() and View.GetFlyByRotation() functions to get flyby sequence parameters at a specified time point.
 * Added Effects.EmitAirBubble() function to spawn air bubbles.
