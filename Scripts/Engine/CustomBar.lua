@@ -157,7 +157,6 @@ end
 ---
 -- Creates a bar tied to Players's attributes (Health, Air, Stamina).
 -- @tparam table playerBarData The table that contains all the player bar data. Refer to table setup for playerBarData.
---
 -- @treturn CustomBar Player attribute bar.
 
 CustomBar.CreatePlayerBar = function (playerBarData)
@@ -166,7 +165,9 @@ CustomBar.CreatePlayerBar = function (playerBarData)
 	local dataName	= barName .. "_bar_data"
 
 	if playerBarData.getActionType >= 1 and playerBarData.getActionType <= 3 then
-		local startValue = playerBarData.getActionType == 1 and Lara:GetHP() or (playerBarData.getActionType == 2 and Lara:GetAir() or (playerBarData.getActionType == 3 and Lara:GetStamina()))
+		local startValue = playerBarData.getActionType == 1 and Lara:GetHP() or
+		(playerBarData.getActionType == 2 and Lara:GetAir() or
+		(playerBarData.getActionType == 3 and Lara:GetStamina()))
 		local maxValue = playerBarData.getActionType == 1 and 1000 or (playerBarData.getActionType == 2 and 1800 or (playerBarData.getActionType == 3 and 120))
 
 ---
@@ -244,7 +245,6 @@ end
 -- Creates a custom health bar for a specific enemy (like a boss). Ensure this function is called before Lara aims at the enemy if using generic enemy HP bars as well.
 -- Also be sure to call this function after increasing the HP of the enemy via LUA.
 -- @tparam table enemyBarData The table that contains all the enemy bar data. Refer to table setup for enemyBarData.
---
 -- @treturn CustomBar Enemy health bar.
 CustomBar.CreateEnemyHpBar = function (enemyBarData)
 
@@ -335,9 +335,8 @@ end
 -- Multiple enemies can share the same name by appending _number to the name in the editor. If adjusting an enemy's max HP, ensure this is done before Lara targets the enemy.
 -- To create health bars for specific enemies, use CustomBar.CreateEnemyHpBar, ensuring the bar is created prior to targeting.
 -- @tparam table enemiesBarData The table that contains all the enemies bar data. Refer to table setup for enemiesBarData.
---
 -- @treturn CustomBar Enemy health bars.
---
+
 CustomBar.SetEnemiesHpGenericBar = function (enemiesBarData)
 
 	if LevelVars.Engine.CustomBars.enemiesHpBar.objectIdBg then
@@ -406,8 +405,8 @@ CustomBar.SetEnemiesHpGenericBar = function (enemiesBarData)
 
 end
 
--- The function retrieves an existing bar instance by its unique identifier (barName). This function is useful when you need to access or manipulate a bar that has already been created.
--- 	@string barName: The unique identifier assigned to the bar when it was created using CustomBar.New
+--- The function retrieves an existing bar instance by its unique identifier (barName). This function is useful when you need to access or manipulate a bar that has already been created.
+-- @string barName: The unique identifier assigned to the bar when it was created using CustomBar.New
 CustomBar.Get = function(barName)
 	local dataName = barName .. "_bar_data"
     if LevelVars.Engine.CustomBars.bars[dataName] then
@@ -416,8 +415,8 @@ CustomBar.Get = function(barName)
     end
 end
 
--- The function removes a custom bar and its associated data from the system. It ensures that the bar is no longer tracked or accessible in the LevelVars.Engine.CustomBars.bars table.
--- 	@string barName: The name of the custom bar to be deleted.
+--- The function removes a custom bar and its associated data from the system. It ensures that the bar is no longer tracked or accessible in the LevelVars.Engine.CustomBars.bars table.
+-- @string barName: The name of the custom bar to be deleted.
 CustomBar.Delete = function (barName)
     local dataName = barName .. "_bar_data"
 	if LevelVars.Engine.CustomBars.bars[dataName] then
@@ -425,7 +424,7 @@ CustomBar.Delete = function (barName)
 	end
 end
 
--- The function sets the value of a custom bar over a specified time period.
+--- The function sets the value of a custom bar over a specified time period.
 -- @number value: The new target to which the bar's current value should transition. (Must be a non-negative number; between 0 and the bar's maxValue.
 -- @number time: The time (in seconds) over which the bar's value should transition to the target value.
 function CustomBar:SetBarValue(value, time)
@@ -440,7 +439,7 @@ function CustomBar:SetBarValue(value, time)
 	end
 end
 
--- The function adjusts the bar's value relative to its current or target value over a specified time span.
+--- The function adjusts the bar's value relative to its current or target value over a specified time span.
 -- @number value: The relative value to add (positive or negative) to the current bar value.
 -- @number time: The duration (in seconds) over which the change should occur.
 function CustomBar:ChangeBarValueOverTimespan(value, time)
@@ -466,8 +465,8 @@ function CustomBar:ChangeBarValueOverTimespan(value, time)
 	end
 end
 
--- The function controls the visibility of a custom bar.
--- 	@bool visible: true: Makes the bar visible.; false: Hides the bar.
+--- The function controls the visibility of a custom bar.
+-- @bool visible: true: Makes the bar visible.; false: Hides the bar.
 function CustomBar:SetVisibility(visible)
     --the visible variable is a boolean
 	if LevelVars.Engine.CustomBars.bars[self.name] then
@@ -493,7 +492,7 @@ function CustomBar:IsVisible()
 	end
 end
 
--- The function retrieves the current value of a custom bar.
+--- The function retrieves the current value of a custom bar.
 -- @treturn float returns the current value of a custom bar.
 function CustomBar:GetValue()
 	
@@ -502,14 +501,14 @@ function CustomBar:GetValue()
 	end
 end
 
--- The function deletes all custom bars.
+--- The function deletes all custom bars.
 CustomBar.DeleteAllBars = function ()
 	for _, customBar in pairs (LevelVars.Engine.CustomBars.bars) do
 		LevelVars.Engine.CustomBars.bars[customBar.name] = nil
 	end
 end
 
--- This function prevents the creation of new health bars for enemies when set to false. However, it does not affect the health bars that have already been created.
+--- This function prevents the creation of new health bars for enemies when set to false. However, it does not affect the health bars that have already been created.
 -- @bool value Specifies whether new health bars for enemies should be created. 
 CustomBar.ShowEnemiesHpGenericBar = function(value)
 	if type(value) == "boolean" then
@@ -517,7 +516,7 @@ CustomBar.ShowEnemiesHpGenericBar = function(value)
 	end
 end
 
--- The function deletes all the enemy health bars excluding those created by CustomBar.CreateEnemyHpBar.
+--- The function deletes all the enemy health bars excluding those created by CustomBar.CreateEnemyHpBar.
 CustomBar.DeleteExistingHpGenericBars = function ()
 	for _, customBar in pairs (LevelVars.Engine.CustomBars.bars) do
 		if customBar.getActionType == 4 then
@@ -526,8 +525,7 @@ CustomBar.DeleteExistingHpGenericBars = function ()
 	end
 end
 
----
--- Sets the custom bar background sprite position.
+--- Sets the custom bar background sprite position.
 -- @tparam Vec2 pos X,Y position of the bar's background in screen percent (0-100).
 --
 function CustomBar:SetBackgroundPosition(pos)
@@ -536,8 +534,7 @@ function CustomBar:SetBackgroundPosition(pos)
 	end
 end
 
----
--- Sets the custom bar background sprite rotation.
+--- Sets the custom bar background sprite rotation.
 -- @tparam number rot rotation of the bar's background. sprite (0-360).
 --
 function CustomBar:SetBackgroundRotation(rot)
@@ -546,7 +543,6 @@ function CustomBar:SetBackgroundRotation(rot)
 	end
 end
 
----
 -- Sets the custom bar background sprite color.
 -- @tparam Color color Color of bar's background.
 --
@@ -606,7 +602,6 @@ function CustomBar:SetBackgroundBlendMode(blendMode)
 	end
 end
 
----Set bar properties
 ---
 -- Sets the custom bar sprite position.
 -- @tparam Vec2 pos X,Y position of the bar in screen percent (0-100).
@@ -951,15 +946,6 @@ LevelFuncs.Engine.CustomBar.UpdateCustomBars = function()
 		end
 	end
 end
-
--- LevelFuncs.Engine.CustomBar.GenerateStringOption = function (alignment, effects)
--- 	local options = {}
--- 	if (effects == 1 or effects == 3) then table.insert(options, TEN.Strings.DisplayStringOption.SHADOW) end
--- 	if (effects == 2 or effects == 3) then table.insert(options, TEN.Strings.DisplayStringOption.BLINK) end
--- 	if (alignment == 1) then table.insert(options, TEN.Strings.DisplayStringOption.CENTER) end
--- 	if (alignment == 2) then table.insert(options, TEN.Strings.DisplayStringOption.RIGHT) end
--- 	return options
--- end
 
 TEN.Logic.AddCallback(TEN.Logic.CallbackPoint.PRELOOP, LevelFuncs.Engine.CustomBar.UpdateCustomBars)
 
