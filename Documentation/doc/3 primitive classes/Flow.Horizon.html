@@ -121,7 +121,7 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#Horizon">Horizon(object)</a></td>
+	<td class="name" ><a href="#Horizon">Horizon(objectID)</a></td>
 	<td class="summary">Create a horizon object.</td>
 	</tr>
 	<tr>
@@ -153,11 +153,11 @@
 	<td class="summary">Set the horizon's object ID.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#SetPosition">SetPosition(pos[, disableInterp])</a></td>
+	<td class="name" ><a href="#SetPosition">SetPosition(pos[, noInterpolation])</a></td>
 	<td class="summary">Set the horizon's world position.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#SetRotation">SetRotation(rot[, disableInterp])</a></td>
+	<td class="name" ><a href="#SetRotation">SetRotation(rot[, noInterpolation])</a></td>
 	<td class="summary">Set the horizon's rotation.</td>
 	</tr>
 	<tr>
@@ -175,7 +175,7 @@
     <dl class="function">
     <dt>
     <a name = "Horizon"></a>
-    <strong>Horizon(object)</strong>
+    <strong>Horizon(objectID)</strong>
     </dt>
     <dd>
     Create a horizon object.
@@ -184,9 +184,9 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">object</span>
+        <li><span class="parameter">objectID</span>
             <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-         ID for the horizon to use.
+         Object ID for the horizon to use.
         </li>
     </ul>
 
@@ -352,7 +352,7 @@
 </dd>
     <dt>
     <a name = "SetPosition"></a>
-    <strong>SetPosition(pos[, disableInterp])</strong>
+    <strong>SetPosition(pos[, noInterpolation])</strong>
     </dt>
     <dd>
     Set the horizon's world position.
@@ -365,7 +365,7 @@
             <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
          New world position.
         </li>
-        <li><span class="parameter">disableInterp</span>
+        <li><span class="parameter">noInterpolation</span>
             <span class="types"><span class="type">bool</span></span>
          Disable interpolation with the previous frame's position. <strong>default: false</strong>
          (<em>optional</em>)
@@ -379,7 +379,7 @@
 </dd>
     <dt>
     <a name = "SetRotation"></a>
-    <strong>SetRotation(rot[, disableInterp])</strong>
+    <strong>SetRotation(rot[, noInterpolation])</strong>
     </dt>
     <dd>
     Set the horizon's rotation.
@@ -392,7 +392,7 @@
             <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
          New rotation.
         </li>
-        <li><span class="parameter">disableInterp</span>
+        <li><span class="parameter">noInterpolation</span>
             <span class="types"><span class="type">bool</span></span>
          Disable interpolation with the previous frame's rotation. <strong>default: false</strong>
          (<em>optional</em>)

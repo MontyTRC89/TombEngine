@@ -42,7 +42,7 @@ namespace TEN::Scripting
 
 	/// Create a horizon object.
 	// @function Horizon
-	// @tparam Objects.ObjID object ID for the horizon to use.
+	// @tparam Objects.ObjID objectID Object ID for the horizon to use.
 	// @treturn Horizon A new Horizon object.
 	Horizon::Horizon(GAME_OBJECT_ID objectID)
 	{
@@ -115,10 +115,10 @@ namespace TEN::Scripting
 	/// Set the horizon's world position.
 	// @function SetPosition
 	// @tparam Vec3 pos New world position.
-	// @tparam[opt] bool disableInterp Disable interpolation with the previous frame's position. __default: false__
-	void Horizon::SetPosition(const Vec3& pos, TypeOrNil<bool> disableInterp)
+	// @tparam[opt] bool noInterpolation Disable interpolation with the previous frame's position. __default: false__
+	void Horizon::SetPosition(const Vec3& pos, TypeOrNil<bool> noInterpolation)
 	{
-		bool convertedDisableInterp = ValueOr<bool>(disableInterp, false);
+		bool convertedDisableInterp = ValueOr<bool>(noInterpolation, false);
 
 		_prevPosition = convertedDisableInterp ? pos : _position;
 		_position = pos;
@@ -127,10 +127,10 @@ namespace TEN::Scripting
 	/// Set the horizon's rotation.
 	// @function SetRotation
 	// @tparam Rotation rot New rotation.
-	// @tparam[opt] bool disableInterp Disable interpolation with the previous frame's rotation. __default: false__
-	void Horizon::SetRotation(const Rotation& rot, TypeOrNil<bool> disableInterp)
+	// @tparam[opt] bool noInterpolation Disable interpolation with the previous frame's rotation. __default: false__
+	void Horizon::SetRotation(const Rotation& rot, TypeOrNil<bool> noInterpolation)
 	{
-		bool convertedDisableInterp = ValueOr<bool>(disableInterp, false);
+		bool convertedDisableInterp = ValueOr<bool>(noInterpolation, false);
 
 		_prevRotation = convertedDisableInterp ? rot : _rotation;
 		_rotation = rot;
