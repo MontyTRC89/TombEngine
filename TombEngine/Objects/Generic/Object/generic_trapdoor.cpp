@@ -184,18 +184,15 @@ namespace TEN::Entities::Generic
 
 		bool actionActive = laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber;
 		bool isActionReady = IsHeld(In::Action);
-		bool isPlayerAvailable = (!isUnderwater &&
+		bool isPlayerAvailable = laraInfo->Control.HandStatus == HandStatus::Free && trapDoorItem->Status != ITEM_ACTIVE;
+		bool isPlayerIdle = (!isUnderwater &&
 			laraItem->Animation.ActiveState == LS_IDLE &&
-			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
-			laraInfo->Control.HandStatus == HandStatus::Free &&
-			trapDoorItem->Status != ITEM_ACTIVE) ||
+			laraItem->Animation.AnimNumber == LA_STAND_IDLE) ||
 			(isUnderwater &&
 				laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE &&
-				laraItem->Animation.AnimNumber == LA_UNDERWATER_IDLE &&
-				laraInfo->Control.HandStatus == HandStatus::Free &&
-				trapDoorItem->Status != ITEM_ACTIVE);
-
-		if (actionActive || (isActionReady && isPlayerAvailable))
+				laraItem->Animation.AnimNumber == LA_UNDERWATER_IDLE);
+		
+		if (actionActive || (isActionReady && isPlayerAvailable && isPlayerIdle))
 		{
 			if (TestLaraPosition(bounds, trapDoorItem, laraItem))
 			{
