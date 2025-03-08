@@ -64,6 +64,7 @@
 <h2>3 Primitive Classes</h2>
 <ul class="nowrap">
   <li>    <a href="../3 primitive classes/Flow.Fog.html">Flow.Fog</a></li>
+  <li>    <a href="../3 primitive classes/Flow.Horizon.html">Flow.Horizon</a></li>
   <li>    <a href="../3 primitive classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
   <li>    <a href="../3 primitive classes/Flow.LensFlare.html">Flow.LensFlare</a></li>
   <li>    <a href="../3 primitive classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
@@ -124,7 +125,7 @@
 	<td class="summary">Create a starfield object with only stars.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Starfield">Starfield(starCount, meteorCount)</a></td>
+	<td class="name" ><a href="#Starfield">Starfield(starCount, meteorCount, meteorSpawnDensity, meteorVel)</a></td>
 	<td class="summary">Create a starfield object with stars and meteors.</td>
 	</tr>
 	<tr>
@@ -152,19 +153,19 @@
 	<td class="summary">Get this starfield's meteors enabled status.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Starfield:SetStarCount">Starfield:SetStarCount(New)</a></td>
+	<td class="name" ><a href="#Starfield:SetStarCount">Starfield:SetStarCount(count)</a></td>
 	<td class="summary">Set this starfield's number of stars.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Starfield:SetMeteorCount">Starfield:SetMeteorCount(New)</a></td>
+	<td class="name" ><a href="#Starfield:SetMeteorCount">Starfield:SetMeteorCount(count)</a></td>
 	<td class="summary">Set this starfield's number of meteors.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Starfield:SetMeteorSpawnDensity">Starfield:SetMeteorSpawnDensity(New)</a></td>
+	<td class="name" ><a href="#Starfield:SetMeteorSpawnDensity">Starfield:SetMeteorSpawnDensity(density)</a></td>
 	<td class="summary">Set this starfield's meteor spawn density.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Starfield:SetMeteorVelocity">Starfield:SetMeteorVelocity(New)</a></td>
+	<td class="name" ><a href="#Starfield:SetMeteorVelocity">Starfield:SetMeteorVelocity(velocity)</a></td>
 	<td class="summary">Set this starfield's meteor velocity.</td>
 	</tr>
 </table>
@@ -206,7 +207,7 @@
 </dd>
     <dt>
     <a name = "Starfield"></a>
-    <strong>Starfield(starCount, meteorCount)</strong>
+    <strong>Starfield(starCount, meteorCount, meteorSpawnDensity, meteorVel)</strong>
     </dt>
     <dd>
     Create a starfield object with stars and meteors.
@@ -222,6 +223,14 @@
         <li><span class="parameter">meteorCount</span>
             <span class="types"><span class="type">int</span></span>
          Meteor count. <strong>Max: 100</strong>
+        </li>
+        <li><span class="parameter">meteorSpawnDensity</span>
+            <span class="types"><span class="type">int</span></span>
+         Meteor spawn density.
+        </li>
+        <li><span class="parameter">meteorVel</span>
+            <span class="types"><span class="type">int</span></span>
+         Meteor velocity.
         </li>
     </ul>
 
@@ -364,7 +373,7 @@
 </dd>
     <dt>
     <a name = "Starfield:SetStarCount"></a>
-    <strong>Starfield:SetStarCount(New)</strong>
+    <strong>Starfield:SetStarCount(count)</strong>
     </dt>
     <dd>
     Set this starfield's number of stars.
@@ -373,9 +382,9 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">New</span>
+        <li><span class="parameter">count</span>
             <span class="types"><span class="type">int</span></span>
-         star count.
+         New star count.
         </li>
     </ul>
 
@@ -386,7 +395,7 @@
 </dd>
     <dt>
     <a name = "Starfield:SetMeteorCount"></a>
-    <strong>Starfield:SetMeteorCount(New)</strong>
+    <strong>Starfield:SetMeteorCount(count)</strong>
     </dt>
     <dd>
     Set this starfield's number of meteors.
@@ -395,9 +404,9 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">New</span>
+        <li><span class="parameter">count</span>
             <span class="types"><span class="type">int</span></span>
-         meteor count.
+         New meteor count.
         </li>
     </ul>
 
@@ -408,7 +417,7 @@
 </dd>
     <dt>
     <a name = "Starfield:SetMeteorSpawnDensity"></a>
-    <strong>Starfield:SetMeteorSpawnDensity(New)</strong>
+    <strong>Starfield:SetMeteorSpawnDensity(density)</strong>
     </dt>
     <dd>
     Set this starfield's meteor spawn density.
@@ -417,9 +426,9 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">New</span>
+        <li><span class="parameter">density</span>
             <span class="types"><span class="type">int</span></span>
-         meteor spawn density.
+         New meteor spawn density.
         </li>
     </ul>
 
@@ -430,7 +439,7 @@
 </dd>
     <dt>
     <a name = "Starfield:SetMeteorVelocity"></a>
-    <strong>Starfield:SetMeteorVelocity(New)</strong>
+    <strong>Starfield:SetMeteorVelocity(velocity)</strong>
     </dt>
     <dd>
     Set this starfield's meteor velocity.
@@ -439,9 +448,9 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">New</span>
+        <li><span class="parameter">velocity</span>
             <span class="types"><span class="type">float</span></span>
-         meteor velocity.
+         New meteor velocity.
         </li>
     </ul>
 
