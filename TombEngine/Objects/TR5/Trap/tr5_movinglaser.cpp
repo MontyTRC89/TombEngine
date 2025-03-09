@@ -21,11 +21,11 @@ namespace TEN::Entities::Traps
 {
     enum MovingLaserFlags
     {
-    Speed,
-    PauseCounter,
-    Direction,
-    DistanceTravelled,
-    SpeedCalc
+        Speed,
+        PauseCounter,
+        Direction,
+        DistanceTravelled,
+        SpeedCalc
     };
 
 	constexpr auto MOVING_LASER_DAMAGE = 100;
@@ -39,7 +39,7 @@ namespace TEN::Entities::Traps
 		auto& item = g_Level.Items[itemNumber];
         item.ItemFlags[MovingLaserFlags::Direction] = 1;
         item.ItemFlags[MovingLaserFlags::Speed] = 10;
-        item.Pose.Translate(item.Pose.Orientation, -CLICK(1)); //Offset by one click to make it dangerous at the edges of the block.
+        item.Pose.Translate(item.Pose.Orientation, -CLICK(1)); // Offset by one click to make it dangerous at the edges of the block.
 	}
 
     void ControlMovingLaser(short itemNumber)
@@ -49,7 +49,7 @@ namespace TEN::Entities::Traps
         if (!TriggerActive(&item))
             return;
 
-        float moveDistance = (BLOCK(1) * item.TriggerFlags) + CLICK(2); //Use OCB to calculate the distance and add 2 clicks.
+        float moveDistance = (BLOCK(1) * item.TriggerFlags) + CLICK(2); // Use OCB to calculate the distance and add 2 clicks.
 
         float distancePerFrame = ((float)(CLICK(1)) * item.ItemFlags[MovingLaserFlags::Speed]) / FPS; // Calculate distance per frame
 
@@ -97,7 +97,7 @@ namespace TEN::Entities::Traps
             SoundEffect(SFX_TR5_MOVING_LASER_LOOP, &item.Pose, SoundEnvironment::Always);
         }
 
-        // Update room if necessary
+        // Update room if necessary.
         short new_room = item.RoomNumber;
         GetPointCollision(item).GetRoomNumber();
         if (new_room != item.RoomNumber)
