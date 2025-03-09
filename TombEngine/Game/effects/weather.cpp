@@ -9,7 +9,7 @@
 #include "Game/effects/tomb4fx.h"
 #include "Game/savegame.h"
 #include "Game/Setup.h"
-#include "Math.h"
+#include "Math/Math.h"
 #include "Objects/game_object_ids.h"
 #include "Sound/sound.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
@@ -19,7 +19,7 @@ using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Math;
 
-namespace TEN::Effects::Environment 
+namespace TEN::Effects::Environment
 {
 	EnvironmentController Weather;
 
