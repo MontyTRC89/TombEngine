@@ -30,7 +30,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added TR1 Hammer.
   - You must use this version: <insert address here>
 * Added TR3 Moving Laser.
-  - You must use this version: <insert address here>
 * Added TR4 Statue Plinth.
 
 ### Lua API changes
