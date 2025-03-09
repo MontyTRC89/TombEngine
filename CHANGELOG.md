@@ -27,13 +27,14 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
   - You must update your Lara object: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Lara/TEN_Lara.wad2
 * Added a particle based waterfall emitter object and associated sprite slots.
   - You must use this version: https://github.com/TombEngine/Resources/raw/refs/heads/main/Wad2%20Objects/Interactables/TEN_Waterfall_Emitter.wad2
+* Added TR4 statue plinth.
 * Added TR1 hammer.
   - You must use this version: <insert address here>
 
 ### Lua API changes
 
-* Implemented advanced particles allowing animations and other effects.
 * Added Collision.Probe class for basic room collision detection.
+* Added advanced particle emitter allowing animations and other effects.
 * Added diary module.
 * Added Flow.Horizon class with and use two layers of horizons in a Flow.Level class.
 * Added View.GetFlyByPosition() and View.GetFlyByRotation() functions to get flyby sequence parameters at a specified time point.
@@ -42,7 +43,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added Moveable:GetScale() and Movebale:SetScale() methods to set visible scale of moveables.
 * Added Rotation:Lerp() function to allow linear interpolation between rotations.
 * Added various Translate() methods to Vec2 and Vec3 script objects.
-* Added alpha transparency functionality for statics and moveables by using SetColor() method.
+* Added alpha transparency functionality for statics and moveables to be used with SetColor() method.
 * Added extra arguments for sprite object slots and starting rotation value for EmitParticle function.
 * Added ability to save Flow.Level fields such as fog or horizon to a savegame.
 
