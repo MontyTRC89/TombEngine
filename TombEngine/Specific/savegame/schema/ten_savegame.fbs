@@ -375,6 +375,13 @@ table ParticleInfo {
 	node_number: int32;
 	target_pos: Vector3;
 	sprite_id: int32;
+	damage: int32;
+	framerate: float;
+	animation_type: int32;
+	light_radius: int32;
+	light_flicker: int32;
+	light_flicker_s: int32;
+	sound: int32;
 }
 
 table Soundtrack {
