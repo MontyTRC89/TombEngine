@@ -11,7 +11,6 @@
 #include "Game/effects/explosion.h"
 #include "Game/effects/spark.h"
 #include "Game/effects/Streamer.h"
-#include "Game/effects/Streamer.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/Setup.h"
