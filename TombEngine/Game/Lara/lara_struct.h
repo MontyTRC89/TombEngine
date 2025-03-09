@@ -611,7 +611,7 @@ enum LaraAnim
 	LA_LADDER_RIGHT_CORNER_OUTER_START = 365,				// Ladder around outer right corner
 	LA_PUSHABLE_BLOCK_PUSH_EDGE_SLIP = 366,
 	LA_LADDER_LEFT_CORNER_INNER_START = 367,				// Ladder around inner left corner
-	LA_LADDER_LEFT_CORNER_INNER_END = 368,					// TODO: Remove.
+	LA_UNDERWATER_FLOOR_TRAPDOOR = 368,						// Underwater Floor Trapdoor
 	LA_LADDER_RIGHT_CORNER_INNER_START = 369,				// Ladder around inner right corner
 	LA_LADDER_RIGHT_CORNER_INNER_END = 370,					// TODO: Remove.
 	LA_JUMP_UP_TO_ROPE_START = 371,							// Jump up > rope idle (1/2)
@@ -828,7 +828,7 @@ enum LaraAnim
 	NUM_LARA_ANIMS
 
 	// TRASHED ANIMS (reuse slots before going any higher and remove entries from this list when you do):
-	// 368, 370,
+	// 370,
 	// 442
 };
 

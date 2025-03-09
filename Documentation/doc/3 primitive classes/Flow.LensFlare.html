@@ -64,6 +64,7 @@
 <h2>3 Primitive Classes</h2>
 <ul class="nowrap">
   <li>    <a href="../3 primitive classes/Flow.Fog.html">Flow.Fog</a></li>
+  <li>    <a href="../3 primitive classes/Flow.Horizon.html">Flow.Horizon</a></li>
   <li>    <a href="../3 primitive classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
   <li>    <here>Flow.LensFlare</here></li>
   <li>    <a href="../3 primitive classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
@@ -79,6 +80,7 @@
   <li>    <a href="../4 enums/Collision.MaterialType.html">Collision.MaterialType</a></li>
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
+  <li>    <a href="../4 enums/Effects.FeatherMode.html">Effects.FeatherMode</a></li>
   <li>    <a href="../4 enums/Effects.ParticleAnimationType.html">Effects.ParticleAnimationType</a></li>
   <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
   <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
@@ -101,6 +103,7 @@
 </ul>
 <h2>5 Lua utility modules</h2>
 <ul class="nowrap">
+  <li>    <a href="../5 lua utility modules/CustomBar.html">CustomBar</a></li>
   <li>    <a href="../5 lua utility modules/Diary.html">Diary</a></li>
   <li>    <a href="../5 lua utility modules/EventSequence.html">EventSequence</a></li>
   <li>    <a href="../5 lua utility modules/Timer.html">Timer</a></li>
@@ -121,7 +124,7 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#LensFlare">LensFlare(Pitch, Yaw, Color.)</a></td>
+	<td class="name" ><a href="#LensFlare">LensFlare(pitch, yaw, color)</a></td>
 	<td class="summary">Create a LensFlare object.</td>
 	</tr>
 	<tr>
@@ -145,19 +148,19 @@
 	<td class="summary">Get this lens flare's enabled status.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#LensFlare:SetSunSpriteID">LensFlare:SetSunSpriteID(New)</a></td>
+	<td class="name" ><a href="#LensFlare:SetSunSpriteID">LensFlare:SetSunSpriteID(spriteID)</a></td>
 	<td class="summary">Set this lens flare's sun sprite ID.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#LensFlare:SetPitch">LensFlare:SetPitch(New)</a></td>
+	<td class="name" ><a href="#LensFlare:SetPitch">LensFlare:SetPitch(pitch)</a></td>
 	<td class="summary">Set this lens flare's pitch angle.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#LensFlare:SetYaw">LensFlare:SetYaw(New)</a></td>
+	<td class="name" ><a href="#LensFlare:SetYaw">LensFlare:SetYaw(yaw)</a></td>
 	<td class="summary">Set this lens flare's yaw angle.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#LensFlare:SetColor">LensFlare:SetColor(New)</a></td>
+	<td class="name" ><a href="#LensFlare:SetColor">LensFlare:SetColor(color)</a></td>
 	<td class="summary">Set this lens flare's color.</td>
 	</tr>
 </table>
@@ -171,7 +174,7 @@
     <dl class="function">
     <dt>
     <a name = "LensFlare"></a>
-    <strong>LensFlare(Pitch, Yaw, Color.)</strong>
+    <strong>LensFlare(pitch, yaw, color)</strong>
     </dt>
     <dd>
     Create a LensFlare object.
@@ -180,19 +183,17 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">Pitch</span>
+        <li><span class="parameter">pitch</span>
             <span class="types"><span class="type">float</span></span>
-         angle in degrees.
+         Pitch angle in degrees.
         </li>
-        <li><span class="parameter">Yaw</span>
+        <li><span class="parameter">yaw</span>
             <span class="types"><span class="type">float</span></span>
-         angle in degrees.
+         Yaw angle in degrees.
         </li>
-        <li><span class="parameter">Color.</span>
+        <li><span class="parameter">color</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
-
-
-
+         Color of the lensflare.
         </li>
     </ul>
 
@@ -308,7 +309,7 @@
 </dd>
     <dt>
     <a name = "LensFlare:SetSunSpriteID"></a>
-    <strong>LensFlare:SetSunSpriteID(New)</strong>
+    <strong>LensFlare:SetSunSpriteID(spriteID)</strong>
     </dt>
     <dd>
     Set this lens flare's sun sprite ID.
@@ -317,9 +318,9 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">New</span>
+        <li><span class="parameter">spriteID</span>
             <span class="types"><span class="type">int</span></span>
-         sun sprite ID.
+         New sun sprite ID.
         </li>
     </ul>
 
@@ -330,7 +331,7 @@
 </dd>
     <dt>
     <a name = "LensFlare:SetPitch"></a>
-    <strong>LensFlare:SetPitch(New)</strong>
+    <strong>LensFlare:SetPitch(pitch)</strong>
     </dt>
     <dd>
     Set this lens flare's pitch angle.
@@ -339,9 +340,9 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">New</span>
+        <li><span class="parameter">pitch</span>
             <span class="types"><span class="type">float</span></span>
-         pitch angle in degrees.
+         New pitch angle in degrees.
         </li>
     </ul>
 
@@ -352,7 +353,7 @@
 </dd>
     <dt>
     <a name = "LensFlare:SetYaw"></a>
-    <strong>LensFlare:SetYaw(New)</strong>
+    <strong>LensFlare:SetYaw(yaw)</strong>
     </dt>
     <dd>
     Set this lens flare's yaw angle.
@@ -361,9 +362,9 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">New</span>
+        <li><span class="parameter">yaw</span>
             <span class="types"><span class="type">float</span></span>
-         yaw angle in degrees.
+         New yaw angle in degrees.
         </li>
     </ul>
 
@@ -374,7 +375,7 @@
 </dd>
     <dt>
     <a name = "LensFlare:SetColor"></a>
-    <strong>LensFlare:SetColor(New)</strong>
+    <strong>LensFlare:SetColor(color)</strong>
     </dt>
     <dd>
     Set this lens flare's color.
@@ -383,9 +384,9 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">New</span>
+        <li><span class="parameter">color</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
-         color.
+         New color.
         </li>
     </ul>
 

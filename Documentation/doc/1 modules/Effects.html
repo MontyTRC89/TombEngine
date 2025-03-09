@@ -64,6 +64,7 @@
 <h2>3 Primitive Classes</h2>
 <ul class="nowrap">
   <li>    <a href="../3 primitive classes/Flow.Fog.html">Flow.Fog</a></li>
+  <li>    <a href="../3 primitive classes/Flow.Horizon.html">Flow.Horizon</a></li>
   <li>    <a href="../3 primitive classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
   <li>    <a href="../3 primitive classes/Flow.LensFlare.html">Flow.LensFlare</a></li>
   <li>    <a href="../3 primitive classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
@@ -79,6 +80,7 @@
   <li>    <a href="../4 enums/Collision.MaterialType.html">Collision.MaterialType</a></li>
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
+  <li>    <a href="../4 enums/Effects.FeatherMode.html">Effects.FeatherMode</a></li>
   <li>    <a href="../4 enums/Effects.ParticleAnimationType.html">Effects.ParticleAnimationType</a></li>
   <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
   <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
@@ -101,6 +103,7 @@
 </ul>
 <h2>5 Lua utility modules</h2>
 <ul class="nowrap">
+  <li>    <a href="../5 lua utility modules/CustomBar.html">CustomBar</a></li>
   <li>    <a href="../5 lua utility modules/Diary.html">Diary</a></li>
   <li>    <a href="../5 lua utility modules/EventSequence.html">EventSequence</a></li>
   <li>    <a href="../5 lua utility modules/Timer.html">Timer</a></li>
@@ -129,7 +132,7 @@
 	<td class="summary">Emit a particle.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#EmitAdvancedParticle">EmitAdvancedParticle(particleData)</a></td>
+	<td class="name" ><a href="#EmitAdvancedParticle">EmitAdvancedParticle(ParticleData)</a></td>
 	<td class="summary">Emit a particle with extensive configuration options including animations.</td>
 	</tr>
 	<tr>
@@ -150,7 +153,7 @@
 	</tr>
 	<tr>
 	<td class="name" ><a href="#EmitAirBubble">EmitAirBubble(pos[, size][, amp])</a></td>
-	<td class="summary">Emit air bubble in a water room.</td>
+	<td class="summary">Emit an air bubble in a water room.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#EmitFire">EmitFire(pos, size)</a></td>
@@ -172,7 +175,7 @@
 <h2><a href="#Tables">Tables</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#particleData">particleData</a></td>
+	<td class="name" ><a href="#ParticleData">ParticleData</a></td>
 	<td class="summary">Structure for EmitAdvancedParticle table.</td>
 	</tr>
 </table>
@@ -342,7 +345,7 @@
 </dd>
     <dt>
     <a name = "EmitAdvancedParticle"></a>
-    <strong>EmitAdvancedParticle(particleData)</strong>
+    <strong>EmitAdvancedParticle(ParticleData)</strong>
     </dt>
     <dd>
     Emit a particle with extensive configuration options including animations.
@@ -351,8 +354,8 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">particleData</span>
-            <span class="types"><a class="type" href="../1 modules/Effects.html#particleData">particleData</a></span>
+        <li><span class="parameter">ParticleData</span>
+            <span class="types"><a class="type" href="../1 modules/Effects.html#ParticleData">ParticleData</a></span>
          The table holding all the particle data.
         </li>
     </ul>
@@ -365,8 +368,8 @@
         <pre class="example"><span class="keyword">local</span> particle = {
 position = GetMoveableByName(<span class="string">"camera_target_6"</span>) :GetPosition(),
 velocity = Vec3(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>),
-objectID = TEN.Objects.ObjID.CUSTOM_BAR_GRAPHIC,
-spriteIndex = <span class="number">0</span>,
+spriteSeqID = TEN.Objects.ObjID.CUSTOM_BAR_GRAPHIC,
+spriteID = <span class="number">0</span>,
 lifetime = <span class="number">10</span>,
 maxYVelocity = <span class="number">0</span>,
 gravity = <span class="number">0</span>,
@@ -375,10 +378,10 @@ startRotation = <span class="number">0</span>,
 rotationSpeed = <span class="number">0</span>,
 startSize = <span class="number">80</span>,
 endSize = <span class="number">80</span>,
-wind = <span class="keyword">false</span>,
 startColor = TEN.Color(<span class="number">128</span>, <span class="number">128</span>, <span class="number">128</span>),
 endColor = TEN.Color(<span class="number">128</span>, <span class="number">128</span>, <span class="number">128</span>),
 blendMode = TEN.Effects.BlendID.ADDITIVE,
+wind = <span class="keyword">false</span>,
 damage = <span class="keyword">true</span>,
 poison = <span class="keyword">false</span>,
 burn = <span class="keyword">false</span>,
@@ -564,7 +567,7 @@ EmitAdvancedParticle(particle)</pre>
         </li>
         <li><span class="parameter">count</span>
             <span class="types"><span class="type">int</span></span>
-         (default 1) "amount" of blood. Higher numbers won't add more blood but will make it more "flickery", with higher numbers turning it into a kind of red orb.
+         Sprite count. <strong>default: 1</strong>
         </li>
     </ul>
 
@@ -578,7 +581,7 @@ EmitAdvancedParticle(particle)</pre>
     <strong>EmitAirBubble(pos[, size][, amp])</strong>
     </dt>
     <dd>
-    Emit air bubble in a water room.
+    Emit an air bubble in a water room.
 
 
 
@@ -714,8 +717,8 @@ EmitAdvancedParticle(particle)</pre>
 
     <dl class="function">
     <dt>
-    <a name = "particleData"></a>
-    <strong>particleData</strong>
+    <a name = "ParticleData"></a>
+    <strong>ParticleData</strong>
     </dt>
     <dd>
     Structure for EmitAdvancedParticle table.
@@ -737,7 +740,7 @@ EmitAdvancedParticle(particle)</pre>
          ID of the sprite sequence object. <strong>Default: Objects.ObjID.DEFAULT_SPRITES</strong>
          (<em>optional</em>)
         </li>
-        <li><span class="parameter">spriteIndex</span>
+        <li><span class="parameter">spriteID</span>
             <span class="types"><span class="type">int</span></span>
          ID of the sprite in the sprite sequence object.<strong>Default: 0</strong>
          (<em>optional</em>)
@@ -762,7 +765,7 @@ EmitAdvancedParticle(particle)</pre>
          Specifies the friction with which the particle will slow down over time. <strong>Default: 0</strong>
          (<em>optional</em>)
         </li>
-        <li><span class="parameter">startRot</span>
+        <li><span class="parameter">startRotation</span>
             <span class="types"><span class="type">float</span></span>
          Rotation at start of life. <strong>Default: random</strong>
          (<em>optional</em>)
@@ -794,7 +797,7 @@ EmitAdvancedParticle(particle)</pre>
         </li>
         <li><span class="parameter">blendMode</span>
             <span class="types"><a class="type" href="../4 enums/Effects.BlendID.html#">BlendID</a></span>
-         Render blend mode. <strong>TEN.Effects.BlendID.ALPHABLEND</strong>
+         Render blend mode. <strong>TEN.Effects.BlendID.ALPHA_BLEND</strong>
          (<em>optional</em>)
         </li>
         <li><span class="parameter">damage</span>
@@ -824,7 +827,7 @@ EmitAdvancedParticle(particle)</pre>
         </li>
         <li><span class="parameter">light</span>
             <span class="types"><span class="type">bool</span></span>
-         Specify if the particle will be emit a light based on its color. Recommended for single particles. <strong>Default: false</strong>
+         Specify if the particle will be emit a light based on its color. Caution: Recommended only for a single particle. Having too many particles with lights can overflow the light system. <strong>Default: false</strong>
          (<em>optional</em>)
         </li>
         <li><span class="parameter">lightRadius</span>
@@ -839,7 +842,7 @@ EmitAdvancedParticle(particle)</pre>
         </li>
         <li><span class="parameter">sound</span>
             <span class="types"><span class="type">int</span></span>
-         ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window. Looping sounds recommended. <strong>Default: None</strong>
+         ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window. Looping sounds recommended. Caution: Recommended only for a single particle. Having too many particles with sounds can overflow the sound system. <strong>Default: None</strong>
          (<em>optional</em>)
         </li>
         <li><span class="parameter">animated</span>
