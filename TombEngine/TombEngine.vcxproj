@@ -883,6 +883,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClInclude Include="Scripting\Internal\ReservedScriptNames.h" />
     <ClInclude Include="Scripting\Internal\ScriptAssert.h" />
     <ClInclude Include="Scripting\Internal\ScriptUtil.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Effects\FeatherModes.h" />
     <ClInclude Include="Scripting\Internal\TEN\Effects\ParticleAnimTypes.h" />
     <ClInclude Include="Scripting\Internal\TEN\Collision\MaterialTypes.h" />
     <ClInclude Include="Scripting\Internal\TEN\Collision\Probe.h" />
