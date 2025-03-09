@@ -63,7 +63,7 @@ To be used with @{Input.KeyIsHit}, @{Input.KeyIsHeld}, and similar functions.
 @table Input.ActionID
 */
 
-static const std::unordered_map<std::string, ActionID> ACTION_IDS
+static const std::unordered_map<std::string, InputActionID> ACTION_IDS
 {
 	{ "FORWARD", In::Forward },
 	{ "BACK", In::Back },

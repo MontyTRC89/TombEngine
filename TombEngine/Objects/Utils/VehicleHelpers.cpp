@@ -300,17 +300,17 @@ namespace TEN::Entities::Vehicles
 
 	void ModulateVehicleTurnRateX(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate)
 	{
-		*turnRate = ModulateVehicleTurnRate(*turnRate, accelRate, minTurnRate, maxTurnRate, -AxisMap[(int)InputAxis::Move].y);
+		*turnRate = ModulateVehicleTurnRate(*turnRate, accelRate, minTurnRate, maxTurnRate, -AxisMap[InputAxisID::Move].y);
 	}
 
 	void ModulateVehicleTurnRateY(short* turnRate, short accelRate, short minTurnRate, short maxTurnRate)
 	{
-		*turnRate = ModulateVehicleTurnRate(*turnRate, accelRate, minTurnRate, maxTurnRate, AxisMap[(int)InputAxis::Move].x);
+		*turnRate = ModulateVehicleTurnRate(*turnRate, accelRate, minTurnRate, maxTurnRate, AxisMap[InputAxisID::Move].x);
 	}
 	
 	void ModulateVehicleLean(ItemInfo* vehicleItem, short baseRate, short maxAngle)
 	{
-		float axisCoeff = AxisMap[(int)InputAxis::Move].x;
+		float axisCoeff = AxisMap[InputAxisID::Move].x;
 		int sign = copysign(1, axisCoeff);
 		short maxAngleNormalized = maxAngle * axisCoeff;
 		vehicleItem->Pose.Orientation.z += std::min<short>(baseRate, abs(maxAngleNormalized - vehicleItem->Pose.Orientation.z) / 3) * sign;
@@ -385,14 +385,14 @@ namespace TEN::Entities::Vehicles
 			vehicleItem.Index, (int)tagLeft,
 			positions.first, dir, orient2D, COLOR_START, COLOR_END,
 			0.0f, life, vel, expRate, 0,
-			StreamerFeatherType::Right, BlendMode::Additive);
+			StreamerFeatherMode::Right, BlendMode::Additive);
 
 		// Spawn right wake.
 		StreamerEffect.Spawn(
 			vehicleItem.Index, (int)tagRight,
 			positions.second, dir, orient2D, COLOR_START, COLOR_END,
 			0.0f, life, vel, expRate, 0,
-			StreamerFeatherType::Left, BlendMode::Additive);
+			StreamerFeatherMode::Left, BlendMode::Additive);
 	}
 
 	void HandleVehicleSpeedometer(float vel, float velMax)
