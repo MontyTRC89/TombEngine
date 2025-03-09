@@ -317,6 +317,7 @@ Specify which translations in the strings table correspond to which languages.
 	InventoryItem::Register(tableFlow);
 	Settings::Register(tableFlow);
 	Fog::Register(tableFlow);
+	Horizon::Register(tableFlow);
 	LensFlare::Register(tableFlow);
 	Starfield::Register(tableFlow);
 
@@ -413,6 +414,8 @@ void FlowHandler::SetTotalSecretCount(int secretsNumber)
 void FlowHandler::LoadFlowScript()
 {
 	TENLog("Loading gameflow script, strings, and settings...", LogLevel::Info);
+
+	Levels.clear();
 
 	_handler.ExecuteScript(_gameDir + "Scripts/Gameflow.lua");
 	_handler.ExecuteScript(_gameDir + "Scripts/SystemStrings.lua", true);

@@ -50,6 +50,8 @@ namespace TEN::Scripting
 	// @function Starfield
 	// @tparam int starCount Star count. __Max: 6000__
 	// @tparam int meteorCount Meteor count. __Max: 100__
+	// @tparam int meteorSpawnDensity Meteor spawn density.
+	// @tparam int meteorVel Meteor velocity.
 	// @treturn Starfield A new Starfield object.
 	Starfield::Starfield(int starCount, int meteorCount, int meteorSpawnDensity, float meteorVel)
 	{
@@ -115,7 +117,7 @@ namespace TEN::Scripting
 
 	/// Set this starfield's number of stars.
 	// @function Starfield:SetStarCount
-	// @tparam int New star count.
+	// @tparam int count New star count.
 	void Starfield::SetStarCount(int count)
 	{
 		if (count < 0 || count > STAR_COUNT_MAX)
@@ -126,7 +128,7 @@ namespace TEN::Scripting
 
 	/// Set this starfield's number of meteors.
 	// @function Starfield:SetMeteorCount
-	// @tparam int New meteor count.
+	// @tparam int count New meteor count.
 	void Starfield::SetMeteorCount(int count)
 	{
 		if (count < 0 || count > METEOR_COUNT_MAX)
@@ -137,7 +139,7 @@ namespace TEN::Scripting
 
 	/// Set this starfield's meteor spawn density.
 	// @function Starfield:SetMeteorSpawnDensity
-	// @tparam int New meteor spawn density.
+	// @tparam int density New meteor spawn density.
 	void Starfield::SetMeteorSpawnDensity(int spawnDensity)
 	{
 		_meteorSpawnDensity = spawnDensity;
@@ -145,7 +147,7 @@ namespace TEN::Scripting
 
 	/// Set this starfield's meteor velocity.
 	// @function Starfield:SetMeteorVelocity
-	// @tparam float New meteor velocity.
+	// @tparam float velocity New meteor velocity.
 	void Starfield::SetMeteorVelocity(float vel)
 	{
 		_meteorVelocity = vel;

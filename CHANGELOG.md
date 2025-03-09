@@ -35,6 +35,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Implemented advanced particles allowing animations and other effects.
 * Added Collision.Probe class for basic room collision detection.
 * Added diary module.
+* Added Flow.Horizon class with and use two layers of horizons in a Flow.Level class.
 * Added View.GetFlyByPosition() and View.GetFlyByRotation() functions to get flyby sequence parameters at a specified time point.
 * Added Effects.EmitAirBubble() function to spawn air bubbles.
 * Added Effects.EmitStreamer() function to emit streamers.
@@ -43,7 +44,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added various Translate() methods to Vec2 and Vec3 script objects.
 * Added alpha transparency functionality for statics and moveables by using SetColor() method.
 * Added extra arguments for sprite object slots and starting rotation value for EmitParticle function.
-  
+* Added ability to save Flow.Level fields such as fog or horizon to a savegame.
+
 ## [Version 1.7.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.4) - 2025-04-01
 
 ### Bug fixes

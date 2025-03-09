@@ -64,6 +64,7 @@
 <h2>3 Primitive Classes</h2>
 <ul class="nowrap">
   <li>    <a href="../3 primitive classes/Flow.Fog.html">Flow.Fog</a></li>
+  <li>    <a href="../3 primitive classes/Flow.Horizon.html">Flow.Horizon</a></li>
   <li>    <a href="../3 primitive classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
   <li>    <a href="../3 primitive classes/Flow.LensFlare.html">Flow.LensFlare</a></li>
   <li>    <a href="../3 primitive classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
@@ -79,6 +80,7 @@
   <li>    <a href="../4 enums/Collision.MaterialType.html">Collision.MaterialType</a></li>
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
+  <li>    <a href="../4 enums/Effects.FeatherMode.html">Effects.FeatherMode</a></li>
   <li>    <a href="../4 enums/Effects.ParticleAnimationType.html">Effects.ParticleAnimationType</a></li>
   <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
   <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
@@ -162,7 +164,7 @@
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetPosition">Moveable:GetPosition()</a></td>
-	<td class="summary">Get the object's position</td>
+	<td class="summary">Get the moveable's position</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:SetPosition">Moveable:SetPosition(position[, updateRoom])</a></td>
@@ -180,11 +182,19 @@
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetRotation">Moveable:GetRotation()</a></td>
-	<td class="summary">Get the moveable's rotation</td>
+	<td class="summary">Get the moveable's rotation.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:GetScale">Moveable:GetScale()</a></td>
+	<td class="summary">Get the moveable's visual scale.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:SetRotation">Moveable:SetRotation(rotation)</a></td>
-	<td class="summary">Set the moveable's rotation</td>
+	<td class="summary">Set the moveable's rotation.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Moveable:SetScale">Moveable:SetScale(scale)</a></td>
+	<td class="summary">Set the moveable's visual scale.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetHP">Moveable:GetHP()</a></td>
@@ -508,7 +518,7 @@ most can just be ignored (see usage).
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">int</span></span>
+           <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
         a number representing the ID of the object
     </ol>
 
@@ -714,7 +724,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
     <strong>Moveable:GetPosition()</strong>
     </dt>
     <dd>
-    Get the object's position
+    Get the moveable's position
 
 
 
@@ -826,7 +836,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
     <strong>Moveable:GetRotation()</strong>
     </dt>
     <dd>
-    Get the moveable's rotation
+    Get the moveable's rotation.
 
 
 
@@ -835,7 +845,28 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
     <ol>
 
            <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
-        a copy of the moveable's rotation
+        A copy of the moveable's rotation.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:GetScale"></a>
+    <strong>Moveable:GetScale()</strong>
+    </dt>
+    <dd>
+    Get the moveable's visual scale.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+        A copy of the moveable's visual scale.
     </ol>
 
 
@@ -847,7 +878,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
     <strong>Moveable:SetRotation(rotation)</strong>
     </dt>
     <dd>
-    Set the moveable's rotation
+    Set the moveable's rotation.
 
 
 
@@ -856,6 +887,28 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
         <li><span class="parameter">rotation</span>
             <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
          The moveable's new rotation
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Moveable:SetScale"></a>
+    <strong>Moveable:SetScale(scale)</strong>
+    </dt>
+    <dd>
+    Set the moveable's visual scale.  Does not affect collision.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">scale</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         New visual scale.
         </li>
     </ul>
 
