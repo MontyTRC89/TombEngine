@@ -237,6 +237,7 @@ static constexpr char ScriptReserved_DeleteSaveGame[]			= "DeleteSaveGame";
 static constexpr char ScriptReserved_DoesSaveGameExist[]		= "DoesSaveGameExist";
 static constexpr char ScriptReserved_GetSecretCount[]			= "GetSecretCount";
 static constexpr char ScriptReserved_SetSecretCount[]			= "SetSecretCount";
+static constexpr char ScriptReserved_GetTotalSecretCount[]		= "GetTotalSecretCount";
 static constexpr char ScriptReserved_SetTotalSecretCount[]		= "SetTotalSecretCount";
 static constexpr char ScriptReserved_AddSecret[]				= "AddSecret";
 static constexpr char ScriptReserved_EnableFlyCheat[]			= "EnableFlyCheat";
