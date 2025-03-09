@@ -73,10 +73,10 @@ namespace TEN::Effects::Streamer
 		}
 	}
 
-	Streamer::Streamer(StreamerFeatherType featherType, BlendMode blendMode)
+	Streamer::Streamer(StreamerFeatherMode featherMode, BlendMode blendMode)
 	{
 		_segmentSpawnTimeOffset = GlobalCounter % SEGMENT_SPAWN_INTERVAL_TIME;
-		_featherType = featherType;
+		_featherMode = featherMode;
 		_blendMode = blendMode;
 	}
 
@@ -85,9 +85,9 @@ namespace TEN::Effects::Streamer
 		return _segments;
 	}
 
-	StreamerFeatherType Streamer::GetFeatherType() const
+	StreamerFeatherMode Streamer::GetFeatherMode() const
 	{
-		return _featherType;
+		return _featherMode;
 	}
 
 	BlendMode Streamer::GetBlendMode() const
@@ -110,7 +110,7 @@ namespace TEN::Effects::Streamer
 		// Avoid creating "clipped" streamers by clamping max life according to max segment count.
 		int lifeMax = (int)std::min(round(life * FPS), (float)SEGMENT_COUNT_MAX);
 
-		float alpha = (float(segmentCount + SEGMENT_SPAWN_INTERVAL_TIME) / (float)lifeMax) * FADE_IN_COEFF;
+		float alpha = (float(segmentCount * SEGMENT_SPAWN_INTERVAL_TIME) / (float)lifeMax) * FADE_IN_COEFF;
 		float opacityMax = EaseInOutSine(colorEnd.w, colorStart.w, alpha);
 
 		segment.Orientation = AxisAngle(dir, orient);
@@ -165,7 +165,7 @@ namespace TEN::Effects::Streamer
 
 	void StreamerGroup::AddStreamer(int tag, const Vector3& pos, const Vector3& dir, short orient, const Color& colorStart, const Color& colorEnd,
 									float width, float life, float vel, float expRate, short rot,
-									StreamerFeatherType featherType, BlendMode blendMode)
+									StreamerFeatherMode featherMode, BlendMode blendMode)
 	{
 		TENAssert(_pools.size() <= POOL_COUNT_MAX, "Streamer pool count overflow.");
 
@@ -174,7 +174,7 @@ namespace TEN::Effects::Streamer
 			return;
 
 		// Get and extend streamer iteration.
-		auto& streamer = GetStreamerIteration(tag, featherType, blendMode);
+		auto& streamer = GetStreamerIteration(tag, featherMode, blendMode);
 		streamer.Extend(pos, dir, orient, colorStart, colorEnd, width, life, vel, expRate, rot, (unsigned int)streamer.GetSegments().size());
 	}
 
@@ -202,7 +202,7 @@ namespace TEN::Effects::Streamer
 		return pool;
 	}
 
-	Streamer& StreamerGroup::GetStreamerIteration(int tag, StreamerFeatherType featherType, BlendMode blendMode)
+	Streamer& StreamerGroup::GetStreamerIteration(int tag, StreamerFeatherMode featherMode, BlendMode blendMode)
 	{
 		auto& pool = GetPool(tag);
 		TENAssert(pool.size() <= STREAMER_COUNT_MAX, "Streamer pool size overflow.");
@@ -220,7 +220,7 @@ namespace TEN::Effects::Streamer
 			pool.erase(pool.begin());
 
 		// Add and return new streamer iteration.
-		return pool.emplace_back(Streamer(featherType, blendMode));
+		return pool.emplace_back(Streamer(featherMode, blendMode));
 	}
 
 	void StreamerGroup::ClearInactivePools()
@@ -259,7 +259,7 @@ namespace TEN::Effects::Streamer
 
 	void StreamerEffectController::Spawn(int itemNumber, int tag, const Vector3& pos, const Vector3& dir, short orient, const Color& colorStart, const Color& colorEnd,
 										 float width, float life, float vel, float expRate, short rot,
-										 StreamerFeatherType featherType, BlendMode blendMode)
+										 StreamerFeatherMode featherMode, BlendMode blendMode)
 	{
 		TENAssert(_groups.size() <= GROUP_COUNT_MAX, "Streamer group count overflow.");
 
@@ -269,7 +269,7 @@ namespace TEN::Effects::Streamer
 
 		// Add new or extend existing streamer.
 		auto& group = GetGroup(itemNumber);
-		group.AddStreamer(tag, pos, dir, orient, colorStart, colorEnd, width, life, vel, expRate, rot, featherType, blendMode);
+		group.AddStreamer(tag, pos, dir, orient, colorStart, colorEnd, width, life, vel, expRate, rot, featherMode, blendMode);
 	}
 
 	void StreamerEffectController::Update()

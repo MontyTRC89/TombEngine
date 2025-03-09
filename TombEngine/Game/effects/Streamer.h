@@ -9,7 +9,7 @@ struct ItemInfo;
 
 namespace TEN::Effects::Streamer
 {
-	enum class StreamerFeatherType
+	enum class StreamerFeatherMode
 	{
 		None,
 		Center,
@@ -62,7 +62,7 @@ namespace TEN::Effects::Streamer
 
 		std::vector<StreamerSegment> _segments				 = {};
 		int							 _segmentSpawnTimeOffset = 0; // Time in game frames.
-		StreamerFeatherType			 _featherType			 = StreamerFeatherType::None;
+		StreamerFeatherMode			 _featherMode			 = StreamerFeatherMode::None;
 		BlendMode					 _blendMode				 = BlendMode::AlphaBlend;
 		bool						 _isBroken				 = false;
 
@@ -70,12 +70,12 @@ namespace TEN::Effects::Streamer
 	public:
 		// Constructors
 		
-		Streamer(StreamerFeatherType featherType, BlendMode blendMode);
+		Streamer(StreamerFeatherMode featherMode, BlendMode blendMode);
 
 		// Getters
 		
 		const std::vector<StreamerSegment>& GetSegments() const;
-		StreamerFeatherType					GetFeatherType() const;
+		StreamerFeatherMode					GetFeatherMode() const;
 		BlendMode							GetBlendMode() const;
 
 		// Inquirers
@@ -116,14 +116,14 @@ namespace TEN::Effects::Streamer
 
 		void AddStreamer(int tag, const Vector3& pos, const Vector3& dir, short orient, const Color& colorStart, const Color& colorEnd,
 						 float width, float life, float vel, float expRate, short rot,
-						 StreamerFeatherType featherType, BlendMode blendMode);
+						 StreamerFeatherMode featherMode, BlendMode blendMode);
 		void Update();
 
 	private:
 		// Helpers
 
 		std::vector<Streamer>& GetPool(int tag);
-		Streamer&			   GetStreamerIteration(int tag, StreamerFeatherType featherType, BlendMode blendMode);
+		Streamer&			   GetStreamerIteration(int tag, StreamerFeatherMode featherMode, BlendMode blendMode);
 		void				   ClearInactivePools();
 		void				   ClearInactiveStreamers(int tag);
 	};
@@ -149,7 +149,7 @@ namespace TEN::Effects::Streamer
 		// TODO: Use seconds.
 		void Spawn(int itemNumber, int tag, const Vector3& pos, const Vector3& dir, short orient, const Color& colorStart, const Color& colorEnd,
 				   float width, float life, float vel, float expRate, short rot,
-				   StreamerFeatherType featherType = StreamerFeatherType::None, BlendMode blendMode = BlendMode::AlphaBlend);
+				   StreamerFeatherMode featherMode = StreamerFeatherMode::None, BlendMode blendMode = BlendMode::AlphaBlend);
 		void Update();
 		void Clear();
 
