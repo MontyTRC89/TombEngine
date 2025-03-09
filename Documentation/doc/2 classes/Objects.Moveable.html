@@ -79,7 +79,7 @@
   <li>    <a href="../4 enums/Collision.MaterialType.html">Collision.MaterialType</a></li>
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
-  <li>    <a href="../4 enums/Effects.FeatherMode.html">Effects.FeatherMode</a></li>
+  <li>    <a href="../4 enums/Effects.ParticleAnimationType.html">Effects.ParticleAnimationType</a></li>
   <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
   <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
@@ -162,7 +162,7 @@
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetPosition">Moveable:GetPosition()</a></td>
-	<td class="summary">Get the moveable's position</td>
+	<td class="summary">Get the object's position</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:SetPosition">Moveable:SetPosition(position[, updateRoom])</a></td>
@@ -180,19 +180,11 @@
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetRotation">Moveable:GetRotation()</a></td>
-	<td class="summary">Get the moveable's rotation.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:GetScale">Moveable:GetScale()</a></td>
-	<td class="summary">Get the moveable's visual scale.</td>
+	<td class="summary">Get the moveable's rotation</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:SetRotation">Moveable:SetRotation(rotation)</a></td>
-	<td class="summary">Set the moveable's rotation.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#Moveable:SetScale">Moveable:SetScale(scale)</a></td>
-	<td class="summary">Set the moveable's visual scale.</td>
+	<td class="summary">Set the moveable's rotation</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetHP">Moveable:GetHP()</a></td>
@@ -722,7 +714,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
     <strong>Moveable:GetPosition()</strong>
     </dt>
     <dd>
-    Get the moveable's position
+    Get the object's position
 
 
 
@@ -834,7 +826,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
     <strong>Moveable:GetRotation()</strong>
     </dt>
     <dd>
-    Get the moveable's rotation.
+    Get the moveable's rotation
 
 
 
@@ -843,28 +835,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
     <ol>
 
            <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
-        A copy of the moveable's rotation.
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:GetScale"></a>
-    <strong>Moveable:GetScale()</strong>
-    </dt>
-    <dd>
-    Get the moveable's visual scale.
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-        A copy of the moveable's visual scale.
+        a copy of the moveable's rotation
     </ol>
 
 
@@ -876,7 +847,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
     <strong>Moveable:SetRotation(rotation)</strong>
     </dt>
     <dd>
-    Set the moveable's rotation.
+    Set the moveable's rotation
 
 
 
@@ -885,28 +856,6 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
         <li><span class="parameter">rotation</span>
             <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
          The moveable's new rotation
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "Moveable:SetScale"></a>
-    <strong>Moveable:SetScale(scale)</strong>
-    </dt>
-    <dd>
-    Set the moveable's visual scale.  Does not affect collision.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">scale</span>
-            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-         New visual scale.
         </li>
     </ul>
 

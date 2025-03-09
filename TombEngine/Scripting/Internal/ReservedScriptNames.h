@@ -311,6 +311,18 @@ static constexpr char ScriptReserved_HandleEvent[]					= "HandleEvent";
 static constexpr char ScriptReserved_EnableEvent[]					= "EnableEvent";
 static constexpr char ScriptReserved_DisableEvent[]					= "DisableEvent";
 
+static constexpr char ScriptReserved_EmitParticle[]					= "EmitParticle";
+static constexpr char ScriptReserved_EmitAdvancedParticle[]			= "EmitAdvancedParticle";
+static constexpr char ScriptReserved_EmitLightningArc[]				= "EmitLightningArc";
+static constexpr char ScriptReserved_EmitShockwave[]				= "EmitShockwave";
+static constexpr char ScriptReserved_EmitLight[]					= "EmitLight";
+static constexpr char ScriptReserved_EmitSpotLight[]				= "EmitSpotLight";
+static constexpr char ScriptReserved_EmitBlood[]					= "EmitBlood";
+static constexpr char ScriptReserved_EmitAirBubble[]				= "EmitAirBubble";
+static constexpr char ScriptReserved_EmitFire[]						= "EmitFire";
+static constexpr char ScriptReserved_MakeExplosion[]				= "MakeExplosion";
+static constexpr char ScriptReserved_MakeEarthquake[]				= "MakeEarthquake";
+static constexpr char ScriptReserved_GetWind[]		        		= "GetWind";
 static constexpr char ScriptReserved_Vibrate[]						= "Vibrate";
 static constexpr char ScriptReserved_FlashScreen[]					= "FlashScreen";
 static constexpr char ScriptReserved_FadeIn[]						= "FadeIn";
@@ -373,6 +385,7 @@ static constexpr char ScriptReserved_EndReason[]				= "EndReason";
 static constexpr char ScriptReserved_EventType[]				= "EventType";
 static constexpr char ScriptReserved_AlignMode[]				= "AlignMode";
 static constexpr char ScriptReserved_ScaleMode[]				= "ScaleMode";
+static constexpr char ScriptReserved_ParticleAnimationType[]	= "ParticleAnimationType";
 
 static constexpr char ScriptReserved_LevelVars[]	= "LevelVars";
 static constexpr char ScriptReserved_GameVars[]		= "GameVars";
@@ -386,24 +399,6 @@ static constexpr char ScriptReserved_LogLevelError[]	= "ERROR";
 
 // Internal
 static constexpr char ScriptReserved_LaraObject[] = "LaraObject";
-
-// =======
-// EFFECTS
-// =======
-
-constexpr char ScriptReserved_EmitAirBubble[]		= "EmitAirBubble";
-constexpr char ScriptReserved_EmitBlood[]			= "EmitBlood";
-constexpr char ScriptReserved_EmitFire[]			= "EmitFire";
-constexpr char ScriptReserved_EmitLight[]			= "EmitLight";
-constexpr char ScriptReserved_EmitLightningArc[]	= "EmitLightningArc";
-constexpr char ScriptReserved_EmitParticle[]		= "EmitParticle";
-constexpr char ScriptReserved_EmitShockwave[]		= "EmitShockwave";
-constexpr char ScriptReserved_EmitSpotLight[]		= "EmitSpotLight";
-constexpr char ScriptReserved_EmitStreamer[]		= "EmitStreamer";
-constexpr char ScriptReserved_GetWind[]				= "GetWind";
-constexpr char ScriptReserved_MakeEarthquake[]		= "MakeEarthquake";
-constexpr char ScriptReserved_MakeExplosion[]		= "MakeExplosion";
-constexpr char ScriptReserved_FeatherMode[]			= "FeatherMode";
 
 // =======
 // OBJECTS

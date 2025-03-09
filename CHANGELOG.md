@@ -29,6 +29,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
   - You must use this version: https://github.com/TombEngine/Resources/raw/refs/heads/main/Wad2%20Objects/Interactables/TEN_Waterfall_Emitter.wad2
 
 ### Lua API changes
+
+* Implemented advanced particles allowing animations and other effects.
 * Added Collision.Probe class for basic room collision detection.
 * Added diary module.
 * Added View.GetFlyByPosition() and View.GetFlyByRotation() functions to get flyby sequence parameters at a specified time point.

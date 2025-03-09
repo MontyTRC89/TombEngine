@@ -45,7 +45,6 @@
 </ul>
 <h2>2 Classes</h2>
 <ul class="nowrap">
-  <li>    <a href="../2 classes/Collision.Probe.html">Collision.Probe</a></li>
   <li>    <a href="../2 classes/Flow.Level.html">Flow.Level</a></li>
   <li>    <a href="../2 classes/Flow.Settings.html">Flow.Settings</a></li>
   <li>    <a href="../2 classes/Flow.Statistics.html">Flow.Statistics</a></li>
@@ -66,7 +65,7 @@
   <li>    <a href="../3 primitive classes/Flow.Fog.html">Flow.Fog</a></li>
   <li>    <a href="../3 primitive classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
   <li>    <a href="../3 primitive classes/Flow.LensFlare.html">Flow.LensFlare</a></li>
-  <li>    <here>Flow.SkyLayer</here></li>
+  <li>    <a href="../3 primitive classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
   <li>    <a href="../3 primitive classes/Flow.Starfield.html">Flow.Starfield</a></li>
   <li>    <a href="../3 primitive classes/Color.html">Color</a></li>
   <li>    <a href="../3 primitive classes/Rotation.html">Rotation</a></li>
@@ -76,10 +75,9 @@
 </ul>
 <h2>4 Enums</h2>
 <ul class="nowrap">
-  <li>    <a href="../4 enums/Collision.MaterialType.html">Collision.MaterialType</a></li>
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
-  <li>    <a href="../4 enums/Effects.ParticleAnimationType.html">Effects.ParticleAnimationType</a></li>
+  <li>    <here>Effects.ParticleAnimationType</here></li>
   <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
   <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
@@ -111,111 +109,48 @@
 
 <div id="content">
 
-<h1>Primitive Class <code>Flow.SkyLayer</code></h1>
-<p>Describes a layer of moving clouds.</p>
-<p>As seen in TR4's City of the Dead.</p>
-
-
-<h2><a href="#Members">Members</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" ><a href="#color">color</a></td>
-	<td class="summary">(<a href="../3 primitive classes/Color.html#">Color</a>) RGB sky color</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#speed">speed</a></td>
-	<td class="summary">(int) cloud speed.</td>
-	</tr>
-</table>
-<h2><a href="#Functions">Functions</a></h2>
-<table class="function_list">
-	<tr>
-	<td class="name" ><a href="#SkyLayer">SkyLayer(color, speed)</a></td>
-	<td class="summary">
-
-</td>
-	</tr>
-</table>
-
-<br/>
-<br/>
-
-
-    <h2 class="section-header "><a name="Members"></a>Members</h2>
-
-    <dl class="function">
-    <dt>
-    <a name = "color"></a>
-    <strong>color</strong>
-    </dt>
-    <dd>
-    (<a href="../3 primitive classes/Color.html#">Color</a>) RGB sky color
-
-
-
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "speed"></a>
-    <strong>speed</strong>
-    </dt>
-    <dd>
-    (int) cloud speed. </p>
-
-<pre><code>    Values can be between [-32768, 32767], with positive numbers resulting in a sky that scrolls from
-    west to east, and negative numbers resulting in one that travels east to west.
-
-    Please note that speeds outside of the range of about [-1000, 1000] will cause the
-    sky to scroll so fast that it will no longer appear as a coherent stream of clouds.
-    Less is more. City of The Dead, for example, uses a speed value of 16.
-</code></pre>
+<h1>Enum <code>Effects.ParticleAnimationType</code></h1>
+<p>Constants for particle animation type constants.</p>
 <p>
 
+</p>
 
 
+<h2><a href="#Tables">Tables</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#Effects.ParticleAnimationType">Effects.ParticleAnimationType</a></td>
+	<td class="summary">Table of Effects.ParticleAnimationType type constants.</td>
+	</tr>
+</table>
+
+<br/>
+<br/>
 
 
-
-
-
-</dd>
-</dl>
-    <h2 class="section-header "><a name="Functions"></a>Functions</h2>
+    <h2 class="section-header "><a name="Tables"></a>Tables</h2>
 
     <dl class="function">
     <dt>
-    <a name = "SkyLayer"></a>
-    <strong>SkyLayer(color, speed)</strong>
+    <a name = "Effects.ParticleAnimationType"></a>
+    <strong>Effects.ParticleAnimationType</strong>
     </dt>
     <dd>
 
+<p>Table of Effects.ParticleAnimationType type constants.  To be used with particles.</p>
+
+<ul>
+    <li><code>LOOP</code> - Frames loop sequentially.</li>
+    <li><code>ONE_SHOT</code> - Frames play once and freeze on the last frame.</li>
+    <li><code>BACK_AND_FORTH</code> - Frames bounce back and forth.</li>
+    <li><code>LIFE_TIME_SPREAD</code> - Frames are distributed over the particle's lifetime</li>
+</ul>
 
 
 
 
 
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">color</span>
-            <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
-         RGB color
-        </li>
-        <li><span class="parameter">speed</span>
-            <span class="types"><span class="type">int</span></span>
-         cloud speed
-        </li>
-    </ul>
 
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../3 primitive classes/Flow.SkyLayer.html#SkyLayer">SkyLayer</a></span>
-        A SkyLayer object.
-    </ol>
 
 
 
