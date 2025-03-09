@@ -3,37 +3,76 @@
 The dates are in European standard format where date is presented as **YYYY-MM-DD**.
 TombEngine releases are located in this repository (alongside with Tomb Editor): https://github.com/TombEngine/TombEditorReleases
 
-## [Version 1.7.X] (link to release) - yyyy-mm-dd
+## [Version 1.8](link to release) - yyyy-mm-dd
 
 ### Bug fixes
+* Fixed bridges moving the player when the player is underwater.
+* Fixed trigger triggerer not working.
+* Fixed display pickup numeric string not being interpolated in high framerate mode.
+* Fixed two block platform room portal traversal failing in some cases.
+* Fixed incorrect handling of dynamic light shadows.
+* Fixed ricochet flashes after using explosive weapons.
+* Fixed incorrect flare draw in crawl state.
+* Fixed starfield remaining active in the next level if it does not have a starfield specified.
+* Fixed wetness player attribute not being preserved in savegames.
+* Fixed invisible HK ammo in the inventory.
+* Fixed flickering rat emitter.
+* Fixed player model submerging into the floor while swimming underwater.
+* Fixed custom shatter sounds with custom sound IDs not playing correctly.
+* Fixed crashes with sound samples larger than 2 megabytes.
 
 ### New Features
+* Added multithreading and an option for it to flow system settings.
+* Added ability to use floor trapdoors, keys and puzzle items underwater.
+  - You must update your Lara object: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Lara/TEN_Lara.wad2
+* Added a particle based waterfall emitter object and associated sprite slots.
+  - You must use this version: https://github.com/TombEngine/Resources/raw/refs/heads/main/Wad2%20Objects/Interactables/TEN_Waterfall_Emitter.wad2
+* Added TR1 Hammer.
+  - You must use this version: <insert address here>
+* Added TR3 Moving Laser.
+* Added TR4 Statue Plinth.
 
 ### Lua API changes
+
+* Added Collision.Probe class for basic room collision detection.
+* Added advanced particle emitter allowing animations and other effects.
+* Added diary module.
+* Added custom bar module.
+* Added Flow.Horizon class with and use two layers of horizons in a Flow.Level class.
+* Added View.GetFlyByPosition() and View.GetFlyByRotation() functions to get flyby sequence parameters at a specified time point.
+* Added Effects.EmitAirBubble() function to spawn air bubbles.
+* Added Effects.EmitStreamer() function to emit streamers.
+* Added Moveable:GetScale() and Movebale:SetScale() methods to set visible scale of moveables.
+* Added Rotation:Lerp() function to allow linear interpolation between rotations.
+* Added various Translate() methods to Vec2 and Vec3 script objects.
+* Added alpha transparency functionality for statics and moveables to be used with SetColor() method.
+* Added extra arguments for sprite object slots and starting rotation value for EmitParticle function.
+* Added ability to save Flow.Level fields such as fog or horizon to a savegame.
 * Refactoring Timer and EventSequence modules
 * Timer module uses the Time class for greater precision
 * Timer module containing new methods
 
-## [Version 1.7.1] (https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.4) - 2025-04-01
+## [Version 1.7.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.4) - 2025-04-01
 
 ### Bug fixes
 * Fixed static meshes with dynamic light mode not accepting room lights.
-* Fixed silent crashes if no Visual C++ runtimes are installed, and provide a dialog box to download them instead.
+* Fixed silent crashes if no Visual C++ runtimes are installed and provide a dialog box to download them instead.
 * Fixed issues with launching the engine from directories with non-Western characters in the path.
 * Fixed rare case of not being able to start a new game or exit game from the main menu on very slow GPUs.
 * Fixed occasional crashes with creatures stuck in a sector with no pathfinding set.
 * Fixed occasional cases of underwater switch animation not playing, if player spams jump key while pulling the switch.
-* Fixed player's blob shadows not rendering on moveables and static meshes.
+* Fixed player's  blob shadows not rendering on moveables and static meshes.
 * Fixed antialiasing quality not changing after changing it in display settings.
 * Fixed endless explosion effect for Puna.
 * Fixed diary pick-up item inventory state not preserved in the savegame.
+* Fixed gravity being applied underwater when exiting the fly cheat.
 * Fixed gravity being applied when vaulting on the same frame as the player lands.
-* Fixed unreliable stop at an edge when running at it while holding walk button.
 
 ### New Features
 * Added realtime shader reloading in debug mode by pressing F9 key.
 * Added load, save, stopwatch and compass as a functional pick-up items with ability to add or remove them from inventory.
 * Increased particle limit from 1024 to 4096.
+* Added ability for the player to more reliably stop at an edge when running at it while holding Walk.
 
 ### Lua API changes
 * Fixed Flow.FreezeMode.FULL drawing incorrect background.
