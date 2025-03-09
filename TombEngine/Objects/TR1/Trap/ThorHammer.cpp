@@ -48,7 +48,7 @@ namespace TEN::Entities::Traps
 	{
 		auto& headItem = g_Level.Items[itemNumber];
 
-		int handleItemNumber = SpawnItem(headItem, ID_HAMMER_HEAD);
+		int handleItemNumber = SpawnItem(headItem, ID_THOR_HAMMER_HEAD);
 		if (handleItemNumber == NO_VALUE)
 		{
 			TENLog("Failed to create hammer handle moveable.", LogLevel::Warning);

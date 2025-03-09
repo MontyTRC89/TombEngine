@@ -252,10 +252,10 @@ static void StartTrap(ObjectInfo* obj)
 		obj->SetHitEffect(true);
 	}
 	
-	obj = &Objects[ID_HAMMER_HANDLE];
+	obj = &Objects[ID_THOR_HAMMER_HANDLE];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_HAMMER_HEAD, "ID_HAMMER_HEAD");
+		CheckIfSlotExists(ID_THOR_HAMMER_HEAD, "Thor hammer");
 		obj->Initialize = InitializeThorHammer;
 		obj->collision = CollideThorHammerHandle;
 		obj->control = ControlThorHammer;
@@ -263,10 +263,10 @@ static void StartTrap(ObjectInfo* obj)
 		obj->SetHitEffect(true);
 	}
 
-	obj = &Objects[ID_HAMMER_HEAD];
+	obj = &Objects[ID_THOR_HAMMER_HEAD];
 	if (obj->loaded)
 	{
-		CheckIfSlotExists(ID_HAMMER_HANDLE, "ID_HAMMER_HANDLE");
+		CheckIfSlotExists(ID_THOR_HAMMER_HANDLE, "Thor hammer");
 		obj->collision = CollideThorHammer;
 		obj->shadowType = ShadowMode::All;
 		obj->SetHitEffect(true);
