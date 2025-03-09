@@ -1,5 +1,4 @@
 ------
---- Custom Bars - Draws custom bars on screen.
 -- This module provides functions for creating and managing custom progress bars. It stores bar definitions and configurations in `LevelVars.Engine.CustomBars`, enabling seamless state management. 
 -- Each bar is independently controlled through its associated functions.
 --
@@ -7,48 +6,48 @@
 --
 --	local CustomBar = require("Engine.CustomBar")
 --
---	--Create a table with all the bar properties
+--	-- Create a table with all the bar properties
 --	local barData = {
---	barName             = "water",
---	startValue          = 0,
---	maxValue            = 1000,
---	objectIdBg          = TEN.Objects.ObjID.CUSTOM_BAR_GRAPHIC,
---	spriteIdBg          = 0,
---	colorBg             = TEN.Color(255,255,255),
---	posBg               = TEN.Vec2(20, 20),
---	rotBg               = 0,
---	scaleBg             = TEN.Vec2(19.05, 19.1),
---	alignModeBg         = TEN.View.AlignMode.CENTER_LEFT,
---	scaleModeBg         = TEN.View.ScaleMode.FIT,
---	blendModeBg         = TEN.Effects.BlendID.ALPHABLEND,
---	objectIdBar         = TEN.Objects.ObjID.CUSTOM_BAR_GRAPHIC,
---	spriteIdBar         = 1,
---	colorBar            = TEN.Color(255,0,0),
---	posBar              = TEN.Vec2(20.15, 20),
---	rot                 = 0,
---	scaleBar            = TEN.Vec2(18.7, 18.48),
---	alignMode           = TEN.View.AlignMode.CENTER_LEFT,
---	scaleMode           = TEN.View.ScaleMode.FIT,
---	blendMode           = TEN.Effects.BlendID.ALPHABLEND,
---	text                = "Water Bar",
---	textPos             = TEN.Vec2(20, 15),
---	textOptions         = {TEN.Strings.DisplayStringOption.SHADOW,TEN.Strings.DisplayStringOption.CENTER},
---	textScale           = 1,
---	textColor           = TEN.Color(255,0,0),
---	hideText            = false,
---	alphaBlendSpeed     = 50,
---	blink               = false,
---	blinkLimit          = 0.25
+--		barName             = "water",
+--		startValue          = 0,
+--		maxValue            = 1000,
+--		objectIdBg          = TEN.Objects.ObjID.CUSTOM_BAR_GRAPHIC,
+--		spriteIdBg          = 0,
+--		colorBg             = TEN.Color(255,255,255),
+--		posBg               = TEN.Vec2(20, 20),
+--		rotBg               = 0,
+--		scaleBg             = TEN.Vec2(19.05, 19.1),
+--		alignModeBg         = TEN.View.AlignMode.CENTER_LEFT,
+--		scaleModeBg         = TEN.View.ScaleMode.FIT,
+--		blendModeBg         = TEN.Effects.BlendID.ALPHABLEND,
+--		objectIdBar         = TEN.Objects.ObjID.CUSTOM_BAR_GRAPHIC,
+--		spriteIdBar         = 1,
+--		colorBar            = TEN.Color(255,0,0),
+--		posBar              = TEN.Vec2(20.15, 20),
+--		rot                 = 0,
+--		scaleBar            = TEN.Vec2(18.7, 18.48),
+--		alignMode           = TEN.View.AlignMode.CENTER_LEFT,
+--		scaleMode           = TEN.View.ScaleMode.FIT,
+--		blendMode           = TEN.Effects.BlendID.ALPHABLEND,
+--		text                = "Water Bar",
+--		textPos             = TEN.Vec2(20, 15),
+--		textOptions         = {TEN.Strings.DisplayStringOption.SHADOW,TEN.Strings.DisplayStringOption.CENTER},
+--		textScale           = 1,
+--		textColor           = TEN.Color(255,0,0),
+--		hideText            = false,
+--		alphaBlendSpeed     = 50,
+--		blink               = false,
+--		blinkLimit          = 0.25
 --	}
 --
---	--This function creates the bar.
+--	-- This function creates the bar.
 --	CustomBar.Create(barData)
 --
---	--This method gets the bar with name "water" and stores it in variable bar.
+--	-- This method gets the bar with name "water" and stores it in variable bar.
 --	local bar = CustomBar.Get("water")
---	--This method displays the bar
+--	-- This method displays the bar
 --	bar:SetVisibility(true)
---	--This method sets the bar value to 1000 over 5 seconds.
+--	-- This method sets the bar value to 1000 over 5 seconds.
 --	bar:SetBarValue(1000,5)
 --
 -- @luautil CustomBar
@@ -406,7 +405,7 @@ CustomBar.SetEnemiesHpGenericBar = function (enemiesBarData)
 end
 
 --- The function retrieves an existing bar instance by its unique identifier (barName). This function is useful when you need to access or manipulate a bar that has already been created.
--- @string barName: The unique identifier assigned to the bar when it was created using CustomBar.New
+-- @string barName The unique identifier assigned to the bar when it was created using CustomBar.New
 CustomBar.Get = function(barName)
 	local dataName = barName .. "_bar_data"
     if LevelVars.Engine.CustomBars.bars[dataName] then
@@ -416,7 +415,7 @@ CustomBar.Get = function(barName)
 end
 
 --- The function removes a custom bar and its associated data from the system. It ensures that the bar is no longer tracked or accessible in the LevelVars.Engine.CustomBars.bars table.
--- @string barName: The name of the custom bar to be deleted.
+-- @string barName The name of the custom bar to be deleted.
 CustomBar.Delete = function (barName)
     local dataName = barName .. "_bar_data"
 	if LevelVars.Engine.CustomBars.bars[dataName] then
@@ -425,8 +424,8 @@ CustomBar.Delete = function (barName)
 end
 
 --- The function sets the value of a custom bar over a specified time period.
--- @number value: The new target to which the bar's current value should transition. (Must be a non-negative number; between 0 and the bar's maxValue.
--- @number time: The time (in seconds) over which the bar's value should transition to the target value.
+-- @number value The new target to which the bar's current value should transition. (Must be a non-negative number; between 0 and the bar's maxValue.
+-- @number time The time (in seconds) over which the bar's value should transition to the target value.
 function CustomBar:SetBarValue(value, time)
 	if LevelVars.Engine.CustomBars.bars[self.name] then
 		if type(value) =="number" and value >= 0 then
@@ -440,8 +439,8 @@ function CustomBar:SetBarValue(value, time)
 end
 
 --- The function adjusts the bar's value relative to its current or target value over a specified time span.
--- @number value: The relative value to add (positive or negative) to the current bar value.
--- @number time: The duration (in seconds) over which the change should occur.
+-- @number value The relative value to add (positive or negative) to the current bar value.
+-- @number time The duration (in seconds) over which the change should occur.
 function CustomBar:ChangeBarValueOverTimespan(value, time)
     -- Check if bar data and timer exist
 	if LevelVars.Engine.CustomBars.bars[self.name] then
@@ -466,7 +465,7 @@ function CustomBar:ChangeBarValueOverTimespan(value, time)
 end
 
 --- The function controls the visibility of a custom bar.
--- @bool visible: true: Makes the bar visible.; false: Hides the bar.
+-- @bool visible true: Makes the bar visible.; false: Hides the bar.
 function CustomBar:SetVisibility(visible)
     --the visible variable is a boolean
 	if LevelVars.Engine.CustomBars.bars[self.name] then
