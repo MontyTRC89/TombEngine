@@ -39,9 +39,9 @@ namespace TEN::Scripting
 
 	/// Create a LensFlare object.
 	// @function LensFlare
-	// @tparam float Pitch angle in degrees.
-	// @tparam float Yaw angle in degrees.
-	// @tparam Color Color.
+	// @tparam float pitch Pitch angle in degrees.
+	// @tparam float yaw Yaw angle in degrees.
+	// @tparam Color color Color of the lensflare.
 	// @treturn LensFlare A new LensFlare object.
 	LensFlare::LensFlare(float pitch, float yaw, const ScriptColor& color)
 	{
@@ -91,7 +91,7 @@ namespace TEN::Scripting
 
 	/// Set this lens flare's sun sprite ID.
 	// @function LensFlare:SetSunSpriteID
-	// @tparam int New sun sprite ID.
+	// @tparam int spriteID New sun sprite ID.
 	void LensFlare::SetSunSpriteID(int spriteID)
 	{
 		// Sprite ID out of range; return early.
@@ -106,7 +106,7 @@ namespace TEN::Scripting
 
 	/// Set this lens flare's pitch angle.
 	// @function LensFlare:SetPitch
-	// @tparam float New pitch angle in degrees.
+	// @tparam float pitch New pitch angle in degrees.
 	void LensFlare::SetPitch(float pitch)
 	{
 		_rotation.x = pitch;
@@ -114,7 +114,7 @@ namespace TEN::Scripting
 
 	/// Set this lens flare's yaw angle.
 	// @function LensFlare:SetYaw
-	// @tparam float New yaw angle in degrees.
+	// @tparam float yaw New yaw angle in degrees.
 	void LensFlare::SetYaw(float yaw)
 	{
 		_rotation.y = yaw;
@@ -122,7 +122,7 @@ namespace TEN::Scripting
 	
 	/// Set this lens flare's color.
 	// @function LensFlare:SetColor
-	// @tparam Color New color.
+	// @tparam Color color New color.
 	void LensFlare::SetColor(const ScriptColor& color)
 	{
 		_color = color;

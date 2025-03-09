@@ -58,7 +58,7 @@ namespace TEN::Effects::SmokeEmitter
 		constexpr auto PART_SIZE_MIN		= 128.0f;
 		constexpr auto FADE_SPEED_MAX		= 9;
 		constexpr auto FADE_SPEED_MIN		= 6;
-		constexpr auto DAMAGE_TIME_INTERVAL = 0.02f;
+		constexpr auto DAMAGE_TIME_INTERVAL = 1;
 
 		static const auto SPHERE = BoundingSphere(Vector3::Zero, 32.0f);
 
@@ -384,7 +384,7 @@ namespace TEN::Effects::SmokeEmitter
 					steamPauseTimer = item.TriggerFlags >> 4;
 				}
 
-				SoundEffect(SFX_TEN_STEAM_EMITTER_LOOP, &item.Pose);
+				SoundEffect(SFX_TR4_STEAM_EMITTER_LOOP, &item.Pose);
 			}
 
 			if (!drawNormalSmoke)
