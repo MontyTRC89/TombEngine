@@ -51,7 +51,7 @@ RGBAColor8Byte::RGBAColor8Byte(const Vector4& color)
 	r = FloatComponentToByte(color.x);
 	g = FloatComponentToByte(color.y);
 	b = FloatComponentToByte(color.z);
-	a = FloatComponentToByte(color.w);
+	a = FloatComponentToByte(color.w * 2);
 }
 
 byte RGBAColor8Byte::GetR() const
