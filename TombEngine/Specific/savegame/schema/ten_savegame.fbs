@@ -584,6 +584,7 @@ table SaveGameStatistics {
 	damage_taken: int32;
 	distance: int32;
 	kills: int32;
+	pickups: int32;
 	secrets: int32;
 	timer: int32;
 }

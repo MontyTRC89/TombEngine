@@ -7858,6 +7858,7 @@ struct SaveGameStatisticsT : public flatbuffers::NativeTable {
   int32_t damage_taken = 0;
   int32_t distance = 0;
   int32_t kills = 0;
+  int32_t pickups = 0;
   int32_t secrets = 0;
   int32_t timer = 0;
 };
@@ -7873,8 +7874,9 @@ struct SaveGameStatistics FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_DAMAGE_TAKEN = 10,
     VT_DISTANCE = 12,
     VT_KILLS = 14,
-    VT_SECRETS = 16,
-    VT_TIMER = 18
+    VT_PICKUPS = 16,
+    VT_SECRETS = 18,
+    VT_TIMER = 20
   };
   int32_t ammo_hits() const {
     return GetField<int32_t>(VT_AMMO_HITS, 0);
@@ -7894,6 +7896,9 @@ struct SaveGameStatistics FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t kills() const {
     return GetField<int32_t>(VT_KILLS, 0);
   }
+  int32_t pickups() const {
+    return GetField<int32_t>(VT_PICKUPS, 0);
+  }
   int32_t secrets() const {
     return GetField<int32_t>(VT_SECRETS, 0);
   }
@@ -7908,6 +7913,7 @@ struct SaveGameStatistics FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_DAMAGE_TAKEN) &&
            VerifyField<int32_t>(verifier, VT_DISTANCE) &&
            VerifyField<int32_t>(verifier, VT_KILLS) &&
+           VerifyField<int32_t>(verifier, VT_PICKUPS) &&
            VerifyField<int32_t>(verifier, VT_SECRETS) &&
            VerifyField<int32_t>(verifier, VT_TIMER) &&
            verifier.EndTable();
@@ -7939,6 +7945,9 @@ struct SaveGameStatisticsBuilder {
   void add_kills(int32_t kills) {
     fbb_.AddElement<int32_t>(SaveGameStatistics::VT_KILLS, kills, 0);
   }
+  void add_pickups(int32_t pickups) {
+    fbb_.AddElement<int32_t>(SaveGameStatistics::VT_PICKUPS, pickups, 0);
+  }
   void add_secrets(int32_t secrets) {
     fbb_.AddElement<int32_t>(SaveGameStatistics::VT_SECRETS, secrets, 0);
   }
@@ -7964,11 +7973,13 @@ inline flatbuffers::Offset<SaveGameStatistics> CreateSaveGameStatistics(
     int32_t damage_taken = 0,
     int32_t distance = 0,
     int32_t kills = 0,
+    int32_t pickups = 0,
     int32_t secrets = 0,
     int32_t timer = 0) {
   SaveGameStatisticsBuilder builder_(_fbb);
   builder_.add_timer(timer);
   builder_.add_secrets(secrets);
+  builder_.add_pickups(pickups);
   builder_.add_kills(kills);
   builder_.add_distance(distance);
   builder_.add_damage_taken(damage_taken);
@@ -11269,6 +11280,7 @@ inline void SaveGameStatistics::UnPackTo(SaveGameStatisticsT *_o, const flatbuff
   { auto _e = damage_taken(); _o->damage_taken = _e; }
   { auto _e = distance(); _o->distance = _e; }
   { auto _e = kills(); _o->kills = _e; }
+  { auto _e = pickups(); _o->pickups = _e; }
   { auto _e = secrets(); _o->secrets = _e; }
   { auto _e = timer(); _o->timer = _e; }
 }
@@ -11287,6 +11299,7 @@ inline flatbuffers::Offset<SaveGameStatistics> CreateSaveGameStatistics(flatbuff
   auto _damage_taken = _o->damage_taken;
   auto _distance = _o->distance;
   auto _kills = _o->kills;
+  auto _pickups = _o->pickups;
   auto _secrets = _o->secrets;
   auto _timer = _o->timer;
   return TEN::Save::CreateSaveGameStatistics(
@@ -11297,6 +11310,7 @@ inline flatbuffers::Offset<SaveGameStatistics> CreateSaveGameStatistics(flatbuff
       _damage_taken,
       _distance,
       _kills,
+      _pickups,
       _secrets,
       _timer);
 }
