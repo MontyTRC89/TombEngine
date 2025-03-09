@@ -48,9 +48,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added alpha transparency functionality for statics and moveables to be used with SetColor() method.
 * Added extra arguments for sprite object slots and starting rotation value for EmitParticle function.
 * Added ability to save Flow.Level fields such as fog or horizon to a savegame.
-* Refactoring Timer and EventSequence modules
-* Timer module uses the Time class for greater precision
-* Timer module containing new methods
 
 ## [Version 1.7.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.4) - 2025-04-01
 
