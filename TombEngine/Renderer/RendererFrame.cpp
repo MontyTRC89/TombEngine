@@ -5,6 +5,7 @@
 #include "Game/camera.h"
 #include "Game/collision/Sphere.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/weather.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Setup.h"
@@ -16,8 +17,9 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
-using namespace TEN::Entities::Effects;
 using namespace TEN::Collision::Sphere;
+using namespace TEN::Effects::Environment;
+using namespace TEN::Entities::Effects;
 using namespace TEN::Math;
 using namespace TEN::Utils;
 
