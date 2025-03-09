@@ -12,6 +12,7 @@
 #include "Game/control/volume.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/effects.h"
+#include "Game/effects/weather.h"
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/Lara/lara.h"
@@ -30,6 +31,7 @@
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "Renderer/Renderer.h"
+#include "Scripting/Internal/TEN/Flow//Level/FlowLevel.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
@@ -42,6 +44,7 @@ using namespace flatbuffers;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Items;
+using namespace TEN::Effects::Environment;
 using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
@@ -89,97 +92,89 @@ void SaveGame::LoadHeaders()
 	}
 }
 
-Save::Pose FromPose(const Pose& pose)
-{
-	return Save::Pose(
-		pose.Position.x,
-		pose.Position.y,
-		pose.Position.z,
-		pose.Orientation.x,
-		pose.Orientation.y,
-		pose.Orientation.z);
-}
-
-Save::EulerAngles FromEulerAngles(const EulerAngles& eulers)
+static Save::EulerAngles FromEulerAngles(const EulerAngles& eulers)
 {
 	return Save::EulerAngles(eulers.x, eulers.y, eulers.z);
 }
 
-Save::Vector2 FromVector2(const Vector2& vec)
+static Save::Vector2 FromVector2(const Vector2& vec)
 {
 	return Save::Vector2(vec.x, vec.y);
 }
 
-Save::Vector2 FromVector2i(const Vector2i& vec)
+static Save::Vector2 FromVector2i(const Vector2i& vec)
 {
 	return Save::Vector2(vec.x, vec.y);
 }
 
-Save::Vector3 FromVector3(const Vector3& vec)
+static Save::Vector3 FromVector3(const Vector3& vec)
 {
 	return Save::Vector3(vec.x, vec.y, vec.z);
 }
 
-Save::Vector3 FromVector3i(const Vector3i& vec)
+static Save::Vector3 FromVector3i(const Vector3i& vec)
 {
 	return Save::Vector3(vec.x, vec.y, vec.z);
 }
 
-Save::Vector4 FromVector4(const Vector4& vec)
+static Save::Vector4 FromVector4(const Vector4& vec)
 {
 	return Save::Vector4(vec.x, vec.y, vec.z, vec.w);
 }
 
-Save::GameVector FromGameVector(const GameVector& vec)
+static Save::GameVector FromGameVector(const GameVector& vec)
 {
 	return Save::GameVector(vec.x, vec.y, vec.z, (int)vec.RoomNumber);
 }
 
-Pose ToPose(const Save::Pose& pose)
+static Save::Pose FromPose(const Pose& pose)
 {
-	return Pose(
-		pose.x_pos(), pose.y_pos(), pose.z_pos(),
-		(short)pose.x_rot(), (short)pose.y_rot(), (short)pose.z_rot());
+	return Save::Pose(FromVector3i(pose.Position), FromEulerAngles(pose.Orientation), FromVector3(pose.Scale));
 }
 
-EulerAngles ToEulerAngles(const Save::EulerAngles* eulers)
+static EulerAngles ToEulerAngles(const Save::EulerAngles* eulers)
 {
 	return EulerAngles((short)round(eulers->x()), (short)round(eulers->y()), (short)round(eulers->z()));
 }
 
-Vector2 ToVector2(const Save::Vector2* vec)
+static Vector2 ToVector2(const Save::Vector2* vec)
 {
 	return Vector2(vec->x(), vec->y());
 }
 
-Vector2i ToVector2i(const Save::Vector2* vec)
+static Vector2i ToVector2i(const Save::Vector2* vec)
 {
 	return Vector2i((int)round(vec->x()), (int)round(vec->y()));
 }
 
-Vector3i ToVector3i(const Save::Vector3* vec)
+static Vector3i ToVector3i(const Save::Vector3* vec)
 {
 	return Vector3i((int)round(vec->x()), (int)round(vec->y()), (int)round(vec->z()));
 }
 
-Vector3 ToVector3(const Save::Vector3* vec)
+static Vector3 ToVector3(const Save::Vector3* vec)
 {
 	return Vector3(vec->x(), vec->y(), vec->z());
 }
 
-Vector4 ToVector4(const Save::Vector3* vec)
+static Vector4 ToVector4(const Save::Vector3* vec)
 {
 	return Vector4(vec->x(), vec->y(), vec->z(), 1.0f);
 }
 
-Vector4 ToVector4(const Save::Vector4* vec)
+static Vector4 ToVector4(const Save::Vector4* vec)
 {
 	return Vector4(vec->x(), vec->y(), vec->z(), vec->w());
 }
 
-GameVector ToGameVector(const Save::GameVector* vec)
+static GameVector ToGameVector(const Save::GameVector* vec)
 {
 	return GameVector(vec->x(), vec->y(), vec->z(), (short)vec->room_number());
+}
+
+static Pose ToPose(const Save::Pose& pose)
+{
+	return Pose(ToVector3i(&pose.position()), ToEulerAngles(&pose.orientation()), ToVector3(&pose.scale()));
 }
 
 bool SaveGame::IsSaveGameSlotValid(int slot)
@@ -337,12 +332,12 @@ const std::vector<byte> SaveGame::Build()
 
 	std::vector<float> bubbleNodes;
 	for (int i = 0; i < Lara.Effect.BubbleNodes.size(); i++)
-		bubbleNodes.push_back(Lara.Effect.BubbleNodes[i] == 1);
+		bubbleNodes.push_back(Lara.Effect.BubbleNodes[i]);
 	auto bubbleNodesOffset = fbb.CreateVector(bubbleNodes);
 	
 	std::vector<float> dripNodes;
 	for (int i = 0; i < Lara.Effect.DripNodes.size(); i++)
-		dripNodes.push_back(Lara.Effect.DripNodes[i] == 1);
+		dripNodes.push_back(Lara.Effect.DripNodes[i]);
 	auto dripNodesOffset = fbb.CreateVector(dripNodes);
 
 	std::vector<int> subsuitVelocity{};
@@ -978,8 +973,8 @@ const std::vector<byte> SaveGame::Build()
 
 	// Action queue
 	std::vector<int> actionQueue;
-	for (int i = 0; i < ActionQueue.size(); i++)
-		actionQueue.push_back((int)ActionQueue[i]);
+	for (int i = 0; i < ActionQueueMap.size(); i++)
+		actionQueue.push_back((int)ActionQueueMap[(InputActionID)i]);
 	auto actionQueueOffset = fbb.CreateVector(actionQueue);
 
 	// Flipmaps
@@ -1054,16 +1049,20 @@ const std::vector<byte> SaveGame::Build()
 		{
 			auto& currVolume = room->TriggerVolumes[j];
 
-			std::vector<flatbuffers::Offset<Save::VolumeState>> queue;
+			auto queue = std::vector<flatbuffers::Offset<Save::VolumeState>>{};
 			for (int k = 0; k < currVolume.StateQueue.size(); k++)
 			{
 				auto& entry = currVolume.StateQueue[k];
 
 				int activator = NO_VALUE;
-				if (std::holds_alternative<short>(entry.Activator))
-					activator = std::get<short>(entry.Activator);
+				if (std::holds_alternative<int>(entry.Activator))
+				{
+					activator = std::get<int>(entry.Activator);
+				}
 				else
+				{
 					continue;
+				}
 
 				Save::VolumeStateBuilder volstate{ fbb };
 				volstate.add_status((int)entry.Status);
@@ -1089,6 +1088,54 @@ const std::vector<byte> SaveGame::Build()
 	}
 	auto staticMeshesOffset = fbb.CreateVector(staticMeshes);
 	auto volumesOffset = fbb.CreateVector(volumes);
+
+	// Level state
+	auto* level = (Level*)g_GameFlow->GetLevel(CurrentLevel);
+	Save::LevelDataBuilder levelData { fbb };
+
+	levelData.add_level_far_view(level->LevelFarView);
+
+	levelData.add_fog_enabled(level->Fog.Enabled);
+	levelData.add_fog_color(level->Fog.GetColor());
+	levelData.add_fog_min_distance(level->Fog.MinDistance);
+	levelData.add_fog_max_distance(level->Fog.MaxDistance);
+
+	levelData.add_sky_layer_1_enabled(level->GetSkyLayerEnabled(0));
+	levelData.add_sky_layer_1_color(level->GetSkyLayerColor(0));
+	levelData.add_sky_layer_1_speed(level->GetSkyLayerSpeed(0));
+
+	levelData.add_sky_layer_2_enabled(level->GetSkyLayerEnabled(1));
+	levelData.add_sky_layer_2_color(level->GetSkyLayerColor(1));
+	levelData.add_sky_layer_2_speed(level->GetSkyLayerSpeed(1));
+
+	levelData.add_lensflare_color(level->LensFlare.GetColor());
+	levelData.add_lensflare_pitch(level->LensFlare.GetPitch());
+	levelData.add_lensflare_yaw(level->LensFlare.GetYaw());
+	levelData.add_lensflare_sprite_id(level->LensFlare.GetSunSpriteID());
+
+	levelData.add_starfield_meteor_count(level->Starfield.GetMeteorCount());
+	levelData.add_starfield_meteor_spawn_density(level->Starfield.GetMeteorSpawnDensity());
+	levelData.add_starfield_meteor_velocity(level->Starfield.GetMeteorVelocity());
+	levelData.add_starfield_star_count(level->Starfield.GetStarCount());
+
+	levelData.add_horizon1_enabled(level->Horizon1.GetEnabled());
+	levelData.add_horizon1_object_id(level->Horizon1.GetObjectID());
+	levelData.add_horizon1_position(&FromVector3(level->GetHorizonPosition(0)));
+	levelData.add_horizon1_orientation(&FromEulerAngles(level->GetHorizonOrientation(0)));
+	levelData.add_horizon1_transparency(level->Horizon1.GetTransparency());
+
+	levelData.add_horizon2_enabled(level->Horizon2.GetEnabled());
+	levelData.add_horizon2_object_id(level->Horizon2.GetObjectID());
+	levelData.add_horizon2_position(&FromVector3(level->GetHorizonPosition(1)));
+	levelData.add_horizon2_orientation(&FromEulerAngles(level->GetHorizonOrientation(1)));
+	levelData.add_horizon2_transparency(level->Horizon2.GetTransparency());
+
+	levelData.add_storm_enabled(level->Storm);
+	levelData.add_rumble_enabled(level->Rumble);
+	levelData.add_weather_type((int)level->Weather);
+	levelData.add_weather_strength(level->WeatherStrength);
+
+	auto levelDataOffset = levelData.Finish();
 
 	// Global event sets
 	std::vector<flatbuffers::Offset<Save::EventSet>> globalEventSets{};
@@ -1153,10 +1200,13 @@ const std::vector<byte> SaveGame::Build()
 
 		Save::ParticleInfoBuilder particleInfo{ fbb };
 
+		particleInfo.add_animation_type(particle->animationType);
 		particleInfo.add_b(particle->b);
 		particleInfo.add_col_fade_speed(particle->colFadeSpeed);
 		particleInfo.add_d_b(particle->dB);
-		particleInfo.add_sprite_index(particle->spriteIndex);
+		particleInfo.add_sprite_index(particle->SpriteSeqID);
+		particleInfo.add_sprite_id(particle->SpriteID);
+		particleInfo.add_damage(particle->damage);
 		particleInfo.add_d_g(particle->dG);
 		particleInfo.add_d_r(particle->dR);
 		particleInfo.add_d_size(particle->dSize);
@@ -1164,11 +1214,15 @@ const std::vector<byte> SaveGame::Build()
 		particleInfo.add_extras(particle->extras);
 		particleInfo.add_fade_to_black(particle->fadeToBlack);
 		particleInfo.add_flags(particle->flags);
+		particleInfo.add_framerate(particle->framerate);
 		particleInfo.add_friction(particle->friction);
 		particleInfo.add_fx_obj(particle->fxObj);
 		particleInfo.add_g(particle->g);
 		particleInfo.add_gravity(particle->gravity);
 		particleInfo.add_life(particle->life);
+		particleInfo.add_light_radius(particle->lightRadius);
+		particleInfo.add_light_flicker(particle->lightFlicker);
+		particleInfo.add_light_flicker_s(particle->lightFlickerS);
 		particleInfo.add_max_y_vel(particle->maxYvel);
 		particleInfo.add_node_number(particle->nodeNumber);
 		particleInfo.add_on(particle->on);
@@ -1183,13 +1237,15 @@ const std::vector<byte> SaveGame::Build()
 		particleInfo.add_s_life(particle->sLife);
 		particleInfo.add_s_r(particle->sR);
 		particleInfo.add_s_size(particle->sSize);
+		particleInfo.add_sound(particle->sound);
 		particleInfo.add_blend_mode((int)particle->blendMode);
 		particleInfo.add_x(particle->x);
-		particleInfo.add_x_vel(particle->sSize);
+		particleInfo.add_x_vel(particle->xVel);
 		particleInfo.add_y(particle->y);
 		particleInfo.add_y_vel(particle->yVel);
 		particleInfo.add_z(particle->z);
 		particleInfo.add_z_vel(particle->zVel);
+		particleInfo.add_target_pos(&FromVector3(particle->targetPos));
 
 		particles.push_back(particleInfo.Finish());
 	}
@@ -1479,6 +1535,7 @@ const std::vector<byte> SaveGame::Build()
 	sgb.add_header(headerOffset);
 	sgb.add_level(levelStatisticsOffset);
 	sgb.add_game(gameStatisticsOffset);
+	sgb.add_level_data(levelDataOffset);
 	sgb.add_secret_bits(SaveGame::Statistics.SecretBits);
 	sgb.add_camera(cameraOffset);
 	sgb.add_lara(laraOffset);
@@ -1494,6 +1551,7 @@ const std::vector<byte> SaveGame::Build()
 	sgb.add_postprocess_strength(g_Renderer.GetPostProcessStrength());
 	sgb.add_postprocess_tint(&FromVector3(g_Renderer.GetPostProcessTint()));
 	sgb.add_soundtracks(soundtrackOffset);
+
 	sgb.add_cd_flags(soundtrackMapOffset);
 	sgb.add_action_queue(actionQueueOffset);
 	sgb.add_flip_maps(flipMapsOffset);
@@ -1732,6 +1790,50 @@ static void ParseStatistics(const Save::SaveGame* s, bool isHub)
 
 static void ParseLua(const Save::SaveGame* s, bool hubMode)
 {
+	// Global level data
+
+	auto* level = (Level*)g_GameFlow->GetLevel(CurrentLevel);
+
+	level->Fog.Enabled = s->level_data()->fog_enabled();
+	level->Fog.MaxDistance = s->level_data()->fog_max_distance();
+	level->Fog.MinDistance = s->level_data()->fog_min_distance();
+	level->Fog.SetColor(s->level_data()->fog_color());
+
+	level->Layer1.Enabled = s->level_data()->sky_layer_1_enabled();
+	level->Layer1.CloudSpeed = s->level_data()->sky_layer_1_speed();
+	level->Layer1.SetColor(s->level_data()->sky_layer_1_color());
+
+	level->Layer2.Enabled = s->level_data()->sky_layer_2_enabled();
+	level->Layer2.CloudSpeed = s->level_data()->sky_layer_2_speed();
+	level->Layer2.SetColor(s->level_data()->sky_layer_2_color());
+
+	level->LensFlare.SetSunSpriteID(s->level_data()->lensflare_sprite_id());
+	level->LensFlare.SetPitch(s->level_data()->lensflare_pitch());
+	level->LensFlare.SetYaw(s->level_data()->lensflare_yaw());
+	level->LensFlare.SetColor(s->level_data()->lensflare_color());
+
+	level->Starfield.SetStarCount(s->level_data()->starfield_star_count());
+	level->Starfield.SetMeteorCount(s->level_data()->starfield_meteor_count());
+	level->Starfield.SetMeteorSpawnDensity(s->level_data()->starfield_meteor_spawn_density());
+	level->Starfield.SetMeteorVelocity(s->level_data()->starfield_meteor_velocity());
+
+	level->Horizon1.SetEnabled(s->level_data()->horizon1_enabled());
+	level->Horizon1.SetObjectID((GAME_OBJECT_ID)s->level_data()->horizon1_object_id());
+	level->Horizon1.SetPosition(ToVector3(s->level_data()->horizon1_position()), true);
+	level->Horizon1.SetRotation(ToEulerAngles(s->level_data()->horizon1_orientation()), true);
+	level->Horizon1.SetTransparency(s->level_data()->horizon1_transparency());
+
+	level->Horizon2.SetEnabled(s->level_data()->horizon2_enabled());
+	level->Horizon2.SetObjectID((GAME_OBJECT_ID)s->level_data()->horizon2_object_id());
+	level->Horizon2.SetPosition(ToVector3(s->level_data()->horizon2_position()), true);
+	level->Horizon2.SetRotation(ToEulerAngles(s->level_data()->horizon2_orientation()), true);
+	level->Horizon2.SetTransparency(s->level_data()->horizon2_transparency());
+
+	level->Storm = s->level_data()->storm_enabled();
+	level->Rumble = s->level_data()->rumble_enabled();
+	level->Weather = (WeatherType)s->level_data()->weather_type();
+	level->WeatherStrength = s->level_data()->weather_strength();
+
 	// Event sets
 
 	if (g_Level.VolumeEventSets.size() == s->volume_event_sets()->size())
@@ -1759,6 +1861,8 @@ static void ParseLua(const Save::SaveGame* s, bool hubMode)
 			}
 		}
 	}
+
+	// Variables
 
 	auto loadedVars = std::vector<SavedVar>{};
 
@@ -1844,6 +1948,8 @@ static void ParseLua(const Save::SaveGame* s, bool hubMode)
 	}
 
 	g_GameScript->SetVariables(loadedVars, hubMode);
+
+	// Callbacks
 
 	auto populateCallbackVecs = [&s](auto callbackFunc)
 	{
@@ -2201,7 +2307,8 @@ static void ParseEffects(const Save::SaveGame* s)
 		particle->size = particleInfo->size();
 		particle->friction = particleInfo->friction();
 		particle->scalar = particleInfo->scalar();
-		particle->spriteIndex = particleInfo->sprite_index();
+		particle->SpriteSeqID = (GAME_OBJECT_ID)particleInfo->sprite_index();
+		particle->SpriteID = particleInfo->sprite_id();
 		particle->rotAdd = particleInfo->rot_add();
 		particle->maxYvel = particleInfo->max_y_vel();
 		particle->on = particleInfo->on();
@@ -2224,6 +2331,15 @@ static void ParseEffects(const Save::SaveGame* s)
 		particle->fxObj = particleInfo->fx_obj();
 		particle->roomNumber = particleInfo->room_number();
 		particle->nodeNumber = particleInfo->node_number();
+		particle->targetPos = ToVector3(particleInfo->target_pos());
+		particle->animationType = (ParticleAnimType)particleInfo->animation_type();
+		particle->damage = particleInfo->damage();
+		particle->framerate = particleInfo->framerate();
+		particle->lightRadius = particleInfo->light_radius();
+		particle->lightFlicker = particleInfo->light_flicker();
+		particle->lightFlickerS = particleInfo->light_flicker_s();
+		particle->sound = particleInfo->sound();
+
 	}
 
 	for (int i = 0; i < s->bats()->size(); i++)
@@ -2373,8 +2489,8 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 	// Restore action queue.
 	for (int i = 0; i < s->action_queue()->size(); i++)
 	{
-		TENAssert(i < ActionQueue.size(), "Action queue size was changed");
-		ActionQueue[i] = (QueueState)s->action_queue()->Get(i);
+		TENAssert(i < ActionQueueMap.size(), "Action queue size was changed.");
+		ActionQueueMap[(InputActionID)i] = (ActionQueueState)s->action_queue()->Get(i);
 	}
 
 	// Legacy soundtrack map.
