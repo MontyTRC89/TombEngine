@@ -27,9 +27,11 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
   - You must update your Lara object: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Lara/TEN_Lara.wad2
 * Added a particle based waterfall emitter object and associated sprite slots.
   - You must use this version: https://github.com/TombEngine/Resources/raw/refs/heads/main/Wad2%20Objects/Interactables/TEN_Waterfall_Emitter.wad2
-* Added TR4 statue plinth.
-* Added TR1 hammer.
+* Added TR1 Hammer.
   - You must use this version: <insert address here>
+* Added TR3 Moving Laser.
+  - You must use this version: <insert address here>
+* Added TR4 Statue Plinth.
 
 ### Lua API changes
 
