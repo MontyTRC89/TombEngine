@@ -384,7 +384,7 @@ namespace TEN::Effects::SmokeEmitter
 					steamPauseTimer = item.TriggerFlags >> 4;
 				}
 
-				SoundEffect(SFX_TEN_STEAM_EMITTER_LOOP, &item.Pose);
+				SoundEffect(SFX_TR4_STEAM_EMITTER_LOOP, &item.Pose);
 			}
 
 			if (!drawNormalSmoke)
