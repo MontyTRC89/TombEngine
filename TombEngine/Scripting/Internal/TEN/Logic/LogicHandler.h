@@ -72,7 +72,7 @@ private:
 	sol::protected_function	m_onSave{};
 	sol::protected_function	m_onEnd{};
 	sol::protected_function	m_onUseItem{};
-	sol::protected_function	m_onBreak{};
+	sol::protected_function	m_onFreeze{};
 
 	std::unordered_map<CallbackPoint, std::unordered_set<std::string> *> m_callbacks;
 

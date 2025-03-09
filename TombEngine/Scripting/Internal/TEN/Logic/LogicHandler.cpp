@@ -504,7 +504,7 @@ void LogicHandler::FreeLevelScripts()
 	m_onSave = sol::nil;
 	m_onEnd = sol::nil;
 	m_onUseItem = sol::nil;
-	m_onBreak = sol::nil;
+	m_onFreeze = sol::nil;
 	m_handler.GetState()->collect_garbage();
 }
 
@@ -1096,8 +1096,8 @@ void LogicHandler::OnFreeze()
 	for (const auto& name : m_callbacksPreFreeze)
 		CallLevelFuncByName(name);
 
-	if (m_onBreak.valid())
-		CallLevelFunc(m_onBreak);
+	if (m_onFreeze.valid())
+		CallLevelFunc(m_onFreeze);
 		
 	for (const auto& name : m_callbacksPostFreeze)
 		CallLevelFuncByName(name);
@@ -1248,7 +1248,7 @@ void LogicHandler::InitCallbacks()
 	assignCB(m_onSave, ScriptReserved_OnSave);
 	assignCB(m_onEnd, ScriptReserved_OnEnd);
 	assignCB(m_onUseItem, ScriptReserved_OnUseItem);
-	assignCB(m_onBreak, ScriptReserved_OnFreeze);
+	assignCB(m_onFreeze, ScriptReserved_OnFreeze);
 
 	// COMPATIBILITY
 	assignCB(m_onLoop, "OnControlPhase");
