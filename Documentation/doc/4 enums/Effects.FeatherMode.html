@@ -64,7 +64,6 @@
 <h2>3 Primitive Classes</h2>
 <ul class="nowrap">
   <li>    <a href="../3 primitive classes/Flow.Fog.html">Flow.Fog</a></li>
-  <li>    <a href="../3 primitive classes/Flow.Horizon.html">Flow.Horizon</a></li>
   <li>    <a href="../3 primitive classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
   <li>    <a href="../3 primitive classes/Flow.LensFlare.html">Flow.LensFlare</a></li>
   <li>    <a href="../3 primitive classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
@@ -80,9 +79,9 @@
   <li>    <a href="../4 enums/Collision.MaterialType.html">Collision.MaterialType</a></li>
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
-  <li>    <a href="../4 enums/Effects.ParticleAnimationType.html">Effects.ParticleAnimationType</a></li>
+  <li>    <here>Effects.FeatherMode</here></li>
   <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
-  <li>    <here>Flow.FreezeMode</here></li>
+  <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
   <li>    <a href="../4 enums/Input.ActionID.html">Input.ActionID</a></li>
   <li>    <a href="../4 enums/Objects.AmmoType.html">Objects.AmmoType</a></li>
@@ -112,8 +111,8 @@
 
 <div id="content">
 
-<h1>Enum <code>Flow.FreezeMode</code></h1>
-<p>Constants for freeze modes.</p>
+<h1>Enum <code>Effects.FeatherMode</code></h1>
+<p>Constants for feather modes.</p>
 <p>
 
 </p>
@@ -122,8 +121,8 @@
 <h2><a href="#Tables">Tables</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#FreezeMode">FreezeMode</a></td>
-	<td class="summary">Table of Flow.FreezeMode constants.</td>
+	<td class="name" ><a href="#Effects.FeatherMode">Effects.FeatherMode</a></td>
+	<td class="summary">Table of Effects.FeatherMode constants.</td>
 	</tr>
 </table>
 
@@ -135,20 +134,21 @@
 
     <dl class="function">
     <dt>
-    <a name = "FreezeMode"></a>
-    <strong>FreezeMode</strong>
+    <a name = "Effects.FeatherMode"></a>
+    <strong>Effects.FeatherMode</strong>
     </dt>
     <dd>
 
-<p>Table of Flow.FreezeMode constants.
- To be used with <a href="../1 modules/Flow.html#GetFreezeMode">Flow.GetFreezeMode</a> and <a href="../1 modules/Flow.html#SetFreezeMode">Flow.SetFreezeMode</a> functions.</p>
+<p>Table of Effects.FeatherMode constants.
+ To be used with <a href="../1 modules/Effects.html#EmitStreamer">Effects.EmitStreamer</a> function.</p>
 
 <ul>
-    <li><code>NONE</code> - Normal in-game operation.</li>
-    <li><code>FULL</code> - Game is completely frozen, as in pause or inventory menus.</li>
-    <li><code>SPECTATOR</code> - Game is completely frozen, but with ability to control camera.</li>
-    <li><code>PLAYER</code> - Game is completely frozen, but with ability to control player. Experimental.</li>
+    <li><code>NONE</code></li>
+    <li><code>CENTER</code></li>
+    <li><code>LEFT</code></li>
+    <li><code>RIGHT</code></li>
 </ul>
+
 
 
 

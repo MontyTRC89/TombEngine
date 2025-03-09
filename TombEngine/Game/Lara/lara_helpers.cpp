@@ -802,6 +802,7 @@ void HandlePlayerFlyCheat(ItemInfo& item)
 				item.Animation.Velocity = Vector3::Zero;
 				item.Animation.IsAirborne = true;
 				item.Pose.Position.y -= CLICK(0.5f);
+				item.Pose.Scale = Vector3::One;
 				item.HitPoints = LARA_HEALTH_MAX;
 
 				player.Control.WaterStatus = WaterStatus::FlyCheat;

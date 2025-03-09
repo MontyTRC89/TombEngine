@@ -1200,11 +1200,13 @@ const std::vector<byte> SaveGame::Build()
 
 		Save::ParticleInfoBuilder particleInfo{ fbb };
 
+		particleInfo.add_animation_type(particle->animationType);
 		particleInfo.add_b(particle->b);
 		particleInfo.add_col_fade_speed(particle->colFadeSpeed);
 		particleInfo.add_d_b(particle->dB);
 		particleInfo.add_sprite_index(particle->SpriteSeqID);
 		particleInfo.add_sprite_id(particle->SpriteID);
+		particleInfo.add_damage(particle->damage);
 		particleInfo.add_d_g(particle->dG);
 		particleInfo.add_d_r(particle->dR);
 		particleInfo.add_d_size(particle->dSize);
@@ -1212,11 +1214,15 @@ const std::vector<byte> SaveGame::Build()
 		particleInfo.add_extras(particle->extras);
 		particleInfo.add_fade_to_black(particle->fadeToBlack);
 		particleInfo.add_flags(particle->flags);
+		particleInfo.add_framerate(particle->framerate);
 		particleInfo.add_friction(particle->friction);
 		particleInfo.add_fx_obj(particle->fxObj);
 		particleInfo.add_g(particle->g);
 		particleInfo.add_gravity(particle->gravity);
 		particleInfo.add_life(particle->life);
+		particleInfo.add_light_radius(particle->lightRadius);
+		particleInfo.add_light_flicker(particle->lightFlicker);
+		particleInfo.add_light_flicker_s(particle->lightFlickerS);
 		particleInfo.add_max_y_vel(particle->maxYvel);
 		particleInfo.add_node_number(particle->nodeNumber);
 		particleInfo.add_on(particle->on);
@@ -1231,9 +1237,10 @@ const std::vector<byte> SaveGame::Build()
 		particleInfo.add_s_life(particle->sLife);
 		particleInfo.add_s_r(particle->sR);
 		particleInfo.add_s_size(particle->sSize);
+		particleInfo.add_sound(particle->sound);
 		particleInfo.add_blend_mode((int)particle->blendMode);
 		particleInfo.add_x(particle->x);
-		particleInfo.add_x_vel(particle->sSize);
+		particleInfo.add_x_vel(particle->xVel);
 		particleInfo.add_y(particle->y);
 		particleInfo.add_y_vel(particle->yVel);
 		particleInfo.add_z(particle->z);
@@ -2325,6 +2332,14 @@ static void ParseEffects(const Save::SaveGame* s)
 		particle->roomNumber = particleInfo->room_number();
 		particle->nodeNumber = particleInfo->node_number();
 		particle->targetPos = ToVector3(particleInfo->target_pos());
+		particle->animationType = (ParticleAnimType)particleInfo->animation_type();
+		particle->damage = particleInfo->damage();
+		particle->framerate = particleInfo->framerate();
+		particle->lightRadius = particleInfo->light_radius();
+		particle->lightFlicker = particleInfo->light_flicker();
+		particle->lightFlickerS = particleInfo->light_flicker_s();
+		particle->sound = particleInfo->sound();
+
 	}
 
 	for (int i = 0; i < s->bats()->size(); i++)

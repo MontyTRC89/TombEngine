@@ -27,13 +27,18 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
   - You must update your Lara object: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Lara/TEN_Lara.wad2
 * Added a particle based waterfall emitter object and associated sprite slots.
   - You must use this version: https://github.com/TombEngine/Resources/raw/refs/heads/main/Wad2%20Objects/Interactables/TEN_Waterfall_Emitter.wad2
+* Added TR1 hammer.
+  - You must use this version: <insert address here>
 
 ### Lua API changes
+
+* Implemented advanced particles allowing animations and other effects.
 * Added Collision.Probe class for basic room collision detection.
 * Added diary module.
 * Added Flow.Horizon class with and use two layers of horizons in a Flow.Level class.
 * Added View.GetFlyByPosition() and View.GetFlyByRotation() functions to get flyby sequence parameters at a specified time point.
 * Added Effects.EmitAirBubble() function to spawn air bubbles.
+* Added Effects.EmitStreamer() function to emit streamers.
 * Added Moveable:GetScale() and Movebale:SetScale() methods to set visible scale of moveables.
 * Added Rotation:Lerp() function to allow linear interpolation between rotations.
 * Added various Translate() methods to Vec2 and Vec3 script objects.
