@@ -171,6 +171,10 @@
 	<td class="name" ><a href="#GetWind">GetWind()</a></td>
 	<td class="summary">Get the wind vector for the current game frame.</td>
 	</tr>
+	<tr>
+	<td class="name" ><a href="#EmitStreamer">EmitStreamer(mov, tag, pos, dir[, rot][, startColor][, endColor][, width][, life][, vel][, expRate][, rotRate][, edgeFeatherMode][, lengthFeatherMode][, blendID])</a></td>
+	<td class="summary">Emit an extending streamer effect.</td>
+	</tr>
 </table>
 <h2><a href="#Tables">Tables</a></h2>
 <table class="function_list">
@@ -707,6 +711,95 @@ EmitAdvancedParticle(particle)</pre>
            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
         Wind vector.
     </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "EmitStreamer"></a>
+    <strong>EmitStreamer(mov, tag, pos, dir[, rot][, startColor][, endColor][, width][, life][, vel][, expRate][, rotRate][, edgeFeatherMode][, lengthFeatherMode][, blendID])</strong>
+    </dt>
+    <dd>
+    Emit an extending streamer effect.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">mov</span>
+            <span class="types"><span class="type">Moveable</span></span>
+         Moveable object with which to associate the effect.
+        </li>
+        <li><span class="parameter">tag</span>
+            <span class="types"><span class="type">int[opt]</span></span>
+         Numeric tag with which to associate the effect on the moveable. <strong>Default: 0</strong>
+        </li>
+        <li><span class="parameter">pos</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         World position.
+        </li>
+        <li><span class="parameter">dir</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         Direction vector of movement velocity.
+        </li>
+        <li><span class="parameter">rot</span>
+            <span class="types"><span class="type">float</span></span>
+         Start rotation in degrees. <strong>Default: 0</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">startColor</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
+         Color at the start of life. <strong>Default: Color(255, 255, 255, 255))</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">endColor</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
+         Color at the end of life. <strong>Default: Color(0, 0, 0, 0))</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">width</span>
+            <span class="types"><span class="type">float</span></span>
+         Width in world units. <strong>Default: 0</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">life</span>
+            <span class="types"><span class="type">float</span></span>
+         Lifetime in seconds. <strong>Default: 1</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">vel</span>
+            <span class="types"><span class="type">float</span></span>
+         Movement velocity in world units per second. <strong>Default: 0</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">expRate</span>
+            <span class="types"><span class="type">float</span></span>
+         Width expansion rate in world units per second. <strong>Default: 0</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">rotRate</span>
+            <span class="types"><span class="type">float</span></span>
+         Rotation rate in degrees per second. <strong>Default: 0</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">edgeFeatherMode</span>
+            <span class="types"><span class="type">Effects.StreamerFeatherMode</span></span>
+         Edge feather mode. <strong>Default: Effects.FeatherID.NONE</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">lengthFeatherMode</span>
+            <span class="types"><span class="type">Effects.StreamerFeatherMode</span></span>
+         Length feather mode. <strong>Not implemented yet.</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">blendID</span>
+            <span class="types"><a class="type" href="../4 enums/Effects.BlendID.html#">BlendID</a></span>
+         Renderer blend ID. <strong>Default: Effects.BlendID.ALPHA_BLEND</strong>
+         (<em>optional</em>)
+        </li>
+    </ul>
+
 
 
 

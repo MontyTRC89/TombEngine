@@ -321,6 +321,7 @@ static constexpr char ScriptReserved_EmitSpotLight[]				= "EmitSpotLight";
 static constexpr char ScriptReserved_EmitBlood[]					= "EmitBlood";
 static constexpr char ScriptReserved_EmitAirBubble[]				= "EmitAirBubble";
 static constexpr char ScriptReserved_EmitFire[]						= "EmitFire";
+static constexpr char ScriptReserved_EmitStreamer[]					= "EmitStreamer";
 static constexpr char ScriptReserved_MakeExplosion[]				= "MakeExplosion";
 static constexpr char ScriptReserved_MakeEarthquake[]				= "MakeEarthquake";
 
@@ -388,6 +389,7 @@ static constexpr char ScriptReserved_EventType[]				= "EventType";
 static constexpr char ScriptReserved_AlignMode[]				= "AlignMode";
 static constexpr char ScriptReserved_ScaleMode[]				= "ScaleMode";
 static constexpr char ScriptReserved_ParticleAnimationType[]	= "ParticleAnimationType";
+static constexpr char ScriptReserved_FeatherMode[]				= "StreamerFeatherMode";
 
 static constexpr char ScriptReserved_LevelVars[]	= "LevelVars";
 static constexpr char ScriptReserved_GameVars[]		= "GameVars";
