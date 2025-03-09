@@ -406,7 +406,7 @@ static constexpr char ScriptReserved_LaraObject[] = "LaraObject";
 // =========
 
 constexpr char ScriptReserved_Collision[]					= "Collision";
-
+constexpr char ScriptReserved_CreatureData[]				= "CreatureData";
 constexpr char ScriptReserved_Probe[]						= "Probe";
 constexpr char ScriptReserved_ProbeGetCeilingHeight[]		= "GetCeilingHeight";
 constexpr char ScriptReserved_ProbeGetCeilingMaterialType[]	= "GetCeilingMaterialType";
