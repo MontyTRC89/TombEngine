@@ -38,7 +38,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added advanced particle emitter allowing animations and other effects.
 * Added diary module.
 * Added custom bar module.
-* Added Flow.Horizon class with and use two layers of horizons in a Flow.Level class.
+* Added Flow.Horizon class and two layers of horizons in a Flow.Level class.
 * Added Flow.GetTotalSecretCount() function to get total amount of secrets in the game.
 * Added View.GetFlyByPosition() and View.GetFlyByRotation() functions to get flyby sequence parameters at a specified time point.
 * Added Effects.EmitAirBubble() function to spawn air bubbles.
