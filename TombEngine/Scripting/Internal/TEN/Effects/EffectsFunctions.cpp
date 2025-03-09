@@ -21,7 +21,7 @@
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Effects/BlendIDs.h"
 #include "Scripting/Internal/TEN/Effects/EffectIDs.h"
-#include "Scripting/Internal/TEN/Effects/FeatherIDs.h"
+#include "Scripting/Internal/TEN/Effects/FeatherModes.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 #include "Scripting/Internal/TEN/Objects/ObjectsHandler.h"
 #include "Scripting/Internal/TEN/Types/Color/Color.h"
@@ -344,11 +344,11 @@ namespace TEN::Scripting::Effects
 	// @tparam[opt] float vel Movement velocity in world units per second. __default: 0__
 	// @tparam[opt] float expRate Width expansion rate in world units per second. __default: 0__
 	// @tparam[opt] float rotRate Rotation rate in degrees per second. __default: 0__
-	// @tparam[opt] Effects.FeatherID featherID Edge feathering ID. __default: Effects.FeatherID.NONE__
+	// @tparam[opt] Effects.FeatherMode featherMode Edge feathering mode. __default: Effects.FeatherMode.NONE__
 	// @tparam[opt] Effects.BlendID blendID Renderer blend ID. __Effects.BlendID.ALPHA_BLEND__
 	static void EmitStreamer(const Moveable& mov, TypeOrNil<int> tag, const Vec3& pos, const Vec3& dir, TypeOrNil<float> rot, TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor,
 							 TypeOrNil<float> width, TypeOrNil<float> life, TypeOrNil<float> vel, TypeOrNil<float> expRate, TypeOrNil<float> rotRate,
-							 TypeOrNil<StreamerFeatherType> featherID, TypeOrNil<BlendMode> blendID)
+							 TypeOrNil<StreamerFeatherMode> featherMode, TypeOrNil<BlendMode> blendID)
 	{
 		int movID = mov.GetIndex();
 		int convertedTag = ValueOr<int>(tag, 0);
@@ -364,13 +364,13 @@ namespace TEN::Scripting::Effects
 		auto convertedExpRate = ValueOr<float>(expRate, 0.0f) / (float)FPS;
 		auto convertedRotRate = ANGLE(ValueOr<float>(rotRate, 0.0f) / (float)FPS);
 
-		auto convertedFeatherID = ValueOr<StreamerFeatherType>(featherID, StreamerFeatherType::None);
+		auto convertedFeatherMode = ValueOr<StreamerFeatherMode>(featherMode, StreamerFeatherMode::None);
 		auto convertedBlendID = ValueOr<BlendMode>(blendID, BlendMode::AlphaBlend);
 
 		StreamerEffect.Spawn(
 			movID, convertedTag, convertedPos, convertedDir, convertedRot, convertedStartColor, convertedEndColor,
 			convertedWidth, convertedLife, convertedVel, convertedExpRate, convertedRotRate,
-			convertedFeatherID, convertedBlendID);
+			convertedFeatherMode, convertedBlendID);
 	}
 
 /***Make an explosion. Does not hurt Lara
@@ -428,6 +428,6 @@ namespace TEN::Scripting::Effects
 		auto handler = LuaHandler{ state };
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_BlendID, BLEND_IDS);
 		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_EffectID, EFFECT_IDS);
-		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_FeatherID, FEATHER_IDS);
+		handler.MakeReadOnlyTable(tableEffects, ScriptReserved_FeatherMode, FEATHER_MODES);
 	}
 }

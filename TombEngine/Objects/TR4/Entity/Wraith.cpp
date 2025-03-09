@@ -84,21 +84,21 @@ namespace TEN::Entities::TR4
 			item.Index, (int)TailTag::First,
 			pos, dir0, orient2D, colorStart, COLOR_END,
 			WIDTH, LIFE_MAX, VEL, EXP_RATE, 0,
-			StreamerFeatherType::Center, BlendMode::Additive);
+			StreamerFeatherMode::Center, BlendMode::Additive);
 
 		// Spawn second tail.
 		StreamerEffect.Spawn(
 			item.Index, (int)TailTag::Second,
 			pos, dir1, orient2D, colorStart, COLOR_END,
 			WIDTH, LIFE_MAX, VEL, EXP_RATE, 0,
-			StreamerFeatherType::Center, BlendMode::Additive);
+			StreamerFeatherMode::Center, BlendMode::Additive);
 
 		// Spawn third tail.
 		StreamerEffect.Spawn(
 			item.Index, (int)TailTag::Third,
 			pos, dir2, orient2D, colorStart, COLOR_END,
 			WIDTH, LIFE_MAX, VEL, EXP_RATE, 0,
-			StreamerFeatherType::Center, BlendMode::Additive);
+			StreamerFeatherMode::Center, BlendMode::Additive);
 	}
 
 	static void WraithWallEffect(Vector3i pos, short yRot, int objectNumber)
