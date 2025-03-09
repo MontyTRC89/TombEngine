@@ -37,7 +37,6 @@ public:
 	virtual float GetWeatherStrength() const = 0;
 	virtual WeatherType GetWeatherType() const = 0;
 	virtual RGBAColor8Byte GetSkyLayerColor(int index) const = 0;
-	virtual bool GetFogEnabled() const = 0;
 	virtual RGBAColor8Byte GetFogColor() const = 0;
 	virtual short GetFogMinDistance() const = 0;
 	virtual short GetFogMaxDistance() const = 0;

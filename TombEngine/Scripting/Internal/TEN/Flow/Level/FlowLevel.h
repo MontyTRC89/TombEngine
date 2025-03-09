@@ -53,7 +53,6 @@ struct Level : public ScriptInterfaceLevel
 	// TODO: Clean up this mess.
 
 	RGBAColor8Byte GetFogColor() const override;
-	bool GetFogEnabled() const override;
 	float GetWeatherStrength() const override;
 	bool GetSkyLayerEnabled(int index) const override;
 	bool GetStormEnabled() const override;

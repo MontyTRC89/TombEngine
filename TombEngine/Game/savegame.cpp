@@ -1097,7 +1097,6 @@ const std::vector<byte> SaveGame::Build()
 
 	levelData.add_level_far_view(level->LevelFarView);
 
-	levelData.add_fog_enabled(level->Fog.Enabled);
 	levelData.add_fog_color(level->Fog.GetColor());
 	levelData.add_fog_min_distance(level->Fog.MinDistance);
 	levelData.add_fog_max_distance(level->Fog.MaxDistance);
@@ -1798,7 +1797,6 @@ static void ParseLua(const Save::SaveGame* s, bool hubMode)
 
 	auto* level = (Level*)g_GameFlow->GetLevel(CurrentLevel);
 
-	level->Fog.Enabled = s->level_data()->fog_enabled();
 	level->Fog.MaxDistance = s->level_data()->fog_max_distance();
 	level->Fog.MinDistance = s->level_data()->fog_min_distance();
 	level->Fog.SetColor(s->level_data()->fog_color());

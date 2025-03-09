@@ -220,11 +220,6 @@ WeatherType Level::GetWeatherType() const
 	return Weather;
 }
 
-bool Level::GetFogEnabled() const
-{
-	return Fog.Enabled;
-}
-
 RGBAColor8Byte Level::GetFogColor() const
 {
 	return Fog.GetColor();

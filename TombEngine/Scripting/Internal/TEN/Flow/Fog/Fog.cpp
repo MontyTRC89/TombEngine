@@ -47,7 +47,6 @@ Fog::Fog(ScriptColor const& col, short minDistance, short maxDistance)
 	SetColor(col);
 	MinDistance = minDistance;
 	MaxDistance = maxDistance;
-	Enabled = true;
 }
 
 void Fog::SetColor(ScriptColor const& col)

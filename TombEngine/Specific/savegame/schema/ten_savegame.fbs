@@ -14,7 +14,6 @@ table LevelData {
 	weather_type: int32;
 	weather_strength: float;
 	
-	fog_enabled: bool;
 	fog_color: int32;
 	fog_min_distance: int32;
 	fog_max_distance: int32;
