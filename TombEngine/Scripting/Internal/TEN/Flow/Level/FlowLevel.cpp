@@ -132,7 +132,7 @@ e.g. `myLevel.laraType = LaraType.Divesuit`
 
 /// (short) Set Secrets for Level
 //@mem secrets
-		"secrets", sol::property(&Level::SetSecrets)
+		"secrets", sol::property(&Level::GetSecrets, &Level::SetSecrets)
 	);
 }
 
