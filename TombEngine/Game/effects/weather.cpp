@@ -232,7 +232,7 @@ namespace TEN::Effects::Environment
 
 	void EnvironmentController::UpdateStarfield(const ScriptInterfaceLevel& level)
 	{
-		if (!level.GetStarfieldStarsEnabled())
+		if (level.GetStarfieldStarCount() == 0)
 			return;
 
 		if (ResetStarField)
@@ -277,7 +277,7 @@ namespace TEN::Effects::Environment
 		for (auto& star : Stars)
 			star.Blinking = Random::GenerateFloat(0.5f, 1.0f);
 
-		if (level.GetStarfieldMeteorsEnabled())
+		if (level.GetStarfieldMeteorCount() > 0)
 		{
 			for (auto& meteor : Meteors)
 			{
@@ -639,7 +639,7 @@ namespace TEN::Effects::Environment
 				Meteors.end());
 		}
 
-		if (!level.GetStarfieldMeteorsEnabled())
+		if (level.GetStarfieldMeteorCount() == 0)
 			return;
 
 		int density = level.GetStarfieldMeteorSpawnDensity();

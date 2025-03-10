@@ -433,25 +433,6 @@ constexpr char ScriptReserved_ProbePreview[]				= "Preview";
 
 constexpr char ScriptReserved_MaterialType[]				= "MaterialType";
 
-// ====
-// FLOW
-// ====
-
-// Horizon
-
-constexpr char ScriptReserved_Horizon[]					= "Horizon";
-constexpr char ScriptReserved_HorizonGetEnabled[]		= "GetEnabled";
-constexpr char ScriptReserved_HorizonGetObjectID[]		= "GetObjectID";
-constexpr char ScriptReserved_HorizonGetPosition[]		= "GetPosition";
-constexpr char ScriptReserved_HorizonGetRotation[]		= "GetRotation";
-constexpr char ScriptReserved_HorizonGetTransparency[]	= "GetTransparency";
-constexpr char ScriptReserved_HorizonSetEnabled[]		= "SetEnabled";
-constexpr char ScriptReserved_HorizonSetObjectID[]		= "SetObjectID";
-constexpr char ScriptReserved_HorizonSetPosition[]		= "SetPosition";
-constexpr char ScriptReserved_HorizonSetRotation[]		= "SetRotation";
-constexpr char ScriptReserved_HorizonSetTransparency[]	= "SetTransparency";
-
-
 // =======
 // OBJECTS
 // =======

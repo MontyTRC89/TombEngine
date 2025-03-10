@@ -62,8 +62,6 @@ public:
 	virtual Color GetLensFlareColor() const = 0;
 
 	// Starfield getters
-	virtual bool  GetStarfieldStarsEnabled() const = 0;
-	virtual bool  GetStarfieldMeteorsEnabled() const = 0;
 	virtual int	  GetStarfieldStarCount() const = 0;
 	virtual int	  GetStarfieldMeteorCount() const = 0;
 	virtual int	  GetStarfieldMeteorSpawnDensity() const = 0;

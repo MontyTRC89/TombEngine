@@ -121,51 +121,34 @@
 </p>
 
 
+<h2><a href="#Members">Members</a></h2>
+<table class="function_list">
+	<tr>
+	<td class="name" ><a href="#enabled">enabled</a></td>
+	<td class="summary">(bool) Horizon enabled state.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#objectID">objectID</a></td>
+	<td class="summary">(Objects.ObjID) Horizon object ID.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#position">position</a></td>
+	<td class="summary">(Vec3) Horizon position.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#rotation">rotation</a></td>
+	<td class="summary">(Rotation) Horizon rotation.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#transparency">transparency</a></td>
+	<td class="summary">(float) Horizon transparency.</td>
+	</tr>
+</table>
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
 	<td class="name" ><a href="#Horizon">Horizon(objectID)</a></td>
 	<td class="summary">Create a horizon object.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#GetEnabled">GetEnabled()</a></td>
-	<td class="summary">Get the horizon's enabled state.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#GetObjectID">GetObjectID()</a></td>
-	<td class="summary">Get the horizon's slot object ID.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#GetPosition">GetPosition()</a></td>
-	<td class="summary">Get the horizon's world position.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#GetRotation">GetRotation()</a></td>
-	<td class="summary">Get the horizon's rotation.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#GetTransparency">GetTransparency()</a></td>
-	<td class="summary">Get the horizon's transparency.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#SetEnabled">SetEnabled(enabled)</a></td>
-	<td class="summary">Set the horizon's enabled state.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#SetObjectID">SetObjectID(objectID)</a></td>
-	<td class="summary">Set the horizon's object ID.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#SetPosition">SetPosition(pos[, noInterpolation])</a></td>
-	<td class="summary">Set the horizon's world position.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#SetRotation">SetRotation(rot[, noInterpolation])</a></td>
-	<td class="summary">Set the horizon's rotation.</td>
-	</tr>
-	<tr>
-	<td class="name" ><a href="#SetTransparency">SetTransparency(transparency)</a></td>
-	<td class="summary">Set the horizon's transparency.</td>
 	</tr>
 </table>
 
@@ -173,6 +156,89 @@
 <br/>
 
 
+    <h2 class="section-header "><a name="Members"></a>Members</h2>
+
+    <dl class="function">
+    <dt>
+    <a name = "enabled"></a>
+    <strong>enabled</strong>
+    </dt>
+    <dd>
+    (bool) Horizon enabled state.
+ If set to true, horizon will be visible.
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "objectID"></a>
+    <strong>objectID</strong>
+    </dt>
+    <dd>
+    (Objects.ObjID) Horizon object ID.
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "position"></a>
+    <strong>position</strong>
+    </dt>
+    <dd>
+    (Vec3) Horizon position.
+ Specifies an offset from the camera origin.
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "rotation"></a>
+    <strong>rotation</strong>
+    </dt>
+    <dd>
+    (Rotation) Horizon rotation.
+ Specifies horizon rotation.
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "transparency"></a>
+    <strong>transparency</strong>
+    </dt>
+    <dd>
+    (float) Horizon transparency.
+ Specifies horizon transparency on a range from 0 to 1.
+
+
+
+
+
+
+
+
+</dd>
+</dl>
     <h2 class="section-header "><a name="Functions"></a>Functions</h2>
 
     <dl class="function">
@@ -199,231 +265,6 @@
            <span class="types"><a class="type" href="../3 primitive classes/Flow.Horizon.html#Horizon">Horizon</a></span>
         A new Horizon object.
     </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "GetEnabled"></a>
-    <strong>GetEnabled()</strong>
-    </dt>
-    <dd>
-    Get the horizon's enabled state.
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">bool</span></span>
-        Enabled state.
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "GetObjectID"></a>
-    <strong>GetObjectID()</strong>
-    </dt>
-    <dd>
-    Get the horizon's slot object ID.
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-        Object ID.
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "GetPosition"></a>
-    <strong>GetPosition()</strong>
-    </dt>
-    <dd>
-    Get the horizon's world position.
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-        Position.
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "GetRotation"></a>
-    <strong>GetRotation()</strong>
-    </dt>
-    <dd>
-    Get the horizon's rotation.
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
-        Rotation.
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "GetTransparency"></a>
-    <strong>GetTransparency()</strong>
-    </dt>
-    <dd>
-    Get the horizon's transparency.
-
-
-
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><span class="type">float</span></span>
-        Transparency.
-    </ol>
-
-
-
-
-</dd>
-    <dt>
-    <a name = "SetEnabled"></a>
-    <strong>SetEnabled(enabled)</strong>
-    </dt>
-    <dd>
-    Set the horizon's enabled state.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">enabled</span>
-            <span class="types"><span class="type">bool</span></span>
-         New enabled state.
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "SetObjectID"></a>
-    <strong>SetObjectID(objectID)</strong>
-    </dt>
-    <dd>
-    Set the horizon's object ID.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">objectID</span>
-            <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-         Object ID.
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "SetPosition"></a>
-    <strong>SetPosition(pos[, noInterpolation])</strong>
-    </dt>
-    <dd>
-    Set the horizon's world position.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">pos</span>
-            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-         New world position.
-        </li>
-        <li><span class="parameter">noInterpolation</span>
-            <span class="types"><span class="type">bool</span></span>
-         Disable interpolation with the previous frame's position. <strong>default: false</strong>
-         (<em>optional</em>)
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "SetRotation"></a>
-    <strong>SetRotation(rot[, noInterpolation])</strong>
-    </dt>
-    <dd>
-    Set the horizon's rotation.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">rot</span>
-            <span class="types"><a class="type" href="../3 primitive classes/Rotation.html#">Rotation</a></span>
-         New rotation.
-        </li>
-        <li><span class="parameter">noInterpolation</span>
-            <span class="types"><span class="type">bool</span></span>
-         Disable interpolation with the previous frame's rotation. <strong>default: false</strong>
-         (<em>optional</em>)
-        </li>
-    </ul>
-
-
-
-
-
-</dd>
-    <dt>
-    <a name = "SetTransparency"></a>
-    <strong>SetTransparency(transparency)</strong>
-    </dt>
-    <dd>
-    Set the horizon's transparency.
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">transparency</span>
-            <span class="types"><span class="type">float</span></span>
-         New transparency alpha.
-        </li>
-    </ul>
-
 
 
 

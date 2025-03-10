@@ -308,7 +308,7 @@ EulerAngles Level::GetHorizonPrevOrientation(int index) const
 
 bool Level::GetLensFlareEnabled() const
 {
-	return LensFlare.GetEnabledStatus();
+	return LensFlare.GetEnabled();
 }
 
 int Level::GetLensFlareSunSpriteID() const
@@ -329,16 +329,6 @@ short Level::GetLensFlareYaw() const
 Color Level::GetLensFlareColor() const
 {
 	return LensFlare.GetColor();
-}
-
-bool Level::GetStarfieldStarsEnabled() const
-{
-	return Starfield.GetStarsEnabledStatus();
-}
-
-bool Level::GetStarfieldMeteorsEnabled() const
-{
-	return Starfield.GetMeteorsEnabledStatus();
 }
 
 int Level::GetStarfieldStarCount() const

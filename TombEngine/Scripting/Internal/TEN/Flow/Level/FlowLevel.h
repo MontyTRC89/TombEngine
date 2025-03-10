@@ -93,8 +93,6 @@ struct Level : public ScriptInterfaceLevel
 	Color GetLensFlareColor() const override;
 
 	// Starfield getters
-	bool  GetStarfieldStarsEnabled() const override;
-	bool  GetStarfieldMeteorsEnabled() const override;
 	int	  GetStarfieldStarCount() const override;
 	int	  GetStarfieldMeteorCount() const override;
 	int	  GetStarfieldMeteorSpawnDensity() const override;
