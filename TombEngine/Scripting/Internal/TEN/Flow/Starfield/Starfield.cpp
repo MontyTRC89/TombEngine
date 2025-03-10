@@ -6,7 +6,7 @@
 
 using namespace TEN::Effects::Environment;
 
-/// Represents a star field in the sky.
+/// Represents a star field in the sky. To be used as @{Flow.Level.starField} property.
 // @tenprimitive Flow.StarField
 // @pragma nostrip
 

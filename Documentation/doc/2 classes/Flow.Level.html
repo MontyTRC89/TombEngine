@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.7.2 (Developer) Lua API</title>
+    <title>TombEngine 1.8 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -143,23 +143,23 @@
 	</tr>
 	<tr>
 	<td class="name" ><a href="#layer1">layer1</a></td>
-	<td class="summary">(<a href="../3 primitive classes/Flow.SkyLayer.html#">Flow.SkyLayer</a>) Primary sky layer</td>
+	<td class="summary">(<a href="../3 primitive classes/Flow.SkyLayer.html#">Flow.SkyLayer</a>) Primary sky cloud layer.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#layer2">layer2</a></td>
-	<td class="summary">(<a href="../3 primitive classes/Flow.SkyLayer.html#">Flow.SkyLayer</a>) Secondary sky layer</td>
+	<td class="summary">(<a href="../3 primitive classes/Flow.SkyLayer.html#">Flow.SkyLayer</a>) Secondary sky cloud layer.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#horizon1">horizon1</a></td>
 	<td class="summary">(<a href="../3 primitive classes/Flow.Horizon.html#">Flow.Horizon</a>) First horizon layer.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#horizon1">horizon1</a></td>
+	<td class="name" ><a href="#horizon2">horizon2</a></td>
 	<td class="summary">(<a href="../3 primitive classes/Flow.Horizon.html#">Flow.Horizon</a>) Second horizon layer.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#starfield">starfield</a></td>
-	<td class="summary">(<a href="../3 primitive classes/Flow.StarField.html#">Flow.StarField</a>) Starfield.</td>
+	<td class="name" ><a href="#starField">starField</a></td>
+	<td class="summary">(<a href="../3 primitive classes/Flow.StarField.html#">Flow.StarField</a>) Starfield in the sky.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#lensFlare">lensFlare</a></td>
@@ -167,7 +167,7 @@
 	</tr>
 	<tr>
 	<td class="name" ><a href="#fog">fog</a></td>
-	<td class="summary">(<a href="../3 primitive classes/Flow.Fog.html#">Flow.Fog</a>) omni fog RGB color and distance.</td>
+	<td class="summary">(<a href="../3 primitive classes/Flow.Fog.html#">Flow.Fog</a>) Global distance fog, with specified RGB color and distance.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#storm">storm</a></td>
@@ -199,11 +199,11 @@
 	</tr>
 	<tr>
 	<td class="name" ><a href="#objects">objects</a></td>
-	<td class="summary">(table of <a href="../3 primitive classes/Flow.InventoryItem.html#">Flow.InventoryItem</a>s) table of inventory object overrides</td>
+	<td class="summary">(table of <a href="../3 primitive classes/Flow.InventoryItem.html#">Flow.InventoryItem</a>s) A table of inventory object layout overrides.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#secrets">secrets</a></td>
-	<td class="summary">(short) Set Secrets for Level</td>
+	<td class="summary">(short) Set total secret count for current level.</td>
 	</tr>
 </table>
 <h2><a href="#Functions">Functions</a></h2>
@@ -306,7 +306,7 @@
     <strong>layer1</strong>
     </dt>
     <dd>
-    (<a href="../3 primitive classes/Flow.SkyLayer.html#">Flow.SkyLayer</a>) Primary sky layer
+    (<a href="../3 primitive classes/Flow.SkyLayer.html#">Flow.SkyLayer</a>) Primary sky cloud layer.
 
 
 
@@ -321,7 +321,7 @@
     <strong>layer2</strong>
     </dt>
     <dd>
-    (<a href="../3 primitive classes/Flow.SkyLayer.html#">Flow.SkyLayer</a>) Secondary sky layer
+    (<a href="../3 primitive classes/Flow.SkyLayer.html#">Flow.SkyLayer</a>) Secondary sky cloud layer.
 
 
 
@@ -347,8 +347,8 @@
 
 </dd>
     <dt>
-    <a name = "horizon1"></a>
-    <strong>horizon1</strong>
+    <a name = "horizon2"></a>
+    <strong>horizon2</strong>
     </dt>
     <dd>
     (<a href="../3 primitive classes/Flow.Horizon.html#">Flow.Horizon</a>) Second horizon layer.
@@ -362,11 +362,11 @@
 
 </dd>
     <dt>
-    <a name = "starfield"></a>
-    <strong>starfield</strong>
+    <a name = "starField"></a>
+    <strong>starField</strong>
     </dt>
     <dd>
-    (<a href="../3 primitive classes/Flow.StarField.html#">Flow.StarField</a>) Starfield.
+    (<a href="../3 primitive classes/Flow.StarField.html#">Flow.StarField</a>) Starfield in the sky.
 
 
 
@@ -396,9 +396,8 @@
     <strong>fog</strong>
     </dt>
     <dd>
-    (<a href="../3 primitive classes/Flow.Fog.html#">Flow.Fog</a>) omni fog RGB color and distance.
- As seen in TR4's Desert Railroad.
- If not provided, distance fog will be black.
+    (<a href="../3 primitive classes/Flow.Fog.html#">Flow.Fog</a>) Global distance fog, with specified RGB color and distance.
+ If not provided, distance fog will not be visible.
 
 
 
@@ -537,7 +536,7 @@ Invisible
     <strong>objects</strong>
     </dt>
     <dd>
-    (table of <a href="../3 primitive classes/Flow.InventoryItem.html#">Flow.InventoryItem</a>s) table of inventory object overrides
+    (table of <a href="../3 primitive classes/Flow.InventoryItem.html#">Flow.InventoryItem</a>s) A table of inventory object layout overrides.
 
 
 
@@ -552,7 +551,7 @@ Invisible
     <strong>secrets</strong>
     </dt>
     <dd>
-    (short) Set Secrets for Level
+    (short) Set total secret count for current level.
 
 
 
@@ -580,7 +579,7 @@ Invisible
     <ol>
 
            <span class="types"><a class="type" href="../2 classes/Flow.Level.html#Level">Level</a></span>
-        a Level object
+        a Level object.
     </ol>
 
 

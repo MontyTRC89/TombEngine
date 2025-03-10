@@ -7,7 +7,7 @@ namespace TEN::Scripting::Types { class ScriptColor; }
 
 using namespace TEN::Scripting::Types;
 
-/*** Describes a layer of moving clouds.
+/*** Describes a layer of moving clouds. To be used as @{Flow.Level.layer1} and @{Flow.Level.layer2} properties.
 @tenprimitive Flow.SkyLayer
 @pragma nostrip
 */

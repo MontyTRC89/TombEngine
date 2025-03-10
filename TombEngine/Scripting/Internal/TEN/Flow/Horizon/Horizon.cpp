@@ -9,7 +9,7 @@
 
 namespace TEN::Scripting
 {
-	/// Represents a horizon.
+	/// Represents a horizon. To be used as @{Flow.Level.horizon1} and @{Flow.Level.horizon2} properties.
 	//
 	// @tenprimitive Flow.Horizon
 	// @pragma nostrip
