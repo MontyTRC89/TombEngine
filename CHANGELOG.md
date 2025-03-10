@@ -49,8 +49,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added alpha transparency functionality for statics and moveables to be used with SetColor() method.
 * Added extra arguments for sprite object slots and starting rotation value for EmitParticle function.
 * Added ability to save Flow.Level fields such as fog or horizon to a savegame.
-* Added pickups count to Flow.Statistics class.
-* Fixed level medipacks count in Flow.Statistics class.
+* Added pickup count to Flow.Statistics class.
+* Fixed medipack level count in Flow.Statistics class.
 
 ## [Version 1.7.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.4) - 2025-04-01
 
