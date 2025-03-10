@@ -1890,21 +1890,20 @@ namespace TEN::Renderer
 
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
+		// Opaque geometry
 		DoRenderPass(RendererPass::Opaque, view, true);
+
+		// Water planes
+		DrawWaterPlanes(view);
+
+		// Transparent faces
 		DoRenderPass(RendererPass::Additive, view, true);
+	
 		DoRenderPass(RendererPass::CollectTransparentFaces, view, false);
 		SortTransparentFaces(view);
-
 		DoRenderPass(RendererPass::Transparent, view, true);
-		DoRenderPass(RendererPass::GunFlashes, view, true); // HACK: Gunflashes are drawn after everything because they are near camera.
 		
-		//CalculateSSR(&_renderTarget, view);
-
-		//_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), _renderTarget.DepthStencilView.Get());
-		//DoRenderPass(RendererPass::DynamicWaterSurfaces, view, false);
-
-		//CalculateSSR(&_renderTarget, view);
-		DrawWater(view);
+		DoRenderPass(RendererPass::GunFlashes, view, true); // HACK: Gunflashes are drawn after everything because they are near camera.
 
 		// Draw 3D debug lines and triangles.
 		DrawLines3D(view);
@@ -4335,7 +4334,7 @@ namespace TEN::Renderer
 		_doingFullscreenPass = false;*/
 	}
 
-	void Renderer::DrawWater(RenderView& view)
+	void Renderer::DrawWaterPlanes(RenderView& view)
 	{ 
 		if (view.WaterPlanesToDraw.size() == 0)
 			return;

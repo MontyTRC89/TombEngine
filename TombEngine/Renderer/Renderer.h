@@ -420,7 +420,7 @@ namespace TEN::Renderer
 		void DrawHorizonAndSky(RenderView& renderView, ID3D11DepthStencilView* depthTarget);
 		void DrawRooms(RenderView& view, RendererPass rendererPass);
 		void DrawItems(RenderView& view, RendererPass rendererPass, bool onlyPlayer = false);
-		void DrawWater(RenderView& view);
+		void DrawWaterPlanes(RenderView& view);
 		void DrawAnimatingItem(RendererItem* item, RenderView& view, RendererPass rendererPass);
 		void DrawWaterfalls(RendererItem* item, RenderView& view, int fps, RendererPass rendererPass);
 		void DrawBaddyGunflashes(RenderView& view);
