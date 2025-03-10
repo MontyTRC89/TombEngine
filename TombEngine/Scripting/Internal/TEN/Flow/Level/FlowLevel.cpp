@@ -66,11 +66,11 @@ void Level::Register(sol::table& parent)
 //@mem horizon1
 		"horizon2", &Level::Horizon2,
 
-/// (@{Flow.Starfield}) Starfield.
+/// (@{Flow.StarField}) Starfield.
 // @mem starfield
 		"starfield", &Level::Starfield,
 
-/// (@{Flow.LensFlare}) Global lens flare .
+/// (@{Flow.LensFlare}) Global lens flare.
 // @mem lensFlare
 		"lensFlare", &Level::LensFlare,
 
