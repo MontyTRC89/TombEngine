@@ -124,40 +124,40 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#PlayAudioTrack">PlayAudioTrack(name, type)</a></td>
-	<td class="summary">Play an audio track</td>
+	<td class="name" ><a href="#PlayAudioTrack">PlayAudioTrack(filename, type)</a></td>
+	<td class="summary">Play an audio track.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#SetAmbientTrack">SetAmbientTrack(name, fromStart)</a></td>
-	<td class="summary">Set and play an ambient track</td>
+	<td class="summary">Set and play an ambient track.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#StopAudioTracks">StopAudioTracks()</a></td>
-	<td class="summary">Stop any audio tracks currently playing</td>
+	<td class="summary">Stop any audio tracks currently playing.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#StopAudioTrack">StopAudioTrack(type)</a></td>
-	<td class="summary">Stop audio track that is currently playing</td>
+	<td class="summary">Stop audio track that is currently playing.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#GetAudioTrackLoudness">GetAudioTrackLoudness(type)</a></td>
-	<td class="summary">Get current loudness level for specified track type</td>
+	<td class="summary">Get current loudness level for specified track type.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#PlaySound">PlaySound(sound[, position])</a></td>
-	<td class="summary">Play sound effect</td>
+	<td class="name" ><a href="#PlaySound">PlaySound(soundID[, position])</a></td>
+	<td class="summary">Play sound effect.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#StopSound">StopSound(sound)</a></td>
-	<td class="summary">Stop sound effect</td>
+	<td class="name" ><a href="#StopSound">StopSound(soundID)</a></td>
+	<td class="summary">Stop sound effect.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#IsSoundPlaying">IsSoundPlaying(Sound)</a></td>
-	<td class="summary">Check if the sound effect is playing</td>
+	<td class="name" ><a href="#IsSoundPlaying">IsSoundPlaying(soundID)</a></td>
+	<td class="summary">Check if the sound effect is playing.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#IsAudioTrackPlaying">IsAudioTrackPlaying(Track)</a></td>
-	<td class="summary">Check if the audio track is playing</td>
+	<td class="summary">Check if the audio track is playing.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#GetCurrentSubtitle">GetCurrentSubtitle()</a></td>
@@ -174,22 +174,22 @@
     <dl class="function">
     <dt>
     <a name = "PlayAudioTrack"></a>
-    <strong>PlayAudioTrack(name, type)</strong>
+    <strong>PlayAudioTrack(filename, type)</strong>
     </dt>
     <dd>
-    Play an audio track
+    Play an audio track.  Supported formats are wav, mp3 and ogg.
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">name</span>
+        <li><span class="parameter">filename</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-         of track (without file extension) to play
+         Filename of a track (without file extension) to play.
         </li>
         <li><span class="parameter">type</span>
             <span class="types"><a class="type" href="../4 enums/Sound.SoundTrackType.html#">SoundTrackType</a></span>
-         of the audio track to play
+         Type of the audio track to play.
         </li>
     </ul>
 
@@ -203,7 +203,7 @@
     <strong>SetAmbientTrack(name, fromStart)</strong>
     </dt>
     <dd>
-    Set and play an ambient track
+    Set and play an ambient track.
 
 
 
@@ -211,11 +211,11 @@
     <ul>
         <li><span class="parameter">name</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-         of track (without file extension) to play
+         Name of track (without file extension) to play.
         </li>
         <li><span class="parameter">fromStart</span>
             <span class="types"><span class="type">bool</span></span>
-         specifies whether ambient track should play from the start, or crossfade at a random position
+         Specifies whether ambient track should play from the start, or crossfade at a random position.
         </li>
     </ul>
 
@@ -229,7 +229,7 @@
     <strong>StopAudioTracks()</strong>
     </dt>
     <dd>
-    Stop any audio tracks currently playing
+    Stop any audio tracks currently playing.
 
 
 
@@ -244,7 +244,7 @@
     <strong>StopAudioTrack(type)</strong>
     </dt>
     <dd>
-    Stop audio track that is currently playing
+    Stop audio track that is currently playing.
 
 
 
@@ -252,7 +252,7 @@
     <ul>
         <li><span class="parameter">type</span>
             <span class="types"><a class="type" href="../4 enums/Sound.SoundTrackType.html#">SoundTrackType</a></span>
-         of the audio track
+         Type of the audio track.
         </li>
     </ul>
 
@@ -266,7 +266,7 @@
     <strong>GetAudioTrackLoudness(type)</strong>
     </dt>
     <dd>
-    Get current loudness level for specified track type
+    Get current loudness level for specified track type.
 
 
 
@@ -274,7 +274,7 @@
     <ul>
         <li><span class="parameter">type</span>
             <span class="types"><a class="type" href="../4 enums/Sound.SoundTrackType.html#">SoundTrackType</a></span>
-         of the audio track
+         Type of the audio track.
         </li>
     </ul>
 
@@ -282,7 +282,7 @@
     <ol>
 
            <span class="types"><span class="type">float</span></span>
-        current loudness of a specified audio track
+        Current loudness of a specified audio track.
     </ol>
 
 
@@ -291,18 +291,18 @@
 </dd>
     <dt>
     <a name = "PlaySound"></a>
-    <strong>PlaySound(sound[, position])</strong>
+    <strong>PlaySound(soundID[, position])</strong>
     </dt>
     <dd>
-    Play sound effect
+    Play sound effect.
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">sound</span>
+        <li><span class="parameter">soundID</span>
             <span class="types"><span class="type">int</span></span>
-         ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
+         Sound ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
         </li>
         <li><span class="parameter">position</span>
             <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
@@ -318,18 +318,18 @@
 </dd>
     <dt>
     <a name = "StopSound"></a>
-    <strong>StopSound(sound)</strong>
+    <strong>StopSound(soundID)</strong>
     </dt>
     <dd>
-    Stop sound effect
+    Stop sound effect.
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">sound</span>
+        <li><span class="parameter">soundID</span>
             <span class="types"><span class="type">int</span></span>
-         ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
+         Sound ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
         </li>
     </ul>
 
@@ -340,18 +340,18 @@
 </dd>
     <dt>
     <a name = "IsSoundPlaying"></a>
-    <strong>IsSoundPlaying(Sound)</strong>
+    <strong>IsSoundPlaying(soundID)</strong>
     </dt>
     <dd>
-    Check if the sound effect is playing
+    Check if the sound effect is playing.
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">Sound</span>
+        <li><span class="parameter">soundID</span>
             <span class="types"><span class="type">int</span></span>
-         ID to check. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
+         Sound ID to check. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window.
         </li>
     </ul>
 
@@ -365,7 +365,7 @@
     <strong>IsAudioTrackPlaying(Track)</strong>
     </dt>
     <dd>
-    Check if the audio track is playing
+    Check if the audio track is playing.
 
 
 
@@ -373,7 +373,7 @@
     <ul>
         <li><span class="parameter">Track</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-         filename to check. Should be without extension and without full directory path.
+         Filename to check. Should be without extension and without full directory path.
         </li>
     </ul>
 
@@ -388,8 +388,8 @@
     </dt>
     <dd>
     Get current subtitle string for a voice track currently playing.
-Subtitle file must be in .srt format, have same filename as voice track, and be placed in same directory as voice track.
-Returns nil if no voice track is playing or no subtitle present.
+ Subtitle file must be in .srt format, have same filename as voice track, and be placed in same directory as voice track.
+ Returns nil if no voice track is playing or no subtitle present.
 
 
 
@@ -398,7 +398,7 @@ Returns nil if no voice track is playing or no subtitle present.
     <ol>
 
            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-        current subtitle string
+        Current subtitle string.
     </ol>
 
 
