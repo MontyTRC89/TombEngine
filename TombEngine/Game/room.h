@@ -96,8 +96,6 @@ struct ROOM_INFO
 	int		 TopHeight	  = 0;
 	int		 XSize		  = 0;
 	int		 ZSize		  = 0;
-	int		 FloorWaterPlaneIndex = -1;
-	int		 CeilingWaterPlaneIndex = -1;
 
 	Vector3 ambient;
 	int flags;
