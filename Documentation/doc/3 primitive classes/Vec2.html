@@ -143,23 +143,19 @@
 	<td class="summary">Create a Vec2 object.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#__tostring">__tostring(This)</a></td>
-	<td class="summary">Metafunction.</td>
-	</tr>
-	<tr>
 	<td class="name" ><a href="#Vec2:Normalize">Vec2:Normalize()</a></td>
 	<td class="summary">Get a copy of this Vec2 normalized to length 1.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Translate">Translate(dir, dist)</a></td>
+	<td class="name" ><a href="#Vec2:Translate">Vec2:Translate(dir, dist)</a></td>
 	<td class="summary">Get a copy of this Vec2 translated in the input Vec2 direction by the input distance.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Translate">Translate(rot, dist)</a></td>
+	<td class="name" ><a href="#Vec2:Translate">Vec2:Translate(rot, dist)</a></td>
 	<td class="summary">Get a copy of this Vec2 translated in the direction of the input rotation in degrees by the input distance.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Translate">Translate(rot, relOffset)</a></td>
+	<td class="name" ><a href="#Vec2:Translate">Vec2:Translate(rot, relOffset)</a></td>
 	<td class="summary">Get a copy of this Vec2 translated by an offset, where the input relative offset Vec2 is rotated according to the input rotation in degrees.</td>
 	</tr>
 	<tr>
@@ -185,6 +181,10 @@
 	<tr>
 	<td class="name" ><a href="#Vec2:Length">Vec2:Length()</a></td>
 	<td class="summary">Get the length of this Vec2.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#__tostring">__tostring(This)</a></td>
+	<td class="summary">Metafunction.</td>
 	</tr>
 </table>
 
@@ -290,34 +290,6 @@
 
 </dd>
     <dt>
-    <a name = "__tostring"></a>
-    <strong>__tostring(This)</strong>
-    </dt>
-    <dd>
-    Metafunction.  Use tostring(vector).
-
-
-
-    <h3>Parameters:</h3>
-    <ul>
-        <li><span class="parameter">This</span>
-            <span class="types"><a class="type" href="../3 primitive classes/Vec2.html#">Vec2</a></span>
-         Vec2.
-        </li>
-    </ul>
-
-    <h3>Returns:</h3>
-    <ol>
-
-           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
-        A string showing the X and Y components of the Vec2.
-    </ol>
-
-
-
-
-</dd>
-    <dt>
     <a name = "Vec2:Normalize"></a>
     <strong>Vec2:Normalize()</strong>
     </dt>
@@ -339,8 +311,8 @@
 
 </dd>
     <dt>
-    <a name = "Translate"></a>
-    <strong>Translate(dir, dist)</strong>
+    <a name = "Vec2:Translate"></a>
+    <strong>Vec2:Translate(dir, dist)</strong>
     </dt>
     <dd>
     Get a copy of this Vec2 translated in the input Vec2 direction by the input distance.
@@ -371,8 +343,8 @@
 
 </dd>
     <dt>
-    <a name = "Translate"></a>
-    <strong>Translate(rot, dist)</strong>
+    <a name = "Vec2:Translate"></a>
+    <strong>Vec2:Translate(rot, dist)</strong>
     </dt>
     <dd>
     Get a copy of this Vec2 translated in the direction of the input rotation in degrees by the input distance.
@@ -403,8 +375,8 @@
 
 </dd>
     <dt>
-    <a name = "Translate"></a>
-    <strong>Translate(rot, relOffset)</strong>
+    <a name = "Vec2:Translate"></a>
+    <strong>Vec2:Translate(rot, relOffset)</strong>
     </dt>
     <dd>
     Get a copy of this Vec2 translated by an offset, where the input relative offset Vec2 is rotated according to the input rotation in degrees.
@@ -593,6 +565,34 @@
 
            <span class="types"><span class="type">float</span></span>
         Length.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "__tostring"></a>
+    <strong>__tostring(This)</strong>
+    </dt>
+    <dd>
+    Metafunction.  Use tostring(vector).
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">This</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec2.html#">Vec2</a></span>
+         Vec2.
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+        A string showing the X and Y components of the Vec2.
     </ol>
 
 
