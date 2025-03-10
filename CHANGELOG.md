@@ -50,6 +50,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added extra arguments for sprite object slots and starting rotation value for EmitParticle function.
 * Added ability to save Flow.Level fields such as fog or horizon to a savegame.
 * Added pickup count to Flow.Statistics class.
+* Changed Flow.StarField and Flow.LensFlare primitive types to use parameters instead of getters and setters.
 * Fixed medipack level count in Flow.Statistics class.
 
 ## [Version 1.7.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.4) - 2025-04-01
