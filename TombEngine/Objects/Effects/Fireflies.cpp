@@ -75,7 +75,6 @@ namespace TEN::Effects::Fireflies
 
         if (triggerFlags >= 0)
         {
-
             float brightnessShift = Random::GenerateFloat(-0.1f, 0.1f);
             r = std::clamp(item.Model.Color.x / 2.0f + brightnessShift, 0.0f, 1.0f) * UCHAR_MAX;
             g = std::clamp(item.Model.Color.y / 2.0f + brightnessShift, 0.0f, 1.0f) * UCHAR_MAX;
@@ -128,7 +127,8 @@ namespace TEN::Effects::Fireflies
         {
             // Remove all fireflies associated with this item.
             FireflySwarm.erase(std::remove_if(FireflySwarm.begin(), FireflySwarm.end(),
-                [&item](FireflyData& firefly) {
+                [&item](FireflyData& firefly) 
+                {
                     if (firefly.TargetItemPtr == &item)
                     {
                         firefly.Life = 0.0f;
@@ -235,7 +235,6 @@ namespace TEN::Effects::Fireflies
                     targetItem->ItemFlags[6] == firefly.Number) && 
                     targetItem->ItemFlags[FirefliesItemFlags::Light] == 1)
                 {
-
                     float totalCycleDuration = 2 * (LIGHT_ALPHA_CYCLE_DURATION + ALPHA_PAUSE_DURATION);
                     float alphaTime = fmod(frameCounter, totalCycleDuration);
 
