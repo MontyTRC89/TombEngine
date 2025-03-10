@@ -6,7 +6,7 @@
 using namespace TEN::Scripting::Types;
 
 /***
-Distance fog.
+Represesnts distance fog.
 
 @tenprimitive Flow.Fog
 @pragma nostrip
