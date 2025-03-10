@@ -36,7 +36,7 @@ namespace TEN::Effects::Fireflies
     constexpr auto DEFAULT_FIREFLY_COUNT = 20;
     constexpr auto FIREFLY_RISE_UP_FACTOR = 200;
     constexpr auto MAX_AREA_RANGE = 8;
-    constexpr auto LIGHT_ALPHA_CYCLE_DURATION = 120.0f; // Dauer des Lichts in Frames (z.B. 2 Sekunden bei 60 FPS)
+    constexpr auto LIGHT_ALPHA_CYCLE_DURATION = 120.0f;
 
     std::vector<FireflyData> FireflySwarm = {};
     std::unordered_map<int, int> nextFireflyNumberMap; // Numbering the Fireflies for Streamer effect.
@@ -125,10 +125,34 @@ namespace TEN::Effects::Fireflies
         auto& item = g_Level.Items[itemNumber];
 
         if (!TriggerActive(&item))
+        {
+            // Remove all fireflies associated with this item.
+            FireflySwarm.erase(std::remove_if(FireflySwarm.begin(), FireflySwarm.end(),
+                [&item](FireflyData& firefly) {
+                    if (firefly.TargetItemPtr == &item)
+                    {
+                        firefly.Life = 0.0f;
+                        firefly.on = false;
+                        return true;
+                    }
+                    return false;
+                }), FireflySwarm.end());
+
+            // Delete the numbers (map) of the current item.
+            nextFireflyNumberMap.erase(item.Index);
+
+            // Reset ItemFlags.
+            if (item.HitPoints == NOT_TARGETABLE)
+                item.HitPoints = item.ItemFlags[FirefliesItemFlags::Spawncounter];
+
+            item.ItemFlags[FirefliesItemFlags::Spawncounter] = 0;
+            item.ItemFlags[5] = -1;
+            item.ItemFlags[6] = -1;
+
             return;
+        }
 
         constexpr auto ALPHA_PAUSE_DURATION = 2.0f;
-
         static float frameCounter = 0.0f;
 
         // Increment the counter variable in each frame.
@@ -176,12 +200,12 @@ namespace TEN::Effects::Fireflies
             if (targetItem == &item)
             {
                 // choose one of the available firefly number that has the light.
-                if (targetItem->ItemFlags[5] == -1 && targetItem->TriggerFlags)
+                if (targetItem->ItemFlags[5] == -1  && targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] >= 0)
                 {
                     targetItem->ItemFlags[5] = Random::GenerateInt(0, targetItem->TriggerFlags);
                 }
                 // two lights max for each cluster.
-                if (targetItem->ItemFlags[6] == -1 && targetItem->TriggerFlags)
+                if (targetItem->ItemFlags[6] == -1  && targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] >= 0)
                 {
                     targetItem->ItemFlags[6] = Random::GenerateInt(0, targetItem->TriggerFlags);
                 }
@@ -413,6 +437,7 @@ namespace TEN::Effects::Fireflies
     void ClearFireflySwarm()
     {
         FireflySwarm.clear();
+        nextFireflyNumberMap.clear();
     }
 }
 
