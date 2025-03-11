@@ -139,32 +139,8 @@
       </Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>SETLOCAL EnableDelayedExpansion
-
-SET SchemaDir=$(ProjectDir)Specific\savegame\schema
-SET TimestampFile=$(TargetDir)flatbuffers.timestamp
-
-FOR %%F IN ("%SchemaDir%\ten_itemdata.fbs" "%SchemaDir%\ten_savegame.fbs") DO (
-    SET "CurrentTimestamp=!CurrentTimestamp! %%~tF"
-)
-
-IF EXIST "%TimestampFile%" (
-    SET /P LastTimestamp=&lt;"%TimestampFile%"
-)
-
-SET CurrentTimestamp=%CurrentTimestamp: =%
-SET LastTimestamp=%LastTimestamp: =%
-
-IF "%CurrentTimestamp%" == "%LastTimestamp%" (
-    ECHO Skipping gen.bat, schema files are unchanged
-) ELSE (
-    ECHO Generating savegame code from flatbuffer schema...
-    CD "%SchemaDir%"
-    CALL gen.bat
-    ECHO !CurrentTimestamp! &gt; "%TimestampFile%"
-)
-
-ENDLOCAL
+      <Command>powershell -ExecutionPolicy Bypass -File "$(SolutionDir)\Documentation\generate_objectlist.ps1"
+powershell -ExecutionPolicy Bypass -File "$(ProjectDir)Specific\savegame\schema\generate_code.ps1"
 
 CD "$(ProjectDir)..\Documentation\"
 CALL compile.bat .
@@ -228,32 +204,8 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
       </Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>SETLOCAL EnableDelayedExpansion
-
-SET SchemaDir=$(ProjectDir)Specific\savegame\schema
-SET TimestampFile=$(TargetDir)flatbuffers.timestamp
-
-FOR %%F IN ("%SchemaDir%\ten_itemdata.fbs" "%SchemaDir%\ten_savegame.fbs") DO (
-    SET "CurrentTimestamp=!CurrentTimestamp! %%~tF"
-)
-
-IF EXIST "%TimestampFile%" (
-    SET /P LastTimestamp=&lt;"%TimestampFile%"
-)
-
-SET CurrentTimestamp=%CurrentTimestamp: =%
-SET LastTimestamp=%LastTimestamp: =%
-
-IF "%CurrentTimestamp%" == "%LastTimestamp%" (
-    ECHO Skipping gen.bat, schema files are unchanged
-) ELSE (
-    ECHO Generating savegame code from flatbuffer schema...
-    CD "%SchemaDir%"
-    CALL gen.bat
-    ECHO !CurrentTimestamp! &gt; "%TimestampFile%"
-)
-
-ENDLOCAL
+      <Command>powershell -ExecutionPolicy Bypass -File "$(SolutionDir)\Documentation\generate_objectlist.ps1"
+powershell -ExecutionPolicy Bypass -File "$(ProjectDir)Specific\savegame\schema\generate_code.ps1"
 
 CD "$(ProjectDir)..\Documentation\"
 CALL compile.bat .
@@ -330,7 +282,9 @@ del "$(TargetDir)*.exp" /q
 del "$(TargetDir)OIS_d.dll" /q</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD "$(ProjectDir)..\Documentation\"
+      <Command>powershell -ExecutionPolicy Bypass -File "$(SolutionDir)\Documentation\generate_objectlist.ps1"
+
+CD "$(ProjectDir)..\Documentation\"
 CALL compile.bat .
 
 CD "$(ProjectDir)Specific\savegame\schema\"
@@ -409,7 +363,9 @@ del "$(TargetDir)*.exp" /q
 del "$(TargetDir)OIS_d.dll" /q</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>CD "$(ProjectDir)..\Documentation\"
+      <Command>powershell -ExecutionPolicy Bypass -File "$(SolutionDir)\Documentation\generate_objectlist.ps1"
+
+CD "$(ProjectDir)..\Documentation\"
 CALL compile.bat .
 
 CD "$(ProjectDir)Specific\savegame\schema\"

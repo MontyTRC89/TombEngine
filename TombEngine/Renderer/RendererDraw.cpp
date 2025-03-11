@@ -2695,8 +2695,8 @@ namespace TEN::Renderer
 				// Bind caustics texture.
 				if (_causticTextures.size() > 0)
 				{     
-					int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
-					int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;     
+					int nmeshes = -Objects[ID_CAUSTIC_TEXTURES].nmeshes;
+					int meshIndex = Objects[ID_CAUSTIC_TEXTURES].meshIndex;
 					int causticsFrame = GlobalCounter % _causticTextures.size();
 					BindTexture(TextureRegister::CausticsMap, &_causticTextures[causticsFrame], SamplerStateRegister::AnisotropicClamp);
 				} 
