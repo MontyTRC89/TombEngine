@@ -6,7 +6,7 @@
 using namespace TEN::Scripting::Types;
 
 /***
-Represesnts distance fog. To be used as @{Flow.Level.fog} property.
+Represesnts distance fog. To be used with @{Flow.Level.fog} property.
 
 @tenprimitive Flow.Fog
 @pragma nostrip

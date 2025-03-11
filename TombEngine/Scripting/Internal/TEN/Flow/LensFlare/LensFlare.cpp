@@ -8,7 +8,7 @@
 
 using namespace TEN::Scripting::Types;
 
-/// Represents a global lens flare (not to be confused with the lens flare object). To be used as @{Flow.Level.lensFlare} property.
+/// Represents a global lens flare (not to be confused with the lens flare object). To be used with @{Flow.Level.lensFlare} property.
 //
 // @tenprimitive Flow.LensFlare
 // @pragma nostrip
