@@ -8,14 +8,6 @@ using namespace TEN::Math;
 
 namespace TEN::Scripting
 {
-	float WrapAngle(float angle)
-	{
-		angle -= std::floor(angle / 360.0f) * 360.0f;
-		return (angle < 0.0f) ? angle + 360.0f : angle;
-
-		return angle;
-	}
-
 	/// Represents a 3D rotation.
 	// All angle components are in degrees clamped to the range [0.0, 360.0].
 	// @tenprimitive Rotation
@@ -33,7 +25,6 @@ namespace TEN::Scripting
 
 			// Meta functions
 			sol::meta_function::to_string, &Rotation::ToString,
-
 			sol::meta_function::equal_to, &Rotation::operator ==,
 			sol::meta_function::addition, &Rotation::operator +,
 			sol::meta_function::subtraction, &Rotation::operator -,
@@ -150,5 +141,11 @@ namespace TEN::Scripting
 		y = WrapAngle(y - rot.y);
 		z = WrapAngle(z - rot.z);
 		return *this;
+	}
+
+	float Rotation::WrapAngle(float angle) const
+	{
+		angle -= std::floor(angle / 360.0f) * 360.0f;
+		return ((angle < 0.0f) ? (angle + 360.0f) : angle);
 	}
 }

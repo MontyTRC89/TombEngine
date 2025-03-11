@@ -233,7 +233,6 @@ namespace TEN::Effects::Environment
 	void EnvironmentController::UpdateStarfield(const ScriptInterfaceLevel& level)
 	{
 		int starCount = level.GetStarfieldStarCount();
-
 		if (starCount == 0)
 			return;
 
@@ -245,10 +244,11 @@ namespace TEN::Effects::Environment
 
 		if (starCount != Stars.size())
 		{
-			// If starCount increased, add new stars to the existing list.
+			// If starCount increased, add new stars to existing list.
 			if (starCount > Stars.size())
 			{
-				Stars.reserve(starCount);  // Reserve space for new stars if necessary.
+				// Reserve space for new stars if necessary.
+				Stars.reserve(starCount);
 
 				for (int i = (int)Stars.size(); i < starCount; i++)
 				{
@@ -279,7 +279,8 @@ namespace TEN::Effects::Environment
 					Stars.push_back(star);
 				}
 			}
-			else // If starCount decreased, just resize the vector without reinitializing.
+			// If starCount decreased, resize vector without reinitializing.
+			else
 			{
 				Stars.resize(starCount);
 			}

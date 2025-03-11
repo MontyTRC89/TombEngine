@@ -46,5 +46,10 @@ namespace TEN::Scripting
 		Rotation  operator -(const Rotation& rot) const;
 		Rotation& operator +=(const Rotation& rot);
 		Rotation& operator -=(const Rotation& rot);
+
+	private:
+		// Helpers
+
+		float WrapAngle(float angle) const;
 	};
 }
