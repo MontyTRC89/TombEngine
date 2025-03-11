@@ -16,7 +16,6 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Setup.h"
-#include "Math/Geometry.h"
 #include "Math/Math.h"
 #include "Objects/Effects/Fireflies.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
@@ -27,7 +26,6 @@ using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Splash;
 using namespace TEN::Math;
-using namespace TEN::Math::Geometry;
 using namespace TEN::Effects::Fireflies;
 
 namespace TEN::Entities::TR3
