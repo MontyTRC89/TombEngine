@@ -1240,7 +1240,7 @@ The following ObjID members refer to sprites.
 	CUSTOM_AMMO_GRAPHICS
 @table SpriteConstants
 */
-static const std::unordered_map<std::string, GAME_OBJECT_ID> kObjIDs {
+static const std::unordered_map<std::string, GAME_OBJECT_ID> GAME_OBJECT_IDS {
 	{ "LARA", ID_LARA },
 	{ "LARA_EXTRA_ANIMS", ID_LARA_EXTRA_ANIMS },
 	{ "PISTOLS_ANIM", ID_PISTOLS_ANIM },
