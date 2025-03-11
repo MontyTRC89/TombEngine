@@ -15,7 +15,7 @@ These are things things which aren't present in the compiled level file itself.
 
 /// Make a new Level object.
 //@function Level
-//@treturn Level a Level object
+//@treturn Level a Level object.
 void Level::Register(sol::table& parent)
 {
 	// Register type.
@@ -49,11 +49,11 @@ void Level::Register(sol::table& parent)
 //@mem ambientTrack
 		"ambientTrack", &Level::AmbientTrack,
 
-/// (@{Flow.SkyLayer}) Primary sky layer  
+/// (@{Flow.SkyLayer}) Primary sky cloud layer.
 //@mem layer1
 		"layer1", &Level::Layer1,
 
-/// (@{Flow.SkyLayer}) Secondary sky layer
+/// (@{Flow.SkyLayer}) Secondary sky cloud layer.
 //@mem layer2
 		"layer2", &Level::Layer2,
 
@@ -63,20 +63,20 @@ void Level::Register(sol::table& parent)
 		"horizon", sol::property(&Level::GetHorizon1Enabled, &Level::SetHorizon1Enabled), // Compatibility.
 
 ///  (@{Flow.Horizon}) Second horizon layer.
-//@mem horizon1
+//@mem horizon2
 		"horizon2", &Level::Horizon2,
 
-/// (@{Flow.Starfield}) Starfield.
-// @mem starfield
-		"starfield", &Level::Starfield,
+/// (@{Flow.StarField}) Starfield in the sky.
+// @mem starField
+		"starField", &Level::Starfield,
+		"starfield", &Level::Starfield, // Compatibility.
 
-/// (@{Flow.LensFlare}) Global lens flare .
+/// (@{Flow.LensFlare}) Global lens flare.
 // @mem lensFlare
 		"lensFlare", &Level::LensFlare,
 
-/// (@{Flow.Fog}) omni fog RGB color and distance.
-// As seen in TR4's Desert Railroad.
-// If not provided, distance fog will be black.
+/// (@{Flow.Fog}) Global distance fog, with specified RGB color and distance.
+// If not provided, distance fog will not be visible.
 //@mem fog
 		"fog", &Level::Fog,
 
@@ -126,11 +126,11 @@ e.g. `myLevel.laraType = LaraType.Divesuit`
 //@mem resetHub
 		"resetHub", &Level::ResetHub,
 
-/// (table of @{Flow.InventoryItem}s) table of inventory object overrides
+/// (table of @{Flow.InventoryItem}s) A table of inventory object layout overrides.
 //@mem objects
 		"objects", &Level::InventoryObjects,
 
-/// (short) Set Secrets for Level
+/// (short) Set total secret count for current level.
 //@mem secrets
 		"secrets", sol::property(&Level::GetSecrets, &Level::SetSecrets)
 	);
@@ -308,7 +308,7 @@ EulerAngles Level::GetHorizonPrevOrientation(int index) const
 
 bool Level::GetLensFlareEnabled() const
 {
-	return LensFlare.GetEnabledStatus();
+	return LensFlare.GetEnabled();
 }
 
 int Level::GetLensFlareSunSpriteID() const
@@ -329,16 +329,6 @@ short Level::GetLensFlareYaw() const
 Color Level::GetLensFlareColor() const
 {
 	return LensFlare.GetColor();
-}
-
-bool Level::GetStarfieldStarsEnabled() const
-{
-	return Starfield.GetStarsEnabledStatus();
-}
-
-bool Level::GetStarfieldMeteorsEnabled() const
-{
-	return Starfield.GetMeteorsEnabledStatus();
 }
 
 int Level::GetStarfieldStarCount() const

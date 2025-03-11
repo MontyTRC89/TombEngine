@@ -30,7 +30,7 @@ using namespace TEN::Scripting::Types;
 // Examples include the player, traps, enemies, doors, and pickups. See also @{Objects.LaraObject} for player-specific features.
 //
 // @tenclass Objects.Moveable
-// pragma nostrip
+// @pragma nostrip
 
 static auto IndexError = IndexErrorMaker(Moveable, ScriptReserved_Moveable);
 static auto NewIndexError = NewIndexErrorMaker(Moveable, ScriptReserved_Moveable);

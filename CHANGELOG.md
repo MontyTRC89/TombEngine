@@ -34,7 +34,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added TR4 Statue Plinth.
 
 ### Lua API changes
-
 * Added Collision.Probe class for basic room collision detection.
 * Added advanced particle emitter allowing animations and other effects.
 * Added diary module.
@@ -46,11 +45,13 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added Effects.EmitStreamer() function to emit streamers.
 * Added Moveable:GetScale() and Movebale:SetScale() methods to set visible scale of moveables.
 * Added Rotation:Lerp() function to allow linear interpolation between rotations.
+* Added ability to perform additive and subtractive operations on Rotation class and compare one Rotation to another.
 * Added various Translate() methods to Vec2 and Vec3 script objects.
 * Added alpha transparency functionality for statics and moveables to be used with SetColor() method.
 * Added extra arguments for sprite object slots and starting rotation value for EmitParticle function.
-* Added ability to save Flow.Level fields such as fog or horizon to a savegame.
+* Added ability to dynamically change Flow.Level fields such as fog, starfield or horizon, and save them to a savegame.
 * Added pickup count to Flow.Statistics class.
+* Changed Flow.StarField and Flow.LensFlare primitive types to use parameters instead of getters and setters.
 * Fixed medipack level count in Flow.Statistics class.
 
 ## [Version 1.7.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.4) - 2025-04-01
