@@ -237,41 +237,53 @@ namespace TEN::Effects::Environment
 		if (starCount == 0)
 			return;
 
-		if (ResetStarField || starCount != Stars.size())
+		if (ResetStarField)
 		{
 			Stars.clear();
-			Stars.reserve(starCount);
+			ResetStarField = false;
+		}
 
-			for (int i = 0; i < starCount; i++)
+		if (starCount != Stars.size())
+		{
+			// If starCount increased, add new stars to the existing list.
+			if (starCount > Stars.size())
 			{
-				auto starDir = Random::GenerateDirectionInCone(-Vector3::UnitY, 70.0f);
-				starDir.Normalize();
+				Stars.reserve(starCount);  // Reserve space for new stars if necessary.
 
-				auto star = StarParticle{};
-				star.Direction = starDir;
-				star.Color = Vector3(
-					Random::GenerateFloat(0.6f, 1.0f),
-					Random::GenerateFloat(0.6f, 1.0f),
-					Random::GenerateFloat(0.6f, 1.0f));
-				star.Scale = Random::GenerateFloat(0.5f, 1.5f);
-
-				float cosine = Vector3::UnitY.Dot(starDir);
-				float maxCosine = cos(DEG_TO_RAD(50.0f));
-				float minCosine = cos(DEG_TO_RAD(70.0f));
-
-				if (cosine >= minCosine && cosine <= maxCosine)
+				for (int i = (int)Stars.size(); i < starCount; i++)
 				{
-					star.Extinction = (cosine - minCosine) / (maxCosine - minCosine);
-				}
-				else
-				{
-					star.Extinction = 1.0f;
-				}
+					auto starDir = Random::GenerateDirectionInCone(-Vector3::UnitY, 70.0f);
+					starDir.Normalize();
 
-				Stars.push_back(star);
+					auto star = StarParticle{};
+					star.Direction = starDir;
+					star.Color = Vector3(
+						Random::GenerateFloat(0.6f, 1.0f),
+						Random::GenerateFloat(0.6f, 1.0f),
+						Random::GenerateFloat(0.6f, 1.0f));
+					star.Scale = Random::GenerateFloat(0.5f, 1.5f);
+
+					float cosine = Vector3::UnitY.Dot(starDir);
+					float maxCosine = cos(DEG_TO_RAD(50.0f));
+					float minCosine = cos(DEG_TO_RAD(70.0f));
+
+					if (cosine >= minCosine && cosine <= maxCosine)
+					{
+						star.Extinction = (cosine - minCosine) / (maxCosine - minCosine);
+					}
+					else
+					{
+						star.Extinction = 1.0f;
+					}
+
+					Stars.push_back(star);
+				}
+			}
+			else // If starCount decreased, just resize the vector without reinitializing.
+			{
+				Stars.resize(starCount);
 			}
 
-			ResetStarField = false;
 		}
 
 		for (auto& star : Stars)
