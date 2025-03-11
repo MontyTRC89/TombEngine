@@ -1409,11 +1409,11 @@ static std::vector<int> FillCollideableItemList()
 
 bool CheckStaticCollideCamera(MESH_INFO* mesh)
 {
-	bool isCloseEnough = Vector3i::Distance(mesh->pos.Position, Camera.pos.ToVector3i()) <= COLL_CHECK_THRESHOLD;
+	bool isCloseEnough = Vector3i::Distance(mesh->Transform.Position, Camera.pos.ToVector3i()) <= COLL_CHECK_THRESHOLD;
 	if (!isCloseEnough)
 		return false;
 
-	if (!(mesh->flags & StaticMeshFlags::SM_VISIBLE))
+	if (!(mesh->Flags & StaticMeshFlags::SM_VISIBLE))
 		return false;
 
 	const auto& bounds = GetBoundsAccurate(*mesh, false);
@@ -1500,18 +1500,18 @@ void ItemsCollideCamera()
 		if (!mesh)
 			return;
 
-		auto distance = Vector3i::Distance(mesh->pos.Position, LaraItem->Pose.Position);
+		auto distance = Vector3i::Distance(mesh->Transform.Position, LaraItem->Pose.Position);
 		if (distance > COLL_CANCEL_THRESHOLD)
 			continue;
 
 		auto bounds = GetBoundsAccurate(*mesh, false);
-		if (TestBoundsCollideCamera(bounds, mesh->pos, CAMERA_RADIUS))
-			ItemPushCamera(&bounds, &mesh->pos, RADIUS);
+		if (TestBoundsCollideCamera(bounds, mesh->Transform, CAMERA_RADIUS))
+			ItemPushCamera(&bounds, &mesh->Transform, RADIUS);
 
 		if (DebugMode)
 		{
 			DrawDebugBox(
-				bounds.ToBoundingOrientedBox(mesh->pos),
+				bounds.ToBoundingOrientedBox(mesh->Transform),
 				Vector4(1.0f, 0.0f, 0.0f, 1.0f), RendererDebugPage::CollisionStats);
 		}
 	}

@@ -249,22 +249,6 @@ namespace TEN::Collision::Room
 	}
 }
 
-GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool getVisibilityBox)
-{
-	static auto bounds = GameBoundingBox();
-
-	if (getVisibilityBox)
-	{
-		bounds = Statics[mesh.staticNumber].visibilityBox * mesh.scale;
-	}
-	else
-	{
-		bounds = Statics[mesh.staticNumber].collisionBox * mesh.scale;
-	}
-
-	return bounds;
-}
-
 bool IsPointInRoom(const Vector3i& pos, int roomNumber)
 {
 	const auto& room = g_Level.Rooms[roomNumber];

@@ -5,6 +5,7 @@
 
 namespace sol { class state; }
 
+enum GAME_OBJECT_ID : short;
 class Vec3;
 namespace TEN::Scripting::Types { class ScriptColor; }
 
@@ -37,23 +38,23 @@ namespace TEN::Scripting
 
 		// Getters
 
-		std::string GetName() const;
-		int			GetSlot() const;
-		Vec3		GetPosition() const;
-		Rotation	GetRotation() const;
-		float		GetScale() const;
-		ScriptColor GetColor() const;
-		int			GetHitPoints() const;
-		bool		GetActiveStatus() const;
-		bool		GetSolidStatus() const;
+		std::string	   GetName() const;
+		GAME_OBJECT_ID GetObjectId() const;
+		Vec3		   GetPosition() const;
+		Rotation	   GetRotation() const;
+		Vec3		   GetScale() const;
+		ScriptColor	   GetColor() const;
+		int			   GetHitPoints() const;
+		bool		   GetActiveStatus() const;
+		bool		   GetSolidStatus() const;
 
 		// Setters
 
 		void SetName(const std::string& name);
-		void SetSlot(int slotID);
+		void SetObjectId(GAME_OBJECT_ID objectId);
 		void SetPosition(const Vec3& pos);
 		void SetRotation(const Rotation& rot);
-		void SetScale(float scale);
+		void SetScale(const Vec3& scale);
 		void SetColor(const ScriptColor& color);
 		void SetHitPoints(int hitPoints);
 		void SetSolidStatus(bool status);
@@ -67,5 +68,9 @@ namespace TEN::Scripting
 		// Operators
 
 		Static& operator =(const Static& staticObj) = delete;
+
+		// COMPATIBILITY
+
+		void SetScale(float scale);
 	};
 }

@@ -414,14 +414,14 @@ void UpdateShatters()
 		SmashedMeshCount--;
 
 		auto* floor = GetFloor(
-			SmashedMesh[SmashedMeshCount]->pos.Position.x,
-			SmashedMesh[SmashedMeshCount]->pos.Position.y,
-			SmashedMesh[SmashedMeshCount]->pos.Position.z,
+			SmashedMesh[SmashedMeshCount]->Transform.Position.x,
+			SmashedMesh[SmashedMeshCount]->Transform.Position.y,
+			SmashedMesh[SmashedMeshCount]->Transform.Position.z,
 			&SmashedMeshRoom[SmashedMeshCount]);
 
-		TestTriggers(SmashedMesh[SmashedMeshCount]->pos.Position.x,
-			SmashedMesh[SmashedMeshCount]->pos.Position.y,
-			SmashedMesh[SmashedMeshCount]->pos.Position.z,
+		TestTriggers(SmashedMesh[SmashedMeshCount]->Transform.Position.x,
+			SmashedMesh[SmashedMeshCount]->Transform.Position.y,
+			SmashedMesh[SmashedMeshCount]->Transform.Position.z,
 			SmashedMeshRoom[SmashedMeshCount], true);
 
 		TestVolumes(SmashedMeshRoom[SmashedMeshCount], SmashedMesh[SmashedMeshCount]);

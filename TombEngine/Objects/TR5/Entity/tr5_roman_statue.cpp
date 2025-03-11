@@ -556,12 +556,12 @@ namespace TEN::Entities::Creatures::TR5
 						{
 							auto* mesh = &room->mesh[i];
 
-							if (!((mesh->pos.Position.z ^ pos.z) & 0xFFFFFC00) && !((mesh->pos.Position.x ^ pos.x) & 0xFFFFFC00))
+							if (!((mesh->Transform.Position.z ^ pos.z) & 0xFFFFFC00) && !((mesh->Transform.Position.x ^ pos.x) & 0xFFFFFC00))
 							{
-								if (Statics[mesh->staticNumber].shatterType != ShatterType::None)
+								if (Statics[mesh->ObjectId].shatterType != ShatterType::None)
 								{
 									ShatterObject(0, mesh, -64, LaraItem->RoomNumber, 0);
-									SoundEffect(GetShatterSound(mesh->staticNumber), (Pose*)mesh);
+									SoundEffect(GetShatterSound(mesh->ObjectId), (Pose*)mesh);
 
 									floor->Stopper = false;
 

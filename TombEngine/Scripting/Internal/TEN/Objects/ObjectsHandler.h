@@ -96,7 +96,7 @@ private:
 			
 			auto staticObj = std::get<std::reference_wrapper<MESH_INFO>>(value).get();
 
-			if (staticObj.staticNumber == slot)
+			if (staticObj.ObjectId == slot)
 				items.push_back(GetByName<Static, ScriptReserved_Static>(key));
 		}
 
