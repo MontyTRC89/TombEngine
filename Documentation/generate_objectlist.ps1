@@ -66,7 +66,8 @@ if ($enumValues.Count -gt 0) { $enumValues = $enumValues[1..($enumValues.Count -
 $header = @"
 #pragma once
 
-// Last generated on $(Get-Date -Format "dd/MM/yyyy")
+// This file is generated automatically, do not edit it.
+// Last generated on $(Get-Date -Format "dd/MM/yyyy").
 
 #include <unordered_map>
 #include <string>
@@ -121,7 +122,7 @@ $spriteFooter = @"
 "@
 
 # Map definition.
-$mapHeader = "static const std::unordered_map<std::string, GAME_OBJECT_ID> kObjIDs {"
+$mapHeader = "static const std::unordered_map<std::string, GAME_OBJECT_ID> GAME_OBJECT_IDS {"
 $mapBody = ($enumValues | ForEach-Object { "`t" + '{ "' + "$_" + '", ID_' + "$_" + ' }' }) -join ",`r`n"
 $mapFooter = "};"
 
