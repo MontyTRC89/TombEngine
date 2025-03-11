@@ -14,6 +14,7 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/configuration.h"
+#include "Specific/Parallel.h"
 #include "Specific/trutils.h"
 #include "Scripting/Internal/LanguageScript.h"
 #include "Scripting/Include/ScriptInterfaceState.h"
@@ -49,8 +50,12 @@ bool ArgEquals(wchar_t* incomingArg, std::string name)
 	return (lowerArg == "-" + name) || (lowerArg == "/" + name);
 }
 
-bool IsRedistInstalled()
+void CheckIfRedistInstalled()
 {
+	// Before doing any actions, check if VC redist is installed, because otherwise it can
+	// silently crash at any moment. Still allows to run the game in any case, even if user
+	// decides not to install redistributables.
+
 	const char* redistKey =
 #ifdef _WIN64
 		R"(SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64)";
@@ -62,13 +67,28 @@ bool IsRedistInstalled()
 	LSTATUS result = RegOpenKeyExA(HKEY_LOCAL_MACHINE, redistKey, 0, KEY_READ, &hKey);
 	if (result == ERROR_SUCCESS)
 	{
-		RegCloseKey(hKey);
+		DWORD majorVersion = 0;
+		DWORD minorVersion = 0;
+		DWORD dataSize = sizeof(DWORD);
 
-		HMODULE hModule = LoadLibraryW(L"vcruntime140.dll");
-		if (hModule != NULL)
+		if (RegQueryValueExA(hKey, "Major", NULL, NULL, (LPBYTE)&majorVersion, &dataSize) == ERROR_SUCCESS &&
+			RegQueryValueExA(hKey, "Minor", NULL, NULL, (LPBYTE)&minorVersion, &dataSize) == ERROR_SUCCESS)
 		{
-			FreeLibrary(hModule);
-			return true;
+			RegCloseKey(hKey);
+
+			if (majorVersion >= 14 && minorVersion >= 40)
+			{
+				HMODULE hModule = LoadLibraryW(L"vcruntime140.dll");
+				if (hModule != NULL)
+				{
+					FreeLibrary(hModule);
+					return;
+				}
+			}
+		}
+		else
+		{
+			RegCloseKey(hKey);
 		}
 	}
 
@@ -79,7 +99,7 @@ bool IsRedistInstalled()
 		R"(https://aka.ms/vs/17/release/vc_redist.x86.exe)";
 #endif
 
-	const char* message = "TombEngine requires Visual C++ Redistributable to be installed. Would you like to download it now?";
+	const char* message = "TombEngine requires Visual C++ 2015-2022 Redistributable to be installed. Would you like to download it now?";
 	int msgBoxResult = MessageBoxA(NULL, message, "Missing libraries", MB_ICONWARNING | MB_OKCANCEL);
 
 	if (msgBoxResult == IDOK)
@@ -92,8 +112,6 @@ bool IsRedistInstalled()
 				std::to_string((long)(intptr_t)hResult)).c_str(), "Error", MB_ICONERROR | MB_OK);
 		}
 	}
-
-	return false;
 }
 
 Vector2i GetScreenResolution()
@@ -345,11 +363,7 @@ int main()
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
-	if (!IsRedistInstalled())
-	{
-		WinClose();
-		exit(EXIT_SUCCESS);
-	}
+	CheckIfRedistInstalled();
 
 	// Process command line arguments.
 	bool setup = false;
@@ -579,6 +593,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	DoTheGame = true;
 
+	g_Parallel.Initialize();
 	ThreadEnded = false;
 	ThreadHandle = BeginThread(GameMain, ThreadID);
 

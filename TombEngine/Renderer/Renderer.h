@@ -232,7 +232,7 @@ namespace TEN::Renderer
 		std::vector<TexturePair>							   _staticTextures;
 		std::vector<Texture2D>								   _spritesTextures;
 
-		Matrix _laraWorldMatrix;
+		Matrix _playerWorldMatrix;
 
 		// Preallocated pools of objects for avoiding new/delete.
 		// Items and effects are safe (can't be more than 1024 items in TR), 
@@ -509,7 +509,7 @@ namespace TEN::Renderer
 							const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3,
 							BlendMode blendMode, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);
 
-		Matrix GetWorldMatrixForSprite(RendererSpriteToDraw* spr, RenderView& view);
+		Matrix GetWorldMatrixForSprite(const RendererSpriteToDraw& sprite, RenderView& view);
 		RendererObject& GetRendererObject(GAME_OBJECT_ID id);
 		RendererMesh* GetMesh(int meshIndex);
 		Texture2D CreateDefaultNormalTexture();
@@ -580,9 +580,17 @@ namespace TEN::Renderer
 		static inline bool IsSortedBlendMode(BlendMode blendMode)
 		{
 			return !(blendMode == BlendMode::Opaque ||
-				blendMode == BlendMode::AlphaTest ||
-				blendMode == BlendMode::Additive ||
-				blendMode == BlendMode::FastAlphaBlend);
+					 blendMode == BlendMode::AlphaTest ||
+					 blendMode == BlendMode::Additive ||
+					 blendMode == BlendMode::FastAlphaBlend);
+		}
+
+		static inline BlendMode GetBlendModeFromAlpha(BlendMode blendMode, float alpha)
+		{
+			if (alpha < ALPHA_BLEND_THRESHOLD && (blendMode == BlendMode::Opaque || blendMode == BlendMode::FastAlphaBlend))
+				return BlendMode::AlphaBlend;
+
+			return blendMode;
 		}
 
 		inline RendererObject& GetStaticRendererObject(short objectNumber)
