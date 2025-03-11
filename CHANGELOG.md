@@ -33,7 +33,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added TR4 Statue Plinth.
 
 ### Lua API changes
-
 * Added Collision.Probe class for basic room collision detection.
 * Added advanced particle emitter allowing animations and other effects.
 * Added diary module.
