@@ -239,7 +239,6 @@ namespace TEN::Effects::Environment
 
 		if (ResetStarField || starCount != Stars.size())
 		{
-
 			Stars.clear();
 			Stars.reserve(starCount);
 
