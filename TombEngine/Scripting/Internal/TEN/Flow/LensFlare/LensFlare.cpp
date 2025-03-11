@@ -30,7 +30,7 @@ namespace TEN::Scripting
 			// @mem enabled
 			"enabled", sol::property(&LensFlare::GetEnabled, &LensFlare::SetEnabled),
 
-			/// (int) Lens flare's sun sprite object ID.
+			/// (@{Objects.ObjID.SpriteConstants}) Lens flare's sun sprite object ID.
 			// @mem spriteID
 			"spriteID", sol::property(&LensFlare::GetSunSpriteID, &LensFlare::SetSunSpriteID),
 
@@ -42,7 +42,7 @@ namespace TEN::Scripting
 			// @mem yaw
 			"yaw", sol::property(&LensFlare::GetYaw, &LensFlare::SetYaw),
 
-			/// (Color) Lens flare's color.
+			/// (@{Color}) Lens flare's color.
 			// @mem color
 			"color", sol::property(&LensFlare::GetColor, &LensFlare::SetColor),
 
@@ -64,7 +64,7 @@ namespace TEN::Scripting
 	// @function LensFlare
 	// @tparam float pitch Pitch angle in degrees.
 	// @tparam float yaw Yaw angle in degrees.
-	// @tparam Color color Color of the lensflare.
+	// @tparam @{Color} color Color of the lensflare.
 	// @treturn LensFlare A new LensFlare object.
 	LensFlare::LensFlare(float pitch, float yaw, const ScriptColor& color)
 	{

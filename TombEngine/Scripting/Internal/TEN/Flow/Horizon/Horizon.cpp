@@ -30,16 +30,16 @@ namespace TEN::Scripting
 			// @mem enabled
 			"enabled", sol::property(&Horizon::GetEnabled, &Horizon::SetEnabled),
 
-			/// (Objects.ObjID) Horizon object ID.
+			/// (@{Objects.ObjID}) Horizon object ID.
 			// @mem objectID
 			"objectID", sol::property(&Horizon::GetObjectID, &Horizon::SetObjectID),
 
-			/// (Vec3) Horizon position.
+			/// (@{Vec3}) Horizon position.
 			// Specifies an offset from the camera origin.
 			// @mem position
 			"position", sol::property(&Horizon::GetPosition, &Horizon::SetPosition),
 
-			/// (Rotation) Horizon rotation.
+			/// (@{Rotation}) Horizon rotation.
 			// Specifies horizon rotation.
 			// @mem rotation
 			"rotation", sol::property(&Horizon::GetRotation, &Horizon::SetRotation),
