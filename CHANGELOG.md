@@ -6,6 +6,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ## [Version 1.8](link to release) - yyyy-mm-dd
 
 ### Bug fixes
+* Improved engine performance up to 20%.
 * Fixed bridges moving the player when the player is underwater.
 * Fixed trigger triggerer not working.
 * Fixed display pickup numeric string not being interpolated in high framerate mode.
