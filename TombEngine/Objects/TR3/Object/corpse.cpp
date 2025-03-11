@@ -16,6 +16,7 @@
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Setup.h"
+#include "Math/Geometry.h"
 #include "Math/Math.h"
 #include "Objects/Effects/Fireflies.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
@@ -26,6 +27,7 @@ using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Splash;
 using namespace TEN::Math;
+using namespace TEN::Math::Geometry;
 using namespace TEN::Effects::Fireflies;
 
 namespace TEN::Entities::TR3
@@ -113,31 +115,31 @@ namespace TEN::Entities::TR3
 				item.ItemFlags[FirefliesItemFlags::RemoveFliesEffect] = 1;
 			}
 
-			pointColl = GetPointCollision(item);
+			auto bounds = GameBoundingBox(&item);
+
 			item.Animation.IsAirborne = true;
 
-			if (pointColl.GetFloorHeight() < item.Pose.Position.y)
+			if (pointColl.GetFloorHeight() <= item.Pose.Position.y - bounds.Y2)
 			{
 				if (!isWater)
 				{
-					item.Pose.Position.y = item.Pose.Position.y - item.Animation.Velocity.y;
+					item.Pose.Position.y = pointColl.GetFloorHeight();
 					SoundEffect(SFX_TR4_CROCGOD_LAND, &item.Pose);
 				}
-				else
+				else 
 				{
-					item.Pose.Position.y = item.Pose.Position.y;
+					item.Pose.Position.y = pointColl.GetFloorHeight();
 				}
 
 				item.Animation.IsAirborne = false;
 				item.Animation.Velocity = Vector3::Zero;
 				item.Animation.TargetState = CORPSE_STATE_LAND;
 				item.Animation.AnimNumber = object.animIndex + CORPSE_ANIM_LAND;
-				AlignEntityToSurface(&item, Vector2(object.radius));
 
 				item.ItemFlags[7] = (int)CorpseFlag::Grounded;
 				return;
 			}
-			else
+			else if (item.Animation.ActiveState == CORPSE_STATE_FALL)
 			{
 				if (isWater)
 				{
