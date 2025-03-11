@@ -6,33 +6,10 @@
 #include "./Math.hlsli"
 #include "./VertexInput.hlsli"
 #include "./PostProcessVertexInput.hlsli"
+#include "./CBWater.hlsli"
 
 #define MAX_REFLECTION_TARGETS      8
 #define BORDERS_BIAS                0.008f
-
-cbuffer WaterConstantBuffer : register(b2)
-{
-    float4x4 WaterReflectionViews[8];
-    //--
-    float4 WaterLevels[8];
-    //--
-    float4x4 SkyWorldMatrices[8];
-    //--
-    float4x4 WaterReflectionView;
-    //--
-    float3 LightPosition;
-    float KSpecular;
-	//--
-    float3 LightColor;
-    float Shininess;
-	//--
-    float MoveFactor;
-    float WaveStrength;
-    int WaterLevel;
-    int WaterPlaneIndex;
-    //--
-    float4 SkyColor;
-};
 
 struct WaterPixelShaderInput
 {
@@ -82,6 +59,9 @@ SamplerState WaterReflectionSampler : register(s14);
 
 Texture2D WaterDistortionMapTexture : register(t15);
 SamplerState WaterDistortionMapSampler : register(s15);
+
+Texture2D WaterFoamTexture : register(t11);
+SamplerState WaterFoamSampler : register(s11);
 
 // Utility functions
 float3 Unproject(float2 uv)
@@ -203,17 +183,31 @@ float4 PSWater(WaterPixelShaderInput input) : SV_Target
 #else
         float fresnel = FresnelSchlick(viewDirection);
 #endif
-    
-    // Underwater color extinction
-    float3 groundPosition = Unproject(refractionUV);
-    float distance = abs(WaterLevels[WaterPlaneIndex] - groundPosition.y);
-    float t = smoothstep(0.0, 2048.0, distance);  
-    float extinction = 0.4 * t; 
-    float3 underwaterColor = lerp(refractedColor, float3(0.0, 0.5, 0.7), extinction);
-    
-    // Final calculation
-    output = lerp(float4(underwaterColor, 1.0f), float4(reflectedColor, 1.0f), fresnel) + float4(specularLight, 0.0);
 
+    // Final calculation
+    output = lerp(float4(refractedColor, 1.0f), float4(reflectedColor, 1.0f), fresnel) + float4(specularLight, 0.0);
+
+    // Extinction
+#ifdef CAMERA_UNDERWATER
+    float waterDepth = distance(CamPositionWS, input.WorldPosition);
+    float3 extinction = exp(-waterDepth * AbsorptionCoefficient * WaterFogDensity * 0.1f);
+    output.xyz = lerp(WaterFogColor, output.xyz, extinction);
+#else
+    float3 groundPosition = Unproject(refractionUV);
+    float waterDepth = abs(WaterLevels[WaterPlaneIndex] - groundPosition.y);
+    float3 extinction = exp(-waterDepth * AbsorptionCoefficient * WaterDepthScale);
+    output.xyz = lerp(WaterFogColor, output.xyz, extinction);
+#endif
+    
+    // Foam
+    float foamThreshold = 128.0f;
+    float foamFactor = saturate(1.0 - (waterDepth / foamThreshold));
+    float2 foamUV = float2(mappedUV.x + time, mappedUV.y); 
+    float foamNoise = WaterFoamTexture.Sample(WaterFoamSampler, foamUV).r;
+    float foamIntensity = saturate(foamFactor * foamNoise);
+    float foamFinal = foamIntensity * 0.5f;
+    output.xyz = lerp(output.xyz, float3(1.0, 1.0, 1.0), foamFinal);
+    
     return output;
 }
 

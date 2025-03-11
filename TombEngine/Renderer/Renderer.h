@@ -357,6 +357,7 @@ namespace TEN::Renderer
 		Texture2D _waterDistortionMap;
 		Texture2D _wave0NormalMap;
 		Texture2D _wave1NormalMap;
+		Texture2D _waterFoamMap;
 
 		// Transparency
 

@@ -1889,7 +1889,7 @@ namespace TEN::Renderer
 		_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), _renderTarget.DepthStencilView.Get());
 
 		_context->ClearDepthStencilView(_renderTarget.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
+		
 		// Opaque geometry
 		DoRenderPass(RendererPass::Opaque, view, true);
 
@@ -2208,6 +2208,22 @@ namespace TEN::Renderer
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
 		SetDepthState(DepthState::Write);
+		     
+		// Setup water parameters for drawing underwater geometry
+		_stWater.WaveStrength = 0.005f;
+		_stWater.Shininess = 20.0f;
+		_stWater.KSpecular = 0.3f;
+		_stWater.LightColor = Vector3::One;
+		_stWater.AbsorptionCoefficient = Vector3(0.5f, 0.7f, 1.2f);
+		_stWater.WaterFogColor = Vector3(0.0f, 0.2f, 0.4f);
+		_stWater.WaterDepthScale = 0.001f;
+		_stWater.WaterFogDensity = 0.0002f; 
+
+		for (int i = 0; i < view.WaterPlanesToDraw.size(); i++)
+		{
+			_stWater.WaterLevels[i].x = view.WaterPlanesToDraw[i].WaterLevel;
+		}
+		_cbWater.UpdateData(_stWater, _context.Get());
 
 		// Draw room geometry first if applicable for a given pass.
 		if (pass != RendererPass::Transparent && pass != RendererPass::GunFlashes)
@@ -2753,7 +2769,7 @@ namespace TEN::Renderer
 			{
 				const auto& room = *view.RoomsToDraw[i];
 				const auto& nativeRoom = g_Level.Rooms[room.RoomNumber];				
-
+				   
 				if (rendererPass != RendererPass::GBuffer)
 				{
 					_stRoom.Caustics = int(g_Configuration.EnableCaustics && (nativeRoom.flags & ENV_FLAG_WATER));
@@ -4341,17 +4357,17 @@ namespace TEN::Renderer
 
 		// Copy the content of temporary back buffer to a post process buffer to use as refraction
 		CopyRenderTarget(&_renderTarget, &_postProcessRenderTarget[0], view);
-
+		 
 		_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), _renderTarget.DepthStencilView.Get());
-		
-		SetBlendMode(BlendMode::Opaque);
+		     
+		SetBlendMode(BlendMode::Opaque); 
 		SetCullMode(CullMode::CounterClockwise);
 		SetDepthState(DepthState::Read);
-
+		            
 		// Draw water surfaces
 		bool isUnderwater = (g_Level.Rooms[view.Camera.RoomNumber].flags & ENV_FLAG_WATER) != 0;
 		_shaders.Bind(isUnderwater ? Shader::WaterCameraBelowWater :  Shader::WaterCameraAboveWater);
-
+		 
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetInputLayout(_inputLayout.Get());
 
@@ -4365,15 +4381,20 @@ namespace TEN::Renderer
 		BindRenderTargetAsTexture(TextureRegister::WaterRefractionTexture, &_postProcessRenderTarget[0], SamplerStateRegister::PointWrap);
 		BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::PointWrap);
 		BindTexture(TextureRegister::WaterReflectionTexture, &_waterReflectionsBlurredRenderTarget, SamplerStateRegister::PointWrap);
-
+		    
 		BindTexture(TextureRegister::WaterDistortionMap, &_waterDistortionMap, SamplerStateRegister::AnisotropicWrap);
 		BindTexture(TextureRegister::WaterNormalMap, &_wave1NormalMap, SamplerStateRegister::AnisotropicWrap);
-		 
+		BindTexture(TextureRegister::WaterFoamMap, &_waterFoamMap, SamplerStateRegister::AnisotropicWrap);
+
 		_stWater.WaveStrength = 0.005f;
 		_stWater.Shininess = 20.0f;
 		_stWater.KSpecular = 0.3f;
 		_stWater.LightColor = Vector3::One;
-
+		_stWater.AbsorptionCoefficient = Vector3(0.5f, 0.7f, 1.2f);
+		_stWater.WaterFogColor = Vector3(0.0f, 0.2f, 0.4f);
+		_stWater.WaterDepthScale = 0.001f;
+		_stWater.WaterFogDensity = 0.002f;
+		 
 		for (int i = 0; i < view.WaterPlanesToDraw.size(); i++)
 		{
 			_stWater.WaterLevels[i].x = view.WaterPlanesToDraw[i].WaterLevel;

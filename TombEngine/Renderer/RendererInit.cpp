@@ -539,6 +539,7 @@ namespace TEN::Renderer
 		SetTextureOrDefault(_waterDistortionMap, GetAssetPath(L"Textures/WaterDistortionMap.png"));
 		SetTextureOrDefault(_wave0NormalMap, GetAssetPath(L"Textures/Wave0Normal.png"));
 		SetTextureOrDefault(_wave1NormalMap, GetAssetPath(L"Textures/Wave1Normal.png"));
+		SetTextureOrDefault(_waterFoamMap, GetAssetPath(L"Textures/WaterFoam.png"));
 
 		_whiteSprite.Height = _whiteTexture.Height;
 		_whiteSprite.Width = _whiteTexture.Width;

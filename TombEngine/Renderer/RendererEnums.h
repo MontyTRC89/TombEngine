@@ -182,10 +182,11 @@ enum class TextureRegister
 	EnvironmentMapFront = 7,
 	EnvironmentMapBack = 8,
 	SSAO = 9,
+	WaterFoamMap = 11,
 	WaterNormalMap = 12,
 	WaterRefractionTexture = 13,
 	WaterReflectionTexture = 14,
-	WaterDistortionMap = 15,
+	WaterDistortionMap = 15
 };
 
 enum class SamplerStateRegister

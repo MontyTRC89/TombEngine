@@ -29,5 +29,11 @@ namespace TEN::Renderer::ConstantBuffers
 		int WaterPlaneIndex;
 		//--
 		Vector4 SkyColor;
+		//--
+		Vector3 WaterFogColor;
+		float WaterDepthScale;
+		//--
+		Vector3 AbsorptionCoefficient;
+		float WaterFogDensity;
 	};
 }
