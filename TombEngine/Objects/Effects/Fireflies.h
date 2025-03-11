@@ -70,4 +70,5 @@ namespace TEN::Effects::Fireflies
 	void UpdateFireflySwarm();
 	void ClearFireflySwarm();
 	void SpawnFireflySwarm(ItemInfo& item, int triggerFlags);
+	void RemoveFireflies(ItemInfo& item);
 }

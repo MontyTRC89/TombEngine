@@ -126,20 +126,7 @@ namespace TEN::Effects::Fireflies
         if (!TriggerActive(&item))
         {
             // Remove all fireflies associated with this item.
-            FireflySwarm.erase(std::remove_if(FireflySwarm.begin(), FireflySwarm.end(),
-                [&item](FireflyData& firefly) 
-                {
-                    if (firefly.TargetItemPtr == &item)
-                    {
-                        firefly.Life = 0.0f;
-                        firefly.on = false;
-                        return true;
-                    }
-                    return false;
-                }), FireflySwarm.end());
-
-            // Delete the numbers (map) of the current item.
-            nextFireflyNumberMap.erase(item.Index);
+            RemoveFireflies(item);
 
             // Reset ItemFlags.
             if (item.HitPoints == NOT_TARGETABLE)
@@ -432,6 +419,22 @@ namespace TEN::Effects::Fireflies
             }
         }
     }
+
+	void RemoveFireflies(ItemInfo& item)
+	{
+		FireflySwarm.erase(std::remove_if(FireflySwarm.begin(), FireflySwarm.end(),
+			[&item](FireflyData& firefly)
+			{
+				if (firefly.TargetItemPtr == &item)
+				{
+					firefly.Life = 0.0f;
+					firefly.on = false;
+					return true;
+				}
+				return false;
+			}), FireflySwarm.end());
+		nextFireflyNumberMap.erase(item.Index);
+	}
 
     void ClearFireflySwarm()
     {
