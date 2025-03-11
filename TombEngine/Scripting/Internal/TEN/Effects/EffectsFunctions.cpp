@@ -123,7 +123,7 @@ namespace TEN::Scripting::Effects
 	// @tparam float life Lifespan in seconds. __Default: 2__
 	// @tparam bool applyDamage Specify if the particle will harm the player on collision. __Default: false__
 	// @tparam bool applyPoison Specify if the particle will poison the player on collision. __Default: false__
-	// @tparam Objects.ObjID spriteSeqID ID of the sprite sequence object. __Default: Objects.ObjID.DEFAULT_SPRITES__
+	// @tparam Objects.ObjID.SpriteConstants spriteSeqID ID of the sprite sequence object. __Default: Objects.ObjID.DEFAULT_SPRITES__
 	// @tparam float startRot Rotation at start of life. __Default: random__
 	// @usage
 	// EmitParticle(
@@ -259,7 +259,7 @@ namespace TEN::Scripting::Effects
 	// @table ParticleData
 	// @tfield Vec3 position World position.
 	// @tfield Vec3 velocity Velocity.
-	// @tfield[opt] Objects.ObjID spriteSeqID ID of the sprite sequence object. __Default: Objects.ObjID.DEFAULT_SPRITES__
+	// @tfield[opt] Objects.ObjID.SpriteConstants spriteSeqID ID of the sprite sequence object. __Default: Objects.ObjID.DEFAULT_SPRITES__
 	// @tfield[opt] int spriteID ID of the sprite in the sprite sequence object.__Default: 0__
 	// @tfield[opt] float lifetime Lifespan in seconds. __Default: 2__
 	// @tfield[opt] float maxYVelocity Specifies ithe maximum Y velocity for the particle. __Default: 0__
