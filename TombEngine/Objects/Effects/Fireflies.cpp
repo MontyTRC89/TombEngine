@@ -54,7 +54,7 @@ namespace TEN::Effects::Fireflies
         item.ItemFlags[FirefliesItemFlags::TriggerFlags] = std::clamp((int)item.TriggerFlags, -MAX_AREA_RANGE, MAX_AREA_RANGE);
 
         item.ItemFlags[FirefliesItemFlags::Spawncounter] = 0;
-        item.ItemFlags[FirefliesItemFlags::FliesEffect] = 0;
+        item.ItemFlags[FirefliesItemFlags::RemoveFliesEffect] = 0;
 
         // Firefly numbers that has the light.
         item.ItemFlags[5] = -1;
@@ -276,7 +276,7 @@ namespace TEN::Effects::Fireflies
 
             auto targetItem = firefly.TargetItemPtr;
 
-            if (targetItem->ItemFlags[FirefliesItemFlags::FliesEffect])
+            if (targetItem->ItemFlags[FirefliesItemFlags::RemoveFliesEffect])
             {
                 firefly.r = 0;
                 firefly.g = 0;

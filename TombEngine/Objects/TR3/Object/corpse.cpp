@@ -67,6 +67,8 @@ namespace TEN::Entities::TR3
 			item.Animation.ActiveState = CORPSE_STATE_GROUNDED;
 		}
 
+		item.ItemFlags[FirefliesItemFlags::RemoveFliesEffect] = 0;
+
 		AddActiveItem(itemNumber);
 		item.Status = ITEM_ACTIVE;
 
@@ -108,11 +110,7 @@ namespace TEN::Entities::TR3
 			// Remove fly effect when in water.
 			if (isWater || isSwamp)
 			{
-				item.ItemFlags[FirefliesItemFlags::FliesEffect] = 1;
-			}
-			else
-			{
-				item.ItemFlags[FirefliesItemFlags::FliesEffect] = 0;
+				item.ItemFlags[FirefliesItemFlags::RemoveFliesEffect] = 1;
 			}
 
 			pointColl = GetPointCollision(item);
@@ -154,7 +152,7 @@ namespace TEN::Entities::TR3
 
 		AnimateItem(&item);
 
-		if (!TriggerActive(&item) || item.ItemFlags[FirefliesItemFlags::FliesEffect] == 1)
+		if (!TriggerActive(&item) || item.ItemFlags[FirefliesItemFlags::RemoveFliesEffect] == 1)
 		{
 			// Remove all fireflies associated with this item.
 			RemoveFireflies(item);
