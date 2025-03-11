@@ -44,6 +44,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added Effects.EmitStreamer() function to emit streamers.
 * Added Moveable:GetScale() and Movebale:SetScale() methods to set visible scale of moveables.
 * Added Rotation:Lerp() function to allow linear interpolation between rotations.
+* Added ability to perform additive and subtractive operations on Rotation class and compare one Rotation to another.
 * Added various Translate() methods to Vec2 and Vec3 script objects.
 * Added alpha transparency functionality for statics and moveables to be used with SetColor() method.
 * Added extra arguments for sprite object slots and starting rotation value for EmitParticle function.
