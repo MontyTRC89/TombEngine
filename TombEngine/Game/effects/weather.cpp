@@ -232,12 +232,13 @@ namespace TEN::Effects::Environment
 
 	void EnvironmentController::UpdateStarfield(const ScriptInterfaceLevel& level)
 	{
-		if (level.GetStarfieldStarCount() == 0)
+		int starCount = level.GetStarfieldStarCount();
+
+		if (starCount == 0)
 			return;
 
-		if (ResetStarField)
+		if (ResetStarField || starCount != Stars.size())
 		{
-			int starCount = level.GetStarfieldStarCount();
 
 			Stars.clear();
 			Stars.reserve(starCount);
