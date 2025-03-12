@@ -29,7 +29,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added a particle based waterfall emitter object and associated sprite slots.
   - You must use this version: https://github.com/TombEngine/Resources/raw/refs/heads/main/Wad2%20Objects/Interactables/TEN_Waterfall_Emitter.wad2
 * Added TR1 Hammer.
-  - You must use this version: <insert address here>
+  - You must use this version: <https://github.com/TombEngine/Resources/raw/refs/heads/main/Wad2%20Objects/Traps/TR1_Thor%20Hammer.wad2>
 * Added TR3 Moving Laser.
 * Added TR4 Statue Plinth.
 
