@@ -3029,7 +3029,7 @@ namespace TEN::Renderer
 		// Draw horizon.
 		for (int layer = 0; layer < 2; layer++)
 		{
-			if (!levelPtr->GetHorizonEnabled(layer))
+			if (!levelPtr->GetHorizonEnabled(layer) || levelPtr->GetHorizonTransparency(layer) <= EPSILON)
 				continue;
 
 			SetDepthState(DepthState::None);
