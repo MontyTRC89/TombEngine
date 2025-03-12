@@ -345,18 +345,6 @@ void StartDoors(ObjectInfo* object)
 		}
 	}
 
-	for (int objectID = ID_PUSHPULL_DOOR1; objectID <= ID_KICK_DOOR4; objectID++)
-	{
-		object = &Objects[objectID];
-		if (object->loaded)
-		{
-			object->Initialize = InitializeDoor;
-			object->collision = PushPullKickDoorCollision;
-			object->control = PushPullKickDoorControl;
-			object->SetHitEffect(true);
-		}
-	}
-
 	object = &Objects[ID_STEEL_DOOR];
 	if (object->loaded)
 	{
