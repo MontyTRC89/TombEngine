@@ -26,7 +26,8 @@ namespace TEN::Entities::Doors
 	enum WallStates
 	{
 		BreakUnderwater = 1,
-		BreakAboveGround = 2,
+		BreakingDone = 2,
+		BreakAboveGround = 3,
 	};
 
 	const auto UnderwaterWallPos = Vector3i(0, -512, 0);
@@ -35,7 +36,7 @@ namespace TEN::Entities::Doors
 		GameBoundingBox(
 			-BLOCK(3 / 4.0f), BLOCK(3 / 4.0f),
 			-BLOCK(1), 0,
-			-BLOCK(1 / 2.0f),0
+			-BLOCK(0.5f), BLOCK(0.25f)
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
@@ -43,13 +44,13 @@ namespace TEN::Entities::Doors
 		)
 	};
 
-	const auto WallPos = Vector3i(0, 0, 220);
+	const auto WallPos = Vector3i(0, 0, -220);
 	const ObjectCollisionBounds WallBounds =
 	{
 		GameBoundingBox(
-			-384, 384,
+			-BLOCK(0.5f), BLOCK(0.5f),
 			0, 0,
-			-BLOCK(1), BLOCK(0.5f)
+			-BLOCK(0.5f), 0
 		),
 		std::pair(
 			EulerAngles(ANGLE(-10.0f), ANGLE(-30.0f), ANGLE(-10.0f)),
@@ -80,9 +81,10 @@ namespace TEN::Entities::Doors
 
 			if (TestLaraPosition(bounds, doorItem, laraItem))
 			{
-				if (MoveLaraPosition(WallPos, doorItem, laraItem))
+				if (MoveLaraPosition(position, doorItem, laraItem))
 				{
-					laraItem->Animation.AnimNumber = isUnderwater ? LA_UNDERWATER_WALL_KICK : LA_WALL_PUSH;
+					int animNumber = isUnderwater ? LA_UNDERWATER_WALL_KICK : LA_WALL_PUSH;
+					SetAnimation(laraItem, animNumber);
 					laraItem->Animation.Velocity.y = 0;
 					doorItem->Status = ITEM_ACTIVE;
 
