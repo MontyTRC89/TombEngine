@@ -37,6 +37,7 @@
 #include "Objects/Generic/Doors/sequence_door.h"
 #include "Objects/Generic/Doors/steel_door.h"
 #include "Objects/Generic/Doors/underwater_door.h"
+#include "Objects/Generic/Doors/underwater_wall.h"
 
 // Traps
 #include "Objects/Generic/Traps/CrumblingPlatform.h"
@@ -315,6 +316,30 @@ void StartDoors(ObjectInfo* object)
 		{
 			object->Initialize = InitializeDoor;
 			object->collision = UnderwaterDoorCollision;
+			object->control = PushPullKickDoorControl;
+			object->SetHitEffect(true);
+		}
+	}
+
+	for (int i = ID_UNDERWATER_WALL1; i <= ID_UNDERWATER_WALL4; i++)
+	{
+		object = &Objects[i];
+		if (object->loaded)
+		{
+			object->Initialize = InitializeDoor;
+			object->collision = UnderwaterDoorCollision;
+			object->control = PushPullKickDoorControl;
+			object->SetHitEffect(true);
+		}
+	}
+
+	for (int objectID = ID_PUSHPULL_DOOR1; objectID <= ID_KICK_DOOR4; objectID++)
+	{
+		object = &Objects[objectID];
+		if (object->loaded)
+		{
+			object->Initialize = InitializeDoor;
+			object->collision = PushPullKickDoorCollision;
 			object->control = PushPullKickDoorControl;
 			object->SetHitEffect(true);
 		}
