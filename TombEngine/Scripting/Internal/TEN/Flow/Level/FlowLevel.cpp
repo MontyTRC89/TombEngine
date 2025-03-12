@@ -93,7 +93,7 @@ void Level::Register(sol::table& parent)
 /// (float) Choose weather strength.
 // Must be value between `0.1` and `1.0`.
 //@mem weatherStrength
-		"weatherStrength", sol::property(&Level::SetWeatherStrength),
+		"weatherStrength", &Level::WeatherStrength,
 
 /*** (LaraType) Must be one of the LaraType values.
 These are:
@@ -119,7 +119,7 @@ e.g. `myLevel.laraType = LaraType.Divesuit`
 /// (int) The maximum draw distance for level.
 // Given in sectors (blocks). Must be at least 4.
 //@mem farView
-		"farView", sol::property(&Level::SetLevelFarView),
+		"farView", &Level::LevelFarView,
 
 /// (bool) Reset hub data.
 // Resets the state for all previous levels, including items, flipmaps and statistics.
@@ -132,7 +132,7 @@ e.g. `myLevel.laraType = LaraType.Divesuit`
 
 /// (short) Set total secret count for current level.
 //@mem secrets
-		"secrets", sol::property(&Level::GetSecrets, &Level::SetSecrets)
+		"secrets", &Level::LevelSecrets
 	);
 }
 
