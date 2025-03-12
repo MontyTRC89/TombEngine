@@ -327,7 +327,7 @@ void StartDoors(ObjectInfo* object)
 		if (object->loaded)
 		{
 			object->Initialize = InitializeDoor;
-			object->collision = UnderwaterDoorCollision;
+			object->collision = UnderwaterWallCollision;
 			object->control = PushPullKickDoorControl;
 			object->SetHitEffect(true);
 		}

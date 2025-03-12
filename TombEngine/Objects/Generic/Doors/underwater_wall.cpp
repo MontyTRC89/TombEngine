@@ -23,13 +23,13 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Doors
 {
-	const auto UnderwaterDoorPos = Vector3i(-251, -540, -46);
+	const auto UnderwaterDoorPos = Vector3i(0, -512, 0);
 	const ObjectCollisionBounds UnderwaterDoorBounds =
 	{
 		GameBoundingBox(
 			-BLOCK(3 / 4.0f), BLOCK(3 / 4.0f),
 			-BLOCK(1), 0,
-			-BLOCK(1 / 2.0f), 0
+			-BLOCK(1 / 2.0f),0
 		),
 		std::pair(
 			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
@@ -56,7 +56,7 @@ namespace TEN::Entities::Doors
 			{
 				if (MoveLaraPosition(UnderwaterDoorPos, doorItem, laraItem))
 				{
-					SetAnimation(laraItem, LA_UNDERWATER_DOOR_OPEN);
+					SetAnimation(laraItem, LA_UNDERWATER_WALL_KICK);
 					laraItem->Animation.Velocity.y = 0;
 					doorItem->Status = ITEM_ACTIVE;
 
