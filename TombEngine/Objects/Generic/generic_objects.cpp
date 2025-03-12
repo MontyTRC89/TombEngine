@@ -31,13 +31,13 @@
 #include "Objects/Generic/Switches/switch.h"
 
 // Doors
+#include "Objects/Generic/Doors/breakable_wall.h"
 #include "Objects/Generic/Doors/generic_doors.h"
 #include "Objects/Generic/Doors/double_doors.h"
 #include "Objects/Generic/Doors/pushpull_kick_door.h"
 #include "Objects/Generic/Doors/sequence_door.h"
 #include "Objects/Generic/Doors/steel_door.h"
 #include "Objects/Generic/Doors/underwater_door.h"
-#include "Objects/Generic/Doors/underwater_wall.h"
 
 // Traps
 #include "Objects/Generic/Traps/CrumblingPlatform.h"
@@ -321,13 +321,13 @@ void StartDoors(ObjectInfo* object)
 		}
 	}
 
-	for (int i = ID_UNDERWATER_WALL1; i <= ID_UNDERWATER_WALL4; i++)
+	for (int i = ID_BREAKABLE_WALL1; i <= ID_BREAKABLE_WALL4; i++)
 	{
 		object = &Objects[i];
 		if (object->loaded)
 		{
 			object->Initialize = InitializeDoor;
-			object->collision = UnderwaterWallCollision;
+			object->collision = BreakableWallCollision;
 			object->control = PushPullKickDoorControl;
 			object->SetHitEffect(true);
 		}
