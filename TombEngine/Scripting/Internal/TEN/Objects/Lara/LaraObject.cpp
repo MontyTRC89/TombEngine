@@ -120,7 +120,7 @@ void LaraObject::SetStamina(sol::optional<int> value)
 
 /// Get stamina value of Lara.
 // @function LaraObject:GetStamina
-// @treturn int current sprint value
+// @treturn int Current sprint value.
 // @usage
 // local sprintEnergy = Lara:GetStamina()
 int LaraObject::GetStamina() const
