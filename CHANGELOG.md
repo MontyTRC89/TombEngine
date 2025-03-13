@@ -15,6 +15,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed ricochet flashes after using explosive weapons.
 * Fixed incorrect flare draw in crawl state.
 * Fixed starfield remaining active in the next level if it does not have a starfield specified.
+* Fixed underwater dust particles overflowing when camera is underwater.
 * Fixed wetness player attribute not being preserved in savegames.
 * Fixed invisible HK ammo in the inventory.
 * Fixed flickering rat emitter.
