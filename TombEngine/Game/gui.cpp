@@ -616,12 +616,16 @@ namespace TEN::Gui
 			{
 				// Save the configuration.
 				auto screenResolution = g_Configuration.SupportedScreenResolutions[CurrentSettings.SelectedScreenResolution];
+
+				bool screenResolutionChanged = CurrentSettings.Configuration.ScreenWidth != screenResolution.x ||
+											   CurrentSettings.Configuration.ScreenHeight != screenResolution.y;
+
 				CurrentSettings.Configuration.ScreenWidth = screenResolution.x;
 				CurrentSettings.Configuration.ScreenHeight = screenResolution.y;
 
 				// Determine whether we should update AA shaders.
-				bool shouldRecompileAAShaders = g_Configuration.AntialiasingMode != CurrentSettings.Configuration.AntialiasingMode &&
-												CurrentSettings.Configuration.AntialiasingMode != AntialiasingMode::Low;
+				bool shouldRecompileAAShaders = CurrentSettings.Configuration.AntialiasingMode != AntialiasingMode::Low &&
+												(screenResolutionChanged || g_Configuration.AntialiasingMode != CurrentSettings.Configuration.AntialiasingMode);
 
 				g_Configuration = CurrentSettings.Configuration;
 				SaveConfiguration();
@@ -2233,6 +2237,7 @@ namespace TEN::Gui
 					item.HitPoints = LARA_HEALTH_MAX;
 
 				SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
+				SaveGame::Statistics.Level.HealthUsed++;
 				SaveGame::Statistics.Game.HealthUsed++;
 			}
 			else
@@ -2259,6 +2264,7 @@ namespace TEN::Gui
 				item.HitPoints = LARA_HEALTH_MAX;
 
 				SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
+				SaveGame::Statistics.Level.HealthUsed++;
 				SaveGame::Statistics.Game.HealthUsed++;
 			}
 			else

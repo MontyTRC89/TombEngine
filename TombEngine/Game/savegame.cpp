@@ -274,6 +274,7 @@ const std::vector<byte> SaveGame::Build()
 	sgLevelStatisticsBuilder.add_medipacks_used(Statistics.Level.HealthUsed);
 	sgLevelStatisticsBuilder.add_damage_taken(Statistics.Level.DamageTaken);
 	sgLevelStatisticsBuilder.add_distance(Statistics.Level.Distance);
+	sgLevelStatisticsBuilder.add_pickups(Statistics.Level.Pickups);
 	sgLevelStatisticsBuilder.add_secrets(Statistics.Level.Secrets);
 	sgLevelStatisticsBuilder.add_timer(SaveGame::Statistics.Level.TimeTaken);
 	auto levelStatisticsOffset = sgLevelStatisticsBuilder.Finish();
@@ -285,6 +286,7 @@ const std::vector<byte> SaveGame::Build()
 	sgGameStatisticsBuilder.add_medipacks_used(Statistics.Game.HealthUsed);
 	sgGameStatisticsBuilder.add_damage_taken(Statistics.Game.DamageTaken);
 	sgGameStatisticsBuilder.add_distance(Statistics.Game.Distance);
+	sgGameStatisticsBuilder.add_pickups(Statistics.Game.Pickups);
 	sgGameStatisticsBuilder.add_secrets(Statistics.Game.Secrets);
 	sgGameStatisticsBuilder.add_timer(SaveGame::Statistics.Game.TimeTaken);
 	auto gameStatisticsOffset = sgGameStatisticsBuilder.Finish();
@@ -1095,7 +1097,6 @@ const std::vector<byte> SaveGame::Build()
 
 	levelData.add_level_far_view(level->LevelFarView);
 
-	levelData.add_fog_enabled(level->Fog.Enabled);
 	levelData.add_fog_color(level->Fog.GetColor());
 	levelData.add_fog_min_distance(level->Fog.MinDistance);
 	levelData.add_fog_max_distance(level->Fog.MaxDistance);
@@ -1771,6 +1772,7 @@ static void ParseStatistics(const Save::SaveGame* s, bool isHub)
 	SaveGame::Statistics.Level.HealthUsed = s->level()->medipacks_used();
 	SaveGame::Statistics.Level.DamageTaken = s->level()->damage_taken();
 	SaveGame::Statistics.Level.Kills = s->level()->kills();
+	SaveGame::Statistics.Level.Pickups = s->level()->pickups();
 	SaveGame::Statistics.Level.Secrets = s->level()->secrets();
 	SaveGame::Statistics.Level.TimeTaken = s->level()->timer();
 
@@ -1784,6 +1786,7 @@ static void ParseStatistics(const Save::SaveGame* s, bool isHub)
 	SaveGame::Statistics.Game.HealthUsed = s->game()->medipacks_used();
 	SaveGame::Statistics.Game.DamageTaken = s->game()->damage_taken();
 	SaveGame::Statistics.Game.Kills = s->game()->kills();
+	SaveGame::Statistics.Game.Pickups = s->game()->pickups();
 	SaveGame::Statistics.Game.Secrets = s->game()->secrets();
 	SaveGame::Statistics.Game.TimeTaken = s->game()->timer();
 }
@@ -1794,7 +1797,6 @@ static void ParseLua(const Save::SaveGame* s, bool hubMode)
 
 	auto* level = (Level*)g_GameFlow->GetLevel(CurrentLevel);
 
-	level->Fog.Enabled = s->level_data()->fog_enabled();
 	level->Fog.MaxDistance = s->level_data()->fog_max_distance();
 	level->Fog.MinDistance = s->level_data()->fog_min_distance();
 	level->Fog.SetColor(s->level_data()->fog_color());

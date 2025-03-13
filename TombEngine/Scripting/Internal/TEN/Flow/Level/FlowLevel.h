@@ -53,7 +53,6 @@ struct Level : public ScriptInterfaceLevel
 	// TODO: Clean up this mess.
 
 	RGBAColor8Byte GetFogColor() const override;
-	bool GetFogEnabled() const override;
 	float GetWeatherStrength() const override;
 	bool GetSkyLayerEnabled(int index) const override;
 	bool GetStormEnabled() const override;
@@ -94,8 +93,6 @@ struct Level : public ScriptInterfaceLevel
 	Color GetLensFlareColor() const override;
 
 	// Starfield getters
-	bool  GetStarfieldStarsEnabled() const override;
-	bool  GetStarfieldMeteorsEnabled() const override;
 	int	  GetStarfieldStarCount() const override;
 	int	  GetStarfieldMeteorCount() const override;
 	int	  GetStarfieldMeteorSpawnDensity() const override;

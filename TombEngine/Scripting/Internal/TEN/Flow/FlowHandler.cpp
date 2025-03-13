@@ -240,16 +240,22 @@ The index argument corresponds to the secret's unique ID, the same that would go
 */
 	tableFlow.set_function(ScriptReserved_AddSecret, &FlowHandler::AddSecret, this);
 
-/*** Total number of secrets in game.
+/*** Get total number of secrets in the game.
+@function GetTotalSecretCount
+@treturn int Total number of secrets in the game.
+*/
+	tableFlow.set_function(ScriptReserved_GetTotalSecretCount, &FlowHandler::GetTotalSecretCount, this);
+
+/*** Set total number of secrets in the game.
 Must be an integer value (0 means no secrets).
 @function SetTotalSecretCount
-@tparam int total number of secrets
+@tparam int count Total number of secrets in the game.
 */
 	tableFlow.set_function(ScriptReserved_SetTotalSecretCount, &FlowHandler::SetTotalSecretCount, this);
 	
 /*** Do FlipMap with specific group ID.
 @function FlipMap
-@tparam int flipmap (ID of flipmap group to actuvate / deactivate)
+@tparam int flipmap ID of flipmap group to actuvate / deactivate.
 */
 	tableFlow.set_function(ScriptReserved_FlipMap, &FlowHandler::FlipMap, this);
 	
@@ -404,6 +410,11 @@ void FlowHandler::SetIntroImagePath(const std::string& path)
 void FlowHandler::SetTitleScreenImagePath(const std::string& path)
 {
 	TitleScreenImagePath = path;
+}
+
+int FlowHandler::GetTotalSecretCount()
+{
+	return TotalNumberOfSecrets;
 }
 
 void FlowHandler::SetTotalSecretCount(int secretsNumber)
