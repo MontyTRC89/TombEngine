@@ -4,9 +4,7 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptAssert.h"
 
-/***
-Represents the properties of an object as it appears in the inventory.
-
+/*** Represents the properties of an object as it appears in the inventory. To be used in @{Flow.Level.objects} list.
 @tenprimitive Flow.InventoryItem
 @pragma nostrip
 */

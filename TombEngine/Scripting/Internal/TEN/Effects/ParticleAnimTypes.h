@@ -4,7 +4,7 @@
 
 namespace TEN::Scripting::Effects
 {
-	/// Constants for particle animation type constants.
+	/// Constants for particle animation type constants. To be used with @{Effects.EmitAdvancedParticle} function.
 	// @enum Effects.ParticleAnimationType
 	// @pragma nostrip
 

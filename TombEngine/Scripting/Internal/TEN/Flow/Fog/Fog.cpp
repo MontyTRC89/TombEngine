@@ -6,7 +6,7 @@
 using namespace TEN::Scripting::Types;
 
 /***
-Distance fog.
+Represesnts distance fog. To be used with @{Flow.Level.fog} property.
 
 @tenprimitive Flow.Fog
 @pragma nostrip
@@ -47,7 +47,6 @@ Fog::Fog(ScriptColor const& col, short minDistance, short maxDistance)
 	SetColor(col);
 	MinDistance = minDistance;
 	MaxDistance = maxDistance;
-	Enabled = true;
 }
 
 void Fog::SetColor(ScriptColor const& col)

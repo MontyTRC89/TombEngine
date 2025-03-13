@@ -10,7 +10,6 @@ using namespace TEN::Scripting::Types;
 
 struct Fog
 {
-	bool Enabled{ false };
 	byte R{ 0 };
 	byte G{ 0 };
 	byte B{ 0 };
