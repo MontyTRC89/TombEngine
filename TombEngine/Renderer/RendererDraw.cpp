@@ -4359,8 +4359,8 @@ namespace TEN::Renderer
 		CopyRenderTarget(&_renderTarget, &_postProcessRenderTarget[0], view);
 		 
 		_context->OMSetRenderTargets(1, _renderTarget.RenderTargetView.GetAddressOf(), _renderTarget.DepthStencilView.Get());
-		     
-		SetBlendMode(BlendMode::Opaque); 
+		      
+		SetBlendMode(BlendMode::DynamicWaterSurface);
 		SetCullMode(CullMode::CounterClockwise);
 		SetDepthState(DepthState::Read);
 		            
@@ -4374,10 +4374,10 @@ namespace TEN::Renderer
 		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 		 
-		// Bind vertex and index buffer.
+		// Bind vertex and index buffer.  
 		_context->IASetVertexBuffers(0, 1, _roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		_context->IASetIndexBuffer(_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-		  
+		              
 		BindRenderTargetAsTexture(TextureRegister::WaterRefractionTexture, &_postProcessRenderTarget[0], SamplerStateRegister::PointWrap);
 		BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::PointWrap);
 		BindTexture(TextureRegister::WaterReflectionTexture, &_waterReflectionsBlurredRenderTarget, SamplerStateRegister::PointWrap);
@@ -4385,7 +4385,7 @@ namespace TEN::Renderer
 		BindTexture(TextureRegister::WaterDistortionMap, &_waterDistortionMap, SamplerStateRegister::AnisotropicWrap);
 		BindTexture(TextureRegister::WaterNormalMap, &_wave1NormalMap, SamplerStateRegister::AnisotropicWrap);
 		BindTexture(TextureRegister::WaterFoamMap, &_waterFoamMap, SamplerStateRegister::AnisotropicWrap);
-
+		   
 		_stWater.WaveStrength = 0.005f;
 		_stWater.Shininess = 20.0f;
 		_stWater.KSpecular = 0.3f;

@@ -92,7 +92,7 @@ enum class BlendMode
 	Lighten = 10,
 	AlphaBlend = 11,
 	FastAlphaBlend = 12,
-	DynamicWaterSurface = 13
+	DynamicWaterSurface = 100
 };
 
 enum class ShaderMaterialType

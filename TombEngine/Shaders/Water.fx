@@ -118,6 +118,8 @@ float4 PSWater(WaterPixelShaderInput input) : SV_Target
 {
     float4 output;
     
+    float waterSceneDepth = input.PositionCopy.z / input.PositionCopy.w;
+    
     // Refraction
     float4 refractionUV = input.PositionCopy;
     refractionUV.xy /= refractionUV.w;
@@ -200,13 +202,27 @@ float4 PSWater(WaterPixelShaderInput input) : SV_Target
 #endif
     
     // Foam
+    mappedUV = frac(input.WorldPosition.xyz / 1024.0f).xz;
     float foamThreshold = 128.0f;
-    float foamFactor = saturate(1.0 - (waterDepth / foamThreshold));
-    float2 foamUV = float2(mappedUV.x + time, mappedUV.y); 
-    float foamNoise = WaterFoamTexture.Sample(WaterFoamSampler, foamUV).r;
-    float foamIntensity = saturate(foamFactor * foamNoise);
+    float foamFactor = saturate(1.0 - (waterDepth / foamThreshold));  
+    float2 foamUV = float2(mappedUV.x + time, mappedUV.y);
+    float foamColor = WaterFoamTexture.Sample(WaterFoamSampler, foamUV).x;
+    float foamIntensity = saturate(foamFactor);
     float foamFinal = foamIntensity * 0.5f;
-    output.xyz = lerp(output.xyz, float3(1.0, 1.0, 1.0), foamFinal);
+    output.xyz = lerp(output.xyz, float3(foamColor, foamColor, foamColor), foamFinal);
+    
+    // Water fade
+    float sceneDepth = DepthTexture.Sample(DepthSampler, oldRefractionUV).x;
+    sceneDepth = LinearizeDepth(sceneDepth, NearPlane, FarPlane);
+    waterSceneDepth = LinearizeDepth(waterSceneDepth, NearPlane, FarPlane);
+    if (waterSceneDepth - sceneDepth > 0.01f)
+    {
+        discard;
+    }
+
+    float fade = (sceneDepth - waterSceneDepth) * 100.0f;
+    output.w = min(output.w, fade);
+    //output.a = saturate(1.0f - foamFactor * 1.2f);
     
     return output;
 }

@@ -360,7 +360,7 @@ namespace TEN::Renderer
 				break;
 
 			case BlendMode::DynamicWaterSurface:
-				_context->OMSetBlendState(_renderStates->Additive(), nullptr, 0xFFFFFFFF);
+				_context->OMSetBlendState(_waterBlendState.Get(), nullptr, 0xFFFFFFFF);
 				break;
 			}
 			 

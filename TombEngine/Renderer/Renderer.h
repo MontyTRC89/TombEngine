@@ -106,6 +106,7 @@ namespace TEN::Renderer
 		ComPtr<ID3D11BlendState> _excludeBlendState = nullptr;
 		ComPtr<ID3D11BlendState> _transparencyBlendState = nullptr;
 		ComPtr<ID3D11BlendState> _finalTransparencyBlendState = nullptr;
+		ComPtr<ID3D11BlendState> _waterBlendState = nullptr;
 		ComPtr<ID3D11RasterizerState> _cullCounterClockwiseRasterizerState = nullptr;
 		ComPtr<ID3D11RasterizerState> _cullClockwiseRasterizerState = nullptr;
 		ComPtr<ID3D11RasterizerState> _cullNoneRasterizerState = nullptr;

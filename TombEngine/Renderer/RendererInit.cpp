@@ -95,6 +95,8 @@ namespace TEN::Renderer
 			effect.LightsToDraw = createVector<RendererLight*>(MAX_LIGHTS_PER_ITEM);
 
 		D3D11_BLEND_DESC blendStateDesc{};
+		
+		ZeroMemory(&blendStateDesc, sizeof(D3D11_BLEND_DESC));
 		blendStateDesc.AlphaToCoverageEnable = false;
 		blendStateDesc.IndependentBlendEnable = false;
 		blendStateDesc.RenderTarget[0].BlendEnable = true;
@@ -107,6 +109,7 @@ namespace TEN::Renderer
 		blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 		Utils::throwIfFailed(_device->CreateBlendState(&blendStateDesc, _subtractiveBlendState.GetAddressOf()));
 
+		ZeroMemory(&blendStateDesc, sizeof(D3D11_BLEND_DESC));
 		blendStateDesc.AlphaToCoverageEnable = false;
 		blendStateDesc.IndependentBlendEnable = false;
 		blendStateDesc.RenderTarget[0].BlendEnable = true;
@@ -119,6 +122,7 @@ namespace TEN::Renderer
 		blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 		Utils::throwIfFailed(_device->CreateBlendState(&blendStateDesc, _screenBlendState.GetAddressOf()));
 
+		ZeroMemory(&blendStateDesc, sizeof(D3D11_BLEND_DESC));
 		blendStateDesc.AlphaToCoverageEnable = false;
 		blendStateDesc.IndependentBlendEnable = false;
 		blendStateDesc.RenderTarget[0].BlendEnable = true;
@@ -131,6 +135,7 @@ namespace TEN::Renderer
 		blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 		Utils::throwIfFailed(_device->CreateBlendState(&blendStateDesc, _lightenBlendState.GetAddressOf()));
 		 
+		ZeroMemory(&blendStateDesc, sizeof(D3D11_BLEND_DESC));
 		blendStateDesc.AlphaToCoverageEnable = false;
 		blendStateDesc.IndependentBlendEnable = false;
 		blendStateDesc.RenderTarget[0].BlendEnable = true;
@@ -143,6 +148,7 @@ namespace TEN::Renderer
 		blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 		Utils::throwIfFailed(_device->CreateBlendState(&blendStateDesc, _excludeBlendState.GetAddressOf()));
 
+		ZeroMemory(&blendStateDesc, sizeof(D3D11_BLEND_DESC));
 		blendStateDesc.AlphaToCoverageEnable = false;
 		blendStateDesc.IndependentBlendEnable = true;
 		blendStateDesc.RenderTarget[0].BlendEnable = true;
@@ -163,6 +169,7 @@ namespace TEN::Renderer
 		blendStateDesc.RenderTarget[1].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_RED;
 		Utils::throwIfFailed(_device->CreateBlendState(&blendStateDesc, _transparencyBlendState.GetAddressOf()));
 
+		ZeroMemory(&blendStateDesc, sizeof(D3D11_BLEND_DESC));
 		blendStateDesc.AlphaToCoverageEnable = false;
 		blendStateDesc.IndependentBlendEnable = false;
 		blendStateDesc.RenderTarget[0].BlendEnable = true;
@@ -174,6 +181,17 @@ namespace TEN::Renderer
 		blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
 		blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 		Utils::throwIfFailed(_device->CreateBlendState(&blendStateDesc, _finalTransparencyBlendState.GetAddressOf()));
+
+		ZeroMemory(&blendStateDesc, sizeof(D3D11_BLEND_DESC));
+		blendStateDesc.RenderTarget[0].BlendEnable = true;
+		blendStateDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		blendStateDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		blendStateDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		blendStateDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		blendStateDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+		blendStateDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		blendStateDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+		Utils::throwIfFailed(_device->CreateBlendState(&blendStateDesc, _waterBlendState.GetAddressOf()));
 
 		D3D11_SAMPLER_DESC shadowSamplerDesc = {};
 		shadowSamplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
