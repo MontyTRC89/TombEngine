@@ -32,7 +32,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
   - You must use this version: <insert address here>
 * Added TR3 Moving Laser.
 * Added TR4 Statue Plinth.
-* Added Underwater Kick Wall.
+* Added Breakable Wall. Can be used on ground or underwater.
 
 ### Lua API changes
 * Added Collision.Probe class for basic room collision detection.
