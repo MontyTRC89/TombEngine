@@ -355,6 +355,7 @@ void ThrowPoison(const ItemInfo& item, int boneID, const Vector3& offset, const 
 		auto& part = SetupPoisonParticle(colorStart, colorEnd);
 		AttachAndCreateSpark(&part, &item, boneID, offset, vel, spriteID);
 		part.flags = SP_POISON | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+		part.damage += 5;
 	}
 }
 
