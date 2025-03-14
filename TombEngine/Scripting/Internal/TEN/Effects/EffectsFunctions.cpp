@@ -213,8 +213,10 @@ namespace TEN::Scripting::Effects
 
 		bool convertedApplyDamage = ValueOr<bool>(applyDamage, false);
 		if (convertedApplyDamage)
+		{
 			part.flags |= SP_DAMAGE;
-
+			part.damage = 2;
+		}
 		// TODO: Add option to turn off wind.
 		if (TestEnvironment(RoomEnvFlags::ENV_FLAG_WIND, part.roomNumber))
 			part.flags |= SP_WIND;
