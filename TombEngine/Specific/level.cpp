@@ -442,8 +442,8 @@ void LoadObjects()
 
 		if (objNum >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
 		{
-			TENLog("Unsupported object slot is detected in a level. Make sure you delete unsupported objects from your wads.", LogLevel::Warning);
-			continue;
+			throw std::exception(("Unsupported object slot " + std::to_string(objNum) + 
+								  " is detected in a level. Make sure you delete unsupported objects from your wads.").c_str());
 		}
 
 		Objects[objNum].loaded = true;
