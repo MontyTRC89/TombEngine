@@ -452,10 +452,10 @@ namespace TEN::Renderer
 			newItem.DisableInterpolation = item.DisableInterpolation || newItem.DisableInterpolation;
 
 			// Disable interpolation when object has traveled significant distance.
-			// It's needed because when object gets out of frustum, its previous position doesn't update.
-			bool positionChanged = Vector3::Distance(newItem.PrevPosition, newItem.Position) > BLOCK(1);
+			// Needed because when object goes out of frustum, previous position doesn't update.
+			bool posChanged = Vector3::Distance(newItem.PrevPosition, newItem.Position) > BLOCK(1);
 
-			if (newItem.DisableInterpolation || positionChanged)
+			if (newItem.DisableInterpolation || posChanged)
 			{
 				// NOTE: Interpolation always returns same result.
 				newItem.PrevPosition = newItem.Position;
