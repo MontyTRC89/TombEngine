@@ -261,10 +261,12 @@ namespace TEN::Input
 
 			g_Bindings.SetConflict(actionID, false);
 
-			int key = g_Bindings.GetBoundKeyID(InputDeviceID::Default, (InputActionID)i);
+			int key = g_Bindings.GetBoundKeyID(InputDeviceID::Default, actionID);
 			for (int j = 0; j < (int)InputActionID::Count; j++)
 			{
-				if (key != g_Bindings.GetBoundKeyID(InputDeviceID::Custom, (InputActionID)j))
+				auto conflictActionID = (InputActionID)j;
+
+				if (key != g_Bindings.GetBoundKeyID(InputDeviceID::Custom, conflictActionID))
 					continue;
 
 				g_Bindings.SetConflict(actionID, true);
@@ -546,11 +548,10 @@ namespace TEN::Input
 		for (int i = (int)InputDeviceID::Count - 1; i >= 0; i--)
 		{
 			auto deviceID = (InputDeviceID)i;
-
 			if (deviceID == InputDeviceID::Default && g_Bindings.TestConflict(actionID))
 				continue;
 
-			int keyID = g_Bindings.GetBoundKeyID((InputDeviceID)i, actionID);
+			int keyID = g_Bindings.GetBoundKeyID(deviceID, actionID);
 			if (KeyMap[keyID] != 0.0f)
 				return KeyMap[keyID];
 		}

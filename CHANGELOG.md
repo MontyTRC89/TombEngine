@@ -15,6 +15,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed ricochet flashes after using explosive weapons.
 * Fixed incorrect flare draw in crawl state.
 * Fixed starfield remaining active in the next level if it does not have a starfield specified.
+* Fixed underwater dust particles overflowing when camera is underwater.
 * Fixed wetness player attribute not being preserved in savegames.
 * Fixed invisible HK ammo in the inventory.
 * Fixed flickering rat emitter.
@@ -35,25 +36,25 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added TR4 Statue Plinth.
 
 ### Lua API changes
-* Added Collision.Probe class for basic room collision detection.
-* Added advanced particle emitter allowing animations and other effects.
 * Added diary module.
 * Added custom bar module.
-* Added Flow.Horizon class and two layers of horizons in a Flow.Level class.
-* Added Flow.GetTotalSecretCount() function to get total amount of secrets in the game.
-* Added View.GetFlyByPosition() and View.GetFlyByRotation() functions to get flyby sequence parameters at a specified time point.
-* Added Effects.EmitAirBubble() function to spawn air bubbles.
-* Added Effects.EmitStreamer() function to emit streamers.
-* Added Moveable:GetScale() and Movebale:SetScale() methods to set visible scale of moveables.
-* Added Rotation:Lerp() function to allow linear interpolation between rotations.
-* Added ability to perform additive and subtractive operations on Rotation class and compare one Rotation to another.
-* Added various Translate() methods to Vec2 and Vec3 script objects.
-* Added alpha transparency functionality for statics and moveables to be used with SetColor() method.
-* Added extra arguments for sprite object slots and starting rotation value for EmitParticle function.
-* Added ability to dynamically change Flow.Level fields such as fog, starfield or horizon, and save them to a savegame.
-* Added pickup count to Flow.Statistics class.
-* Changed Flow.StarField and Flow.LensFlare primitive types to use parameters instead of getters and setters.
-* Fixed medipack level count in Flow.Statistics class.
+* Added `Collision.Probe` class for basic room collision detection.
+* Added `Flow.Horizon` class and two layers of horizons in a `Flow.Level` class.
+* Added `Effects.EmitAdvancedParticle` function, allowing animations and other effects.
+* Added `Effects.EmitAirBubble` function to spawn air bubbles.
+* Added `Effects.EmitStreamer` function to emit streamers.
+* Added `Flow.GetTotalSecretCount` function to get total amount of secrets in the game.
+* Added `View.GetFlyByPosition` and `View.GetFlyByRotation` functions to get flyby sequence parameters at a specified time point.
+* Added `Moveable:GetScale` and `Movebale:SetScale` methods to set visible scale of moveables.
+* Added `Rotation:Lerp` function to allow linear interpolation between rotations.
+* Added ability to perform additive and subtractive operations on `Rotation` class and compare one `Rotation` to another.
+* Added various `Translate` methods to `Vec2` and `Vec3` script objects.
+* Added alpha transparency functionality for statics and moveables to be used with `SetColor` method.
+* Added extra arguments for sprite object slots and starting rotation value for `EmitParticle` function.
+* Added ability to dynamically change `Flow.Level` weather and environment parameters and save them to a savegame.
+* Added pickup count to `Flow.Statistics` class.
+* Changed `Flow.StarField` and `Flow.LensFlare` primitive types to use parameters instead of getters and setters.
+* Fixed medipack level count in `Flow.Statistics` class.
 
 ## [Version 1.7.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.4) - 2025-04-01
 

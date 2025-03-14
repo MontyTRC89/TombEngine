@@ -50,7 +50,7 @@ namespace TEN::Scripting
 			"SetMeteorSpawnDensity", &Starfield::SetMeteorSpawnDensity,
 			"SetMeteorVelocity", &Starfield::SetMeteorVelocity);
 
-		parent["StarField"] = parent["Starfield"];
+		parent["Starfield"] = parent["StarField"];
 	}
 
 	/// Create a starfield object with only stars.

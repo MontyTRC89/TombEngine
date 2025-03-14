@@ -6,7 +6,7 @@
 // @enum Collision.MaterialType
 // @pragma nostrip
 
-/// Table of MaterialType constants.
+/// Table of MaterialType constants. To be used with @{Collision.Probe.GetFloorMaterialType} and @{Collision.Probe.GetCeilingMaterialType}.
 //
 // - `MUD`
 // - `SNOW`
