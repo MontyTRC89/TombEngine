@@ -50,6 +50,11 @@ namespace TEN::Scripting
 			*/
 			"kills", &Statistics::Kills,
 
+			/*** Pickups.
+			@tfield int pickups amount of picked up items.
+			*/
+			"pickups", &Statistics::Pickups,
+
 			/*** Secrets.
 			@tfield int secrets amount of found secrets.
 			*/

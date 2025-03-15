@@ -819,6 +819,7 @@ int FindRoomNumber(const Vector3i& pos, int startRoomNumber, bool onlyNeighbors)
 
 	if (!onlyNeighbors)
 	{
+		// TODO: Optimise search to O(log n) with BVH. -- Sezz 2025.03.01
 		for (int roomNumber = 0; roomNumber < g_Level.Rooms.size(); roomNumber++)
 		{
 			if (IsPointInRoom(pos, roomNumber))

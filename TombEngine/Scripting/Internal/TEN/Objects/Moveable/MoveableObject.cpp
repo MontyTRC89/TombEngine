@@ -30,7 +30,7 @@ using namespace TEN::Scripting::Types;
 // Examples include the player, traps, enemies, doors, and pickups. See also @{Objects.LaraObject} for player-specific features.
 //
 // @tenclass Objects.Moveable
-// pragma nostrip
+// @pragma nostrip
 
 static auto IndexError = IndexErrorMaker(Moveable, ScriptReserved_Moveable);
 static auto NewIndexError = NewIndexErrorMaker(Moveable, ScriptReserved_Moveable);
@@ -127,6 +127,7 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 		ScriptReserved_GetRoom, &Moveable::GetRoom,
 		ScriptReserved_GetRoomNumber, &Moveable::GetRoomNumber,
 		ScriptReserved_GetRotation, &Moveable::GetRotation,
+		ScriptReserved_GetScale, &Moveable::GetScale,
 		ScriptReserved_GetVelocity, &Moveable::GetVelocity,
 		ScriptReserved_GetColor, &Moveable::GetColor,
 		ScriptReserved_GetCollidable, &Moveable::GetCollidable,
@@ -153,6 +154,7 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 		ScriptReserved_SetName, &Moveable::SetName,
 		ScriptReserved_SetObjectID, &Moveable::SetObjectID,
 		ScriptReserved_SetPosition, &Moveable::SetPosition,
+		ScriptReserved_SetScale, &Moveable::SetScale,
 		ScriptReserved_SetRoomNumber, &Moveable::SetRoomNumber,
 		ScriptReserved_SetRotation, &Moveable::SetRotation,
 		ScriptReserved_SetColor, &Moveable::SetColor,
@@ -242,7 +244,7 @@ void Moveable::Initialize()
 
 /// Retrieve the object ID
 // @function Moveable:GetObjectID
-// @treturn int a number representing the ID of the object
+// @treturn Objects.ObjID a number representing the ID of the object
 GAME_OBJECT_ID Moveable::GetObjectID() const
 {
 	return _moveable->ObjectNumber;
@@ -380,7 +382,7 @@ bool Moveable::SetName(const std::string& id)
 	return true;
 }
 
-/// Get the object's position
+/// Get the moveable's position
 // @function Moveable:GetPosition
 // @treturn Vec3 a copy of the moveable's position
 Vec3 Moveable::GetPosition() const
@@ -467,9 +469,9 @@ Rotation Moveable::GetJointRot(int jointIndex) const
 // will be mathematically equal
 // (e.g. 90 degrees = -270 degrees = 450 degrees)
 
-/// Get the moveable's rotation
+/// Get the moveable's rotation.
 // @function Moveable:GetRotation
-// @treturn Rotation a copy of the moveable's rotation
+// @treturn Rotation A copy of the moveable's rotation.
 Rotation Moveable::GetRotation() const
 {
 	return 
@@ -480,7 +482,15 @@ Rotation Moveable::GetRotation() const
 	};
 }
 
-/// Set the moveable's rotation
+/// Get the moveable's visual scale.
+// @function Moveable:GetScale
+// @treturn Vec3 A copy of the moveable's visual scale.
+Vec3 Moveable::GetScale() const
+{
+	return Vec3(_moveable->Pose.Scale);
+}
+
+/// Set the moveable's rotation.
 // @function Moveable:SetRotation
 // @tparam Rotation rotation The moveable's new rotation
 void Moveable::SetRotation(const Rotation& rot)
@@ -500,6 +510,14 @@ void Moveable::SetRotation(const Rotation& rot)
 
 	if (bigRotation)
 		_moveable->DisableInterpolation = true;
+}
+
+/// Set the moveable's visual scale. Does not affect collision.
+// @function Moveable:SetScale
+// @tparam Vec3 scale New visual scale.
+void Moveable::SetScale(const Vec3& scale)
+{
+	_moveable->Pose.Scale = scale.ToVector3();
 }
 
 /// Get current HP (hit points/health points)

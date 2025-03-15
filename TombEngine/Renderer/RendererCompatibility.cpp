@@ -884,7 +884,7 @@ namespace TEN::Renderer
 
 				_spriteSequences[SpriteSequencesIds[i]] = sequence;
 
-				if (SpriteSequencesIds[i] == ID_CAUSTICS_TEXTURES)
+				if (SpriteSequencesIds[i] == ID_CAUSTIC_TEXTURES)
 				{
 					_causticTextures.clear();
 					for (int j = 0; j < sequence.SpritesList.size(); j++)

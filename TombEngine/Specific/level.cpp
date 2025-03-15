@@ -440,6 +440,12 @@ void LoadObjects()
 		int objNum = ReadInt32();
 		MoveablesIds.push_back(objNum);
 
+		if (objNum >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
+		{
+			throw std::exception(("Unsupported object slot " + std::to_string(objNum) + 
+								  " is detected in a level. Make sure you delete unsupported objects from your wads.").c_str());
+		}
+
 		Objects[objNum].loaded = true;
 		Objects[objNum].nmeshes = ReadInt32();
 		Objects[objNum].meshIndex = ReadInt32();

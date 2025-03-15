@@ -1,6 +1,5 @@
 -----
---- Diaries:
--- The module provides functions to create and manage Diaries. It maintains diary definitions and entries through all levels and hubs.
+-- This module provides functions to create and manage diaries. It maintains diary definitions and entries through all levels and hubs.
 -- Each diary is accessed by the object that was used to create it. 
 --
 -- Example usage:
