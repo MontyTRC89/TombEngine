@@ -587,7 +587,7 @@ namespace TEN::Renderer
 
 		static inline BlendMode GetBlendModeFromAlpha(BlendMode blendMode, float alpha)
 		{
-			if (alpha < ALPHA_BLEND_THRESHOLD && (blendMode == BlendMode::Opaque || blendMode == BlendMode::FastAlphaBlend))
+			if (alpha < ALPHA_BLEND_THRESHOLD && (blendMode == BlendMode::Opaque || blendMode == BlendMode::AlphaTest || blendMode == BlendMode::FastAlphaBlend))
 				return BlendMode::AlphaBlend;
 
 			return blendMode;
