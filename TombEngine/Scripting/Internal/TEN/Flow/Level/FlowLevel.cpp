@@ -224,12 +224,12 @@ RGBAColor8Byte Level::GetFogColor() const
 	return Fog.GetColor();
 }
 
-short Level::GetFogMinDistance() const
+float Level::GetFogMinDistance() const
 {
 	return Fog.MinDistance;
 }
 
-short Level::GetFogMaxDistance() const
+float Level::GetFogMaxDistance() const
 {
 	return Fog.MaxDistance;
 }

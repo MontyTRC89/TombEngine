@@ -23,13 +23,13 @@ void Fog::Register(sol::table& parent)
 		// @mem color
 		"color", sol::property(&Fog::GetColor, &Fog::SetColor),
 
-		/// (int) Minimum distance.
-		// This is the distance at which the fog starts.
+		/// (float) Minimum distance.
+		// This is the distance at which the fog starts (in sectors).
 		// @mem minDistance
 		"minDistance", &Fog::MinDistance,
 
-		/// (int) Maximum distance.
-		// This is the distance at which the fog reaches the maximum strength.
+		/// (float) Maximum distance.
+		// This is the distance at which the fog reaches the maximum strength (in sectors).
 		// @mem maxDistance
 		"maxDistance", &Fog::MaxDistance
 		);
@@ -42,7 +42,7 @@ void Fog::Register(sol::table& parent)
 @treturn Fog A fog object.
 @function Fog
 */
-Fog::Fog(ScriptColor const& col, short minDistance, short maxDistance)
+Fog::Fog(ScriptColor const& col, float minDistance, float maxDistance)
 {
 	SetColor(col);
 	MinDistance = minDistance;
