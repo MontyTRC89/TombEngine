@@ -247,7 +247,7 @@ namespace TEN::Scripting::Effects
 	//     poison = false,
 	//     burn = false,
 	//     damageHit = 80,
-	//     sound = 197,
+	//     soundID = 197,
 	//     light = true,
 	//     lightRadius = 6, 
 	//     lightFlicker = 5, 
@@ -361,7 +361,7 @@ namespace TEN::Scripting::Effects
 		if (convertedApplyBurn)
 			part.flags |= SP_FIRE;
 
-		int convertedSoundID = table.get_or("sound", NO_VALUE);
+		int convertedSoundID = table.get_or("soundID", NO_VALUE);
 		if (convertedSoundID != NO_VALUE)
 		{
 			part.flags |= SP_SOUND;
