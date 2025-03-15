@@ -66,10 +66,9 @@ void Level::Register(sol::table& parent)
 //@mem horizon2
 		"horizon2", &Level::Horizon2,
 
-/// (@{Flow.StarField}) Starfield in the sky.
-// @mem starField
-		"starField", &Level::Starfield,
-		"starfield", &Level::Starfield, // Compatibility.
+/// (@{Flow.Starfield}) Starfield in the sky.
+// @mem starfield
+		"starfield", &Level::Starfield,
 
 /// (@{Flow.LensFlare}) Global lens flare.
 // @mem lensFlare
