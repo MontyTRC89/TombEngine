@@ -403,6 +403,9 @@ namespace TEN::Renderer
 			if (item.Status == ITEM_INVISIBLE)
 				continue;
 
+			if (item.Model.Color.w < EPSILON)
+				continue;
+
 			if (item.ObjectNumber == ID_LARA && (SpotcamOverlay || SpotcamDontDrawLara))
 				continue;
 
@@ -522,6 +525,9 @@ namespace TEN::Renderer
 			}
 
 			if (!(nativeMesh->flags & StaticMeshFlags::SM_VISIBLE))
+				continue;
+
+			if (nativeMesh->color.w < EPSILON)
 				continue;
 
 			if (!_staticObjects[Statics.GetIndex(mesh->ObjectNumber)].has_value())
