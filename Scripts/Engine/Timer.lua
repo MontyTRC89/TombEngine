@@ -36,8 +36,10 @@ local Type= require("Engine.Type")
 local Utility = require("Engine.Util")
 
 local Timer = {}
+local zero = TEN.Time()
 Timer.__index = Timer
 LevelFuncs.Engine.Timer = {}
+LevelVars.Engine.Timer = {}
 LevelVars.Engine.Timer = {timers = {}}
 
 --- Create (but do not start) a new timer.
@@ -53,7 +55,7 @@ LevelVars.Engine.Timer = {timers = {}}
 --	-- also mins:secs
 --	local myTimeFormat2 = {minutes = true, seconds = true}
 --	
---	-- secs:decisecs
+--	-- secs.decisecs
 --	local myTimeFormat3 = {seconds = true, deciseconds = true}
 --
 --	-- secs; also what is printed if you pass true instead of a table
@@ -74,6 +76,7 @@ LevelVars.Engine.Timer = {timers = {}}
 -- @tparam[opt] LevelFunc func The function defined in the *LevelFuncs* table to call when the time is up
 -- @tparam[opt] any ... a variable number of arguments with which the above function will be called
 -- @treturn Timer The timer in its paused state
+--
 --
 -- @usage
 --  -- Example 1 simple timer:
@@ -107,6 +110,7 @@ Timer.Create = function (name, totalTime, loop, timerFormat, func, ...)
 	local thisTimer = LevelVars.Engine.Timer.timers[name]
 	thisTimer.name = name
 	thisTimer.totalTime = TEN.Time((math.floor(totalTime * 10) / 10)  * 30)
+	thisTimer.realRemainingTime = thisTimer.totalTime
 	thisTimer.remainingTime = thisTimer.totalTime
 
 	loop = loop or false
@@ -124,7 +128,7 @@ Timer.Create = function (name, totalTime, loop, timerFormat, func, ...)
 	thisTimer.active = false
 	thisTimer.paused = true
 	thisTimer.first = true
-	thisTimer.precise = true
+	thisTimer.clock = true
 	thisTimer.pos = TEN.Vec2(TEN.Util.PercentToScreen(50, 90))
 	thisTimer.scale = 1
 	thisTimer.unpausedColor = TEN.Color(255, 255, 255)
@@ -150,22 +154,21 @@ end
 
 --- Get a timer by its name.
 -- @tparam string name The label that was given to the timer when it was created
--- @treturn Timer The timer
+-- @treturn ?Timer|nil *The timer* or *nil* if timer does not exist
 -- @usage
 --	-- Example:
 --	Timer.Get("my_timer")
 Timer.Get = function (name)
-	local self = {}
-	if not Type.IsString(name) then
-		TEN.Util.PrintLog("Error in Timer.Get(): invalid name", TEN.Util.LogLevel.ERROR)
-		self = {name = "noError", errorName = name}
-	elseif LevelVars.Engine.Timer.timers[name] then
-		self = {name = name}
-	else
-		TEN.Util.PrintLog("Warning in Timer.Get(): '".. name .."' timer not found", TEN.Util.LogLevel.WARNING)
-		self = {name = "noError", errorName = name}
-	end
-	return setmetatable(self, Timer)
+    if not Type.IsString(name) then
+        return TEN.Util.PrintLog("Error in Timer.Get(): invalid name", TEN.Util.LogLevel.ERROR)
+    end
+
+    local timer = LevelVars.Engine.Timer.timers[name]
+    if not timer then
+        return TEN.Util.PrintLog("Warning in Timer.Get(): '" .. name .. "' timer not found", TEN.Util.LogLevel.ERROR)
+    end
+
+    return setmetatable({ name = name }, Timer)
 end
 
 --- Check if a timer exists.
@@ -174,9 +177,9 @@ end
 --	-- Example:
 --	-- This function checks if a timer named "my_timer" exists and starts it
 --	LevelFuncs.CheckAndStart = function()
---      if Timer.IfExists("my_timer") then
---          Timer.Get("my_timer"):Start()
---      end
+--		if Timer.IfExists("my_timer") then
+--			Timer.Get("my_timer"):Start()
+--		end
 --	end
 Timer.IfExists = function (name)
 	if not Type.IsString(name) then
@@ -202,6 +205,8 @@ end
 
 
 --- Begin or unpause a timer. If showing the remaining time on-screen, its default color will be set to white.
+--
+-- __Please note:__ It's recommended to check that the timer exists.
 -- @tparam[opt] bool reset If true, the timer will restart from the beginning (total time)
 -- @usage
 --  local TimeFormat = {minutes = true, seconds = true, deciseconds = true}
@@ -209,59 +214,64 @@ end
 --
 --	-- Example 1: Start the timer
 --	-- This function starts the timer named my_timer
---	LevelFuncs.StartTimer = function() 
---      Timer.Get("my_timer"):Start()
+--	LevelFuncs.StartTimer = function()
+--  	if Timer.IfExists("timer1") then
+--			Timer.Get("my_timer"):Start()
+--  	end
 --	end
 --
 --	-- Example 2: Start the timer and reset it
 --	-- This function resets the timer named my_timer and starts it
 --	LevelFuncs.Reset_StartTimer = function()
---      Timer.Get("my_timer"):Start(true)
+--  	if Timer.IfExists("timer1") then
+--			Timer.Get("my_timer"):Start(true)
+--  	end
 --	end
 function Timer:Start(reset)
-	if self.errorName then
-		TEN.Util.PrintLog("Error in Timer:Start(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
-	else
-		local thisTimer = LevelVars.Engine.Timer.timers[self.name]
-		thisTimer.remainingTime = reset and thisTimer.totalTime or thisTimer.remainingTime
-		thisTimer.active = true
-		thisTimer.paused = false
-	end
+	local thisTimer = LevelVars.Engine.Timer.timers[self.name]
+	thisTimer.remainingTime = reset and thisTimer.totalTime or thisTimer.remainingTime
+	thisTimer.realRemainingTime = reset and thisTimer.totalTime or thisTimer.realRemainingTime
+	thisTimer.active = true
+	thisTimer.paused = false
 end
 
 --- Stop the timer.
+--
+-- __Please note:__ It's recommended to check that the timer exists.
 -- @usage
 --  -- example
 --  local TimeFormat = {minutes = true, seconds = true, deciseconds = true}
 --  Timer.Create("my_timer", 6.1, false, TimerFormat)
 --	
 --  -- This function stops the timer named my_timer
---  LevelFuncs.StopTimer = function() 
---      Timer.Get("my_timer"):Stop()
---  end
+--  LevelFuncs.StopTimer = function()
+--		if Timer.IfExists("timer1") then
+--			Timer.Get("my_timer"):Stop()
+--		end
+--	end
 function Timer:Stop()
-	if self.errorName then
-		TEN.Util.PrintLog("Error in Timer:Stop(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
-	else
-		LevelVars.Engine.Timer.timers[self.name].active = false
-	end
+	LevelVars.Engine.Timer.timers[self.name].active = false
 end
 
 --- Pause or unpause the timer. If showing the remaining time on-screen, its default color will be set to yellow (paused) or white (unpaused).
+--
+-- __Please note:__ It's recommended to check that the timer exists.
 -- @tparam bool p If true, the timer will be paused; if false, it would be unpaused
 -- @usage
 --  local TimeFormat = {minutes = true, seconds = true, deciseconds = true}
 --  Timer.Create("my_timer", 6.1, false, TimerFormat)
 --
 --  -- Example 1 paused timer:
---  Timer.Get("my_timer"):SetPaused(true)
+--  if Timer.IfExists("timer1") then
+--  	Timer.Get("my_timer"):SetPaused(true)
+--  end
 --
 --  -- Example 2 unpaused timer:
---  Timer.Get("my_timer"):SetPaused(false)
+--  if Timer.IfExists("timer1") then
+--  	Timer.Get("my_timer"):SetPaused(false)
+--  end
 function Timer:SetPaused(p)
-	if self.errorName then
-		TEN.Util.PrintLog("Error in Timer:SetPaused(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
-	elseif not Type.IsBoolean(p) then
+	if not Type.IsBoolean(p) then
 		TEN.Util.PrintLog("Error in Timer:SetPaused(): wrong value for pause in '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 	else
 		LevelVars.Engine.Timer.timers[self.name].paused = p
@@ -269,72 +279,59 @@ function Timer:SetPaused(p)
 end
 
 --- Get the remaining time of a timer in game frames.
--- @treturn ?Time|nil The remaining time in *game frames* of timer or *nil* if timer does not exist
 --
--- __Please note:__ It's recommended to check that GetRemainingTime() doesn't have a null value
+-- __Please note:__ It's recommended to check that the timer exists.
+-- @treturn Time The remaining time in *game frames* of timer.
 -- @usage
 --  -- Example:
---  local TimeFormat = {minutes = true, seconds = true, deciseconds = true}
---  Timer.Create("my_timer", 6.1, false, TimerFormat)
+--	local TimeFormat = {minutes = true, seconds = true, deciseconds = true}
+--	Timer.Create("my_timer", 6.1, false, TimerFormat)
 --
 --	local timer = TEN.Time()
---	if Timer.Get("my_timer"):GetRemainingTime() then
+--	if Timer.IfExists("timer1") then
 --      time = Timer.Get("my_timer"):GetRemainingTime()
 --	end
 function Timer:GetRemainingTime()
-	if self.errorName then
-		TEN.Util.PrintLog("Error in Timer:GetRemainingTime(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
-		return nil
-	end
 	local thisTimer = LevelVars.Engine.Timer.timers[self.name]
-	return thisTimer.precise and thisTimer.remainingTime or nil
+	return thisTimer.remainingTime
 end
 
 --- Get the remaining time of a timer in seconds.
--- @treturn ?float|nil The remaining time in *seconds* of timer or *nil* if timer does not exist.
+-- @treturn float The remaining time in *seconds* of timer.
 --
 -- Seconds have an accuracy of 0.1 tenths. Example: 1.5 - 6.0 - 9.9 - 123.6
 --
--- __Please note:__ It's recommended to check that GetRemainingTimeInSeconds() doesn't have a null value
+-- __Please note:__ It's recommended to check that the timer exists.
 -- @usage
 --  -- Example:
 --	local timer = 0
---	if Timer.Get("my_timer"):GetRemainingTimeInSeconds() then
+--	if Timer.IfExists("timer1") then
 --      time = Timer.Get("my_timer"):GetRemainingTimeInSeconds()
 --	end
 function Timer:GetRemainingTimeInSeconds()
-	if self.errorName then
-		TEN.Util.PrintLog("Error in Timer:GetRemainingTimeInSeconds(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
-		return nil
-	end
 	local thisTimer = LevelVars.Engine.Timer.timers[self.name]
 	local remainingTime = thisTimer.remainingTime
-	local seconds = remainingTime.s + 60 * remainingTime.m + math.floor(remainingTime.c / 10) * 0.1
-	return thisTimer.precise and seconds or nil
+	return remainingTime.s + 60 * remainingTime.m + math.floor(remainingTime.c / 10) * 0.1
 end
 
 --- Get the formatted remaining time of a timer.
 -- @tparam ?table|bool timerFormat If a table is given, the time will be shown as a string, formatted according to the values in the table. If true, only seconds will be displayed.
--- @treturn ?string|nil The *formatted remaining time* or *nil* if timer does not exist
+-- @treturn string The formatted remaining time.
 --
--- __Please note:__ It's recommended to check that GetRemainingTimeFormatted() doesn't have a null value
+-- __Please note:__ It's recommended to check that the timer exists.
 -- @usage
 --  -- Example:
 --	local TimerFormat = {seconds = true, deciseconds = true}
---	if Timer.Get("my_timer"):GetRemainingTimeFormatted(TimerFormat) then
+--	if Timer.IfExists("timer1") then
 --      local pos = TEN.Vec2(TEN.Util.PercentToScreen(50, 10))
 --      local timer = Timer.Get("my_timer"):GetRemainingTimeFormatted(TimerFormat)
 --      local str = TEN.Strings.DisplayString("Timer: " .. timer, pos)
 --      TEN.Strings.ShowString(str, 1)
 --	end
 function Timer:GetRemainingTimeFormatted(timerFormat)
-	if self.errorName then
-		TEN.Util.PrintLog("Error in Timer:GetRemainingTimeFormatted(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
-		return nil
-	end
 	local thisTimer = LevelVars.Engine.Timer.timers[self.name]
 	local errorFormat = "Error in Timer:GetRemainingTimeFormatted(): wrong value for timerFormat in '" .. self.name .. "' timer"
-	return thisTimer.precise and Utility.GenerateTimeFormattedString(thisTimer.remainingTime, timerFormat, errorFormat) or nil
+	return Utility.GenerateTimeFormattedString(thisTimer.remainingTime, timerFormat, errorFormat)
 end
 
 --- Set the remaining time of a timer.
@@ -345,14 +342,13 @@ end
 --  -- Example:
 --  Timer.Get("my_timer"):SetRemainingTime(3.5)
 function Timer:SetRemainingTime(remainingTime)
-	if self.errorName then
-		TEN.Util.PrintLog("Error in Timer:SetRemainingTime(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
-	elseif not Type.IsNumber(remainingTime) or remainingTime < 0 then
-		TEN.Util.PrintLog("Error in Timer:SetRemainingTime(): wrong value  (" .. tostring(remainingTime) .. ")  for remainingTime ir '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
+	if not Type.IsNumber(remainingTime) or remainingTime < 0 then
+		TEN.Util.PrintLog("Error in Timer:SetRemainingTime(): wrong value  (" .. tostring(remainingTime) .. ")  for remainingTime in '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 	else
         local thisTimer = LevelVars.Engine.Timer.timers[self.name]
     	thisTimer.remainingTime = TEN.Time((math.floor(remainingTime * 10) / 10) * 30)
-	thisTimer.first = true
+		thisTimer.realRemainingTime = thisTimer.remainingTime
+		thisTimer.first = true
     end
 end
 
@@ -378,16 +374,13 @@ end
 -- @treturn bool *true* if comparison is true, *false* if comparison is false or timer does not exist
 -- @usage
 --  -- Example:
---  if Timer.Get("timer1"):IfRemainingTimeIs(0, 1.5) then
+--  if Timer.IfExists("timer1") and Timer.Get("timer1"):IfRemainingTimeIs(0, 1.5) then
 --      local pos = TEN.Vec2(TEN.Util.PercentToScreen(50, 10))
 --      local str = TEN.Strings.DisplayString("QUICK!", pos, 1)
 --      TEN.Strings.ShowString(str, 1)
 --  end
 function Timer:IfRemainingTimeIs(operator, seconds)
-	if self.errorName then
-		TEN.Util.PrintLog("Error in Timer:IfRemainingTimeIs(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
-		return false
-	elseif not Type.IsNumber(operator) or operator < 0 or operator > 5 then
+	if not Type.IsNumber(operator) or operator < 0 or operator > 5 then
 		TEN.Util.PrintLog("Error in Timer:IfRemainingTimeIs(): invalid operator for '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 		return false
 	elseif not Type.IsNumber(seconds) or seconds < 0 then
@@ -396,76 +389,67 @@ function Timer:IfRemainingTimeIs(operator, seconds)
 	end
 	local remainingTime = LevelVars.Engine.Timer.timers[self.name].remainingTime
 	local seconds_ = math.floor(seconds * 10) / 10
-	local time = TEN.Time(seconds_*30)
-	return Utility.CompareValue(remainingTime, time, operator)
+	local time = TEN.Time(seconds_ * 30)
+	if LevelVars.Engine.Timer.timers[self.name].clock then
+		return Utility.CompareValue(remainingTime, time, operator)
+	else
+		return false
+	end
 end
 
 --- Get the total time of a timer in game frames.
 -- This is the amount of time the timer will start with, as well as when starting a new loop.
--- @treturn ?Time|nil The timer's total time in *game frames* or *nil* if timer does not exist
+-- @treturn Time The timer's total time in *game frames*.
 --
--- __Please note:__ It's recommended to check that GetTotalTime() doesn't have a null value
+-- __Please note:__ It's recommended to check that the timer exists.
 -- @usage
 --  -- Example:
 --  local total = TEN.Time()
---	if Timer.Get("my_timer"):GetTotalTime() then
+--	if Timer.IfExists("timer1") then
 --      total = Timer.Get("my_timer"):GetTotalTime()
 --	end
 function Timer:GetTotalTime()
-	if self.errorName then
-		TEN.Util.PrintLog("Error in Timer:GetTotalTime(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
-		return nil
-	end
 	local thisTimer = LevelVars.Engine.Timer.timers[self.name]
-	return thisTimer.precise and thisTimer.totalTime or nil
+	return thisTimer.totalTime
 end
 
 --- Get the total time of a timer in seconds.
 -- This is the amount of time the timer will start with, as well as when starting a new loop
--- @treturn ?float|nil The timer's total time in *seconds* or *nil* if timer does not exist
+-- @treturn float The timer's total time in *seconds*.
 --
 -- Seconds have an accuracy of 0.1 tenths. Example: 1.5 - 6.0 - 9.9 - 123.6
 --
--- __Please note:__ It's recommended to check that GetTotalTimeInSeconds() doesn't have a null value
+-- __Please note:__ It's recommended to check that the timer exists.
 -- @usage
 --  -- Example:
 --  local total = 0
---	if Timer.Get("my_timer"):GetTotalTimeInSeconds() then
+--	if Timer.IfExists("timer1") then
 --      total = Timer.Get("my_timer"):GetTotalTimeInSeconds()
 --	end
 function Timer:GetTotalTimeInSeconds()
-	if self.errorName then
-		TEN.Util.PrintLog("Error in Timer:GetTotalTimeInSeconds(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
-		return nil
-	end
 	local thisTimer = LevelVars.Engine.Timer.timers[self.name]
 	local totalTime = thisTimer.totalTime
-	local seconds = totalTime.s + 60 * totalTime.m + math.floor(totalTime.c / 10) * 0.1
-	return thisTimer.precise and seconds or nil
+	return totalTime.s + 60 * totalTime.m + math.floor(totalTime.c / 10) * 0.1
 end
 
 --- Get the formatted total time of a timer.
 -- This is the amount of time the timer will start with, as well as when starting a new loop
 -- @tparam ?table|bool timerFormat If a table is given, the time will be shown as a string, formatted according to the values in the table. If true, only seconds will be displayed. If false, the time will not be displayed on the screen.
--- @treturn ?string|nil The *formatted total time* or *nil* if timer does not exist
+-- @treturn string The *formatted total time*.
 --
--- __Please note:__ It's recommended to check that GetTotalTimeFormatted() doesn't have a null value
+-- __Please note:__ It's recommended to check that the timer exists.
 -- @usage
 --  -- Example:
 --	local TimerFormat = {minutes = false, seconds = true, deciseconds = true}
---	if Timer.Get("my_timer"):GetTotalTimeFormatted(TimerFormat) then
+--	if Timer.IfExists("timer1") then
 --      local pos = TEN.Vec2(TEN.Util.PercentToScreen(50, 10))
 --      local totalTime = Timer.Get("my_timer"):GetTotalTimeFormatted(TimerFormat)
 --      local str = TEN.Strings.DisplayString("Total time is: " .. totalTime, pos)
 --	end
 function Timer:GetTotalTimeFormatted(timerFormat)
-	if self.errorName then
-		TEN.Util.PrintLog("Error in Timer:GetTotalTimeFormatted(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
-		return nil
-	end
 	local thisTimer = LevelVars.Engine.Timer.timers[self.name]
 	local errorFormat = "Error in Timer:GetTotalTimeFormatted(): wrong value for timerFormat in '" .. self.name .. "' timer"
-	return thisTimer.precise and Utility.GenerateTimeFormattedString(thisTimer.totalTime, timerFormat, errorFormat) or nil
+	return Utility.GenerateTimeFormattedString(thisTimer.totalTime, timerFormat, errorFormat)
 end
 
 --- Set the total time for a timer
@@ -477,9 +461,7 @@ end
 --  -- Example:
 --  Timer.Get("my_timer"):SetTotalTime(3.5)
 function Timer:SetTotalTime(totalTime)
-	if self.errorName then
-		TEN.Util.PrintLog("Error in Timer:SetTotalTime(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
-	elseif not Type.IsNumber(totalTime) or totalTime < 0 then
+	if not Type.IsNumber(totalTime) or totalTime < 0 then
 		TEN.Util.PrintLog("Error in Timer:SetTotalTime(): wrong value (" .. tostring(totalTime) .. ") for totalTime in '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 	else
 		local seconds = math.floor(totalTime * 10) / 10
@@ -511,10 +493,7 @@ end
 --  -- Example:
 --  local test = Timer.Get("timer1"):IfTotalTimeIs(0, 5.1)
 function Timer:IfTotalTimeIs(operator, seconds)
-	if self.errorName then
-		TEN.Util.PrintLog("Error in Timer:IfTotalTimeIs(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
-		return false
-	elseif not Type.IsNumber(operator) or operator < 0 or operator > 5 then
+	if not Type.IsNumber(operator) or operator < 0 or operator > 5 then
 		TEN.Util.PrintLog("Error in Timer:IfTotalTimeIs(): invalid operator for '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 		return false
 	elseif not Type.IsNumber(seconds) or seconds < 0 then
@@ -533,9 +512,7 @@ end
 --  -- Example:
 --  Timer.Get("my_timer"):SetLooping(true)
 function Timer:SetLooping(looping)
-	if self.errorName then
-		TEN.Util.PrintLog("Error in Timer:SetLooping(): '".. self.errorName .."' timer does not exist", Util.LogLevel.ERROR)
-	elseif not Type.IsBoolean(looping) then
+	if not Type.IsBoolean(looping) then
 		TEN.Util.PrintLog("Error in Timer:SetLooping(): wrong value for looping in '" .. self.name .. "' timer", Util.LogLevel.ERROR)
 	else
 		LevelVars.Engine.Timer.timers[self.name].loop = looping
@@ -554,9 +531,7 @@ end
 --  end
 --  Timer.Get("my_timer"):SetFunction(LevelFuncs.KillLara)
 function Timer:SetFunction(func, ...)
-	if self.errorName then
-		TEN.Util.PrintLog("Error in Timer:SetFunction(): '".. self.errorName .."' timer does not exist", TEN.Util.LogLevel.ERROR)
-	elseif not Type.IsLevelFunc(func) then
+	if not Type.IsLevelFunc(func) then
 		TEN.Util.PrintLog("Error in Timer:SetFunction(): invalid function for '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 	else
 		local thisTimer = LevelVars.Engine.Timer.timers[self.name]
@@ -576,9 +551,7 @@ end
 --  -- Example:
 --  Timer.Get("my_timer"):SetPosition(10.0,10.0)
 function Timer:SetPosition(x,y)
-	if self.errorName then
-		TEN.Util.PrintLog("Error in Timer:SetPosition(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
-	elseif not Type.IsNumber(x) then
+	if not Type.IsNumber(x) then
 		TEN.Util.PrintLog("Error in Timer:SetPosition(): wrong value for X in '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 	elseif not Type.IsNumber(y) then
 		TEN.Util.PrintLog("Error in Timer:SetPosition(): wrong value for Y in '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
@@ -595,9 +568,7 @@ end
 --  -- Example:
 --  Timer.Get("my_timer"):SetScale(1.5)
 function Timer:SetScale(scale)
-	if self.name == "noError" then
-		TEN.Util.PrintLog("Error in Timer:SetScale(): '".. self.errorName .."' timer does not exist", TEN.Util.LogLevel.ERROR)
-	elseif not Type.IsNumber(scale) then
+	if not Type.IsNumber(scale) then
 		TEN.Util.PrintLog("Error in Timer:SetScale(): wrong value for scale in '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 	else
 		LevelVars.Engine.Timer.timers[self.name].scale = scale
@@ -612,9 +583,7 @@ end
 --  -- Example:
 --  Timer.Get("my_timer"):SetPausedColor(TEN.Color(0, 255, 0, 255))
 function Timer:SetPausedColor(color)
-	if self.errorName then
-		TEN.Util.PrintLog("Error in Timer:SetPausedColor(): '".. self.errorName .."' timer does not exist", TEN.Util.LogLevel.ERROR)
-	elseif not Type.IsColor(color) then
+	if not Type.IsColor(color) then
 		TEN.Util.PrintLog("Error in Timer:SetPausedColor(): wrong value for color in '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 	else
 		LevelVars.Engine.Timer.timers[self.name].pausedColor = color
@@ -629,9 +598,7 @@ end
 --  -- Example:
 --  Timer.Get("my_timer"):SetUnpausedColor(TEN.Color(0, 255, 255, 255))
 function Timer:SetUnpausedColor(color)
-	if self.errorName then
-		TEN.Util.PrintLog("Error in Timer:SetUnpausedColor(): '".. self.errorName .."' timer does not exist", TEN.Util.LogLevel.ERROR)
-	elseif not Type.IsColor(color) then
+	if not Type.IsColor(color) then
 		TEN.Util.PrintLog("Error in Timer:SetUnpausedColor(): wrong value for color in '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 	else
 		LevelVars.Engine.Timer.timers[self.name].unpausedColor = color
@@ -652,8 +619,8 @@ end
 --  -- Example 2
 --  -- defaul arguments + BLINK effect
 --	newOptins = {TEN.Strings.DisplayStringOption.CENTER,
---		TEN.Strings.DisplayStringOption.SHADOW,
---		TEN.Strings.DisplayStringOption.BLINK}
+--				TEN.Strings.DisplayStringOption.SHADOW,
+--				TEN.Strings.DisplayStringOption.BLINK}
 --  Timer.Get("my_timer"):SetTextOption(newOptins)
 --
 --  -- Example 3
@@ -661,9 +628,7 @@ end
 --  Timer.Get("my_timer"):SetTextOption()
 function Timer:SetTextOption(_table)
 	_table = _table or {}
-	if self.errorName then
-		TEN.Util.PrintLog("Error in Timer:SetTextOption(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
-	elseif type(_table) ~= "table" then
+	if type(_table) ~= "table" then
 		TEN.Util.PrintLog("Error in Timer:SetTextOption(): options is not a table for '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 	else
 		for _, v in pairs(_table) do
@@ -682,10 +647,6 @@ end
 --  -- Example:
 --  local pauseState = Timer.Get("my_timer"):IsPaused()
 function Timer:IsPaused()
-	if self.errorName then
-		TEN.Util.PrintLog("Error in Timer:IsPaused(): '" .. self.errorName .. "' timer does not exist", TEN.Util.LogLevel.ERROR)
-		return false
-	end
 	return LevelVars.Engine.Timer.timers[self.name].paused
 end
 
@@ -695,18 +656,24 @@ end
 --  -- Example:
 --  local state = Timer.Get("my_timer"):IsActive()
 function Timer:IsActive()
-	if self.errorName then
-		TEN.Util.PrintLog("Error in Timer:IsActive(): '".. self.errorName .."' timer does not exist", TEN.Util.LogLevel.ERROR)
-		return false
-	end
 	return LevelVars.Engine.Timer.timers[self.name].active
+end
+
+function Timer:TimerCheck()
+	local thisTimer = LevelVars.Engine.Timer.timers[self.name]
+	return thisTimer.clock
 end
 
 LevelFuncs.Engine.Timer.Decrease = function ()
 	for _, t in pairs(LevelVars.Engine.Timer.timers) do
 		if t.active and not t.paused then
-			t.remainingTime = t.first and t.remainingTime or t.remainingTime - 1
-			t.precise = t.remainingTime.c % 10 == 0 and true or false
+			if not t.first then
+				t.realRemainingTime = t.realRemainingTime - 1
+				if t.realRemainingTime.c % 10 == 0 then
+					t.remainingTime = t.remainingTime - 3
+				end
+			end
+			t.clock = (t.realRemainingTime.c % 10 == 0)
 			t.first = false
 		end
 	end
@@ -719,9 +686,9 @@ LevelFuncs.Engine.Timer.UpdateAll = function()
 				local str = TEN.Strings.DisplayString("TIMER", t.pos, t.scale, t.unpausedColor, false, t.stringOption)
 				str:SetKey(Utility.GenerateTimeFormattedString(t.remainingTime, t.timerFormat))
 				str:SetColor(t.paused and t.pausedColor or t.unpausedColor)
-				TEN.Strings.ShowString(str, (t.remainingTime == TEN.Time() and not t.loop and not string.match(t.name, "__TEN")) and 1 or 1/30)
+				TEN.Strings.ShowString(str, (t.remainingTime == zero and not t.loop and not string.match(t.name, "__TEN")) and 1 or 1/30)
 			end
-			if t.remainingTime == TEN.Time() then
+			if t.remainingTime == zero then
 				if t.loop then
 					t.remainingTime = t.totalTime
 				else
