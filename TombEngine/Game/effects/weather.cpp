@@ -526,7 +526,7 @@ namespace TEN::Effects::Environment
 			if (!IsPointInRoom(pos, roomNumber))
 				roomNumber = FindRoomNumber(pos, Camera.pos.RoomNumber, true);
 
-			if (roomNumber == NO_VALUE)
+			if (!IsPointInRoom(pos, roomNumber) || roomNumber == NO_VALUE)
 				continue;
 
 			// Check if water room.

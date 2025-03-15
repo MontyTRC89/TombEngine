@@ -37,8 +37,9 @@ enum RoomEnvFlags
 
 enum StaticMeshFlags : short
 {
-	SM_VISIBLE = 1,
-	SM_SOLID = 2
+	SM_VISIBLE		= (1 << 0),
+	SM_SOLID		= (1 << 1),
+	SM_COLLISION	= (1 << 2)
 };
 
 struct ROOM_VERTEX
