@@ -156,6 +156,10 @@
 	<td class="summary">Get this static's visibility status.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#Static:GetCollidable">Static:GetCollidable()</a></td>
+	<td class="summary">Get this static's collision status.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#Static:GetSolid">Static:GetSolid()</a></td>
 	<td class="summary">Get this static's solid collision status.</td>
 	</tr>
@@ -190,6 +194,10 @@
 	<tr>
 	<td class="name" ><a href="#Static:SetSolid">Static:SetSolid(status)</a></td>
 	<td class="summary">Set this static's solid collision status.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#Static:SetCollidable">Static:SetCollidable(collidable)</a></td>
+	<td class="summary">Set this static's collision status.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Static:Enable">Static:Enable()</a></td>
@@ -374,6 +382,27 @@
 
            <span class="types"><span class="type">bool</span></span>
         Status.  <strong>true: visible</strong>, <strong>false: invisible</strong>
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Static:GetCollidable"></a>
+    <strong>Static:GetCollidable()</strong>
+    </dt>
+    <dd>
+    Get this static's collision status.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        Collision status.  <strong>true: can be collided with</strong>, <strong>false: no collision</strong>
     </ol>
 
 
@@ -569,6 +598,28 @@
         <li><span class="parameter">status</span>
             <span class="types"><span class="type">bool</span></span>
          New status. <strong>true: solid</strong>, <strong>false: soft</strong>
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "Static:SetCollidable"></a>
+    <strong>Static:SetCollidable(collidable)</strong>
+    </dt>
+    <dd>
+    Set this static's collision status.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">collidable</span>
+            <span class="types"><span class="type">bool</span></span>
+         New collision status. <strong>true: can be collided with</strong>, <strong>false: no collision</strong>
         </li>
     </ul>
 

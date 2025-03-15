@@ -45,7 +45,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added `Effects.EmitStreamer` function to emit streamers.
 * Added `Flow.GetTotalSecretCount` function to get total amount of secrets in the game.
 * Added `View.GetFlyByPosition` and `View.GetFlyByRotation` functions to get flyby sequence parameters at a specified time point.
-* Added `Moveable:GetScale` and `Movebale:SetScale` methods to set visible scale of moveables.
+* Added `Moveable:GetScale` and `Movebale:SetScale` methods to get or set visible scale of moveables.
+* Added `Static:GetCollidable` and `Static:SetCollidable` methods to get or set collision status of static meshes.
 * Added `Rotation:Lerp` function to allow linear interpolation between rotations.
 * Added ability to perform additive and subtractive operations on `Rotation` class and compare one `Rotation` to another.
 * Added various `Translate` methods to `Vec2` and `Vec3` script objects.
