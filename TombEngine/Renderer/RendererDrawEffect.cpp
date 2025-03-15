@@ -523,7 +523,7 @@ namespace TEN::Renderer
 						Color(particle.r / (float)UCHAR_MAX, particle.g / (float)UCHAR_MAX, particle.b / (float)UCHAR_MAX, 1.0f),
 						TO_RAD(particle.rotAng << 4),
 						particle.scalar,
-						Vector2(4, particle.size), particle.blendMode, particle.constraint, true, view);
+						Vector2(particle.size, particle.size), particle.blendMode, particle.constraint, true, view);
 				}
 				else
 				{
