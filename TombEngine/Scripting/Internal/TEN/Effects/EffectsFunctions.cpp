@@ -399,6 +399,13 @@ namespace TEN::Scripting::Effects
 				part.flags |= SP_WIND;
 		}
 
+		bool convertedConstraint = ParticleData.get_or("constraint", false);
+		if (convertedConstraint)
+		{
+			Rotation constraints = ParticleData["constraint"];
+			part.constraint = Vector3(constraints.x, constraints.y, constraints.z);
+		}
+
 	}
 	
 	/// Emit a shockwave, similar to that seen when a harpy projectile hits something.

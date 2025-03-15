@@ -515,13 +515,27 @@ namespace TEN::Renderer
 				int spriteIndex = Objects[particle.SpriteSeqID].meshIndex + particle.SpriteID;
 				spriteIndex = std::clamp(spriteIndex, 0, (int)_sprites.size());
 
-				AddSpriteBillboard(
-					&_sprites[spriteIndex],
-					pos,
-					Color(particle.r / (float)UCHAR_MAX, particle.g / (float)UCHAR_MAX, particle.b / (float)UCHAR_MAX, 1.0f),
-					TO_RAD(particle.rotAng << 4), particle.scalar,
-					Vector2(particle.size, particle.size),
-					particle.blendMode, true, view);
+				if (particle.flags & SP_CONSTRAINED)
+				{
+					AddSpriteBillboardConstrained(
+						&_sprites[spriteIndex],
+						pos,
+						Color(particle.r / (float)UCHAR_MAX, particle.g / (float)UCHAR_MAX, particle.b / (float)UCHAR_MAX, 1.0f),
+						TO_RAD(particle.rotAng << 4),
+						particle.scalar,
+						Vector2(4, particle.size), particle.blendMode, particle.constraint, true, view);
+				}
+				else
+				{
+					AddSpriteBillboard(
+						&_sprites[spriteIndex],
+						pos,
+						Color(particle.r / (float)UCHAR_MAX, particle.g / (float)UCHAR_MAX, particle.b / (float)UCHAR_MAX, 1.0f),
+						TO_RAD(particle.rotAng << 4), particle.scalar,
+						Vector2(particle.size, particle.size),
+						particle.blendMode, true, view);
+				}
+				
 			}
 			else
 			{
