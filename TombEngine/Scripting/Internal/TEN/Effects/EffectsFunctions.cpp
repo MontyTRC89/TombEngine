@@ -399,10 +399,11 @@ namespace TEN::Scripting::Effects
 				part.flags |= SP_WIND;
 		}
 
-		bool convertedConstraint = ParticleData.get_or("constraint", false);
+		bool convertedConstraint = table .get_or("constraint", false);
 		if (convertedConstraint)
 		{
-			Rotation constraints = ParticleData["constraint"];
+			part.flags |= SP_CONSTRAINED;
+			Rotation constraints = table["constraint"];
 			part.constraint = Vector3(constraints.x, constraints.y, constraints.z);
 		}
 	}
