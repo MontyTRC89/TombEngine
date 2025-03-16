@@ -11,6 +11,8 @@
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/Collision/MaterialTypes.h"
+#include "Scripting/Internal/TEN/Collision/Probe.h"
 #include "Scripting/Internal/TEN/Flow/Enums/ErrorModes.h"
 #include "Scripting/Internal/TEN/Flow/Enums/FreezeModes.h"
 #include "Scripting/Internal/TEN/Flow/Enums/GameStatuses.h"
@@ -25,6 +27,7 @@
 #include "Specific/trutils.h"
 
 using namespace TEN::Scripting;
+using namespace TEN::Scripting::Collision;
 
 /***
 Functions that (mostly) don't directly impact in-game mechanics. Used for setup
@@ -237,16 +240,22 @@ The index argument corresponds to the secret's unique ID, the same that would go
 */
 	tableFlow.set_function(ScriptReserved_AddSecret, &FlowHandler::AddSecret, this);
 
-/*** Total number of secrets in game.
+/*** Get total number of secrets in the game.
+@function GetTotalSecretCount
+@treturn int Total number of secrets in the game.
+*/
+	tableFlow.set_function(ScriptReserved_GetTotalSecretCount, &FlowHandler::GetTotalSecretCount, this);
+
+/*** Set total number of secrets in the game.
 Must be an integer value (0 means no secrets).
 @function SetTotalSecretCount
-@tparam int total number of secrets
+@tparam int count Total number of secrets in the game.
 */
 	tableFlow.set_function(ScriptReserved_SetTotalSecretCount, &FlowHandler::SetTotalSecretCount, this);
 	
 /*** Do FlipMap with specific group ID.
 @function FlipMap
-@tparam int flipmap (ID of flipmap group to actuvate / deactivate)
+@tparam int flipmap ID of flipmap group to actuvate / deactivate.
 */
 	tableFlow.set_function(ScriptReserved_FlipMap, &FlowHandler::FlipMap, this);
 	
@@ -302,7 +311,7 @@ Specify which translations in the strings table correspond to which languages.
 @tparam tab table array-style table with language names
 */
 	tableFlow.set_function(ScriptReserved_SetLanguageNames, &FlowHandler::SetLanguageNames, this);
-
+	
 	ScriptColor::Register(parent);
 	Rotation::Register(parent);
 	Statistics::Register(parent);
@@ -314,6 +323,7 @@ Specify which translations in the strings table correspond to which languages.
 	InventoryItem::Register(tableFlow);
 	Settings::Register(tableFlow);
 	Fog::Register(tableFlow);
+	Horizon::Register(tableFlow);
 	LensFlare::Register(tableFlow);
 	Starfield::Register(tableFlow);
 
@@ -402,6 +412,11 @@ void FlowHandler::SetTitleScreenImagePath(const std::string& path)
 	TitleScreenImagePath = path;
 }
 
+int FlowHandler::GetTotalSecretCount()
+{
+	return TotalNumberOfSecrets;
+}
+
 void FlowHandler::SetTotalSecretCount(int secretsNumber)
 {
 	TotalNumberOfSecrets = secretsNumber;
@@ -410,6 +425,8 @@ void FlowHandler::SetTotalSecretCount(int secretsNumber)
 void FlowHandler::LoadFlowScript()
 {
 	TENLog("Loading gameflow script, strings, and settings...", LogLevel::Info);
+
+	Levels.clear();
 
 	_handler.ExecuteScript(_gameDir + "Scripts/Gameflow.lua");
 	_handler.ExecuteScript(_gameDir + "Scripts/SystemStrings.lua", true);

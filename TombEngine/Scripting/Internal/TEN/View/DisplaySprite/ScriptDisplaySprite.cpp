@@ -10,6 +10,7 @@
 #include "Scripting/Internal/TEN/Types/Color/Color.h"
 #include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 
+using namespace TEN::Scripting::Types;
 using TEN::Renderer::g_Renderer;
 
 /// Represents a display sprite.
@@ -49,7 +50,7 @@ namespace TEN::Scripting::DisplaySprite
 
 	/// Create a DisplaySprite object.
 	// @function DisplaySprite()
-	// @tparam Objects.ObjID ID of the sprite sequence object.
+	// @tparam Objects.ObjID.SpriteConstants ID of the sprite sequence object.
 	// @tparam int int spriteID ID of the sprite in the sequence.
 	// @tparam Vec2 pos Display position in percent.
 	// @tparam float rot Rotation in degrees.
@@ -75,7 +76,7 @@ namespace TEN::Scripting::DisplaySprite
 
 	/// Get the object ID of the sprite sequence object used by the display sprite.
 	// @function DisplaySprite:GetObjectID()
-	// @treturn Objects.ObjID Sprite sequence object ID.
+	// @treturn Objects.ObjID.SpriteConstants Sprite sequence object ID.
 	GAME_OBJECT_ID ScriptDisplaySprite::GetObjectID() const
 	{
 		return _objectID;
@@ -122,8 +123,8 @@ namespace TEN::Scripting::DisplaySprite
 	}
 
 	/// Set the sprite sequence object ID used by the display sprite.
-	// @function DisplaySprite:SetObjectID(Objects.ObjID)
-	// @tparam Objects.ObjID New sprite sequence object ID.
+	// @function DisplaySprite:SetObjectID(Objects.ObjID.SpriteConstants)
+	// @tparam Objects.ObjID.SpriteConstants New sprite sequence object ID.
 	void ScriptDisplaySprite::SetObjectID(GAME_OBJECT_ID objectID)
 	{
 		_objectID = objectID;

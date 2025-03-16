@@ -13,10 +13,9 @@ These are things things which aren't present in the compiled level file itself.
 @pragma nostrip
 */
 
-/*** Make a new Level object.
-	@function Level
-	@treturn Level a Level object
-	*/
+/// Make a new Level object.
+//@function Level
+//@treturn Level a Level object.
 void Level::Register(sol::table& parent)
 {
 	// Register type.
@@ -50,49 +49,50 @@ void Level::Register(sol::table& parent)
 //@mem ambientTrack
 		"ambientTrack", &Level::AmbientTrack,
 
-/// (@{Flow.SkyLayer}) Primary sky layer  
+/// (@{Flow.SkyLayer}) Primary sky cloud layer.
 //@mem layer1
 		"layer1", &Level::Layer1,
 
-/// (@{Flow.SkyLayer}) Secondary sky layer
+/// (@{Flow.SkyLayer}) Secondary sky cloud layer.
 //@mem layer2
 		"layer2", &Level::Layer2,
 
-/// (@{Flow.Starfield}) Starfield.
+///  (@{Flow.Horizon}) First horizon layer.
+//@mem horizon1
+		"horizon1", &Level::Horizon1,
+		"horizon", sol::property(&Level::GetHorizon1Enabled, &Level::SetHorizon1Enabled), // Compatibility.
+
+///  (@{Flow.Horizon}) Second horizon layer.
+//@mem horizon2
+		"horizon2", &Level::Horizon2,
+
+/// (@{Flow.Starfield}) Starfield in the sky.
 // @mem starfield
 		"starfield", &Level::Starfield,
 
-/// (@{Flow.LensFlare}) Global lens flare .
+/// (@{Flow.LensFlare}) Global lens flare.
 // @mem lensFlare
 		"lensFlare", &Level::LensFlare,
 
-/// (@{Flow.Fog}) omni fog RGB color and distance.
-// As seen in TR4's Desert Railroad.
-// If not provided, distance fog will be black.
+/// (@{Flow.Fog}) Global distance fog, with specified RGB color and distance.
+// If not provided, distance fog will not be visible.
 //@mem fog
 		"fog", &Level::Fog,
 
-/// (bool) Draw sky layer? (default: false)
-//@mem horizon
-		"horizon", &Level::Horizon,
-
 /// (bool) Enable flickering lightning in the sky.
 // Equivalent to classic TRLE's LIGHTNING setting. As in the TRC Ireland levels.
-//
 //@mem storm
 		"storm", &Level::Storm,
 
 /// (WeatherType) Choose weather effect.
 // Must be one of the values `WeatherType.None`, `WeatherType.Rain`, or `WeatherType.Snow`.
-//
 //@mem weather
 		"weather", &Level::Weather,
 
 /// (float) Choose weather strength.
 // Must be value between `0.1` and `1.0`.
-//
 //@mem weatherStrength
-		"weatherStrength", sol::property(&Level::SetWeatherStrength),
+		"weatherStrength", &Level::WeatherStrength,
 
 /*** (LaraType) Must be one of the LaraType values.
 These are:
@@ -115,21 +115,24 @@ e.g. `myLevel.laraType = LaraType.Divesuit`
 //@mem rumble
 		"rumble", &Level::Rumble,
 
-		"farView", sol::property(&Level::SetLevelFarView),
+/// (int) The maximum draw distance for level.
+// Given in sectors (blocks). Must be at least 4.
+//@mem farView
+		"farView", &Level::LevelFarView,
 
 /// (bool) Reset hub data.
 // Resets the state for all previous levels, including items, flipmaps and statistics.
 //@mem resetHub
 		"resetHub", &Level::ResetHub,
 
-/// (table of @{Flow.InventoryItem}s) table of inventory object overrides
+/// (table of @{Flow.InventoryItem}s) A table of inventory object layout overrides.
 //@mem objects
 		"objects", &Level::InventoryObjects,
 
-/// (short) Set Secrets for Level
+/// (short) Set total secret count for current level.
 //@mem secrets
-		"secrets", sol::property(&Level::SetSecrets)
-		);
+		"secrets", &Level::LevelSecrets
+	);
 }
 
 void Level::SetWeatherStrength(float val)
@@ -147,14 +150,6 @@ void Level::SetWeatherStrength(float val)
 	}
 }
 
-/*** (int) The maximum draw distance for level.
-Given in sectors (blocks).
-Must be at least 4.
-
-This is equivalent to TRNG's LevelFarView variable.
-
-@mem farView
-*/
 void Level::SetLevelFarView(short val)
 {
 	static_assert(MIN_FAR_VIEW == 3200.0f, "Please update the comment, docs, and warning message if this number changes.");
@@ -173,46 +168,25 @@ void Level::SetLevelFarView(short val)
 	}
 }
 
-RGBAColor8Byte Level::GetSkyLayerColor(int index) const
+const SkyLayer& Level::GetSkyLayer(int index) const
 {
 	TENAssert(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
+	return (index == 0 ? Layer1 : Layer2);
+}
 
-	if (index == 0)
-	{
-		return Layer1.GetColor();
-	}
-	else
-	{
-		return Layer2.GetColor();
-	}
+RGBAColor8Byte Level::GetSkyLayerColor(int index) const
+{
+	return GetSkyLayer(index).GetColor();
 }
 
 bool Level::GetSkyLayerEnabled(int index) const
 {
-	TENAssert(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
-
-	if (index == 0)
-	{
-		return Layer1.Enabled;
-	}
-	else
-	{
-		return Layer2.Enabled;
-	}
+	return GetSkyLayer(index).Enabled;
 }
 
 short Level::GetSkyLayerSpeed(int index) const
 {
-	TENAssert(index == 0 || index == 1, "Sky layer index must be 0 or 1.");
-
-	if (index == 0)
-	{
-		return Layer1.CloudSpeed;
-	}
-	else
-	{
-		return Layer2.CloudSpeed;
-	}
+	return GetSkyLayer(index).CloudSpeed;
 }
 
 LaraType Level::GetLaraType() const
@@ -230,19 +204,19 @@ bool Level::GetStormEnabled() const
 	return Storm;
 }
 
+bool Level::GetRumbleEnabled() const
+{
+	return Rumble;
+}
+
 float Level::GetWeatherStrength() const
 {
-	return WeatherStrength;
+	return WeatherStrength;	
 }
 
 WeatherType Level::GetWeatherType() const
 {
 	return Weather;
-}
-
-bool Level::GetFogEnabled() const
-{
-	return Fog.Enabled;
 }
 
 RGBAColor8Byte Level::GetFogColor() const
@@ -280,6 +254,57 @@ std::string Level::GetAmbientTrack() const
 	return AmbientTrack;
 }
 
+const TEN::Scripting::Horizon& Level::GetHorizon(int index) const
+{
+	TENAssert(index == 0 || index == 1, "Horizon index must be 0 or 1.");
+	return (index == 0 ? Horizon1 : Horizon2);
+}
+
+bool Level::GetHorizon1Enabled() const
+{
+	return Horizon1.GetEnabled();
+}
+
+void Level::SetHorizon1Enabled(bool enabled)
+{
+	Horizon1.SetEnabled(enabled);
+}
+
+bool Level::GetHorizonEnabled(int index) const
+{
+	return GetHorizon(index).GetEnabled();
+}
+
+GAME_OBJECT_ID Level::GetHorizonObjectID(int index) const
+{
+	return GetHorizon(index).GetObjectID();
+}
+
+float Level::GetHorizonTransparency(int index) const
+{
+	return GetHorizon(index).GetTransparency();
+}
+
+Vector3 Level::GetHorizonPosition(int index) const
+{
+	return GetHorizon(index).GetPosition().ToVector3();
+}
+
+EulerAngles Level::GetHorizonOrientation(int index) const
+{
+	return GetHorizon(index).GetRotation().ToEulerAngles();
+}
+
+Vector3 Level::GetHorizonPrevPosition(int index) const
+{
+	return GetHorizon(index).GetPrevPosition().ToVector3();
+}
+
+EulerAngles Level::GetHorizonPrevOrientation(int index) const
+{
+	return GetHorizon(index).GetPrevRotation().ToEulerAngles();
+}
+
 bool Level::GetLensFlareEnabled() const
 {
 	return LensFlare.GetEnabled();
@@ -303,16 +328,6 @@ short Level::GetLensFlareYaw() const
 Color Level::GetLensFlareColor() const
 {
 	return LensFlare.GetColor();
-}
-
-bool Level::GetStarfieldStarsEnabled() const
-{
-	return Starfield.GetStarsEnabled();
-}
-
-bool Level::GetStarfieldMeteorsEnabled() const
-{
-	return Starfield.GetMeteorsEnabled();
 }
 
 int Level::GetStarfieldStarCount() const
