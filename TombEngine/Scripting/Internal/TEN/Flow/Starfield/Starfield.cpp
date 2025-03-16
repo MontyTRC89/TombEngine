@@ -6,8 +6,8 @@
 
 using namespace TEN::Effects::Environment;
 
-/// Represents a star field in the sky. To be used with @{Flow.Level.starField} property.
-// @tenprimitive Flow.StarField
+/// Represents a star field in the sky. To be used with @{Flow.Level.starfield} property.
+// @tenprimitive Flow.Starfield
 // @pragma nostrip
 
 namespace TEN::Scripting
@@ -20,7 +20,7 @@ namespace TEN::Scripting
 		
 		// Register type.
 		parent.new_usertype<Starfield>(
-			"StarField",
+			"Starfield",
 			ctors(), sol::call_constructor, ctors(),
 
 			/// (int) Amount of visible stars.
@@ -49,26 +49,24 @@ namespace TEN::Scripting
 			"SetMeteorCount", &Starfield::SetMeteorCount,
 			"SetMeteorSpawnDensity", &Starfield::SetMeteorSpawnDensity,
 			"SetMeteorVelocity", &Starfield::SetMeteorVelocity);
-
-		parent["StarField"] = parent["Starfield"];
 	}
 
 	/// Create a starfield object with only stars.
-	// @function StarField
+	// @function Starfield
 	// @tparam int starCount Star count.
-	// @treturn Starfield A new StarField object.
+	// @treturn Starfield A new Starfield object.
 	Starfield::Starfield(int starCount)
 	{
 		_starCount = starCount;
 	}
 
 	/// Create a starfield object with stars and meteors.
-	// @function StarField
+	// @function Starfield
 	// @tparam int starCount Star count. __Max: 6000__
 	// @tparam int meteorCount Meteor count. __Max: 100__
 	// @tparam int meteorSpawnDensity Meteor spawn density.
 	// @tparam int meteorVel Meteor velocity.
-	// @treturn StarField A new StarField object.
+	// @treturn StarField A new Starfield object.
 	Starfield::Starfield(int starCount, int meteorCount, int meteorSpawnDensity, float meteorVel)
 	{
 		if (starCount < 0 || starCount > STAR_COUNT_MAX)

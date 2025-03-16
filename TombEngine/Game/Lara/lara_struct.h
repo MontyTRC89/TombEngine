@@ -611,9 +611,9 @@ enum LaraAnim
 	LA_LADDER_RIGHT_CORNER_OUTER_START = 365,				// Ladder around outer right corner
 	LA_PUSHABLE_BLOCK_PUSH_EDGE_SLIP = 366,
 	LA_LADDER_LEFT_CORNER_INNER_START = 367,				// Ladder around inner left corner
-	LA_UNDERWATER_FLOOR_TRAPDOOR = 368,						// Underwater Floor Trapdoor
+	LA_LADDER_LEFT_CORNER_INNER_END = 368,
 	LA_LADDER_RIGHT_CORNER_INNER_START = 369,				// Ladder around inner right corner
-	LA_UNDERWATER_WALL_KICK = 370,							// Underwater Wall Kick.
+	LA_UNUSED = 370,										// Unused.
 	LA_JUMP_UP_TO_ROPE_START = 371,							// Jump up > rope idle (1/2)
 	LA_TRAIN_OVERBOARD_DEATH = 372,							// Train overboard death
 	LA_JUMP_UP_TO_ROPE_END = 373,							// Jump up > rope idle (2/2)
@@ -688,7 +688,7 @@ enum LaraAnim
 	LA_PICKUP_SARCOPHAGUS = 439,							// Pickup from sarcophagus
 	LA_DRAG_BODY = 440,										// Drag dead body
 	LA_BINOCULARS_IDLE = 441,								// Stand, looking through binoculars
-	LA_WALL_PUSH = 442,										// Lara Push Wall.
+	LA_UNDERWATER_FLOOR_TRAPDOOR = 442,						// Underwater floor trapdoor
 	LA_ELEVATOR_RECOVER = 443,								// Recover from elevator crash
 	LA_MECHANICAL_BEETLE_USE = 444,							// Wind mechanical beetle, place on floor
 	LA_FLY_CHEAT = 445,										// Fly cheat
@@ -825,6 +825,8 @@ enum LaraAnim
 
 	// 569-598 reserved for ladder object. -- Sezz 2023.04.16
 
+	LA_WALL_PUSH = 600,						// Lara Push Wall.
+	LA_UNDERWATER_WALL_KICK = 601,
 	NUM_LARA_ANIMS
 
 	// TRASHED ANIMS (reuse slots before going any higher and remove entries from this list when you do):

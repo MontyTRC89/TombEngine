@@ -474,6 +474,7 @@ constexpr char ScriptReserved_StaticGetPosition[]	= "GetPosition";
 constexpr char ScriptReserved_StaticGetRotation[]	= "GetRotation";
 constexpr char ScriptReserved_StaticGetScale[]		= "GetScale";
 constexpr char ScriptReserved_StaticGetSlot[]		= "GetSlot";
+constexpr char ScriptReserved_StaticGetCollidable[]	= "GetCollidable";
 constexpr char ScriptReserved_StaticGetSolid[]		= "GetSolid";
 constexpr char ScriptReserved_StaticSetColor[]		= "SetColor";
 constexpr char ScriptReserved_StaticSetHitPoints[]	= "SetHP";
@@ -483,6 +484,7 @@ constexpr char ScriptReserved_StaticSetRotation[]	= "SetRotation";
 constexpr char ScriptReserved_StaticSetScale[]		= "SetScale";
 constexpr char ScriptReserved_StaticSetSlot[]		= "SetSlot";
 constexpr char ScriptReserved_StaticSetSolid[]		= "SetSolid";
+constexpr char ScriptReserved_StaticSetCollidable[]	= "SetCollidable";
 constexpr char ScriptReserved_StaticShatter[]		= "Shatter";
 
 // =====

@@ -68,7 +68,7 @@
   <li>    <a href="../3 primitive classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
   <li>    <a href="../3 primitive classes/Flow.LensFlare.html">Flow.LensFlare</a></li>
   <li>    <a href="../3 primitive classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
-  <li>    <a href="../3 primitive classes/Flow.StarField.html">Flow.StarField</a></li>
+  <li>    <a href="../3 primitive classes/Flow.Starfield.html">Flow.Starfield</a></li>
   <li>    <a href="../3 primitive classes/Color.html">Color</a></li>
   <li>    <a href="../3 primitive classes/Rotation.html">Rotation</a></li>
   <li>    <a href="../3 primitive classes/Time.html">Time</a></li>
@@ -80,7 +80,7 @@
   <li>    <a href="../4 enums/Collision.MaterialType.html">Collision.MaterialType</a></li>
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
-  <li>    <a href="../4 enums/Effects.FeatherMode.html">Effects.FeatherMode</a></li>
+  <li>    <a href="../4 enums/Effects.StreamerFeatherMode.html">Effects.StreamerFeatherMode</a></li>
   <li>    <a href="../4 enums/Effects.ParticleAnimationType.html">Effects.ParticleAnimationType</a></li>
   <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
   <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
@@ -144,11 +144,11 @@
 	<td class="summary">Set the room's unique string identifier.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Room:SetReverbType">Room:SetReverbType(Reverb)</a></td>
+	<td class="name" ><a href="#Room:SetReverbType">Room:SetReverbType(reverb)</a></td>
 	<td class="summary">Set the room's reverb type.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Room:SetFlag">Room:SetFlag(flagID, Boolean)</a></td>
+	<td class="name" ><a href="#Room:SetFlag">Room:SetFlag(flagID, value)</a></td>
 	<td class="summary">Set the room's specified flag.</td>
 	</tr>
 	<tr>
@@ -280,7 +280,7 @@
 </dd>
     <dt>
     <a name = "Room:SetReverbType"></a>
-    <strong>Room:SetReverbType(Reverb)</strong>
+    <strong>Room:SetReverbType(reverb)</strong>
     </dt>
     <dd>
     Set the room's reverb type.
@@ -289,9 +289,9 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">Reverb</span>
+        <li><span class="parameter">reverb</span>
             <span class="types"><a class="type" href="../4 enums/Objects.RoomReverb.html#">RoomReverb</a></span>
-         type.
+         Reverb type.
         </li>
     </ul>
 
@@ -302,7 +302,7 @@
 </dd>
     <dt>
     <a name = "Room:SetFlag"></a>
-    <strong>Room:SetFlag(flagID, Boolean)</strong>
+    <strong>Room:SetFlag(flagID, value)</strong>
     </dt>
     <dd>
     Set the room's specified flag.
@@ -315,9 +315,9 @@
             <span class="types"><a class="type" href="../4 enums/Objects.RoomFlagID.html#">RoomFlagID</a></span>
          Room flag ID.
         </li>
-        <li><span class="parameter">Boolean</span>
+        <li><span class="parameter">value</span>
             <span class="types"><span class="type">bool</span></span>
-         to set the flag to.
+         Boolean to set the flag to.
         </li>
     </ul>
 

@@ -66,10 +66,9 @@ void Level::Register(sol::table& parent)
 //@mem horizon2
 		"horizon2", &Level::Horizon2,
 
-/// (@{Flow.StarField}) Starfield in the sky.
-// @mem starField
-		"starField", &Level::Starfield,
-		"starfield", &Level::Starfield, // Compatibility.
+/// (@{Flow.Starfield}) Starfield in the sky.
+// @mem starfield
+		"starfield", &Level::Starfield,
 
 /// (@{Flow.LensFlare}) Global lens flare.
 // @mem lensFlare
@@ -107,7 +106,7 @@ These are:
 
 e.g. `myLevel.laraType = LaraType.Divesuit`
 
- __(not yet fully implemented)__
+ __Not yet fully implemented.__ Only types `Normal` and `Young` are guaranteed to work.
  @mem laraType*/
 		"laraType", &Level::Type,
 
@@ -225,12 +224,12 @@ RGBAColor8Byte Level::GetFogColor() const
 	return Fog.GetColor();
 }
 
-short Level::GetFogMinDistance() const
+float Level::GetFogMinDistance() const
 {
 	return Fog.MinDistance;
 }
 
-short Level::GetFogMaxDistance() const
+float Level::GetFogMaxDistance() const
 {
 	return Fog.MaxDistance;
 }

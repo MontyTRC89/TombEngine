@@ -105,7 +105,7 @@ using namespace TEN::Scripting::Types;
 
 	/// Set the room's reverb type.
 	// @function Room:SetReverbType
-	// @tparam Objects.RoomReverb Reverb type.
+	// @tparam Objects.RoomReverb reverb Reverb type.
 	void Room::SetReverbType(ReverbType reverb)
 	{
 		_room.reverbType = reverb;
@@ -114,7 +114,7 @@ using namespace TEN::Scripting::Types;
 	/// Set the room's specified flag.
 	// @function Room:SetFlag
 	// @tparam Objects.RoomFlagID flagID Room flag ID.
-	// @tparam bool Boolean to set the flag to.
+	// @tparam bool value Boolean to set the flag to.
 	void Room::SetFlag(RoomEnvFlags flag, bool value)
 	{
 		if (value)

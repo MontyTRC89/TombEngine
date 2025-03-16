@@ -68,7 +68,7 @@
   <li>    <a href="../3 primitive classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
   <li>    <a href="../3 primitive classes/Flow.LensFlare.html">Flow.LensFlare</a></li>
   <li>    <a href="../3 primitive classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
-  <li>    <a href="../3 primitive classes/Flow.StarField.html">Flow.StarField</a></li>
+  <li>    <a href="../3 primitive classes/Flow.Starfield.html">Flow.Starfield</a></li>
   <li>    <a href="../3 primitive classes/Color.html">Color</a></li>
   <li>    <a href="../3 primitive classes/Rotation.html">Rotation</a></li>
   <li>    <a href="../3 primitive classes/Time.html">Time</a></li>
@@ -80,7 +80,7 @@
   <li>    <a href="../4 enums/Collision.MaterialType.html">Collision.MaterialType</a></li>
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
-  <li>    <a href="../4 enums/Effects.FeatherMode.html">Effects.FeatherMode</a></li>
+  <li>    <a href="../4 enums/Effects.StreamerFeatherMode.html">Effects.StreamerFeatherMode</a></li>
   <li>    <a href="../4 enums/Effects.ParticleAnimationType.html">Effects.ParticleAnimationType</a></li>
   <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
   <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
@@ -123,44 +123,44 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#LaraObject:SetPoison">LaraObject:SetPoison([Poison])</a></td>
+	<td class="name" ><a href="#LaraObject:SetPoison">LaraObject:SetPoison([poison])</a></td>
 	<td class="summary">Set player poison.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#LaraObject:GetPoison">LaraObject:GetPoison()</a></td>
-	<td class="summary">Get poison potency of Lara</td>
+	<td class="summary">Get poison potency of Lara.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#LaraObject:SetAir">LaraObject:SetAir(Air)</a></td>
-	<td class="summary">Set air value of Lara</td>
+	<td class="name" ><a href="#LaraObject:SetAir">LaraObject:SetAir(air)</a></td>
+	<td class="summary">Set air value of Lara.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#LaraObject:GetAir">LaraObject:GetAir()</a></td>
-	<td class="summary">Get air value of Lara</td>
+	<td class="summary">Get air value of Lara.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#LaraObject:SetWet">LaraObject:SetWet(Wetness)</a></td>
-	<td class="summary">Set wetness value of Lara (causes dripping)</td>
+	<td class="name" ><a href="#LaraObject:SetWet">LaraObject:SetWet(wetness)</a></td>
+	<td class="summary">Set wetness value of Lara (causes dripping).</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#LaraObject:GetWet">LaraObject:GetWet()</a></td>
-	<td class="summary">Get wetness value of Lara</td>
+	<td class="summary">Get wetness value of Lara.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#LaraObject:SetStamina">LaraObject:SetStamina(stamina)</a></td>
-	<td class="summary">Set sprint energy value of Lara</td>
+	<td class="summary">Set sprint energy value of Lara.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#LaraObject:GetStamina">LaraObject:GetStamina()</a></td>
-	<td class="summary">Get stamina value of Lara</td>
+	<td class="summary">Get stamina value of Lara.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#Moveable:GetAirborne">Moveable:GetAirborne()</a></td>
-	<td class="summary">Get the moveable's airborne status</td>
+	<td class="summary">Get the moveable's airborne status.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetAirborne">Moveable:SetAirborne(New)</a></td>
-	<td class="summary">Set the moveable's airborne status</td>
+	<td class="name" ><a href="#Moveable:SetAirborne">Moveable:SetAirborne(airborne)</a></td>
+	<td class="summary">Set the moveable's airborne status.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#LaraObject:UndrawWeapon">LaraObject:UndrawWeapon()</a></td>
@@ -172,15 +172,15 @@
 	</tr>
 	<tr>
 	<td class="name" ><a href="#LaraObject:GetHandStatus">LaraObject:GetHandStatus()</a></td>
-	<td class="summary">Get actual hand status of Lara</td>
+	<td class="summary">Get actual hand status of Lara.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#LaraObject:GetWeaponType">LaraObject:GetWeaponType()</a></td>
-	<td class="summary">Get actual weapon type of Lara</td>
+	<td class="summary">Get actual weapon type of Lara.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#LaraObject:SetWeaponType">LaraObject:SetWeaponType(weaponType, activate)</a></td>
-	<td class="summary">Set Lara weapon type</td>
+	<td class="summary">Set Lara weapon type.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#LaraObject:GetAmmoType">LaraObject:GetAmmoType()</a></td>
@@ -188,11 +188,11 @@
 	</tr>
 	<tr>
 	<td class="name" ><a href="#LaraObject:GetAmmoCount">LaraObject:GetAmmoCount()</a></td>
-	<td class="summary">Get current weapon's ammo count</td>
+	<td class="summary">Get current weapon's ammo count.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#LaraObject:GetVehicle">LaraObject:GetVehicle()</a></td>
-	<td class="summary">Get current vehicle, if it exists</td>
+	<td class="summary">Get current vehicle, if it exists.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#LaraObject:GetTarget">LaraObject:GetTarget()</a></td>
@@ -217,7 +217,7 @@
     <dl class="function">
     <dt>
     <a name = "LaraObject:SetPoison"></a>
-    <strong>LaraObject:SetPoison([Poison])</strong>
+    <strong>LaraObject:SetPoison([poison])</strong>
     </dt>
     <dd>
     Set player poison.
@@ -226,9 +226,9 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">Poison</span>
+        <li><span class="parameter">poison</span>
             <span class="types"><span class="type">int</span></span>
-        ; maximum value is 128 (default 0)
+         Poison strength. Maximum value is 128 (default 0)
          (<em>optional</em>)
         </li>
     </ul>
@@ -247,7 +247,7 @@
     <strong>LaraObject:GetPoison()</strong>
     </dt>
     <dd>
-    Get poison potency of Lara
+    Get poison potency of Lara.
 
 
 
@@ -256,7 +256,7 @@
     <ol>
 
            <span class="types"><span class="type">int</span></span>
-        current poison potency
+        Current poison potency.
     </ol>
 
 
@@ -269,18 +269,18 @@
 </dd>
     <dt>
     <a name = "LaraObject:SetAir"></a>
-    <strong>LaraObject:SetAir(Air)</strong>
+    <strong>LaraObject:SetAir(air)</strong>
     </dt>
     <dd>
-    Set air value of Lara
+    Set air value of Lara.
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">Air</span>
+        <li><span class="parameter">air</span>
             <span class="types"><span class="type">int</span></span>
-         value to give Lara. Maximum value is 1800.
+         Air value to give Lara. Maximum value is 1800.
         </li>
     </ul>
 
@@ -298,7 +298,7 @@
     <strong>LaraObject:GetAir()</strong>
     </dt>
     <dd>
-    Get air value of Lara
+    Get air value of Lara.
 
 
 
@@ -307,7 +307,7 @@
     <ol>
 
            <span class="types"><span class="type">int</span></span>
-        current air value
+        Current air value.
     </ol>
 
 
@@ -320,18 +320,18 @@
 </dd>
     <dt>
     <a name = "LaraObject:SetWet"></a>
-    <strong>LaraObject:SetWet(Wetness)</strong>
+    <strong>LaraObject:SetWet(wetness)</strong>
     </dt>
     <dd>
-    Set wetness value of Lara (causes dripping)
+    Set wetness value of Lara (causes dripping).
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">Wetness</span>
+        <li><span class="parameter">wetness</span>
             <span class="types"><span class="type">int</span></span>
-         value. Maximum 255
+         Wetness value. Maximum value is 255.
         </li>
     </ul>
 
@@ -349,7 +349,7 @@
     <strong>LaraObject:GetWet()</strong>
     </dt>
     <dd>
-    Get wetness value of Lara
+    Get wetness value of Lara.
 
 
 
@@ -358,7 +358,7 @@
     <ol>
 
            <span class="types"><span class="type">int</span></span>
-        current wetness value
+        Current wetness value.
     </ol>
 
 
@@ -374,7 +374,7 @@
     <strong>LaraObject:SetStamina(stamina)</strong>
     </dt>
     <dd>
-    Set sprint energy value of Lara
+    Set sprint energy value of Lara.
 
 
 
@@ -382,7 +382,7 @@
     <ul>
         <li><span class="parameter">stamina</span>
             <span class="types"><span class="type">int</span></span>
-         to give to Lara; maximum value is 120.
+         Stamina to give to Lara. Maximum value is 120.
         </li>
     </ul>
 
@@ -400,7 +400,7 @@
     <strong>LaraObject:GetStamina()</strong>
     </dt>
     <dd>
-    Get stamina value of Lara
+    Get stamina value of Lara.
 
 
 
@@ -409,7 +409,7 @@
     <ol>
 
            <span class="types"><span class="type">int</span></span>
-        current sprint value
+        Current sprint value.
     </ol>
 
 
@@ -425,7 +425,7 @@
     <strong>Moveable:GetAirborne()</strong>
     </dt>
     <dd>
-    Get the moveable's airborne status
+    Get the moveable's airborne status.
 
 
 
@@ -433,8 +433,8 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">(bool)</span></span>
-        true if Lara state must react to aerial forces.
+           <span class="types"><span class="type">bool</span></span>
+        True if Lara state must react to aerial forces.
     </ol>
 
 
@@ -443,18 +443,18 @@
 </dd>
     <dt>
     <a name = "Moveable:SetAirborne"></a>
-    <strong>Moveable:SetAirborne(New)</strong>
+    <strong>Moveable:SetAirborne(airborne)</strong>
     </dt>
     <dd>
-    Set the moveable's airborne status
+    Set the moveable's airborne status.
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">New</span>
-            <span class="types"><span class="type">(bool)</span></span>
-         airborn status for Lara.
+        <li><span class="parameter">airborne</span>
+            <span class="types"><span class="type">bool</span></span>
+         New airborne status for Lara.
         </li>
     </ul>
 
@@ -506,7 +506,7 @@
     <strong>LaraObject:GetHandStatus()</strong>
     </dt>
     <dd>
-    Get actual hand status of Lara
+    Get actual hand status of Lara.
 
 
 
@@ -514,8 +514,8 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">int</span></span>
-        hand status 0=HandsFree, 1=Busy(climbing,etc), 2=WeaponDraw, 3=WeaponUndraw, 4=WeaponInHand.
+           <span class="types"><a class="type" href="../4 enums/Objects.HandStatus.html#">HandStatus</a></span>
+        Current hand status.
     </ol>
 
 
@@ -531,7 +531,7 @@
     <strong>LaraObject:GetWeaponType()</strong>
     </dt>
     <dd>
-    Get actual weapon type of Lara
+    Get actual weapon type of Lara.
 
 
 
@@ -539,8 +539,8 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">Flow.WeaponType</span></span>
-        current weapon type.
+           <span class="types"><a class="type" href="../4 enums/Objects.WeaponType.html#">WeaponType</a></span>
+        Current weapon type.
     </ol>
 
 
@@ -556,21 +556,19 @@
     <strong>LaraObject:SetWeaponType(weaponType, activate)</strong>
     </dt>
     <dd>
-    Set Lara weapon type
+    Set Lara weapon type.
 
 
 
     <h3>Parameters:</h3>
     <ul>
         <li><span class="parameter">weaponType</span>
-            <span class="types"><span class="type">Flow.WeaponType</span></span>
-
-
-
+            <span class="types"><a class="type" href="../4 enums/Objects.WeaponType.html#">WeaponType</a></span>
+         New weapon type to set.
         </li>
         <li><span class="parameter">activate</span>
             <span class="types"><span class="type">bool</span></span>
-         if <code>true</code>, also draw the weapons or set torch lit. If <code>false</code>, keep weapons holstered or leave torch unlit.
+         If <code>true</code>, also draw the weapons or set torch lit. If <code>false</code>, keep weapons holstered or leave torch unlit.
         </li>
     </ul>
 
@@ -596,8 +594,8 @@
     <h3>Returns:</h3>
     <ol>
 
-           <span class="types"><span class="type">Flow.AmmoType</span></span>
-        player weapon ammo type
+           <span class="types"><a class="type" href="../4 enums/Objects.AmmoType.html#">AmmoType</a></span>
+        Player weapon ammo type.
     </ol>
 
 
@@ -613,7 +611,7 @@
     <strong>LaraObject:GetAmmoCount()</strong>
     </dt>
     <dd>
-    Get current weapon's ammo count
+    Get current weapon's ammo count.
 
 
 
@@ -622,7 +620,7 @@
     <ol>
 
            <span class="types"><span class="type">int</span></span>
-        current ammo count (-1 if infinite)
+        Current ammo count (-1 if infinite).
     </ol>
 
 
@@ -638,7 +636,7 @@
     <strong>LaraObject:GetVehicle()</strong>
     </dt>
     <dd>
-    Get current vehicle, if it exists
+    Get current vehicle, if it exists.
 
 
 
@@ -647,7 +645,7 @@
     <ol>
 
            <span class="types"><a class="type" href="../2 classes/Objects.Moveable.html#">Moveable</a></span>
-        current vehicle (nil if no vehicle present)
+        current vehicle (nil if no vehicle present).
     </ol>
 
 
