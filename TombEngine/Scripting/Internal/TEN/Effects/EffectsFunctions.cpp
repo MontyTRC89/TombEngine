@@ -403,7 +403,7 @@ namespace TEN::Scripting::Effects
 		if (!Vec3::IsEqualTo(convertedConstraint,Vec3(0,0,0)))
 		{
 			part.flags |= SP_CONSTRAINED;
-			part.constraint = convertedConstraint;
+			part.constraint = Vec3(ANGLE(convertedConstraint.x), ANGLE(convertedConstraint.y), ANGLE(convertedConstraint.z));
 		}
 	}
 	
