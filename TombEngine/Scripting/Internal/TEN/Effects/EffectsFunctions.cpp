@@ -399,10 +399,11 @@ namespace TEN::Scripting::Effects
 				part.flags |= SP_WIND;
 		}
 
-		bool convertedConstraint = table.get_or("constrained", false);
-		if (convertedConstraint)
+		Vec3 convertedConstraint = table.get_or("constrained", Vec3(0,0,0));
+		if (!Vec3::IsEqualTo(convertedConstraint,Vec3(0,0,0)))
 		{
 			part.flags |= SP_CONSTRAINED;
+			part.constraint = convertedConstraint;
 		}
 	}
 	
