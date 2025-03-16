@@ -325,13 +325,13 @@ namespace TEN::Scripting
 			sol::meta_function::new_index, NewIndexErrorMaker(SystemSettings, ScriptReserved_SystemSettings),
 
 		/// How should the application respond to script errors?
-		// @tfield Flow.ErrorMode errorMode error mode to use. */
+		// @tfield Flow.ErrorMode errorMode error mode to use.
 		"errorMode", &SystemSettings::ErrorMode,
 
 		/// Use multithreading in certain calculations. <br>
 		// When set to `true`, some performance-critical calculations will be performed in parallel, which can give
 		// a significant performance boost. Don't disable unless you have problems with launching or using TombEngine.
-		// @tfield bool multithreaded determines whether to use multithreading or not. */
+		// @tfield bool multithreaded determines whether to use multithreading or not.
 		"multithreaded", &SystemSettings::Multithreaded,
 
 		/// Can the game utilize the fast reload feature? <br>

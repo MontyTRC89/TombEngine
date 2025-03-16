@@ -244,7 +244,7 @@ void Moveable::Initialize()
 
 /// Retrieve the object ID
 // @function Moveable:GetObjectID
-// @treturn Objects.ObjID a number representing the ID of the object
+// @treturn Objects.ObjID a number representing the ID of the object.
 GAME_OBJECT_ID Moveable::GetObjectID() const
 {
 	return _moveable->ObjectNumber;
@@ -252,7 +252,7 @@ GAME_OBJECT_ID Moveable::GetObjectID() const
 
 /// Change the object's ID. This will literally change the object.
 // @function Moveable:SetObjectID
-// @tparam Objects.ObjID ID the new ID 
+// @tparam Objects.ObjID objectID the new ID 
 // @usage
 // shiva = TEN.Objects.GetMoveableByName("shiva_60")
 // shiva:SetObjectID(TEN.Objects.ObjID.BIGMEDI_ITEM)
@@ -432,7 +432,7 @@ void Moveable::SetPosition(const Vec3& pos, sol::optional<bool> updateRoom)
 // @function Moveable:GetJointPosition
 // @tparam int jointID Joint ID.
 // @tparam[opt] Vec3 offset Offset relative to the joint.
-// @treturn Vec3 pos World position.
+// @treturn Vec3 World position.
 Vec3 Moveable::GetJointPos(int jointID, sol::optional<Vec3> offset) const
 {
 	auto convertedOffset = offset.has_value() ? offset->ToVector3i() : Vector3i::Zero;
@@ -441,7 +441,7 @@ Vec3 Moveable::GetJointPos(int jointID, sol::optional<Vec3> offset) const
 
 /// Get the object's joint rotation
 // @function Moveable:GetJointRotation
-// @tparam int index of a joint to get rotation
+// @tparam int index Index of a joint to get rotation.
 // @treturn Rotation a calculated copy of the moveable's joint rotation
 Rotation Moveable::GetJointRot(int jointIndex) const
 {
@@ -606,9 +606,9 @@ void Moveable::SetEffect(EffectType effectType, sol::optional<float> timeout)
 
 /// Set custom colored burn effect to moveable
 // @function Moveable:SetCustomEffect
-// @tparam Color Color1 color the primary color of the effect (also used for lighting).
-// @tparam Color Color2 color the secondary color of the effect.
-// @tparam[opt] float timeout time (in seconds) after which effect turns off.
+// @tparam Color color1 The primary color of the effect (also used for lighting).
+// @tparam Color color2 The secondary color of the effect.
+// @tparam[opt] float timeout Time (in seconds) after which effect turns off.
 void Moveable::SetCustomEffect(const ScriptColor& col1, const ScriptColor& col2, sol::optional<float> timeout)
 {
 	int realTimeout = timeout.has_value() ? int(timeout.value() * FPS) : -1;
@@ -619,7 +619,7 @@ void Moveable::SetCustomEffect(const ScriptColor& col1, const ScriptColor& col2,
 
 /// Get current moveable effect
 // @function Moveable:GetEffect
-// @treturn Effects.EffectID Sffect type currently assigned.
+// @treturn Effects.EffectID Effect type currently assigned.
 EffectType Moveable::GetEffect() const
 {
 	return _moveable->Effect.Type;
@@ -627,7 +627,7 @@ EffectType Moveable::GetEffect() const
 
 /// Get the value stored in ItemFlags[index]
 // @function Moveable:GetItemFlags
-// @tparam int index of the ItemFlags, can be between 0 and 7.
+// @tparam int index Index of the ItemFlag, can be between 0 and 7.
 // @treturn int the value contained in the ItemFlags[index]
 short Moveable::GetItemFlags(int index) const
 {
@@ -636,8 +636,8 @@ short Moveable::GetItemFlags(int index) const
 
 /// Stores a value in ItemFlags[index]
 // @function Moveable:SetItemFlags
-// @tparam short value to store in the moveable's ItemFlags[index]
-// @tparam int index of the ItemFlags where store the value.
+// @tparam short value Value to store in the moveable's ItemFlags[index].
+// @tparam int index Index of the ItemFlag where to store the value.
 void Moveable::SetItemFlags(short value, int index)
 {
 	_moveable->ItemFlags[index] = value;
@@ -660,7 +660,7 @@ short Moveable::GetLocationAI() const
 
 /// Updates the location in the enemy AI with the given value.
 // @function Moveable:SetLocationAI
-// @tparam short value to store.
+// @tparam short value Value to store.
 void Moveable::SetLocationAI(short value)
 {
 	if (_moveable->IsCreature())
@@ -696,12 +696,13 @@ void Moveable::SetColor(const ScriptColor& color)
 // have a *1* in the corresponding cell. Otherwise, the cell will hold
 // a *0*.
 //
-// <br />1 - guard
-// <br />2 - ambush
-// <br />3 - patrol 1
-// <br />4 - modify
-// <br />5 - follow
-// <br />6 - patrol 2
+//	1 - Guard
+//	2 - Ambush
+//	3 - Patrol 1
+//	4 - Modify
+//	5 - Follow
+//	6 - Patrol 2
+//
 // @function Moveable:GetAIBits
 // @treturn table a table of AI bits
 aiBitsType Moveable::GetAIBits() const
@@ -934,7 +935,7 @@ void Moveable::SetRoomNumber(int roomNumber)
 }
 
 /// Get the moveable's status.
-// @function Moveable:GetStatus()
+// @function Moveable:GetStatus
 // @treturn Objects.MoveableStatus Status.
 short Moveable::GetStatus() const
 {
@@ -942,7 +943,7 @@ short Moveable::GetStatus() const
 }
 
 /// Set the moveable's status.
-// @function Moveable:SetStatus()
+// @function Moveable:SetStatus
 // @tparam Objects.MoveableStatus status The new status of the moveable.
 void Moveable::SetStatus(ItemStatus status)
 {
@@ -1234,9 +1235,9 @@ bool Moveable::MeshExists(int index) const
 
 /// Attach camera to an object.
 // @function Moveable:AttachObjCamera
-// @tparam int mesh of a moveable to use as a camera position
-// @tparam Moveable target moveable to attach camera to
-// @tparam int mesh of a target moveable to use as a camera target
+// @tparam int mesh Mesh of a moveable to use as a camera position.
+// @tparam Moveable target Target moveable to attach camera to.
+// @tparam int mesh Mesh of a target moveable to use as a camera target.
 void Moveable::AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId)
 {
 	if ((_moveable->Active || _moveable->IsLara()) && (mov._moveable->Active || mov._moveable->IsLara()))
@@ -1245,9 +1246,9 @@ void Moveable::AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshI
 
 /// Borrow animation from an object
 // @function Moveable:AnimFromObject
-// @tparam Objects.ObjID ObjectID to take animation and stateID from,
-// @tparam int animNumber animation from object
-// @tparam int stateID state from object
+// @tparam Objects.ObjID objectID Object ID to take animation and stateID from.
+// @tparam int animNumber Animation from object.
+// @tparam int stateID state State from object.
 void Moveable::AnimFromObject(GAME_OBJECT_ID objectID, int animNumber, int stateID)
 {
 	_moveable->Animation.AnimObjectID = objectID;
