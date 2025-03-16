@@ -517,6 +517,7 @@ namespace TEN::Renderer
 
 				if (particle.flags & SP_CONSTRAINED)
 				{
+
 					AddSpriteBillboardConstrainedLookAt(
 						&_sprites[spriteIndex],
 						pos,

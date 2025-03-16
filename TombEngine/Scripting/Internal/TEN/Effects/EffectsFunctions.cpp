@@ -399,11 +399,11 @@ namespace TEN::Scripting::Effects
 				part.flags |= SP_WIND;
 		}
 
-		Vec3 convertedConstraint = table.get_or("constraint", Vec3(0,0,0));
+		Vec3 convertedConstraint = table.get_or("drawDir", Vec3(0,0,0));
 		if (!Vec3::IsEqualTo(convertedConstraint,Vec3(0,0,0)))
 		{
 			part.flags |= SP_CONSTRAINED;
-			part.constraint = Vec3(ANGLE(convertedConstraint.x), ANGLE(convertedConstraint.y), ANGLE(convertedConstraint.z));
+			part.constraint = convertedConstraint;
 		}
 	}
 	
