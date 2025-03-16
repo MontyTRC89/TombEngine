@@ -208,6 +208,8 @@ void CustomObjects()
 
 void InitializeObjects()
 {
+	TENLog("Initializing objects...", LogLevel::Info);
+
 	AllocTR4Objects();
 	AllocTR5Objects();
 
@@ -249,9 +251,6 @@ void InitializeObjects()
 
 	// User defined objects
 	CustomObjects();
-
-	HairEffect.Initialize();
-	InitializeSpecialEffects();
 
 	NumRPickups = 0;
 	CurrentSequence = 0;
