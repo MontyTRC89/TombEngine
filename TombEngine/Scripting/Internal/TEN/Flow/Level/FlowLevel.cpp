@@ -106,7 +106,7 @@ These are:
 
 e.g. `myLevel.laraType = LaraType.Divesuit`
 
- __(not yet fully implemented)__
+ __Not yet fully implemented.__ Only types `Normal` and `Young` are guaranteed to work.
  @mem laraType*/
 		"laraType", &Level::Type,
 

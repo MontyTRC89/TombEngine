@@ -130,7 +130,7 @@
 	<td class="summary">Retrieve the object ID</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetObjectID">Moveable:SetObjectID(ID)</a></td>
+	<td class="name" ><a href="#Moveable:SetObjectID">Moveable:SetObjectID(objectID)</a></td>
 	<td class="summary">Change the object's ID.</td>
 	</tr>
 	<tr>
@@ -221,7 +221,7 @@
 	<td class="summary">Set the effect for this moveable.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetCustomEffect">Moveable:SetCustomEffect(Color1, Color2[, timeout])</a></td>
+	<td class="name" ><a href="#Moveable:SetCustomEffect">Moveable:SetCustomEffect(color1, color2[, timeout])</a></td>
 	<td class="summary">Set custom colored burn effect to moveable</td>
 	</tr>
 	<tr>
@@ -418,7 +418,7 @@
 	<td class="summary">Attach camera to an object.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:AnimFromObject">Moveable:AnimFromObject(ObjectID, animNumber, stateID)</a></td>
+	<td class="name" ><a href="#Moveable:AnimFromObject">Moveable:AnimFromObject(objectID, animNumber, stateID)</a></td>
 	<td class="summary">Borrow animation from an object</td>
 	</tr>
 </table>
@@ -518,7 +518,7 @@ most can just be ignored (see usage).
     <ol>
 
            <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-        a number representing the ID of the object
+        a number representing the ID of the object.
     </ol>
 
 
@@ -527,7 +527,7 @@ most can just be ignored (see usage).
 </dd>
     <dt>
     <a name = "Moveable:SetObjectID"></a>
-    <strong>Moveable:SetObjectID(ID)</strong>
+    <strong>Moveable:SetObjectID(objectID)</strong>
     </dt>
     <dd>
     Change the object's ID.  This will literally change the object.
@@ -536,7 +536,7 @@ most can just be ignored (see usage).
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">ID</span>
+        <li><span class="parameter">objectID</span>
             <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
          the new ID
         </li>
@@ -795,7 +795,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
     <ol>
 
            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-        pos World position.
+        World position.
     </ol>
 
 
@@ -815,7 +815,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
     <ul>
         <li><span class="parameter">index</span>
             <span class="types"><span class="type">int</span></span>
-         of a joint to get rotation
+         Index of a joint to get rotation.
         </li>
     </ul>
 
@@ -1053,7 +1053,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
 </dd>
     <dt>
     <a name = "Moveable:SetCustomEffect"></a>
-    <strong>Moveable:SetCustomEffect(Color1, Color2[, timeout])</strong>
+    <strong>Moveable:SetCustomEffect(color1, color2[, timeout])</strong>
     </dt>
     <dd>
     Set custom colored burn effect to moveable
@@ -1062,17 +1062,17 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">Color1</span>
+        <li><span class="parameter">color1</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
-         color the primary color of the effect (also used for lighting).
+         The primary color of the effect (also used for lighting).
         </li>
-        <li><span class="parameter">Color2</span>
+        <li><span class="parameter">color2</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
-         color the secondary color of the effect.
+         The secondary color of the effect.
         </li>
         <li><span class="parameter">timeout</span>
             <span class="types"><span class="type">float</span></span>
-         time (in seconds) after which effect turns off.
+         Time (in seconds) after which effect turns off.
          (<em>optional</em>)
         </li>
     </ul>
@@ -1096,7 +1096,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
     <ol>
 
            <span class="types"><a class="type" href="../4 enums/Effects.EffectID.html#">EffectID</a></span>
-        Sffect type currently assigned.
+        Effect type currently assigned.
     </ol>
 
 
@@ -1116,7 +1116,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
     <ul>
         <li><span class="parameter">index</span>
             <span class="types"><span class="type">int</span></span>
-         of the ItemFlags, can be between 0 and 7.
+         Index of the ItemFlag, can be between 0 and 7.
         </li>
     </ul>
 
@@ -1144,11 +1144,11 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
     <ul>
         <li><span class="parameter">value</span>
             <span class="types"><span class="type">short</span></span>
-         to store in the moveable's ItemFlags[index]
+         Value to store in the moveable's ItemFlags[index].
         </li>
         <li><span class="parameter">index</span>
             <span class="types"><span class="type">int</span></span>
-         of the ItemFlags where store the value.
+         Index of the ItemFlag where to store the value.
         </li>
     </ul>
 
@@ -1191,7 +1191,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
     <ul>
         <li><span class="parameter">value</span>
             <span class="types"><span class="type">short</span></span>
-         to store.
+         Value to store.
         </li>
     </ul>
 
@@ -1248,18 +1248,22 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
     <strong>Moveable:GetAIBits()</strong>
     </dt>
     <dd>
-    Get AIBits of object
+
+<p>Get AIBits of object
  This will return a table with six values, each corresponding to
  an active behaviour.  If the object is in a certain AI mode, the table will
  have a <em>1</em> in the corresponding cell. Otherwise, the cell will hold
  a <em>0</em>.</p>
 
-<p> <br />1 - guard
- <br />2 - ambush
- <br />3 - patrol 1
- <br />4 - modify
- <br />5 - follow
- <br />6 - patrol 2
+<pre><code>1 - Guard
+2 - Ambush
+3 - Patrol 1
+4 - Modify
+5 - Follow
+6 - Patrol 2
+</code></pre>
+
+
 
 
 
@@ -1681,7 +1685,7 @@ sas:SetPosition(newPos, <span class="keyword">false</span>)</pre>
     <strong>Moveable:GetStatus()</strong>
     </dt>
     <dd>
-    Get the moveable's status. ()
+    Get the moveable's status.
 
 
 
@@ -1702,7 +1706,7 @@ sas:SetPosition(newPos, <span class="keyword">false</span>)</pre>
     <strong>Moveable:SetStatus(status)</strong>
     </dt>
     <dd>
-    Set the moveable's status. ()
+    Set the moveable's status.
 
 
 
@@ -2103,15 +2107,15 @@ sas:SetPosition(newPos, <span class="keyword">false</span>)</pre>
     <ul>
         <li><span class="parameter">mesh</span>
             <span class="types"><span class="type">int</span></span>
-         of a target moveable to use as a camera target
+         Mesh of a target moveable to use as a camera target.
         </li>
         <li><span class="parameter">target</span>
             <span class="types"><a class="type" href="../2 classes/Objects.Moveable.html#Moveable">Moveable</a></span>
-         moveable to attach camera to
+         Target moveable to attach camera to.
         </li>
         <li><span class="parameter">mesh</span>
             <span class="types"><span class="type">int</span></span>
-         of a target moveable to use as a camera target
+         Mesh of a target moveable to use as a camera target.
         </li>
     </ul>
 
@@ -2122,7 +2126,7 @@ sas:SetPosition(newPos, <span class="keyword">false</span>)</pre>
 </dd>
     <dt>
     <a name = "Moveable:AnimFromObject"></a>
-    <strong>Moveable:AnimFromObject(ObjectID, animNumber, stateID)</strong>
+    <strong>Moveable:AnimFromObject(objectID, animNumber, stateID)</strong>
     </dt>
     <dd>
     Borrow animation from an object
@@ -2131,17 +2135,17 @@ sas:SetPosition(newPos, <span class="keyword">false</span>)</pre>
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">ObjectID</span>
+        <li><span class="parameter">objectID</span>
             <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-         to take animation and stateID from,
+         Object ID to take animation and stateID from.
         </li>
         <li><span class="parameter">animNumber</span>
             <span class="types"><span class="type">int</span></span>
-         animation from object
+         Animation from object.
         </li>
         <li><span class="parameter">stateID</span>
             <span class="types"><span class="type">int</span></span>
-         state from object
+         state State from object.
         </li>
     </ul>
 
