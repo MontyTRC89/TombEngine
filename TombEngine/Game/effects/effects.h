@@ -184,8 +184,6 @@ struct Particle
 
 	int sound;
 
-	Vector3 constraint;
-
 	int PrevX;
 	int PrevY;
 	int PrevZ;
