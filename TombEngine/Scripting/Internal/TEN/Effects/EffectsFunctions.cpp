@@ -399,11 +399,14 @@ namespace TEN::Scripting::Effects
 				part.flags |= SP_WIND;
 		}
 
-		Vec3 convertedConstraint = table.get_or("drawDir", Vec3(0,0,0));
-		if (!Vec3::IsEqualTo(convertedConstraint,Vec3(0,0,0)))
+		bool convertedConstraint = table.get_or("fixedDraw", false);
+
+		table.get_or("drawRot", Rotation(0, 0, 0));
+		if (convertedConstraint)
 		{
+			Rotation rot = table.get_or("drawRot", Rotation(0, 0, 0));
 			part.flags |= SP_CONSTRAINED;
-			part.constraint = Vec3(ANGLE(convertedConstraint.x),ANGLE(convertedConstraint.y),ANGLE(convertedConstraint.z));
+			part.constraint = Vector3(DEG_TO_RAD(rot.x), DEG_TO_RAD(rot.y), DEG_TO_RAD(rot.z));
 		}
 	}
 	
