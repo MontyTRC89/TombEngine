@@ -27,7 +27,7 @@ namespace TEN::Entities::Switches
 	const ObjectCollisionBounds UnderwaterSwitchBounds =
 	{
 		GameBoundingBox(
-			-BLOCK(3 / 4.0f), BLOCK(3 / 4.0f),
+			-BLOCK(0.5f), BLOCK(0.5f),
 			-BLOCK(1), 0,
 			-BLOCK(0.5f), BLOCK(0.25f)
 		),
