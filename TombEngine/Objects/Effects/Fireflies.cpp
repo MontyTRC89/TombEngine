@@ -208,14 +208,14 @@ namespace TEN::Effects::Fireflies
                     StreamerEffect.Spawn(targetItem->Index, firefly.Number, pos, direction0, orient2D,
                         Vector4(firefly.r / (float)UCHAR_MAX, firefly.g / (float)UCHAR_MAX, firefly.b / (float)UCHAR_MAX, 1.0f),
                         Vector4::Zero,
-                        6.3f - (firefly.zVel / 12), ((firefly.Velocity / 8) + firefly.zVel * 3) / (float)UCHAR_MAX, 0.0f, -0.1f, 90.0f, StreamerFeatherType::None, BlendMode::Additive);
+                        6.3f - (firefly.zVel / 12), ((firefly.Velocity / 8) + firefly.zVel * 3) / (float)UCHAR_MAX, 0.0f, -0.1f, 90.0f, StreamerFeatherMode::None, BlendMode::Additive);
                 }
                 else if (targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] < 0)
                 {
                     StreamerEffect.Spawn(targetItem->Index, firefly.Number, pos, direction0, orient2D,
                         Vector4((firefly.r / 2) / (float)UCHAR_MAX, (firefly.g / 2) / (float)UCHAR_MAX, (firefly.b / 2) / (float)UCHAR_MAX, 0.2f),
                         Vector4((firefly.r / 3) / (float)UCHAR_MAX, (firefly.g / 3) / (float)UCHAR_MAX, (firefly.b / 3) / (float)UCHAR_MAX, 0.2f),
-                        0.0f, 0.4f, 0.0f, 0.2f, 0.0f, StreamerFeatherType::None, BlendMode::Subtractive);
+                        0.0f, 0.4f, 0.0f, 0.2f, 0.0f, StreamerFeatherMode::None, BlendMode::Subtractive);
                 }
 
                 if ((targetItem->ItemFlags[FirefliesItemFlags::LightIndex1] == firefly.Number || targetItem->ItemFlags[FirefliesItemFlags::LightIndex2] == firefly.Number) &&
