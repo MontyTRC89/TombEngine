@@ -549,8 +549,8 @@ struct LevelDataT : public flatbuffers::NativeTable {
   int32_t weather_type = 0;
   float weather_strength = 0.0f;
   int32_t fog_color = 0;
-  int32_t fog_min_distance = 0;
-  int32_t fog_max_distance = 0;
+  float fog_min_distance = 0.0f;
+  float fog_max_distance = 0.0f;
   bool sky_layer_1_enabled = false;
   int32_t sky_layer_1_color = 0;
   int32_t sky_layer_1_speed = 0;
@@ -633,11 +633,11 @@ struct LevelData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t fog_color() const {
     return GetField<int32_t>(VT_FOG_COLOR, 0);
   }
-  int32_t fog_min_distance() const {
-    return GetField<int32_t>(VT_FOG_MIN_DISTANCE, 0);
+  float fog_min_distance() const {
+    return GetField<float>(VT_FOG_MIN_DISTANCE, 0.0f);
   }
-  int32_t fog_max_distance() const {
-    return GetField<int32_t>(VT_FOG_MAX_DISTANCE, 0);
+  float fog_max_distance() const {
+    return GetField<float>(VT_FOG_MAX_DISTANCE, 0.0f);
   }
   bool sky_layer_1_enabled() const {
     return GetField<uint8_t>(VT_SKY_LAYER_1_ENABLED, 0) != 0;
@@ -719,8 +719,8 @@ struct LevelData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_WEATHER_TYPE) &&
            VerifyField<float>(verifier, VT_WEATHER_STRENGTH) &&
            VerifyField<int32_t>(verifier, VT_FOG_COLOR) &&
-           VerifyField<int32_t>(verifier, VT_FOG_MIN_DISTANCE) &&
-           VerifyField<int32_t>(verifier, VT_FOG_MAX_DISTANCE) &&
+           VerifyField<float>(verifier, VT_FOG_MIN_DISTANCE) &&
+           VerifyField<float>(verifier, VT_FOG_MAX_DISTANCE) &&
            VerifyField<uint8_t>(verifier, VT_SKY_LAYER_1_ENABLED) &&
            VerifyField<int32_t>(verifier, VT_SKY_LAYER_1_COLOR) &&
            VerifyField<int32_t>(verifier, VT_SKY_LAYER_1_SPEED) &&
@@ -774,11 +774,11 @@ struct LevelDataBuilder {
   void add_fog_color(int32_t fog_color) {
     fbb_.AddElement<int32_t>(LevelData::VT_FOG_COLOR, fog_color, 0);
   }
-  void add_fog_min_distance(int32_t fog_min_distance) {
-    fbb_.AddElement<int32_t>(LevelData::VT_FOG_MIN_DISTANCE, fog_min_distance, 0);
+  void add_fog_min_distance(float fog_min_distance) {
+    fbb_.AddElement<float>(LevelData::VT_FOG_MIN_DISTANCE, fog_min_distance, 0.0f);
   }
-  void add_fog_max_distance(int32_t fog_max_distance) {
-    fbb_.AddElement<int32_t>(LevelData::VT_FOG_MAX_DISTANCE, fog_max_distance, 0);
+  void add_fog_max_distance(float fog_max_distance) {
+    fbb_.AddElement<float>(LevelData::VT_FOG_MAX_DISTANCE, fog_max_distance, 0.0f);
   }
   void add_sky_layer_1_enabled(bool sky_layer_1_enabled) {
     fbb_.AddElement<uint8_t>(LevelData::VT_SKY_LAYER_1_ENABLED, static_cast<uint8_t>(sky_layer_1_enabled), 0);
@@ -871,8 +871,8 @@ inline flatbuffers::Offset<LevelData> CreateLevelData(
     int32_t weather_type = 0,
     float weather_strength = 0.0f,
     int32_t fog_color = 0,
-    int32_t fog_min_distance = 0,
-    int32_t fog_max_distance = 0,
+    float fog_min_distance = 0.0f,
+    float fog_max_distance = 0.0f,
     bool sky_layer_1_enabled = false,
     int32_t sky_layer_1_color = 0,
     int32_t sky_layer_1_speed = 0,

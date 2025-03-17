@@ -13,11 +13,11 @@ struct Fog
 	byte R{ 0 };
 	byte G{ 0 };
 	byte B{ 0 };
-	short MinDistance{ 0 };
-	short MaxDistance{ 0 };
+	float MinDistance{ 0 };
+	float MaxDistance{ 0 };
 
 	Fog() = default;
-	Fog(ScriptColor const& color, short minDistance, short maxDistance);
+	Fog(ScriptColor const& color, float minDistance, float maxDistance);
 	void SetColor(ScriptColor const& color);
 	ScriptColor GetColor() const;
 

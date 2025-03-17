@@ -15,8 +15,8 @@ table LevelData {
 	weather_strength: float;
 	
 	fog_color: int32;
-	fog_min_distance: int32;
-	fog_max_distance: int32;
+	fog_min_distance: float;
+	fog_max_distance: float;
 
 	sky_layer_1_enabled: bool;
 	sky_layer_1_color: int32;
