@@ -27,9 +27,6 @@ private:
 	void PrepareInventoryObjects();
 
 public:
-	int FogInDistance  = 0;
-	int FogOutDistance = 0;
-
 	bool LevelSelect = true;
 	bool HomeLevel	 = false;
 	bool LoadSave	 = true;
@@ -73,6 +70,7 @@ public:
 	void		AddSecret(int levelSecretIndex);
 	void		SetIntroImagePath(const std::string& path);
 	void		SetTitleScreenImagePath(const std::string& path);
+	int			GetTotalSecretCount();
 	void		SetTotalSecretCount(int secretsNumber);
 	bool		IsFlyCheatEnabled() const;
 	void		EnableFlyCheat(bool enable);

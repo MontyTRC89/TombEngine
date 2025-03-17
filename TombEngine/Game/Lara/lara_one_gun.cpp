@@ -1339,8 +1339,8 @@ void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile
 			SaveGame::Statistics.Level.AmmoHits++;
 			if (target.HitPoints <= 0)
 			{
-				SaveGame::Statistics.Level.Kills++;
 				SaveGame::Statistics.Game.Kills++;
+				SaveGame::Statistics.Level.Kills++;
 				CreatureDie(target.Index, true);
 			}
 		}

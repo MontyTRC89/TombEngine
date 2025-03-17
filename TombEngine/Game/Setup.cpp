@@ -175,6 +175,7 @@ void InitializeGameFlags()
 
 	FlipEffect = NO_VALUE;
 	FlipStatus = false;
+	NumRPickups = 0;
 	Camera.underwater = false;
 }
 
@@ -210,6 +211,8 @@ void CustomObjects()
 
 void InitializeObjects()
 {
+	TENLog("Initializing objects...", LogLevel::Info);
+
 	AllocTR4Objects();
 	AllocTR5Objects();
 
@@ -252,10 +255,6 @@ void InitializeObjects()
 	// User defined objects
 	CustomObjects();
 
-	HairEffect.Initialize();
-	InitializeSpecialEffects();
-
-	NumRPickups = 0;
 	CurrentSequence = 0;
 	SequenceResults[0][1][2] = 0;
 	SequenceResults[0][2][1] = 1;

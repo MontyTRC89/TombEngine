@@ -66,6 +66,7 @@
 #include "Objects/TR5/Trap/tr5_ventilator.h"
 #include "Objects/TR5/Trap/tr5_romehammer.h"
 #include "Objects/TR5/Trap/tr5_fallingceiling.h"
+#include "Objects/TR5/Trap/tr5_movinglaser.h"
 #include "Objects/TR5/Trap/tr5_explosion.h"
 #include "Objects/TR5/Trap/tr5_wreckingball.h"
 
@@ -972,6 +973,15 @@ static void StartTrap(ObjectInfo *obj)
 		obj->collision = CollideLaserBeam;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_MOVING_LASER];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeMovingLaser;
+		obj->control = ControlMovingLaser;
+		obj->collision = CollideMovingLaser;
+		obj->SetHitEffect(true);
 	}
 }
 

@@ -33,14 +33,13 @@
 #include "Specific/level.h"
 #include "Specific/winmain.h"
 
-using namespace std::chrono;
 using namespace TEN::Effects::Hair;
-using namespace TEN::Entities::Creatures::TR3;
-using namespace TEN::Entities::Generic;
 using namespace TEN::Hud;
-using namespace TEN::Renderer::Structures;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::DisplaySprite;
+using namespace TEN::Entities::Creatures::TR3;
+using namespace TEN::Entities::Generic;
+using namespace TEN::Renderer::Structures;
 
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
@@ -1823,7 +1822,7 @@ namespace TEN::Renderer
 		cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
 		cameraConstantBuffer.DualParaboloidView = Matrix::CreateLookAt(LaraItem->Pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3() + Vector3(0, 0, 1024), -Vector3::UnitY);
 
-		if (level.GetFogEnabled())
+		if (level.GetFogMaxDistance() > 0)
 		{
 			auto fogColor = level.GetFogColor();
 			cameraConstantBuffer.FogColor = Vector4(fogColor.GetR() / 255.0f, fogColor.GetG() / 255.0f, fogColor.GetB() / 255.0f, 1.0f);
@@ -1832,7 +1831,7 @@ namespace TEN::Renderer
 		}
 		else
 		{
-			cameraConstantBuffer.FogMaxDistance = 0;
+			cameraConstantBuffer.FogMaxDistance = 0.0f;
 			cameraConstantBuffer.FogColor = Vector4::Zero;
 		}
 
@@ -1933,6 +1932,8 @@ namespace TEN::Renderer
 
 	void Renderer::RenderSimpleSceneToParaboloid(RenderTarget2D* renderTarget, Vector3 position, int emisphere)
 	{
+		// TODO: Update the horizon draw code here once paraboloids are required. TrainWreck Feb 2, 2025.
+		
 		// Reset GPU state
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
@@ -1982,10 +1983,10 @@ namespace TEN::Renderer
 		view.FillConstantBuffer(cameraConstantBuffer);
 		_cbCameraMatrices.UpdateData(cameraConstantBuffer, _context.Get());
 
-		// Draw horizon and the sky
+		// Draw horizon and sky.
 		auto* levelPtr = g_GameFlow->GetLevel(CurrentLevel);
 
-		if (levelPtr->Horizon)
+		if (levelPtr->GetHorizonEnabled(0) || levelPtr->GetHorizonEnabled(1))
 		{
 			_shaders.Bind(Shader::RoomAmbientSky);
 
@@ -2027,31 +2028,26 @@ namespace TEN::Renderer
 			_context->ClearDepthStencilView(renderTarget->DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 
 			// Draw horizon.
-			if (_moveableObjects[ID_HORIZON].has_value())
+			if (_moveableObjects[ID_HORIZON].has_value()) // FIXME: Replace with same function as in the main pipeline!
 			{
 				_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-				auto& moveableObj = *_moveableObjects[ID_HORIZON];
+				const auto& moveableObj = *_moveableObjects[ID_HORIZON]; // FIXME: Replace with same function as in the main pipeline!
 
 				_stStatic.World = Matrix::CreateTranslation(LaraItem->Pose.Position.ToVector3());
 				_stStatic.Color = Vector4::One;
 				_stStatic.ApplyFogBulbs = 1;
 				_cbStatic.UpdateData(_stStatic, _context.Get());
 
-				for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+				for (const auto* mesh : moveableObj.ObjectMeshes)
 				{
-					auto* meshPtr = moveableObj.ObjectMeshes[k];
-
-					for (auto& bucket : meshPtr->Buckets)
+					for (const auto& bucket : mesh->Buckets)
 					{
 						if (bucket.NumVertices == 0)
-						{
 							continue;
-						}
 
-						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]),
-							SamplerStateRegister::AnisotropicClamp);
+						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
 						// Always render horizon as alpha-blended surface.
 						SetBlendMode(bucket.BlendMode == BlendMode::AlphaTest ? BlendMode::AlphaBlend : bucket.BlendMode);
@@ -2072,8 +2068,8 @@ namespace TEN::Renderer
 		_shaders.Bind(Shader::RoomAmbient);
 
 		// Draw rooms
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
+		unsigned int stride = sizeof(Vertex);
+		unsigned int offset = 0;
 
 		// Bind vertex and index buffer.
 		_context->IASetVertexBuffers(0, 1, _roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -2082,8 +2078,8 @@ namespace TEN::Renderer
 		for (int i = 0; i < _rooms.size(); i++)
 		{
 			int index = i;
-			RendererRoom* room = &_rooms[index];
-			ROOM_INFO* nativeRoom = &g_Level.Rooms[room->RoomNumber];
+			auto* room = &_rooms[index];
+			auto* nativeRoom = &g_Level.Rooms[room->RoomNumber];
 
 			// Avoid drawing of too far rooms... Environment map is tiny, blurred, so very far rooms would not contribute to the
 			// final pixel colors
@@ -2104,9 +2100,7 @@ namespace TEN::Renderer
 			for (auto& bucket : room->Buckets)
 			{
 				if (bucket.NumVertices == 0)
-				{
 					continue;
-				}
 
 				SetBlendMode(bucket.BlendMode);
 				SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
@@ -2711,8 +2705,8 @@ namespace TEN::Renderer
 				// Bind caustics texture.
 				if (_causticTextures.size() > 0)
 				{     
-					int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
-					int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;     
+					int nmeshes = -Objects[ID_CAUSTIC_TEXTURES].nmeshes;
+					int meshIndex = Objects[ID_CAUSTIC_TEXTURES].meshIndex;
 					int causticsFrame = GlobalCounter % _causticTextures.size();
 					BindTexture(TextureRegister::CausticsMap, &_causticTextures[causticsFrame], SamplerStateRegister::AnisotropicClamp);
 				} 
@@ -2851,7 +2845,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		if (!levelPtr->Horizon || !anyOutsideRooms)
+		if ((!levelPtr->GetHorizonEnabled(0) && !levelPtr->GetHorizonEnabled(1)) || !anyOutsideRooms)
 			return;
 
 		if (Lara.Control.Look.OpticRange != 0)
@@ -2871,21 +2865,23 @@ namespace TEN::Renderer
 
 		SetBlendMode(BlendMode::Additive);
 
-		for (int s = 0; s < 2; s++)
+		for (int layer = 0; layer < 2; layer++)
 		{
+			if (Vector3(Weather.SkyColor(layer)) == Vector3::Zero)
+				continue;
+
 			for (int i = 0; i < 2; i++)
 			{
-				auto weather = TEN::Effects::Environment::Weather;
 
 				auto translation = Matrix::CreateTranslation(
-					renderView.Camera.WorldPosition.x + weather.SkyPosition(s) - i * SKY_SIZE,
+					renderView.Camera.WorldPosition.x + Weather.SkyPosition(layer) - i * SKY_SIZE,
 					renderView.Camera.WorldPosition.y - 1536.0f, 
 					renderView.Camera.WorldPosition.z);
 				auto world = rotation * translation;
 
 				_stStatic.World = (rotation * translation);
-				_stStatic.Color = weather.SkyColor(s);
-				_stStatic.ApplyFogBulbs = s == 0 ? 1 : 0;
+				_stStatic.Color = Weather.SkyColor(layer);
+				_stStatic.ApplyFogBulbs = layer == 0 ? 1 : 0;
 				_cbStatic.UpdateData(_stStatic, _context.Get());
 
 				DrawIndexedTriangles(SKY_INDICES_COUNT, 0, 0);
@@ -3034,8 +3030,11 @@ namespace TEN::Renderer
 		}
 
 		// Draw horizon.
-		if (_moveableObjects[ID_HORIZON].has_value())
+		for (int layer = 0; layer < 2; layer++)
 		{
+			if (!levelPtr->GetHorizonEnabled(layer) || levelPtr->GetHorizonTransparency(layer) <= EPSILON)
+				continue;
+
 			SetDepthState(DepthState::None);
 			SetBlendMode(BlendMode::Opaque);
 			SetCullMode(CullMode::CounterClockwise);
@@ -3045,29 +3044,31 @@ namespace TEN::Renderer
 
 			_shaders.Bind(Shader::Sky);
 
-			auto& moveableObj = *_moveableObjects[ID_HORIZON];
+			auto pos = Vector3::Lerp(levelPtr->GetHorizonPrevPosition(layer), levelPtr->GetHorizonPosition(layer), GetInterpolationFactor());
+			auto orient = EulerAngles::Lerp(levelPtr->GetHorizonPrevOrientation(layer), levelPtr->GetHorizonOrientation(layer), GetInterpolationFactor());
+			auto rotMatrix = orient.ToRotationMatrix();
+			auto translationMatrix = Matrix::CreateTranslation(pos);
+			auto cameraMatrix = Matrix::CreateTranslation(renderView.Camera.WorldPosition);
 
-			_stStatic.World = Matrix::CreateTranslation(renderView.Camera.WorldPosition);
-			_stStatic.Color = Vector4::One;
+			float alpha = levelPtr->GetHorizonTransparency(layer);
+
+			_stStatic.World = rotMatrix * translationMatrix * cameraMatrix;
+			_stStatic.Color = Color(1.0f, 1.0f, 1.0f, alpha);
 			_stStatic.ApplyFogBulbs = 1;
 			_cbStatic.UpdateData(_stStatic, _context.Get());
 
-			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+			const auto& moveableObj = *_moveableObjects[levelPtr->GetHorizonObjectID(layer)];
+			for (const auto* mesh : moveableObj.ObjectMeshes)
 			{
-				auto* meshPtr = moveableObj.ObjectMeshes[k];
-
-				for (auto& bucket : meshPtr->Buckets)
+				for (const auto& bucket : mesh->Buckets)
 				{
 					if (bucket.NumVertices == 0)
-					{
 						continue;
-					}
 
-					BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]),
-						SamplerStateRegister::AnisotropicClamp);
+					BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
 					// Always render horizon as alpha-blended surface.
-					SetBlendMode(bucket.BlendMode == BlendMode::AlphaTest ? BlendMode::AlphaBlend : bucket.BlendMode);
+					SetBlendMode(GetBlendModeFromAlpha((bucket.BlendMode == BlendMode::AlphaTest) ? BlendMode::AlphaBlend : bucket.BlendMode, alpha));
 					SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 					// Draw vertices.

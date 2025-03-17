@@ -136,10 +136,10 @@ namespace TEN::Renderer
 						auto color = Vector4::Lerp(segment.PrevColor, segment.Color, GetInterpolationFactor());
 						auto prevColor = Vector4::Lerp(prevSegment.PrevColor, prevSegment.Color, GetInterpolationFactor());
 
-						switch (streamer.GetFeatherType())
+						switch (streamer.GetFeatherMode())
 						{
 							default:
-							case StreamerFeatherType::None:
+							case StreamerFeatherMode::None:
 								AddColoredQuad(
 									vertex0, vertex1,
 									prevVertex1,
@@ -151,7 +151,7 @@ namespace TEN::Renderer
 									streamer.GetBlendMode(), view);
 								break;
 
-							case StreamerFeatherType::Center:
+							case StreamerFeatherMode::Center:
 							{
 								auto center = (vertex0 + vertex1) / 2;
 								auto prevCenter = (prevVertex0 + prevVertex1) / 2;
@@ -167,14 +167,14 @@ namespace TEN::Renderer
 							}
 								break;
 
-							case StreamerFeatherType::Left:
+							case StreamerFeatherMode::Left:
 								AddColoredQuad(
 									vertex0, vertex1, prevVertex1, prevVertex0,
 									color, Vector4::Zero, Vector4::Zero, prevColor,
 									streamer.GetBlendMode(), view);
 								break;
 
-							case StreamerFeatherType::Right:
+							case StreamerFeatherMode::Right:
 								AddColoredQuad(
 									vertex0, vertex1, prevVertex1, prevVertex0,
 									Vector4::Zero, color, prevColor, Vector4::Zero,
