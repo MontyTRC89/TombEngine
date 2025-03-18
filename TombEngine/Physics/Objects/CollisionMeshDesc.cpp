@@ -102,53 +102,44 @@ namespace TEN::Physics
 		auto vertexAdjacencyMap = GetVertexAdjacencyMap(tris, edgeCountMap); // TODO: Not used yet.
 		auto boundaryEdges = GetBoundaryEdges(edgeCountMap);
 
-		// TODO: This function only works for already monotone polygons. Also make it work for:
-		//	- Irregular polygons.
-		//	- Holed polygons.
-		//
-		// Steps:
-		// 1) Split boundary edges into islands to be processed later. Can use vertex adjacency map?
-		// 2) Run through this collection of split boundary edges. Deconstruct irregular or holed polygons into monotone ones.
-		// 3) Process the collection of monotone polygons using the simple method below.
-
-		// 2) Process boundary edges into optimal polygon loops.
-		auto polygons = std::vector<std::vector<int>>{};
+		// 2) Collect raw loops.
+		auto rawLoops = std::vector<std::vector<int>>{};
 		while (!boundaryEdges.empty())
 		{
-			auto polygon = std::vector<int>{};
+			auto rawLoop = std::vector<int>{};
 
 			const auto& firstEdgeIt = boundaryEdges.begin();
 			const auto& [firstVertexId0, firstVertexId1] = *firstEdgeIt;
 
 			// 2.1) Add first boundary edge.
-			polygon.push_back(firstVertexId0);
-			polygon.push_back(firstVertexId1);
+			rawLoop.push_back(firstVertexId0);
+			rawLoop.push_back(firstVertexId1);
 			boundaryEdges.erase(firstEdgeIt);
 
 			// 2.2) Run through remaining boundary edges.
 			while (!boundaryEdges.empty())
 			{
 				// TODO: Optimise this. O(n) search here is too inefficient.
-				// Find matching edge by checking last polygon vertex.
+				// Find matching edge by checking last loop vertex.
 				bool isFound = false;
 				for (auto it = boundaryEdges.begin(); it != boundaryEdges.end(); it++)
 				{
 					const auto& [vertexId0, vertexId1] = *it;
 
-					// If current vertex is equal to one in polygon, add next vertex.
-					if (vertexId0 == polygon.back())
+					// If current vertex is equal to one in loop, add next vertex.
+					if (vertexId0 == rawLoop.back())
 					{
-						// Add vertex ID to polygon and remove used edge.
-						polygon.push_back(vertexId1);
+						// Add vertex ID to loop and remove used edge.
+						rawLoop.push_back(vertexId1);
 						boundaryEdges.erase(it);
 
 						isFound = true;
 						break;
 					}
-					else if (vertexId1 == polygon.back())
+					else if (vertexId1 == rawLoop.back())
 					{
-						// Add vertex ID to polygon and remove used edge.
-						polygon.push_back(vertexId0);
+						// Add vertex ID to loop and remove used edge.
+						rawLoop.push_back(vertexId0);
 						boundaryEdges.erase(it);
 
 						isFound = true;
@@ -156,18 +147,54 @@ namespace TEN::Physics
 					}
 				}
 
-				// No matching edge found; finalize monotone polygon.
+				// No matching edge found; finalize raw loop.
 				if (!isFound)
 					break;
 			}
 
-			// 2.3) Simplify and collect valid polygon.
-			SimplifyPolygon(polygon);
-			if (polygon.size() >= VERTEX_COUNT)
-				polygons.push_back(std::move(polygon));
+			// 2.3) Collect valid raw loop.
+			if (rawLoop.size() >= VERTEX_COUNT)
+				rawLoops.push_back(std::move(rawLoop));
 		}
 
-		// 3) Return optimal polygons.
+		// 3) Collect monotone and irregular loops.
+		auto monotoneLoops = std::vector<std::vector<int>>{};
+		auto irregularLoops = std::vector<std::vector<int>>{};
+		for (auto& rawLoop : rawLoops)
+		{
+			// 3.1) Move monotone loops as they are into `monotoneLoops`.
+			
+			// 3.2) Move irregular loops as they are into `irregularLoops`.
+
+			// 3.3) Convert holed polys into irregular loops and collect into `irregularLoops`.
+		}
+
+		// 4) Sweep irregular loops and collect monotone loops.
+		for (const auto& irregularLoop : irregularLoops)
+		{
+
+		}
+
+		// 5) Simplify monotone loops and collect valid polygons.
+		auto polygons = std::vector<std::vector<int>>{};
+		for (auto& monotoneLoop : monotoneLoops)
+		{
+			SimplifyPolygon(monotoneLoop);
+			if (monotoneLoop.size() >= VERTEX_COUNT)
+				polygons.push_back(std::move(monotoneLoop));
+		}
+
+		//=====================================================================================
+		// TEMP: Use raw loops for now.
+		for (auto& rawLoop : rawLoops)
+		{
+			SimplifyPolygon(rawLoop);
+			if (rawLoop.size() >= VERTEX_COUNT)
+				polygons.push_back(std::move(rawLoop));
+		}
+		//=====================================================================================
+
+		// 6) Return optimal polygons.
 		return polygons;
 	}
 
@@ -314,7 +341,7 @@ namespace TEN::Physics
 		if (polygon.size() < VERTEX_COUNT)
 			return;
 
-		// Triangulate using ear clipping method.
+		// Triangulate monotone polygon using ear clipping method.
 		auto vertexIds = polygon;
 		int i = 0;
 		while (vertexIds.size() > 2)
@@ -345,25 +372,15 @@ namespace TEN::Physics
 			// Calculate cross product of projected edges.
 			auto edgeCross = projEdge0.Cross(projEdge1);
 
-			// Convex angle between edges (< 180 degrees).
-			if (edgeCross.LengthSquared() >= 0.0f)
-			{
-				// Collect optimized vertex IDs.
-				optimizedVertexIds.push_back(vertexId0);
-				optimizedVertexIds.push_back(vertexId1);
-				optimizedVertexIds.push_back(vertexId2);
+			// Collect optimized vertex IDs.
+			optimizedVertexIds.push_back(vertexId0);
+			optimizedVertexIds.push_back(vertexId1);
+			optimizedVertexIds.push_back(vertexId2);
 
-				// Remove vertex 1.
-				vertexIds.erase(vertexIds.begin() + ((i + 1) % vertexIds.size()));
-				if (i == vertexIds.size())
-					i--;
-			}
-			// Reflex angle between edges (>= 180 degrees).
-			else
-			{
-				// Skip current vertex.
-				i = (i + 1) % vertexIds.size();
-			}
+			// Remove vertex 1.
+			vertexIds.erase(vertexIds.begin() + ((i + 1) % vertexIds.size()));
+			if (i == vertexIds.size())
+				i--;
 		}
 	}
 }
