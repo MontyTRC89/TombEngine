@@ -61,6 +61,27 @@ namespace TEN::Effects::Fireflies
 		item.ItemFlags[FirefliesItemFlags::LightID1] = NO_VALUE;
 	}
 
+	static void RemoveFireflies(ItemInfo& item)
+	{
+		FireflySwarm.erase(
+			std::remove_if(
+				FireflySwarm.begin(), FireflySwarm.end(),
+				[&item](FireflyData& firefly)
+				{
+					if (firefly.TargetItemPtr == &item)
+					{
+						firefly.Life = 0.0f;
+						firefly.on = false;
+						return true;
+					}
+
+					return false;
+				}),
+			FireflySwarm.end());
+
+		NextFireflyIDMap.erase(item.Index);
+	}
+
 	void SpawnFireflySwarm(ItemInfo& item, int triggerFlags)
 	{
 		constexpr auto VEL_MAX = 34.0f;
@@ -420,27 +441,6 @@ namespace TEN::Effects::Fireflies
 					firefly.zVel = 0.3f;
 			}
 		}
-	}
-
-	void RemoveFireflies(ItemInfo& item)
-	{
-		FireflySwarm.erase(
-			std::remove_if(
-				FireflySwarm.begin(), FireflySwarm.end(),
-				[&item](FireflyData& firefly)
-				{
-					if (firefly.TargetItemPtr == &item)
-					{
-						firefly.Life = 0.0f;
-						firefly.on = false;
-						return true;
-					}
-
-					return false;
-				}),
-			FireflySwarm.end());
-
-		NextFireflyIDMap.erase(item.Index);
 	}
 
 	void ClearFireflySwarm()
