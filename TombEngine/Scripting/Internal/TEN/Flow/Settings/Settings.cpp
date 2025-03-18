@@ -124,7 +124,7 @@ namespace TEN::Scripting
 		"lasersightLightColor", &CameraSettings::LasersightLightColor,
 	
 		/// Specify whether camera can collide with objects.
-		// @tfield bool objectCollision when enabled, camera will collide with moveables and statics. Disable or TR4-like camera behaviour.
+		// @tfield bool objectCollision when enabled, camera will collide with moveables and statics. Disable for TR4-like camera behaviour.
 		"objectCollision", &CameraSettings::ObjectCollision);
 	}
 

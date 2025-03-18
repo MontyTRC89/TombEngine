@@ -219,8 +219,6 @@ std::string ReadString()
 
 void LoadItems()
 {
-	InitializeObjects();
-
 	g_Level.NumItems = ReadCount();
 	TENLog("Moveables: " + std::to_string(g_Level.NumItems), LogLevel::Info);
 
@@ -455,6 +453,8 @@ void LoadObjects()
 		Objects[objNum].frameBase = ReadInt32();
 		Objects[objNum].animIndex = ReadInt32();
 	}
+
+	InitializeObjects();
 
 	int staticCount = ReadCount();
 	TENLog("Statics: " + std::to_string(staticCount), LogLevel::Info);
