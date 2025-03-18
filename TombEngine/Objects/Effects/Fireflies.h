@@ -15,8 +15,8 @@ namespace TEN::Effects::Fireflies
 		TriggerFlags,
 		Spawncounter,
 		RemoveFliesEffect,
-		LightIndex0,
-		LightIndex1
+		LightID0,
+		LightID1
 	};
 
 	struct FireflyData
