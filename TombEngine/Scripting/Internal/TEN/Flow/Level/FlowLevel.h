@@ -64,8 +64,8 @@ struct Level : public ScriptInterfaceLevel
 	void SetLevelFarView(short val);
 	static void Register(sol::table& parent);
 	WeatherType GetWeatherType() const override;
-	short GetFogMinDistance() const override;
-	short GetFogMaxDistance() const override;
+	float GetFogMinDistance() const override;
+	float GetFogMaxDistance() const override;
 	short GetFarView() const override;
 	void SetSecrets(int secrets);
 	int GetSecrets() const override;

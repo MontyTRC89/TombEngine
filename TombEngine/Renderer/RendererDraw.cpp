@@ -1830,7 +1830,7 @@ namespace TEN::Renderer
 		}
 		else
 		{
-			cameraConstantBuffer.FogMaxDistance = 0;
+			cameraConstantBuffer.FogMaxDistance = 0.0f;
 			cameraConstantBuffer.FogColor = Vector4::Zero;
 		}
 

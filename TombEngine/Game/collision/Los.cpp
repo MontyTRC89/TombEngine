@@ -410,6 +410,10 @@ namespace TEN::Collision::Los
 			if (collideOnlySolid && !(staticLos.Static->flags & StaticMeshFlags::SM_SOLID))
 				continue;
 
+			// Check if static is collidable.
+			if (!(staticLos.Static->flags & StaticMeshFlags::SM_COLLISION))
+				continue;
+
 			return staticLos;
 		}
 

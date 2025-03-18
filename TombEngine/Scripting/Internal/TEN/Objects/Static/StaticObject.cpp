@@ -38,6 +38,7 @@ namespace TEN::Scripting
 			ScriptReserved_StaticGetColor, &Static::GetColor,
 			ScriptReserved_StaticGetHP, &Static::GetHitPoints, // TODO: Deprecate.
 			ScriptReserved_StaticGetActive, &Static::GetActiveStatus, // TODO: Deprecate. Rename Lua func to GetActiveStatus.
+			ScriptReserved_StaticGetCollidable, &Static::GetCollidable,
 			ScriptReserved_StaticGetSolid, &Static::GetSolidStatus, // TODO: Deprecate. Rename Lua func to GetSolidStatus.
 
 			ScriptReserved_StaticSetName, &Static::SetName,
@@ -47,6 +48,7 @@ namespace TEN::Scripting
 			ScriptReserved_StaticSetScale, &Static::SetScale,
 			ScriptReserved_StaticSetColor, &Static::SetColor,
 			ScriptReserved_StaticSetHitPoints, &Static::SetHitPoints, // TODO: Deprecate. Rename Lua func to SetHitPoints.
+			ScriptReserved_StaticSetCollidable, &Static::SetCollidable,
 			ScriptReserved_StaticSetSolid, &Static::SetSolidStatus, // TODO: Deprecate. Rename Lua func to SetSolidStatus.
 			
 			ScriptReserved_StaticEnable, &Static::Enable,
@@ -121,6 +123,14 @@ namespace TEN::Scripting
 	bool Static::GetActiveStatus() const
 	{
 		return ((_static.flags & StaticMeshFlags::SM_VISIBLE) != 0);
+	}
+
+	/// Get this static's collision status.
+	// @function Static:GetCollidable
+	// @treturn bool Collision status.  __true: can be collided with__, __false: no collision__
+	bool Static::GetCollidable() const
+	{
+		return ((_static.flags & StaticMeshFlags::SM_COLLISION) != 0);
 	}
 
 	/// Get this static's solid collision status.
@@ -216,6 +226,21 @@ namespace TEN::Scripting
 		else
 		{
 			_static.flags &= ~StaticMeshFlags::SM_SOLID;
+		}
+	}
+
+	/// Set this static's collision status.
+	// @function Static:SetCollidable
+	// @tparam bool collidable New collision status. __true: can be collided with__, __false: no collision__
+	void Static::SetCollidable(bool collidable)
+	{
+		if (collidable)
+		{
+			_static.flags |= StaticMeshFlags::SM_COLLISION;
+		}
+		else
+		{
+			_static.flags &= ~StaticMeshFlags::SM_COLLISION;
 		}
 	}
 

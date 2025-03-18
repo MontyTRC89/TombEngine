@@ -454,7 +454,6 @@ void LoadObjects()
 		Objects[objNum].animIndex = ReadInt32();
 	}
 
-	TENLog("Initializing objects...", LogLevel::Info);
 	InitializeObjects();
 
 	int staticCount = ReadCount();

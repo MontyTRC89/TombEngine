@@ -3,7 +3,16 @@
 The dates are in European standard format where date is presented as **YYYY-MM-DD**.
 TombEngine releases are located in this repository (alongside with Tomb Editor): https://github.com/TombEngine/TombEditorReleases
 
-## [Version 1.8](link to release) - yyyy-mm-dd
+## [Version 1.8.1](link to release) - yyyy-mm-dd
+
+### Bug fixes
+* Fixed particles remaining in the level after reloading from the savegame.
+* Fixed particles being canceled by fog bulbs.
+
+### Lua API changes
+* Added missing constructor for `Collision.Probe` without room number.
+
+## [Version 1.8](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.8) - 2025-03-16
 
 ### Bug fixes
 * Improved engine performance up to 20%.
@@ -45,7 +54,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added `Effects.EmitStreamer` function to emit streamers.
 * Added `Flow.GetTotalSecretCount` function to get total amount of secrets in the game.
 * Added `View.GetFlyByPosition` and `View.GetFlyByRotation` functions to get flyby sequence parameters at a specified time point.
-* Added `Moveable:GetScale` and `Movebale:SetScale` methods to set visible scale of moveables.
+* Added `Moveable:GetScale` and `Movebale:SetScale` methods to get or set visible scale of moveables.
+* Added `Static:GetCollidable` and `Static:SetCollidable` methods to get or set collision status of static meshes.
 * Added `Rotation:Lerp` function to allow linear interpolation between rotations.
 * Added ability to perform additive and subtractive operations on `Rotation` class and compare one `Rotation` to another.
 * Added various `Translate` methods to `Vec2` and `Vec3` script objects.

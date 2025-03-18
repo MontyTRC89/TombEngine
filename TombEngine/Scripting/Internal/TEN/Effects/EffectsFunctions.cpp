@@ -247,7 +247,7 @@ namespace TEN::Scripting::Effects
 	//     poison = false,
 	//     burn = false,
 	//     damageHit = 80,
-	//     sound = 197,
+	//     soundID = 197,
 	//     light = true,
 	//     lightRadius = 6, 
 	//     lightFlicker = 5, 
@@ -361,7 +361,7 @@ namespace TEN::Scripting::Effects
 		if (convertedApplyBurn)
 			part.flags |= SP_FIRE;
 
-		int convertedSoundID = table.get_or("sound", NO_VALUE);
+		int convertedSoundID = table.get_or("soundID", NO_VALUE);
 		if (convertedSoundID != NO_VALUE)
 		{
 			part.flags |= SP_SOUND;
@@ -551,7 +551,7 @@ namespace TEN::Scripting::Effects
 	// @tparam[opt] float vel Movement velocity in world units per second. __Default: 0__
 	// @tparam[opt] float expRate Width expansion rate in world units per second. __Default: 0__
 	// @tparam[opt] float rotRate Rotation rate in degrees per second. __Default: 0__
-	// @tparam[opt] Effects.StreamerFeatherMode edgeFeatherMode Edge feather mode. __Default: Effects.FeatherID.NONE__
+	// @tparam[opt] Effects.StreamerFeatherMode edgeFeatherMode Edge feather mode. __Default: Effects.StreamerFeatherMode.NONE__
 	// @tparam[opt] Effects.StreamerFeatherMode lengthFeatherMode Length feather mode. __UNIMPLEMENTED, currently will always leave a fading tail__
 	// @tparam[opt] Effects.BlendID blendID Renderer blend ID. __Default: Effects.BlendID.ALPHA_BLEND__
 	static void EmitStreamer(const Moveable& mov, TypeOrNil<int> tag, const Vec3& pos, const Vec3& dir, TypeOrNil<float> rot, TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor,
