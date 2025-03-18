@@ -166,6 +166,8 @@ namespace TEN::Renderer::Utils
 		Load(Shader::BlurWaterReflectionsPixelShader, "Water", "BlurWaterReflections", ShaderType::Pixel);
 		Load(Shader::WaterCameraAboveWater, "Water", "Water", ShaderType::PixelAndVertex);
 		Load(Shader::WaterCameraBelowWater, "Water", "Water", ShaderType::PixelAndVertex, defines.data());
+		Load(Shader::WaterHullShader, "Water", "Water", ShaderType::Hull);
+		Load(Shader::WaterDomainShader, "Water", "Water", ShaderType::Domain);
 	}
 
 	void ShaderManager::Unbind(Shader shader)
@@ -363,16 +365,16 @@ namespace TEN::Renderer::Utils
 		// Load or compile and create hull shader.
 		if (type == ShaderType::Hull)
 		{
-			loadOrCompileShader(wideFileName, "HS", funcName, "hs_5_0", rendererShader.Compute.Blob);
-			throwIfFailed(_device->CreateHullShader(rendererShader.Hull.Blob->GetBufferPointer(), rendererShader.Compute.Blob->GetBufferSize(),
+			loadOrCompileShader(wideFileName, "HS", funcName, "hs_5_0", rendererShader.Hull.Blob);
+			throwIfFailed(_device->CreateHullShader(rendererShader.Hull.Blob->GetBufferPointer(), rendererShader.Hull.Blob->GetBufferSize(),
 				nullptr, rendererShader.Hull.Shader.GetAddressOf()));
 		}
 
 		// Load or compile and create domain shader.
 		if (type == ShaderType::Domain)
 		{
-			loadOrCompileShader(wideFileName, "DS", funcName, "ds_5_0", rendererShader.Compute.Blob);
-			throwIfFailed(_device->CreateDomainShader(rendererShader.Domain.Blob->GetBufferPointer(), rendererShader.Compute.Blob->GetBufferSize(),
+			loadOrCompileShader(wideFileName, "DS", funcName, "ds_5_0", rendererShader.Domain.Blob);
+			throwIfFailed(_device->CreateDomainShader(rendererShader.Domain.Blob->GetBufferPointer(), rendererShader.Domain.Blob->GetBufferSize(),
 				nullptr, rendererShader.Domain.Shader.GetAddressOf()));
 		}
 
@@ -389,7 +391,7 @@ namespace TEN::Renderer::Utils
 
 		return rendererShader;
 	}
-
+	 
 	void ShaderManager::Load(Shader shader, const std::string& fileName, const std::string& funcName, ShaderType type, const D3D_SHADER_MACRO* defines, bool forceRecompile)
 	{
 		Destroy(shader);
