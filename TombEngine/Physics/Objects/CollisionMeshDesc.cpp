@@ -314,9 +314,6 @@ namespace TEN::Physics
 		if (polygon.size() < VERTEX_COUNT)
 			return;
 
-		// TEMP
-		int count = 0;
-
 		// Triangulate using ear clipping method.
 		auto vertexIds = polygon;
 		int i = 0;
@@ -348,14 +345,9 @@ namespace TEN::Physics
 			// Calculate cross product of projected edges.
 			auto edgeCross = projEdge0.Cross(projEdge1);
 
-			// Angle between edges is convex (< 180 degrees).
-			//if (true)
+			// Convex angle between edges (< 180 degrees).
 			if (edgeCross.LengthSquared() >= 0.0f)
 			{
-				// FAILSAFE: Skip degenerate triangle.
-				//if (abs(edgeCross.LengthSquared()) > EPSILON)
-				//	continue;
-				
 				// Collect optimized vertex IDs.
 				optimizedVertexIds.push_back(vertexId0);
 				optimizedVertexIds.push_back(vertexId1);
@@ -365,21 +357,12 @@ namespace TEN::Physics
 				vertexIds.erase(vertexIds.begin() + ((i + 1) % vertexIds.size()));
 				if (i == vertexIds.size())
 					i--;
-
-				count = 0;
 			}
-			// Angle between edges is reflex (>= 180 degrees).
+			// Reflex angle between edges (>= 180 degrees).
 			else
 			{
 				// Skip current vertex.
 				i = (i + 1) % vertexIds.size();
-				count++;
-
-				if (count > 10)
-				{
-					PrintDebugMessage("Fail!");
-					break;
-				}
 			}
 		}
 	}
