@@ -37,12 +37,12 @@
 #include "Objects/TR5/Entity/tr5_willowwisp.h"	 // OK
 
 // Emitters
+#include "Objects/Effects/Fireflies.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "Objects/TR5/Emitter/tr5_smoke_emitter.h"
 #include "Objects/TR5/Emitter/Waterfall.h"
-#include "Objects/Effects/Fireflies.h"
 
 // Objects
 #include "Objects/TR5/Light/tr5_light.h"
@@ -77,12 +77,12 @@
 #include "Objects/TR5/Shatter/tr5_smashobject.h"
 
 using namespace TEN::Effects::EmberEmitter;
+using namespace TEN::Effects::Fireflies;
 using namespace TEN::Effects::SmokeEmitter;
 using namespace TEN::Effects::WaterfallEmitter;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::Traps;
-using namespace TEN::Effects::Fireflies;
 
 static void StartEntity(ObjectInfo *obj)
 {

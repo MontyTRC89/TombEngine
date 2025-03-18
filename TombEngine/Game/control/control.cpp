@@ -47,6 +47,7 @@
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
+#include "Objects/Effects/Fireflies.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
 #include "Objects/TR5/Trap/LaserBeam.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
@@ -59,7 +60,6 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/winmain.h"
-#include "Objects/Effects/Fireflies.h"
 
 using namespace std::chrono;
 using namespace TEN::Effects;
@@ -70,6 +70,7 @@ using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Electricity;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Explosion;
+using namespace TEN::Effects::Fireflies;
 using namespace TEN::Effects::Footprint;
 using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Ripple;
@@ -78,6 +79,7 @@ using namespace TEN::Effects::Spark;
 using namespace TEN::Effects::Splash;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Entities::Creatures::TR3;
+using namespace TEN::Entities::Effects;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::Traps;
@@ -88,9 +90,6 @@ using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
 using namespace TEN::Renderer;
-using namespace TEN::Entities::Creatures::TR3;
-using namespace TEN::Entities::Effects;
-using namespace TEN::Effects::Fireflies;
 
 constexpr auto DEATH_NO_INPUT_TIMEOUT = 10 * FPS;
 constexpr auto DEATH_INPUT_TIMEOUT	  = 3 * FPS;
@@ -212,8 +211,8 @@ GameStatus GamePhase(bool insideMenu)
 	UpdateBeetleSwarm();
 	UpdateLocusts();
 	UpdateUnderwaterBloodParticles();
-	UpdateFishSwarm();
 	UpdateFireflySwarm();
+	UpdateFishSwarm();
 	UpdateGlobalLensFlare();
 
 	// Update HUD.

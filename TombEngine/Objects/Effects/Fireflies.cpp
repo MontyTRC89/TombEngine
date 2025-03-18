@@ -57,8 +57,8 @@ namespace TEN::Effects::Fireflies
         item.ItemFlags[FirefliesItemFlags::RemoveFliesEffect] = 0;
 
         // Firefly numbers that has the light.
+        item.ItemFlags[FirefliesItemFlags::LightIndex0] = NO_VALUE;
         item.ItemFlags[FirefliesItemFlags::LightIndex1] = NO_VALUE;
-        item.ItemFlags[FirefliesItemFlags::LightIndex2] = NO_VALUE;
     }
 
     void SpawnFireflySwarm(ItemInfo& item, int triggerFlags)
@@ -133,8 +133,8 @@ namespace TEN::Effects::Fireflies
                 item.HitPoints = item.ItemFlags[FirefliesItemFlags::Spawncounter];
 
             item.ItemFlags[FirefliesItemFlags::Spawncounter] = 0;
+            item.ItemFlags[FirefliesItemFlags::LightIndex0] = NO_VALUE;
             item.ItemFlags[FirefliesItemFlags::LightIndex1] = NO_VALUE;
-            item.ItemFlags[FirefliesItemFlags::LightIndex2] = NO_VALUE;
 
             return;
         }
@@ -187,14 +187,14 @@ namespace TEN::Effects::Fireflies
             if (targetItem == &item)
             {
                 // Choose one of the available firefly number that has the light.
+                if (targetItem->ItemFlags[FirefliesItemFlags::LightIndex0] == NO_VALUE && targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] >= 0)
+                {
+                    targetItem->ItemFlags[FirefliesItemFlags::LightIndex0] = Random::GenerateInt(0, targetItem->TriggerFlags);
+                }
+                // Two lights max for each cluster.
                 if (targetItem->ItemFlags[FirefliesItemFlags::LightIndex1] == NO_VALUE && targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] >= 0)
                 {
                     targetItem->ItemFlags[FirefliesItemFlags::LightIndex1] = Random::GenerateInt(0, targetItem->TriggerFlags);
-                }
-                // Two lights max for each cluster.
-                if (targetItem->ItemFlags[FirefliesItemFlags::LightIndex2] == NO_VALUE && targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] >= 0)
-                {
-                    targetItem->ItemFlags[FirefliesItemFlags::LightIndex2] = Random::GenerateInt(0, targetItem->TriggerFlags);
                 }
 
                 auto posBase = firefly.Position;
@@ -218,7 +218,7 @@ namespace TEN::Effects::Fireflies
                         0.0f, 0.4f, 0.0f, 0.2f, 0.0f, StreamerFeatherMode::None, BlendMode::Subtractive);
                 }
 
-                if ((targetItem->ItemFlags[FirefliesItemFlags::LightIndex1] == firefly.Number || targetItem->ItemFlags[FirefliesItemFlags::LightIndex2] == firefly.Number) &&
+                if ((targetItem->ItemFlags[FirefliesItemFlags::LightIndex0] == firefly.Number || targetItem->ItemFlags[FirefliesItemFlags::LightIndex1] == firefly.Number) &&
                     targetItem->ItemFlags[FirefliesItemFlags::Light] == 1)
                 {
                     float totalCycleDuration = 2 * (LIGHT_ALPHA_CYCLE_DURATION + ALPHA_PAUSE_DURATION);
@@ -235,8 +235,8 @@ namespace TEN::Effects::Fireflies
                     else if (alphaTime < 2 * ALPHA_PAUSE_DURATION + LIGHT_ALPHA_CYCLE_DURATION)
                     {
                         alphaFactor = 0.0f; // Pause on Alpha 0.
+                        targetItem->ItemFlags[FirefliesItemFlags::LightIndex0] = NO_VALUE;
                         targetItem->ItemFlags[FirefliesItemFlags::LightIndex1] = NO_VALUE;
-                        targetItem->ItemFlags[FirefliesItemFlags::LightIndex2] = NO_VALUE;
                     }
                     else
                     {

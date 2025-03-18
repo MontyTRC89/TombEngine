@@ -1,6 +1,8 @@
 #pragma once
-#include "Game/items.h"
+
 #include "Math/Math.h"
+
+struct ItemInfo;
 
 using namespace TEN::Math;
 
@@ -13,8 +15,8 @@ namespace TEN::Effects::Fireflies
 		TriggerFlags,
 		Spawncounter,
 		RemoveFliesEffect,
-		LightIndex1,
-		LightIndex2
+		LightIndex0,
+		LightIndex1
 	};
 
 	struct FireflyData

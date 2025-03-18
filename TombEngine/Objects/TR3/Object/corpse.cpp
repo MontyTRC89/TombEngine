@@ -30,8 +30,8 @@ using namespace TEN::Effects::Fireflies;
 
 namespace TEN::Entities::TR3
 {
-	constexpr auto FLY_EFFECT_MAX_WIDTH = -1;
-	constexpr auto FLY_AMOUNT = 16;
+	constexpr auto FLY_EFFECT_WIDTH_MAX = NO_VALUE;
+	constexpr auto FLY_COUNT			= 16;
 
 	enum CorpseState
 	{
@@ -73,8 +73,8 @@ namespace TEN::Entities::TR3
 		item.Status = ITEM_ACTIVE;
 
 		item.ItemFlags[FirefliesItemFlags::TargetItemPtr] = item.Index;
-		item.ItemFlags[FirefliesItemFlags::TriggerFlags] = -1;
-		item.HitPoints = FLY_AMOUNT;
+		item.ItemFlags[FirefliesItemFlags::TriggerFlags] = NO_VALUE;
+		item.HitPoints = FLY_COUNT;
 	}
 
 	void ControlCorpse(short itemNumber)
@@ -109,15 +109,13 @@ namespace TEN::Entities::TR3
 
 			// Remove fly effect when in water.
 			if (isWater || isSwamp)
-			{
 				item.ItemFlags[FirefliesItemFlags::RemoveFliesEffect] = 1;
-			}
 
 			auto bounds = GameBoundingBox(&item);
 
 			item.Animation.IsAirborne = true;
 
-			if (pointColl.GetFloorHeight() <= item.Pose.Position.y - bounds.Y2)
+			if (pointColl.GetFloorHeight() <= (item.Pose.Position.y - bounds.Y2))
 			{
 				if (!isWater)
 				{
@@ -159,10 +157,9 @@ namespace TEN::Entities::TR3
 
 			// Reset ItemFlags.
 			if (item.HitPoints == NOT_TARGETABLE)
-				item.HitPoints = FLY_AMOUNT;
+				item.HitPoints = FLY_COUNT;
 
 			item.ItemFlags[FirefliesItemFlags::Spawncounter] = 0;
-
 			return;
 		}
 		else
@@ -196,7 +193,7 @@ namespace TEN::Entities::TR3
 			{
 				for (int i = 0; i < fireflyCount; i++)
 				{
-					SpawnFireflySwarm(item, FLY_EFFECT_MAX_WIDTH);
+					SpawnFireflySwarm(item, FLY_EFFECT_WIDTH_MAX);
 				}
 			}
 

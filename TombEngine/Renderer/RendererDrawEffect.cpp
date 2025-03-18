@@ -27,6 +27,7 @@
 #include "Game/misc.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
+#include "Objects/Effects/Fireflies.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
 #include "Objects/TR5/Trap/LaserBeam.h"
 #include "Objects/Utils/object_helper.h"
@@ -35,7 +36,6 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
 #include "Structures/RendererSpriteBucket.h"
-#include "Objects/Effects/Fireflies.h"
 
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
@@ -349,7 +349,6 @@ namespace TEN::Renderer
 			auto axis = Vector3(0,0,0);
 			axis.Normalize();
 
-
 			firefly.scalar = 3;
 			firefly.size = 3;
 
@@ -371,7 +370,6 @@ namespace TEN::Renderer
 				TO_RAD(firefly.rotAng << 4), firefly.scalar,
 				Vector2(firefly.size, firefly.size),
 				firefly.blendMode, true, view);
-
 		}
 	}
 

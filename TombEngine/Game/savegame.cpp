@@ -926,10 +926,10 @@ const std::vector<byte> SaveGame::Build()
 	}
 	auto fishSwarmOffset = fbb.CreateVector(fishSwarm);
 
-	std::vector<flatbuffers::Offset<Save::FireflyData>> fireflySwarm;
+	auto fireflySwarm = std::vector<flatbuffers::Offset<Save::FireflyData>>{};
 	for (const auto& firefly : FireflySwarm)
 	{
-		Save::FireflyDataBuilder fireflySave{ fbb };
+		auto fireflySave = Save::FireflyDataBuilder(fbb);
 		fireflySave.add_sprite_index(firefly.SpriteSeqID);
 		fireflySave.add_sprite_id(firefly.SpriteID);
 		fireflySave.add_blend_mode((int)firefly.blendMode);
@@ -939,7 +939,7 @@ const std::vector<byte> SaveGame::Build()
 		fireflySave.add_position_target(&FromVector3(firefly.PositionTarget));
 		fireflySave.add_orientation(&FromEulerAngles(firefly.Orientation));
 		fireflySave.add_velocity(firefly.Velocity);
-		fireflySave.add_target_item_number((firefly.TargetItemPtr == nullptr) ? -1 : firefly.TargetItemPtr->Index);
+		fireflySave.add_target_item_number((firefly.TargetItemPtr == nullptr) ? -NO_VALUE : firefly.TargetItemPtr->Index);
 		fireflySave.add_z_vel(firefly.zVel);
 		fireflySave.add_life(firefly.Life);
 		fireflySave.add_number(firefly.Number);
@@ -1578,8 +1578,8 @@ const std::vector<byte> SaveGame::Build()
 	sgb.add_next_item_free(NextItemFree);
 	sgb.add_next_item_active(NextItemActive);
 	sgb.add_items(serializedItemsOffset);
-	sgb.add_fish_swarm(fishSwarmOffset);
 	sgb.add_firefly_swarm(fireflySwarmOffset);
+	sgb.add_fish_swarm(fishSwarmOffset);
 	sgb.add_fxinfos(serializedEffectsOffset);
 	sgb.add_next_fx_free(NextFxFree);
 	sgb.add_next_fx_active(NextFxActive);
