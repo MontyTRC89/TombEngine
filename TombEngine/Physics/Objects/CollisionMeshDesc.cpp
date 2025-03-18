@@ -102,15 +102,20 @@ namespace TEN::Physics
 		auto vertexAdjacencyMap = GetVertexAdjacencyMap(tris, edgeCountMap); // TODO: Not used yet.
 		auto boundaryEdges = GetBoundaryEdges(edgeCountMap);
 
+		// TODO: This function only works for already monotone polygons. Also make it work for:
+		//	- Irregular polygons.
+		//	- Holed polygons.
+		//
+		// Steps:
+		// 1) Split boundary edges into islands to be processed later. Can use vertex adjacency map?
+		// 2) Run through this collection of split boundary edges. Deconstruct irregular or holed polygons into monotone ones.
+		// 3) Process the collection of monotone polygons using the simple method below.
+
 		// 2) Process boundary edges into optimal polygon loops.
 		auto polygons = std::vector<std::vector<int>>{};
 		while (!boundaryEdges.empty())
 		{
 			auto polygon = std::vector<int>{};
-
-			// TODO:
-			// - Split polygon into isolated islands.
-			// - Process monotone, irregular, and holed polygons.
 
 			const auto& firstEdgeIt = boundaryEdges.begin();
 			const auto& [firstVertexId0, firstVertexId1] = *firstEdgeIt;
@@ -130,7 +135,7 @@ namespace TEN::Physics
 				{
 					const auto& [vertexId0, vertexId1] = *it;
 
-					// If current vertex is equal to the one in polygon, add next vertex.
+					// If current vertex is equal to one in polygon, add next vertex.
 					if (vertexId0 == polygon.back())
 					{
 						// Add vertex ID to polygon and remove used edge.
@@ -151,7 +156,7 @@ namespace TEN::Physics
 					}
 				}
 
-				// No matching edge found; finalize polygon.
+				// No matching edge found; finalize monotone polygon.
 				if (!isFound)
 					break;
 			}
@@ -219,7 +224,7 @@ namespace TEN::Physics
 					std::swap(vertexId0, vertexId1);
 
 				// Count shared edges.
-				auto edgePair = EdgeVertexIdPair{ vertexId0, vertexId1 };
+				auto edgePair = EdgeVertexIdPair(vertexId0, vertexId1);
 				edgeCountMap[edgePair]++;
 			}
 		}
