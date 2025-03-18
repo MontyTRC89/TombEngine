@@ -35,7 +35,7 @@ template <typename T> std::enable_if_t<std::is_same_v<T, std::underlying_type_t<
 		SPR_LENS_FLARE_LIGHT,
 		SPR_BULLETIMPACT,
 		SPR_BUBBLES,
-		SPR_UNDERWATERDUST,
+		SPR_UNDERWATER_DUST,
 		SPR_BLOOD,
 		SPR_EMPTY1,
 		SPR_BUBBLE_CLUSTER,

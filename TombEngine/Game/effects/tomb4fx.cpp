@@ -1344,7 +1344,7 @@ void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned ch
 
 		spark->scalar = 1;
 		spark->SpriteSeqID = ID_DEFAULT_SPRITES;
-		spark->SpriteID = SPR_UNDERWATERDUST;
+		spark->SpriteID = SPR_UNDERWATER_DUST;
 		spark->maxYvel = 0;
 		spark->gravity = (GetRandomControl() & 0x3F) + 64;
 		spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 32;

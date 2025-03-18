@@ -82,7 +82,7 @@ void TriggerElectricityWireSparks(int x, int z, byte objNum, byte node, bool glo
 	{
 		spark->scalar = 0;
 		spark->SpriteSeqID = ID_DEFAULT_SPRITES;
-		spark->SpriteID = SPR_UNDERWATERDUST;
+		spark->SpriteID = SPR_UNDERWATER_DUST;
 		spark->size = spark->sSize = (GetRandomControl() & 7) + 8;
 	}
 

@@ -337,27 +337,16 @@ namespace TEN::Renderer
 		if (!Objects[ID_FIREFLY_EMITTER].loaded)
 			return;
 
-		for (auto& firefly : FireflySwarm)
+		for (const auto& firefly : FireflySwarm)
 		{
-			if (!firefly.on)
+			if (firefly.Life <= 0.0f)
 				continue;
-
 
 			if (!CheckIfSlotExists(ID_SPARK_SPRITE, "Particle rendering"))
 				continue;
 
-			auto axis = Vector3(0,0,0);
-			axis.Normalize();
-
-			firefly.scalar = 3;
-			firefly.size = 3;
-
-			auto pos = Vector3::Lerp(
-				Vector3(firefly.PrevX, firefly.PrevY, firefly.PrevZ),
-				Vector3(firefly.Position.x, firefly.Position.y, firefly.Position.z),
-				GetInterpolationFactor());
-
-			pos = Vector3(firefly.Position.x, firefly.Position.y, firefly.Position.z);
+			auto pos = Vector3::Lerp(firefly.PrevPosition, firefly.Position, GetInterpolationFactor());
+			// TODO: Interpolate colour.
 
 			// Disallow sprites out of bounds.
 			int spriteIndex = Objects[firefly.SpriteSeqID].meshIndex + firefly.SpriteID;
@@ -367,9 +356,7 @@ namespace TEN::Renderer
 				&_sprites[spriteIndex],
 				pos,
 				Color(firefly.r / (float)UCHAR_MAX, firefly.g / (float)UCHAR_MAX, firefly.b / (float)UCHAR_MAX, 1.0f),
-				TO_RAD(firefly.rotAng << 4), firefly.scalar,
-				Vector2(firefly.size, firefly.size),
-				firefly.blendMode, true, view);
+				0, 1.0f, Vector2(firefly.Size), firefly.BlendMode, true, view);
 		}
 	}
 
@@ -1028,7 +1015,7 @@ namespace TEN::Renderer
 					return;
 
 				AddSpriteBillboard(
-					&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
+					&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATER_DUST],
 					Vector3::Lerp(part.PrevPosition, part.Position, GetInterpolationFactor()),
 					Color(1.0f, 1.0f, 1.0f, part.Transparency()),
 					0.0f, 1.0f, Vector2(Lerp(part.PrevSize, part.Size, GetInterpolationFactor())),
@@ -1042,7 +1029,7 @@ namespace TEN::Renderer
 					return;
 
 				AddSpriteBillboard(
-					&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
+					&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATER_DUST],
 					Vector3::Lerp(part.PrevPosition, part.Position, GetInterpolationFactor()),
 					Color(1.0f, 1.0f, 1.0f, part.Transparency()),
 					0.0f, 1.0f, Vector2(Lerp(part.PrevSize, part.Size, GetInterpolationFactor())),

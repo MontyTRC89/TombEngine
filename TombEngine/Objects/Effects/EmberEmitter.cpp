@@ -81,7 +81,7 @@ namespace TEN::Effects::EmberEmitter
 				else
 				{
 					spark.SpriteSeqID = ID_DEFAULT_SPRITES;
-					spark.SpriteID = SPR_UNDERWATERDUST;
+					spark.SpriteID = SPR_UNDERWATER_DUST;
 					spark.scalar = 1.0f;
 					spark.gravity = Random::GenerateFloat(64.0f, 80.0f);
 					spark.flags = SP_ROTATE | SP_DEF | SP_SCALE;
@@ -133,7 +133,7 @@ namespace TEN::Effects::EmberEmitter
 				}
 
 				spark.SpriteSeqID = ID_DEFAULT_SPRITES;
-				spark.SpriteID = SPR_UNDERWATERDUST;
+				spark.SpriteID = SPR_UNDERWATER_DUST;
 				spark.life =
 				spark.sLife = Random::GenerateFloat(74.0f, 78.0f);
 				spark.x = item.Pose.Position.x + Random::GenerateFloat(0.0f, 22.0f);

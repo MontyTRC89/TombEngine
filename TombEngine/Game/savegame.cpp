@@ -932,26 +932,23 @@ const std::vector<byte> SaveGame::Build()
 		auto fireflySave = Save::FireflyDataBuilder(fbb);
 		fireflySave.add_sprite_index(firefly.SpriteSeqID);
 		fireflySave.add_sprite_id(firefly.SpriteID);
-		fireflySave.add_blend_mode((int)firefly.blendMode);
-		fireflySave.add_scalar(firefly.scalar);
+		fireflySave.add_blend_mode((int)firefly.BlendMode);
 		fireflySave.add_position(&FromVector3(firefly.Position));
 		fireflySave.add_room_number(firefly.RoomNumber);
 		fireflySave.add_position_target(&FromVector3(firefly.PositionTarget));
 		fireflySave.add_orientation(&FromEulerAngles(firefly.Orientation));
 		fireflySave.add_velocity(firefly.Velocity);
-		fireflySave.add_target_item_number((firefly.TargetItemPtr == nullptr) ? -NO_VALUE : firefly.TargetItemPtr->Index);
+		fireflySave.add_target_item_number((firefly.TargetItem == nullptr) ? -NO_VALUE : firefly.TargetItem->Index);
 		fireflySave.add_z_vel(firefly.zVel);
 		fireflySave.add_life(firefly.Life);
-		fireflySave.add_number(firefly.Number);
+		fireflySave.add_number(firefly.ID);
 		fireflySave.add_d_r(firefly.rB);
 		fireflySave.add_d_g(firefly.gB);
 		fireflySave.add_d_b(firefly.bB);
 		fireflySave.add_r(firefly.r);
 		fireflySave.add_g(firefly.g);
 		fireflySave.add_b(firefly.b);
-		fireflySave.add_on(firefly.on);
-		fireflySave.add_size(firefly.size);
-		fireflySave.add_rot_Ang(firefly.rotAng);
+		fireflySave.add_size(firefly.Size);
 
 		auto fireflySaveOffset = fireflySave.Finish();
 		fireflySwarm.push_back(fireflySaveOffset);
@@ -2328,30 +2325,27 @@ static void ParseEffects(const Save::SaveGame* s)
 	for (int i = 0; i < s->firefly_swarm()->size(); i++)
 	{
 		const auto& fireflySave = s->firefly_swarm()->Get(i);
-		auto firefly = FireflyData{};
 
+		auto firefly = FireflyData{};
 		firefly.SpriteSeqID = fireflySave->sprite_index();
 		firefly.SpriteID = fireflySave->sprite_id();
-		firefly.blendMode = (BlendMode)fireflySave->blend_mode();
-		firefly.scalar = fireflySave->scalar();
+		firefly.BlendMode = (BlendMode)fireflySave->blend_mode();
 		firefly.Position = ToVector3(fireflySave->position());
 		firefly.RoomNumber = fireflySave->room_number();
 		firefly.PositionTarget = ToVector3(fireflySave->position_target());
 		firefly.Orientation = ToEulerAngles(fireflySave->orientation());
 		firefly.Velocity = fireflySave->velocity();
-		firefly.TargetItemPtr = (fireflySave->target_item_number() == -1) ? nullptr : &g_Level.Items[fireflySave->target_item_number()];
+		firefly.TargetItem = (fireflySave->target_item_number() == NO_VALUE) ? nullptr : &g_Level.Items[fireflySave->target_item_number()];
 		firefly.zVel = fireflySave->z_vel();
 		firefly.Life = fireflySave->life();
-		firefly.Number = fireflySave->number();
+		firefly.ID = fireflySave->number();
 		firefly.rB = fireflySave->d_r();
 		firefly.gB = fireflySave->d_g();
 		firefly.bB = fireflySave->d_b();
 		firefly.r = fireflySave->r();
 		firefly.g = fireflySave->g();
 		firefly.b = fireflySave->b();
-		firefly.on = fireflySave->on();
-		firefly.size = fireflySave->size();
-		firefly.rotAng = fireflySave->rot_Ang();
+		firefly.Size = fireflySave->size();
 
 		FireflySwarm.push_back(firefly);
 	}

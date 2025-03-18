@@ -153,13 +153,13 @@ namespace TEN::Entities::TR3
 		if (!TriggerActive(&item) || item.ItemFlags[FirefliesItemFlags::RemoveFliesEffect] == 1)
 		{
 			// Remove all fireflies associated with this item.
-			RemoveFireflies(item);
+			ClearInactiveFireflies(item);
 
 			// Reset ItemFlags.
 			if (item.HitPoints == NOT_TARGETABLE)
 				item.HitPoints = FLY_COUNT;
 
-			item.ItemFlags[FirefliesItemFlags::Spawncounter] = 0;
+			item.ItemFlags[FirefliesItemFlags::SpawnCounter] = 0;
 			return;
 		}
 		else
@@ -171,17 +171,16 @@ namespace TEN::Entities::TR3
 		// Spawn fly effect.
 		if (item.HitPoints != NOT_TARGETABLE)
 		{
-			int fireflyCount = item.HitPoints - item.ItemFlags[FirefliesItemFlags::Spawncounter];
+			int fireflyCount = item.HitPoints - item.ItemFlags[FirefliesItemFlags::SpawnCounter];
 
 			if (fireflyCount < 0)
 			{
 				int firefliesToTurnOff = -fireflyCount;
 				for (auto& firefly : FireflySwarm)
 				{
-					if (firefly.TargetItemPtr == &item && firefly.Life > 0.0f)
+					if (firefly.TargetItem == &item && firefly.Life > 0.0f)
 					{
 						firefly.Life = 0.0f;
-						firefly.on = false;
 						firefliesToTurnOff--;
 
 						if (firefliesToTurnOff == 0)
@@ -197,7 +196,7 @@ namespace TEN::Entities::TR3
 				}
 			}
 
-			item.ItemFlags[FirefliesItemFlags::Spawncounter] = item.HitPoints;
+			item.ItemFlags[FirefliesItemFlags::SpawnCounter] = item.HitPoints;
 			item.HitPoints = NOT_TARGETABLE;
 		}
 	}
