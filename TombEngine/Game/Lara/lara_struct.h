@@ -520,7 +520,7 @@ enum LaraAnim
 	LA_CRAWL_BACK_TO_IDLE_RIGHT = 277,								// Crawl back > crawl idle, right foot first
 	LA_REMOVE_PUZZLE = 278,											// Remove puzzle item > idle
 	LA_CRAWL_BACK_TO_IDLE_LEFT = 279,								// Crawl back > crawl idle, left foot first
-	LA_CRAWL_BACK_TO_IDLE_LEFT_END = 280,							// Unused.
+	LA_REMOVE_PUZZLE_UNDERWATER = 280,								// Remove puzzle item > underwater idle
 	LA_CRAWL_TURN_LEFT_TO_IDLE_EARLY = 281,							// Crawl rotate left > crawl idle, early opportunity
 	LA_CRAWL_TURN_RIGHT_TO_IDLE_EARLY = 282,						// Crawl rotate right > crawl idle, early opportunity
 	LA_MONKEY_TURN_LEFT_TO_IDLE_EARLY = 283,						// Turn left on monkey swing > monkey swing idle, 1st opportunity
@@ -611,7 +611,7 @@ enum LaraAnim
 	LA_LADDER_RIGHT_CORNER_OUTER_START = 365,				// Ladder around outer right corner
 	LA_PUSHABLE_BLOCK_PUSH_EDGE_SLIP = 366,
 	LA_LADDER_LEFT_CORNER_INNER_START = 367,				// Ladder around inner left corner
-	LA_LADDER_LEFT_CORNER_INNER_END = 368,					// TODO: Remove.
+	LA_LADDER_LEFT_CORNER_INNER_END = 368,
 	LA_LADDER_RIGHT_CORNER_INNER_START = 369,				// Ladder around inner right corner
 	LA_LADDER_RIGHT_CORNER_INNER_END = 370,					// TODO: Remove.
 	LA_JUMP_UP_TO_ROPE_START = 371,							// Jump up > rope idle (1/2)
@@ -688,7 +688,7 @@ enum LaraAnim
 	LA_PICKUP_SARCOPHAGUS = 439,							// Pickup from sarcophagus
 	LA_DRAG_BODY = 440,										// Drag dead body
 	LA_BINOCULARS_IDLE = 441,								// Stand, looking through binoculars
-	LA_UNUSED_442 = 442,									// Formelly, LA_BIG_SCORPION_DEATH, but that animation is now in LARA EXTRA ANIMS so this slot is unused.
+	LA_UNDERWATER_FLOOR_TRAPDOOR = 442,						// Underwater floor trapdoor
 	LA_ELEVATOR_RECOVER = 443,								// Recover from elevator crash
 	LA_MECHANICAL_BEETLE_USE = 444,							// Wind mechanical beetle, place on floor
 	LA_FLY_CHEAT = 445,										// Fly cheat
@@ -828,8 +828,7 @@ enum LaraAnim
 	NUM_LARA_ANIMS
 
 	// TRASHED ANIMS (reuse slots before going any higher and remove entries from this list when you do):
-	// 280,
-	// 368, 370,
+	// 370,
 	// 442
 };
 

@@ -117,7 +117,7 @@ struct SectorFlagData
 	bool MinecartRight() { return MarkBeetle; }
 	bool MinecartStop() { return (MarkBeetle && MarkTriggerer); }
 
-	bool IsWallClimbable(ClimbDirectionFlags flag)
+	bool IsWallClimbable(ClimbDirectionFlags flag) const
 	{
 		switch (flag)
 		{

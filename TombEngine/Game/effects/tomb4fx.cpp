@@ -308,7 +308,8 @@ static void AttachAndCreateSpark(Particle* spark, const ItemInfo* item, int mesh
 	int v = (GetRandomControl() & 0x3F) + 192;
 
 	spark->life = spark->sLife = v / 6;
-	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + spriteID;
+	spark->SpriteSeqID = ID_DEFAULT_SPRITES;
+	spark->SpriteID = spriteID;
 
 	spark->xVel = v * (pos2.x - pos1.x) / 10;
 	spark->yVel = v * (pos2.y - pos1.y) / 10;
@@ -354,6 +355,7 @@ void ThrowPoison(const ItemInfo& item, int boneID, const Vector3& offset, const 
 		auto& part = SetupPoisonParticle(colorStart, colorEnd);
 		AttachAndCreateSpark(&part, &item, boneID, offset, vel, spriteID);
 		part.flags = SP_POISON | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+		part.damage = 5;
 	}
 }
 
@@ -1341,7 +1343,8 @@ void TriggerShockwaveHitEffect(int x, int y, int z, unsigned char r, unsigned ch
 			spark->rotAdd = (GetRandomControl() & 0xF) + 16;
 
 		spark->scalar = 1;
-		spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST;
+		spark->SpriteSeqID = ID_DEFAULT_SPRITES;
+		spark->SpriteID = SPR_UNDERWATERDUST;
 		spark->maxYvel = 0;
 		spark->gravity = (GetRandomControl() & 0x3F) + 64;
 		spark->sSize = spark->size = (GetRandomControl() & 0x1F) + 32;
@@ -1441,7 +1444,8 @@ void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
 	spark->flags = 2058;
 	spark->scalar = 3;
 	spark->gravity = 0;
-	spark->spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_BUBBLES;
+	spark->SpriteSeqID = ID_DEFAULT_SPRITES;
+	spark->SpriteID = SPR_BUBBLES;
 	spark->maxYvel = 0;
 	int size = (GetRandomControl() & 7) + 63;
 	spark->sSize = size >> 1;

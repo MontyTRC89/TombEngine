@@ -6,6 +6,49 @@ struct RoomVector {
 	y_location: uint32;
 }
 
+table LevelData {
+	level_far_view: int32;
+
+	storm_enabled: bool;
+	rumble_enabled: bool;
+	weather_type: int32;
+	weather_strength: float;
+	
+	fog_color: int32;
+	fog_min_distance: float;
+	fog_max_distance: float;
+
+	sky_layer_1_enabled: bool;
+	sky_layer_1_color: int32;
+	sky_layer_1_speed: int32;
+
+	sky_layer_2_enabled: bool;
+	sky_layer_2_color: int32;
+	sky_layer_2_speed: int32;
+
+	horizon1_enabled: bool;
+	horizon1_object_id: int32;
+	horizon1_position: Vector3;
+	horizon1_orientation: EulerAngles;
+	horizon1_transparency: float;
+
+	horizon2_enabled: bool;
+	horizon2_object_id: int32;
+	horizon2_position: Vector3;
+	horizon2_orientation: EulerAngles;
+	horizon2_transparency: float;
+
+	lensflare_sprite_id: int32;
+	lensflare_pitch: float;
+	lensflare_yaw: float;
+	lensflare_color: int32;
+
+	starfield_star_count: int32;
+	starfield_meteor_count: int32;
+	starfield_meteor_spawn_density: int32;
+	starfield_meteor_velocity: int32;
+}
+
 table Room {
 	index: int32;
 	name: string;
@@ -373,6 +416,15 @@ table ParticleInfo {
 	fx_obj: int32;
 	room_number: int32;
 	node_number: int32;
+	target_pos: Vector3;
+	sprite_id: int32;
+	damage: int32;
+	framerate: float;
+	animation_type: int32;
+	light_radius: int32;
+	light_flicker: int32;
+	light_flicker_s: int32;
+	sound: int32;
 }
 
 table Soundtrack {
@@ -531,6 +583,7 @@ table SaveGameStatistics {
 	damage_taken: int32;
 	distance: int32;
 	kills: int32;
+	pickups: int32;
 	secrets: int32;
 	timer: int32;
 }
@@ -539,6 +592,7 @@ table SaveGame {
 	header: SaveGameHeader;
 	game: SaveGameStatistics;
 	level: SaveGameStatistics;
+	level_data: LevelData;
 	secret_bits: int32;
 	camera: Camera;
 	lara: Lara;
@@ -570,6 +624,7 @@ table SaveGame {
 	action_queue: [int32];
 	soundtracks: [Soundtrack];
 	cd_flags: [int32];
+
 	postprocess_mode: int32;
 	postprocess_strength: float;
 	postprocess_tint: Vector3;

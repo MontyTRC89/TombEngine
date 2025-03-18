@@ -33,14 +33,13 @@
 #include "Specific/level.h"
 #include "Specific/winmain.h"
 
-using namespace std::chrono;
 using namespace TEN::Effects::Hair;
-using namespace TEN::Entities::Creatures::TR3;
-using namespace TEN::Entities::Generic;
 using namespace TEN::Hud;
-using namespace TEN::Renderer::Structures;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::DisplaySprite;
+using namespace TEN::Entities::Creatures::TR3;
+using namespace TEN::Entities::Generic;
+using namespace TEN::Renderer::Structures;
 
 extern GUNSHELL_STRUCT Gunshells[MAX_GUNSHELL];
 
@@ -128,27 +127,28 @@ namespace TEN::Renderer
 
 	void Renderer::RenderShadowMap(RendererItem* item, RenderView& renderView)
 	{
-		// Doesn't cast shadow
+		// Doesn't cast shadow.
 		if (_moveableObjects[item->ObjectID].value().ShadowType == ShadowMode::None)
 			return;
 
-		// Only render for Lara if such setting is active
-		if (g_Configuration.ShadowType == ShadowMode::Lara && _moveableObjects[item->ObjectID].value().ShadowType != ShadowMode::Lara)
+		// Only render for player if such setting is active.
+		if (g_Configuration.ShadowType == ShadowMode::Player && _moveableObjects[item->ObjectID].value().ShadowType != ShadowMode::Player)
 			return;
 
-		// No shadow light found
+		// No shadow light found.
 		if (_shadowLight == nullptr)
 			return;
 
-		// Shadow light found but type is incorrect
+		// Shadow light found but type is incorrect.
 		if (_shadowLight->Type != LightType::Point && _shadowLight->Type != LightType::Spot)
 			return;
 
-		// Reset GPU state
+		// Reset GPU state.
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
 
-		auto shadowLightPos = _shadowLight->Hash == 0 ? _shadowLight->Position :
+		auto shadowLightPos = (_shadowLight->Hash == 0) ?
+			_shadowLight->Position :
 			Vector3::Lerp(_shadowLight->PrevPosition, _shadowLight->Position, GetInterpolationFactor());
 
 		for (int step = 0; step < 6; step++)
@@ -185,7 +185,7 @@ namespace TEN::Renderer
 
 			auto projection = Matrix::CreatePerspectiveFieldOfView(90.0f * PI / 180.0f, 1.0f, 16.0f, _shadowLight->Out);
 
-			CCameraMatrixBuffer shadowProjection;
+			auto shadowProjection = CCameraMatrixBuffer{};
 			shadowProjection.ViewProjection = view * projection;
 			_cbCameraMatrices.UpdateData(shadowProjection, _context.Get());
 			BindConstantBufferVS(ConstantBufferRegister::Camera, _cbCameraMatrices.get());
@@ -194,7 +194,7 @@ namespace TEN::Renderer
 
 			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
-			RendererObject& obj = GetRendererObject((GAME_OBJECT_ID)item->ObjectID);
+			auto& obj = GetRendererObject((GAME_OBJECT_ID)item->ObjectID);
 
 			_stItem.World = item->InterpolatedWorld;
 			_stItem.Color = item->Color;
@@ -225,7 +225,7 @@ namespace TEN::Renderer
 					if (bucket.BlendMode != BlendMode::Opaque && bucket.BlendMode != BlendMode::AlphaTest)
 						continue;
 
-					// Draw vertices
+					// Draw vertices.
 					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 
 					_numShadowMapDrawCalls++;
@@ -234,7 +234,7 @@ namespace TEN::Renderer
 
 			if (item->ObjectID == ID_LARA)
 			{
-				RendererRoom& room = _rooms[item->RoomNumber];
+				auto& room = _rooms[item->RoomNumber];
 
 				DrawLaraHolsters(item, &room, renderView, RendererPass::ShadowMap);
 				DrawLaraJoints(item, &room, renderView, RendererPass::ShadowMap);
@@ -485,7 +485,8 @@ namespace TEN::Renderer
 
 				if (rat->On)
 				{
-					RendererMesh* mesh = GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
+					int index = (GlobalCounter + i) % Objects[ID_RATS_EMITTER].nmeshes;
+					auto* mesh = GetMesh(Objects[ID_RATS_EMITTER].meshIndex + index);
 
 					for (int j = 0; j < mesh->Buckets.size(); j++)
 					{
@@ -503,8 +504,9 @@ namespace TEN::Renderer
 								object.ObjectType = RendererObjectType::MoveableAsStatic;
 								object.Centre = centre;
 								object.Distance = distance;
+								object.BlendMode = bucket.BlendMode;
 								object.Bucket = &bucket;
-								object.Mesh = mesh;
+								object.LightMode = mesh->LightMode;
 								object.Polygon = &bucket.Polygons[p];
 								object.World = rat->Transform;
 								object.Room = &_rooms[rat->RoomNumber];
@@ -561,7 +563,8 @@ namespace TEN::Renderer
 
 					if (rat->On)
 					{
-						const auto& mesh = *GetMesh(Objects[ID_RATS_EMITTER].meshIndex + (rand() % 8));
+						int index = (GlobalCounter + i) % Objects[ID_RATS_EMITTER].nmeshes;
+						const auto& mesh = *GetMesh(Objects[ID_RATS_EMITTER].meshIndex + index);
 
 						auto world = rat->Transform;
 						ReflectMatrixOptionally(world);
@@ -629,8 +632,9 @@ namespace TEN::Renderer
 						object.ObjectType = RendererObjectType::MoveableAsStatic;
 						object.Centre = center;
 						object.Distance = dist;
+						object.BlendMode = bucket.BlendMode;
 						object.Bucket = &bucket;
-						object.Mesh = &mesh;
+						object.LightMode = mesh.LightMode;
 						object.Polygon = &poly;
 						object.World = worldMatrix;
 						object.Room = &_rooms[fish.RoomNumber];
@@ -746,8 +750,9 @@ namespace TEN::Renderer
 						object.ObjectType = RendererObjectType::MoveableAsStatic;
 						object.Centre = centre;
 						object.Distance = dist;
+						object.BlendMode = bucket.BlendMode;
 						object.Bucket = &bucket;
-						object.Mesh = &mesh;
+						object.LightMode = mesh.LightMode;
 						object.Polygon = &bucket.Polygons[p];
 						object.World = transformMatrix;
 						object.Room = &_rooms[bat.RoomNumber];
@@ -867,8 +872,9 @@ namespace TEN::Renderer
 						object.ObjectType = RendererObjectType::MoveableAsStatic;
 						object.Centre = centre;
 						object.Distance = dist;
+						object.BlendMode = bucket.BlendMode;
 						object.Bucket = &bucket;
-						object.Mesh = &mesh;
+						object.LightMode = mesh.LightMode;
 						object.Polygon = &bucket.Polygons[p];
 						object.World = transformMatrix;
 						object.Room = &_rooms[beetle.RoomNumber];
@@ -996,8 +1002,9 @@ namespace TEN::Renderer
 						object.ObjectType = RendererObjectType::MoveableAsStatic;
 						object.Centre = centre;
 						object.Distance = dist;
+						object.BlendMode = bucket.BlendMode;
 						object.Bucket = &bucket;
-						object.Mesh = &mesh;
+						object.LightMode = mesh.LightMode;
 						object.Polygon = &bucket.Polygons[p];
 						object.World = transformMatrix;
 						object.Room = &_rooms[locust.roomNumber];
@@ -1826,7 +1833,7 @@ namespace TEN::Renderer
 		cameraConstantBuffer.DualParaboloidView = Matrix::CreateLookAt(LaraItem->Pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3() + Vector3(0, 0, 1024), -Vector3::UnitY);
 		cameraConstantBuffer.InverseView = cameraConstantBuffer.View.Invert();
 		  
-		if (level.GetFogEnabled())
+		if (level.GetFogMaxDistance() > 0)
 		{
 			auto fogColor = level.GetFogColor();
 			cameraConstantBuffer.FogColor = Vector4(fogColor.GetR() / 255.0f, fogColor.GetG() / 255.0f, fogColor.GetB() / 255.0f, 1.0f);
@@ -1835,7 +1842,7 @@ namespace TEN::Renderer
 		}
 		else
 		{
-			cameraConstantBuffer.FogMaxDistance = 0;
+			cameraConstantBuffer.FogMaxDistance = 0.0f;
 			cameraConstantBuffer.FogColor = Vector4::Zero;
 		} 
 
@@ -1945,6 +1952,8 @@ namespace TEN::Renderer
 
 	void Renderer::RenderSimpleSceneToParaboloid(RenderTarget2D* renderTarget, Vector3 position, int emisphere)
 	{
+		// TODO: Update the horizon draw code here once paraboloids are required. TrainWreck Feb 2, 2025.
+		
 		// Reset GPU state
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
@@ -1994,10 +2003,10 @@ namespace TEN::Renderer
 		view.FillConstantBuffer(cameraConstantBuffer);
 		_cbCameraMatrices.UpdateData(cameraConstantBuffer, _context.Get());
 
-		// Draw horizon and the sky
+		// Draw horizon and sky.
 		auto* levelPtr = g_GameFlow->GetLevel(CurrentLevel);
 
-		if (levelPtr->Horizon)
+		if (levelPtr->GetHorizonEnabled(0) || levelPtr->GetHorizonEnabled(1))
 		{
 			_shaders.Bind(Shader::RoomAmbientSky);
 
@@ -2039,31 +2048,26 @@ namespace TEN::Renderer
 			_context->ClearDepthStencilView(renderTarget->DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1, 0);
 
 			// Draw horizon.
-			if (_moveableObjects[ID_HORIZON].has_value())
+			if (_moveableObjects[ID_HORIZON].has_value()) // FIXME: Replace with same function as in the main pipeline!
 			{
 				_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-				auto& moveableObj = *_moveableObjects[ID_HORIZON];
+				const auto& moveableObj = *_moveableObjects[ID_HORIZON]; // FIXME: Replace with same function as in the main pipeline!
 
 				_stStatic.World = Matrix::CreateTranslation(LaraItem->Pose.Position.ToVector3());
 				_stStatic.Color = Vector4::One;
 				_stStatic.ApplyFogBulbs = 1;
 				_cbStatic.UpdateData(_stStatic, _context.Get());
 
-				for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+				for (const auto* mesh : moveableObj.ObjectMeshes)
 				{
-					auto* meshPtr = moveableObj.ObjectMeshes[k];
-
-					for (auto& bucket : meshPtr->Buckets)
+					for (const auto& bucket : mesh->Buckets)
 					{
 						if (bucket.NumVertices == 0)
-						{
 							continue;
-						}
 
-						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]),
-							SamplerStateRegister::AnisotropicClamp);
+						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
 						// Always render horizon as alpha-blended surface.
 						SetBlendMode(bucket.BlendMode == BlendMode::AlphaTest ? BlendMode::AlphaBlend : bucket.BlendMode);
@@ -2084,8 +2088,8 @@ namespace TEN::Renderer
 		_shaders.Bind(Shader::RoomAmbient);
 
 		// Draw rooms
-		UINT stride = sizeof(Vertex);
-		UINT offset = 0;
+		unsigned int stride = sizeof(Vertex);
+		unsigned int offset = 0;
 
 		// Bind vertex and index buffer.
 		_context->IASetVertexBuffers(0, 1, _roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
@@ -2094,8 +2098,8 @@ namespace TEN::Renderer
 		for (int i = 0; i < _rooms.size(); i++)
 		{
 			int index = i;
-			RendererRoom* room = &_rooms[index];
-			ROOM_INFO* nativeRoom = &g_Level.Rooms[room->RoomNumber];
+			auto* room = &_rooms[index];
+			auto* nativeRoom = &g_Level.Rooms[room->RoomNumber];
 
 			// Avoid drawing of too far rooms... Environment map is tiny, blurred, so very far rooms would not contribute to the
 			// final pixel colors
@@ -2116,9 +2120,7 @@ namespace TEN::Renderer
 			for (auto& bucket : room->Buckets)
 			{
 				if (bucket.NumVertices == 0)
-				{
 					continue;
-				}
 
 				SetBlendMode(bucket.BlendMode);
 				SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
@@ -2577,6 +2579,9 @@ namespace TEN::Renderer
 						if (IgnoreReflectionPassForRoom(current->RoomNumber))
 							continue;
 
+						if (current->Color.w < ALPHA_BLEND_THRESHOLD)
+							continue;
+
 						auto world = current->World;
 						ReflectMatrixOptionally(world);
 
@@ -2647,7 +2652,9 @@ namespace TEN::Renderer
 						if (bucket.NumVertices == 0)
 							continue;
 
-						if (IsSortedBlendMode(bucket.BlendMode))
+						auto blendMode = GetBlendModeFromAlpha(bucket.BlendMode, statics[i]->Color.w);
+
+						if (IsSortedBlendMode(blendMode) || statics[i]->Color.w < ALPHA_BLEND_THRESHOLD)
 						{
 							for (int p = 0; p < bucket.Polygons.size(); p++)
 							{
@@ -2658,7 +2665,8 @@ namespace TEN::Renderer
 								object.Static = statics[i];
 								object.Centre = Vector3::Transform(bucket.Polygons[p].Centre, statics[i]->World);
 								object.Distance = Vector3::Distance(object.Centre, view.Camera.WorldPosition);
-								object.Mesh = refMesh;
+								object.BlendMode = blendMode;
+								object.LightMode = refMesh->LightMode;
 								object.Polygon = &bucket.Polygons[p];
 								object.Room = &_rooms[object.Static->RoomNumber];
 
@@ -2702,6 +2710,7 @@ namespace TEN::Renderer
 									object.ObjectType = RendererObjectType::Room;
 									object.Centre = bucket.Centre;
 									object.Distance = Vector3::Distance(view.Camera.WorldPosition, bucket.Polygons[p].Centre);
+									object.BlendMode = bucket.BlendMode;
 									object.Bucket = &bucket;
 									object.Room = room;
 									object.Polygon = &bucket.Polygons[p];
@@ -2737,8 +2746,8 @@ namespace TEN::Renderer
 				// Bind caustics texture.
 				if (_causticTextures.size() > 0)
 				{     
-					int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
-					int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;     
+					int nmeshes = -Objects[ID_CAUSTIC_TEXTURES].nmeshes;
+					int meshIndex = Objects[ID_CAUSTIC_TEXTURES].meshIndex;
 					int causticsFrame = GlobalCounter % _causticTextures.size();
 					BindTexture(TextureRegister::CausticsMap, &_causticTextures[causticsFrame], SamplerStateRegister::AnisotropicClamp);
 				} 
@@ -2880,7 +2889,7 @@ namespace TEN::Renderer
 			}
 		}
 
-		if (!levelPtr->Horizon || !anyOutsideRooms)
+		if ((!levelPtr->GetHorizonEnabled(0) && !levelPtr->GetHorizonEnabled(1)) || !anyOutsideRooms)
 			return;
 
 		if (Lara.Control.Look.OpticRange != 0)
@@ -2900,21 +2909,23 @@ namespace TEN::Renderer
 
 		SetBlendMode(BlendMode::Additive);
 
-		for (int s = 0; s < 2; s++)
+		for (int layer = 0; layer < 2; layer++)
 		{
+			if (Vector3(Weather.SkyColor(layer)) == Vector3::Zero)
+				continue;
+
 			for (int i = 0; i < 2; i++)
 			{
-				auto weather = TEN::Effects::Environment::Weather;
 
 				auto translation = Matrix::CreateTranslation(
-					renderView.Camera.WorldPosition.x + weather.SkyPosition(s) - i * SKY_SIZE,
+					renderView.Camera.WorldPosition.x + Weather.SkyPosition(layer) - i * SKY_SIZE,
 					renderView.Camera.WorldPosition.y - 1536.0f, 
 					renderView.Camera.WorldPosition.z);
 				auto world = rotation * translation;
 
 				_stStatic.World = (rotation * translation);
-				_stStatic.Color = weather.SkyColor(s);
-				_stStatic.ApplyFogBulbs = s == 0 ? 1 : 0;
+				_stStatic.Color = Weather.SkyColor(layer);
+				_stStatic.ApplyFogBulbs = layer == 0 ? 1 : 0;
 				_cbStatic.UpdateData(_stStatic, _context.Get());
 
 				DrawIndexedTriangles(SKY_INDICES_COUNT, 0, 0);
@@ -2967,7 +2978,7 @@ namespace TEN::Renderer
 					rDrawSprite.Width = STAR_SIZE * star.Scale;
 					rDrawSprite.Height = STAR_SIZE * star.Scale;
 
-					_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
+					_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(rDrawSprite, renderView);
 					_stInstancedSpriteBuffer.Sprites[i].Color = Vector4(
 						star.Color.x,
 						star.Color.y,
@@ -3030,7 +3041,7 @@ namespace TEN::Renderer
 						rDrawSprite.Height = 192;
 						rDrawSprite.ConstrainAxis = meteor.Direction;
 
-						_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
+						_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(rDrawSprite, renderView);
 						_stInstancedSpriteBuffer.Sprites[i].Color = Vector4(
 							meteor.Color.x,
 							meteor.Color.y,
@@ -3063,8 +3074,11 @@ namespace TEN::Renderer
 		}
 
 		// Draw horizon.
-		if (_moveableObjects[ID_HORIZON].has_value())
+		for (int layer = 0; layer < 2; layer++)
 		{
+			if (!levelPtr->GetHorizonEnabled(layer) || levelPtr->GetHorizonTransparency(layer) <= EPSILON)
+				continue;
+
 			SetDepthState(DepthState::None);
 			SetBlendMode(BlendMode::Opaque);
 			SetCullMode(CullMode::CounterClockwise);
@@ -3074,29 +3088,31 @@ namespace TEN::Renderer
 
 			_shaders.Bind(Shader::Sky);
 
-			auto& moveableObj = *_moveableObjects[ID_HORIZON];
+			auto pos = Vector3::Lerp(levelPtr->GetHorizonPrevPosition(layer), levelPtr->GetHorizonPosition(layer), GetInterpolationFactor());
+			auto orient = EulerAngles::Lerp(levelPtr->GetHorizonPrevOrientation(layer), levelPtr->GetHorizonOrientation(layer), GetInterpolationFactor());
+			auto rotMatrix = orient.ToRotationMatrix();
+			auto translationMatrix = Matrix::CreateTranslation(pos);
+			auto cameraMatrix = Matrix::CreateTranslation(renderView.Camera.WorldPosition);
 
-			_stStatic.World = Matrix::CreateTranslation(renderView.Camera.WorldPosition);
-			_stStatic.Color = Vector4::One;
+			float alpha = levelPtr->GetHorizonTransparency(layer);
+
+			_stStatic.World = rotMatrix * translationMatrix * cameraMatrix;
+			_stStatic.Color = Color(1.0f, 1.0f, 1.0f, alpha);
 			_stStatic.ApplyFogBulbs = 1;
 			_cbStatic.UpdateData(_stStatic, _context.Get());
 
-			for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+			const auto& moveableObj = *_moveableObjects[levelPtr->GetHorizonObjectID(layer)];
+			for (const auto* mesh : moveableObj.ObjectMeshes)
 			{
-				auto* meshPtr = moveableObj.ObjectMeshes[k];
-
-				for (auto& bucket : meshPtr->Buckets)
+				for (const auto& bucket : mesh->Buckets)
 				{
 					if (bucket.NumVertices == 0)
-					{
 						continue;
-					}
 
-					BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]),
-						SamplerStateRegister::AnisotropicClamp);
+					BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
 					// Always render horizon as alpha-blended surface.
-					SetBlendMode(bucket.BlendMode == BlendMode::AlphaTest ? BlendMode::AlphaBlend : bucket.BlendMode);
+					SetBlendMode(GetBlendModeFromAlpha((bucket.BlendMode == BlendMode::AlphaTest) ? BlendMode::AlphaBlend : bucket.BlendMode, alpha));
 					SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 					// Draw vertices.
@@ -3134,7 +3150,7 @@ namespace TEN::Renderer
 			rDrawSprite.Height = SUN_SIZE;
 			rDrawSprite.color = renderView.LensFlaresToDraw[0].Color;
 
-			_stInstancedSpriteBuffer.Sprites[0].World = GetWorldMatrixForSprite(&rDrawSprite, renderView);
+			_stInstancedSpriteBuffer.Sprites[0].World = GetWorldMatrixForSprite(rDrawSprite, renderView);
 			_stInstancedSpriteBuffer.Sprites[0].Color = renderView.LensFlaresToDraw[0].Color;
 			_stInstancedSpriteBuffer.Sprites[0].IsBillboard = 1;
 			_stInstancedSpriteBuffer.Sprites[0].IsSoftParticle = 0;
@@ -3174,35 +3190,33 @@ namespace TEN::Renderer
 
 	void Renderer::DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, RenderView& view, RendererPass rendererPass)
 	{
-		auto cameraPos = Camera.pos.ToVector3();
-
 		if (rendererPass == RendererPass::CollectTransparentFaces)
 		{
-			for (int j = 0; j < mesh->Buckets.size(); j++)
+			for (auto& bucket : mesh->Buckets)
 			{
-				auto& bucket = mesh->Buckets[j];
+				if (bucket.NumVertices == 0)
+					continue;
 
-				if (rendererPass == RendererPass::CollectTransparentFaces)
+				auto blendMode = GetBlendModeFromAlpha(bucket.BlendMode, itemToDraw->Color.w);
+
+				if (IsSortedBlendMode(blendMode))
 				{
-					if (IsSortedBlendMode(bucket.BlendMode))
+					for (int p = 0; p < bucket.Polygons.size(); p++)
 					{
-						for (int p = 0; p < bucket.Polygons.size(); p++)
-						{
-							auto centre = Vector3::Transform(
-								bucket.Polygons[p].Centre, itemToDraw->InterpolatedAnimTransforms[boneIndex] * itemToDraw->InterpolatedWorld);
-							int distance = (centre - cameraPos).Length();
+						auto center = Vector3::Transform(bucket.Polygons[p].Centre, itemToDraw->InterpolatedAnimTransforms[boneIndex] * itemToDraw->InterpolatedWorld);
+						int dist = Vector3::Distance(center, Camera.pos.ToVector3());
 
-							RendererSortableObject object;
-							object.ObjectType = RendererObjectType::Moveable;
-							object.Centre = centre;
-							object.Distance = distance;
-							object.Bucket = &bucket;
-							object.Item = itemToDraw;
-							object.Mesh = mesh;
-							object.Polygon = &bucket.Polygons[p];
+						auto object = RendererSortableObject{};
+						object.ObjectType = RendererObjectType::Moveable;
+						object.Centre = center;
+						object.Distance = dist;
+						object.BlendMode = blendMode;
+						object.Bucket = &bucket;
+						object.Item = itemToDraw;
+						object.LightMode = mesh->LightMode;
+						object.Polygon = &bucket.Polygons[p];
 
-							view.TransparentObjectsToDraw.push_back(object);
-						}
+						view.TransparentObjectsToDraw.push_back(object);
 					}
 				}
 			}
@@ -3213,6 +3227,8 @@ namespace TEN::Renderer
 			{
 				if (bucket.NumVertices == 0)
 					continue;
+
+				auto blendMode = GetBlendModeFromAlpha(bucket.BlendMode, itemToDraw->Color.w);
 				
 				if (rendererPass == RendererPass::ShadowMap)
 				{
@@ -3225,19 +3241,15 @@ namespace TEN::Renderer
 				}
 				else
 				{
-					int passes = rendererPass == RendererPass::Opaque && bucket.BlendMode == BlendMode::AlphaTest ? 2 : 1;
+					int passes = rendererPass == RendererPass::Opaque && blendMode == BlendMode::AlphaTest ? 2 : 1;
 
 					for (int p = 0; p < passes; p++)
 					{
-						if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
-						{
+						if (!SetupBlendModeAndAlphaTest(blendMode, rendererPass, p))
 							continue;
-						}
 
-						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]),
-							SamplerStateRegister::AnisotropicClamp);
-						BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]),
-							SamplerStateRegister::AnisotropicClamp);
+						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+						BindTexture(TextureRegister::NormalMap, &std::get<1>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
 						DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
 
@@ -3378,7 +3390,7 @@ namespace TEN::Renderer
 					view.TransparentObjectsToDraw[i].ObjectType == object->ObjectType &&
 					view.TransparentObjectsToDraw[i].Room->RoomNumber == object->Room->RoomNumber &&
 					view.TransparentObjectsToDraw[i].Bucket->Texture == object->Bucket->Texture &&
-					view.TransparentObjectsToDraw[i].Bucket->BlendMode == object->Bucket->BlendMode &&
+					view.TransparentObjectsToDraw[i].BlendMode == object->BlendMode &&
 					_sortedPolygonsIndices.size() + (view.TransparentObjectsToDraw[i].Polygon->Shape == 0 ? 6 : 3) < MAX_TRANSPARENT_VERTICES)
 				{
 					auto* currentObject = &view.TransparentObjectsToDraw[i];
@@ -3402,7 +3414,7 @@ namespace TEN::Renderer
 					view.TransparentObjectsToDraw[i].ObjectType == object->ObjectType &&
 					view.TransparentObjectsToDraw[i].Item->ItemNumber == object->Item->ItemNumber &&
 					view.TransparentObjectsToDraw[i].Bucket->Texture == object->Bucket->Texture &&
-					view.TransparentObjectsToDraw[i].Bucket->BlendMode == object->Bucket->BlendMode &&
+					view.TransparentObjectsToDraw[i].BlendMode == object->BlendMode &&
 					_sortedPolygonsIndices.size() + (view.TransparentObjectsToDraw[i].Polygon->Shape == 0 ? 6 : 3) < MAX_TRANSPARENT_VERTICES)
 				{
 					auto* currentObject = &view.TransparentObjectsToDraw[i];
@@ -3427,7 +3439,7 @@ namespace TEN::Renderer
 					view.TransparentObjectsToDraw[i].Static->RoomNumber == object->Static->RoomNumber &&
 					view.TransparentObjectsToDraw[i].Static->IndexInRoom == object->Static->IndexInRoom &&
 					view.TransparentObjectsToDraw[i].Bucket->Texture == object->Bucket->Texture &&
-					view.TransparentObjectsToDraw[i].Bucket->BlendMode == object->Bucket->BlendMode &&
+					view.TransparentObjectsToDraw[i].BlendMode == object->BlendMode &&
 					_sortedPolygonsIndices.size() + (view.TransparentObjectsToDraw[i].Polygon->Shape == 0 ? 6 : 3) < MAX_TRANSPARENT_VERTICES)
 				{
 					auto* currentObject = &view.TransparentObjectsToDraw[i];
@@ -3451,7 +3463,7 @@ namespace TEN::Renderer
 					view.TransparentObjectsToDraw[i].ObjectType == object->ObjectType &&
 					view.TransparentObjectsToDraw[i].Room->RoomNumber == object->Room->RoomNumber &&
 					view.TransparentObjectsToDraw[i].Bucket->Texture == object->Bucket->Texture &&
-					view.TransparentObjectsToDraw[i].Bucket->BlendMode == object->Bucket->BlendMode &&
+					view.TransparentObjectsToDraw[i].BlendMode == object->BlendMode &&
 					_sortedPolygonsIndices.size() + (view.TransparentObjectsToDraw[i].Polygon->Shape == 0 ? 6 : 3) < MAX_TRANSPARENT_VERTICES)
 				{
 					auto* currentObject = &view.TransparentObjectsToDraw[i];
@@ -3514,7 +3526,7 @@ namespace TEN::Renderer
 					uv2 = spr->Sprite->UV[2];
 					uv3 = spr->Sprite->UV[3];
 
-					auto world = GetWorldMatrixForSprite(currentObject->Sprite, view);
+					auto world = GetWorldMatrixForSprite(*currentObject->Sprite, view);
 					
 					Vertex v0;
 					v0.Position = Vector3::Transform(p0t, world);
@@ -3584,7 +3596,7 @@ namespace TEN::Renderer
 		if (objectInfo->Bucket->Animated != 0)
 			_shaders.Bind(Shader::RoomsAnimated);
 
-		SetBlendMode(objectInfo->Bucket->BlendMode);
+		SetBlendMode(objectInfo->BlendMode);
 		SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 		// Draw geometry
@@ -3645,7 +3657,7 @@ namespace TEN::Renderer
 
 		SetDepthState(DepthState::Read);
 		SetCullMode(CullMode::CounterClockwise);
-		SetBlendMode(objectInfo->Bucket->BlendMode);
+		SetBlendMode(objectInfo->BlendMode);
 		SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 		_shaders.Bind(Shader::Items);
@@ -3702,7 +3714,7 @@ namespace TEN::Renderer
 
 		SetDepthState(DepthState::Read);
 		SetCullMode(CullMode::CounterClockwise);
-		SetBlendMode(objectInfo->Bucket->BlendMode);
+		SetBlendMode(objectInfo->BlendMode);
 		SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 		BindTexture(TextureRegister::ColorMap, &std::get<0>(_staticTextures[objectInfo->Bucket->Texture]),
@@ -3734,13 +3746,13 @@ namespace TEN::Renderer
 
 		_stStatic.Color = Vector4::One;
 		_stStatic.AmbientLight = objectInfo->Room->AmbientLight;
-		_stStatic.LightMode = (int)objectInfo->Mesh->LightMode;
+		_stStatic.LightMode = (int)objectInfo->LightMode;
 		BindStaticLights(objectInfo->Room->LightsToDraw);
 		_cbStatic.UpdateData(_stStatic, _context.Get());
 
 		SetDepthState(DepthState::Read);
 		SetCullMode(CullMode::CounterClockwise);
-		SetBlendMode(objectInfo->Bucket->BlendMode);
+		SetBlendMode(objectInfo->BlendMode);
 		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
 		BindTexture(TextureRegister::ColorMap, &std::get<0>(_staticTextures[objectInfo->Bucket->Texture]),
@@ -3908,7 +3920,18 @@ namespace TEN::Renderer
 		// Draw horizon and the sky
 		auto* levelPtr = g_GameFlow->GetLevel(CurrentLevel);
 
-		if (levelPtr->Horizon)
+		bool anyOutsideRooms = false;
+		for (int k = 0; k < view.RoomsToDraw.size(); k++)
+		{
+			const auto& nativeRoom = g_Level.Rooms[view.RoomsToDraw[k]->RoomNumber];
+			if (nativeRoom.flags & ENV_FLAG_SKYBOX)
+			{
+				anyOutsideRooms = true;
+				break;
+			}
+		}
+
+		if (!((!levelPtr->GetHorizonEnabled(0) && !levelPtr->GetHorizonEnabled(1)) || !anyOutsideRooms))
 		{
 			_shaders.Bind(Shader::SkyWaterReflectionsVertexShader);
 			_shaders.Bind(Shader::SkyWaterReflectionsGeometryShader);
@@ -3917,8 +3940,8 @@ namespace TEN::Renderer
 			if (Lara.Control.Look.OpticRange != 0)
 				AlterFOV(ANGLE(DEFAULT_FOV) - Lara.Control.Look.OpticRange, false);
 
-			unsigned int stride = sizeof(Vertex);
-			unsigned int offset = 0;
+			UINT stride = sizeof(Vertex);
+			UINT offset = 0;
 
 			// Draw sky.
 			auto rotation = Matrix::CreateRotationX(PI);
@@ -3959,35 +3982,43 @@ namespace TEN::Renderer
 			_stWater.SkyColor = Vector4::One;
 
 			// Draw horizon.
-			if (_moveableObjects[ID_HORIZON].has_value())
+			for (int layer = 0; layer < 2; layer++)
 			{
+				if (!levelPtr->GetHorizonEnabled(layer) || levelPtr->GetHorizonTransparency(layer) <= EPSILON)
+					continue;
+
+				SetDepthState(DepthState::None);
+				SetBlendMode(BlendMode::Opaque);
+				SetCullMode(CullMode::CounterClockwise);
+
 				_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 				_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-				auto& moveableObj = *_moveableObjects[ID_HORIZON];
+				auto pos = Vector3::Lerp(levelPtr->GetHorizonPrevPosition(layer), levelPtr->GetHorizonPosition(layer), GetInterpolationFactor());
+				auto orient = EulerAngles::Lerp(levelPtr->GetHorizonPrevOrientation(layer), levelPtr->GetHorizonOrientation(layer), GetInterpolationFactor());
+				auto rotMatrix = orient.ToRotationMatrix();
+				auto translationMatrix = Matrix::CreateTranslation(pos);
 
 				for (int w = 0; w < view.WaterPlanesToDraw.size(); w++)
 				{
-					_stWater.SkyWorldMatrices[w] = Matrix::CreateTranslation(view.WaterPlanesToDraw[w].CameraPositionWS);
+					_stWater.SkyWorldMatrices[w] = rotMatrix * translationMatrix * Matrix::CreateTranslation(view.WaterPlanesToDraw[w].CameraPositionWS);
 				}
+				_stWater.SkyColor = Vector4(1.0f, 1.0f, 1.0f, levelPtr->GetHorizonTransparency(layer));
+
 				_cbWater.UpdateData(_stWater, _context.Get());
 
-				for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+				const auto& moveableObj = *_moveableObjects[levelPtr->GetHorizonObjectID(layer)];
+				for (const auto* mesh : moveableObj.ObjectMeshes)
 				{
-					auto* meshPtr = moveableObj.ObjectMeshes[k];
-
-					for (auto& bucket : meshPtr->Buckets)
+					for (const auto& bucket : mesh->Buckets)
 					{
 						if (bucket.NumVertices == 0)
-						{
 							continue;
-						}
 
-						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]),
-							SamplerStateRegister::AnisotropicClamp);
+						BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
 						// Always render horizon as alpha-blended surface.
-						SetBlendMode(bucket.BlendMode == BlendMode::AlphaTest ? BlendMode::AlphaBlend : bucket.BlendMode);
+						SetBlendMode(GetBlendModeFromAlpha((bucket.BlendMode == BlendMode::AlphaTest) ? BlendMode::AlphaBlend : bucket.BlendMode, _stWater.SkyColor.w));
 						SetAlphaTest(AlphaTestMode::None, ALPHA_TEST_THRESHOLD);
 
 						// Draw vertices.

@@ -112,65 +112,72 @@ namespace TEN::Renderer
 
 	void Renderer::PrepareStreamers(RenderView& view)
 	{
-		constexpr auto DEFAULT_BLEND_MODE = BlendMode::Additive;
-
-		for (const auto& [itemNumber, module] : StreamerEffect.Modules)
+		for (const auto& [itemNumber, group] : StreamerEffect.GetGroups())
 		{
-			for (const auto& [tag, pool] : module.Pools)
+			for (const auto& [tag, pool] : group.GetPools())
 			{
 				for (const auto& streamer : pool)
 				{
-					for (int i = 0; i < streamer.Segments.size(); i++)
+					for (int i = 0; i < streamer.GetSegments().size(); i++)
 					{
-						const auto& segment = streamer.Segments[i];
-						const auto& prevSegment = streamer.Segments[std::max(i - 1, 0)];
+						const auto& segment = streamer.GetSegments()[i];
+						const auto& prevSegment = streamer.GetSegments()[std::max(i - 1, 0)];
 
 						if (segment.Life <= 0.0f)
 							continue;
-						
-						// Determine blend mode.
-						auto blendMode = DEFAULT_BLEND_MODE;
-						if (segment.Flags & (int)StreamerFlags::BlendModeAdditive)
-							blendMode = BlendMode::AlphaBlend;
 
-						if (segment.Flags & (int)StreamerFlags::FadeLeft)
+						auto vertex0 = Vector3::Lerp(segment.PrevVertices[0], segment.Vertices[0], GetInterpolationFactor());
+						auto vertex1 = Vector3::Lerp(segment.PrevVertices[1], segment.Vertices[1], GetInterpolationFactor());
+						auto prevVertex0 = Vector3::Lerp(prevSegment.PrevVertices[0], prevSegment.Vertices[0], GetInterpolationFactor());
+						auto prevVertex1 = Vector3::Lerp(prevSegment.PrevVertices[1], prevSegment.Vertices[1], GetInterpolationFactor());
+
+						auto color = Vector4::Lerp(segment.PrevColor, segment.Color, GetInterpolationFactor());
+						auto prevColor = Vector4::Lerp(prevSegment.PrevColor, prevSegment.Color, GetInterpolationFactor());
+
+						switch (streamer.GetFeatherMode())
 						{
-							AddColoredQuad(
-								Vector3::Lerp(segment.PrevVertices[0], segment.Vertices[0], GetInterpolationFactor()),
-								Vector3::Lerp(segment.PrevVertices[1], segment.Vertices[1], GetInterpolationFactor()),
-								Vector3::Lerp(prevSegment.PrevVertices[1], prevSegment.Vertices[1], GetInterpolationFactor()),
-								Vector3::Lerp(prevSegment.PrevVertices[0], prevSegment.Vertices[0], GetInterpolationFactor()),
-								Vector4::Zero, 
-								Vector4::Lerp(segment.PrevColor, segment.Color, GetInterpolationFactor()),
-								Vector4::Lerp(prevSegment.PrevColor, prevSegment.Color, GetInterpolationFactor()),
-								Vector4::Zero,
-								blendMode, view);
-						}
-						else if (segment.Flags & (int)StreamerFlags::FadeRight)
-						{
-							AddColoredQuad(
-								Vector3::Lerp(segment.PrevVertices[0], segment.Vertices[0], GetInterpolationFactor()),
-								Vector3::Lerp(segment.PrevVertices[1], segment.Vertices[1], GetInterpolationFactor()),
-								Vector3::Lerp(prevSegment.PrevVertices[1], prevSegment.Vertices[1], GetInterpolationFactor()),
-								Vector3::Lerp(prevSegment.PrevVertices[0], prevSegment.Vertices[0], GetInterpolationFactor()),
-								Vector4::Lerp(segment.PrevColor, segment.Color, GetInterpolationFactor()),
-								Vector4::Zero,
-								Vector4::Zero,
-								Vector4::Lerp(prevSegment.PrevColor, prevSegment.Color, GetInterpolationFactor()),
-								blendMode, view);
-						}
-						else
-						{
-							AddColoredQuad(
-								Vector3::Lerp(segment.PrevVertices[0], segment.Vertices[0], GetInterpolationFactor()),
-								Vector3::Lerp(segment.PrevVertices[1], segment.Vertices[1], GetInterpolationFactor()),
-								Vector3::Lerp(prevSegment.PrevVertices[1], prevSegment.Vertices[1], GetInterpolationFactor()),
-								Vector3::Lerp(prevSegment.PrevVertices[0], prevSegment.Vertices[0], GetInterpolationFactor()),
-								Vector4::Lerp(segment.PrevColor, segment.Color, GetInterpolationFactor()),
-								Vector4::Lerp(segment.PrevColor, segment.Color, GetInterpolationFactor()),
-								Vector4::Lerp(prevSegment.PrevColor, prevSegment.Color, GetInterpolationFactor()),
-								Vector4::Lerp(prevSegment.PrevColor, prevSegment.Color, GetInterpolationFactor()),
-								blendMode, view);
+							default:
+							case StreamerFeatherMode::None:
+								AddColoredQuad(
+									vertex0, vertex1,
+									prevVertex1,
+									prevVertex0,
+									color,
+									color,
+									prevColor,
+									prevColor,
+									streamer.GetBlendMode(), view);
+								break;
+
+							case StreamerFeatherMode::Center:
+							{
+								auto center = (vertex0 + vertex1) / 2;
+								auto prevCenter = (prevVertex0 + prevVertex1) / 2;
+
+								AddColoredQuad(
+									center, vertex1, prevVertex1, prevCenter,
+									color, Vector4::Zero, Vector4::Zero, prevColor,
+									streamer.GetBlendMode(), view);
+								AddColoredQuad(
+									vertex0, center, prevCenter, prevVertex0,
+									Vector4::Zero, color, prevColor, Vector4::Zero,
+									streamer.GetBlendMode(), view);
+							}
+								break;
+
+							case StreamerFeatherMode::Left:
+								AddColoredQuad(
+									vertex0, vertex1, prevVertex1, prevVertex0,
+									color, Vector4::Zero, Vector4::Zero, prevColor,
+									streamer.GetBlendMode(), view);
+								break;
+
+							case StreamerFeatherMode::Right:
+								AddColoredQuad(
+									vertex0, vertex1, prevVertex1, prevVertex0,
+									Vector4::Zero, color, prevColor, Vector4::Zero,
+									streamer.GetBlendMode(), view);
+								break;
 						}
 					}
 				}
@@ -308,9 +315,16 @@ namespace TEN::Renderer
 
 					AddSpriteBillboardConstrained(
 						&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
-						center, Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f), PI_DIV_2, 1.0f,
-						Vector2(arc.width * 8, Vector3::Distance(origin, target)),
-						BlendMode::Additive, dir, true, view);
+						center,
+						Vector4(1.0f, 1.0f, 1.0f, 0.5f),
+						PI_DIV_2, 1.0f, Vector2(4, Vector3::Distance(origin, target)), BlendMode::Additive, dir, true, view);
+
+
+					AddSpriteBillboardConstrained(
+						&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_LIGHTHING],
+						center,
+						Vector4(r / 255.0f, g / 255.0f, b / 255.0f, 1.0f),
+						PI_DIV_2, 1.0f, Vector2(arc.width * 8, Vector3::Distance(origin, target)), BlendMode::Additive, dir, true, view);					
 				}
 			}
 		}
@@ -498,7 +512,8 @@ namespace TEN::Renderer
 				}
 
 				// Disallow sprites out of bounds.
-				int spriteIndex = std::clamp((int)particle.spriteIndex, 0, (int)_sprites.size());
+				int spriteIndex = Objects[particle.SpriteSeqID].meshIndex + particle.SpriteID;
+				spriteIndex = std::clamp(spriteIndex, 0, (int)_sprites.size());
 
 				AddSpriteBillboard(
 					&_sprites[spriteIndex],
@@ -862,6 +877,9 @@ namespace TEN::Renderer
 
 				p2 = Vector3::Transform(p2, rotMatrix);
 				p3 = Vector3::Transform(p3, rotMatrix);
+
+				if (shockwave->style == (int)ShockwaveStyle::Invisible)
+					return;
 
 				if (shockwave->style == (int)ShockwaveStyle::Normal)
 				{
@@ -1280,14 +1298,14 @@ namespace TEN::Renderer
 		}
 	}
 
-	Matrix Renderer::GetWorldMatrixForSprite(RendererSpriteToDraw* sprite, RenderView& view)
+	Matrix Renderer::GetWorldMatrixForSprite(const RendererSpriteToDraw& sprite, RenderView& view)
 	{
 		auto spriteMatrix = Matrix::Identity;
-		auto scaleMatrix = Matrix::CreateScale(sprite->Width * sprite->Scale, sprite->Height * sprite->Scale, sprite->Scale);
+		auto scaleMatrix = Matrix::CreateScale(sprite.Width * sprite.Scale, sprite.Height * sprite.Scale, sprite.Scale);
 
-		auto spritePos = sprite->pos;
+		auto spritePos = sprite.pos;
 
-		if (sprite->Type == SpriteType::ThreeD)
+		if (sprite.Type == SpriteType::ThreeD)
 		{
 			ReflectMatrixOptionally(spriteMatrix);
 		}
@@ -1296,23 +1314,23 @@ namespace TEN::Renderer
 			ReflectVectorOptionally(spritePos);
 		}
 
-		switch (sprite->Type)
+		switch (sprite.Type)
 		{
 		case SpriteType::Billboard:
 		{
 			auto cameraUp = Vector3(view.Camera.View._12, view.Camera.View._22, view.Camera.View._32);
-			spriteMatrix = scaleMatrix * Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateBillboard(spritePos, Camera.pos.ToVector3(), cameraUp);
+			spriteMatrix = scaleMatrix * Matrix::CreateRotationZ(sprite.Rotation) * Matrix::CreateBillboard(spritePos, Camera.pos.ToVector3(), cameraUp);
 		}
 		break; 
 
 		case SpriteType::CustomBillboard:
 		{
-			auto rotMatrix = Matrix::CreateRotationY(sprite->Rotation);
+			auto rotMatrix = Matrix::CreateRotationY(sprite.Rotation);
 			auto quadForward = Vector3(0.0f, 0.0f, 1.0f);
 			spriteMatrix = scaleMatrix * Matrix::CreateConstrainedBillboard(
 				spritePos,
 				Camera.pos.ToVector3(),
-				sprite->ConstrainAxis,
+				sprite.ConstrainAxis,
 				nullptr,
 				&quadForward);
 		}
@@ -1321,7 +1339,7 @@ namespace TEN::Renderer
 		case SpriteType::LookAtBillboard:
 		{
 			auto translationMatrix = Matrix::CreateTranslation(spritePos);
-			auto rotMatrix = Matrix::CreateRotationZ(sprite->Rotation) * Matrix::CreateLookAt(Vector3::Zero, sprite->LookAtAxis, Vector3::UnitZ);
+			auto rotMatrix = Matrix::CreateRotationZ(sprite.Rotation) * Matrix::CreateLookAt(Vector3::Zero, sprite.LookAtAxis, Vector3::UnitZ);
 			spriteMatrix = scaleMatrix * rotMatrix * translationMatrix;
 		}
 		break;

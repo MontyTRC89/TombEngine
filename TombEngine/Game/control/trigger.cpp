@@ -47,16 +47,16 @@ int TriggerActive(ItemInfo* item)
 			{
 				--item->Timer;
 				if (!item->Timer)
-					item->Timer = -1;
+					item->Timer = NO_VALUE;
 			}
-			else if (item->Timer < -1)
+			else if (item->Timer < NO_VALUE)
 			{
 				++item->Timer;
-				if (item->Timer == -1)
+				if (item->Timer == NO_VALUE)
 					item->Timer = 0;
 			}
 
-			if (item->Timer <= -1)
+			if (item->Timer <= NO_VALUE)
 				flag = !flag;
 		}
 	}
@@ -427,6 +427,10 @@ void TestTriggers(int x, int y, int z, FloorInfo* floor, Activator activator, bo
 	auto data = GetTriggerIndex(floor, x, y, z);
 
 	if (!data)
+		return;
+
+	// Don't process legacy triggers if triggerer flag was used in editor and trigger triggerer wasn't activated or used.
+	if (floor->Flags.MarkTriggerer && !floor->Flags.MarkTriggererActive)
 		return;
 
 	short triggerType = (*(data++) >> 8) & TRIGGER_BITS;
@@ -842,6 +846,10 @@ void TestTriggers(ItemInfo* item, bool isHeavy, int heavyFlags)
 	short roomNumber = item->RoomNumber;
 	auto floor = GetFloor(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, &roomNumber);
 
+	// Don't process legacy triggers if triggerer flag was used in editor and trigger triggerer wasn't activated or used.
+	if (floor->Flags.MarkTriggerer && !floor->Flags.MarkTriggererActive)
+		return;
+
 	TestTriggers(item->Pose.Position.x, item->Pose.Position.y, item->Pose.Position.z, floor, (Activator)short(item->Index), isHeavy, heavyFlags);
 }
 
@@ -850,7 +858,7 @@ void TestTriggers(int x, int y, int z, short roomNumber, bool heavy, int heavyFl
 	auto roomNum = roomNumber;
 	auto floor = GetFloor(x, y, z, &roomNum);
 
-	// Don't process legacy triggers if trigger triggerer wasn't used
+	// Don't process legacy triggers if triggerer flag was used in editor and trigger triggerer wasn't activated or used.
 	if (floor->Flags.MarkTriggerer && !floor->Flags.MarkTriggererActive)
 		return;
 

@@ -29,8 +29,8 @@ cbuffer CBCamera : register(b0)
 	//--
 	float4 FogColor;
 	//--
-	int FogMinDistance;
-	int FogMaxDistance;
+	float FogMinDistance;
+	float FogMaxDistance;
 	float NearPlane;
 	float FarPlane;
 	//--
