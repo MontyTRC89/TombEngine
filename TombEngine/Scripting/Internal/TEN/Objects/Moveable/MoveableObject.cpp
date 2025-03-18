@@ -1,6 +1,7 @@
 #include "framework.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 
+#include "Game/collision/collide_item.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/lot.h"
 #include "Game/effects/debris.h"
@@ -188,7 +189,8 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 		ScriptReserved_UnswapMesh, &Moveable::UnswapMesh,
 		ScriptReserved_Destroy, &Moveable::Destroy,
 		ScriptReserved_AttachObjCamera, &Moveable::AttachObjCamera,
-		ScriptReserved_AnimFromObject, &Moveable::AnimFromObject);
+		ScriptReserved_AnimFromObject, &Moveable::AnimFromObject,
+		"TestPosition", & Moveable::TestPosition);
 }
 
 Moveable::Moveable(int movID, bool alreadyInitialized)
@@ -1256,4 +1258,35 @@ void Moveable::AnimFromObject(GAME_OBJECT_ID objectID, int animNumber, int state
 	_moveable->Animation.ActiveState = stateID;
 	_moveable->Animation.FrameNumber = GetAnimData(*_moveable).frameBase;
 	AnimateItem(_moveable);
+}
+
+bool Moveable::TestPosition(Vec3 bound1, Vec3 bound2, Rotation rot1, Rotation rot2, Vec3 offset) const
+{
+
+	ObjectCollisionBounds bounds =
+	{
+	GameBoundingBox(
+			bound1.x, bound2.x,
+			bound1.y, bound2.y,
+			bound1.z, bound2.z
+		),
+		std::pair(
+			EulerAngles(ANGLE(rot1.x), ANGLE(rot1.y), ANGLE(rot1.z)),
+			EulerAngles(ANGLE(rot2.x), ANGLE(rot2.y), ANGLE(rot2.z))
+		)
+	};
+
+	Vector3i pos = offset.ToVector3i();
+
+	if (TestLaraPosition(bounds, _moveable, LaraItem))
+	{
+		TENLog("TestPosition Success", LogLevel::Warning);
+		if (MoveLaraPosition(pos, _moveable, LaraItem))
+		{
+			TENLog("Test Success", LogLevel::Warning);
+			return true;
+		}
+	}
+
+	return false;
 }
