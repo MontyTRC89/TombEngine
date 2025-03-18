@@ -174,6 +174,7 @@ void InitializeGameFlags()
 
 	FlipEffect = NO_VALUE;
 	FlipStatus = false;
+	NumRPickups = 0;
 	Camera.underwater = false;
 }
 
@@ -252,7 +253,6 @@ void InitializeObjects()
 	// User defined objects
 	CustomObjects();
 
-	NumRPickups = 0;
 	CurrentSequence = 0;
 	SequenceResults[0][1][2] = 0;
 	SequenceResults[0][2][1] = 1;
