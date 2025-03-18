@@ -10,7 +10,7 @@ using namespace TEN::Math;
 
 namespace TEN::Effects::Fireflies
 {
-	enum FirefliesItemFlags
+	enum class FirefliesItemFlags
 	{
 		TargetItemPtr,
 		Light,

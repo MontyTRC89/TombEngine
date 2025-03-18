@@ -67,13 +67,13 @@ namespace TEN::Entities::TR3
 			item.Animation.ActiveState = CORPSE_STATE_GROUNDED;
 		}
 
-		item.ItemFlags[FirefliesItemFlags::RemoveFliesEffect] = 0;
+		item.ItemFlags[(int)FirefliesItemFlags::RemoveFliesEffect] = 0;
 
 		AddActiveItem(itemNumber);
 		item.Status = ITEM_ACTIVE;
 
-		item.ItemFlags[FirefliesItemFlags::TargetItemPtr] = item.Index;
-		item.ItemFlags[FirefliesItemFlags::TriggerFlags] = NO_VALUE;
+		item.ItemFlags[(int)FirefliesItemFlags::TargetItemPtr] = item.Index;
+		item.ItemFlags[(int)FirefliesItemFlags::TriggerFlags] = NO_VALUE;
 		item.HitPoints = FLY_COUNT;
 	}
 
@@ -109,7 +109,7 @@ namespace TEN::Entities::TR3
 
 			// Remove fly effect when in water.
 			if (isWater || isSwamp)
-				item.ItemFlags[FirefliesItemFlags::RemoveFliesEffect] = 1;
+				item.ItemFlags[(int)FirefliesItemFlags::RemoveFliesEffect] = 1;
 
 			auto bounds = GameBoundingBox(&item);
 
@@ -150,7 +150,7 @@ namespace TEN::Entities::TR3
 
 		AnimateItem(&item);
 
-		if (!TriggerActive(&item) || item.ItemFlags[FirefliesItemFlags::RemoveFliesEffect] == 1)
+		if (!TriggerActive(&item) || item.ItemFlags[(int)FirefliesItemFlags::RemoveFliesEffect] == 1)
 		{
 			// Remove all fireflies associated with this item.
 			ClearInactiveFireflies(item);
@@ -159,7 +159,7 @@ namespace TEN::Entities::TR3
 			if (item.HitPoints == NOT_TARGETABLE)
 				item.HitPoints = FLY_COUNT;
 
-			item.ItemFlags[FirefliesItemFlags::SpawnCounter] = 0;
+			item.ItemFlags[(int)FirefliesItemFlags::SpawnCounter] = 0;
 			return;
 		}
 		else
@@ -171,7 +171,7 @@ namespace TEN::Entities::TR3
 		// Spawn fly effect.
 		if (item.HitPoints != NOT_TARGETABLE)
 		{
-			int fireflyCount = item.HitPoints - item.ItemFlags[FirefliesItemFlags::SpawnCounter];
+			int fireflyCount = item.HitPoints - item.ItemFlags[(int)FirefliesItemFlags::SpawnCounter];
 
 			if (fireflyCount < 0)
 			{
@@ -196,7 +196,7 @@ namespace TEN::Entities::TR3
 				}
 			}
 
-			item.ItemFlags[FirefliesItemFlags::SpawnCounter] = item.HitPoints;
+			item.ItemFlags[(int)FirefliesItemFlags::SpawnCounter] = item.HitPoints;
 			item.HitPoints = NOT_TARGETABLE;
 		}
 	}

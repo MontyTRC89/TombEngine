@@ -53,15 +53,15 @@ namespace TEN::Effects::Fireflies
 
 		item.HitPoints = FIREFLY_COUNT_DEFAULT;
 
-		item.ItemFlags[FirefliesItemFlags::TargetItemPtr] = item.Index;
-		item.ItemFlags[FirefliesItemFlags::Light] = 1; // 1 = light effect, 0 = no light effect.
-		item.ItemFlags[FirefliesItemFlags::TriggerFlags] = std::clamp((int)item.TriggerFlags, -FIREFLY_RANGE_MAX, FIREFLY_RANGE_MAX);
-		item.ItemFlags[FirefliesItemFlags::SpawnCounter] = 0;
-		item.ItemFlags[FirefliesItemFlags::RemoveFliesEffect] = 0;
+		item.ItemFlags[(int)FirefliesItemFlags::TargetItemPtr] = item.Index;
+		item.ItemFlags[(int)FirefliesItemFlags::Light] = 1; // 1 = light effect, 0 = no light effect.
+		item.ItemFlags[(int)FirefliesItemFlags::TriggerFlags] = std::clamp((int)item.TriggerFlags, -FIREFLY_RANGE_MAX, FIREFLY_RANGE_MAX);
+		item.ItemFlags[(int)FirefliesItemFlags::SpawnCounter] = 0;
+		item.ItemFlags[(int)FirefliesItemFlags::RemoveFliesEffect] = 0;
 
 		// Firefly IDs with light.
-		item.ItemFlags[FirefliesItemFlags::LightID0] = NO_VALUE;
-		item.ItemFlags[FirefliesItemFlags::LightID1] = NO_VALUE;
+		item.ItemFlags[(int)FirefliesItemFlags::LightID0] = NO_VALUE;
+		item.ItemFlags[(int)FirefliesItemFlags::LightID1] = NO_VALUE;
 	}
 
 	void SpawnFireflySwarm(ItemInfo& item, int triggerFlags)
@@ -114,7 +114,7 @@ namespace TEN::Effects::Fireflies
 		// TODO: Demagic.
 		firefly.Life = Random::GenerateFloat(1.0f, 400.0f);
 
-		firefly.TargetItem = &g_Level.Items[item.ItemFlags[FirefliesItemFlags::TargetItemPtr]];
+		firefly.TargetItem = &g_Level.Items[item.ItemFlags[(int)FirefliesItemFlags::TargetItemPtr]];
 
 		int& nextFireflyID = NextFireflyIDMap[item.Index];
 		firefly.ID = nextFireflyID++; // TODO: Increment should be on separate line for clarity.
@@ -133,11 +133,11 @@ namespace TEN::Effects::Fireflies
 
 			// Reset ItemFlags.
 			if (item.HitPoints == NOT_TARGETABLE)
-				item.HitPoints = item.ItemFlags[FirefliesItemFlags::SpawnCounter];
+				item.HitPoints = item.ItemFlags[(int)FirefliesItemFlags::SpawnCounter];
 
-			item.ItemFlags[FirefliesItemFlags::SpawnCounter] = 0;
-			item.ItemFlags[FirefliesItemFlags::LightID0] = NO_VALUE;
-			item.ItemFlags[FirefliesItemFlags::LightID1] = NO_VALUE;
+			item.ItemFlags[(int)FirefliesItemFlags::SpawnCounter] = 0;
+			item.ItemFlags[(int)FirefliesItemFlags::LightID0] = NO_VALUE;
+			item.ItemFlags[(int)FirefliesItemFlags::LightID1] = NO_VALUE;
 
 			return;
 		}
@@ -149,7 +149,7 @@ namespace TEN::Effects::Fireflies
 
 		if (item.HitPoints != NOT_TARGETABLE)
 		{
-			int fireflyCount = item.HitPoints - item.ItemFlags[FirefliesItemFlags::SpawnCounter];
+			int fireflyCount = item.HitPoints - item.ItemFlags[(int)FirefliesItemFlags::SpawnCounter];
 
 			if (fireflyCount < 0)
 			{
@@ -174,7 +174,7 @@ namespace TEN::Effects::Fireflies
 				}
 			}
 
-			item.ItemFlags[FirefliesItemFlags::SpawnCounter] = item.HitPoints;
+			item.ItemFlags[(int)FirefliesItemFlags::SpawnCounter] = item.HitPoints;
 			item.HitPoints = NOT_TARGETABLE;
 		}
 	
@@ -188,14 +188,14 @@ namespace TEN::Effects::Fireflies
 			if (targetItem == &item)
 			{
 				// Choose one available firefly ID that has light.
-				if (targetItem->ItemFlags[FirefliesItemFlags::LightID0] == NO_VALUE && targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] >= 0)
+				if (targetItem->ItemFlags[(int)FirefliesItemFlags::LightID0] == NO_VALUE && targetItem->ItemFlags[(int)FirefliesItemFlags::TriggerFlags] >= 0)
 				{
-					targetItem->ItemFlags[FirefliesItemFlags::LightID0] = Random::GenerateInt(0, targetItem->TriggerFlags);
+					targetItem->ItemFlags[(int)FirefliesItemFlags::LightID0] = Random::GenerateInt(0, targetItem->TriggerFlags);
 				}
 				// Two lights max for each cluster.
-				if (targetItem->ItemFlags[FirefliesItemFlags::LightID1] == NO_VALUE && targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] >= 0)
+				if (targetItem->ItemFlags[(int)FirefliesItemFlags::LightID1] == NO_VALUE && targetItem->ItemFlags[(int)FirefliesItemFlags::TriggerFlags] >= 0)
 				{
-					targetItem->ItemFlags[FirefliesItemFlags::LightID1] = Random::GenerateInt(0, targetItem->TriggerFlags);
+					targetItem->ItemFlags[(int)FirefliesItemFlags::LightID1] = Random::GenerateInt(0, targetItem->TriggerFlags);
 				}
 
 				auto posBase = firefly.Position;
@@ -204,7 +204,7 @@ namespace TEN::Effects::Fireflies
 				auto dir0 = Geometry::RotatePoint(posBase, EulerAngles::Identity);
 				short orient2D = firefly.Orientation.z;
 
-				if (targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] >= 0)
+				if (targetItem->ItemFlags[(int)FirefliesItemFlags::TriggerFlags] >= 0)
 				{
 					StreamerEffect.Spawn(
 						targetItem->Index, firefly.ID, pos, dir0, orient2D,
@@ -212,7 +212,7 @@ namespace TEN::Effects::Fireflies
 						Vector4::Zero,
 						6.3f - (firefly.zVel / 12), ((firefly.Velocity / 8) + firefly.zVel * 3) / (float)UCHAR_MAX, 0.0f, -0.1f, 90.0f, StreamerFeatherMode::None, BlendMode::Additive);
 				}
-				else if (targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] < 0)
+				else if (targetItem->ItemFlags[(int)FirefliesItemFlags::TriggerFlags] < 0)
 				{
 					StreamerEffect.Spawn(
 						targetItem->Index, firefly.ID, pos, dir0, orient2D,
@@ -221,8 +221,8 @@ namespace TEN::Effects::Fireflies
 						0.0f, 0.4f, 0.0f, 0.2f, 0.0f, StreamerFeatherMode::None, BlendMode::Subtractive);
 				}
 
-				if ((targetItem->ItemFlags[FirefliesItemFlags::LightID0] == firefly.ID || targetItem->ItemFlags[FirefliesItemFlags::LightID1] == firefly.ID) &&
-					targetItem->ItemFlags[FirefliesItemFlags::Light] == 1)
+				if ((targetItem->ItemFlags[(int)FirefliesItemFlags::LightID0] == firefly.ID || targetItem->ItemFlags[(int)FirefliesItemFlags::LightID1] == firefly.ID) &&
+					targetItem->ItemFlags[(int)FirefliesItemFlags::Light] == 1)
 				{
 					float totalCycleDuration = 2 * (FIREFLY_LIGHT_ALPHA_CYCLE_DURATION + ALPHA_PAUSE_DURATION);
 					float alphaTime = fmod(frameCounter, totalCycleDuration);
@@ -238,8 +238,8 @@ namespace TEN::Effects::Fireflies
 					else if (alphaTime < 2 * ALPHA_PAUSE_DURATION + FIREFLY_LIGHT_ALPHA_CYCLE_DURATION)
 					{
 						alphaFactor = 0.0f; // Pause on Alpha 0.
-						targetItem->ItemFlags[FirefliesItemFlags::LightID0] = NO_VALUE;
-						targetItem->ItemFlags[FirefliesItemFlags::LightID1] = NO_VALUE;
+						targetItem->ItemFlags[(int)FirefliesItemFlags::LightID0] = NO_VALUE;
+						targetItem->ItemFlags[(int)FirefliesItemFlags::LightID1] = NO_VALUE;
 					}
 					else
 					{
@@ -279,7 +279,7 @@ namespace TEN::Effects::Fireflies
 
 			auto targetItem = firefly.TargetItem;
 
-			if (targetItem->ItemFlags[FirefliesItemFlags::RemoveFliesEffect])
+			if (targetItem->ItemFlags[(int)FirefliesItemFlags::RemoveFliesEffect])
 			{
 				firefly.r = 0;
 				firefly.g = 0;
@@ -292,9 +292,9 @@ namespace TEN::Effects::Fireflies
 			firefly.PositionTarget = Random::GeneratePointInSphere(SPHERE);
 
 			auto spheroidAxis = Vector3(
-				CLICK(targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] * 2),
-				CLICK(targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] * 4),
-				CLICK(targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] * 2));
+				CLICK(targetItem->ItemFlags[(int)FirefliesItemFlags::TriggerFlags] * 2),
+				CLICK(targetItem->ItemFlags[(int)FirefliesItemFlags::TriggerFlags] * 4),
+				CLICK(targetItem->ItemFlags[(int)FirefliesItemFlags::TriggerFlags] * 2));
 
 			auto itemPos = Vector3i(targetItem->Pose.Position.x, targetItem->Pose.Position.y - FIREFLY_ASCENT_FACTOR, targetItem->Pose.Position.z);
 
@@ -377,8 +377,8 @@ namespace TEN::Effects::Fireflies
 					firefly.Velocity -= std::min(FLEE_VEL, firefly.TargetItem->Animation.Velocity.z - 1.0f);
 
 					if (Random::TestProbability(1.0f / 700.0f) &&
-						targetItem->ItemFlags[FirefliesItemFlags::Light] == 1 &&
-						targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] >= 0)
+						targetItem->ItemFlags[(int)FirefliesItemFlags::Light] == 1 &&
+						targetItem->ItemFlags[(int)FirefliesItemFlags::TriggerFlags] >= 0)
 					{
 						if (firefly.zVel == 0.3f)
 						{
@@ -408,10 +408,10 @@ namespace TEN::Effects::Fireflies
 				firefly.RoomNumber = pointColl.GetRoomNumber();
 			}
 
-			if (targetItem->ItemFlags[FirefliesItemFlags::Light] == 1 &&
-				targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] >= 0)
+			if (targetItem->ItemFlags[(int)FirefliesItemFlags::Light] == 1 &&
+				targetItem->ItemFlags[(int)FirefliesItemFlags::TriggerFlags] >= 0)
 			{
-				if (Random::TestProbability(1.0f / (700.0f - float(targetItem->ItemFlags[FirefliesItemFlags::SpawnCounter] * 2))))
+				if (Random::TestProbability(1.0f / (700.0f - float(targetItem->ItemFlags[(int)FirefliesItemFlags::SpawnCounter] * 2))))
 					firefly.zVel = 100.0f;
 
 				if (firefly.zVel > 1.0f)
