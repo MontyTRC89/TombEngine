@@ -1,6 +1,6 @@
 -----
 --- Basic timer - after a specified number of seconds, the chosen event happens.
---
+--<style>table.function_list td.name {min-width: 395px;}</style>
 -- Timers are updated automatically at every frame before OnLoop event.
 --
 --
@@ -44,11 +44,19 @@ LevelVars.Engine.Timer = {timers = {}}
 
 --- Create (but do not start) a new timer.
 --
--- You have the option of displaying the remaining time of timer. Timer format details:
+--<h3 id="timerFormat">Timer format:</h3>
+-- <ul>You have the option of displaying the remaining time of timer.
+--
+-- You can display hours, minutes, seconds and deciseconds (deciseconds are 1/10th of a second).
+--
+--To set which unit to display, you can use a **table** or a **boolean value**.
+--
+-- Timer format details:
 --
 --@advancedDesc
---	-- deciseconds are 1/10th of a second
---	
+--	-- hours:mins:secs.decisecs
+--	local myTimeFormat = {hours = true, minutes = true, seconds = true, deciseconds = true}
+--
 --	-- mins:secs
 --	local myTimeFormat1 = {minutes = true, seconds = true, deciseconds = false}
 --
@@ -58,12 +66,17 @@ LevelVars.Engine.Timer = {timers = {}}
 --	-- secs.decisecs
 --	local myTimeFormat3 = {seconds = true, deciseconds = true}
 --
---	-- secs; also what is printed if you pass true instead of a table
+--	-- secs; to display only seconds you can pass a table or true
 --	local myTimeFormat4 = {seconds = true}
+--	local myTimeFormat5 = true
+--
+--	-- no remaining time display
+--	local myTimeFormat6 = false
+--
 --
 --Use this sparingly; in the classics, timed challenges did not have visible countdowns. For shorter timers, the gameplay benefit from showing the remaining time might not be necessary, and could interfere with the atmosphere of the level.
 --
---At any given time, multiple timers can show their countdown.
+--At any given time, multiple timers can show their countdown.</ul>
 --
 -- @tparam string name A label to give this timer; used to retrieve the timer later.
 --
@@ -72,7 +85,7 @@ LevelVars.Engine.Timer = {timers = {}}
 --
 -- Values with only 1 tenth of a second (0.1) are accepted, example: 1.5 - 6.0 - 9.9 - 123.6. No negative values allowed!
 -- @tparam[opt] bool loop If true, the timer will start again immediately after the time has elapsed. __Default: false__
--- @tparam[opt] ?table|bool timerFormat If a table is given, the remaining time will be shown as a string, formatted according to the values in the table. If true, the remaining seconds, rounded up, will show at the bottom of the screen. If false, the remaining time will not be shown on screen. __Default: false__
+-- @tparam[opt] ?table|bool timerFormat Sets the remaining time display. See <a href="#timerFormat">timer format</a>. __Default: false__.
 -- @tparam[opt] LevelFunc func The function defined in the *LevelFuncs* table to call when the time is up
 -- @tparam[opt] any ... a variable number of arguments with which the above function will be called
 -- @treturn Timer The timer in its paused state
@@ -315,7 +328,7 @@ function Timer:GetRemainingTimeInSeconds()
 end
 
 --- Get the formatted remaining time of a timer.
--- @tparam ?table|bool timerFormat If a table is given, the time will be shown as a string, formatted according to the values in the table. If true, only seconds will be displayed.
+-- @tparam ?table|bool timerFormat Sets the remaining time display. See <a href="#timerFormat">timer format</a>.
 -- @treturn string The formatted remaining time.
 --
 -- __Please note:__ It's recommended to check that the timer exists.
@@ -397,8 +410,7 @@ function Timer:IfRemainingTimeIs(operator, seconds)
 	end
 end
 
---- Get the total time of a timer in game frames.
--- This is the amount of time the timer will start with, as well as when starting a new loop.
+--- Get the total time of a timer in game frames. This is the amount of time the timer will start with, as well as when starting a new loop.
 -- @treturn Time The timer's total time in *game frames*.
 --
 -- __Please note:__ It's recommended to check that the timer exists.
@@ -413,8 +425,7 @@ function Timer:GetTotalTime()
 	return thisTimer.totalTime
 end
 
---- Get the total time of a timer in seconds.
--- This is the amount of time the timer will start with, as well as when starting a new loop
+--- Get the total time of a timer in seconds. This is the amount of time the timer will start with, as well as when starting a new loop
 -- @treturn float The timer's total time in *seconds*.
 --
 -- Seconds have an accuracy of 0.1 tenths. Example: 1.5 - 6.0 - 9.9 - 123.6
@@ -432,9 +443,8 @@ function Timer:GetTotalTimeInSeconds()
 	return totalTime.s + 60 * totalTime.m + math.floor(totalTime.c / 10) * 0.1
 end
 
---- Get the formatted total time of a timer.
--- This is the amount of time the timer will start with, as well as when starting a new loop
--- @tparam ?table|bool timerFormat If a table is given, the time will be shown as a string, formatted according to the values in the table. If true, only seconds will be displayed. If false, the time will not be displayed on the screen.
+--- Get the formatted total time of a timer. This is the amount of time the timer will start with, as well as when starting a new loop
+-- @tparam ?table|bool timerFormat Sets the remaining time display. See <a href="#timerFormat">timer format</a>.
 -- @treturn string The *formatted total time*.
 --
 -- __Please note:__ It's recommended to check that the timer exists.
@@ -452,8 +462,9 @@ function Timer:GetTotalTimeFormatted(timerFormat)
 	return Utility.GenerateTimeFormattedString(thisTimer.totalTime, timerFormat, errorFormat)
 end
 
---- Set the total time for a timer
--- The total time is changed only if the timer loops
+--- Set the total time for a timer.
+--
+-- __Please note:__ The total time is changed when the timer is next started
 -- @tparam float totalTime Timer's new total time
 --
 -- Values with only 1 tenth of a second (0.1) are accepted, example: 1.5 - 6.0 - 9.9 - 123.6. No negative values allowed!
@@ -506,7 +517,9 @@ function Timer:IfTotalTimeIs(operator, seconds)
 	return Utility.CompareValue(totalTime, time, operator)
 end
 
---- Set whether or not the timer loops
+--- Set whether or not the timer loops.
+--
+-- __Default value__: *false*
 -- @tparam bool looping Whether or not the timer loops
 -- @usage
 --  -- Example:
@@ -544,7 +557,7 @@ end
 --
 -- The coordinate (0,0) is in the upper left-hand corner.
 --
--- Default position of the timer is (50,90)
+-- __Default position__: (50,90)
 -- @tparam float x The x-coordinate in percent
 -- @tparam float y The y-coordinate in percent
 -- @usage
@@ -561,9 +574,9 @@ function Timer:SetPosition(x,y)
 end
 
 --- Set the scale of the displayed timer when it is active.
--- @tparam float scale The new scale value
 --
---  The default scale of the timer is 1.0
+-- __Default value__: 1.0
+-- @tparam float scale The new scale value
 -- @usage
 --  -- Example:
 --  Timer.Get("my_timer"):SetScale(1.5)
@@ -576,9 +589,9 @@ function Timer:SetScale(scale)
 end
 
 --- Set the paused color of the displayed timer when it is active.
--- @tparam Color color Timer's new paused color
 --
---  Default paused color of the timer is yellow: TEN.Color(255, 255, 0, 255)
+-- __Default paused color__: TEN.Color(255, 255, 0, 255) [yellow]
+-- @tparam Color color Timer's new paused color
 -- @usage
 --  -- Example:
 --  Timer.Get("my_timer"):SetPausedColor(TEN.Color(0, 255, 0, 255))
@@ -591,9 +604,9 @@ function Timer:SetPausedColor(color)
 end
 
 --- Set the color of the displayed timer when it is active.
--- @tparam Color color Timer's new color
 --
---  Default color of the timer is white: TEN.Color(255, 255, 255, 255)
+-- __Default color__: TEN.Color(255, 255, 255, 255) [white]
+-- @tparam Color color Timer's new color
 -- @usage
 --  -- Example:
 --  Timer.Get("my_timer"):SetUnpausedColor(TEN.Color(0, 255, 255, 255))
@@ -605,10 +618,10 @@ function Timer:SetUnpausedColor(color)
 	end
 end
 
---- Set text options for a timer
--- @tparam table _table Table containing timer's new text options. See @{Strings.DisplayStringOption}
+--- Set text options for a timer.
 --
--- Default options: {TEN.Strings.DisplayStringOption.CENTER, TEN.Strings.DisplayStringOption.SHADOW}
+-- __Default options__: {TEN.Strings.DisplayStringOption.CENTER, TEN.Strings.DisplayStringOption.SHADOW}
+-- @tparam table optionsTable Table containing timer's new text options. See @{Strings.DisplayStringOption}
 --
 -- __Please note:__ the new table overwrites the existing table options
 -- @usage
@@ -626,18 +639,18 @@ end
 --  -- Example 3
 --  -- left alignment
 --  Timer.Get("my_timer"):SetTextOption()
-function Timer:SetTextOption(_table)
-	_table = _table or {}
-	if type(_table) ~= "table" then
+function Timer:SetTextOption(optionsTable)
+	optionsTable = optionsTable or {}
+	if type(optionsTable) ~= "table" then
 		TEN.Util.PrintLog("Error in Timer:SetTextOption(): options is not a table for '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 	else
-		for _, v in pairs(_table) do
+		for _, v in pairs(optionsTable) do
 			if not Type.IsNumber(v) or v < 0 or v > 3 then
 				TEN.Util.PrintLog("Error in Timer:SetTextOption(): invalid value in options for '" .. self.name .. "' timer", TEN.Util.LogLevel.ERROR)
 				return
 			end
 		end
-		LevelVars.Engine.Timer.timers[self.name].stringOption = _table
+		LevelVars.Engine.Timer.timers[self.name].stringOption = optionsTable
 	end
 end
 
@@ -659,22 +672,24 @@ function Timer:IsActive()
 	return LevelVars.Engine.Timer.timers[self.name].active
 end
 
+--- Ticks the time of the timer 
+-- @treturn bool Tick of timer. Returns *true* every 0.1 seconds with respect to the timer
 function Timer:TimerCheck()
-	local thisTimer = LevelVars.Engine.Timer.timers[self.name]
-	return thisTimer.clock
+	return LevelVars.Engine.Timer.timers[self.name].clock
 end
 
 LevelFuncs.Engine.Timer.Decrease = function ()
 	for _, t in pairs(LevelVars.Engine.Timer.timers) do
 		if t.active and not t.paused then
-			if not t.first then
+			if t.first then
+				t.first = false
+			else
 				t.realRemainingTime = t.realRemainingTime - 1
-				if t.realRemainingTime.c % 10 == 0 then
+				t.clock = (t.realRemainingTime.c % 10 == 0)
+				if t.clock then
 					t.remainingTime = t.remainingTime - 3
 				end
 			end
-			t.clock = (t.realRemainingTime.c % 10 == 0)
-			t.first = false
 		end
 	end
 end
@@ -690,6 +705,7 @@ LevelFuncs.Engine.Timer.UpdateAll = function()
 			end
 			if t.remainingTime == zero then
 				if t.loop then
+					t.realRemainingTime = t.totalTime
 					t.remainingTime = t.totalTime
 				else
 					t.active = false
