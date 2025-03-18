@@ -141,10 +141,10 @@ namespace TEN::Effects::Fireflies
 			return;
 		}
 
-		static float frameCounter = 0.0f;
+		static int frameCounter = 0;
 
-		// Increment counter variable in each frame.
-		frameCounter += 1.0f;
+		// Increment game frame counter.
+		frameCounter++;
 
 		if (item.HitPoints != NOT_TARGETABLE)
 		{
@@ -266,10 +266,11 @@ namespace TEN::Effects::Fireflies
 			return;
 
 		const auto& playerItem = *LaraItem;
-		static float frameCounter = 0.0f;
+
+		static int frameCounter = 0;
 
 		// Increment game frame counter.
-		frameCounter += 1.0f;
+		frameCounter++;
 
 		for (auto& firefly : FireflySwarm)
 		{
@@ -290,11 +291,11 @@ namespace TEN::Effects::Fireflies
 
 			firefly.PositionTarget = Random::GeneratePointInSphere(SPHERE);
 
-			int multiplierX = CLICK(targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] * 2);
-			int multiplierY = CLICK(targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] * 4);
-			int multiplierZ = CLICK(targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] * 2);
+			auto spheroidAxis = Vector3(
+				CLICK(targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] * 2),
+				CLICK(targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] * 4),
+				CLICK(targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] * 2));
 
-			auto spheroidAxis = Vector3(multiplierX, multiplierY, multiplierZ);
 			auto itemPos = Vector3i(targetItem->Pose.Position.x, targetItem->Pose.Position.y - FIREFLY_RISE_UP_FACTOR, targetItem->Pose.Position.z);
 
 			// Calculate desired position based on target object and random offsets.
@@ -346,9 +347,9 @@ namespace TEN::Effects::Fireflies
 				alphaFactor = (alphaTime - 2 * ALPHA_PAUSE_DURATION - FIREFLY_LIGHT_ALPHA_CYCLE_DURATION) / FIREFLY_LIGHT_ALPHA_CYCLE_DURATION;
 			}
 
-			firefly.r = static_cast<unsigned char>(firefly.rB * alphaFactor);
-			firefly.g = static_cast<unsigned char>(firefly.gB * alphaFactor);
-			firefly.b = static_cast<unsigned char>(firefly.bB * alphaFactor);
+			firefly.r = unsigned char(firefly.rB * alphaFactor);
+			firefly.g = unsigned char(firefly.gB * alphaFactor);
+			firefly.b = unsigned char(firefly.bB * alphaFactor);
 
 			for (const auto& otherFirefly : FireflySwarm)
 			{
@@ -407,9 +408,10 @@ namespace TEN::Effects::Fireflies
 				firefly.RoomNumber = pointColl.GetRoomNumber();
 			}
 
-			if (targetItem->ItemFlags[FirefliesItemFlags::Light] == 1 && targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] >= 0)
+			if (targetItem->ItemFlags[FirefliesItemFlags::Light] == 1 &&
+				targetItem->ItemFlags[FirefliesItemFlags::TriggerFlags] >= 0)
 			{
-				if (Random::TestProbability(1.0f / (700.0f - (float)(targetItem->ItemFlags[FirefliesItemFlags::Spawncounter] * 2))))
+				if (Random::TestProbability(1.0f / (700.0f - float(targetItem->ItemFlags[FirefliesItemFlags::Spawncounter] * 2))))
 					firefly.zVel = 100.0f;
 
 				if (firefly.zVel > 1.0f)
@@ -422,17 +424,21 @@ namespace TEN::Effects::Fireflies
 
 	void RemoveFireflies(ItemInfo& item)
 	{
-		FireflySwarm.erase(std::remove_if(FireflySwarm.begin(), FireflySwarm.end(),
-			[&item](FireflyData& firefly)
-			{
-				if (firefly.TargetItemPtr == &item)
+		FireflySwarm.erase(
+			std::remove_if(
+				FireflySwarm.begin(), FireflySwarm.end(),
+				[&item](FireflyData& firefly)
 				{
-					firefly.Life = 0.0f;
-					firefly.on = false;
-					return true;
-				}
-				return false;
-			}), FireflySwarm.end());
+					if (firefly.TargetItemPtr == &item)
+					{
+						firefly.Life = 0.0f;
+						firefly.on = false;
+						return true;
+					}
+
+					return false;
+				}),
+			FireflySwarm.end());
 
 		NextFireflyIDMap.erase(item.Index);
 	}
