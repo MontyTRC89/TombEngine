@@ -851,16 +851,16 @@ namespace TEN::Input
 
 	const Vector2& GetMoveAxis()
 	{
-		return AxisMap[(int)InputAxis::Move];
+		return AxisMap[InputAxisID::Move];
 	}
 
 	const Vector2& GetCameraAxis()
 	{
-		return AxisMap[(int)InputAxis::Camera];
+		return AxisMap[InputAxisID::Camera];
 	}
 
 	const Vector2& GetMouseAxis()
 	{
-		return AxisMap[(int)InputAxis::Mouse];
+		return AxisMap[InputAxisID::Mouse];
 	}
 }

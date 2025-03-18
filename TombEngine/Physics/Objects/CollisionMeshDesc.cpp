@@ -2,8 +2,10 @@
 #include "Physics/Objects/CollisionMeshDesc.h"
 
 #include "Math/Math.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Math;
+using namespace TEN::Utils;
 
 namespace TEN::Physics
 {
@@ -30,7 +32,7 @@ namespace TEN::Physics
 			auto it = _vertexMap.find(vertex);
 			if (it != _vertexMap.end())
 			{
-				int vertexId = it->second;
+				const auto& [vertex, vertexId] = *it;
 				return vertexId;
 			}
 
@@ -60,7 +62,6 @@ namespace TEN::Physics
 
 		// 1) Get coplanar triangle map.
 		auto coplanarTriMap = GetCoplanarTriangleMap();
-		PrintDebugMessage("coplanar size: %d", (int)coplanarTriMap.size());
 
 		// 2) Process coplanar triangles into optimized vertex IDs.
 		auto optimizedVertexIds = std::vector<int>{};
@@ -80,7 +81,7 @@ namespace TEN::Physics
 		auto reoptimizedVertexIds = std::vector<int>{};
 		reoptimizedVertexIds.reserve(optimizedVertexIds.size());
 
-		// 3) Finalize optimized vertices and IDs.
+		// 3) Finalize optimized vertices and vertex IDs.
 		for (int vertexId : optimizedVertexIds)
 		{
 			const auto& vertex = _vertices[vertexId];
@@ -89,7 +90,7 @@ namespace TEN::Physics
 			reoptimizedVertexIds.push_back((int)optimizedVertices.size() - 1);
 		}
 
-		// 4) Store optimized vertices and IDs.
+		// 4) Store optimized vertices and vertex IDs.
 		_vertices = std::move(optimizedVertices);
 		_ids = std::move(reoptimizedVertexIds);
 	}
@@ -165,7 +166,6 @@ namespace TEN::Physics
 		return polygons;
 	}
 
-	// TODO: Make rounding optional.
 	CollisionMeshDesc::CoplanarTriangleMap CollisionMeshDesc::GetCoplanarTriangleMap() const
 	{
 		constexpr auto NORMAL_EPSILON	 = 0.0001f;
@@ -189,6 +189,7 @@ namespace TEN::Physics
 			normal.Normalize();
 			normal = RoundNormal(normal, NORMAL_EPSILON);
 
+			// TODO: Make rounding optional.
 			// Calculate plane distance.
 			float dist = RoundToStep(normal.Dot(vertex0), PLANE_HEIGHT_STEP);
 
@@ -288,7 +289,7 @@ namespace TEN::Physics
 			auto edgeCross = edge0.Cross(edge1);
 			if (edgeCross.LengthSquared() < EPSILON)
 			{
-				polygon.erase(polygon.begin() + ((i + 1) % polygon.size()));
+				Erase(polygon, (i + 1) % polygon.size());
 				if (i >= polygon.size())
 					i = (int)polygon.size() - 1;
 			}
@@ -302,13 +303,13 @@ namespace TEN::Physics
 		}
 	}
 
-	// TODO: Use better method for complex polygons.
 	void CollisionMeshDesc::TriangulatePolygon(std::vector<int>& optimizedVertexIds, const std::vector<int>& polygon, const Vector3& normal) const
 	{
 		// Invalid polygon; return early.
 		if (polygon.size() < VERTEX_COUNT)
 			return;
 
+		// TEMP
 		int count = 0;
 
 		// Triangulate using ear clipping method.
@@ -346,6 +347,10 @@ namespace TEN::Physics
 			//if (true)
 			if (edgeCross.LengthSquared() >= 0.0f)
 			{
+				// FAILSAFE: Skip degenerate triangle.
+				//if (abs(edgeCross.LengthSquared()) > EPSILON)
+				//	continue;
+				
 				// Collect optimized vertex IDs.
 				optimizedVertexIds.push_back(vertexId0);
 				optimizedVertexIds.push_back(vertexId1);

@@ -27,4 +27,10 @@ namespace TEN::Utils
 		auto it = std::find(vector.begin(), vector.end(), element);
 		return (it != vector.end());
 	}
+
+	template <typename TElement>
+	void Erase(std::vector<TElement>& vector, unsigned int elementID)
+	{
+		vector.erase(vector.begin() + elementID);
+	}
 }
