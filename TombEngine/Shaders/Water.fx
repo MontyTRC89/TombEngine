@@ -201,6 +201,7 @@ float4 PSWater(WaterPixelShaderInput input) : SV_Target
     output.xyz = lerp(WaterFogColor, output.xyz, extinction);
 #endif
     
+#ifdef WATER_FOAM
     // Foam
     mappedUV = frac(input.WorldPosition.xyz / 1024.0f).xz;
     float foamThreshold = 128.0f;
@@ -219,10 +220,9 @@ float4 PSWater(WaterPixelShaderInput input) : SV_Target
     {
         discard;
     }
-
     float fade = (sceneDepth - waterSceneDepth) * 100.0f;
     output.w = min(output.w, fade);
-    //output.a = saturate(1.0f - foamFactor * 1.2f);
+#endif
     
     return output;
 }
