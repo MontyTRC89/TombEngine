@@ -7,6 +7,7 @@
 #include "./VertexInput.hlsli"
 #include "./PostProcessVertexInput.hlsli"
 #include "./CBWater.hlsli"
+#include "./VertexEffects.hlsli"
 
 #define MAX_REFLECTION_TARGETS      8
 #define BORDERS_BIAS                0.008f
@@ -83,12 +84,16 @@ WaterPixelShaderInput VSWater(VertexShaderInput input)
 {
     WaterPixelShaderInput output;
 
-    output.Position = mul(float4(input.Position, 1.0f), ViewProjection);
+    float weight = input.Effects.z;
+    float wibble = Wibble(input.Effects.xyz, input.Hash);
+    float3 pos = Move(input.Position, input.Effects.xyz * weight, wibble);
+    
+    output.Position = mul(float4(pos, 1.0f), ViewProjection);
     output.Color = input.Color;
     output.UV = input.UV;
     output.PositionCopy = output.Position;
-    output.WorldPosition = input.Position;
-    output.ReflectedPosition = mul(float4(input.Position, 1.0f), mul(WaterReflectionView, Projection));
+    output.WorldPosition = pos;
+    output.ReflectedPosition = mul(float4(pos, 1.0f), mul(WaterReflectionView, Projection));
     
     return output;
 }
@@ -160,7 +165,7 @@ float4 PSWater(WaterPixelShaderInput input) : SV_Target
     {
         refractionUV.xy = oldRefractionUV;
     }
-    
+
     // Sample refraction and reflections colors
     float3 refractedColor = WaterRefractionTexture.Sample(WaterRefractionSampler, refractionUV.xy);
     float3 reflectedColor = WaterReflectionTexture.Sample(WaterReflectionSampler, float3(reflectionUV.xy, WaterPlaneIndex));

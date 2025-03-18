@@ -4398,13 +4398,13 @@ namespace TEN::Renderer
 		// Draw water surfaces
 		bool isUnderwater = (g_Level.Rooms[view.Camera.RoomNumber].flags & ENV_FLAG_WATER) != 0;
 		_shaders.Bind(isUnderwater ? Shader::WaterCameraBelowWater :  Shader::WaterCameraAboveWater);
-		 
+		  
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetInputLayout(_inputLayout.Get());
 
 		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
-		 
+		
 		// Bind vertex and index buffer.  
 		_context->IASetVertexBuffers(0, 1, _roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		_context->IASetIndexBuffer(_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);

@@ -166,8 +166,6 @@ namespace TEN::Renderer::Utils
 		Load(Shader::BlurWaterReflectionsPixelShader, "Water", "BlurWaterReflections", ShaderType::Pixel);
 		Load(Shader::WaterCameraAboveWater, "Water", "Water", ShaderType::PixelAndVertex);
 		Load(Shader::WaterCameraBelowWater, "Water", "Water", ShaderType::PixelAndVertex, defines.data());
-		Load(Shader::WaterHullShader, "Water", "Water", ShaderType::Hull);
-		Load(Shader::WaterDomainShader, "Water", "Water", ShaderType::Domain);
 	}
 
 	void ShaderManager::Unbind(Shader shader)
