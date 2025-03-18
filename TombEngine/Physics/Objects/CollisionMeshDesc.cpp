@@ -11,7 +11,7 @@ namespace TEN::Physics
 {
 	unsigned int CollisionMeshDesc::GetTriangleCount() const
 	{
-		return ((unsigned int)_ids.size() / VERTEX_COUNT);
+		return ((unsigned int)_vertexIds.size() / VERTEX_COUNT);
 	}
 
 	const std::vector<Vector3>& CollisionMeshDesc::GetVertices() const
@@ -21,7 +21,7 @@ namespace TEN::Physics
 
 	const std::vector<int>& CollisionMeshDesc::GetIds() const
 	{
-		return _ids;
+		return _vertexIds;
 	}
 
 	void CollisionMeshDesc::InsertTriangle(const Vector3& vertex0, const Vector3& vertex1, const Vector3& vertex2)
@@ -51,9 +51,9 @@ namespace TEN::Physics
 		int vertexId2 = getVertexId(vertex2);
 
 		// Add vertex IDs.
-		_ids.push_back(vertexId0);
-		_ids.push_back(vertexId1);
-		_ids.push_back(vertexId2);
+		_vertexIds.push_back(vertexId0);
+		_vertexIds.push_back(vertexId1);
+		_vertexIds.push_back(vertexId2);
 	}
 
 	void CollisionMeshDesc::Optimize()
@@ -92,7 +92,7 @@ namespace TEN::Physics
 
 		// 4) Store optimized vertices and vertex IDs.
 		_vertices = std::move(optimizedVertices);
-		_ids = std::move(reoptimizedVertexIds);
+		_vertexIds = std::move(reoptimizedVertexIds);
 	}
 
 	std::vector<std::vector<int>> CollisionMeshDesc::GetPolygons(const std::vector<TriangleVertexIds>& tris) const
@@ -173,12 +173,12 @@ namespace TEN::Physics
 
 		// Collect coplanar triangle groups.
 		auto coplanarTriMap = std::unordered_map<Plane, std::vector<TriangleVertexIds>>{}; // Key = plane, value = triangles.
-		for (int i = 0; i < _ids.size(); i += VERTEX_COUNT)
+		for (int i = 0; i < _vertexIds.size(); i += VERTEX_COUNT)
 		{
 			// Get vertices.
-			const auto& vertex0 = _vertices[_ids[i]];
-			const auto& vertex1 = _vertices[_ids[i + 1]];
-			const auto& vertex2 = _vertices[_ids[i + 2]];
+			const auto& vertex0 = _vertices[_vertexIds[i]];
+			const auto& vertex1 = _vertices[_vertexIds[i + 1]];
+			const auto& vertex2 = _vertices[_vertexIds[i + 2]];
 
 			// Calculate edges.
 			auto edge0 = vertex1 - vertex0;
@@ -195,7 +195,7 @@ namespace TEN::Physics
 
 			// Collect triangles by plane.
 			auto plane = Plane(normal, dist);
-			coplanarTriMap[plane].push_back({ _ids[i], _ids[i + 1], _ids[i + 2] });
+			coplanarTriMap[plane].push_back({ _vertexIds[i], _vertexIds[i + 1], _vertexIds[i + 2] });
 		}
 
 		return coplanarTriMap;

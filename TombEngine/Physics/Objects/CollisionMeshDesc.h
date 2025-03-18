@@ -19,8 +19,8 @@ namespace TEN::Physics
 
 		// Fields
 
-		std::vector<Vector3> _vertices = {};
-		std::vector<int>	 _ids	   = {};
+		std::vector<Vector3> _vertices	= {};
+		std::vector<int>	 _vertexIds = {}; // Vertex IDs in batches of 3 defining triangles.
 
 		std::unordered_map<Vector3, int> _vertexMap = {}; // Key = vertex, value = vertex ID.
 
