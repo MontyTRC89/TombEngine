@@ -1,5 +1,6 @@
 #include "framework.h"
 #include "Scripting/Internal/TEN/Objects/Creature/Creature.h"
+#include "Scripting/Internal/TEN/Objects/Creature/CreatureStates.h"
 
 #include "Game/collision/Point.h"
 #include "Game/Lara/lara_climb.h"
@@ -33,48 +34,84 @@ namespace TEN::Scripting::Creature
 			ctors(), sol::call_constructor, ctors(),
 
 			// Getters
-			"GetMood", & LuaCreatureInfo::GetMood);
+			"GetMood", &LuaCreatureInfo::GetMood,
+			"GetTarget", &LuaCreatureInfo::GetTarget,
+			"GetTargetPosition", &LuaCreatureInfo::GetTargetPosition,
+			"SetTarget", & LuaCreatureInfo::SetTarget,
+			"SetTargetPosition", & LuaCreatureInfo::SetTargetPosition,
+			"ClearTarget", & LuaCreatureInfo::ClearTarget,
+			"IsAlerted", & LuaCreatureInfo::IsAlerted,
+			"IsFriendly", & LuaCreatureInfo::IsFriendly,
+			"IsHurtByLara", & LuaCreatureInfo::IsHurtByLara,
+			"IsPoisoned", & LuaCreatureInfo::IsPoisoned,
+			"IsAtGoa", & LuaCreatureInfo::IsAtGoal);
 			
 	}
-
 
 	LuaCreatureInfo::LuaCreatureInfo(const Moveable& mov)
 	{
 			auto* item = &g_Level.Items[mov.GetIndex()];
+			
+			if (item->IsCreature())
 			m_Creature = GetCreatureInfo(item);
 	}
 
-	/// Get the world position of this Probe.
-	// @function GetPosition
-	// @treturn Vec3 World position.
 	MoodType LuaCreatureInfo::GetMood()
 	{
 		return m_Creature->Mood;
 	}
 
-	/*			"GetTarget", & LuaCreatureInfo::GetTarget,
-
-			// Setters
-			"SetTarget", & LuaCreatureInfo::SetTarget,
-			"SetTargetPosition", & LuaCreatureInfo::SetTargetPosition,
-
-			// Inquirers
-			"IsAlerted", & LuaCreatureInfo::IsAlerted,
-			"IsFriendly", & LuaCreatureInfo::IsFriendly,
-			"IsHurtByLara", &LuaCreatureInfo::IsHurtByLara,
-			"IsPoisoned", & LuaCreatureInfo::IsPoisoned,
-			"IsAtGoal", & LuaCreatureInfo::IsAtGoal
-			
-			/// Get the Room object of this Probe.
-	// @function GetRoom
-	// @treturn Room Room object.
-	std::unique_ptr<Moveable&> LuaCreatureInfo::GetTarget()
+	std::optional<Moveable> LuaCreatureInfo::GetTarget()
 	{
-	
+		auto enemy = m_Creature->Enemy;
+		return Moveable(enemy->Index);
 	}
 
-	*/
-	
+	Vec3 LuaCreatureInfo::GetTargetPosition()
+	{
+		return m_Creature->Target;
+	}
+
+	void LuaCreatureInfo::SetTarget(Moveable& moveable)
+	{
+		auto* item = &g_Level.Items[moveable.GetIndex()];
+		m_Creature->Enemy = item;
+	}
+
+	void LuaCreatureInfo::SetTargetPosition(Vec3& position)
+	{
+		m_Creature->Target = position.ToVector3i();
+	}
+
+	void LuaCreatureInfo::ClearTarget()
+	{
+		m_Creature->Enemy = nullptr;
+	}
+
+	bool LuaCreatureInfo::IsAlerted()
+	{
+		return m_Creature->Alerted;
+	}
+
+	bool LuaCreatureInfo::IsFriendly()
+	{
+		return m_Creature->Friendly;
+	}
+
+	bool LuaCreatureInfo::IsHurtByLara()
+	{
+		return m_Creature->HurtByLara;
+	}
+
+	bool LuaCreatureInfo::IsPoisoned()
+	{
+		return m_Creature->Poisoned;
+	}
+
+	bool LuaCreatureInfo::IsAtGoal()
+	{
+		return m_Creature->ReachedGoal;
+	}
 
 	void Register(sol::state* state, sol::table& parent)
 	{
@@ -83,7 +120,7 @@ namespace TEN::Scripting::Creature
 
 		LuaCreatureInfo::Register(collTable2);
 
-		//auto handler = LuaHandler(state);
-		//handler.MakeReadOnlyTable(collTable, ScriptReserved_MaterialType, MATERIAL_TYPES);
+		auto handler = LuaHandler(state);
+		handler.MakeReadOnlyTable(collTable2, ScriptReserved_MaterialType, CREATURE_MOOD);
 	}
 }

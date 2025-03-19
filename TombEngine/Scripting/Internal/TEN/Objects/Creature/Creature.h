@@ -30,12 +30,13 @@ namespace TEN::Scripting::Creature
 				
         // Getters
 		MoodType					GetMood();
-		std::unique_ptr<Moveable&>	GetTarget();
+		std::optional<Moveable>		GetTarget();
 		Vec3						GetTargetPosition();
 		
 		// Setters
 		void SetTarget(Moveable& moveable);
-		void SetTargetPosition(Vec3 position);
+		void SetTargetPosition(Vec3& position);
+		void ClearTarget();
 
 		// Inquirers
 		bool				IsAlerted();
