@@ -22,6 +22,7 @@
 #include "Game/pickup/pickup_misc_items.h"
 #include "Game/pickup/pickup_weapon.h"
 #include "Game/room.h"
+#include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Math/Math.h"
 #include "Objects/Generic/Object/burning_torch.h"
@@ -158,6 +159,11 @@ void PickedUpObject(GAME_OBJECT_ID objectID, std::optional<int> count)
 		!TryAddMiscItem(Lara, objectID))
 	{
 		// Item isn't any of the above; do nothing.
+	}
+	else
+	{
+		SaveGame::Statistics.Level.Pickups++;
+		SaveGame::Statistics.Game.Pickups++;
 	}
 }
 

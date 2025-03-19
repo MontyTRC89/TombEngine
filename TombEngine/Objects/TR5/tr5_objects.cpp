@@ -57,10 +57,11 @@
 
 // Traps
 #include "Objects/Effects/EmberEmitter.h"
-#include "Objects/Effects/tr5_electricity.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
 #include "Objects/TR5/Trap/LaserBeam.h"
+#include "Objects/TR5/Trap/MovingLaser.h"
 #include "Objects/TR5/Trap/ZipLine.h"
+#include "Objects/Effects/tr5_electricity.h"
 #include "Objects/TR5/Object/tr5_rollingball.h"
 #include "Objects/TR5/Trap/tr5_ventilator.h"
 #include "Objects/TR5/Trap/tr5_romehammer.h"
@@ -962,6 +963,15 @@ static void StartTrap(ObjectInfo *obj)
 		obj->collision = CollideLaserBeam;
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
+	}
+
+	obj = &Objects[ID_MOVING_LASER];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeMovingLaser;
+		obj->control = ControlMovingLaser;
+		obj->collision = CollideMovingLaser;
+		obj->SetHitEffect(true);
 	}
 }
 

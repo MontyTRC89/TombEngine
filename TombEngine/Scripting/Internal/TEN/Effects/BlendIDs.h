@@ -2,26 +2,26 @@
 
 #include "Renderer/RendererEnums.h"
 
-/// Constants for blend mode IDs.
-// @enum Effects.BlendID
-// @pragma nostrip
-
-/// Table of Effects.BlendID constants.
-//
-// - `OPAQUE`
-// - `ALPHA_TEST`
-// - `ADDITIVE`
-// - `NO_DEPTH_TEST`
-// - `SUBTRACTIVE`
-// - `EXCLUDE`
-// - `SCREEN`
-// - `LIGHTEN`
-// - `ALPHA_BLEND`
-//
-// @table Effects.BlendID
-
 namespace TEN::Scripting::Effects
 {
+	/// Constants for blend mode IDs.
+	// @enum Effects.BlendID
+	// @pragma nostrip
+
+	/// Table of Effects.BlendID constants.
+	//
+	// - `OPAQUE`
+	// - `ALPHA_TEST`
+	// - `ADDITIVE`
+	// - `NO_DEPTH_TEST`
+	// - `SUBTRACTIVE`
+	// - `EXCLUDE`
+	// - `SCREEN`
+	// - `LIGHTEN`
+	// - `ALPHA_BLEND`
+	//
+	// @table Effects.BlendID
+
 	static const auto BLEND_IDS = std::unordered_map<std::string, BlendMode>
 	{
 		{ "OPAQUE", BlendMode::Opaque },

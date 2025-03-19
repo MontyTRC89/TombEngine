@@ -377,8 +377,10 @@ void LoadObjects()
 		int objectID = ReadInt32();
 		MoveablesIds.push_back(objectID);
 
-		auto& object = Objects[objectID];
+		if (objectID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
+			throw std::exception(("Unsupported object slot " + std::to_string(objectID) + " is detected in a level. Make sure to delete unsupported objects from wads.").c_str());
 
+		auto& object = Objects[objectID];
 		object.loaded = true;
 		object.nmeshes = ReadInt32();
 		object.meshIndex = ReadInt32();
@@ -564,7 +566,6 @@ void LoadObjects()
 		}
 	}
 
-	TENLog("Initializing objects...", LogLevel::Info);
 	InitializeObjects();
 
 	int staticCount = ReadCount();
