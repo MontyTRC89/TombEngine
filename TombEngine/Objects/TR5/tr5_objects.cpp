@@ -57,15 +57,15 @@
 
 // Traps
 #include "Objects/Effects/EmberEmitter.h"
-#include "Objects/Effects/tr5_electricity.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
 #include "Objects/TR5/Trap/LaserBeam.h"
+#include "Objects/TR5/Trap/MovingLaser.h"
 #include "Objects/TR5/Trap/ZipLine.h"
+#include "Objects/Effects/tr5_electricity.h"
 #include "Objects/TR5/Object/tr5_rollingball.h"
 #include "Objects/TR5/Trap/tr5_ventilator.h"
 #include "Objects/TR5/Trap/tr5_romehammer.h"
 #include "Objects/TR5/Trap/tr5_fallingceiling.h"
-#include "Objects/TR5/Trap/tr5_movinglaser.h"
 #include "Objects/TR5/Trap/tr5_explosion.h"
 #include "Objects/TR5/Trap/tr5_wreckingball.h"
 
