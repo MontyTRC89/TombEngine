@@ -75,7 +75,7 @@ struct MoveableAnimBlendData
 
 struct MoveableAnimData
 {
-	GAME_OBJECT_ID AnimObjectID	 = ID_NO_OBJECT;
+	GAME_OBJECT_ID AnimObjectID	 = GAME_OBJECT_ID::ID_NO_OBJECT;
 	int			   AnimNumber	 = 0;
 	int			   FrameNumber	 = 0;
 	int			   ActiveState	 = 0;
@@ -93,15 +93,17 @@ struct MoveableAnimData
 	MoveableAnimBlendData Blend = {};
 };
 
-struct EntityCallbackData
+struct MoveableModelData
 {
-	std::string OnKilled		 = {};
-	std::string OnHit			 = {};
-	std::string OnObjectCollided = {};
-	std::string OnRoomCollided	 = {};
+	int BaseMesh = 0;
+
+	std::vector<int>		 MeshIndex = {};
+	std::vector<BoneMutator> Mutators = {};
+
+	Vector4 Color = Vector4::Zero;
 };
 
-struct EntityEffectData
+struct MoveableEffectData
 {
 	EffectType Type					= EffectType::None;
 	Vector3	   LightColor			= Vector3::Zero;
@@ -110,14 +112,12 @@ struct EntityEffectData
 	int		   Count				= NO_VALUE;
 };
 
-struct EntityModelData
+struct MoveableCallbackData
 {
-	int BaseMesh = 0;
-
-	std::vector<int>		 MeshIndex = {};
-	std::vector<BoneMutator> Mutators  = {};
-
-	Vector4 Color = Vector4::Zero;
+	std::string OnKilled		 = {};
+	std::string OnHit			 = {};
+	std::string OnObjectCollided = {};
+	std::string OnRoomCollided	 = {};
 };
 
 struct ItemInfo
@@ -133,11 +133,11 @@ struct ItemInfo
 	int NextItem   = 0;
 	int NextActive = 0;
 
-	ItemData		   Data		 = {};
-	MoveableAnimData   Animation = {};
-	EntityCallbackData Callbacks = {};
-	EntityEffectData   Effect	 = {};
-	EntityModelData	   Model	 = {};
+	ItemData			 Data	   = {};
+	MoveableAnimData	 Animation = {};
+	MoveableModelData	 Model	   = {};
+	MoveableEffectData	 Effect	   = {};
+	MoveableCallbackData Callbacks = {};
 
 	Pose	   StartPose  = Pose::Zero;
 	Pose	   Pose		  = Pose::Zero;
@@ -189,7 +189,7 @@ struct ItemInfo
 	void SetMeshSwapFlags(const std::vector<unsigned int>& flags, bool clear = false);
 	void ResetModelToDefault();
 
-	// Anim blend utilities
+	// Animation blending utilities
 
 	void SetAnimBlend(int frameCount, const BezierCurve2D& curve);
 	void DisableAnimBlend();

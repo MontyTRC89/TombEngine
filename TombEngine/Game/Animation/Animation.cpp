@@ -36,7 +36,11 @@ namespace TEN::Animation
 		auto translation = Vector3(FixedMotionCurveX.GetY(alpha), FixedMotionCurveY.GetY(alpha), FixedMotionCurveZ.GetY(alpha));
 
 		// Return fixed motion.
-		return FixedMotionData{ translation, alpha };
+		return FixedMotionData
+		{
+			translation,
+			alpha
+		};
 	}
 
 	RootMotionData AnimData::GetRootMotion(int frameNumber) const
@@ -47,9 +51,10 @@ namespace TEN::Animation
 		if (!hasTranslation && !hasRot)
 			return {};
 
-		// Derive root motion from first two frames if animation is cycled.
+		// Handle frame 0.
 		if (frameNumber == 0)
 		{
+			// Derive root motion from first two frames if animation is cycled.
 			if (Flags & (int)AnimFlags::RootMotionCycle)
 			{
 				if (Frames.size() > 1)
@@ -101,7 +106,11 @@ namespace TEN::Animation
 		}
 
 		// Return root motion.
-		return RootMotionData{ translation, rot };
+		return RootMotionData
+		{
+			translation,
+			rot
+		};
 	}
 
 	RootMotionData AnimData::GetRootMotionCounteraction(int frameNumber) const
@@ -149,7 +158,11 @@ namespace TEN::Animation
 		}
 
 		// Return root motion counteraction.
-		return RootMotionData{ translation, rot };
+		return RootMotionData
+		{
+			translation,
+			rot
+		};
 	}
 
 	bool BoneMutator::IsEmpty() const
