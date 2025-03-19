@@ -1,5 +1,5 @@
 #include "framework.h"
-#include "Objects/TR5/Trap/tr5_movinglaser.h"
+#include "Objects/TR5/Trap/MovingLaser.h"
 
 #include "Game/animation.h"
 #include "Game/collision/collide_item.h"
