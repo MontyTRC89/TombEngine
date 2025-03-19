@@ -706,6 +706,10 @@ std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber,
 			if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
 				continue;
 
+			// Check if static is collidable.
+			if (!(staticObject.flags & StaticMeshFlags::SM_COLLISION))
+				continue;
+
 			// Check if static is solid (if applicable).
 			if (onlySolid && !(staticObject.flags & StaticMeshFlags::SM_SOLID))
 				continue;

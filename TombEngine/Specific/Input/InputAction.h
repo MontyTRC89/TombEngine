@@ -2,7 +2,7 @@
 
 namespace TEN::Input
 {
-	typedef enum class ActionID
+	typedef enum class InputActionID
 	{
 		// General actions
 
@@ -63,33 +63,34 @@ namespace TEN::Input
 	class InputAction
 	{
 	private:
-		// Members
+		// Fields
 
-		ActionID _id			 = In::Forward;
-		float	 _value			 = 0.0f;
-		float	 _prevValue		 = 0.0f;
-		float	 _timeActive	 = 0.0f;
-		float	 _prevTimeActive = 0.0f;
-		float	 _timeInactive	 = 0.0f;
+		InputActionID _id			  = In::Forward;
+		float		  _value		  = 0.0f;
+		float		  _prevValue	  = 0.0f;
+		unsigned int  _timeActive	  = 0;
+		unsigned int  _prevTimeActive = 0;
+		unsigned int  _timeInactive	  = 0;
 
 	public:
 		// Constructors
 
-		InputAction(ActionID actionID);
+		InputAction() = default;
+		InputAction(InputActionID actionID);
 
 		// Getters
 
-		ActionID GetID() const;
-		float	 GetValue() const;
-		float	 GetTimeActive() const;
-		float	 GetTimeInactive() const;
+		InputActionID GetID() const;
+		float		  GetValue() const;
+		unsigned int  GetTimeActive() const;
+		unsigned int  GetTimeInactive() const;
 		
 		// Inquirers
 
 		bool IsClicked() const;
-		bool IsHeld(float delayInSec = 0.0f) const;
-		bool IsPulsed(float delayInSec, float initialDelayInSec = 0.0f) const;
-		bool IsReleased(float maxDelayInSec = INFINITY) const;
+		bool IsHeld(float delaySecs = 0.0f) const;
+		bool IsPulsed(float delaySecs, float initialDelaySecs = 0.0f) const;
+		bool IsReleased(float delaySecsMax = INFINITY) const;
 
 		// Utilities
 
