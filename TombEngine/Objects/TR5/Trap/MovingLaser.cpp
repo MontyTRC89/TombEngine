@@ -12,99 +12,111 @@
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Sound/sound.h"
-#include "Math/Utils.h"
 #include "Specific/level.h"
 
 using namespace TEN::Collision::Sphere;
 
 namespace TEN::Entities::Traps
 {
-    enum MovingLaserFlags
-    {
-        Speed,
-        PauseCounter,
-        Direction,
-        DistanceTravelled,
-        SpeedCalc
-    };
+	constexpr auto MOVING_LASER_DAMAGE			  = 100;
+	constexpr auto MOVING_LASER_VELOCITY_MIN	  = 1.0f;
+	constexpr auto MOVING_LASER_ACCEL			  = 1.0f;
+	constexpr auto MOVING_LASER_PAUSE_FRAME_COUNT = 30;
 
-	constexpr auto MOVING_LASER_DAMAGE = 100;
-    constexpr int PAUSE_FRAMES = 30;
-    constexpr float MAX_SPEED_THRESHOLD = 0.9f;
-    constexpr float MIN_SPEED = 1.0f;
-    constexpr float ACCELERATION = 1.0f;
+	enum class MovingLaserProperty
+	{
+		Velocity,
+		PauseTimer,
+		DirectionSign,
+		DistanceTraveled,
+		VelocityCalc
+	};
 
 	void InitializeMovingLaser(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-        item.ItemFlags[MovingLaserFlags::Direction] = 1;
-        item.ItemFlags[MovingLaserFlags::Speed] = 10;
-        item.Pose.Translate(item.Pose.Orientation, -CLICK(1)); // Offset by one click to make it dangerous at the edges of the block.
+		item.ItemFlags[(int)MovingLaserProperty::DirectionSign] = 1;
+		item.ItemFlags[(int)MovingLaserProperty::Velocity] = 10;
+
+		// Offset by 1/4 block to make it dangerous at sector edges.
+		item.Pose.Translate(item.Pose.Orientation, -BLOCK(0.25f));
 	}
 
-    void ControlMovingLaser(short itemNumber)
-    {
-        auto& item = g_Level.Items[itemNumber];
+	void ControlMovingLaser(short itemNumber)
+	{
+		auto& item = g_Level.Items[itemNumber];
 
-        if (!TriggerActive(&item))
-            return;
+		if (!TriggerActive(&item))
+			return;
 
-        float moveDistance = (BLOCK(1) * item.TriggerFlags) + CLICK(2); // Use OCB to calculate the distance and add 2 clicks.
+		// Calculate distances.
+		float moveDist = BLOCK(item.TriggerFlags) + BLOCK(0.5f);
+		float distPerFrame = (BLOCK(item.ItemFlags[(int)MovingLaserProperty::Velocity]) * 0.25f) / (float)FPS;
 
-        float distancePerFrame = ((float)(CLICK(1)) * item.ItemFlags[MovingLaserFlags::Speed]) / FPS; // Calculate distance per frame
+		item.Animation.ActiveState = 0;
 
-        item.Animation.ActiveState = 0;
-        SpawnDynamicLight(item.Pose.Position.x, item.Pose.Position.y - 64, item.Pose.Position.z, (Random::GenerateInt() % 2) + 8, (Random::GenerateInt() % 4) + 24, Random::GenerateInt() % 4, Random::GenerateInt() % 2);
-        item.MeshBits = -1 - (GetRandomControl() & 0x14); // To make lasers flicker
+		// TODO: Use SpawnDynamicPointLight().
+		SpawnDynamicLight(
+			item.Pose.Position.x, item.Pose.Position.y - 64, item.Pose.Position.z, (Random::GenerateInt() % 2) + 8,
+			(Random::GenerateInt() % 4) + 24, Random::GenerateInt() % 4, Random::GenerateInt() % 2);
+		/*auto lightPos = item.Pose.Position.ToVector3() + Vector3(0.0f, -64, 0.0f);
+		auto lightColor = Color(Random::GenerateFloat(0.1f, 0.2f), Random::GenerateFloat(0.0f, 0.01f), Random::GenerateFloat(Random::GenerateFloat(0.0f, 0.01f)));
+		float lightFalloff = ??
+		SpawnDynamicPointLight(lightPos, lightPos, lightFalloff);*/
 
-        if (item.TriggerFlags == 0)
-        {
-            AnimateItem(&item);
-            return;
-        }
+		// TODO: Demagic.
+		// Used for flicker.
+		item.MeshBits = -1 - (GetRandomControl() & 20);
 
-        if (item.ItemFlags[MovingLaserFlags::PauseCounter] > 0)
-        {
-            item.ItemFlags[MovingLaserFlags::PauseCounter]--;
+		if (item.TriggerFlags == 0)
+		{
+			AnimateItem(&item);
+			return;
+		}
 
-            if (item.ItemFlags[MovingLaserFlags::PauseCounter] == 0)
-            {
-                item.ItemFlags[MovingLaserFlags::Direction] *= -1;
-                item.ItemFlags[MovingLaserFlags::DistanceTravelled] = 0;
-            }
+		if (item.ItemFlags[(int)MovingLaserProperty::PauseTimer] > 0)
+		{
+			item.ItemFlags[(int)MovingLaserProperty::PauseTimer]--;
+			if (item.ItemFlags[(int)MovingLaserProperty::PauseTimer] == 0)
+			{
+				item.ItemFlags[(int)MovingLaserProperty::DirectionSign] *= -1;
+				item.ItemFlags[(int)MovingLaserProperty::DistanceTraveled] = 0;
+			}
 
-            AnimateItem(&item);
-            return;
-        }
+			AnimateItem(&item);
+			return;
+		}
 
-        item.Pose.Translate(item.Pose.Orientation, (item.ItemFlags[MovingLaserFlags::Direction] * item.ItemFlags[MovingLaserFlags::SpeedCalc]));
+		item.Pose.Translate(item.Pose.Orientation, (item.ItemFlags[(int)MovingLaserProperty::DirectionSign] * item.ItemFlags[(int)MovingLaserProperty::VelocityCalc]));
 
-        item.ItemFlags[MovingLaserFlags::DistanceTravelled] += item.ItemFlags[MovingLaserFlags::SpeedCalc];
+		item.ItemFlags[(int)MovingLaserProperty::DistanceTraveled] += item.ItemFlags[(int)MovingLaserProperty::VelocityCalc];
 
-        if (item.ItemFlags[DistanceTravelled] < (moveDistance -BLOCK(0.5f)))
-            item.ItemFlags[SpeedCalc] = std::min(distancePerFrame, item.ItemFlags[MovingLaserFlags::SpeedCalc] + ACCELERATION);
-        else
-            item.ItemFlags[SpeedCalc] = std::max(MIN_SPEED, item.ItemFlags[MovingLaserFlags::SpeedCalc] - ACCELERATION);
+		if (item.ItemFlags[(int)MovingLaserProperty::DistanceTraveled] < (moveDist - BLOCK(0.5f)))
+		{
+			item.ItemFlags[(int)MovingLaserProperty::VelocityCalc] = std::min(distPerFrame, item.ItemFlags[(int)MovingLaserProperty::VelocityCalc] + MOVING_LASER_ACCEL);
+		}
+		else
+		{
+			item.ItemFlags[(int)MovingLaserProperty::VelocityCalc] = std::max(MOVING_LASER_VELOCITY_MIN, item.ItemFlags[(int)MovingLaserProperty::VelocityCalc] - MOVING_LASER_ACCEL);
+		}
 
+		if (item.ItemFlags[(int)MovingLaserProperty::DistanceTraveled] >= moveDist)
+		{
+			item.ItemFlags[(int)MovingLaserProperty::PauseTimer] = MOVING_LASER_PAUSE_FRAME_COUNT;
+		}
 
-        if (item.ItemFlags[MovingLaserFlags::DistanceTravelled] >= moveDistance)
-        {
-            item.ItemFlags[MovingLaserFlags::PauseCounter] = PAUSE_FRAMES;
-        }
+		if (item.ItemFlags[(int)MovingLaserProperty::PauseTimer] == 0)
+		{
+			SoundEffect(SFX_TR5_MOVING_LASER_LOOP, &item.Pose, SoundEnvironment::Always);
+		}
 
-        if (item.ItemFlags[MovingLaserFlags::PauseCounter] == 0)
-        {
-            SoundEffect(SFX_TR5_MOVING_LASER_LOOP, &item.Pose, SoundEnvironment::Always);
-        }
+		// Update room if necessary.
+		int roomNumber = GetPointCollision(item).GetRoomNumber();
+		if (roomNumber != item.RoomNumber)
+			ItemNewRoom(itemNumber, roomNumber);
 
-        // Update room if necessary.
-        short new_room = item.RoomNumber;
-        GetPointCollision(item).GetRoomNumber();
-        if (new_room != item.RoomNumber)
-            ItemNewRoom(itemNumber, new_room);
-
-        AnimateItem(&item);
-    }
+		AnimateItem(&item);
+	}
 
 	void CollideMovingLaser(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
@@ -123,7 +135,7 @@ namespace TEN::Entities::Traps
 			ObjectCollision(itemNumber, playerItem, coll);
 		}
 		
-		// Damage entity.
+		// Damage player.
 		if (TestBoundsCollide(&item, playerItem, coll->Setup.Radius))
 		{
 			DoDamage(playerItem, MOVING_LASER_DAMAGE);
