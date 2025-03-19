@@ -52,7 +52,11 @@ namespace TEN::Scripting::Creature
 	{
 			auto* item = &g_Level.Items[mov.GetIndex()];
 			
+			if (!CreatureActive(mov.GetIndex()))
+				return;
+
 			if (item->IsCreature())
+
 			m_Creature = GetCreatureInfo(item);
 	}
 
