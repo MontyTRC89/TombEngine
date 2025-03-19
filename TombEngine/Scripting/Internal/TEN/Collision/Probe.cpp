@@ -332,8 +332,8 @@ namespace TEN::Scripting::Collision
 	void Probe::Preview()
 	{
 		constexpr auto TARGET_RADIUS = 100.0f;
-		constexpr auto SPHERE_RADIUS = TARGET_RADIUS * 0.6f;
-		constexpr auto COLOR		 = Color(1.0f, 1.0f, 1.0f, 0.4f);
+		constexpr auto SPHERE_RADIUS = TARGET_RADIUS * 0.4f;
+		constexpr auto COLOR		 = Color(1.0f, 1.0f, 0.8f, 0.2f);
 		constexpr auto DEBUG_PAGE	 = RendererDebugPage::CollisionStats;
 
 		auto pos = _pointCollision.GetPosition().ToVector3();
