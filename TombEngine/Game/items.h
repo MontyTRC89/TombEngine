@@ -123,8 +123,8 @@ struct MoveableCallbackData
 struct ItemInfo
 {
 	std::string	   Name			= {};
-	int			   Index		= 0;			// ItemNumber // TODO: Make int.
-	GAME_OBJECT_ID ObjectNumber = ID_NO_OBJECT; // ObjectID
+	int			   Index		= 0;			// ID
+	GAME_OBJECT_ID ObjectNumber = ID_NO_OBJECT; // SlotID
 
 	ItemStatus Status = ITEM_NOT_ACTIVE;
 	bool	   Active = false;
