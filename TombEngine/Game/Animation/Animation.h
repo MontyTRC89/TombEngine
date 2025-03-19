@@ -40,14 +40,15 @@ namespace TEN::Animation
 
 	struct StateDispatchData
 	{
-		int			  StateID			  = 0;
-		int			  FrameNumberLow	  = 0;
-		int			  FrameNumberHigh	  = 0;
-		int			  NextAnimNumber	  = 0;
-		int			  NextFrameNumberLow  = 0;
-		int			  NextFrameNumberHigh = 0;
-		int			  BlendFrameCount	  = 0;
-		BezierCurve2D BlendCurve		  = BezierCurve2D::Zero;
+		int StateID				= 0;
+		int FrameNumberLow		= 0;
+		int FrameNumberHigh		= 0;
+		int NextAnimNumber		= 0;
+		int NextFrameNumberLow  = 0;
+		int NextFrameNumberHigh = 0;
+
+		int			  BlendFrameCount = 0;
+		BezierCurve2D BlendCurve	  = BezierCurve2D::Zero;
 	};
 
 	struct FixedMotionData
@@ -66,12 +67,14 @@ namespace TEN::Animation
 	{
 		using AnimCommandPtr = std::unique_ptr<AnimCommand>;
 
-		int			  StateID			= 0;
-		int			  EndFrameNumber	= 0;
-		int			  NextAnimNumber	= 0;
-		int			  NextFrameNumber   = 0;
-		int			  BlendFrameCount   = 0;
-		BezierCurve2D BlendCurve		= BezierCurve2D::Zero;
+		int StateID			= 0;
+		int EndFrameNumber	= 0;
+		int NextAnimNumber	= 0;
+		int NextFrameNumber = 0;
+
+		int			  BlendFrameCount = 0;
+		BezierCurve2D BlendCurve	  = BezierCurve2D::Zero;
+
 		BezierCurve2D FixedMotionCurveX = BezierCurve2D::Zero;
 		BezierCurve2D FixedMotionCurveY = BezierCurve2D::Zero;
 		BezierCurve2D FixedMotionCurveZ = BezierCurve2D::Zero;
