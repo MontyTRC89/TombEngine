@@ -368,29 +368,31 @@ void LoadObjects()
 	g_Level.Bones.resize(boneCount);
 	ReadBytes(g_Level.Bones.data(), 4 * boneCount);
 
-	int modelCount = ReadCount();
-	TENLog("Model count: " + std::to_string(modelCount), LogLevel::Info);
+	int movSlotCount = ReadCount();
+	TENLog("Moveable slot count: " + std::to_string(movSlotCount), LogLevel::Info);
 
-	// Load moveables.
-	for (int i = 0; i < modelCount; i++)
+	// Load moveable slots.
+	for (int i = 0; i < movSlotCount; i++)
 	{
-		int objectID = ReadInt32();
-		MoveablesIds.push_back(objectID);
+		int movSlotID = ReadInt32();
+		MoveablesIds.push_back(movSlotID);
 
-		if (objectID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
-			throw std::exception(("Unsupported object slot " + std::to_string(objectID) + " is detected in a level. Make sure to delete unsupported objects from wads.").c_str());
+		if (movSlotID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
+			throw std::exception(("Unsupported moveable slot " + std::to_string(movSlotID) + " detected in a level. Make sure to delete unsupported moveable slots from wads.").c_str());
 
-		auto& object = Objects[objectID];
-		object.loaded = true;
-		object.nmeshes = ReadInt32();
-		object.meshIndex = ReadInt32();
-		object.boneIndex = ReadInt32();
+		auto& movSlot = Objects[movSlotID];
+		movSlot.loaded = true;
+		movSlot.nmeshes = ReadInt32();
+		movSlot.meshIndex = ReadInt32();
+		movSlot.boneIndex = ReadInt32();
 
 		// Load animations.
 		int animCount = ReadCount();
-		object.Animations.resize(animCount);
-		for (auto& anim : object.Animations)
+		movSlot.Animations.resize(animCount);
+		for (int j = 0; j < movSlot.Animations.size(); j++)
 		{
+			auto& anim = movSlot.Animations[j];
+
 			anim.StateID = ReadInt32();
 			int interpolation = ReadInt32();
 			anim.EndFrameNumber = ReadInt32();
@@ -563,6 +565,10 @@ void LoadObjects()
 			}
 
 			anim.Flags = ReadInt32();
+
+			// Set root motion cycle flag if animation is cycled.
+			if (anim.NextAnimNumber == j)
+				anim.Flags |= (int)AnimFlags::RootMotionCycle;
 		}
 	}
 

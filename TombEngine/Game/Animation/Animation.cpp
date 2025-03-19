@@ -47,7 +47,7 @@ namespace TEN::Animation
 		if (!hasTranslation && !hasRot)
 			return {};
 
-		// Handle frame 0.
+		// Derive root motion from first two frames if animation is cycled.
 		if (frameNumber == 0)
 		{
 			if (Flags & (int)AnimFlags::RootMotionCycle)
