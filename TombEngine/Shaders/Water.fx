@@ -9,8 +9,8 @@
 #include "./CBWater.hlsli"
 #include "./VertexEffects.hlsli"
 
-#define MAX_REFLECTION_TARGETS      8
-#define BORDERS_BIAS                0.008f
+#define MAX_REFLECTION_TARGETS       8
+#define BORDERS_BIAS                 0.008f
 
 struct WaterPixelShaderInput
 {
@@ -119,6 +119,35 @@ float FresnelSchlick(float3 viewDir)
 }
 #endif
 
+static const float WAVELENGTH = 512.0; 
+static const float WAVE_SPEED = 0.1;
+static const float ATTENUATION = 0.01;
+
+// Funzione aggiornata per onde in propagazione
+float CircularWave(float2 uv, float2 origin, float amplitude, float normTime, float waveSize)
+{
+    // d è la distanza dal punto di origine
+    float d = length(uv - origin);
+
+    // Numero d'onda: k = 2*pi / wavelength
+    float k = (2.0 * 3.14159) / WAVELENGTH;
+
+    // Il fronte dell'onda si sposta nel tempo (l'onda si propaga)
+    float phase = k * (d - WAVE_SPEED * (1.0 - normTime));
+
+    // Decadimento dell'ampiezza: l'ampiezza diminuisce linearmente nel tempo
+    float adjustedAmplitude = amplitude * (1.0 - normTime);
+
+    // Equazione dell'onda con attenuazione
+    float wave = adjustedAmplitude * cos(phase) * exp(-ATTENUATION * d);
+
+    // Applichiamo una maschera per limitare l'effetto all'interno di waveSize
+    wave *= saturate(1.0 - d / waveSize);
+
+    return wave;
+}
+
+
 float4 PSWater(WaterPixelShaderInput input) : SV_Target
 {
     float4 output;
@@ -151,6 +180,25 @@ float4 PSWater(WaterPixelShaderInput input) : SV_Target
     
     refractionUV.xy += totalDistortion;
     refractionUV.xy += totalDistortion;
+    
+#ifdef NEW_RIPPLES
+    float wavesDistortion = 0.0;
+
+    for (int i = 0; i < RipplesCount; i++)
+    {
+        float2 origin = RipplesPosSize[i].xz;
+        float amplitude = 256.0f;
+        float normTime = RipplesParameters[i].y;
+
+        float waveSize = 1024.0;
+
+        wavesDistortion += CircularWave(input.WorldPosition.xz, origin, amplitude, normTime, waveSize);
+    }
+    
+    // Distorsione delle UV in base alle onde
+    refractionUV.xy += float2(wavesDistortion * RIPPLE_ATTENUATION, wavesDistortion * RIPPLE_ATTENUATION);
+    reflectionUV.xy += float2(wavesDistortion * RIPPLE_ATTENUATION, wavesDistortion * RIPPLE_ATTENUATION);
+ #endif
     
     // Reconstruct world position for avoiding sampling wrong refraction color
     float3 worldPosition = Unproject(refractionUV.xy);
@@ -420,3 +468,29 @@ float4 PSBlurWaterReflections(WaterReflectionsPixelShaderInput input) : SV_Targe
 
     return float4(color / weightSum, 1.0);
 }
+
+/*
+[numthreads(64, 1, 1)]
+void CSWaves(uint id : SV_DispatchThreadID)
+{
+    if (id >= MAX_WAVES)
+        return;
+
+    WavesParticle particle = WavesParticlesBuffer[id];
+
+    // Se la particella è "morta", sostituiamola con una nuova se c'è un oggetto in movimento
+    if (particle.timeToLive <= 0.0f)
+    {
+        particle.position = newParticlePosition.xz;
+        particle.amplitude = newParticleAmplitude;
+        particle.timeToLive = 5.0f; // Le onde durano 5 secondi
+    }
+    else
+    {
+        // Altrimenti, facciamo decadere l'onda
+        particle.timeToLive -= deltaTime;
+        particle.amplitude *= 0.98; // Smorzamento
+    }
+
+    WavesParticlesBuffer[id] = particle;
+}*/

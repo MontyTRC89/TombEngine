@@ -55,6 +55,7 @@
 #include "Renderer/Graphics/Texture2DArray.h"
 #include "Renderer/Graphics/VertexBuffer.h"
 #include "Renderer/Graphics/UAVRenderTarget2D.h"
+#include "Renderer/Graphics/UAVBuffer.h"
 #include "Renderer/Graphics/Vertices/PostProcessVertex.h"
 #include "Renderer/Graphics/RenderTarget2DArray.h"
 #include "Renderer/ShaderManager/ShaderManager.h"
@@ -71,6 +72,10 @@
 #include "Renderer/Structures/RendererObject.h"
 #include "Renderer/Structures/RendererStar.h"
 #include "Structures/RendererShader.h"
+
+#ifdef NEW_RIPPLES
+#include "Renderer/Structures/RendererRipple.h"
+#endif
 
 enum GAME_OBJECT_ID : short;
 enum class SphereSpaceType;
@@ -90,6 +95,14 @@ namespace TEN::Renderer
 	using namespace DirectX::SimpleMath;
 
 	using TexturePair = std::tuple<Texture2D, Texture2D>;
+
+	struct WavesParticle {
+		XMFLOAT2 position;  // Posizione (x, z) nel mondo
+		float amplitude;    // Intensità dell'onda
+		float timeToLive;   // Quanto tempo rimane attiva
+	};
+
+#define MAX_WAVES 1024
 
 	class Renderer
 	{

@@ -55,6 +55,10 @@ namespace TEN::Renderer
 		TransparentObjectsToDraw.clear();
 		Mirrors.clear();
 		WaterPlanesToDraw.clear();
+		
+#ifdef NEW_RIPPLES
+		WaterRipplesToDraw.clear();
+#endif
 	}
 
 	RenderViewCamera::RenderViewCamera(CAMERA_INFO* cam, float roll, float fov, float n, float f, int w, int h)

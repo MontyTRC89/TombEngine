@@ -35,8 +35,9 @@ cbuffer CBCamera : register(b0)
 	float FarPlane;
 	//--
     int RefreshRate;
-	int NumFogBulbs;
-    float2 UnusedCamera;
+    int NumFogBulbs;
+    float InterpolatedFrame;
+    float UnusedCamera;
 	//--
 	ShaderFogBulb FogBulbs[MAX_FOG_BULBS];
 };

@@ -693,6 +693,20 @@ namespace TEN::Renderer
 			if (ripple.Life <= 0.0f)
 				continue;
 
+#ifdef NEW_RIPPLES
+			Vector3 newPos = Vector3::Lerp(ripple.PrevPosition, ripple.Position, GetInterpolationFactor());
+
+			RendererRipple waterRipple;
+			waterRipple.Position = Vector2(newPos.x, newPos.z);
+			waterRipple.Size = ripple.Size + 32;
+			waterRipple.Opacity = ripple.Color.w;
+			waterRipple.Time = ripple.Life / ripple.LifeMax;
+			
+			view.WaterRipplesToDraw.push_back(waterRipple);
+
+			continue;
+#endif
+
 			float opacity = ripple.Color.w * ((ripple.Flags & (int)RippleFlags::LowOpacity) ? 0.5f : 1.0f);
 			auto color = ripple.Color;
 			color.w = opacity;

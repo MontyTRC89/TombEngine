@@ -35,5 +35,13 @@ namespace TEN::Renderer::ConstantBuffers
 		//--
 		Vector3 AbsorptionCoefficient;
 		float WaterFogDensity;
+#ifdef NEW_RIPPLES
+		//--
+		Vector4 RipplesPositionSize[MAX_WAVES];
+		//--
+		Vector4 RipplesParameters[MAX_WAVES];
+		//--
+		int RipplesCount;
+#endif
 	};
 }

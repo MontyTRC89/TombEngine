@@ -1,6 +1,8 @@
 #ifndef CBWATERSHADER
 #define CBWATERSHADER
 
+#define MAX_WAVES 1024
+
 cbuffer WaterConstantBuffer : register(b2)
 {
     float4x4 WaterReflectionViews[8];
@@ -29,6 +31,12 @@ cbuffer WaterConstantBuffer : register(b2)
     //--
     float3 AbsorptionCoefficient;
     float WaterFogDensity;
+    //--
+    float4 RipplesPosSize[MAX_WAVES];
+    //--
+    float4 RipplesParameters[MAX_WAVES];
+    //--
+    int RipplesCount;
 };
 
 #endif

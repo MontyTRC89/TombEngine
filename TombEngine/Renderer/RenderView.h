@@ -18,6 +18,10 @@
 #include "Renderer/Structures/RendererMirror.h"
 #include "Renderer/Structures/RendererWaterPlaneBucket.h"
 
+#ifdef NEW_RIPPLES
+#include "Renderer/Structures/RendererRipple.h"
+#endif
+
 namespace TEN::Renderer 
 {
 	using namespace TEN::Renderer::ConstantBuffers;
@@ -57,6 +61,10 @@ namespace TEN::Renderer
 		std::vector<RendererLensFlare>							LensFlaresToDraw		 = {};
 		std::vector<RendererMirror>								Mirrors					 = {};
 		std::vector<RendererWaterPlane>							WaterPlanesToDraw		 = {};
+		
+#ifdef NEW_RIPPLES
+		std::vector<RendererRipple>								WaterRipplesToDraw		 = {};
+#endif
 
 		RenderView(CAMERA_INFO* cam, float roll, float fov, float nearPlane, float farPlane, int w, int h);
 		RenderView(const Vector3& pos, const Vector3& dir, const Vector3& up, int w, int h, int room, float nearPlane, float farPlane, float fov);

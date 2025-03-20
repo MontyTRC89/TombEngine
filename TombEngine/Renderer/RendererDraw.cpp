@@ -1828,11 +1828,12 @@ namespace TEN::Renderer
 		CCameraMatrixBuffer cameraConstantBuffer;
 		view.FillConstantBuffer(cameraConstantBuffer);
 		cameraConstantBuffer.Frame = GlobalCounter;
+		cameraConstantBuffer.InterpolatedFrame = (float)cameraConstantBuffer.Frame + _interpolationFactor;
 		cameraConstantBuffer.RefreshRate = _refreshRate;
 		cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
 		cameraConstantBuffer.DualParaboloidView = Matrix::CreateLookAt(LaraItem->Pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3() + Vector3(0, 0, 1024), -Vector3::UnitY);
 		cameraConstantBuffer.InverseView = cameraConstantBuffer.View.Invert();
-		  
+		
 		if (level.GetFogMaxDistance() > 0)
 		{
 			auto fogColor = level.GetFogColor();
@@ -4379,7 +4380,7 @@ namespace TEN::Renderer
 		ResetScissor();
 
 		_doingFullscreenPass = false;*/
-	}
+	}      
 
 	void Renderer::DrawWaterPlanes(RenderView& view)
 	{ 
@@ -4416,7 +4417,8 @@ namespace TEN::Renderer
 		BindTexture(TextureRegister::WaterDistortionMap, &_waterDistortionMap, SamplerStateRegister::AnisotropicWrap);
 		BindTexture(TextureRegister::WaterNormalMap, &_wave1NormalMap, SamplerStateRegister::AnisotropicWrap);
 		BindTexture(TextureRegister::WaterFoamMap, &_waterFoamMap, SamplerStateRegister::AnisotropicWrap);
-		   
+
+#ifdef NEW_RIPPLES
 		_stWater.WaveStrength = 0.005f;
 		_stWater.Shininess = 20.0f;
 		_stWater.KSpecular = 0.3f;
@@ -4425,7 +4427,22 @@ namespace TEN::Renderer
 		_stWater.WaterFogColor = Vector3(0.0f, 0.2f, 0.4f);
 		_stWater.WaterDepthScale = 0.001f;
 		_stWater.WaterFogDensity = 0.002f;
-		 
+		       
+		_stWater.RipplesCount = (int)view.WaterRipplesToDraw.size();
+ 		for (int i = 0; i < view.WaterRipplesToDraw.size(); i++)
+		{
+			_stWater.RipplesPositionSize[i].x = view.WaterRipplesToDraw[i].Position.x;
+			_stWater.RipplesPositionSize[i].y = 0;
+			_stWater.RipplesPositionSize[i].z = view.WaterRipplesToDraw[i].Position.y;
+			_stWater.RipplesPositionSize[i].w = view.WaterRipplesToDraw[i].Size;
+
+			_stWater.RipplesParameters[i].x = view.WaterRipplesToDraw[i].Opacity;
+			_stWater.RipplesParameters[i].y = view.WaterRipplesToDraw[i].Time;
+			_stWater.RipplesParameters[i].z = 0;
+			_stWater.RipplesParameters[i].w = 0;
+		}
+#endif
+
 		for (int i = 0; i < view.WaterPlanesToDraw.size(); i++)
 		{
 			_stWater.WaterLevels[i].x = view.WaterPlanesToDraw[i].WaterLevel;

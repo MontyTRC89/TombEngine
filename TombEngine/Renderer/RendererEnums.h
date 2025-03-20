@@ -69,6 +69,7 @@ constexpr auto ROOM_AMBIENT_MAP_SIZE = 64;
 constexpr auto MAX_ROOM_AMBIENT_MAPS = 10;
 
 constexpr auto WATER_REFLECTIONS_DOWNSCALE_FACTOR = 4;
+constexpr auto MAX_WAVES = 1024;
 
 enum class LightType
 {
@@ -183,6 +184,7 @@ enum class TextureRegister
 	EnvironmentMapFront = 7,
 	EnvironmentMapBack = 8,
 	SSAO = 9,
+	WavesBuffer = 10,
 	WaterFoamMap = 11,
 	WaterNormalMap = 12,
 	WaterRefractionTexture = 13,

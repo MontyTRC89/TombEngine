@@ -23,6 +23,7 @@ namespace TEN::Effects::Ripple
 		float Size		   = 0.0f;
 		float FadeDuration = 0.0f;
 		int	  Flags		   = 0;
+		float Amplitude    = 256.0f;
 
 		Vector3 PrevPosition = Vector3::Zero;
 		Vector4 PrevColor	 = Vector4::Zero;
