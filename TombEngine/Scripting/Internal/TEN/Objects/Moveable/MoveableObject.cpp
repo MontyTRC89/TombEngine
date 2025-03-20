@@ -1278,14 +1278,43 @@ bool Moveable::TestPosition(Vec3 bound1, Vec3 bound2, Rotation rot1, Rotation ro
 
 	Vector3i pos = offset.ToVector3i();
 
-	if (TestLaraPosition(bounds, _moveable, LaraItem))
+	bool isUnderwater = (Lara.Control.WaterStatus == WaterStatus::Underwater);
+
+	// HACK: Check player state and anim number.
+	bool isPlayerAvailable = isUnderwater ?
+		(LaraItem->Animation.ActiveState == LS_UNDERWATER_IDLE && LaraItem->Animation.AnimNumber == LA_UNDERWATER_IDLE) :
+		(LaraItem->Animation.ActiveState == LS_IDLE && LaraItem->Animation.AnimNumber == LA_STAND_IDLE);
+
+	if ((Lara.Control.IsMoving && Lara.Context.InteractedItem == _moveableID) ||
+		(IsHeld(In::Action) &&
+			(Lara.Control.Look.OpticRange == 0 && isPlayerAvailable)))
 	{
-		TENLog("TestPosition Success", LogLevel::Warning);
-		if (MoveLaraPosition(pos, _moveable, LaraItem))
+		if (TestLaraPosition(bounds, _moveable, LaraItem))
 		{
-			TENLog("Test Success", LogLevel::Warning);
-			return true;
+			if (!Lara.Control.IsMoving)
+			{
+				Lara.Context.InteractedItem = _moveableID;
+			}
+
+			if (Lara.Context.InteractedItem != _moveableID)
+				return false;
+
+			if (MoveLaraPosition(pos, _moveable, LaraItem))
+			{
+				Lara.Control.IsMoving = false;
+				ResetPlayerFlex(LaraItem);
+				Lara.Control.HandStatus = HandStatus::Busy;
+				return true;
+			}
+
 		}
+
+		if (Lara.Control.IsMoving && Lara.Context.InteractedItem == _moveableID)
+		{
+			Lara.Control.IsMoving = false;
+			Lara.Control.HandStatus = HandStatus::Free;
+		}
+
 	}
 
 	return false;
