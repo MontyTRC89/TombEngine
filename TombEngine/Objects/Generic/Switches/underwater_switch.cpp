@@ -15,6 +15,7 @@ using namespace TEN::Input;
 
 namespace TEN::Entities::Switches
 { 
+	//TODO Cleanup code for above ground. Lara stops sometimes when CTRL is not pressed.
 	const auto GroundSwitchPos = Vector3i(0, 0, 128);
 	const auto UnderwaterSwitchPos = Vector3i(0, -560, 108);
 	const ObjectCollisionBounds UnderwaterSwitchBounds =
