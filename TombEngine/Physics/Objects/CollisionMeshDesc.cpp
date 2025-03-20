@@ -58,7 +58,7 @@ namespace TEN::Physics
 
 	void CollisionMeshDesc::Optimize()
 	{
-		return;
+		//return;
 
 		// 1) Get coplanar triangle map.
 		auto coplanarTriMap = GetCoplanarTriangleMap();
@@ -72,7 +72,7 @@ namespace TEN::Physics
 
 			// Triangulate polygons.
 			for (const auto& polygon : polygons)
-				TriangulatePolygon(optimizedVertexIds, polygon, plane.Normal());
+				TriangulateMonotonePolygon(optimizedVertexIds, polygon, plane.Normal());
 		}
 
 		auto optimizedVertices = std::vector<Vector3>{};
@@ -157,6 +157,7 @@ namespace TEN::Physics
 				rawLoops.push_back(std::move(rawLoop));
 		}
 
+		// TODO
 		// 3) Collect monotone and irregular loops.
 		auto monotoneLoops = std::vector<std::vector<int>>{};
 		auto irregularLoops = std::vector<std::vector<int>>{};
@@ -169,6 +170,7 @@ namespace TEN::Physics
 			// 3.3) Convert holed polys into irregular loops and collect into `irregularLoops`.
 		}
 
+		// TODO
 		// 4) Sweep irregular loops and collect monotone loops.
 		for (const auto& irregularLoop : irregularLoops)
 		{
@@ -335,7 +337,7 @@ namespace TEN::Physics
 		}
 	}
 
-	void CollisionMeshDesc::TriangulatePolygon(std::vector<int>& optimizedVertexIds, const std::vector<int>& polygon, const Vector3& normal) const
+	void CollisionMeshDesc::TriangulateMonotonePolygon(std::vector<int>& optimizedVertexIds, const std::vector<int>& polygon, const Vector3& normal) const
 	{
 		// Invalid polygon; return early.
 		if (polygon.size() < VERTEX_COUNT)

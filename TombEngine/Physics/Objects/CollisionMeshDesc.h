@@ -49,7 +49,7 @@ namespace TEN::Physics
 		VertexAdjacencyMap			  GetVertexAdjacencyMap(const std::vector<TriangleVertexIds>& tris, const EdgeCountMap& edgeCountMap) const;
 		std::vector<EdgeVertexIdPair> GetBoundaryEdges(const EdgeCountMap& edgeCountMap) const;
 		
+		void TriangulateMonotonePolygon(std::vector<int>& optimizedVertexIds, const std::vector<int>& polygon, const Vector3& normal) const;
 		void SimplifyPolygon(std::vector<int>& polygon) const;
-		void TriangulatePolygon(std::vector<int>& optimizedVertexIds, const std::vector<int>& polygon, const Vector3& normal) const;
 	};
 }
