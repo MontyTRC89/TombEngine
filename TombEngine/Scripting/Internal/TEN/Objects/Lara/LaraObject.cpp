@@ -474,8 +474,8 @@ void LaraObject::AlignToMoveable(Moveable& mov, TypeOrNil<int> animNumber, TypeO
 // @tparam Moveable mov The moveable object to align player with..
 // @tparam[opt] Vec3 bound1 The lower boundary for alignment, defining the minimum allowed position. __default: Vec3(-256,-512,0)__
 // @tparam[opt] Vec3 bound2 The upper boundary for alignment, defining the maximum allowed position. __default: Vec3(256,0,512)__
-// @tparam[opt] Rotation rot1 The minimum rotation bounds for alignment. __default: Rotation(-10,-30,-10)__
-// @tparam[opt] Rotation rot2 The maximum rotation bounds for alignment. __default: Rotation(10, 30, 10)__
+// @tparam[opt] Rotation rot1 The minimum rotation bounds for test. __default: Rotation(-10,-30,-10)__
+// @tparam[opt] Rotation rot2 The maximum rotation bounds for test. __default: Rotation(10, 30, 10)__
 bool LaraObject::TestPosition(Moveable& mov, TypeOrNil<Vec3> bound1, TypeOrNil<Vec3> bound2, TypeOrNil<Rotation> rot1, TypeOrNil<Rotation> rot2) const
 {
 
