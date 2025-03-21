@@ -1,7 +1,6 @@
 #include "framework.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 
-#include "Game/collision/collide_item.h"
 #include "Game/collision/floordata.h"
 #include "Game/control/lot.h"
 #include "Game/effects/debris.h"
