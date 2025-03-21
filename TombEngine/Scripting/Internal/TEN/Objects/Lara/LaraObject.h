@@ -31,7 +31,6 @@ public:
 	void UndrawWeapon();
 	void ThrowAwayTorch();
 	bool TorchIsLit() const;
-	void AlignToMoveable(Moveable& mov, int animation, Vec3 bound1, Vec3 bound2, Rotation rot1, Rotation rot2, Vec3 offset, TypeOrNil<In> actionID) const;
-	bool TestPosition(Moveable& mov, Vec3 bound1, Vec3 bound2, Rotation rot1, Rotation rot2) const;
+	void AlignToMoveable(Moveable& mov, TypeOrNil<int> animation, TypeOrNil <Vec3> bound1, TypeOrNil <Vec3> bound2, TypeOrNil <Rotation> rot1, TypeOrNil <Rotation> rot2, TypeOrNil <Vec3> offset, TypeOrNil<In> actionID) const;
 	using Moveable::Moveable;
 };
