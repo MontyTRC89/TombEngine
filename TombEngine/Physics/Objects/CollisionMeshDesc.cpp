@@ -58,7 +58,7 @@ namespace TEN::Physics
 
 	void CollisionMeshDesc::Optimize()
 	{
-		return;
+		//return;
 
 		// 1) Get coplanar triangle map.
 		auto coplanarTriMap = GetCoplanarTriangleMap();
@@ -158,45 +158,30 @@ namespace TEN::Physics
 		}
 
 		// TODO
-		// 3) Collect monotone and irregular loops.
-		auto monotoneLoops = std::vector<std::vector<int>>{};
-		auto irregularLoops = std::vector<std::vector<int>>{};
-		for (auto& rawLoop : rawLoops)
-		{
-			// 3.1) Move monotone loops as they are into `monotoneLoops`.
-			
-			// 3.2) Move irregular loops as they are into `irregularLoops`.
-
-			// 3.3) Convert holed polys into irregular loops and collect into `irregularLoops`.
-		}
-
-		// TODO
-		// 4) Sweep irregular loops and collect monotone loops.
-		for (const auto& irregularLoop : irregularLoops)
-		{
-
-		}
-
-		// 5) Simplify monotone loops and collect valid polygons.
+		// 3) Collect polygons.
 		auto polygons = std::vector<std::vector<int>>{};
-		for (auto& monotoneLoop : monotoneLoops)
-		{
-			SimplifyPolygon(monotoneLoop);
-			if (monotoneLoop.size() >= VERTEX_COUNT)
-				polygons.push_back(std::move(monotoneLoop));
-		}
-
-		//=====================================================================================
-		// TEMP: Use raw loops for now.
 		for (auto& rawLoop : rawLoops)
 		{
+			// 3.1) Collect monotone and irregular polygons first. They are processed more easily; they are simply determined
+			// by checking if a given boundary loop has no edges adjacent to a separate boundary loop.
+
+			// 3.2) Collect holed polygons. These require bridging boundary edges of loops which have an adjacency in the adjacency map.
+			// The method I want to use is as follows:
+			// - Start with any raw loop.
+			// - Check if it is connected to another loop.
+			// - If yes, find the closest two vertices between these loops.
+			// - Then, create a new loop from these by connecting them at these two verts. Some reordering would have to happen.
+			// - Continue this process until all related loops are connected into a single one, producing an irregular polygon.
+			// - Insert this into the `polygons` vector.
+			
+			// TEMP: Use raw loops for now.
 			SimplifyPolygon(rawLoop);
 			if (rawLoop.size() >= VERTEX_COUNT)
 				polygons.push_back(std::move(rawLoop));
 		}
-		//=====================================================================================
 
-		// 6) Return optimal polygons.
+
+		// 4) Return optimal polygons.
 		return polygons;
 	}
 
