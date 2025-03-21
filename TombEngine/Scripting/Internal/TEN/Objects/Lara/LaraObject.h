@@ -2,6 +2,7 @@
 
 #include "Game/Lara/lara_struct.h"
 #include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
+#include "Scripting/Internal/TEN/Input/ActionIDs.h"
 
 // TODO: Organise.
 class LaraObject : public Moveable
@@ -30,5 +31,7 @@ public:
 	void UndrawWeapon();
 	void ThrowAwayTorch();
 	bool TorchIsLit() const;
+	void AlignToMoveable(Moveable& mov, int animation, Vec3 bound1, Vec3 bound2, Rotation rot1, Rotation rot2, Vec3 offset, TypeOrNil<In> actionID) const;
+	bool TestPosition(Moveable& mov, Vec3 bound1, Vec3 bound2, Rotation rot1, Rotation rot2) const;
 	using Moveable::Moveable;
 };

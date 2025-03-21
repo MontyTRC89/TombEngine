@@ -189,8 +189,7 @@ void Moveable::Register(sol::state& state, sol::table& parent)
 		ScriptReserved_UnswapMesh, &Moveable::UnswapMesh,
 		ScriptReserved_Destroy, &Moveable::Destroy,
 		ScriptReserved_AttachObjCamera, &Moveable::AttachObjCamera,
-		ScriptReserved_AnimFromObject, &Moveable::AnimFromObject,
-		"TestPosition", & Moveable::TestPosition);
+		ScriptReserved_AnimFromObject, &Moveable::AnimFromObject);
 }
 
 Moveable::Moveable(int movID, bool alreadyInitialized)
@@ -1258,57 +1257,4 @@ void Moveable::AnimFromObject(GAME_OBJECT_ID objectID, int animNumber, int state
 	_moveable->Animation.ActiveState = stateID;
 	_moveable->Animation.FrameNumber = GetAnimData(*_moveable).frameBase;
 	AnimateItem(_moveable);
-}
-
-void Moveable::TestPosition(Vec3 bound1, Vec3 bound2, Rotation rot1, Rotation rot2, Vec3 offset, int animation) const
-{
-
-	ObjectCollisionBounds bounds =
-	{
-	GameBoundingBox(
-			bound1.x, bound2.x,
-			bound1.y, bound2.y,
-			bound1.z, bound2.z
-		),
-		std::pair(
-			EulerAngles(ANGLE(rot1.x), ANGLE(rot1.y), ANGLE(rot1.z)),
-			EulerAngles(ANGLE(rot2.x), ANGLE(rot2.y), ANGLE(rot2.z))
-		)
-	};
-
-	Vector3i pos = offset.ToVector3i();
-
-	bool isUnderwater = (Lara.Control.WaterStatus == WaterStatus::Underwater);
-
-	bool isActionActive = Lara.Control.IsMoving && Lara.Context.InteractedItem == _moveableID;
-	bool isActionReady = IsHeld(In::Action);
-	bool isPlayerAvailable = Lara.Control.HandStatus == HandStatus::Free;
-
-	bool isPlayerIdle = (!isUnderwater && LaraItem->Animation.ActiveState == LS_IDLE && LaraItem->Animation.AnimNumber == LA_STAND_IDLE) ||
-		(isUnderwater && LaraItem->Animation.ActiveState == LS_UNDERWATER_IDLE && LaraItem->Animation.AnimNumber == LA_UNDERWATER_IDLE);
-
-	if (isActionActive || (isActionReady && isPlayerAvailable && isPlayerIdle))
-	{
-		TENLog("Test1", LogLevel::Warning);
-		if (TestLaraPosition(bounds, _moveable, LaraItem))
-		{
-			TENLog("Test2", LogLevel::Warning);
-
-			if (MoveLaraPosition(pos, _moveable, LaraItem))
-			{
-				TENLog("Test3", LogLevel::Warning);
-				ResetPlayerFlex(LaraItem);
-				SetAnimation(LaraItem, animation);
-				LaraItem->Animation.FrameNumber = GetAnimData(LaraItem).frameBase;
-				Lara.Control.IsMoving = false;
-				Lara.Control.HandStatus = HandStatus::Busy;
-			}
-			else
-			{
-				Lara.Context.InteractedItem = _moveableID;
-			}
-
-		}
-
-	}
 }

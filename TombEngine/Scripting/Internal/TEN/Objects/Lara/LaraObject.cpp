@@ -2,6 +2,7 @@
 #include "LaraObject.h"
 
 #include "Game/camera.h"
+#include "Game/collision/collide_item.h"
 #include "Game/effects/item_fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
@@ -9,8 +10,16 @@
 #include "Game/Lara/lara_struct.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/Input/ActionIDs.h"
 #include "Scripting/Internal/TEN/Objects/Lara/AmmoTypes.h"
+#include "Scripting/Internal/TEN/Types/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
+#include "Specific/Input/Input.h"
+#include "Specific/Input/InputAction.h"
 #include "Specific/level.h"
+
+using namespace TEN::Input;
 
 /// Class for extra player-only functions.
 // Do not try to create an object of this type. Use the built-in *Lara* variable instead.
@@ -388,6 +397,91 @@ bool LaraObject::TorchIsLit() const
 	return lara->Torch.IsLit;
 }
 
+void LaraObject::AlignToMoveable(Moveable& mov, int animation, Vec3 bound1, Vec3 bound2, Rotation rot1, Rotation rot2, Vec3 offset, TypeOrNil<In> actionID) const
+{
+
+	ObjectCollisionBounds bounds =
+	{
+	GameBoundingBox(
+			bound1.x, bound2.x,
+			bound1.y, bound2.y,
+			bound1.z, bound2.z
+		),
+		std::pair(
+			EulerAngles(ANGLE(rot1.x), ANGLE(rot1.y), ANGLE(rot1.z)),
+			EulerAngles(ANGLE(rot2.x), ANGLE(rot2.y), ANGLE(rot2.z))
+		)
+	};
+
+	Vector3i pos = offset.ToVector3i();
+
+	auto* player = GetLaraInfo(_moveable);
+	auto itemIndex = mov.GetIndex();
+	auto* item = &g_Level.Items[mov.GetIndex()];
+
+	auto key = (InputActionID)ValueOr<In>(actionID, In::Action);
+
+	bool isUnderwater = (player->Control.WaterStatus == WaterStatus::Underwater);
+
+	bool isActionActive = player->Control.IsMoving && player->Context.InteractedItem == itemIndex;
+	bool isActionReady = IsHeld(key);
+	bool isPlayerAvailable = player->Control.HandStatus == HandStatus::Free;
+
+	bool isPlayerIdle = (!isUnderwater && _moveable->Animation.ActiveState == LS_IDLE && _moveable->Animation.AnimNumber == LA_STAND_IDLE) ||
+		(isUnderwater && _moveable->Animation.ActiveState == LS_UNDERWATER_IDLE && _moveable->Animation.AnimNumber == LA_UNDERWATER_IDLE);
+
+	if (isActionActive || (isActionReady && isPlayerAvailable && isPlayerIdle))
+	{
+		TENLog("Test1", LogLevel::Warning);
+		if (TestLaraPosition(bounds, item, _moveable))
+		{
+			TENLog("Test2", LogLevel::Warning);
+
+			if (MoveLaraPosition(pos, item, _moveable))
+			{
+				TENLog("Test3", LogLevel::Warning);
+				ResetPlayerFlex(_moveable);
+				SetAnimation(_moveable, animation);
+				_moveable->Animation.FrameNumber = GetAnimData(_moveable).frameBase;
+				player->Control.IsMoving = false;
+				player->Control.HandStatus = HandStatus::Busy;
+			}
+			else
+			{
+				player->Context.InteractedItem = itemIndex;
+			}
+
+		}
+
+	}
+}
+
+bool LaraObject::TestPosition(Moveable& mov, Vec3 bound1, Vec3 bound2, Rotation rot1, Rotation rot2) const
+{
+
+	ObjectCollisionBounds bounds =
+	{
+	GameBoundingBox(
+			bound1.x, bound2.x,
+			bound1.y, bound2.y,
+			bound1.z, bound2.z
+		),
+		std::pair(
+			EulerAngles(ANGLE(rot1.x), ANGLE(rot1.y), ANGLE(rot1.z)),
+			EulerAngles(ANGLE(rot2.x), ANGLE(rot2.y), ANGLE(rot2.z))
+		)
+	};
+
+	auto* player = GetLaraInfo(_moveable);
+	auto itemIndex = mov.GetIndex();
+	auto* item = &g_Level.Items[mov.GetIndex()];
+
+	if (TestLaraPosition(bounds, item, _moveable))
+		return true;
+
+	return false;
+}
+
 void LaraObject::Register(sol::table& parent)
 {
 	parent.new_usertype<LaraObject>(LUA_CLASS_NAME,
@@ -412,6 +506,8 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetTarget, &LaraObject::GetTarget,
 			ScriptReserved_GetPlayerInteractedMoveable, &LaraObject::GetPlayerInteractedMoveable,
 			ScriptReserved_TorchIsLit, &LaraObject::TorchIsLit,
+			ScriptReserved_AlignToMoveable, &LaraObject::AlignToMoveable,
+			ScriptReserved_TestPosition, &LaraObject::TestPosition,
 			sol::base_classes, sol::bases<Moveable>()
 		);
 }
