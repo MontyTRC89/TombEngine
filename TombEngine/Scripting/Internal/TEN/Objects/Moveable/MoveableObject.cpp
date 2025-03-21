@@ -1260,7 +1260,7 @@ void Moveable::AnimFromObject(GAME_OBJECT_ID objectID, int animNumber, int state
 	AnimateItem(_moveable);
 }
 
-bool Moveable::TestPosition(Vec3 bound1, Vec3 bound2, Rotation rot1, Rotation rot2, Vec3 offset) const
+void Moveable::TestPosition(Vec3 bound1, Vec3 bound2, Rotation rot1, Rotation rot2, Vec3 offset, int animation) const
 {
 
 	ObjectCollisionBounds bounds =
@@ -1280,42 +1280,35 @@ bool Moveable::TestPosition(Vec3 bound1, Vec3 bound2, Rotation rot1, Rotation ro
 
 	bool isUnderwater = (Lara.Control.WaterStatus == WaterStatus::Underwater);
 
-	// HACK: Check player state and anim number.
-	bool isPlayerAvailable = isUnderwater ?
-		(LaraItem->Animation.ActiveState == LS_UNDERWATER_IDLE && LaraItem->Animation.AnimNumber == LA_UNDERWATER_IDLE) :
-		(LaraItem->Animation.ActiveState == LS_IDLE && LaraItem->Animation.AnimNumber == LA_STAND_IDLE);
+	bool isActionActive = Lara.Control.IsMoving && Lara.Context.InteractedItem == _moveableID;
+	bool isActionReady = IsHeld(In::Action);
+	bool isPlayerAvailable = Lara.Control.HandStatus == HandStatus::Free;
 
-	if ((Lara.Control.IsMoving && Lara.Context.InteractedItem == _moveableID) ||
-		(IsHeld(In::Action) &&
-			(Lara.Control.Look.OpticRange == 0 && isPlayerAvailable)))
+	bool isPlayerIdle = (!isUnderwater && LaraItem->Animation.ActiveState == LS_IDLE && LaraItem->Animation.AnimNumber == LA_STAND_IDLE) ||
+		(isUnderwater && LaraItem->Animation.ActiveState == LS_UNDERWATER_IDLE && LaraItem->Animation.AnimNumber == LA_UNDERWATER_IDLE);
+
+	if (isActionActive || (isActionReady && isPlayerAvailable && isPlayerIdle))
 	{
+		TENLog("Test1", LogLevel::Warning);
 		if (TestLaraPosition(bounds, _moveable, LaraItem))
 		{
-			if (!Lara.Control.IsMoving)
+			TENLog("Test2", LogLevel::Warning);
+
+			if (MoveLaraPosition(pos, _moveable, LaraItem))
+			{
+				TENLog("Test3", LogLevel::Warning);
+				ResetPlayerFlex(LaraItem);
+				SetAnimation(LaraItem, animation);
+				LaraItem->Animation.FrameNumber = GetAnimData(LaraItem).frameBase;
+				Lara.Control.IsMoving = false;
+				Lara.Control.HandStatus = HandStatus::Busy;
+			}
+			else
 			{
 				Lara.Context.InteractedItem = _moveableID;
 			}
 
-			if (Lara.Context.InteractedItem != _moveableID)
-				return false;
-
-			if (MoveLaraPosition(pos, _moveable, LaraItem))
-			{
-				Lara.Control.IsMoving = false;
-				ResetPlayerFlex(LaraItem);
-				Lara.Control.HandStatus = HandStatus::Busy;
-				return true;
-			}
-
-		}
-
-		if (Lara.Control.IsMoving && Lara.Context.InteractedItem == _moveableID)
-		{
-			Lara.Control.IsMoving = false;
-			Lara.Control.HandStatus = HandStatus::Free;
 		}
 
 	}
-
-	return false;
 }

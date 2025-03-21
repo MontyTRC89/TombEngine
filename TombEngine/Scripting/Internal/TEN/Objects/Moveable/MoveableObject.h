@@ -119,7 +119,7 @@ public:
 	void UnswapMesh(int meshId);
 	void AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId);
 	void AnimFromObject(GAME_OBJECT_ID object, int animNumber, int stateID);
-	bool TestPosition(Vec3 bound1, Vec3 bound2, Rotation rot1, Rotation rot2, Vec3 offset) const;
+	void TestPosition(Vec3 bound1, Vec3 bound2, Rotation rot1, Rotation rot2, Vec3 offset, int animation) const;
 	void EnableItem(sol::optional<float> timer);
 	void DisableItem();
 	void MakeInvisible();
