@@ -469,6 +469,45 @@ void LaraObject::AlignToMoveable(Moveable& mov, TypeOrNil<int> animNumber, TypeO
 	}
 }
 
+/// Tests player to a moveable object with bounds and rotation parameters.
+// @function LaraObject:TestPosition
+// @tparam Moveable mov The moveable object to align player with..
+// @tparam[opt] Vec3 bound1 The lower boundary for alignment, defining the minimum allowed position. __default: Vec3(-256,-512,0)__
+// @tparam[opt] Vec3 bound2 The upper boundary for alignment, defining the maximum allowed position. __default: Vec3(256,0,512)__
+// @tparam[opt] Rotation rot1 The minimum rotation bounds for alignment. __default: Rotation(-10,-30,-10)__
+// @tparam[opt] Rotation rot2 The maximum rotation bounds for alignment. __default: Rotation(10, 30, 10)__
+bool LaraObject::TestPosition(Moveable& mov, TypeOrNil<Vec3> bound1, TypeOrNil<Vec3> bound2, TypeOrNil<Rotation> rot1, TypeOrNil<Rotation> rot2) const
+{
+
+	auto b1 = ValueOr<Vec3>(bound1, Vec3(-BLOCK(1 / 4), -BLOCK(1 / 2), 0));
+	auto b2 = ValueOr<Vec3>(bound2, Vec3(BLOCK(1 / 4), 0, BLOCK(1 / 2)));
+	auto r1 = ValueOr<Rotation>(rot1, Rotation(-10, -30, -10));
+	auto r2 = ValueOr<Rotation>(rot2, Rotation(10, 30, 10));
+
+	ObjectCollisionBounds bounds =
+	{
+	GameBoundingBox(
+			b1.x, b2.x,
+			b1.y, b2.y,
+			b1.z, b2.z
+		),
+		std::pair(
+			EulerAngles(ANGLE(r1.x), ANGLE(r1.y), ANGLE(r1.z)),
+			EulerAngles(ANGLE(r2.x), ANGLE(r2.y), ANGLE(r2.z))
+		)
+	};
+
+	auto* player = GetLaraInfo(_moveable);
+	auto itemIndex = mov.GetIndex();
+	auto* item = &g_Level.Items[mov.GetIndex()];
+
+	if (TestLaraPosition(bounds, item, _moveable))
+		return true;
+
+	return false;
+}
+
+
 void LaraObject::Register(sol::table& parent)
 {
 	parent.new_usertype<LaraObject>(LUA_CLASS_NAME,
@@ -494,6 +533,7 @@ void LaraObject::Register(sol::table& parent)
 			ScriptReserved_GetPlayerInteractedMoveable, &LaraObject::GetPlayerInteractedMoveable,
 			ScriptReserved_TorchIsLit, &LaraObject::TorchIsLit,
 			ScriptReserved_AlignToMoveable, &LaraObject::AlignToMoveable,
+			ScriptReserved_TestPosition, &LaraObject::TestPosition,
 			sol::base_classes, sol::bases<Moveable>()
 		);
 }
