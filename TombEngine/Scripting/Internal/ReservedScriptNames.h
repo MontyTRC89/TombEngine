@@ -365,7 +365,6 @@ static constexpr char ScriptReserved_ThrowAwayTorch[]				= "ThrowAwayTorch";
 static constexpr char ScriptReserved_SetWeaponType[]				= "SetWeaponType";
 static constexpr char ScriptReserved_TorchIsLit[]					= "TorchIsLit";
 static constexpr char ScriptReserved_AlignToMoveable[]				= "AlignToMoveable";
-static constexpr char ScriptReserved_TestPosition[]					= "TestPosition";
 static constexpr char ScriptReserved_PrintLog[]						= "PrintLog";
 static constexpr char ScriptReserved_PickMoveable[]					= "PickMoveableByDisplayPosition";
 static constexpr char ScriptReserved_PickStatic[]					= "PickStaticByDisplayPosition";
