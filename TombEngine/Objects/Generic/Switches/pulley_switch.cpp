@@ -29,6 +29,22 @@ namespace TEN::Entities::Switches
 	};
 	const auto PulleyPos = Vector3i(0, 0, -148);
 
+	const ObjectCollisionBounds UnderwaterPulleyBounds =
+	{
+		GameBoundingBox(
+			-BLOCK(0.5f), BLOCK(0.5f),
+			-BLOCK(2.0f), 0,
+			-BLOCK(0.5f), BLOCK(0.5f)
+		),
+		std::pair(
+			EulerAngles(ANGLE(-80.0f), ANGLE(-80.0f), ANGLE(-80.0f)),
+			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f))
+		)
+	};
+
+	//-306.05f is the hardcoded distance in the animation.
+	const auto UnderwaterPulleyPos = Vector3i(0, -BLOCK(1.0f), -BLOCK(1.0f / 4));
+
 	void InitializePulleySwitch(short itemNumber)
 	{
 		auto* switchItem = &g_Level.Items[itemNumber];
@@ -48,16 +64,26 @@ namespace TEN::Entities::Switches
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];
 
-		if (IsHeld(In::Action) &&
-			laraItem->Animation.ActiveState == LS_IDLE &&
-			laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
-			laraItem->Animation.IsAirborne == false &&
-			laraInfo->Control.HandStatus == HandStatus::Free ||
-			laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber)
+		bool isUnderwater = (laraInfo->Control.WaterStatus == WaterStatus::Underwater);
+
+		const auto& bounds = isUnderwater ? UnderwaterPulleyBounds : PulleyBounds;
+		const auto& position = isUnderwater ? UnderwaterPulleyPos : PulleyPos;
+
+		bool isActionActive = laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber;
+		bool isActionReady = IsHeld(In::Action);
+		bool isPlayerAvailable = laraInfo->Control.HandStatus == HandStatus::Free;
+
+		bool isPlayerIdle = (!isUnderwater && laraItem->Animation.ActiveState == LS_IDLE && laraItem->Animation.AnimNumber == LA_STAND_IDLE && laraItem->Animation.IsAirborne == false) ||
+			(isUnderwater && laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE && laraItem->Animation.AnimNumber == LA_UNDERWATER_IDLE);
+
+		if (isActionActive || (isActionReady && isPlayerAvailable && isPlayerIdle))
 		{
 			short oldYrot = switchItem->Pose.Orientation.y;
+			
+			if (!isUnderwater)
 			switchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
-			if (TestLaraPosition(PulleyBounds, switchItem, laraItem))
+
+			if (TestLaraPosition(bounds, switchItem, laraItem))
 			{
 				if (switchItem->ItemFlags[1])
 				{
@@ -69,15 +95,17 @@ namespace TEN::Entities::Switches
 						SayNo();
 					}
 				}
-				else if (MoveLaraPosition(PulleyPos, switchItem, laraItem))
+				else if (MoveLaraPosition(position, switchItem, laraItem))
 				{
-					laraItem->Animation.AnimNumber = LA_PULLEY_GRAB;
+					laraItem->Animation.AnimNumber = isUnderwater ? LA_UNDERWATER_PULLEY_GRAB : LA_PULLEY_GRAB;
 					laraItem->Animation.ActiveState = LS_PULLEY;
 					laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
 
 					AddActiveItem(itemNumber);
 
+					if (!isUnderwater)
 					switchItem->Pose.Orientation.y = oldYrot;
+
 					switchItem->Status = ITEM_ACTIVE;
 
 					laraInfo->Control.IsMoving = false;
@@ -88,6 +116,7 @@ namespace TEN::Entities::Switches
 				else
 					laraInfo->Context.InteractedItem = itemNumber;
 				
+				if (!isUnderwater)
 				switchItem->Pose.Orientation.y = oldYrot;
 			}
 			else
@@ -98,6 +127,7 @@ namespace TEN::Entities::Switches
 					laraInfo->Control.HandStatus = HandStatus::Free;
 				}
 
+				if (!isUnderwater)
 				switchItem->Pose.Orientation.y = oldYrot;
 			}
 		}

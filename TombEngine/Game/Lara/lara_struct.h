@@ -860,6 +860,9 @@ enum LaraAnim
 	LA_UNDERWATER_WALL_KICK = 599,			// Lara kick wall underwater.
 	LA_WALL_PUSH = 600,						// Lara Push Wall.
 	LA_WALL_LEVER_SWITCH = 601,				// Use underwater level above ground
+	LA_UNDERWATER_PULLEY_GRAB = 602,		// Grab underwater pulley
+	LA_UNDERWATER_PULLEY_PULL = 603,		// Pull underwater pulley		
+	LA_UNDERWATER_PULLEY_UNGRAB = 604,		// Release underwater pulley
 
 	NUM_LARA_ANIMS
 
