@@ -58,7 +58,7 @@ namespace TEN::Physics
 
 	void CollisionMeshDesc::Optimize()
 	{
-		//return;
+		return;
 
 		// 1) Get coplanar triangle map.
 		auto coplanarTriMap = GetCoplanarTriangleMap();
@@ -72,7 +72,7 @@ namespace TEN::Physics
 
 			// Triangulate polygons.
 			for (const auto& polygon : polygons)
-				TriangulateMonotonePolygon(optimizedVertexIds, polygon, plane.Normal());
+				TriangulatePolygon(optimizedVertexIds, polygon, plane.Normal());
 		}
 
 		auto optimizedVertices = std::vector<Vector3>{};
@@ -99,8 +99,8 @@ namespace TEN::Physics
 	{
 		// 1) Get key mesh collections.
 		auto edgeCountMap = GetEdgeCountMap(tris);
-		auto vertexAdjacencyMap = GetVertexAdjacencyMap(tris, edgeCountMap); // TODO: Not used yet.
 		auto boundaryEdges = GetBoundaryEdges(edgeCountMap);
+		auto vertexAdjacencyMap = GetVertexAdjacencyMap(tris, edgeCountMap, boundaryEdges); // TODO: Not used yet.
 
 		// 2) Collect raw loops.
 		auto rawLoops = std::vector<std::vector<int>>{};
@@ -261,10 +261,106 @@ namespace TEN::Physics
 		return edgeCountMap;
 	}
 
-	CollisionMeshDesc::VertexAdjacencyMap CollisionMeshDesc::GetVertexAdjacencyMap(const std::vector<TriangleVertexIds>& tris, const EdgeCountMap& edgeCountMap) const
+	struct EdgeHash
 	{
-		// Run through triangles.
+		template <typename T>
+		size_t operator ()(const std::pair<T, T>& edge) const
+		{
+			// Combine the hashes of the two integers in the pair
+			size_t h1 = std::hash<T>{}(edge.first);
+			size_t h2 = std::hash<T>{}(edge.second);
+			return h1 ^ (h2 << 1); // Combine hashes using bitwise operations
+		}
+	};
+
+	CollisionMeshDesc::VertexAdjacencyMap CollisionMeshDesc::GetVertexAdjacencyMap(const std::vector<TriangleVertexIds>& tris,
+																				   const EdgeCountMap& edgeCountMap,
+																				   const std::vector<EdgeVertexIdPair>& boundaryEdges) const
+	{
+		// Process each boundary edge and group them into connected loops.
+		auto processedEdges = std::unordered_set<EdgeVertexIdPair, EdgeHash>{};
+		auto boundaryLoops = std::vector<std::vector<EdgeVertexIdPair>>{};
+		for (const auto& edge : boundaryEdges)
+		{
+			if (processedEdges.find(edge) != processedEdges.end())
+				continue;
+
+			// Find where to insert edge based on connectivity to existing boundary loops.
+			bool isConnectedToExistingLoop = false;
+			for (auto& loop : boundaryLoops)
+			{
+				// Check if either vertex of this edge is already in loop.
+				for (const auto& existingEdge : loop)
+				{
+					if (existingEdge.first == edge.first || existingEdge.second == edge.second)
+					{
+						// Add edge to current loop and mark as processed.
+						loop.push_back(edge);
+						processedEdges.insert(edge);
+						processedEdges.insert({ edge.second, edge.first });
+						isConnectedToExistingLoop = true;
+						break;
+					}
+				}
+
+				if (isConnectedToExistingLoop)
+					break;
+			}
+
+			// If not connected to any existing loop, start new loop.
+			if (!isConnectedToExistingLoop)
+			{
+				boundaryLoops.push_back({ edge });
+				processedEdges.insert(edge);
+				processedEdges.insert({ edge.second, edge.first });
+			}
+		}
+
+		// Run through boundary loops and connect vertices belonging to different loops.
 		auto vertexAdjacencyMap = VertexAdjacencyMap{};
+		for (const auto& loop : boundaryLoops)
+		{
+			for (int i = 0; i < loop.size(); i++)
+			{
+				// Get vertices for current boundary edge.
+				auto& edge = loop[i];
+				int vertexId0 = edge.first;
+				int vertexId1 = edge.second;
+
+				// Track adjacency between vertices of boundary edges in different loops.
+				for (const auto& otherLoop : boundaryLoops)
+				{
+					// Don't connect within the same loop
+					if (&otherLoop == &loop)
+						continue;
+
+					for (const auto& otherEdge : otherLoop)
+					{
+						int otherVertexId0 = otherEdge.first;
+						int otherVertexId1 = otherEdge.second;
+
+						// Check if this edge is connected to another loop, add to adjacency.
+						if (vertexId0 == otherVertexId0 || vertexId0 == otherVertexId1)
+						{
+							vertexAdjacencyMap[vertexId0].insert(vertexId1);
+							vertexAdjacencyMap[vertexId1].insert(vertexId0);
+						}
+
+						if (vertexId1 == otherVertexId0 || vertexId1 == otherVertexId1)
+						{
+							vertexAdjacencyMap[vertexId0].insert(vertexId1);
+							vertexAdjacencyMap[vertexId1].insert(vertexId0);
+						}
+					}
+				}
+			}
+		}
+
+		return vertexAdjacencyMap;
+
+		// Old version.
+		// Run through triangles.
+		/*auto vertexAdjacencyMap = VertexAdjacencyMap{};
 		for (const auto& tri : tris)
 		{
 			// Run through vertices.
@@ -280,7 +376,7 @@ namespace TEN::Physics
 			}
 		}
 
-		return vertexAdjacencyMap;
+		return vertexAdjacencyMap;*/
 	}
 
 	std::vector<CollisionMeshDesc::EdgeVertexIdPair> CollisionMeshDesc::GetBoundaryEdges(const EdgeCountMap& edgeCountMap) const
@@ -337,13 +433,13 @@ namespace TEN::Physics
 		}
 	}
 
-	void CollisionMeshDesc::TriangulateMonotonePolygon(std::vector<int>& optimizedVertexIds, const std::vector<int>& polygon, const Vector3& normal) const
+	void CollisionMeshDesc::TriangulatePolygon(std::vector<int>& optimizedVertexIds, const std::vector<int>& polygon, const Vector3& normal) const
 	{
 		// Invalid polygon; return early.
 		if (polygon.size() < VERTEX_COUNT)
 			return;
 
-		// Triangulate monotone polygon using ear clipping method.
+		// Triangulate monotone or irregular polygon using ear clipping method.
 		auto vertexIds = polygon;
 		int i = 0;
 		while (vertexIds.size() > 2)
@@ -367,22 +463,36 @@ namespace TEN::Physics
 			auto edge0 = vertex1 - vertex0;
 			auto edge1 = vertex2 - vertex1;
 
-			// Project edges onto plane by removing component along normal.
-			auto projEdge0 = edge0 - (normal * (edge0.Dot(normal) / normal.LengthSquared()));
-			auto projEdge1 = edge1 - (normal * (edge1.Dot(normal) / normal.LengthSquared()));
+			// Calculate cross product of edges.
+			auto edgeCross = edge0.Cross(edge1);
 
-			// Calculate cross product of projected edges.
-			auto edgeCross = projEdge0.Cross(projEdge1);
+			/*TENLog("edge0: " + std::to_string(edge0.x) + ", " + std::to_string(edge0.y) + ", " + std::to_string(edge0.z));
+			TENLog("edge1: " + std::to_string(edge1.x) + ", " + std::to_string(edge1.y) + ", " + std::to_string(edge1.z));
+			TENLog("edgeCross: " + std::to_string(edgeCross.x) + ", " + std::to_string(edgeCross.y) + ", " + std::to_string(edgeCross.z));
+			TENLog("edgeCrossDotNormal: " + std::to_string(edgeCross.Dot(normal)));
+			TENLog("Normal: " + std::to_string(normal.x) + ", " + std::to_string(normal.y) + ", " + std::to_string(normal.z));
+			TENLog("NormalLength: " + std::to_string(normal.Length()));*/
 
-			// Collect optimized vertex IDs.
-			optimizedVertexIds.push_back(vertexId0);
-			optimizedVertexIds.push_back(vertexId1);
-			optimizedVertexIds.push_back(vertexId2);
+			// TODO: Correct this.
+			// Angle between edges is convex (< 180 degrees).
+			if (edgeCross.Dot(normal) >= 0.0f)
+			{
+				// Collect optimized vertex IDs.
+				optimizedVertexIds.push_back(vertexId0);
+				optimizedVertexIds.push_back(vertexId1);
+				optimizedVertexIds.push_back(vertexId2);
 
-			// Remove vertex 1.
-			vertexIds.erase(vertexIds.begin() + ((i + 1) % vertexIds.size()));
-			if (i == vertexIds.size())
-				i--;
+				// Remove vertex 1.
+				vertexIds.erase(vertexIds.begin() + ((i + 1) % vertexIds.size()));
+				if (i == vertexIds.size())
+					i--;
+			}
+			// Angle between edges is reflex (>= 180 degrees).
+			else
+			{
+				// Skip current vertex.
+				i = (i + 1) % vertexIds.size();
+			}
 		}
 	}
 }
