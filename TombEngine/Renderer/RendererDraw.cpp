@@ -2571,6 +2571,12 @@ namespace TEN::Renderer
 								if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
 									continue;
 
+								if (_staticTextures.size() <= bucket.Texture)
+								{
+									TENLog("Attempted to set incorrect static mesh texture atlas", LogLevel::Warning);
+									continue;
+								}
+
 								BindTexture(TextureRegister::ColorMap,
 									&std::get<0>(_staticTextures[bucket.Texture]),
 									SamplerStateRegister::AnisotropicClamp);
