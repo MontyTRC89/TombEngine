@@ -68,33 +68,51 @@ namespace TEN::Entities::Switches
 
 		const auto& position = isUnderwater ? UnderwaterSwitchPos : GroundSwitchPos;
 
+		bool isActionActive = player->Control.IsMoving && player->Context.InteractedItem == itemNumber;
 		bool isActionReady = IsHeld(In::Action) && !IsHeld(In::Jump);
 		bool isPlayerAvailable = player->Control.HandStatus == HandStatus::Free && switchItem->Status == ITEM_NOT_ACTIVE;
 
 		bool isPlayerIdle = (!isUnderwater && laraItem->Animation.ActiveState == LS_IDLE && laraItem->Animation.AnimNumber == LA_STAND_IDLE) ||
 			(isUnderwater && laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE && laraItem->Animation.AnimNumber == LA_UNDERWATER_IDLE);
 
-		if (isActionReady && isPlayerAvailable && isPlayerIdle)
+		if (isActionActive || (isActionReady && isPlayerAvailable && isPlayerIdle))
 		{
 			if (TestLaraPosition(UnderwaterSwitchBounds, switchItem, laraItem))
 			{
-				if (switchItem->Animation.ActiveState == SWITCH_ON ||
-					switchItem->Animation.ActiveState == SWITCH_OFF)
-				{
-					if (MoveLaraPosition(position, switchItem, laraItem))
+				if (MoveLaraPosition(position, switchItem, laraItem))
+				{	
+					if (switchItem->Animation.ActiveState == SWITCH_OFF)
 					{
-						isUnderwater ? SetAnimation(laraItem, LA_WATERLEVER_PULL) : SetAnimation(laraItem, LA_WALL_LEVER_SWITCH);
-						laraItem->Animation.Velocity.y = 0;
-						laraItem->Animation.TargetState = isUnderwater ? LS_UNDERWATER_IDLE : LS_IDLE;
-						player->Control.HandStatus = HandStatus::Busy;
-						switchItem->Animation.TargetState = switchItem->Animation.ActiveState != SWITCH_ON;
-						switchItem->Status = ITEM_ACTIVE;
-
-						AddActiveItem(itemNumber);
-						AnimateItem(switchItem);
+						SetAnimation(laraItem, isUnderwater ? LA_WATERLEVER_PULL : LA_WALL_LEVER_SWITCH);
+						switchItem->Animation.TargetState = SWITCH_ON;
 					}
+					else
+					{
+						SetAnimation(laraItem, isUnderwater ? LA_WATERLEVER_PULL : LA_WALL_LEVER_SWITCH);
+						switchItem->Animation.TargetState = SWITCH_OFF;
+					}
+
+					ResetPlayerFlex(laraItem);
+					laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+					laraItem->Animation.Velocity.y = 0;
+					laraItem->Animation.TargetState = isUnderwater ? LS_UNDERWATER_IDLE : LS_IDLE;
+					player->Control.IsMoving = false;
+					player->Control.HandStatus = HandStatus::Busy;
+
+					AddActiveItem(itemNumber);
+					switchItem->Status = ITEM_ACTIVE;
+					AnimateItem(switchItem);
 				}
+				else
+					player->Context.InteractedItem = itemNumber;
 			}
+			else if (player->Control.IsMoving && player->Context.InteractedItem == itemNumber)
+			{
+				player->Control.IsMoving = false;
+				player->Control.HandStatus = HandStatus::Free;
+			}
+
+			return;	
 		}
 	}
 
