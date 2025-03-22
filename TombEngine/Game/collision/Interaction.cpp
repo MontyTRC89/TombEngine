@@ -140,7 +140,7 @@ namespace TEN::Collision::Interaction
 
 		// Set interactor parameters.
 		interactor.Animation.Velocity = Vector3::Zero;
-		interactor.OffsetBlend.SetLogarithmic(absPosOffset, absOrientOffset, OFFSET_BLEND_ALPHA);
+		interactor.OffsetBlend.SetSmooth(absPosOffset, absOrientOffset, OFFSET_BLEND_ALPHA);
 
 		// Set player parameters.
 		if (interactor.IsLara())
@@ -168,7 +168,7 @@ namespace TEN::Collision::Interaction
 				player.Control.WaterStatus != WaterStatus::Wade)
 			{
 				SetLatchInteraction(interactor, interactable, basis, routine);
-				TENLog("SetWalkInteraction(): player not grounded. Setting latch interaction instead.", LogLevel::Warning);
+				TENLog("SetWalkInteraction(): Player not grounded. Setting latch interaction instead.", LogLevel::Warning);
 				return;
 			}
 
@@ -182,7 +182,7 @@ namespace TEN::Collision::Interaction
 
 		// FAILSAFE.
 		SetLatchInteraction(interactor, interactable, basis, routine);
-		TENLog("SetWalkInteraction(): non-player passed as interactor. Setting latch interaction instead.", LogLevel::Warning);
+		TENLog("SetWalkInteraction(): Non-player passed as interactor. Setting latch interaction instead.", LogLevel::Warning);
 	}
 
 	void SetInteraction(ItemInfo& interactor, ItemInfo& interactable, const InteractionBasis& basis, const InteractionRoutine& routine, InteractionType type)

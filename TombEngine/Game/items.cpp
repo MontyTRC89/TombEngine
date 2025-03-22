@@ -44,18 +44,18 @@ void OffsetBlendData::SetLinear(const Vector3& posOffset, const EulerAngles& ori
 {
 	Mode = OffsetBlendMode::Linear;
 	IsActive = true;
-	DelayTime = std::round(delayInSec / DELTA_TIME);
+	TimeDelay = (int)std::round(delayInSec / (float)FPS);
 	PosOffset = posOffset / vel;
 	OrientOffset = orientOffset / turnRate;
 }
 
-void OffsetBlendData::SetLogarithmic(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha, float delayInSec)
+void OffsetBlendData::SetSmooth(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha, float delayInSec)
 {
 	alpha = std::clamp(alpha, 0.0f, 1.0f);
 
-	Mode = OffsetBlendMode::Logarithmic;
+	Mode = OffsetBlendMode::Smooth;
 	IsActive = true;
-	DelayTime = std::round(delayInSec / DELTA_TIME);
+	TimeDelay = (int)std::round(delayInSec / (float)FPS);
 	PosOffset = posOffset;
 	OrientOffset = orientOffset;
 	Alpha = alpha;
@@ -69,8 +69,8 @@ void OffsetBlendData::Clear()
 void OffsetBlendData::DrawDebug() const
 {
 	g_Renderer.PrintDebugMessage("IsActive: %d", IsActive);
-	g_Renderer.PrintDebugMessage("TimeAcive: %.3f", TimeActive);
-	g_Renderer.PrintDebugMessage("DelayTime: %.3f", DelayTime);
+	g_Renderer.PrintDebugMessage("TimeAcive: %d", TimeActive);
+	g_Renderer.PrintDebugMessage("DelayTime: %d", TimeDelay);
 	g_Renderer.PrintDebugMessage("PosOffset: %.3f, %.3f, %.3f", PosOffset.x, PosOffset.y, PosOffset.z);
 	g_Renderer.PrintDebugMessage("OrientOffset: %.3f, %.3f, %.3f", TO_DEGREES(OrientOffset.x), TO_DEGREES(OrientOffset.y), TO_DEGREES(OrientOffset.z));
 	g_Renderer.PrintDebugMessage("Alpha: %.3f", Alpha);
@@ -82,7 +82,7 @@ void ItemInfo::HandleOffsetBlend()
 
 	if (IsLara())
 	{
-		g_Renderer.PrintDebugMessage("Interacted item number: %d", GetLaraInfo(*this).Context.InteractedItem);
+		g_Renderer.PrintDebugMessage("Interacted moveable ID: %d", GetLaraInfo(*this).Context.InteractedItem);
 		OffsetBlend.DrawDebug();
 	}
 
@@ -90,18 +90,18 @@ void ItemInfo::HandleOffsetBlend()
 	if (!OffsetBlend.IsActive)
 		return;
 
-	// Update delay.
-	if (OffsetBlend.DelayTime > 0.0f)
+	// Update time delay.
+	if (OffsetBlend.TimeDelay > 0)
 	{
-		OffsetBlend.DelayTime -= 1.0f;// DELTA_TIME;
-		if (OffsetBlend.DelayTime < 0.0f)
-			OffsetBlend.DelayTime = 0.0f;
+		OffsetBlend.TimeDelay--;
+		if (OffsetBlend.TimeDelay < 0)
+			OffsetBlend.TimeDelay = 0;
 
 		return;
 	}
 
 	// Update time active.
-	OffsetBlend.TimeActive += 1.0f;// DELTA_TIME;
+	OffsetBlend.TimeActive++;
 
 	// Handle offset blend.
 	switch (OffsetBlend.Mode)
@@ -112,7 +112,7 @@ void ItemInfo::HandleOffsetBlend()
 
 		break;
 
-	case OffsetBlendMode::Logarithmic:
+	case OffsetBlendMode::Smooth:
 	{
 		// Calculate offset steps.
 		auto posOffsetStep = Vector3::Lerp(Vector3::Zero, OffsetBlend.PosOffset, OffsetBlend.Alpha);
@@ -133,13 +133,12 @@ void ItemInfo::HandleOffsetBlend()
 		break;
 	}
 
-	// Offset blend complete; apply remainig values and clear data.
+	// Offset blending complete; apply remaining offset and clear.
 	if ((OffsetBlend.PosOffset.Length() <= EPSILON && EulerAngles::Compare(OffsetBlend.OrientOffset, EulerAngles::Identity)) ||
-		OffsetBlend.TimeActive >= (int)round(TIME_ACTIVE_MAX * FPS))
+		OffsetBlend.TimeActive >= (int)round(TIME_ACTIVE_MAX * (float)FPS))
 	{
 		Pose.Position += OffsetBlend.PosOffset;
 		Pose.Orientation += OffsetBlend.OrientOffset;
-
 		OffsetBlend.Clear();
 	}
 }

@@ -60,23 +60,22 @@ enum AIObjectType
 enum class OffsetBlendMode
 {
 	Linear,
-	Logarithmic
+	Smooth
 };
 
 struct OffsetBlendData
 {
-	OffsetBlendMode Mode = OffsetBlendMode::Linear;
-
-	bool  IsActive	 = false;
-	float TimeActive = 0.0f;
-	float DelayTime	 = 0.0f;
+	OffsetBlendMode Mode	   = OffsetBlendMode::Linear;
+	bool			IsActive   = false;
+	int				TimeActive = 0; // Time in game frames.
+	int				TimeDelay  = 0; // Time in game frames.
 
 	Vector3		PosOffset	 = Vector3::Zero;
 	EulerAngles OrientOffset = EulerAngles::Identity;
 	float		Alpha		 = 0.0f;
 
 	void SetLinear(const Vector3& posOffset, const EulerAngles& orientOffset, float vel, short turnRate, float delayInSec = 0.0f);
-	void SetLogarithmic(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha, float delayInSec = 0.0f);
+	void SetSmooth(const Vector3& posOffset, const EulerAngles& orientOffset, float alpha, float delayInSec = 0.0f);
 	void Clear();
 
 	void DrawDebug() const;
@@ -177,9 +176,9 @@ struct ItemInfo
 	short		  AfterDeath  = 0;
 	short		  CarriedItem = 0;
 
-	// OCB utilities
-
 	void HandleOffsetBlend();
+
+	// OCB utilities
 
 	bool TestOcb(short ocbFlags) const;
 	void RemoveOcb(short ocbFlags);
