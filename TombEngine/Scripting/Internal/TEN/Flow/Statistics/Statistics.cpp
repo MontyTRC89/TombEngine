@@ -18,7 +18,7 @@ namespace TEN::Scripting
 		parent.new_usertype<Statistics>(
 			ScriptReserved_Statistics, sol::constructors<Statistics()>(),
 			sol::call_constructor, sol::constructors<Statistics()>(),
-			sol::meta_function::new_index, newindex_error_maker(Statistics, ScriptReserved_Statistics),
+			sol::meta_function::new_index, NewIndexErrorMaker(Statistics, ScriptReserved_Statistics),
 
 			/*** Ammo hits.
 			@tfield int ammoHits amount of successful enemy hits.
@@ -31,9 +31,9 @@ namespace TEN::Scripting
 			"ammoUsed", &Statistics::AmmoUsed,
 
 			/*** Distance traveled.
-			@tfield int traveledDistance amount of traveled distance in world units. One meter is 420 world units.
+			@tfield int distanceTraveled amount of traveled distance in world units. One meter is 420 world units.
 			*/
-			"traveledDistance", &Statistics::Distance,
+			"distanceTraveled", &Statistics::Distance,
 
 			/*** Health packs used.
 			@tfield int healthPacksUsed amount of used medipacks.
@@ -49,6 +49,11 @@ namespace TEN::Scripting
 			@tfield int kills amount of killed enemies.
 			*/
 			"kills", &Statistics::Kills,
+
+			/*** Pickups.
+			@tfield int pickups amount of picked up items.
+			*/
+			"pickups", &Statistics::Pickups,
 
 			/*** Secrets.
 			@tfield int secrets amount of found secrets.

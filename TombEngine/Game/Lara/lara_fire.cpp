@@ -572,9 +572,9 @@ void HandleWeapon(ItemInfo& laraItem)
 					player.Control.HandStatus = HandStatus::WeaponUndraw;
 				}
 			}
-			else if (player.Inventory.TotalFlares)
+			else if (player.Inventory.TotalFlares && !player.Control.Look.IsUsingBinoculars)
 			{
-				if (player.Inventory.TotalFlares != -1)
+				if (player.Inventory.TotalFlares != NO_VALUE)
 					player.Inventory.TotalFlares--;
 
 				player.Control.Weapon.RequestGunType = LaraWeaponType::Flare;
@@ -648,7 +648,13 @@ void HandleWeapon(ItemInfo& laraItem)
 		laraItem.Animation.ActiveState == LS_CRAWL_IDLE &&
 		laraItem.Animation.AnimNumber == LA_CRAWL_IDLE)
 	{
-		player.Control.Weapon.RequestGunType = LaraWeaponType::Flare;
+			if (player.Inventory.TotalFlares)
+			{
+				if (player.Inventory.TotalFlares != NO_VALUE)
+					player.Inventory.TotalFlares--;
+
+				player.Control.Weapon.RequestGunType = LaraWeaponType::Flare;
+			}
 	}
 
 	switch (player.Control.HandStatus)

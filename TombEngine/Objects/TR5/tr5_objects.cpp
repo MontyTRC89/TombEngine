@@ -37,10 +37,11 @@
 #include "Objects/TR5/Entity/tr5_willowwisp.h"	 // OK
 
 // Emitters
-#include "Objects/TR5/Emitter/tr5_smoke_emitter.h"
 #include "Objects/TR5/Emitter/tr5_rats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_bats_emitter.h"
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
+#include "Objects/TR5/Emitter/tr5_smoke_emitter.h"
+#include "Objects/TR5/Emitter/Waterfall.h"
 
 // Objects
 #include "Objects/TR5/Light/tr5_light.h"
@@ -56,10 +57,11 @@
 
 // Traps
 #include "Objects/Effects/EmberEmitter.h"
-#include "Objects/Effects/tr5_electricity.h"
 #include "Objects/TR5/Trap/LaserBarrier.h"
 #include "Objects/TR5/Trap/LaserBeam.h"
+#include "Objects/TR5/Trap/MovingLaser.h"
 #include "Objects/TR5/Trap/ZipLine.h"
+#include "Objects/Effects/tr5_electricity.h"
 #include "Objects/TR5/Object/tr5_rollingball.h"
 #include "Objects/TR5/Trap/tr5_ventilator.h"
 #include "Objects/TR5/Trap/tr5_romehammer.h"
@@ -75,6 +77,7 @@
 
 using namespace TEN::Effects::EmberEmitter;
 using namespace TEN::Effects::SmokeEmitter;
+using namespace TEN::Effects::WaterfallEmitter;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::Traps;
@@ -85,7 +88,7 @@ static void StartEntity(ObjectInfo *obj)
 	if (obj->loaded)
 	{
 		obj->Initialize = InitializeLaraLoad;
-		obj->shadowType = ShadowMode::Lara;
+		obj->shadowType = ShadowMode::Player;
 		obj->HitPoints = 1000;
 		obj->usingDrawAnimatingItem = false;
 	}
@@ -757,6 +760,15 @@ static void StartObject(ObjectInfo *obj)
 		obj->usingDrawAnimatingItem = false;
 	}
 
+	obj = &Objects[ID_WATERFALL_EMITTER];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeWaterfall;
+		obj->control = ControlWaterfall;
+		obj->drawRoutine = nullptr;
+		obj->usingDrawAnimatingItem = false;
+	}
+
 	obj = &Objects[ID_TELEPORTER];
 	if (obj->loaded)
 	{
@@ -952,6 +964,15 @@ static void StartTrap(ObjectInfo *obj)
 		obj->drawRoutine = nullptr;
 		obj->usingDrawAnimatingItem = false;
 	}
+
+	obj = &Objects[ID_MOVING_LASER];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeMovingLaser;
+		obj->control = ControlMovingLaser;
+		obj->collision = CollideMovingLaser;
+		obj->SetHitEffect(true);
+	}
 }
 
 static void StartSwitch(ObjectInfo *obj)
@@ -1042,6 +1063,10 @@ static void StartPickup(ObjectInfo *obj)
 	InitPickup(obj, ID_WATERSKIN2_EMPTY);
 	InitPickup(obj, ID_GOLDROSE_ITEM);
 	InitPickup(obj, ID_DIARY_ITEM);
+	InitPickup(obj, ID_PC_LOAD_INV_ITEM);
+	InitPickup(obj, ID_PC_SAVE_INV_ITEM);
+	InitPickup(obj, ID_STOPWATCH_ITEM);
+	InitPickup(obj, ID_COMPASS_ITEM);
 }
 
 void InitializeTR5Objects()

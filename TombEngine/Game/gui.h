@@ -20,7 +20,6 @@ namespace TEN::Gui
 		Pause,
 		Statistics,
 		Examine,
-		Diary,
 		Load,
 		Save
 	};
@@ -59,8 +58,7 @@ namespace TEN::Gui
 		Load,
 		Save,
 		Examine,
-		Statistics,
-		Diary
+		Statistics
 	};
 
 	enum class RingTypes
@@ -122,7 +120,7 @@ namespace TEN::Gui
 	{
 	private:
 		// Input inquirers
-		bool GuiIsPulsed(ActionID actionID) const;
+		bool GuiIsPulsed(InputActionID actionID) const;
 		bool GuiIsSelected(bool onClicked = true) const;
 		bool GuiIsDeselected() const;
 		bool CanSelect() const;
@@ -134,7 +132,7 @@ namespace TEN::Gui
 		int OptionCount;
 		int SelectedSaveSlot;
 
-		float TimeInMenu = -1.0f;
+		int TimeInMenu = NO_VALUE;
 		SettingsData CurrentSettings;
 
 		// Inventory variables
@@ -230,7 +228,6 @@ namespace TEN::Gui
 		void UpdateWeaponStatus(ItemInfo* item);
 		void DoStatisticsMode();
 		void DoExamineMode();
-		void DoDiary(ItemInfo* item);
 		LoadResult DoLoad();
 		bool DoSave();
 		void DoInventory(ItemInfo* item);

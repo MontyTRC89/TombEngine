@@ -448,70 +448,6 @@ static void ClearPlayerLookAroundActions(const ItemInfo& item)
 	}
 }
 
-static void SetPlayerOptics(ItemInfo* item)
-{
-	constexpr auto OPTIC_RANGE_DEFAULT = ANGLE(0.7f);
-
-	auto& player = GetLaraInfo(*item);
-
-	bool breakOptics = true;
-
-	// Standing; can use optics.
-	if (item->Animation.ActiveState == LS_IDLE || item->Animation.AnimNumber == LA_STAND_IDLE)
-		breakOptics = false;
-
-	// Crouching; can use optics.
-	if ((player.Control.IsLow || !IsHeld(In::Crouch)) &&
-		(item->Animation.TargetState == LS_CROUCH_IDLE || item->Animation.AnimNumber == LA_CROUCH_IDLE))
-	{
-		breakOptics = false;
-	}
-
-	// If lasersight and Look is not held, exit optics.
-	if (player.Control.Look.IsUsingLasersight && !IsHeld(In::Look))
-		breakOptics = true;
-
-	// If lasersight and weapon is holstered, exit optics.
-	if (player.Control.Look.IsUsingLasersight && IsHeld(In::Draw))
-		breakOptics = true;
-
-	// Engage lasersight if available.
-	if (!player.Control.Look.IsUsingLasersight && !breakOptics && IsHeld(In::Look))
-	{
-		if (player.Control.HandStatus == HandStatus::WeaponReady &&
-			((player.Control.Weapon.GunType == LaraWeaponType::HK && player.Weapons[(int)LaraWeaponType::HK].HasLasersight) ||
-				(player.Control.Weapon.GunType == LaraWeaponType::Revolver && player.Weapons[(int)LaraWeaponType::Revolver].HasLasersight) ||
-				(player.Control.Weapon.GunType == LaraWeaponType::Crossbow && player.Weapons[(int)LaraWeaponType::Crossbow].HasLasersight)))
-		{
-			player.Control.Look.OpticRange = OPTIC_RANGE_DEFAULT;
-			player.Control.Look.IsUsingBinoculars = true;
-			player.Control.Look.IsUsingLasersight = true;
-			player.Inventory.IsBusy = true;
-
-			Camera.DisableInterpolation = true;
-			BinocularOldCamera = Camera.oldType;
-			return;
-		}
-	}
-
-	if (!breakOptics)
-		return;
-
-	// Not using optics; return early.
-	if (!player.Control.Look.IsUsingBinoculars && !player.Control.Look.IsUsingLasersight)
-		return;
-
-	player.Control.Look.OpticRange = 0;
-	player.Control.Look.IsUsingBinoculars = false;
-	player.Control.Look.IsUsingLasersight = false;
-	player.Inventory.IsBusy = false;
-
-	Camera.DisableInterpolation = true;
-	Camera.type = BinocularOldCamera;
-	Camera.bounce = 0;
-	AlterFOV(LastFOV);
-}
-
 static short NormalizeLookAroundTurnRate(short turnRate, short opticRange)
 {
 	constexpr auto ZOOM_LEVEL_MAX = ANGLE(10.0f);
@@ -525,68 +461,29 @@ static short NormalizeLookAroundTurnRate(short turnRate, short opticRange)
 
 void HandlePlayerLookAround(ItemInfo& item, bool invertXAxis)
 {
-	constexpr auto OPTIC_RANGE_MAX	= ANGLE(8.5f);
-	constexpr auto OPTIC_RANGE_MIN	= ANGLE(0.7f);
-	constexpr auto OPTIC_RANGE_RATE = ANGLE(0.35f);
-	constexpr auto TURN_RATE_MAX	= ANGLE(4.0f);
-	constexpr auto TURN_RATE_ACCEL	= ANGLE(0.75f);
+	constexpr auto TURN_RATE_MAX   = ANGLE(4.0f);
+	constexpr auto TURN_RATE_ACCEL = ANGLE(0.75f);
 
 	auto& player = GetLaraInfo(item);
 
 	// Set optics.
 	Camera.type = CameraType::Look;
-	SetPlayerOptics(LaraItem);
 
 	bool isSlow = IsHeld(In::Walk);
-
-	// Zoom optics.
-	if (player.Control.Look.IsUsingBinoculars || player.Control.Look.IsUsingLasersight)
-	{
-		short rangeRate = isSlow ? (OPTIC_RANGE_RATE / 2) : OPTIC_RANGE_RATE;
-
-		// NOTE: Zooming allowed with either StepLeft/StepRight or Walk/Sprint.
-		if ((IsHeld(In::StepLeft) && !IsHeld(In::StepRight)) ||
-			(IsHeld(In::Walk) && !IsHeld(In::Sprint)))
-		{
-			player.Control.Look.OpticRange -= rangeRate;
-			if (player.Control.Look.OpticRange < OPTIC_RANGE_MIN)
-			{
-				player.Control.Look.OpticRange = OPTIC_RANGE_MIN;
-			}
-			else
-			{
-				SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 0.9f);
-			}
-		}
-		else if ((IsHeld(In::StepRight) && !IsHeld(In::StepLeft)) ||
-			(IsHeld(In::Sprint) && !IsHeld(In::Walk)))
-		{
-			player.Control.Look.OpticRange += rangeRate;
-			if (player.Control.Look.OpticRange > OPTIC_RANGE_MAX)
-			{
-				player.Control.Look.OpticRange = OPTIC_RANGE_MAX;
-			}
-			else
-			{
-				SoundEffect(SFX_TR4_BINOCULARS_ZOOM, nullptr, SoundEnvironment::Land, 1.0f);
-			}
-		}
-	}
-
 	auto axisCoeff = Vector2::Zero;
 
 	// Determine X axis coefficient.
 	if ((IsHeld(In::Forward) || IsHeld(In::Back)) &&
 		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Vertical))
 	{
-		axisCoeff.x = AxisMap[(int)InputAxis::Move].y;
+		axisCoeff.x = AxisMap[InputAxisID::Move].y;
 	}
 
 	// Determine Y axis coefficient.
 	if ((IsHeld(In::Left) || IsHeld(In::Right)) &&
 		(player.Control.Look.Mode == LookMode::Free || player.Control.Look.Mode == LookMode::Horizontal))
 	{
-		axisCoeff.y = AxisMap[(int)InputAxis::Move].x;
+		axisCoeff.y = AxisMap[InputAxisID::Move].x;
 	}
 
 	// Determine turn rate base values.
@@ -686,7 +583,7 @@ void HandlePlayerLean(ItemInfo* item, CollisionInfo* coll, short baseRate, short
 	if (!item->Animation.Velocity.z)
 		return;
 
-	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
+	float axisCoeff = AxisMap[InputAxisID::Move].x;
 	int sign = copysign(1, axisCoeff);
 	short maxAngleNormalized = maxAngle * axisCoeff;
 
@@ -707,7 +604,7 @@ void HandlePlayerCrawlFlex(ItemInfo& item)
 	if (item.Animation.Velocity.z == 0.0f)
 		return;
 
-	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
+	float axisCoeff = AxisMap[InputAxisID::Move].x;
 	int sign = copysign(1, axisCoeff);
 	short maxAngleNormalized = FLEX_ANGLE_MAX * axisCoeff;
 
@@ -905,6 +802,7 @@ void HandlePlayerFlyCheat(ItemInfo& item)
 				item.Animation.Velocity = Vector3::Zero;
 				item.Animation.IsAirborne = true;
 				item.Pose.Position.y -= CLICK(0.5f);
+				item.Pose.Scale = Vector3::One;
 				item.HitPoints = LARA_HEALTH_MAX;
 
 				player.Control.WaterStatus = WaterStatus::FlyCheat;
@@ -1333,7 +1231,7 @@ void ModulateLaraTurnRateY(ItemInfo* item, short accelRate, short minTurnRate, s
 {
 	auto* lara = GetLaraInfo(item);
 
-	float axisCoeff = AxisMap[(int)InputAxis::Move].x;
+	float axisCoeff = AxisMap[InputAxisID::Move].x;
 	if (item->Animation.IsAirborne)
 	{
 		int sign = std::copysign(1, axisCoeff);
@@ -1524,6 +1422,7 @@ void SetLaraVault(ItemInfo* item, CollisionInfo* coll, const VaultTestResult& va
 	auto& player = GetLaraInfo(*item);
 
 	ResetPlayerTurnRateY(*item);
+	item->Animation.IsAirborne = false;
 	player.Context.ProjectedFloorHeight = vaultResult.Height;
 
 	if (vaultResult.SetBusyHands)
@@ -1552,7 +1451,8 @@ void SetLaraLand(ItemInfo* item, CollisionInfo* coll)
 	if (item->Animation.TargetState != LS_RUN_FORWARD)
 		item->Animation.Velocity.z = 0.0f;
 
-	//item->IsAirborne = false; // TODO: Removing this avoids an unusual landing bug. I hope to find a proper solution later. -- Sezz 2022.02.18
+	// TODO: Commenting this avoids an unusual bug where if the player hits a ceiling, they won't land. I hope to find a proper solution later. -- Sezz 2022.02.18
+	//item->Animation.IsAirborne = false;
 	item->Animation.Velocity.y = 0.0f;
 	LaraSnapToHeight(item, coll);
 }

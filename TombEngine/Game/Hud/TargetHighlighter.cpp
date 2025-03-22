@@ -132,7 +132,7 @@ namespace TEN::Hud
 
 	void CrosshairData::Draw() const
 	{
-		constexpr auto SPRITE_SEQUENCE_OBJECT_ID = ID_CROSSHAIR;
+		constexpr auto SPRITE_SEQUENCE_OBJECT_ID = ID_CROSSHAIR_GRAPHICS;
 		constexpr auto STATIC_ELEMENT_SPRITE_ID	 = 0;
 		constexpr auto SEGMENT_ELEMENT_SPRITE_ID = 1;
 		constexpr auto PRIORITY					 = 0; // TODO: Check later. May interfere with Lua display sprites. -- Sezz 2023.10.06
@@ -171,16 +171,16 @@ namespace TEN::Hud
 
 	void TargetHighlighterController::Update(const ItemInfo& playerItem)
 	{
-		// Check if target highlighter is enabled.
-		if (!g_Configuration.EnableTargetHighlighter)
+		const auto& player = GetLaraInfo(playerItem);
+
+		// Check if target highlighter is enabled or lasersight is active.
+		if (!g_Configuration.EnableTargetHighlighter || player.Control.Look.IsUsingBinoculars)
 		{
 			if (!_crosshairs.empty())
 				_crosshairs.clear();
 
 			return;
 		}
-
-		const auto& player = GetLaraInfo(playerItem);
 
 		// Loop over player targets.
 		auto itemNumbers = std::vector<int>{};

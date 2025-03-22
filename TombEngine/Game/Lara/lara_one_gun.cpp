@@ -14,6 +14,7 @@
 #include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/Ripple.h"
+#include "Game/effects/Splash.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
 #include "Game/items.h"
@@ -38,6 +39,7 @@ using namespace TEN::Effects::Drip;
 using namespace TEN::Effects::Environment;
 using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Ripple;
+using namespace TEN::Effects::Splash;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -972,7 +974,7 @@ void RocketControl(short itemNumber)
 	// Trigger fire, smoke, and light.
 	TriggerRocketSmoke(wx + rocketItem.Pose.Position.x, wy + rocketItem.Pose.Position.y, wz + rocketItem.Pose.Position.z);
 	TriggerRocketFire(wx + rocketItem.Pose.Position.x, wy + rocketItem.Pose.Position.y, wz + rocketItem.Pose.Position.z);
-	TriggerDynamicLight(
+	SpawnDynamicLight(
 		wx + rocketItem.Pose.Position.x + (GetRandomControl() & 15) - 8, 
 		wy + rocketItem.Pose.Position.y + (GetRandomControl() & 15) - 8, 
 		wz + rocketItem.Pose.Position.z + (GetRandomControl() & 15) - 8, 
@@ -1084,7 +1086,7 @@ void FireCrossbow(ItemInfo& laraItem, const std::optional<Pose>& pose)
 void FireCrossBowFromLaserSight(ItemInfo& laraItem, GameVector* origin, GameVector* target)
 {
 	auto orient = Geometry::GetOrientToPoint(origin->ToVector3(), target->ToVector3());
-	auto boltPose = Pose(origin->x, origin->y, origin->z, orient);
+	auto boltPose = Pose(origin->ToVector3i(), orient);
 	FireCrossbow(laraItem, boltPose);
 }
 
@@ -1305,12 +1307,12 @@ void RifleHandler(ItemInfo& laraItem, LaraWeaponType weaponType)
 		if (weaponType == LaraWeaponType::Shotgun || weaponType == LaraWeaponType::HK)
 		{
 			auto pos = GetJointPosition(&laraItem, LM_RHAND, Vector3i(0, -64, 0));
-			TriggerDynamicPointLight(pos.ToVector3(), color, CLICK(settings.FlashRange));
+			SpawnDynamicPointLight(pos.ToVector3(), color, CLICK(settings.FlashRange));
 		}
 		else if (weaponType == LaraWeaponType::Revolver)
 		{
 			auto pos = GetJointPosition(&laraItem, LM_RHAND, Vector3i(0, -32, 0));
-			TriggerDynamicPointLight(pos.ToVector3(), color, CLICK(settings.FlashRange));
+			SpawnDynamicPointLight(pos.ToVector3(), color, CLICK(settings.FlashRange));
 		}
 	}
 }
@@ -1337,8 +1339,8 @@ void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile
 			SaveGame::Statistics.Level.AmmoHits++;
 			if (target.HitPoints <= 0)
 			{
-				SaveGame::Statistics.Level.Kills++;
 				SaveGame::Statistics.Game.Kills++;
+				SaveGame::Statistics.Level.Kills++;
 				CreatureDie(target.Index, true);
 			}
 		}
@@ -1584,7 +1586,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 				continue;
 
 			TriggerExplosionSparks(staticPtr->pos.Position.x, staticPtr->pos.Position.y, staticPtr->pos.Position.z, 3, -2, 0, projectile.RoomNumber);
-			auto pose = Pose(staticPtr->pos.Position.x, staticPtr->pos.Position.y - 128, staticPtr->pos.Position.z, 0, staticPtr->pos.Orientation.y, 0);
+			auto pose = Pose(Vector3i(staticPtr->pos.Position.x, staticPtr->pos.Position.y - 128, staticPtr->pos.Position.z), EulerAngles(0, staticPtr->pos.Orientation.y, 0));
 			TriggerShockwave(&pose, 40, 176, 64, 0, 96, 128, 16, EulerAngles::Identity, 0, true, false, false, (int)ShockwaveStyle::Normal);
 		}
 

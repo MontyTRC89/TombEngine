@@ -15,12 +15,14 @@ private:
 	LARGE_INTEGER _frequency;
 	double _controlDelay = 0.0;
 	double _frameTime    = 0.0;
+	bool _locked = false;
 
 public:
 	void Init();
 	void Sync();
 	void Step();
 	bool Synced();
+	bool Locked();
 	float GetInterpolationFactor();
 };
 
@@ -28,6 +30,6 @@ int	 TimeSync();
 bool TimeInit();
 bool TimeReset();
 
-bool TestGlobalTimeInterval(float intervalSecs, float offsetSecs = 0.0f);
+bool TestGlobalTimeInterval(unsigned int intervalGameFrames, unsigned int offsetGameFrames = 0);
 
 extern HighFramerateSynchronizer g_Synchronizer;

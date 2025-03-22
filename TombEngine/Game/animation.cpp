@@ -714,6 +714,10 @@ Vector3i GetJointPosition(const ItemInfo& item, const CreatureBiteInfo& bite)
 Vector3 GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex)
 {
 	const auto& object = Objects[objectID];
+	int boneIndex = object.boneIndex + (jointIndex * 4);
+
+	if (g_Level.Bones.size() <= boneIndex)
+		return Vector3::Zero;
 
 	int* bonePtr = &g_Level.Bones[object.boneIndex + (jointIndex * 4)];
 	return Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));

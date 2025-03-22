@@ -440,6 +440,12 @@ void LoadObjects()
 		int objNum = ReadInt32();
 		MoveablesIds.push_back(objNum);
 
+		if (objNum >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
+		{
+			throw std::exception(("Unsupported object slot " + std::to_string(objNum) + 
+								  " is detected in a level. Make sure you delete unsupported objects from your wads.").c_str());
+		}
+
 		Objects[objNum].loaded = true;
 		Objects[objNum].nmeshes = ReadInt32();
 		Objects[objNum].meshIndex = ReadInt32();
@@ -448,7 +454,6 @@ void LoadObjects()
 		Objects[objNum].animIndex = ReadInt32();
 	}
 
-	TENLog("Initializing objects...", LogLevel::Info);
 	InitializeObjects();
 
 	int staticCount = ReadCount();
@@ -1009,6 +1014,7 @@ void FreeLevel(bool partial)
 	g_Level.Commands.resize(0);
 	g_Level.Frames.resize(0);
 	g_Level.Sprites.resize(0);
+	g_Level.Mirrors.resize(0);
 	g_Level.SoundDetails.resize(0);
 	g_Level.SoundMap.resize(0);
 	g_Level.FloorData.resize(0);
@@ -1061,7 +1067,7 @@ void LoadAnimatedTextures()
 		auto sequence = ANIMATED_TEXTURES_SEQUENCE{};
 		sequence.atlas = ReadInt32();
 		sequence.Fps = ReadInt32();
-		sequence.numFrames = ReadInt32();
+		sequence.numFrames = ReadCount();
 
 		for (int j = 0; j < sequence.numFrames; j++)
 		{
@@ -1363,6 +1369,7 @@ bool LoadLevel(const std::string& path, bool partial)
 
 			LoadSprites();
 			LoadBoxes();
+			LoadMirrors();
 			LoadAnimatedTextures();
 			UpdateProgress(70);
 
@@ -1391,7 +1398,7 @@ bool LoadLevel(const std::string& path, bool partial)
 		InitializeNeighborRoomList();
 		GetCarriedItems();
 		GetAIPickups();
-		g_GameScriptEntities->AssignLara();
+		g_GameScriptEntities->AssignPlayer();
 		UpdateProgress(90, partial);
 
 		if (!partial)
@@ -1457,19 +1464,19 @@ void LoadSamples()
 
 	TENLog("Sample count: " + std::to_string(sampleCount), LogLevel::Info);
 
-	int uncompressedSize = 0;
-	int compressedSize = 0;
-	char* buffer = (char*)malloc(2 * 1024 * 1024);
+	std::vector<char> buffer;
+	buffer.reserve(2 * 1024 * 1024);
 
 	for (int i = 0; i < sampleCount; i++)
 	{
-		uncompressedSize = ReadInt32();
-		compressedSize = ReadInt32();
-		ReadBytes(buffer, compressedSize);
-		LoadSample(buffer, compressedSize, uncompressedSize, i);
-	}
+		int uncompressedSize = ReadInt32();
+		int compressedSize = ReadInt32();
 
-	free(buffer);
+		buffer.resize(compressedSize);
+
+		ReadBytes(buffer.data(), compressedSize);
+		LoadSample(buffer.data(), compressedSize, uncompressedSize, i);
+	}
 }
 
 void LoadBoxes()
@@ -1514,6 +1521,33 @@ void LoadBoxes()
 	{
 		if (g_Level.PathfindingBoxes[i].flags & BLOCKABLE)
 			g_Level.PathfindingBoxes[i].flags |= BLOCKED;
+	}
+}
+
+void LoadMirrors()
+{
+	int mirrorCount = ReadCount();
+	TENLog("Mirror count: " + std::to_string(mirrorCount), LogLevel::Info);
+	g_Level.Mirrors.reserve(mirrorCount);
+
+	for (int i = 0; i < mirrorCount; i++)
+	{
+		auto& mirror = g_Level.Mirrors.emplace_back();
+
+		mirror.RoomNumber = ReadInt16(); // TODO: Write Int32 to level instead. Short isn't used for room numbers anymore.
+		mirror.Plane.x = ReadFloat();
+		mirror.Plane.y = ReadFloat();
+		mirror.Plane.z = ReadFloat();
+		mirror.Plane.w = ReadFloat();
+
+		mirror.ReflectPlayer = ReadBool();
+		mirror.ReflectMoveables = ReadBool();
+		mirror.ReflectStatics = ReadBool();
+		mirror.ReflectSprites = ReadBool();
+		mirror.ReflectLights = ReadBool();
+		mirror.Enabled = true;
+
+		mirror.ReflectionMatrix = Matrix::CreateReflection(mirror.Plane);
 	}
 }
 

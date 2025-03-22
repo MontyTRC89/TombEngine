@@ -3,12 +3,104 @@
 The dates are in European standard format where date is presented as **YYYY-MM-DD**.
 TombEngine releases are located in this repository (alongside with Tomb Editor): https://github.com/TombEngine/TombEditorReleases
 
-## Version 1.6 - xxxx-xx-xx
+## [Version 1.8.1](link to release) - yyyy-mm-dd
+
+### Bug fixes
+* Fixed particles remaining in the level after reloading from the savegame.
+* Fixed particles being canceled by fog bulbs.
+* Fixed crash in case hair object is the last object in a level.
+* Fixed crash with incorrectly applied animated textures on static meshes.
+
+### Lua API changes
+* Added missing constructor for `Collision.Probe` without room number.
+
+## [Version 1.8](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.8) - 2025-03-16
+
+### Bug fixes
+* Improved engine performance up to 20%.
+* Fixed bridges moving the player when the player is underwater.
+* Fixed trigger triggerer not working.
+* Fixed display pickup numeric string not being interpolated in high framerate mode.
+* Fixed two block platform room portal traversal failing in some cases.
+* Fixed incorrect handling of dynamic light shadows.
+* Fixed ricochet flashes after using explosive weapons.
+* Fixed incorrect flare draw in crawl state.
+* Fixed starfield remaining active in the next level if it does not have a starfield specified.
+* Fixed underwater dust particles overflowing when camera is underwater.
+* Fixed wetness player attribute not being preserved in savegames.
+* Fixed invisible HK ammo in the inventory.
+* Fixed flickering rat emitter.
+* Fixed camera glitch when going into quicksand rooms with weapons drawn.
+* Fixed player model submerging into the floor while swimming underwater.
+* Fixed custom shatter sounds with custom sound IDs not playing correctly.
+* Fixed crashes with sound samples larger than 2 megabytes.
+
+### New Features
+* Added multithreading and an option for it to flow system settings.
+* Added ability to use floor trapdoors, keys and puzzle items underwater.
+  - You must update your Lara object: https://github.com/TombEngine/Resources/raw/main/Wad2%20Objects/Lara/TEN_Lara.wad2
+* Added a particle based waterfall emitter object and associated sprite slots.
+  - You must use this version: https://github.com/TombEngine/Resources/raw/refs/heads/main/Wad2%20Objects/Interactables/TEN_Waterfall_Emitter.wad2
+* Added TR1 Hammer.
+  - You must use this version: <https://github.com/TombEngine/Resources/raw/refs/heads/main/Wad2%20Objects/Traps/TR1_Thor%20Hammer.wad2>
+* Added TR3 Moving Laser.
+* Added TR4 Statue Plinth.
+
+### Lua API changes
+* Added diary module.
+* Added custom bar module.
+* Added `Collision.Probe` class for basic room collision detection.
+* Added `Flow.Horizon` class and two layers of horizons in a `Flow.Level` class.
+* Added `Effects.EmitAdvancedParticle` function, allowing animations and other effects.
+* Added `Effects.EmitAirBubble` function to spawn air bubbles.
+* Added `Effects.EmitStreamer` function to emit streamers.
+* Added `Flow.GetTotalSecretCount` function to get total amount of secrets in the game.
+* Added `View.GetFlyByPosition` and `View.GetFlyByRotation` functions to get flyby sequence parameters at a specified time point.
+* Added `Moveable:GetScale` and `Movebale:SetScale` methods to get or set visible scale of moveables.
+* Added `Static:GetCollidable` and `Static:SetCollidable` methods to get or set collision status of static meshes.
+* Added `Rotation:Lerp` function to allow linear interpolation between rotations.
+* Added ability to perform additive and subtractive operations on `Rotation` class and compare one `Rotation` to another.
+* Added various `Translate` methods to `Vec2` and `Vec3` script objects.
+* Added alpha transparency functionality for statics and moveables to be used with `SetColor` method.
+* Added extra arguments for sprite object slots and starting rotation value for `EmitParticle` function.
+* Added ability to dynamically change `Flow.Level` weather and environment parameters and save them to a savegame.
+* Added pickup count to `Flow.Statistics` class.
+* Changed `Flow.Starfield` and `Flow.LensFlare` primitive types to use parameters instead of getters and setters.
+* Fixed medipack level count in `Flow.Statistics` class.
+
+## [Version 1.7.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.4) - 2025-04-01
+
+### Bug fixes
+* Fixed static meshes with dynamic light mode not accepting room lights.
+* Fixed silent crashes if no Visual C++ runtimes are installed and provide a dialog box to download them instead.
+* Fixed issues with launching the engine from directories with non-Western characters in the path.
+* Fixed rare case of not being able to start a new game or exit game from the main menu on very slow GPUs.
+* Fixed occasional crashes with creatures stuck in a sector with no pathfinding set.
+* Fixed occasional cases of underwater switch animation not playing, if player spams jump key while pulling the switch.
+* Fixed player's  blob shadows not rendering on moveables and static meshes.
+* Fixed antialiasing quality not changing after changing it in display settings.
+* Fixed endless explosion effect for Puna.
+* Fixed diary pick-up item inventory state not preserved in the savegame.
+* Fixed gravity being applied underwater when exiting the fly cheat.
+* Fixed gravity being applied when vaulting on the same frame as the player lands.
+
+### New Features
+* Added realtime shader reloading in debug mode by pressing F9 key.
+* Added load, save, stopwatch and compass as a functional pick-up items with ability to add or remove them from inventory.
+* Increased particle limit from 1024 to 4096.
+* Added ability for the player to more reliably stop at an edge when running at it while holding Walk.
+
+### Lua API changes
+* Fixed Flow.FreezeMode.FULL drawing incorrect background.
+* Fixed DisplayString scale argument not being optional, as stated in documentation.
+
+## [Version 1.7](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.7.3) - 2024-12-25
 
 ### Bug fixes
 * Significantly improved renderer performance.
 * Improved engine performance around bridges.
 * Improved engine performance if weather or bubble effects are active.
+* Improved engine start-up time.
 * Fixed silent crashes if loaded level is corrupted or in incorrect format.
 * Fixed occasional crashes if there are static meshes placed within room border walls.
 * Fixed climbable pushables clipping Lara under the bridges when pulled.
@@ -30,6 +122,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed incorrect object camera position.
 * Fixed incorrect camera movement near walls after leaving look mode.
 * Fixed binocular or lasersight camera not switching off correctly after flyby.
+* Fixed binocular or lasersight camera transitions.
+* Fixed target highlighter still being active in binocular or lasersight mode.
 * Fixed Lara's Home entry not working.
 * Fixed exploding TR3 bosses.
 * Fixed original issue with deactivation of Dart Emitter.
@@ -41,9 +135,10 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed Skeleton and Mummy not reacting to shotgun hits.
 
 ### New Features
-* Added fast savegame reloading.
+* Added classic mirror effect with ability to reflect moveables and static meshes.
 * Added ability to customize many hardcoded parameters, such as flare, weapon, and hair settings.
 * Added dynamic shadow casting on objects and static meshes.
+* Added fast savegame reloading.
 * Added ricochet sounds and make the effect more prominent.
 * Allow camera shake during flybys.
 * Allow to run the engine without title level.
@@ -53,7 +148,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### Lua API changes
 * Added Flow.Statistics class, Flow.GetStatistics() and Flow.SetStatistics() functions.
 * Added Flow.GetFreezeMode() and Flow.SetFreezeMode() functions.
-* Added Flow.GetNextLevel() function to get script entry for incoming level, if it's about to start.
 * Added Effects.EmitSpotLight() function for directional spotlights.
 * Added optional cast shadow and name parameters for Effects.EmitLight() function.
 * Added Effects.GetWind() function to get current wind speed vector.
@@ -64,7 +158,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added extra argument for Sound.SetAmbientTrack() function to specify if new ambient track should play from the beginning.
 * Added new View.CameraType enum entries and return it by View.GetCameraType(), when flyby camera or binoculars/lasersight is active.
 * Added new primitive Time class, which allows to manipulate and format game time without precision loss.
-* Allow to use TR4-like load cameras by playing fixed camera from OnEnd() event and removing loadScreenFile field from level's gameflow entry.
 * Renamed Flow.WeaponType enumeration to Objects.WeaponType, and removed similar Objects.LaraWeaponType enumeration for consistency.
 * Renamed Objects.PlayerAmmoType to Objects.AmmoType for consistency.
 * Fixed Strings.DisplayString class not supporting some Unicode characters and empty lines in multiline strings.

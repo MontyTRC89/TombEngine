@@ -176,7 +176,7 @@ void StartSwitches(ObjectInfo* object)
 		object->shadowType = ShadowMode::All;
 	}
 
-	for (int objectID = ID_UNDERWATER_WALL_SWITCH_1; objectID <= ID_UNDERWATER_WALL_SWITCH_2; objectID++)
+	for (int objectID = ID_UNDERWATER_WALL_SWITCH1; objectID <= ID_UNDERWATER_WALL_SWITCH2; objectID++)
 	{
 		object = &Objects[objectID];
 		if (object->loaded)
@@ -185,8 +185,8 @@ void StartSwitches(ObjectInfo* object)
 			object->collision = CollideUnderwaterWallSwitch;
 		}
 	}
-	
-	for (int objectID = ID_UNDERWATER_CEILING_SWITCH_1; objectID <= ID_UNDERWATER_CEILING_SWITCH_2; objectID++)
+
+	for (int objectID = ID_UNDERWATER_CEILING_SWITCH1; objectID <= ID_UNDERWATER_CEILING_SWITCH2; objectID++)
 	{
 		object = &Objects[objectID];
 		if (object->loaded)

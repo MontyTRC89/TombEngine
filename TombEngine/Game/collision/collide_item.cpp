@@ -10,6 +10,7 @@
 #include "Game/effects/debris.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/simple_particle.h"
+#include "Game/effects/Splash.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/items.h"
 #include "Game/Lara/lara.h"
@@ -20,10 +21,12 @@
 #include "Math/Math.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Sound/sound.h"
+#include "Specific/winmain.h"
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
 using namespace TEN::Collision::Sphere;
+using namespace TEN::Effects::Splash;
 using namespace TEN::Math;
 
 constexpr auto ANIMATED_ALIGNMENT_FRAME_COUNT_THRESHOLD = 6;
@@ -331,7 +334,28 @@ void TestForObjectOnLedge(ItemInfo* item, CollisionInfo* coll)
 // Deprecated.
 bool TestLaraPosition(const ObjectCollisionBounds& bounds, ItemInfo* item, ItemInfo* laraItem)
 {
-	DrawDebugBox(bounds.BoundingBox.ToBoundingOrientedBox(item->Pose), Color(1.0f, 0.0f, 0.0f), RendererDebugPage::CollisionStats);
+	constexpr auto DEBUG_BOX_COLOR = Color(1.0f, 0.0f, 0.0f);
+
+	// Draw oriented debug interaction box.
+	if (DebugMode)
+	{
+		auto obb = bounds.BoundingBox.ToBoundingOrientedBox(item->Pose);
+		auto rotMatrix = item->Pose.Orientation.ToRotationMatrix();
+
+		DrawDebugBox(obb, DEBUG_BOX_COLOR, RendererDebugPage::CollisionStats);
+		DrawDebugLine(
+			obb.Center + Vector3::Transform(Vector3(0.0f, -obb.Extents.y, 0.0f), rotMatrix),
+			obb.Center + Vector3::Transform(Vector3(0.0f, -obb.Extents.y, obb.Extents.z), rotMatrix),
+			DEBUG_BOX_COLOR, RendererDebugPage::CollisionStats);
+		DrawDebugLine(
+			obb.Center + Vector3::Transform(Vector3(0.0f, -obb.Extents.y, obb.Extents.z), rotMatrix),
+			obb.Center + Vector3::Transform(Vector3(0.0f, obb.Extents.y, obb.Extents.z), rotMatrix),
+			DEBUG_BOX_COLOR, RendererDebugPage::CollisionStats);
+		DrawDebugLine(
+			obb.Center + Vector3::Transform(Vector3(0.0f, obb.Extents.y, 0.0f), rotMatrix),
+			obb.Center + Vector3::Transform(Vector3(0.0f, obb.Extents.y, obb.Extents.z), rotMatrix),
+			DEBUG_BOX_COLOR, RendererDebugPage::CollisionStats);
+	}
 
 	auto deltaOrient = laraItem->Pose.Orientation - item->Pose.Orientation;
 	if (deltaOrient.x < bounds.OrientConstraint.first.x || deltaOrient.x > bounds.OrientConstraint.second.x ||
@@ -901,7 +925,8 @@ void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, PointCollisionData&
 		auto deltaPose = Pose(deltaPos, deltaOrient);
 
 		// Item is grounded and bridge position changed; set shift.
-		if (deltaPose != Pose::Zero && !item.Animation.IsAirborne)
+		if (deltaPose != Pose::Zero && !item.Animation.IsAirborne &&
+			item.IsLara() ? (GetLaraInfo(item).Control.WaterStatus != WaterStatus::Underwater && GetLaraInfo(item).Control.WaterStatus != WaterStatus::FlyCheat) : true)
 		{
 			const auto& bridgePos = bridgeItem.Pose.Position;
 
@@ -952,6 +977,10 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 		{
 			// Only process meshes which are visible.
 			if (!(mesh.flags & StaticMeshFlags::SM_VISIBLE))
+				continue;
+
+			// Bypass static meshes which are marked as non-collidable.
+			if (!(mesh.flags & StaticMeshFlags::SM_COLLISION))
 				continue;
 
 			// Only process meshes which are solid, or if solid mode is set by the setup.
@@ -1902,7 +1931,12 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 
 		for (auto& staticObject : neighborRoom.mesh)
 		{
+			// Check if static is visible.
 			if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
+				continue;
+
+			// Check if static is collidable.
+			if (!(staticObject.flags & StaticMeshFlags::SM_COLLISION))
 				continue;
 
 			// For Lara, solid static mesh collisions are directly managed by GetCollisionInfo,

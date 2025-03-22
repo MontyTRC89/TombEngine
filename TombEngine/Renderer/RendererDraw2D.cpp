@@ -119,7 +119,7 @@ namespace TEN::Renderer
 
 	void Renderer::DrawBar(float percent, const RendererHudBar& bar, GAME_OBJECT_ID textureSlot, int frame, bool isPoisoned)
 	{
-		if (!CheckIfSlotExists(ID_BAR_BORDER_GRAPHIC, "Bar rendering"))
+		if (!CheckIfSlotExists(ID_BAR_BORDER_GRAPHICS, "Bar rendering"))
 			return;
 
 		unsigned int strides = sizeof(Vertex);
@@ -132,8 +132,8 @@ namespace TEN::Renderer
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetIndexBuffer(bar.IndexBufferBorder.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 		
-		_context->VSSetShader(_vsHUD.Get(), nullptr, 0);
-		_context->PSSetShader(_psHUDTexture.Get(), nullptr, 0);
+		_shaders.Bind(Shader::Hud);
+		_shaders.Bind(Shader::HudDTexture);
 
 		SetBlendMode(BlendMode::Opaque);
 		SetDepthState(DepthState::None);
@@ -141,7 +141,7 @@ namespace TEN::Renderer
 
 		BindConstantBufferVS(ConstantBufferRegister::Hud, _cbHUD.get());
 
-		RendererSprite* borderSprite = &_sprites[Objects[ID_BAR_BORDER_GRAPHIC].meshIndex];
+		RendererSprite* borderSprite = &_sprites[Objects[ID_BAR_BORDER_GRAPHICS].meshIndex];
 		_stHUDBar.BarStartUV = borderSprite->UV[0];
 		_stHUDBar.BarScale = Vector2(borderSprite->Width / (float)borderSprite->Texture->Width, borderSprite->Height / (float)borderSprite->Texture->Height);
 		_cbHUDBar.UpdateData(_stHUDBar, _context.Get());
@@ -161,8 +161,8 @@ namespace TEN::Renderer
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetIndexBuffer(bar.InnerIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 		
-		_context->VSSetShader(_vsHUD.Get(), nullptr, 0);
-		_context->PSSetShader(_psHUDBarColor.Get(), nullptr, 0);
+		_shaders.Bind(Shader::Hud);
+		_shaders.Bind(Shader::HudBarColor);
 
 		_stHUDBar.Percent = percent;
 		_stHUDBar.Poisoned = isPoisoned;
@@ -195,8 +195,8 @@ namespace TEN::Renderer
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetIndexBuffer(g_LoadingBar->IndexBufferBorder.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	
-		_context->VSSetShader(_vsHUD.Get(), NULL, 0);
-		_context->PSSetShader(_psHUDTexture.Get(), NULL, 0);
+		_shaders.Bind(Shader::Hud);
+		_shaders.Bind(Shader::HudDTexture);
 
 		SetBlendMode(BlendMode::Opaque);
 		SetDepthState(DepthState::None);
@@ -220,8 +220,8 @@ namespace TEN::Renderer
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetIndexBuffer(g_LoadingBar->InnerIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 	
-		_context->VSSetShader(_vsHUD.Get(), nullptr, 0);
-		_context->PSSetShader(_psHUDBarColor.Get(), nullptr, 0);
+		_shaders.Bind(Shader::Hud);
+		_shaders.Bind(Shader::HudBarColor);
 		
 		_stHUDBar.Percent = percentage / 100.0f;
 		_stHUDBar.Poisoned = false;
@@ -266,11 +266,11 @@ namespace TEN::Renderer
 
 		if (Lara.Control.Look.OpticRange != 0 && !Lara.Control.Look.IsUsingLasersight)
 		{
-			DrawFullScreenSprite(&_sprites[Objects[ID_BINOCULAR_GRAPHIC].meshIndex], Vector3::One, false);
+			DrawFullScreenSprite(&_sprites[Objects[ID_BINOCULAR_GRAPHICS].meshIndex], Vector3::One, false);
 		}
 		else if (Lara.Control.Look.OpticRange != 0 && Lara.Control.Look.IsUsingLasersight)
 		{
-			DrawFullScreenSprite(&_sprites[Objects[ID_LASER_SIGHT_GRAPHIC].meshIndex], Vector3::One);
+			DrawFullScreenSprite(&_sprites[Objects[ID_LASERSIGHT_GRAPHICS].meshIndex], Vector3::One);
 
 			SetBlendMode(BlendMode::Opaque);
 
@@ -305,8 +305,7 @@ namespace TEN::Renderer
 			vertices[3].UV.y = 1.0f;
 			vertices[3].Color = Vector4(1.0f, 0.0f, 0.0f, 1.0f);
 
-			_context->VSSetShader(_vsFullScreenQuad.Get(), nullptr, 0);
-			_context->PSSetShader(_psFullScreenQuad.Get(), nullptr, 0);
+			_shaders.Bind(Shader::FullScreenQuad);
 
 			_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			_context->IASetInputLayout(_inputLayout.Get());
@@ -342,8 +341,7 @@ namespace TEN::Renderer
 		if (renderView.DisplaySpritesToDraw.empty())
 			return;
 
-		_context->VSSetShader(_vsFullScreenQuad.Get(), nullptr, 0);
-		_context->PSSetShader(_psFullScreenQuad.Get(), nullptr, 0);
+		_shaders.Bind(Shader::FullScreenQuad);
 
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		_context->IASetInputLayout(_inputLayout.Get());
@@ -465,8 +463,7 @@ namespace TEN::Renderer
 		vertices[3].UV.y = uvEnd.y;
 		vertices[3].Color = colorVec4;
 
-		_context->VSSetShader(_vsFullScreenQuad.Get(), nullptr, 0);
-		_context->PSSetShader(_psFullScreenQuad.Get(), nullptr, 0);
+		_shaders.Bind(Shader::FullScreenQuad);
 
 		_context->PSSetShaderResources(0, 1, &texture);
 
@@ -543,8 +540,7 @@ namespace TEN::Renderer
 		vertices[3].UV.y = uvEnd.y;
 		vertices[3].Color = Vector4(color.x, color.y, color.z, 1.0f);
 
-		_context->VSSetShader(_vsFullScreenQuad.Get(), nullptr, 0);
-		_context->PSSetShader(_psFullScreenQuad.Get(), nullptr, 0);
+		_shaders.Bind(Shader::FullScreenQuad);
 
 		_context->PSSetShaderResources(0, 1, &texture);
 		auto* sampler = _renderStates->AnisotropicClamp();

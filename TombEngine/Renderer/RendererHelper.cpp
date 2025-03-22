@@ -458,7 +458,7 @@ namespace TEN::Renderer
 		if (itemNumber == LaraItem->Index)
 		{
 			auto& object = *_moveableObjects[ID_LARA];
-			*outMatrix = object.AnimationTransforms[jointIndex] * _laraWorldMatrix;
+			*outMatrix = object.AnimationTransforms[jointIndex] * _playerWorldMatrix;
 		}
 		else
 		{
@@ -600,6 +600,18 @@ namespace TEN::Renderer
 		return rendererItem->BoneOrientations[boneID];
 	}
 
+	bool Renderer::IsRoomReflected(RenderView& renderView, int roomNumber)
+	{
+		for (const auto& mirror : renderView.Mirrors)
+		{
+			// TODO: Avoid LaraItem global.
+			if (roomNumber == mirror.RoomNumber && (Camera.pos.RoomNumber == mirror.RoomNumber || LaraItem->RoomNumber == mirror.RoomNumber))
+				return true;
+		}
+
+		return false;
+	}
+
 	void Renderer::SaveScreenshot()
 	{
 		char buffer[64];
@@ -607,7 +619,7 @@ namespace TEN::Renderer
 
 		time(&rawtime);
 		auto time = localtime(&rawtime);
-		strftime(buffer, sizeof(buffer), "/TEN-%d-%m-%Y-%H-%M-%S.png", time);
+		strftime(buffer, sizeof(buffer), "/TEN-%Y-%m-%d_%H-%M-%S.png", time);
 
 		auto screenPath = g_GameFlow->GetGameDir() + "Screenshots";
 

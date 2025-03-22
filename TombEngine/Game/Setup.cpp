@@ -78,38 +78,38 @@ ObjectInfo& ObjectHandler::GetFirstAvailableObject()
 
 void StaticHandler::Initialize()
 {
-	_lookupTable.resize(0);
-	_lookupTable.reserve(_defaultLUTSize);
+	_lut.resize(0);
+	_lut.reserve(LUT_SIZE);
 	_statics.resize(0);
 }
 
 int StaticHandler::GetIndex(int staticID)
 {
-	if (staticID < 0 || staticID >= _lookupTable.size())
+	if (staticID < 0 || staticID >= _lut.size())
 	{
-		TENLog("Attempt to get nonexistent static mesh ID slot index (" + std::to_string(staticID) + ")", LogLevel::Warning);
-		return _lookupTable.front();
+		TENLog("Attempted to get index of missing static object " + std::to_string(staticID) + ".", LogLevel::Warning);
+		return _lut.front();
 	}
 
-	return _lookupTable[staticID];
+	return _lut[staticID];
 }
 
 StaticInfo& StaticHandler::operator [](int staticID)
 {
 	if (staticID < 0)
 	{
-		TENLog("Attempt to access illegal static mesh ID slot info", LogLevel::Warning);
+		TENLog("Attempted to access missing static object " + std::to_string(staticID) + ".", LogLevel::Warning);
 		return _statics.front();
 	}
 
-	if (staticID >= _lookupTable.size())
-		_lookupTable.resize(staticID + 1, NO_VALUE);
+	if (staticID >= _lut.size())
+		_lut.resize(staticID + 1, NO_VALUE);
 
-	if (_lookupTable[staticID] != NO_VALUE)
-		return _statics[_lookupTable[staticID]];
+	if (_lut[staticID] != NO_VALUE)
+		return _statics[_lut[staticID]];
 
 	_statics.emplace_back();
-	_lookupTable[staticID] = (int)_statics.size() - 1;
+	_lut[staticID] = (int)_statics.size() - 1;
 
 	return _statics.back();
 }
@@ -174,6 +174,7 @@ void InitializeGameFlags()
 
 	FlipEffect = NO_VALUE;
 	FlipStatus = false;
+	NumRPickups = 0;
 	Camera.underwater = false;
 }
 
@@ -183,7 +184,6 @@ void InitializeSpecialEffects()
 	memset(&SmokeSparks, 0, MAX_SPARKS_SMOKE * sizeof(SMOKE_SPARKS));
 	memset(&Gunshells, 0, MAX_GUNSHELL * sizeof(GUNSHELL_STRUCT));
 	memset(&Blood, 0, MAX_SPARKS_BLOOD * sizeof(BLOOD_STRUCT));
-	memset(&Splashes, 0, MAX_SPLASHES * sizeof(SPLASH_STRUCT));
 	memset(&ShockWaves, 0, MAX_SHOCKWAVE * sizeof(SHOCKWAVE_STRUCT));
 	memset(&Particles, 0, MAX_PARTICLES * sizeof(Particle));
 
@@ -209,6 +209,8 @@ void CustomObjects()
 
 void InitializeObjects()
 {
+	TENLog("Initializing objects...", LogLevel::Info);
+
 	AllocTR4Objects();
 	AllocTR5Objects();
 
@@ -251,10 +253,6 @@ void InitializeObjects()
 	// User defined objects
 	CustomObjects();
 
-	HairEffect.Initialize();
-	InitializeSpecialEffects();
-
-	NumRPickups = 0;
 	CurrentSequence = 0;
 	SequenceResults[0][1][2] = 0;
 	SequenceResults[0][2][1] = 1;

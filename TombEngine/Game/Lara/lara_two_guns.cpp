@@ -321,7 +321,7 @@ void HandlePistols(ItemInfo& laraItem, LaraWeaponType weaponType)
 		auto lightPos = Random::GeneratePointInSphere(sphere);
 		
 		int range = abs(Random::GenerateInt(settings.FlashRange - 2, settings.FlashRange + 2));
-		TriggerDynamicPointLight(lightPos, color, CLICK(range));
+		SpawnDynamicPointLight(lightPos, color, CLICK(range));
 	}
 }
 

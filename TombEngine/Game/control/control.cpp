@@ -1,9 +1,6 @@
 #include "framework.h"
 #include "Game/control/control.h"
 
-#include <process.h>
-#include <filesystem>
-
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/flipeffect.h"
@@ -23,6 +20,7 @@
 #include "Game/effects/simple_particle.h"
 #include "Game/effects/smoke.h"
 #include "Game/effects/spark.h"
+#include "Game/effects/Splash.h"
 #include "Game/effects/Streamer.h"
 #include "Game/effects/tomb4fx.h"
 #include "Game/effects/weather.h"
@@ -55,6 +53,7 @@
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
 #include "Scripting/Include/ScriptInterfaceGame.h"
 #include "Scripting/Include/Strings/ScriptInterfaceStringsHandler.h"
+#include "Scripting/Internal/TEN/Flow/Level/FlowLevel.h"
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
@@ -75,6 +74,7 @@ using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Ripple;
 using namespace TEN::Effects::Smoke;
 using namespace TEN::Effects::Spark;
+using namespace TEN::Effects::Splash;
 using namespace TEN::Effects::Streamer;
 using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Generic;
@@ -218,7 +218,7 @@ GameStatus GamePhase(bool insideMenu)
 	UpdateFadeScreenAndCinematicBars();
 
 	// Rumble screen (like in submarine level of TRC).
-	if (g_GameFlow->GetLevel(CurrentLevel)->Rumble)
+	if (g_GameFlow->GetLevel(CurrentLevel)->GetRumbleEnabled())
 		RumbleScreen();
 
 	DoFlipEffect(FlipEffect, LaraItem);
@@ -273,7 +273,7 @@ GameStatus FreezePhase()
 	if (g_GameFlow->LastFreezeMode == FreezeMode::None)
 	{
 		// Capture the screen for drawing it as a background.
-		if (g_GameFlow->LastFreezeMode == FreezeMode::Full)
+		if (g_GameFlow->CurrentFreezeMode == FreezeMode::Full)
 			g_Renderer.DumpGameScene(SceneRenderMode::NoHud);
 
 		StopRumble();
@@ -389,6 +389,7 @@ GameStatus DoLevel(int levelIndex, bool loadGame)
 	InitializeCamera();
 	InitializeSpotCamSequences(isTitle);
 	InitializeItemBoxData();
+	InitializeSpecialEffects();
 
 	// Initialize scripting.
 	InitializeScripting(levelIndex, loadGame);
@@ -580,9 +581,13 @@ void InitializeScripting(int levelIndex, bool loadGame)
 
 void DeInitializeScripting(int levelIndex, GameStatus reason)
 {
+	// Reload gameflow script to clear level script variables.
+	g_GameFlow->LoadFlowScript();
+
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
 
+	// If level index is 0, it means we are in a title level and game variables should be cleared.
 	if (levelIndex == 0)
 		g_GameScript->ResetScripts(true);
 }
@@ -699,6 +704,13 @@ void SetupInterpolation()
 {
 	for (auto& item : g_Level.Items)
 		item.DisableInterpolation = false;
+
+	// HACK: Remove after ScriptInterfaceFlowHandler is deprecated.
+	auto* level = (Level*)g_GameFlow->GetLevel(CurrentLevel);
+	level->Horizon1.SetPosition(level->Horizon1.GetPosition(), true);
+	level->Horizon2.SetPosition(level->Horizon2.GetPosition(), true);
+	level->Horizon1.SetRotation(level->Horizon1.GetRotation(), true);
+	level->Horizon2.SetRotation(level->Horizon2.GetRotation(), true);
 }
 
 void HandleControls(bool isTitle)
@@ -751,13 +763,13 @@ GameStatus HandleMenuCalls(bool isTitle)
 	bool doInventory = (IsClicked(In::Inventory) || g_Gui.GetEnterInventory() != NO_VALUE) && playerAlive;
 
 	// Handle inventory.
-	if (doSave && g_GameFlow->IsLoadSaveEnabled() && g_Gui.GetInventoryMode() != InventoryMode::Save)
+	if (doSave && g_GameFlow->IsLoadSaveEnabled() && Lara.Inventory.HasSave && g_Gui.GetInventoryMode() != InventoryMode::Save)
 	{
 		SaveGame::LoadHeaders();
 		g_Gui.SetInventoryMode(InventoryMode::Save);
 		g_Gui.CallInventory(LaraItem, false);
 	}
-	else if (doLoad && g_GameFlow->IsLoadSaveEnabled() && g_Gui.GetInventoryMode() != InventoryMode::Load)
+	else if (doLoad && g_GameFlow->IsLoadSaveEnabled() && Lara.Inventory.HasLoad && g_Gui.GetInventoryMode() != InventoryMode::Load)
 	{
 		SaveGame::LoadHeaders();
 		g_Gui.SetInventoryMode(InventoryMode::Load);

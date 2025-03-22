@@ -27,9 +27,6 @@ private:
 	void PrepareInventoryObjects();
 
 public:
-	int FogInDistance  = 0;
-	int FogOutDistance = 0;
-
 	bool LevelSelect = true;
 	bool HomeLevel	 = false;
 	bool LoadSave	 = true;
@@ -54,7 +51,6 @@ public:
 	void		SetLanguageNames(sol::as_table_t<std::vector<std::string>>&& src);
 	Level*		GetLevel(int id);
 	Level*		GetCurrentLevel();
-	Level*		GetNextLevel();
 	int			GetLevelNumber(const std::string& flieName);
 	int			GetNumLevels() const;
 	void		EndLevel(std::optional<int> nextLevel, std::optional<int> startPosIndex);
@@ -74,6 +70,7 @@ public:
 	void		AddSecret(int levelSecretIndex);
 	void		SetIntroImagePath(const std::string& path);
 	void		SetTitleScreenImagePath(const std::string& path);
+	int			GetTotalSecretCount();
 	void		SetTotalSecretCount(int secretsNumber);
 	bool		IsFlyCheatEnabled() const;
 	void		EnableFlyCheat(bool enable);
