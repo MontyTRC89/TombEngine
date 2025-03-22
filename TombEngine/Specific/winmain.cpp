@@ -251,6 +251,9 @@ unsigned CALLBACK ConsoleInput(void*)
 		if (!std::getline(std::cin, input))
 			break;
 
+		if (std::regex_match(input, std::regex("^\\s*$")))
+			continue;
+
 		if (g_GameScript == nullptr)
 		{
 			TENLog("Scripting engine not initialized.", LogLevel::Error);
