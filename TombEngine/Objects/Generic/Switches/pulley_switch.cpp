@@ -143,9 +143,10 @@ namespace TEN::Entities::Switches
 		auto* switchItem = &g_Level.Items[itemNumber];
 
 		AnimateItem(switchItem);
-
+		TENLog("CONTROL RUNNING", LogLevel::Warning);
 		if (switchItem->Animation.ActiveState == SwitchStatus::SWITCH_ON)
 		{
+			TENLog("SWITCH ON", LogLevel::Warning);
 			if (switchItem->Animation.TargetState == SwitchStatus::SWITCH_ON && !IsHeld(In::Action))
 			{
 				TENLog("UNGRAB STATE DISPATCHED", LogLevel::Warning);
