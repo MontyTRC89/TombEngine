@@ -402,9 +402,9 @@ bool LaraObject::TorchIsLit() const
 // @tparam Moveable mov Moveable object to align the player with.
 // @tparam[opt] Input.ActionID actionID Input action ID to trigger the alignment. __default: Input.ActionID.ACTION__
 // @tparam[opt] int animNumber The animation to play after alignment is complete. __default: BUTTON_PUSH__
-// @tparam[opt] Vec3 offset Relative position offset from the moveable. __default: Vec3(0, 0, 512)__
-// @tparam[opt] Vec3 minOffsetConstraint Minimum relative offset constraint. __default: Vec3(-512, -512, 0)__
-// @tparam[opt] Vec3 maxOffsetConstraint Maximum relative offset constraint. __default: Vec3(512, 512, 0)__
+// @tparam[opt] Vec3 offset Relative position offset from the moveable. __default: Vec3(0, 0, 312)__
+// @tparam[opt] Vec3 minOffsetConstraint Minimum relative offset constraint. __default: Vec3(-256, -512, 0)__
+// @tparam[opt] Vec3 maxOffsetConstraint Maximum relative offset constraint. __default: Vec3(256, 0, 512)__
 // @tparam[opt] Rotation minRotConstraint Minimum relative rotation constraint. __default: Rotation(-10, -40, -10)__
 // @tparam[opt] Rotation maxRotConstraint Maximum relative rotation constraint. __default: Rotation(10, 40, 10)__
 // @usage
@@ -415,9 +415,9 @@ void LaraObject::AlignToMoveable(const Moveable& mov, TypeOrNil<InputActionID> a
 								 TypeOrNil<Vec3> offset, TypeOrNil<Vec3> offsetConstraintMin, TypeOrNil<Vec3> offsetConstraintMax,
 								 TypeOrNil<Rotation> rotConstraintMin, TypeOrNil<Rotation> rotConstraintMax) const
 {
-	auto convertedOffset = ValueOr<Vec3>(offset, Vec3(0, 0, BLOCK(0.5f))).ToVector3i();
-	auto convertedOffsetConstraintMin = ValueOr<Vec3>(offsetConstraintMin, Vec3(-BLOCK(0.5f), -BLOCK(0.5f), 0));
-	auto convertedOffsetConstraintMax = ValueOr<Vec3>(offsetConstraintMax, Vec3(BLOCK(0.5f), 0, BLOCK(0.5f)));
+	auto convertedOffset = ValueOr<Vec3>(offset, Vec3(0, 0, 312)).ToVector3i();
+	auto convertedOffsetConstraintMin = ValueOr<Vec3>(offsetConstraintMin, Vec3(-BLOCK(0.25f), -BLOCK(0.5f), 0));
+	auto convertedOffsetConstraintMax = ValueOr<Vec3>(offsetConstraintMax, Vec3(BLOCK(0.25f), 0, BLOCK(0.5f)));
 	auto convertedRotConstraintMin = ValueOr<Rotation>(rotConstraintMin, Rotation(-10.0f, -40.0f, -10.0f)).ToEulerAngles();
 	auto convertedRotConstraintMax = ValueOr<Rotation>(rotConstraintMax, Rotation(10.0f, 40.0f, 10.0f)).ToEulerAngles();
 	int convertedAnimNumber = ValueOr<int>(animNumber, LA_BUTTON_SMALL_PUSH);
@@ -466,8 +466,8 @@ void LaraObject::AlignToMoveable(const Moveable& mov, TypeOrNil<InputActionID> a
 /// Test the player's position against a moveable object for interaction.
 // @function LaraObject:TestPosition
 // @tparam Moveable mov Moveable object to align the player with.
-// @tparam[opt] Vec3 minOffsetConstraint Minimum relative offset constraint. __default: Vec3(-512, -512, 0)__
-// @tparam[opt] Vec3 maxOffsetConstraint Maximum relative offset constraint. __default: Vec3(512, 512, 0)__
+// @tparam[opt] Vec3 minOffsetConstraint Minimum relative offset constraint. __default: Vec3(-256, -512, 0)__
+// @tparam[opt] Vec3 maxOffsetConstraint Maximum relative offset constraint. __default: Vec3(256, 0, 512)__
 // @tparam[opt] Rotation minRotConstraint Minimum relative rotation constraint. __default: Rotation(-10, -40, -10)__
 // @tparam[opt] Rotation maxRotConstraint Maximum relative rotation constraint. __default: Rotation(10, 40, 10)__
 bool LaraObject::TestPosition(const Moveable& mov,
@@ -475,8 +475,8 @@ bool LaraObject::TestPosition(const Moveable& mov,
 							  TypeOrNil<Rotation> rotConstraintMin, TypeOrNil<Rotation> rotConstraintMax) const
 {
 
-	auto convertedOffsetConstraintMin = ValueOr<Vec3>(offsetConstraintMin, Vec3(-BLOCK(0.5f), -BLOCK(0.5f), 0));
-	auto convertedOffsetConstraintMax = ValueOr<Vec3>(offsetConstraintMax, Vec3(BLOCK(0.5f), 0, BLOCK(0.5f)));
+	auto convertedOffsetConstraintMin = ValueOr<Vec3>(offsetConstraintMin, Vec3(-BLOCK(0.25f), -BLOCK(0.5f), 0));
+	auto convertedOffsetConstraintMax = ValueOr<Vec3>(offsetConstraintMax, Vec3(BLOCK(0.25f), 0, BLOCK(0.5f)));
 	auto convertedRotConstraintMin = ValueOr<Rotation>(rotConstraintMin, Rotation(-10.0f, -40.0f, -10.0f)).ToEulerAngles();
 	auto convertedRotConstraintMax = ValueOr<Rotation>(rotConstraintMax, Rotation(10.0f, 40.0f, 10.0f)).ToEulerAngles();
 
