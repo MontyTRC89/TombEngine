@@ -24,10 +24,6 @@ using namespace TEN::Renderer;
 using namespace TEN::Input;
 using namespace TEN::Utils;
 
-using std::exception;
-using std::string;
-using std::cout;
-using std::endl;
 
 WINAPP App;
 unsigned int ThreadID, ConsoleThreadID;
@@ -261,14 +257,7 @@ unsigned CALLBACK ConsoleInput(void*)
 		}
 		else
 		{
-			try
-			{
-				g_GameScript->ExecuteString(input);
-			}
-			catch (const exception& ex)
-			{
-				TENLog("Error executing " + input + ": " + ex.what(), LogLevel::Error);
-			}
+			g_GameScript->AddConsoleInput(input);
 		}
 	}
 
