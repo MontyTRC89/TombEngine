@@ -267,8 +267,7 @@ unsigned CALLBACK ConsoleInput(void*)
 			}
 			catch (const exception& ex)
 			{
-				std::string error = ex.what();
-				TENLog("Error executing " + input + ": " + error.substr(error.find(":1: ") + 4), LogLevel::Error);
+				TENLog("Error executing " + input + ": " + ex.what(), LogLevel::Error);
 			}
 		}
 	}
