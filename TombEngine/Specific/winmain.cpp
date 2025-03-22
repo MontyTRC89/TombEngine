@@ -639,7 +639,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 void WinClose()
 {
-	CloseHandle((HANDLE)ConsoleThreadHandle);
+	if (ConsoleThreadHandle)
+		CloseHandle((HANDLE)ConsoleThreadHandle);
+
 	WaitForSingleObject((HANDLE)ThreadHandle, 5000);
 
 	DestroyAcceleratorTable(hAccTable);
