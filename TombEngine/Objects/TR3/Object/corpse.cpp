@@ -72,7 +72,7 @@ namespace TEN::Entities::TR3
 		AddActiveItem(itemNumber);
 		item.Status = ITEM_ACTIVE;
 
-		item.ItemFlags[(int)FirefliesItemFlags::TargetItemPtr] = item.Index;
+		item.ItemFlags[(int)FirefliesItemFlags::TargetMoveableID] = item.Index;
 		item.ItemFlags[(int)FirefliesItemFlags::TriggerFlags] = NO_VALUE;
 		item.HitPoints = FLY_COUNT;
 	}

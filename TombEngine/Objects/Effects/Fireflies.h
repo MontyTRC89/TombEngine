@@ -12,7 +12,7 @@ namespace TEN::Effects::Fireflies
 {
 	enum class FirefliesItemFlags
 	{
-		TargetItemPtr,
+		TargetMoveableID,
 		Light,
 		TriggerFlags,
 		SpawnCounter,
@@ -32,7 +32,7 @@ namespace TEN::Effects::Fireflies
 		Vector3		PositionTarget = Vector3::Zero;
 		EulerAngles Orientation	   = EulerAngles::Identity;
 		float		Velocity	   = 0.0f;
-		Vector4		Color		   = Vector4::Zero; // TODO
+		Vector4		Color		   = Vector4::Zero; // TODO: Normalised colours.
 
 		int	  ID   = 0;
 		float Life = 0.0f;
@@ -42,7 +42,7 @@ namespace TEN::Effects::Fireflies
 		ItemInfo* TargetItem = nullptr; // TODO: Use moveable ID instead.
 
 		Vector3 PrevPosition = Vector3::Zero;
-		Vector4 PrevColor	 = Vector4::Zero; // TODO
+		Vector4 PrevColor	 = Vector4::Zero; // TODO: Normalised colours.
 
 		// TODO: Not needed.
 		unsigned char rB;
