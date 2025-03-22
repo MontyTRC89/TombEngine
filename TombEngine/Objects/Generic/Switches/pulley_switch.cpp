@@ -141,38 +141,42 @@ namespace TEN::Entities::Switches
 	void ControlPulleySwitch(short itemNumber)
 	{
 		auto* switchItem = &g_Level.Items[itemNumber];
-		TENLog("CONTROL RUNNING", LogLevel::Warning, LogConfig::All ,true);
 		AnimateItem(switchItem);
-		
+
+		bool isUnderwater = (Lara.Control.WaterStatus == WaterStatus::Underwater);
+
 		if (switchItem->Animation.ActiveState == SwitchStatus::SWITCH_ON)
 		{
-			TENLog("SWITCH ON", LogLevel::Warning);
-			if (switchItem->Animation.TargetState == SwitchStatus::SWITCH_ON && !IsHeld(In::Action))
+			if (switchItem->Animation.TargetState == SwitchStatus::SWITCH_ON && !IsHeld(In::Action) && (LaraItem->Animation.AnimNumber == LA_PULLEY_PULL || LaraItem->Animation.AnimNumber == LA_UNDERWATER_PULLEY_PULL) &&
+				LaraItem->Animation.FrameNumber == GetAnimData(*LaraItem).frameEnd - 1) 
 			{
-				TENLog("UNGRAB STATE DISPATCHED", LogLevel::Warning);
+				TENLog("SWITCH OFF1", LogLevel::Warning);
 				LaraItem->Animation.TargetState = LS_PULLEY_UNGRAB;
 				switchItem->Animation.TargetState = SwitchStatus::SWITCH_OFF;
 			}
+
 			if ((LaraItem->Animation.AnimNumber == LA_PULLEY_PULL || LaraItem->Animation.AnimNumber == LA_UNDERWATER_PULLEY_PULL) &&
-				LaraItem->Animation.FrameNumber == GetAnimData(*LaraItem).frameBase + 44)
+				LaraItem->Animation.FrameNumber == GetAnimData(*LaraItem).frameBase)
 			{
-				if (switchItem->TriggerFlags)
+				TENLog("TEST TRUE", LogLevel::Warning);
+				if (switchItem->TriggerFlags)  //CHECKS IF OCB IS PRESENT
 				{
-					if (!switchItem->ItemFlags[1])
+					TENLog("TriggerFlags: " + std::to_string(switchItem->TriggerFlags), LogLevel::Warning);
+					if (!switchItem->ItemFlags[1]) //CHECK FOR THE SWITCH BEING HIDDEN
 					{
 						switchItem->TriggerFlags--;
-						if (switchItem->TriggerFlags)
+						if (switchItem->TriggerFlags) 
 						{
 							if (switchItem->ItemFlags[2])
 							{
 								switchItem->ItemFlags[2] = 0;
-								switchItem->Status = ITEM_DEACTIVATED;
+								switchItem->Status = ITEM_NOT_ACTIVE;
 							}
 						}
 						else
 						{
-							switchItem->Status = ITEM_DEACTIVATED;
 							switchItem->ItemFlags[2] = 1;
+							switchItem->Status = ITEM_NOT_ACTIVE;
 
 							if (switchItem->ItemFlags[3] >= 0)
 								switchItem->TriggerFlags = abs(switchItem->ItemFlags[3]);
@@ -186,10 +190,9 @@ namespace TEN::Entities::Switches
 		else
 		{
 			if ((switchItem->Animation.FrameNumber == GetAnimData(switchItem).frameEnd)
-				&& (LaraItem->Animation.AnimNumber == LA_PULLEY_RELEASE || LaraItem->Animation.AnimNumber == LA_UNDERWATER_PULLEY_UNGRAB))
+				&& (LaraItem->Animation.AnimNumber == LA_PULLEY_RELEASE))
 			{
-				TENLog("ITEM DEACTIVATED", LogLevel::Warning);
-				switchItem->Animation.ActiveState = SwitchStatus::SWITCH_OFF;
+				switchItem->Animation.ActiveState = SWITCH_OFF;
 				switchItem->Status = ITEM_NOT_ACTIVE;
 
 				RemoveActiveItem(itemNumber);
@@ -198,9 +201,8 @@ namespace TEN::Entities::Switches
 			}
 			else
 			{
-				TENLog("ITEM ACTIVATED", LogLevel::Warning);
 				//If Lara is repeating the PULL animation (because player dropped after the frame check).
-				//do the animation again.
+				//do the wheel animation again.
 				switchItem->Animation.TargetState = SWITCH_ON;
 			}
 		}

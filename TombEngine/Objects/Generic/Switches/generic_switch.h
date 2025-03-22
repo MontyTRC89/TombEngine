@@ -9,7 +9,6 @@ namespace TEN::Entities::Switches
 	{
 		SWITCH_OFF,
 		SWITCH_ON,
-		SWITCH_OFF_UNDERWATER,
 		SWITCH_ON_UNDERWATER
 	};
 	
