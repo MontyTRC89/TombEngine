@@ -30,8 +30,8 @@ using std::cout;
 using std::endl;
 
 WINAPP App;
-unsigned int ThreadID;
-uintptr_t ThreadHandle;
+unsigned int ThreadID, ConsoleThreadID;
+uintptr_t ThreadHandle, ConsoleThreadHandle;
 HACCEL hAccTable;
 bool DebugMode = false;
 HWND WindowsHandle;
@@ -242,6 +242,37 @@ bool GenerateDummyLevel(const std::string& levelPath)
 	return true;
 }
 
+unsigned CALLBACK ConsoleInput(void*)
+{
+	std::string input;
+
+	while (!ThreadEnded)
+	{
+		if (!std::getline(std::cin, input))
+			break;
+
+		if (g_GameScript == nullptr)
+		{
+			TENLog("Scripting engine not initialized.", LogLevel::Error);
+			continue;
+		}
+		else
+		{
+			try
+			{
+				g_GameScript->ExecuteString(input);
+			}
+			catch (const exception& ex)
+			{
+				std::string error = ex.what();
+				TENLog("Error executing " + input + ": " + error.substr(error.find(":1: ") + 4), LogLevel::Error);
+			}
+		}
+	}
+
+	return true;
+}
+
 void WinProcMsg()
 {
 	MSG msg;
@@ -406,7 +437,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 #ifndef _DEBUG
 	if (!DebugMode)
 		ShowWindow(GetConsoleWindow(), 0);
+	else
 #endif
+		ConsoleThreadHandle = BeginThread(ConsoleInput, ConsoleThreadID);
 
 	// Clear application structure.
 	memset(&App, 0, sizeof(WINAPP));
@@ -615,6 +648,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 void WinClose()
 {
+	CloseHandle((HANDLE)ConsoleThreadHandle);
 	WaitForSingleObject((HANDLE)ThreadHandle, 5000);
 
 	DestroyAcceleratorTable(hAccTable);
