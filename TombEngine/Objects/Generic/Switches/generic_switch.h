@@ -9,7 +9,8 @@ namespace TEN::Entities::Switches
 	{
 		SWITCH_OFF,
 		SWITCH_ON,
-		SWITCH_ON_UNDERWATER
+		SWITCH_WAIT,
+		SWITCH_ANIMATE
 	};
 	
 	void SwitchControl(short itemNumber);

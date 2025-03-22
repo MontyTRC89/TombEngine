@@ -76,9 +76,7 @@ namespace TEN::Entities::Switches
 		//polish animations and locations
 		bool isPlayerIdle = (!isUnderwater && laraItem->Animation.ActiveState == LS_IDLE && laraItem->Animation.AnimNumber == LA_STAND_IDLE && laraItem->Animation.IsAirborne == false) ||
 			(isUnderwater && laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE && laraItem->Animation.AnimNumber == LA_UNDERWATER_IDLE);
-		if (switchItem->Status == ITEM_NOT_ACTIVE)
-		{
-			if (isActionActive || (isActionReady && isPlayerAvailable && isPlayerIdle))
+		if (isActionActive || (isActionReady && isPlayerAvailable && isPlayerIdle))
 			{
 				short oldYrot = switchItem->Pose.Orientation.y;
 
@@ -110,7 +108,7 @@ namespace TEN::Entities::Switches
 
 						AddActiveItem(itemNumber);
 						switchItem->Status = ITEM_ACTIVE;
-						switchItem->Animation.TargetState = SWITCH_ON;
+						switchItem->Animation.TargetState = SWITCH_ANIMATE;
 
 						if (!isUnderwater)
 							switchItem->Pose.Orientation.y = oldYrot;
@@ -132,7 +130,6 @@ namespace TEN::Entities::Switches
 					if (!isUnderwater)
 						switchItem->Pose.Orientation.y = oldYrot;
 				}
-			}
 		}
 		else if (laraItem->Animation.ActiveState != LS_PULLEY)
 			ObjectCollision(itemNumber, laraItem, coll);
@@ -145,52 +142,49 @@ namespace TEN::Entities::Switches
 
 		bool isPulling = (LaraItem->Animation.AnimNumber == LA_PULLEY_PULL || LaraItem->Animation.AnimNumber == LA_UNDERWATER_PULLEY_PULL);
 		bool isReleasing = (LaraItem->Animation.AnimNumber == LA_PULLEY_RELEASE);
-		bool isFinalFrame = (LaraItem->Animation.FrameNumber == GetAnimData(*LaraItem).frameEnd - 1);
 		bool isBaseFrame = (LaraItem->Animation.FrameNumber == GetAnimData(*LaraItem).frameBase);
 
-		// If switch is ON (being pulled)
-		if (switchItem->Animation.ActiveState == SwitchStatus::SWITCH_ON)
+		switch (switchItem->Animation.ActiveState)
 		{
-			// Decrement TriggerFlags when pull animation reaches the base frame
+		case SwitchStatus::SWITCH_ANIMATE:
+			// Decrement TriggerFlags when reaching the base frame
 			if (isPulling && isBaseFrame && switchItem->TriggerFlags > 0)
 			{
 				switchItem->TriggerFlags--;
 				TENLog("TriggerFlags Decremented: " + std::to_string(switchItem->TriggerFlags), LogLevel::Warning);
 			}
 
-			// If TriggerFlags reaches 0, activate the switch
-			if (switchItem->TriggerFlags == 0 && switchItem->ItemFlags[2] == 0)
+			// If Ctrl is released, switch goes into WAIT state after animation ends
+			if (!IsHeld(In::Action) && isPulling && switchItem->TriggerFlags > 0)
+			{
+				TENLog("SWITCH TO WAIT", LogLevel::Warning);
+				switchItem->Animation.TargetState = SwitchStatus::SWITCH_WAIT;
+				LaraItem->Animation.TargetState = LS_PULLEY_UNGRAB;
+			}
+
+			// If Ctrl is released, switch goes into complete state if TriggerFlag = 0 and ItemFlag[2] = 0
+			if (!IsHeld(In::Action) && isPulling && switchItem->TriggerFlags == 0 && switchItem->ItemFlags[2] == 0)
 			{
 				switchItem->ItemFlags[2] = 1;  // Mark switch as activated
-				switchItem->Status = ITEM_ACTIVE;
+				switchItem->Animation.TargetState = SwitchStatus::SWITCH_ON;
+				LaraItem->Animation.TargetState = LS_PULLEY_UNGRAB;
 				TENLog("Pulley Activated!", LogLevel::Warning);
 			}
+			break;
 
-			// If player releases Ctrl, allow animation to finish, but count down TriggerFlags
-			if (!IsHeld(In::Action) && isPulling && isFinalFrame)
+		case SwitchStatus::SWITCH_ON:
+			// Restore TriggerFlags if the switch is re-used
+			if (switchItem->ItemFlags[3] >= 0 && switchItem->ItemFlags[2] == 1)
 			{
-				TENLog("SWITCH OFF (Released Early)", LogLevel::Warning);
-				LaraItem->Animation.TargetState = LS_PULLEY_UNGRAB;
-				switchItem->Animation.TargetState = SwitchStatus::SWITCH_OFF;
+				switchItem->TriggerFlags = abs(switchItem->ItemFlags[3]);
+				switchItem->ItemFlags[2] = 0;  // Reset activation flag
+				TENLog("TriggerFlags Restored: " + std::to_string(switchItem->TriggerFlags), LogLevel::Warning);
 			}
-		}
-		else
-		{
-			// If Lara finishes the release animation, reset the switch
-			if (isReleasing && switchItem->Animation.FrameNumber == GetAnimData(switchItem).frameEnd)
-			{
-				switchItem->Animation.ActiveState = SwitchStatus::SWITCH_OFF;
-				Lara.Control.HandStatus = HandStatus::Free;
-				TENLog("Pulley Switch Reset", LogLevel::Warning);
-			}
-		}
+			break;
 
-		// Restore original TriggerFlags if the switch is activated again
-		if (switchItem->ItemFlags[3] >= 0 && switchItem->ItemFlags[2] == 1)
-		{
-			switchItem->TriggerFlags = abs(switchItem->ItemFlags[3]);
-			switchItem->ItemFlags[2] = 0;  // Reset activation flag
-			TENLog("TriggerFlags Restored: " + std::to_string(switchItem->TriggerFlags), LogLevel::Warning);
+		case SwitchStatus::SWITCH_WAIT:
+			// If Ctrl is pressed again, transition to ANIMATE state (handled externally)
+			break;
 		}
 	}
 }
