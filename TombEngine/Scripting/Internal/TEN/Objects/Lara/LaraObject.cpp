@@ -2,6 +2,7 @@
 #include "LaraObject.h"
 
 #include "Game/camera.h"
+#include "Game/collision/collide_item.h"
 #include "Game/effects/item_fx.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_fire.h"
@@ -9,8 +10,16 @@
 #include "Game/Lara/lara_struct.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/Input/ActionIDs.h"
 #include "Scripting/Internal/TEN/Objects/Lara/AmmoTypes.h"
+#include "Scripting/Internal/TEN/Types/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
+#include "Specific/Input/Input.h"
+#include "Specific/Input/InputAction.h"
 #include "Specific/level.h"
+
+using namespace TEN::Input;
 
 /// Class for extra player-only functions.
 // Do not try to create an object of this type. Use the built-in *Lara* variable instead.
@@ -388,30 +397,133 @@ bool LaraObject::TorchIsLit() const
 	return lara->Torch.IsLit;
 }
 
+/// Align the player to a moveable object for interaction.
+// @function LaraObject:AlignToMoveable
+// @tparam Moveable mov Moveable object to align the player with.
+// @tparam[opt] Input.ActionID actionID Input action ID to trigger the alignment. __default: Input.ActionID.ACTION__
+// @tparam[opt] int animNumber The animation to play after alignment is complete. __default: BUTTON_PUSH__
+// @tparam[opt] Vec3 offset Relative position offset from the moveable. __default: Vec3(0, 0, 312)__
+// @tparam[opt] Vec3 minOffsetConstraint Minimum relative offset constraint. __default: Vec3(-256, -512, 0)__
+// @tparam[opt] Vec3 maxOffsetConstraint Maximum relative offset constraint. __default: Vec3(256, 0, 512)__
+// @tparam[opt] Rotation minRotConstraint Minimum relative rotation constraint. __default: Rotation(-10, -40, -10)__
+// @tparam[opt] Rotation maxRotConstraint Maximum relative rotation constraint. __default: Rotation(10, 40, 10)__
+// @usage
+// local Lara:AlignToMoveable(moveable, TEN.Input.ActionID.ACTION, 197,
+//                            Vec3(0, 0, 312), Vec3(-256, -512, -256), Vec3(256, 0, 512),
+//	                          Rotation(-10, -30, -10), Rotation(10, 30, 10))
+void LaraObject::AlignToMoveable(const Moveable& mov, TypeOrNil<InputActionID> actionID, TypeOrNil<int> animNumber,
+								 TypeOrNil<Vec3> offset, TypeOrNil<Vec3> offsetConstraintMin, TypeOrNil<Vec3> offsetConstraintMax,
+								 TypeOrNil<Rotation> rotConstraintMin, TypeOrNil<Rotation> rotConstraintMax) const
+{
+	auto convertedOffset = ValueOr<Vec3>(offset, Vec3(0, 0, 312)).ToVector3i();
+	auto convertedOffsetConstraintMin = ValueOr<Vec3>(offsetConstraintMin, Vec3(-BLOCK(0.25f), -BLOCK(0.5f), 0));
+	auto convertedOffsetConstraintMax = ValueOr<Vec3>(offsetConstraintMax, Vec3(BLOCK(0.25f), 0, BLOCK(0.5f)));
+	auto convertedRotConstraintMin = ValueOr<Rotation>(rotConstraintMin, Rotation(-10.0f, -40.0f, -10.0f)).ToEulerAngles();
+	auto convertedRotConstraintMax = ValueOr<Rotation>(rotConstraintMax, Rotation(10.0f, 40.0f, 10.0f)).ToEulerAngles();
+	int convertedAnimNumber = ValueOr<int>(animNumber, LA_BUTTON_SMALL_PUSH);
+	auto convertedActionID = ValueOr<InputActionID>(actionID, In::Action);
+
+	auto interactionBasis = ObjectCollisionBounds
+	{
+		GameBoundingBox(
+			convertedOffsetConstraintMin.x, convertedOffsetConstraintMax.x,
+			convertedOffsetConstraintMin.y, convertedOffsetConstraintMax.y,
+			convertedOffsetConstraintMin.z, convertedOffsetConstraintMax.z),
+		std::pair(
+			convertedRotConstraintMin,
+			convertedRotConstraintMax)
+	};
+
+	auto& player = GetLaraInfo(*_moveable);
+	auto& item = g_Level.Items[mov.GetIndex()];
+
+	bool isUnderwater = (player.Control.WaterStatus == WaterStatus::Underwater);
+	bool isPlayerIdle = ((!isUnderwater && _moveable->Animation.ActiveState == LS_IDLE && _moveable->Animation.AnimNumber == LA_STAND_IDLE) ||
+						 (isUnderwater && _moveable->Animation.ActiveState == LS_UNDERWATER_IDLE && _moveable->Animation.AnimNumber == LA_UNDERWATER_IDLE));
+
+	if ((player.Control.IsMoving && player.Context.InteractedItem == item.Index) ||
+		(IsHeld(convertedActionID) && player.Control.HandStatus == HandStatus::Free && isPlayerIdle))
+	{
+		if (TestLaraPosition(interactionBasis, &item, _moveable))
+		{
+			if (MoveLaraPosition(convertedOffset, &item, _moveable))
+			{
+				ResetPlayerFlex(_moveable);
+				SetAnimation(_moveable, convertedAnimNumber);
+
+				_moveable->Animation.FrameNumber = GetAnimData(_moveable).frameBase;
+				player.Control.IsMoving = false;
+				player.Control.HandStatus = HandStatus::Busy;
+			}
+			else
+			{
+				player.Context.InteractedItem = item.Index;
+			}
+		}
+	}
+}
+
+/// Test the player's position against a moveable object for interaction.
+// @function LaraObject:TestPosition
+// @tparam Moveable mov Moveable object to align the player with.
+// @tparam[opt] Vec3 minOffsetConstraint Minimum relative offset constraint. __default: Vec3(-256, -512, 0)__
+// @tparam[opt] Vec3 maxOffsetConstraint Maximum relative offset constraint. __default: Vec3(256, 0, 512)__
+// @tparam[opt] Rotation minRotConstraint Minimum relative rotation constraint. __default: Rotation(-10, -40, -10)__
+// @tparam[opt] Rotation maxRotConstraint Maximum relative rotation constraint. __default: Rotation(10, 40, 10)__
+bool LaraObject::TestPosition(const Moveable& mov,
+							  TypeOrNil<Vec3> offsetConstraintMin, TypeOrNil<Vec3> offsetConstraintMax,
+							  TypeOrNil<Rotation> rotConstraintMin, TypeOrNil<Rotation> rotConstraintMax) const
+{
+
+	auto convertedOffsetConstraintMin = ValueOr<Vec3>(offsetConstraintMin, Vec3(-BLOCK(0.25f), -BLOCK(0.5f), 0));
+	auto convertedOffsetConstraintMax = ValueOr<Vec3>(offsetConstraintMax, Vec3(BLOCK(0.25f), 0, BLOCK(0.5f)));
+	auto convertedRotConstraintMin = ValueOr<Rotation>(rotConstraintMin, Rotation(-10.0f, -40.0f, -10.0f)).ToEulerAngles();
+	auto convertedRotConstraintMax = ValueOr<Rotation>(rotConstraintMax, Rotation(10.0f, 40.0f, 10.0f)).ToEulerAngles();
+
+	auto interactionBasis = ObjectCollisionBounds
+	{
+		GameBoundingBox(
+			convertedOffsetConstraintMin.x, convertedOffsetConstraintMax.x,
+			convertedOffsetConstraintMin.y, convertedOffsetConstraintMax.y,
+			convertedOffsetConstraintMin.z, convertedOffsetConstraintMax.z),
+		std::pair(
+			convertedRotConstraintMin,
+			convertedRotConstraintMax)
+	};
+
+	auto& item = g_Level.Items[mov.GetIndex()];
+	return (TestLaraPosition(interactionBasis, &item, _moveable));
+}
+
 void LaraObject::Register(sol::table& parent)
 {
-	parent.new_usertype<LaraObject>(LUA_CLASS_NAME,
-			ScriptReserved_SetPoison, &LaraObject::SetPoison,
-			ScriptReserved_GetPoison, &LaraObject::GetPoison,
-			ScriptReserved_SetAir, &LaraObject::SetAir,
-			ScriptReserved_GetAir, &LaraObject::GetAir,
-			ScriptReserved_SetWet, &LaraObject::SetWet,
-			ScriptReserved_GetWet, &LaraObject::GetWet,
-			ScriptReserved_SetStamina, &LaraObject::SetStamina,
-			ScriptReserved_GetStamina, &LaraObject::GetStamina,
-			ScriptReserved_GetAirborne, &LaraObject::GetAirborne,
-			ScriptReserved_SetAirborne, &LaraObject::SetAirborne,
-			ScriptReserved_UndrawWeapon, &LaraObject::UndrawWeapon,
-			ScriptReserved_ThrowAwayTorch, &LaraObject::ThrowAwayTorch,
-			ScriptReserved_GetHandStatus, &LaraObject::GetHandStatus,
-			ScriptReserved_GetWeaponType, &LaraObject::GetWeaponType,
-			ScriptReserved_SetWeaponType, &LaraObject::SetWeaponType,
-			ScriptReserved_GetAmmoType, &LaraObject::GetAmmoType,
-			ScriptReserved_GetAmmoCount, &LaraObject::GetAmmoCount,
-			ScriptReserved_GetVehicle, &LaraObject::GetVehicle,
-			ScriptReserved_GetTarget, &LaraObject::GetTarget,
-			ScriptReserved_GetPlayerInteractedMoveable, &LaraObject::GetPlayerInteractedMoveable,
-			ScriptReserved_TorchIsLit, &LaraObject::TorchIsLit,
-			sol::base_classes, sol::bases<Moveable>()
-		);
+	parent.new_usertype<LaraObject>(
+		LUA_CLASS_NAME,
+
+		ScriptReserved_SetPoison, &LaraObject::SetPoison,
+		ScriptReserved_GetPoison, &LaraObject::GetPoison,
+		ScriptReserved_SetAir, &LaraObject::SetAir,
+		ScriptReserved_GetAir, &LaraObject::GetAir,
+		ScriptReserved_SetWet, &LaraObject::SetWet,
+		ScriptReserved_GetWet, &LaraObject::GetWet,
+		ScriptReserved_SetStamina, &LaraObject::SetStamina,
+		ScriptReserved_GetStamina, &LaraObject::GetStamina,
+		ScriptReserved_GetAirborne, &LaraObject::GetAirborne,
+		ScriptReserved_SetAirborne, &LaraObject::SetAirborne,
+		ScriptReserved_UndrawWeapon, &LaraObject::UndrawWeapon,
+		ScriptReserved_ThrowAwayTorch, &LaraObject::ThrowAwayTorch,
+		ScriptReserved_GetHandStatus, &LaraObject::GetHandStatus,
+		ScriptReserved_GetWeaponType, &LaraObject::GetWeaponType,
+		ScriptReserved_SetWeaponType, &LaraObject::SetWeaponType,
+		ScriptReserved_GetAmmoType, &LaraObject::GetAmmoType,
+		ScriptReserved_GetAmmoCount, &LaraObject::GetAmmoCount,
+		ScriptReserved_GetVehicle, &LaraObject::GetVehicle,
+		ScriptReserved_GetTarget, &LaraObject::GetTarget,
+		ScriptReserved_GetPlayerInteractedMoveable, &LaraObject::GetPlayerInteractedMoveable,
+		ScriptReserved_TorchIsLit, &LaraObject::TorchIsLit,
+
+		ScriptReserved_AlignToMoveable, &LaraObject::AlignToMoveable,
+		ScriptReserved_TestPosition, &LaraObject::TestPosition,
+
+		sol::base_classes, sol::bases<Moveable>());
 }
