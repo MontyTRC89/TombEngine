@@ -141,9 +141,9 @@ namespace TEN::Entities::Switches
 	void ControlPulleySwitch(short itemNumber)
 	{
 		auto* switchItem = &g_Level.Items[itemNumber];
-
+		TENLog("CONTROL RUNNING", LogLevel::Warning, LogConfig::All ,true);
 		AnimateItem(switchItem);
-		TENLog("CONTROL RUNNING", LogLevel::Warning);
+		
 		if (switchItem->Animation.ActiveState == SwitchStatus::SWITCH_ON)
 		{
 			TENLog("SWITCH ON", LogLevel::Warning);
