@@ -6,7 +6,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ## [Version 1.8.1](link to release) - yyyy-mm-dd
 
 ### New features
-* Added ability to perform Lua commands in the console window in realtime.
+* Added live console input to perform Lua commands in realtime.
 
 ### Bug fixes
 * Fixed particles remaining in the level after reloading from the savegame.
