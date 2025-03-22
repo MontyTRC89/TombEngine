@@ -59,7 +59,7 @@ namespace TEN::Entities::Switches
 		}
 	}
 
-	void PulleySwitchCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	void CollisionPulleySwitch(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
 	{
 		auto* laraInfo = GetLaraInfo(laraItem);
 		auto* switchItem = &g_Level.Items[itemNumber];
@@ -76,63 +76,133 @@ namespace TEN::Entities::Switches
 		//polish animations and locations
 		bool isPlayerIdle = (!isUnderwater && laraItem->Animation.ActiveState == LS_IDLE && laraItem->Animation.AnimNumber == LA_STAND_IDLE && laraItem->Animation.IsAirborne == false) ||
 			(isUnderwater && laraItem->Animation.ActiveState == LS_UNDERWATER_IDLE && laraItem->Animation.AnimNumber == LA_UNDERWATER_IDLE);
-
-		if (isActionActive || (isActionReady && isPlayerAvailable && isPlayerIdle))
+		if (switchItem->Status == ITEM_NOT_ACTIVE)
 		{
-			short oldYrot = switchItem->Pose.Orientation.y;
-			
-			if (!isUnderwater)
-			switchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
-
-			if (TestLaraPosition(bounds, switchItem, laraItem))
+			if (isActionActive || (isActionReady && isPlayerAvailable && isPlayerIdle))
 			{
-				if (switchItem->ItemFlags[1])
-				{
-					if (OldPickupPos.x != laraItem->Pose.Position.x || OldPickupPos.y != laraItem->Pose.Position.y || OldPickupPos.z != laraItem->Pose.Position.z)
-					{
-						OldPickupPos.x = laraItem->Pose.Position.x;
-						OldPickupPos.y = laraItem->Pose.Position.y;
-						OldPickupPos.z = laraItem->Pose.Position.z;
-						SayNo();
-					}
-				}
-				else if (MoveLaraPosition(position, switchItem, laraItem))
-				{
-					laraItem->Animation.AnimNumber = isUnderwater ? LA_UNDERWATER_PULLEY_GRAB : LA_PULLEY_GRAB;
-					laraItem->Animation.ActiveState = LS_PULLEY;
-					laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+				short oldYrot = switchItem->Pose.Orientation.y;
 
-					AddActiveItem(itemNumber);
+				if (!isUnderwater)
+					switchItem->Pose.Orientation.y = laraItem->Pose.Orientation.y;
+
+				if (TestLaraPosition(bounds, switchItem, laraItem))
+				{
+					if (switchItem->ItemFlags[1])
+					{
+						if (OldPickupPos.x != laraItem->Pose.Position.x || OldPickupPos.y != laraItem->Pose.Position.y || OldPickupPos.z != laraItem->Pose.Position.z)
+						{
+							OldPickupPos.x = laraItem->Pose.Position.x;
+							OldPickupPos.y = laraItem->Pose.Position.y;
+							OldPickupPos.z = laraItem->Pose.Position.z;
+							SayNo();
+						}
+					}
+					else if (MoveLaraPosition(position, switchItem, laraItem))
+					{
+						ResetPlayerFlex(laraItem);
+						laraItem->Animation.AnimNumber = isUnderwater ? LA_UNDERWATER_PULLEY_GRAB : LA_PULLEY_GRAB;
+						laraItem->Animation.ActiveState = LS_PULLEY;
+						laraItem->Animation.TargetState = LS_PULLEY;
+						laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
+						laraInfo->Control.IsMoving = false;
+						laraInfo->Control.HandStatus = HandStatus::Busy;
+						laraInfo->Context.InteractedItem = itemNumber;
+
+						AddActiveItem(itemNumber);
+						switchItem->Status = ITEM_ACTIVE;
+						switchItem->Animation.TargetState = SWITCH_ON;
+
+						if (!isUnderwater)
+							switchItem->Pose.Orientation.y = oldYrot;
+					}
+					else
+						laraInfo->Context.InteractedItem = itemNumber;
 
 					if (!isUnderwater)
-					switchItem->Pose.Orientation.y = oldYrot;
-
-					switchItem->Status = ITEM_ACTIVE;
-
-					laraInfo->Control.IsMoving = false;
-					ResetPlayerFlex(laraItem);
-					laraInfo->Control.HandStatus = HandStatus::Busy;
-					laraInfo->Context.InteractedItem = itemNumber;
+						switchItem->Pose.Orientation.y = oldYrot;
 				}
 				else
-					laraInfo->Context.InteractedItem = itemNumber;
-				
-				if (!isUnderwater)
-				switchItem->Pose.Orientation.y = oldYrot;
-			}
-			else
-			{
-				if (laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber)
 				{
-					laraInfo->Control.IsMoving = false;
-					laraInfo->Control.HandStatus = HandStatus::Free;
-				}
+					if (laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber)
+					{
+						laraInfo->Control.IsMoving = false;
+						laraInfo->Control.HandStatus = HandStatus::Free;
+					}
 
-				if (!isUnderwater)
-				switchItem->Pose.Orientation.y = oldYrot;
+					if (!isUnderwater)
+						switchItem->Pose.Orientation.y = oldYrot;
+				}
 			}
 		}
 		else if (laraItem->Animation.ActiveState != LS_PULLEY)
 			ObjectCollision(itemNumber, laraItem, coll);
+	}
+
+	void ControlPulleySwitch(short itemNumber)
+	{
+		auto* switchItem = &g_Level.Items[itemNumber];
+
+		AnimateItem(switchItem);
+
+		if (switchItem->Animation.ActiveState == SwitchStatus::SWITCH_ON)
+		{
+			if (switchItem->Animation.TargetState == SwitchStatus::SWITCH_ON && !IsHeld(In::Action))
+			{
+				TENLog("UNGRAB STATE DISPATCHED", LogLevel::Warning);
+				LaraItem->Animation.TargetState = LS_PULLEY_UNGRAB;
+				switchItem->Animation.TargetState = SwitchStatus::SWITCH_OFF;
+			}
+			if ((LaraItem->Animation.AnimNumber == LA_PULLEY_PULL || LaraItem->Animation.AnimNumber == LA_UNDERWATER_PULLEY_PULL) &&
+				LaraItem->Animation.FrameNumber == GetAnimData(*LaraItem).frameBase + 44)
+			{
+				if (switchItem->TriggerFlags)
+				{
+					if (!switchItem->ItemFlags[1])
+					{
+						switchItem->TriggerFlags--;
+						if (switchItem->TriggerFlags)
+						{
+							if (switchItem->ItemFlags[2])
+							{
+								switchItem->ItemFlags[2] = 0;
+								switchItem->Status = ITEM_DEACTIVATED;
+							}
+						}
+						else
+						{
+							switchItem->Status = ITEM_DEACTIVATED;
+							switchItem->ItemFlags[2] = 1;
+
+							if (switchItem->ItemFlags[3] >= 0)
+								switchItem->TriggerFlags = abs(switchItem->ItemFlags[3]);
+							else
+								switchItem->ItemFlags[0] = 1;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			if ((switchItem->Animation.FrameNumber == GetAnimData(switchItem).frameEnd)
+				&& (LaraItem->Animation.AnimNumber == LA_PULLEY_RELEASE || LaraItem->Animation.AnimNumber == LA_UNDERWATER_PULLEY_UNGRAB))
+			{
+				TENLog("ITEM DEACTIVATED", LogLevel::Warning);
+				switchItem->Animation.ActiveState = SwitchStatus::SWITCH_OFF;
+				switchItem->Status = ITEM_NOT_ACTIVE;
+
+				RemoveActiveItem(itemNumber);
+
+				Lara.Control.HandStatus = HandStatus::Free;
+			}
+			else
+			{
+				TENLog("ITEM ACTIVATED", LogLevel::Warning);
+				//If Lara is repeating the PULL animation (because player dropped after the frame check).
+				//do the animation again.
+				switchItem->Animation.TargetState = SWITCH_ON;
+			}
+		}
+
 	}
 }

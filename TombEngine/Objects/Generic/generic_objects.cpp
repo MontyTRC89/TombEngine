@@ -201,8 +201,8 @@ void StartSwitches(ObjectInfo* object)
 	if (object->loaded)
 	{
 		object->Initialize = InitializePulleySwitch;
-		object->control = SwitchControl;
-		object->collision = PulleySwitchCollision;
+		object->control = ControlPulleySwitch;
+		object->collision = CollisionPulleySwitch;
 	}
 
 	object = &Objects[ID_TURN_SWITCH];
