@@ -163,7 +163,7 @@ namespace TEN::Entities::Switches
 			}
 
 			// If Ctrl is released, switch goes into complete state if TriggerFlag = 0 and ItemFlag[2] = 0
-			if (!IsHeld(In::Action) && isPulling && switchItem->TriggerFlags == 0 && switchItem->ItemFlags[2] == 0)
+			if (isPulling && switchItem->TriggerFlags == 0 && switchItem->ItemFlags[2] == 0)
 			{
 				switchItem->ItemFlags[2] = 1;  // Mark switch as activated
 				switchItem->Animation.TargetState = SwitchStatus::SWITCH_ON;
