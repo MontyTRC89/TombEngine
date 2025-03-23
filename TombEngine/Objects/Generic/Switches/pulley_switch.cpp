@@ -13,6 +13,15 @@
 
 using namespace TEN::Input;
 
+enum PulleyFlags
+{
+	OneShot,
+	NotHidden,
+	Status,
+	PullCount,
+	State
+};
+
 namespace TEN::Entities::Switches
 {
 	const ObjectCollisionBounds PulleyBounds =
@@ -49,12 +58,16 @@ namespace TEN::Entities::Switches
 	{
 		auto* switchItem = &g_Level.Items[itemNumber];
 
-		switchItem->ItemFlags[3] = switchItem->TriggerFlags;
+		//Add OCB 1 in case its not set. This helps avoid builders having to add a manual OCB every single time they have to use the object.
+		if (switchItem->TriggerFlags == 0)
+			switchItem->TriggerFlags = 1;
+
+		switchItem->ItemFlags[PulleyFlags::PullCount] = switchItem->TriggerFlags;
 		switchItem->TriggerFlags = abs(switchItem->TriggerFlags);
 
 		if (switchItem->Status == ITEM_INVISIBLE)
 		{
-			switchItem->ItemFlags[1] = 1;
+			switchItem->ItemFlags[PulleyFlags::NotHidden] = 1;
 			switchItem->Status = ITEM_NOT_ACTIVE;
 		}
 	}
@@ -85,7 +98,7 @@ namespace TEN::Entities::Switches
 
 				if (TestLaraPosition(bounds, switchItem, laraItem))
 				{
-					if (switchItem->ItemFlags[1])
+					if (switchItem->ItemFlags[PulleyFlags::NotHidden])
 					{
 						if (OldPickupPos.x != laraItem->Pose.Position.x || OldPickupPos.y != laraItem->Pose.Position.y || OldPickupPos.z != laraItem->Pose.Position.z)
 						{
@@ -108,7 +121,7 @@ namespace TEN::Entities::Switches
 
 						AddActiveItem(itemNumber);
 						switchItem->Status = ITEM_ACTIVE;
-						switchItem->Animation.TargetState = SWITCH_ANIMATE;
+						switchItem->Animation.TargetState = isUnderwater ? SWITCH_ANIMATE_UNDERWATER : SWITCH_ANIMATE;
 
 						if (!isUnderwater)
 							switchItem->Pose.Orientation.y = oldYrot;
@@ -141,7 +154,7 @@ namespace TEN::Entities::Switches
 		AnimateItem(switchItem);
 
 		bool isPulling = (LaraItem->Animation.AnimNumber == LA_PULLEY_PULL || LaraItem->Animation.AnimNumber == LA_UNDERWATER_PULLEY_PULL);
-		bool isReleasing = (LaraItem->Animation.AnimNumber == LA_PULLEY_RELEASE);
+		bool isReleasing = (LaraItem->Animation.AnimNumber == LA_PULLEY_RELEASE || LaraItem->Animation.AnimNumber == LA_UNDERWATER_PULLEY_UNGRAB);
 		bool isBaseFrame = (LaraItem->Animation.FrameNumber == GetAnimData(*LaraItem).frameBase);
 
 		switch (switchItem->Animation.ActiveState)
@@ -163,10 +176,19 @@ namespace TEN::Entities::Switches
 			}
 
 			// If Ctrl is released, switch goes into complete state if TriggerFlag = 0 and ItemFlag[2] = 0
-			if (isPulling && switchItem->TriggerFlags == 0 && switchItem->ItemFlags[2] == 0)
+			if (isPulling && switchItem->TriggerFlags == 0 && switchItem->ItemFlags[PulleyFlags::Status] == 0)
 			{
-				switchItem->ItemFlags[2] = 1;  // Mark switch as activated
-				switchItem->Animation.TargetState = SwitchStatus::SWITCH_ON;
+				switchItem->ItemFlags[PulleyFlags::Status] = 1;  // Mark switch as activated
+
+				if (switchItem->ItemFlags[PulleyFlags::State] == 1)
+				{
+					switchItem->Animation.TargetState = SwitchStatus::SWITCH_OFF;
+				}
+				else if (switchItem->ItemFlags[PulleyFlags::State] == 0)
+				{
+					switchItem->Animation.TargetState = SwitchStatus::SWITCH_ON;
+				}
+
 				LaraItem->Animation.TargetState = LS_PULLEY_UNGRAB;
 				TENLog("Pulley Activated!", LogLevel::Warning);
 			}
@@ -174,10 +196,22 @@ namespace TEN::Entities::Switches
 
 		case SwitchStatus::SWITCH_ON:
 			// Restore TriggerFlags if the switch is re-used
-			if (switchItem->ItemFlags[3] >= 0 && switchItem->ItemFlags[2] == 1)
+			if (switchItem->ItemFlags[PulleyFlags::PullCount] >= 0 && switchItem->ItemFlags[PulleyFlags::Status] == 1)
 			{
-				switchItem->TriggerFlags = abs(switchItem->ItemFlags[3]);
-				switchItem->ItemFlags[2] = 0;  // Reset activation flag
+				switchItem->TriggerFlags = abs(switchItem->ItemFlags[PulleyFlags::PullCount]);
+				switchItem->ItemFlags[PulleyFlags::Status] = 0;  // Reset activation flag
+				switchItem->ItemFlags[PulleyFlags::State] = 1; //Save switch is active flag
+				TENLog("TriggerFlags Restored: " + std::to_string(switchItem->TriggerFlags), LogLevel::Warning);
+			}
+			break;
+
+		case SwitchStatus::SWITCH_OFF:
+			// Restore TriggerFlags if the switch is re-used
+			if (switchItem->ItemFlags[PulleyFlags::PullCount] >= 0 && switchItem->ItemFlags[PulleyFlags::Status] == 1)
+			{
+				switchItem->TriggerFlags = abs(switchItem->ItemFlags[PulleyFlags::PullCount]);
+				switchItem->ItemFlags[PulleyFlags::Status] = 0;  // Reset activation flag
+				switchItem->ItemFlags[PulleyFlags::State] = 0; //Save switch is Inactive flag
 				TENLog("TriggerFlags Restored: " + std::to_string(switchItem->TriggerFlags), LogLevel::Warning);
 			}
 			break;
