@@ -521,7 +521,7 @@ namespace TEN::Scripting::Effects
 	// @function MakeExplosion 
 	// @tparam Vec3 pos
 	// @tparam float size (default 512.0) this will not be the size of the sprites, but rather the distance between the origin and any additional sprites
-	// @tparam bool shockwave (default false) if true, create a very faint white shockwave which will not hurt Lara. Only visible in dry rooms.
+	// @tparam bool shockwave (default false) if true, create a very faint white shockwave which will not hurt Lara. For underwater rooms it creates a splash if the pos is near the surface.
 	static void MakeExplosion(Vec3 pos, TypeOrNil<float> size, TypeOrNil<bool> shockwave)
 	{
 		int roomNumber = FindRoomNumber(pos.ToVector3i());
