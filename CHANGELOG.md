@@ -9,10 +9,12 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added live console input to perform Lua commands in realtime.
 
 ### Bug fixes
+* Fixed pathfinding for friendly NPCs, such as monkeys.
 * Fixed particles remaining in the level after reloading from the savegame.
 * Fixed particles being canceled by fog bulbs.
 * Fixed crash in case hair object is the last object in a level.
 * Fixed crash with incorrectly applied animated textures on static meshes.
+* Fixed console window not hiding in non-debug mode on Windows 11.
 
 ### Lua API changes
 * Added missing constructor for `Collision.Probe` without room number.
