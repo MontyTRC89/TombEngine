@@ -419,8 +419,8 @@ void LaraObject::Interact(const Moveable& mov, TypeOrNil<InputActionID> actionID
 						  const TypeOrNil<Rotation>& rotConstraintMin, const TypeOrNil<Rotation>& rotConstraintMax) const
 {
 	auto convertedOffset = ValueOr<Vec3>(offset, Vec3(0.0f, 0.0f, BLOCK(0.305f))).ToVector3i();
-	auto convertedOffsetConstraintMin = ValueOr<Vec3>(offsetConstraintMin, Vec3(-BLOCK(0.25f), -BLOCK(0.5f), 0));
-	auto convertedOffsetConstraintMax = ValueOr<Vec3>(offsetConstraintMax, Vec3(BLOCK(0.25f), 0, BLOCK(0.5f)));
+	auto convertedOffsetConstraintMin = ValueOr<Vec3>(offsetConstraintMin, Vec3(-BLOCK(0.25f), -BLOCK(0.5f), 0.0f));
+	auto convertedOffsetConstraintMax = ValueOr<Vec3>(offsetConstraintMax, Vec3(BLOCK(0.25f), 0.0f, BLOCK(0.5f)));
 	auto convertedRotConstraintMin = ValueOr<Rotation>(rotConstraintMin, Rotation(-10.0f, -40.0f, -10.0f)).ToEulerAngles();
 	auto convertedRotConstraintMax = ValueOr<Rotation>(rotConstraintMax, Rotation(10.0f, 40.0f, 10.0f)).ToEulerAngles();
 	int convertedAnimNumber = ValueOr<int>(animNumber, LA_BUTTON_SMALL_PUSH);
