@@ -402,21 +402,21 @@ bool LaraObject::IsTorchLit() const
 /// Align the player with a moveable object for interaction.
 // @function LaraObject:Interact
 // @tparam Moveable mov Moveable object to align the player with.
-// @tparam[opt] Input.ActionID actionID Input action ID to trigger the alignment. __default: Input.ActionID.ACTION__
 // @tparam[opt] int animNumber The animation to play after alignment is complete. __default: BUTTON_PUSH__
 // @tparam[opt] Vec3 offset Relative position offset from the moveable. __default: Vec3(0, 0, 312)__
 // @tparam[opt] Vec3 minOffsetConstraint Minimum relative offset constraint. __default: Vec3(-256, -512, 0)__
 // @tparam[opt] Vec3 maxOffsetConstraint Maximum relative offset constraint. __default: Vec3(256, 0, 512)__
 // @tparam[opt] Rotation minRotConstraint Minimum relative rotation constraint. __default: Rotation(-10, -40, -10)__
 // @tparam[opt] Rotation maxRotConstraint Maximum relative rotation constraint. __default: Rotation(10, 40, 10)__
+// @tparam[opt] Input.ActionID actionID Input action ID to trigger the alignment. __default: Input.ActionID.ACTION__
 // @usage
 // local Lara:Interact(
-//     moveable, TEN.Input.ActionID.ACTION, 197,
+//     moveable, 197,
 //     Vec3(0, 0, 312), Vec3(-256, -512, -256), Vec3(256, 0, 512),
-//	   Rotation(-10, -30, -10), Rotation(10, 30, 10))
-void LaraObject::Interact(const Moveable& mov, TypeOrNil<InputActionID> actionID, TypeOrNil<int> animNumber,
+//	   Rotation(-10, -30, -10), Rotation(10, 30, 10), TEN.Input.ActionID.ACTION)
+void LaraObject::Interact(const Moveable& mov, TypeOrNil<int> animNumber,
 						  const TypeOrNil<Vec3>& offset, const TypeOrNil<Vec3>& offsetConstraintMin, const TypeOrNil<Vec3>& offsetConstraintMax,
-						  const TypeOrNil<Rotation>& rotConstraintMin, const TypeOrNil<Rotation>& rotConstraintMax) const
+						  const TypeOrNil<Rotation>& rotConstraintMin, const TypeOrNil<Rotation>& rotConstraintMax, TypeOrNil<InputActionID> actionID) const
 {
 	auto convertedOffset = ValueOr<Vec3>(offset, Vec3(0.0f, 0.0f, BLOCK(0.305f))).ToVector3i();
 	auto convertedOffsetConstraintMin = ValueOr<Vec3>(offsetConstraintMin, Vec3(-BLOCK(0.25f), -BLOCK(0.5f), 0.0f));

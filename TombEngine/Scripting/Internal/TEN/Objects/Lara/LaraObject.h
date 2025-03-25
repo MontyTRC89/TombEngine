@@ -34,9 +34,9 @@ public:
 	void DiscardTorch();
 	bool IsTorchLit() const;
 
-	void Interact(const Moveable& mov, TypeOrNil<InputActionID> actionID, TypeOrNil<int> animNumber,
+	void Interact(const Moveable& mov, TypeOrNil<int> animNumber,
 				  const TypeOrNil<Vec3>& offset, const TypeOrNil<Vec3>& offsetConstraintMin, const TypeOrNil<Vec3>& offsetConstraintMax,
-				  const TypeOrNil<Rotation>& rotConstraintMin, const TypeOrNil<Rotation>& rotConstraintMax) const;
+				  const TypeOrNil<Rotation>& rotConstraintMin, const TypeOrNil<Rotation>& rotConstraintMax, TypeOrNil<InputActionID> actionID) const;
 	bool TestInteraction(const Moveable& mov,
 						 const TypeOrNil<Vec3>& offsetConstraintMin, const TypeOrNil<Vec3>& offsetConstraintMax,
 						 const TypeOrNil<Rotation>& rotConstraintMin, const TypeOrNil<Rotation>& rotConstraintMax) const;
