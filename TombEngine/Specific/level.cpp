@@ -513,12 +513,12 @@ void LoadObjects()
 						case AnimCommandType::None:
 							continue;
 
-					case AnimCommandType::MoveRoot:
-					{
-						auto translation = ReadVector3();
-						command = std::make_unique<MoveRootCommand>(translation);
-					}
-						break;
+						case AnimCommandType::MoveRoot:
+						{
+							auto translation = ReadVector3();
+							command = std::make_unique<MoveRootCommand>(translation);
+						}
+							break;
 
 						case AnimCommandType::JumpVelocity:
 						{
