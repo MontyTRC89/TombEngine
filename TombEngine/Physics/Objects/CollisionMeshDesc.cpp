@@ -58,7 +58,8 @@ namespace TEN::Physics
 
 	void CollisionMeshDesc::Optimize()
 	{
-		//return;
+		// TODO: Optimise later. -- Sezz 2025.03.25
+		return;
 
 		// 1) Get coplanar triangle map.
 		auto coplanarTriMap = GetCoplanarTriangleMap();
