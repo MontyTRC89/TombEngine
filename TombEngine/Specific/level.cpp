@@ -566,7 +566,7 @@ void LoadObjects()
 
 			anim.Flags = ReadInt32();
 
-			// Set root motion cycle flag if animation is cycled.
+			// Set root motion cycle flag if animation links to itself.
 			if (anim.NextAnimNumber == j)
 				anim.Flags |= (int)AnimFlags::RootMotionCycle;
 		}
