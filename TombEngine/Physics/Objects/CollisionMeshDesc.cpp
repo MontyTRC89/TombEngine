@@ -103,7 +103,136 @@ namespace TEN::Physics
 		auto boundaryEdges = GetBoundaryEdges(edgeCountMap);
 		auto vertexAdjacencyMap = GetVertexAdjacencyMap(tris, edgeCountMap, boundaryEdges); // TODO: Not used yet.
 
-		// 2) Collect raw loops.
+		auto polygons = std::vector<std::vector<int>>{};
+
+		// 2) Get raw polygon loops.
+		auto rawLoops = GetRawPolygonLoops(edgeCountMap);
+		for (auto& rawLoop : rawLoops)
+		{
+			// Simplify and add polygon.
+			SimplifyPolygon(rawLoop);
+			if (rawLoop.size() >= VERTEX_COUNT)
+				polygons.push_back(std::move(rawLoop));
+		}
+
+		return polygons;
+
+		// TODO: Following code needs another pass.
+		/*
+		// 3) Collect monotone and irregular polygons.
+		for (auto& rawLoop : rawLoops)
+		{
+			// Check if raw loop has no adjacent loops.
+			bool hasAdjacency = false;
+
+			for (const auto& vertexId : rawLoop)
+			{
+				// Check adjacency in vertex adjacency map.
+				if (vertexAdjacencyMap.find(vertexId) != vertexAdjacencyMap.end())
+				{
+					hasAdjacency = true;
+					break;
+				}
+			}
+
+			// If no adjacent loops, simplify and add standalone polygon.
+			if (!hasAdjacency)
+			{
+				SimplifyPolygon(rawLoop);
+				if (rawLoop.size() >= VERTEX_COUNT)
+					polygons.push_back(std::move(rawLoop));
+			}
+		}
+
+		// 4) Collect holed polygons converted into irregular polygons.
+		auto usedLoops = std::unordered_set<int>{};
+		for (auto& rawLoop : rawLoops)
+		{
+			if (rawLoop.empty())
+				continue;
+
+			// Skip processed loops.
+			if (usedLoops.find(rawLoop.front()) != usedLoops.end())
+				continue;
+
+			// Process adjacent loops and bridge them.
+			auto combinedLoop = rawLoop;
+			for (auto& adjLoop : rawLoops)
+			{
+				// If rawLoop has adjacency with adjLoop.
+				bool isConnected = false;
+				for (const auto& vertex : rawLoop)
+				{
+					if (vertexAdjacencyMap.find(vertex) != vertexAdjacencyMap.end())
+					{
+						isConnected = true;
+						break;
+					}
+				}
+
+				if (isConnected)
+				{
+					// Find closest vertices between two loops.
+					int closestVertexId0 = NO_VALUE;
+					int closestVertexId1 = NO_VALUE;
+					float distSqrMin = INFINITY;
+
+					for (const int& vertexId0 : rawLoop)
+					{
+						const auto& vertex0 = _vertices[vertexId0];
+
+						for (const int& vertexId1 : adjLoop)
+						{
+							const auto& vertex1 = _vertices[vertexId1];
+
+							// Track closest pair or vertices.
+							// TODO: Revise.
+							float distSqr = Vector3::DistanceSquared(vertex0, vertex1);
+							if (distSqr < distSqrMin)
+							{
+								closestVertexId0 = vertexId0;
+								closestVertexId1 = vertexId1;
+								distSqrMin = distSqr;
+							}
+						}
+					}
+
+					// Reorder and combine loops based on found closest vertices.
+					// Ensure closestVertex0 is in first loop and closestVertex1 is in second.
+					auto it0 = std::find(combinedLoop.begin(), combinedLoop.end(), closestVertexId0);
+					auto it1 = std::find(adjLoop.begin(), adjLoop.end(), closestVertexId1);
+
+					// Insert adjLoop into combinedLoop at correct position.
+					// Insert everything after closestVertex0 from combinedLoop and prepend closestVertex1.
+					if (it0 != combinedLoop.end() && it1 != adjLoop.end())
+					{
+						// If vertex0 is found in combinedLoop and vertex1 is found in adjLoop.
+						combinedLoop.insert(it0 + 1, adjLoop.begin(), adjLoop.end());
+					}
+
+					// Mark loop as used.
+					usedLoops.insert(rawLoop.front());
+
+					break;
+				}
+			}
+
+			// Simplify and add combined polygon.
+			SimplifyPolygon(combinedLoop);
+			if (combinedLoop.size() >= VERTEX_COUNT)
+				polygons.push_back(std::move(combinedLoop));
+		}
+
+		// 5) Return optimal polygons.
+		return polygons;*/
+	}
+
+	std::vector<std::vector<int>> CollisionMeshDesc::GetRawPolygonLoops(const EdgeCountMap& edgeCountMap) const
+	{
+		// Get boundfary edges.
+		auto boundaryEdges = GetBoundaryEdges(edgeCountMap);
+
+		// Run through boundary edges and collect isolated raw loops.
 		auto rawLoops = std::vector<std::vector<int>>{};
 		while (!boundaryEdges.empty())
 		{
@@ -112,12 +241,12 @@ namespace TEN::Physics
 			const auto& firstEdgeIt = boundaryEdges.begin();
 			const auto& [firstVertexId0, firstVertexId1] = *firstEdgeIt;
 
-			// 2.1) Add first boundary edge.
+			// Add first boundary edge.
 			rawLoop.push_back(firstVertexId0);
 			rawLoop.push_back(firstVertexId1);
 			boundaryEdges.erase(firstEdgeIt);
 
-			// 2.2) Run through remaining boundary edges.
+			// Run through remaining boundary edges.
 			while (!boundaryEdges.empty())
 			{
 				// TODO: Optimise this. O(n) search here is too inefficient.
@@ -153,37 +282,13 @@ namespace TEN::Physics
 					break;
 			}
 
-			// 2.3) Collect valid raw loop.
+			// Collect valid raw loop.
 			if (rawLoop.size() >= VERTEX_COUNT)
 				rawLoops.push_back(std::move(rawLoop));
 		}
 
-		// TODO
-		// 3) Collect polygons.
-		auto polygons = std::vector<std::vector<int>>{};
-		for (auto& rawLoop : rawLoops)
-		{
-			// 3.1) Collect monotone and irregular polygons first. They are processed more easily; they are simply determined
-			// by checking if a given boundary loop has no edges adjacent to a separate boundary loop.
-
-			// 3.2) Collect holed polygons. These require bridging boundary edges of loops which have an adjacency in the adjacency map.
-			// The method I want to use is as follows:
-			// - Start with any raw loop.
-			// - Check if it is connected to another loop.
-			// - If yes, find the closest two vertices between these loops.
-			// - Then, create a new loop from these by connecting them at these two verts. Some reordering would have to happen.
-			// - Continue this process until all related loops are connected into a single one, producing an irregular polygon.
-			// - Insert this into the `polygons` vector.
-			
-			// TEMP: Use raw loops for now.
-			SimplifyPolygon(rawLoop);
-			if (rawLoop.size() >= VERTEX_COUNT)
-				polygons.push_back(std::move(rawLoop));
-		}
-
-
-		// 4) Return optimal polygons.
-		return polygons;
+		// Return raw loops.
+		return rawLoops;
 	}
 
 	CollisionMeshDesc::CoplanarTriangleMap CollisionMeshDesc::GetCoplanarTriangleMap() const
@@ -259,94 +364,11 @@ namespace TEN::Physics
 		}
 	};
 
-	CollisionMeshDesc::VertexAdjacencyMap CollisionMeshDesc::GetVertexAdjacencyMap(const std::vector<TriangleVertexIds>& tris,
-																				   const EdgeCountMap& edgeCountMap,
+	CollisionMeshDesc::VertexAdjacencyMap CollisionMeshDesc::GetVertexAdjacencyMap(const std::vector<TriangleVertexIds>& tris, const EdgeCountMap& edgeCountMap,
 																				   const std::vector<EdgeVertexIdPair>& boundaryEdges) const
 	{
-		// Process each boundary edge and group them into connected loops.
-		auto processedEdges = std::unordered_set<EdgeVertexIdPair, EdgeHash>{};
-		auto boundaryLoops = std::vector<std::vector<EdgeVertexIdPair>>{};
-		for (const auto& edge : boundaryEdges)
-		{
-			if (processedEdges.find(edge) != processedEdges.end())
-				continue;
-
-			// Find where to insert edge based on connectivity to existing boundary loops.
-			bool isConnectedToExistingLoop = false;
-			for (auto& loop : boundaryLoops)
-			{
-				// Check if either vertex of this edge is already in loop.
-				for (const auto& existingEdge : loop)
-				{
-					if (existingEdge.first == edge.first || existingEdge.second == edge.second)
-					{
-						// Add edge to current loop and mark as processed.
-						loop.push_back(edge);
-						processedEdges.insert(edge);
-						processedEdges.insert({ edge.second, edge.first });
-						isConnectedToExistingLoop = true;
-						break;
-					}
-				}
-
-				if (isConnectedToExistingLoop)
-					break;
-			}
-
-			// If not connected to any existing loop, start new loop.
-			if (!isConnectedToExistingLoop)
-			{
-				boundaryLoops.push_back({ edge });
-				processedEdges.insert(edge);
-				processedEdges.insert({ edge.second, edge.first });
-			}
-		}
-
-		// Run through boundary loops and connect vertices belonging to different loops.
-		auto vertexAdjacencyMap = VertexAdjacencyMap{};
-		for (const auto& loop : boundaryLoops)
-		{
-			for (int i = 0; i < loop.size(); i++)
-			{
-				// Get vertices for current boundary edge.
-				auto& edge = loop[i];
-				int vertexId0 = edge.first;
-				int vertexId1 = edge.second;
-
-				// Track adjacency between vertices of boundary edges in different loops.
-				for (const auto& otherLoop : boundaryLoops)
-				{
-					// Don't connect within the same loop
-					if (&otherLoop == &loop)
-						continue;
-
-					for (const auto& otherEdge : otherLoop)
-					{
-						int otherVertexId0 = otherEdge.first;
-						int otherVertexId1 = otherEdge.second;
-
-						// Check if this edge is connected to another loop, add to adjacency.
-						if (vertexId0 == otherVertexId0 || vertexId0 == otherVertexId1)
-						{
-							vertexAdjacencyMap[vertexId0].insert(vertexId1);
-							vertexAdjacencyMap[vertexId1].insert(vertexId0);
-						}
-
-						if (vertexId1 == otherVertexId0 || vertexId1 == otherVertexId1)
-						{
-							vertexAdjacencyMap[vertexId0].insert(vertexId1);
-							vertexAdjacencyMap[vertexId1].insert(vertexId0);
-						}
-					}
-				}
-			}
-		}
-
-		return vertexAdjacencyMap;
-
-		// Old version.
 		// Run through triangles.
-		/*auto vertexAdjacencyMap = VertexAdjacencyMap{};
+		auto vertexAdjacencyMap = VertexAdjacencyMap{};
 		for (const auto& tri : tris)
 		{
 			// Run through vertices.
@@ -362,7 +384,7 @@ namespace TEN::Physics
 			}
 		}
 
-		return vertexAdjacencyMap;*/
+		return vertexAdjacencyMap;
 	}
 
 	std::vector<CollisionMeshDesc::EdgeVertexIdPair> CollisionMeshDesc::GetBoundaryEdges(const EdgeCountMap& edgeCountMap) const
@@ -379,6 +401,30 @@ namespace TEN::Physics
 		}
 
 		return boundaryEdges;
+	}
+	
+	std::vector<CollisionMeshDesc::EdgeVertexIdPair> CollisionMeshDesc::GetInnerEdges(const EdgeCountMap& edgeCountMap) const
+	{
+		// Extract innter edges.
+		auto innerEdges = std::vector<EdgeVertexIdPair>{};
+		for (const auto& [edge, count] : edgeCountMap)
+		{
+			// Filter out boundary edge.
+			if (count == 1)
+				continue;
+
+			innerEdges.push_back(edge);
+		}
+
+		return innerEdges;
+	}
+	
+	std::vector<CollisionMeshDesc::EdgeVertexIdPair> CollisionMeshDesc::GetConnectingEdges(const EdgeCountMap& edgeCountMap) const
+	{
+		// TODO: Extract connecting edges.
+		auto connectingEdges = std::vector<EdgeVertexIdPair>{};
+
+		return connectingEdges;
 	}
 
 	void CollisionMeshDesc::SimplifyPolygon(std::vector<int>& polygon) const

@@ -44,11 +44,15 @@ namespace TEN::Physics
 		// Helpers
 
 		std::vector<std::vector<int>> GetPolygons(const std::vector<TriangleVertexIds>& tris) const;
+		std::vector<std::vector<int>> GetRawPolygonLoops(const EdgeCountMap& edgeCountMap) const;
 		CoplanarTriangleMap			  GetCoplanarTriangleMap() const;
 		EdgeCountMap				  GetEdgeCountMap(const std::vector<TriangleVertexIds>& tris) const;
 		VertexAdjacencyMap			  GetVertexAdjacencyMap(const std::vector<TriangleVertexIds>& tris, const EdgeCountMap& edgeCountMap,
 															const std::vector<CollisionMeshDesc::EdgeVertexIdPair>& boundaryEdges) const;
+
 		std::vector<EdgeVertexIdPair> GetBoundaryEdges(const EdgeCountMap& edgeCountMap) const;
+		std::vector<EdgeVertexIdPair> GetInnerEdges(const EdgeCountMap& edgeCountMap) const;
+		std::vector<EdgeVertexIdPair> GetConnectingEdges(const EdgeCountMap& edgeCountMap) const;
 		
 		void TriangulatePolygon(std::vector<int>& optimizedVertexIds, const std::vector<int>& polygon, const Vector3& normal) const;
 		void SimplifyPolygon(std::vector<int>& polygon) const;
