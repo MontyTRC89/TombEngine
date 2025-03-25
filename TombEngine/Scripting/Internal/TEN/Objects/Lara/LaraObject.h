@@ -31,15 +31,15 @@ public:
 	int GetAmmoCount() const;
 
 	void UndrawWeapon();
-	void ThrowAwayTorch();
-	bool TorchIsLit() const;
+	void DiscardTorch();
+	bool IsTorchLit() const;
 
-	void AlignToMoveable(const Moveable& mov, TypeOrNil<InputActionID> actionID, TypeOrNil<int> animNumber,
-						 TypeOrNil<Vec3> offset, TypeOrNil<Vec3> offsetConstraintMin, TypeOrNil<Vec3> offsetConstraintMax,
+	void Interact(const Moveable& mov, TypeOrNil<InputActionID> actionID, TypeOrNil<int> animNumber,
+				  TypeOrNil<Vec3> offset, TypeOrNil<Vec3> offsetConstraintMin, TypeOrNil<Vec3> offsetConstraintMax,
+				  TypeOrNil<Rotation> rotConstraintMin, TypeOrNil<Rotation> rotConstraintMax) const;
+	bool TestInteraction(const Moveable& mov,
+						 TypeOrNil<Vec3> offsetConstraintMin, TypeOrNil<Vec3> offsetConstraintMax,
 						 TypeOrNil<Rotation> rotConstraintMin, TypeOrNil<Rotation> rotConstraintMax) const;
-	bool TestPosition(const Moveable& mov,
-					 TypeOrNil<Vec3> offsetConstraintMin, TypeOrNil<Vec3> offsetConstraintMax,
-					 TypeOrNil<Rotation> rotConstraintMin, TypeOrNil<Rotation> rotConstraintMax) const;
 	
 	using Moveable::Moveable;
 };
