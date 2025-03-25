@@ -482,10 +482,10 @@ void LoadObjects()
 			{
 				dispatch.StateID = ReadInt32();
 				dispatch.FrameNumberLow = ReadInt32();
-				dispatch.FrameNumberHigh = ReadInt32();
+				dispatch.FrameNumberHigh = std::max(ReadInt32(), dispatch.FrameNumberLow);
 				dispatch.NextAnimNumber = ReadInt32();
 				dispatch.NextFrameNumberLow = ReadInt32();
-				dispatch.NextFrameNumberHigh = ReadInt32();
+				dispatch.NextFrameNumberHigh = std::max(ReadInt32(), dispatch.NextFrameNumberLow);
 				dispatch.BlendFrameCount = ReadInt32();
 
 				auto start = ReadVector2();
