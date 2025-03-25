@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Game/Lara/lara_struct.h"
-#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 #include "Scripting/Internal/TEN/Input/ActionIDs.h"
+#include "Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h"
 
 // TODO: Organise.
 class LaraObject : public Moveable
