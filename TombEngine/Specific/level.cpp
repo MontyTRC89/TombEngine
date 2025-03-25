@@ -442,36 +442,36 @@ void LoadObjects()
 					orient = ReadVector4();
 			}
 
-			// TODO: Write interpolated data to level.
+			// TODO: Write interpolated data to level for faster load.
 			// Interpoate frames.
 			float alphaStep = 1.0f / (float)interpolation;
-			for (int i = 0; i < keyFrames.size(); i++)
+			for (int k = 0; k < keyFrames.size(); k++)
 			{
-				const auto& currentKeyFrame = keyFrames[i];
-
+				const auto& currentKeyFrame = keyFrames[k];
 				anim.Frames.push_back(currentKeyFrame);
-				if (i != (keyFrames.size() - 1))
+				
+				if (k == (keyFrames.size() - 1))
+					continue;
+
+				const auto& nextKeyFrame = keyFrames[k + 1];
+
+				for (int l = 1; l < interpolation; l++)
 				{
-					const auto& nextKeyFrame = keyFrames[i + 1];
+					float alpha = alphaStep * l;
 
-					for (int j = 1; j < interpolation; j++)
-					{
-						float alpha = alphaStep * j;
+					auto rootPos = Vector3::Lerp(currentKeyFrame.RootPosition, nextKeyFrame.RootPosition, alpha);
 
-						auto rootPos = Vector3::Lerp(currentKeyFrame.RootPosition, nextKeyFrame.RootPosition, alpha);
-
-						auto boneOrients = std::vector<Quaternion>(currentKeyFrame.BoneOrientations.size());
-						for (int k = 0; k < boneOrients.size(); k++)
-							boneOrients[k] = Quaternion::Slerp(currentKeyFrame.BoneOrientations[k], nextKeyFrame.BoneOrientations[k], alpha);
+					auto boneOrients = std::vector<Quaternion>(currentKeyFrame.BoneOrientations.size());
+					for (int m = 0; m < boneOrients.size(); m++)
+						boneOrients[m] = Quaternion::Slerp(currentKeyFrame.BoneOrientations[m], nextKeyFrame.BoneOrientations[m], alpha);
 						
-						auto aabb = BoundingBox(
-							Vector3::Lerp(currentKeyFrame.Aabb.Center, nextKeyFrame.Aabb.Center, alpha),
-							Vector3::Lerp(currentKeyFrame.Aabb.Extents, nextKeyFrame.Aabb.Extents, alpha));
-						auto legacyAabb = GameBoundingBox(aabb);
+					auto aabb = BoundingBox(
+						Vector3::Lerp(currentKeyFrame.Aabb.Center, nextKeyFrame.Aabb.Center, alpha),
+						Vector3::Lerp(currentKeyFrame.Aabb.Extents, nextKeyFrame.Aabb.Extents, alpha));
+					auto legacyAabb = GameBoundingBox(aabb);
 
-						auto frame = FrameData{ rootPos, boneOrients, aabb, legacyAabb };
-						anim.Frames.push_back(frame);
-					}
+					auto frame = FrameData{ rootPos, boneOrients, aabb, legacyAabb };
+					anim.Frames.push_back(frame);
 				}
 			}
 
@@ -501,7 +501,7 @@ void LoadObjects()
 			{
 				anim.Commands.reserve(commandCount);
 
-				for (int i = 0; i < commandCount; i++)
+				for (int k = 0; k < commandCount; k++)
 				{
 					auto type = (AnimCommandType)ReadInt32();
 
