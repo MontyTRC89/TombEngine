@@ -79,7 +79,8 @@ private:
 
 	bool _shortenedCalls = false;
 
-	std::string _consoleInput = "";
+	std::string _consoleInput = {};
+
 	void PerformConsoleInput();
 
 	std::string GetRequestedPath() const;
