@@ -556,12 +556,12 @@ static void AddRoomFlipItems(const RoomData& room)
 		auto& item = g_Level.Items[itemNumber];
 		const auto& object = Objects[item.ObjectNumber];
 
-		// @BRIDGEME: Check bridges when flipmap happens.
-		// Add bridges.
+		// Initialize bridges.
+		// TODO: If all bridges can be initialized on level load, even ones in not yet loaded rooms, this can call `bridge.Update()` instead. -- Sezz 2025.03.27
 		if (item.IsBridge())
 		{
 			auto& bridge = GetBridgeObject(item);
-			bridge.Update(item);
+			bridge.Initialize(item);
 		}
 	}
 }
@@ -583,7 +583,6 @@ static void RemoveRoomFlipItems(const RoomData& room)
 			KillItem(itemNumber);
 		}
 
-		// @BRIDGEME
 		// Clear bridge.
 		if (item.IsBridge())
 		{
