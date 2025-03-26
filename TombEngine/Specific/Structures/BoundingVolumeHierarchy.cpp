@@ -33,6 +33,7 @@ namespace TEN::Structures
 			return objectIds;
 
 		// Collect all object IDs.
+		objectIds.reserve(_leafIdMap.size());
 		for (const auto& [objectId, leafId] : _leafIdMap)
 			objectIds.push_back(objectId);
 

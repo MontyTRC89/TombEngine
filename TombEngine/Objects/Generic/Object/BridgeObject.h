@@ -19,7 +19,7 @@ namespace TEN::Entities::Generic
 		// TODO: Uncomment when attractors are complete.
 		//AttractorObject _attractor	   = AttractorObject();
 
-		Pose				_prevPose		= Pose::Zero;
+		Pose				_prevTransform	= Pose::Zero;
 		int					_prevRoomNumber = 0;
 		BoundingBox			_prevAabb		= BoundingBox();
 		BoundingOrientedBox _prevObb		= BoundingOrientedBox();

@@ -46,7 +46,7 @@ namespace TEN::Entities::Generic
 		room.Bridges.Insert(item.Index, item.GetAabb());
 
 		// Store previous parameters.
-		_prevPose = item.Pose;
+		_prevTransform = item.Pose;
 		_prevRoomNumber = item.RoomNumber;
 		_prevAabb = item.GetAabb();
 		_prevObb = item.GetObb();
@@ -63,7 +63,7 @@ namespace TEN::Entities::Generic
 			return;
 		}
 
-		if (item.Pose == _prevPose && item.RoomNumber == _prevRoomNumber)
+		if (item.Pose == _prevTransform && item.RoomNumber == _prevRoomNumber)
 			return;
 
 		UpdateCollisionMesh(item);
@@ -71,7 +71,7 @@ namespace TEN::Entities::Generic
 		UpdateSectorAssignments(item);
 
 		// Update room bridge trees.
-		if (item.Pose != _prevPose && item.RoomNumber == _prevRoomNumber)
+		if (item.Pose != _prevTransform && item.RoomNumber == _prevRoomNumber)
 		{
 			auto& room = g_Level.Rooms[item.RoomNumber];
 			room.Bridges.Move(item.Index, item.GetAabb());
@@ -86,7 +86,7 @@ namespace TEN::Entities::Generic
 		}
 
 		// Store previous parameters.
-		_prevPose = item.Pose;
+		_prevTransform = item.Pose;
 		_prevRoomNumber = item.RoomNumber;
 		_prevAabb = item.GetAabb();
 		_prevObb = item.GetObb();
@@ -105,7 +105,7 @@ namespace TEN::Entities::Generic
 		room.Bridges.Insert(item.Index, item.GetAabb());
 
 		// Store previous parameters.
-		_prevPose = item.Pose;
+		_prevTransform = item.Pose;
 		_prevRoomNumber = item.RoomNumber;
 		_prevAabb = item.GetAabb();
 		_prevObb = item.GetObb();
@@ -129,24 +129,24 @@ namespace TEN::Entities::Generic
 		auto offset = Vector3::Zero;
 		switch (item.ObjectNumber)
 		{
-		case ID_BRIDGE_TILT1:
-			offset = Vector3(0.0f, CLICK(1), 0.0f);
-			break;
+			case ID_BRIDGE_TILT1:
+				offset = Vector3(0.0f, CLICK(1), 0.0f);
+				break;
 
-		case ID_BRIDGE_TILT2:
-			offset = Vector3(0.0f, CLICK(2), 0.0f);
-			break;
+			case ID_BRIDGE_TILT2:
+				offset = Vector3(0.0f, CLICK(2), 0.0f);
+				break;
 
-		case ID_BRIDGE_TILT3:
-			offset = Vector3(0.0f, CLICK(3), 0.0f);
-			break;
+			case ID_BRIDGE_TILT3:
+				offset = Vector3(0.0f, CLICK(3), 0.0f);
+				break;
 
-		case ID_BRIDGE_TILT4:
-			offset = Vector3(0.0f, CLICK(4), 0.0f);
-			break;
+			case ID_BRIDGE_TILT4:
+				offset = Vector3(0.0f, CLICK(4), 0.0f);
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 
 		// Get local AABB corners.
@@ -187,7 +187,7 @@ namespace TEN::Entities::Generic
 
 	void BridgeObject::UpdateCollisionMesh(const ItemInfo& item)
 	{
-		if (item.Pose.Scale != _prevPose.Scale)
+		if (item.Pose.Scale != _prevTransform.Scale)
 		{
 			InitializeCollisionMesh(item);
 		}
@@ -238,7 +238,7 @@ namespace TEN::Entities::Generic
 	{
 		// Deassign from sectors.
 		unsigned int searchDepth = (unsigned int)ceil(std::max({ _prevAabb.Extents.x, _prevAabb.Extents.y, _prevAabb.Extents.z }) / BLOCK(1));
-		auto sectors = GetNeighborSectors(_prevPose.Position, _prevRoomNumber, searchDepth);
+		auto sectors = GetNeighborSectors(_prevTransform.Position, _prevRoomNumber, searchDepth);
 		for (auto* sector : sectors)
 		{
 			// Test if previous AABB intersects sector.

@@ -103,7 +103,7 @@ private:
 
 	static constexpr auto AABB_BOUNDARY = BLOCK(0.1f);
 
-	// Members
+	// Fields
 
 	Bvh _tree = Bvh();
 
