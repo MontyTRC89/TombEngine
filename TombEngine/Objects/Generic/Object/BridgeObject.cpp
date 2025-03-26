@@ -118,7 +118,7 @@ namespace TEN::Entities::Generic
 		// TODO: Also destroy attractor here when they're ready. Maybe contain in std::optional?
 		DeassignSectors(item);
 
-		// Remove from room bridge tree.
+		// Remove from previous room bridge tree.
 		auto& prevRoom = g_Level.Rooms[_prevRoomNumber];
 		prevRoom.Bridges.Remove(item.Index);
 	}
