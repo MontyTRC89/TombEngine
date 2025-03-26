@@ -185,7 +185,7 @@ float4 PSLensFlare(PixelShaderInput input) : SV_Target
 		totalLensFlareColor += lensFlareColor;
 	}
 
-	color.xyz += totalLensFlareColor;
+	color.xyz = lerp(color.xyz, color.xyz + totalLensFlareColor, saturate(dot(totalLensFlareColor, float3(0.5f, 0.5f, 0.5f))));
 
 	return color;
 }
