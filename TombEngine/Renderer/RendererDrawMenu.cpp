@@ -765,7 +765,7 @@ namespace TEN::Renderer
 		float opacity = Lerp(pickup.PrevOpacity, pickup.Opacity, GetInterpolationFactor());
 
 		// Draw display pickup.
-		DrawObjectIn3DSpace(pickup.ObjectID, pos, orient, scale, 0.1f);
+		DrawObjectIn3DSpace(pickup.ObjectID, pos, orient, scale, 128.0f);
 
 		// Draw count string.
 		if (pickup.Count != 1)
@@ -898,7 +898,6 @@ namespace TEN::Renderer
 	void Renderer::DrawObjectIn3DSpace(int objectNumber, Vector2 pos2D, EulerAngles orient, float scale, float depth, float opacity, int meshBits)
 	{
 		constexpr auto AMBIENT_LIGHT_COLOR = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
-		constexpr float FieldOfView = (4.0f * XM_PI) / 9.0f; // 80-degree field of view
 		constexpr float NearPlane = 0.1f; // Near clipping plane
 		constexpr float FarPlane = BLOCK(100); // Far clipping plane
 
@@ -921,15 +920,17 @@ namespace TEN::Renderer
 			pos2D.y += invObject.YOffset;
 			orient += invObject.Orientation;
 		}
+		
+		float aspectRatio = static_cast<float>(_screenWidth) / _screenHeight;
 
-		auto viewMatrix = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, BLOCK(1)), Vector3::Zero, Vector3::Down);
+		auto viewMatrix = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, BLOCK(1)), Vector3::Zero, Vector3::Up);
 		auto projMatrix = Matrix::CreatePerspectiveFieldOfView(
-			FieldOfView, _screenWidth / _screenHeight, NearPlane, FarPlane);
+			CurrentFOV, aspectRatio, NearPlane, FarPlane);
 		//auto projMatrix = Matrix::CreateOrthographic(_screenWidth, _screenHeight, -BLOCK(1), BLOCK(1));
 
 		TENLog("Screen Width: " + std::to_string(_screenWidth), LogLevel::Warning);
 		TENLog("Screen Height: " + std::to_string(_screenHeight), LogLevel::Warning);
-		TENLog("Aspect Ratio: " + std::to_string(_screenWidth / _screenHeight), LogLevel::Warning);
+		TENLog("Aspect Ratio: " + std::to_string(aspectRatio), LogLevel::Warning);
 
 		auto& moveableObject = _moveableObjects[objectNumber];
 		if (!moveableObject.has_value())
@@ -975,10 +976,10 @@ namespace TEN::Renderer
 			// HACK: Rotate compass needle.
 			if (objectNumber == ID_COMPASS_ITEM && i == 1)
 				moveableObject->LinearizedBones[i]->ExtraRotation = EulerAngles(0, g_Gui.CompassNeedleAngle - ANGLE(180.0f), 0).ToQuaternion();
-
+			depth -= 1.0f;
 			TENLog("Final Scale: " + std::to_string(scale), LogLevel::Warning);
 			// Construct world matrix. // pos.x, pos.y, pos.z
-			auto translationMatrix = Matrix::CreateTranslation(pos2D.x, pos2D.y, depth);
+			auto translationMatrix = Matrix::CreateTranslation(0.0f, 0.0f, -BLOCK(3));
 			auto rotMatrix = orient.ToRotationMatrix();
 			auto scaleMatrix = Matrix::CreateScale(scale);
 			auto worldMatrix = scaleMatrix * rotMatrix * translationMatrix;
