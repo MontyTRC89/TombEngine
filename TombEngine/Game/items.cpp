@@ -195,7 +195,7 @@ bool ItemInfo::IsCreature() const
 
 bool ItemInfo::IsBridge() const
 {
-	return Contains(BRIDGE_OBJECT_IDS, ObjectNumber);
+	return Contains(BRIDGE_MOVEABLE_SLOT_IDS, ObjectNumber);
 }
 
 std::vector<BoundingSphere> ItemInfo::GetSpheres() const
@@ -578,7 +578,7 @@ void InitializeItem(short itemNumber)
 		item->ObjectNumber == ID_CROSSBOW_ITEM ||
 		item->ObjectNumber == ID_REVOLVER_ITEM)
 	{
-		item->MeshBits = 1;
+		item->MeshBits = 1 << 0;
 	}
 	else
 	{

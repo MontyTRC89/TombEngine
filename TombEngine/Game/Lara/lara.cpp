@@ -170,80 +170,18 @@ static void HandleRoomDebug(const ItemInfo& item)
 		timer = 15;
 		room.GenerateCollisionMesh();
 	}
-}
 
-static void TriangulatePolygon(const std::vector<Vector3>& polygon, const Vector3& offset, const Vector3& normal)
-{
-	// Invalid polygon; return early.
-	if (polygon.size() < 3)
-		return;
-
-	// Triangulate using ear clipping method.
-	auto vertices = polygon;
-	int i = 0;
-	while (vertices.size() > 2)
+	if (IsClicked(In::Walk))
 	{
-		// Get vertex IDs.
-		int vertexId0 = i;
-		int vertexId1 = (i + 1) % vertices.size();
-		int vertexId2 = (i + 2) % vertices.size();
-
-		// Ensure correct winding order.
-		auto faceNormal = (vertices[vertexId1] - vertices[vertexId0]).Cross(vertices[vertexId2] - vertices[vertexId1]);
-		if (faceNormal.Dot(normal) > 0.0f)
-			std::swap(vertexId0, vertexId2);
-
-		// Get vertices.
-		const auto& vertex0 = vertices[vertexId0];
-		const auto& vertex1 = vertices[vertexId1];
-		const auto& vertex2 = vertices[vertexId2];
-
-		// Calculate edges.
-		auto edge0 = vertex1 - vertex0;
-		auto edge1 = vertex2 - vertex1;
-
-		auto edgeNormal = edge0.Cross(edge1);
-		edgeNormal.Normalize();
-
-		// Convex angle.
-		auto edgeCross = edge0.Cross(edge1);
-		if (edgeNormal.Dot(normal) < 0.0f)
+		auto bridgeItemNumbers = room.Bridges.GetIds();
+		for (int bridgeItemNumber : bridgeItemNumbers)
 		{
-			// Remove vertex 1.
-			Erase(vertices, (i + 1) % vertices.size());
-			if (i >= vertices.size())
-				i--;
+			auto& bridgeItem = g_Level.Items[bridgeItemNumber];
+			auto& bridge = GetBridgeObject(bridgeItem);
 
-			// FAILSAFE: Skip degenerate triangle.
-			if (abs(edgeCross.LengthSquared()) > EPSILON)
-				continue;
-
-			// Draw triangle.
-			auto center = ((vertex0 + vertex1 + vertex2) / 3) + offset;
-			DrawDebugTriangle(vertex0 + offset, vertex1 + offset, vertex2 + offset, Color(1, 1, 0, 0.2f));
-			DrawDebugLine(vertex0 + offset, vertex1 + offset, Color(1, 1, 1));
-			DrawDebugLine(vertex1 + offset, vertex2 + offset, Color(1, 1, 1));
-			DrawDebugLine(vertex2 + offset, vertex0 + offset, Color(1, 1, 1));
-			DrawDebugLine(center, Geometry::TranslatePoint(center, normal, BLOCK(0.15f)), Color(1, 1, 1));
-
-		}
-		// Reflex angle.
-		else
-		{
-			// Skip current vertex.
-			i++;
-			if (i == vertices.size())
-				break;
+			bridge.Initialize(bridgeItem);
 		}
 	}
-}
-
-static void HandleCollMeshOptimizationDebug(const ItemInfo& item)
-{
-	auto base = item.Pose.Position.ToVector3() + Vector3(0.0f, -BLOCK(1), 0.0f);
-	auto tris = std::vector<std::array<Vector3, 3>>{};
-
-	// TODO: Create test.
 }
 
 static void HandlePlayerDebug(const ItemInfo& item)
@@ -251,7 +189,6 @@ static void HandlePlayerDebug(const ItemInfo& item)
 	HandleLosDebug(item);
 	HandleBridgeDebug(item);
 	HandleRoomDebug(item);
-	HandleCollMeshOptimizationDebug(item);
 
 	if constexpr (!DEBUG_BUILD)
 		return;

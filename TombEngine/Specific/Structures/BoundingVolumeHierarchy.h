@@ -1,8 +1,7 @@
 #pragma once
 
 // References:
-// https://github.com/erincatto/box2d/blob/main/include/box2d/b2_dynamic_tree.h
-// https://github.com/erincatto/box2d/blob/main/src/collision/b2_dynamic_tree.cpp
+// https://github.com/erincatto/box2d/blob/28adacf82377d4113f2ed00586141463244b9d10/src/dynamic_tree.c
 // https://www.gdcvault.com/play/1025909/Math-for-Game-Developers-Dynamic
 
 // NOTE: _leafIdMap is a hash map for convenience. If performance suffers with too many Move() and Remove() calls, a method with faster access can be implemented.

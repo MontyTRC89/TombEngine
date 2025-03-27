@@ -34,8 +34,8 @@ namespace TEN::Structures
 
 		// Collect all object IDs.
 		objectIds.reserve(_leafIdMap.size());
-		for (const auto& [objectId, leafId] : _leafIdMap)
-			objectIds.push_back(objectId);
+		for (const auto& [keyObjectId, leafId] : _leafIdMap)
+			objectIds.push_back(keyObjectId);
 
 		return objectIds;
 	}
@@ -154,7 +154,7 @@ namespace TEN::Structures
 		}
 
 		// Remove leaf.
-		const auto& [key, leafId] = *it;
+		const auto& [keyObjectId, leafId] = *it;
 		RemoveLeaf(leafId);
 	}
 
@@ -378,42 +378,44 @@ namespace TEN::Structures
 		// Prune branch up to root.
 		while (parentId != NO_VALUE)
 		{
-			auto& parentNode = _nodes[parentId];
+			auto& parent = _nodes[parentId];
 
 			// Check if parent becomes new leaf.
-			int siblingId = (parentNode.LeftChildId == nodeId) ? parentNode.RightChildId : parentNode.LeftChildId;
-			auto& siblingNode = _nodes[siblingId];
+			int siblingId = (parent.LeftChildId == nodeId) ? parent.RightChildId : parent.LeftChildId;
+			auto& sibling = _nodes[siblingId];
 
-			if (parentNode.LeftChildId == nodeId || parentNode.RightChildId == nodeId)
+			if (parent.LeftChildId == nodeId || parent.RightChildId == nodeId)
 			{
 				// Replace parent with sibling.
-				if (parentNode.ParentId != NO_VALUE)
+				if (parent.ParentId != NO_VALUE)
 				{
-					auto& grandparentNode = _nodes[parentNode.ParentId];
-					if (grandparentNode.LeftChildId == parentId)
+					auto& grandparent = _nodes[parent.ParentId];
+					if (grandparent.LeftChildId == parentId)
 					{
-						grandparentNode.LeftChildId = siblingId;
+						grandparent.LeftChildId = siblingId;
 					}
 					else
 					{
-						grandparentNode.RightChildId = siblingId;
+						grandparent.RightChildId = siblingId;
 					}
 
-					siblingNode.ParentId = parentNode.ParentId;
+					sibling.ParentId = parent.ParentId;
 				}
 				else
 				{
 					// No grandparent; sibling becomes root.
 					_rootId = siblingId;
-					siblingNode.ParentId = NO_VALUE;
+					sibling.ParentId = NO_VALUE;
 				}
 
+				// Refit and remove parent.
+				RefitNode(parentId);
 				RemoveNode(parentId);
-				parentId = siblingNode.ParentId;
+				parentId = sibling.ParentId;
 			}
 			else
 			{
-				// Refit valid node.
+				// Refit parent.
 				RefitNode(parentId);
 				parentId = NO_VALUE;
 			}

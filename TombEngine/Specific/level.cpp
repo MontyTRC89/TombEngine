@@ -36,7 +36,7 @@ using namespace TEN::Entities::Doors;
 using namespace TEN::Input;
 using namespace TEN::Utils;
 
-const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS =
+const std::vector<GAME_OBJECT_ID> BRIDGE_MOVEABLE_SLOT_IDS =
 {
 	ID_EXPANDING_PLATFORM,
 
@@ -254,13 +254,13 @@ void LoadItems()
 	// Initialize items.
 	for (int i = 0; i <= 1; i++)
 	{
-		// HACK: Initialize bridges first. Required because other items need final floordata to init properly.
+		// HACK: Initialize bridge items first. Required because other items need final floordata to init properly.
 		if (i == 0)
 		{
 			for (int j = 0; j < g_Level.NumItems; j++)
 			{
 				const auto& item = g_Level.Items[j];
-				if (Contains(BRIDGE_OBJECT_IDS, item.ObjectNumber))
+				if (item.IsBridge())
 					InitializeItem(j);
 			}
 		}
