@@ -384,6 +384,7 @@ namespace TEN::Structures
 			int siblingId = (parent.LeftChildId == nodeId) ? parent.RightChildId : parent.LeftChildId;
 			auto& sibling = _nodes[siblingId];
 
+			// Rearrange nodes local to removal.
 			if (parent.LeftChildId == nodeId || parent.RightChildId == nodeId)
 			{
 				// Replace parent with sibling.
@@ -408,11 +409,14 @@ namespace TEN::Structures
 					sibling.ParentId = NO_VALUE;
 				}
 
-				// Refit and remove parent.
-				RefitNode(parentId);
+				// Refit sibling (new parent).
+				RefitNode(siblingId);
+
+				// Remove previous parent.
 				RemoveNode(parentId);
 				parentId = sibling.ParentId;
 			}
+			// Refit up hierarchy.
 			else
 			{
 				// Refit parent.
