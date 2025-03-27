@@ -765,7 +765,7 @@ namespace TEN::Renderer
 		float opacity = Lerp(pickup.PrevOpacity, pickup.Opacity, GetInterpolationFactor());
 
 		// Draw display pickup.
-		DrawObjectIn3DSpace(pickup.ObjectID, pos, orient, scale, BLOCK(1));
+		DrawObjectIn3DSpace(pickup.ObjectID, pos, orient, scale, 0.1f);
 
 		// Draw count string.
 		if (pickup.Count != 1)
@@ -898,7 +898,7 @@ namespace TEN::Renderer
 	void Renderer::DrawObjectIn3DSpace(int objectNumber, Vector2 pos2D, EulerAngles orient, float scale, float depth, float opacity, int meshBits)
 	{
 		constexpr auto AMBIENT_LIGHT_COLOR = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
-		constexpr float FieldOfView = XM_PI / 4; // 45-degree field of view
+		constexpr float FieldOfView = (4.0f * XM_PI) / 9.0f; // 80-degree field of view
 		constexpr float NearPlane = 0.1f; // Near clipping plane
 		constexpr float FarPlane = BLOCK(100); // Far clipping plane
 
@@ -910,8 +910,8 @@ namespace TEN::Renderer
 			screenRes.x / DISPLAY_SPACE_RES.x,
 			screenRes.y / DISPLAY_SPACE_RES.y);
 
-		pos2D *= factor;
-		scale *= (factor.x > factor.y) ? factor.y : factor.x;
+		//pos2D *= factor;
+		//scale *= (factor.x > factor.y) ? factor.y : factor.x;
 
 		int invObjectID = g_Gui.ConvertObjectToInventoryItem(objectNumber);
 		if (invObjectID != NO_VALUE)
@@ -922,7 +922,7 @@ namespace TEN::Renderer
 			orient += invObject.Orientation;
 		}
 
-		auto viewMatrix = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, BLOCK(10)), Vector3::Zero, Vector3::Down);
+		auto viewMatrix = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, BLOCK(1)), Vector3::Zero, Vector3::Down);
 		auto projMatrix = Matrix::CreatePerspectiveFieldOfView(
 			FieldOfView, _screenWidth / _screenHeight, NearPlane, FarPlane);
 		//auto projMatrix = Matrix::CreateOrthographic(_screenWidth, _screenHeight, -BLOCK(1), BLOCK(1));
