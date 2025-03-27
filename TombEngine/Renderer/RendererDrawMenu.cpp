@@ -923,7 +923,7 @@ namespace TEN::Renderer
 		
 		float aspectRatio = static_cast<float>(_screenWidth) / _screenHeight;
 
-		auto viewMatrix = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, BLOCK(1)), Vector3::Zero, Vector3::Up);
+		auto viewMatrix = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, -BLOCK(1)), Vector3::Zero, Vector3::Up);
 		auto projMatrix = Matrix::CreatePerspectiveFieldOfView(
 			CurrentFOV, aspectRatio, NearPlane, FarPlane);
 		//auto projMatrix = Matrix::CreateOrthographic(_screenWidth, _screenHeight, -BLOCK(1), BLOCK(1));
@@ -976,10 +976,10 @@ namespace TEN::Renderer
 			// HACK: Rotate compass needle.
 			if (objectNumber == ID_COMPASS_ITEM && i == 1)
 				moveableObject->LinearizedBones[i]->ExtraRotation = EulerAngles(0, g_Gui.CompassNeedleAngle - ANGLE(180.0f), 0).ToQuaternion();
-			depth -= 1.0f;
+			
 			TENLog("Final Scale: " + std::to_string(scale), LogLevel::Warning);
 			// Construct world matrix. // pos.x, pos.y, pos.z
-			auto translationMatrix = Matrix::CreateTranslation(0.0f, 0.0f, -BLOCK(3));
+			auto translationMatrix = Matrix::CreateTranslation(pos2D.x / 10, pos2D.y / 10, 10.0f);
 			auto rotMatrix = orient.ToRotationMatrix();
 			auto scaleMatrix = Matrix::CreateScale(scale);
 			auto worldMatrix = scaleMatrix * rotMatrix * translationMatrix;
