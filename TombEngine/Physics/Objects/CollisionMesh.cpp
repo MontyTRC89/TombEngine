@@ -165,7 +165,7 @@ namespace TEN::Physics
 	{
 		// Get matrices.
 		auto rotMatrix = GetRotationMatrix();
-		auto transformMatrix = GetTranslationMatrix() * rotMatrix;
+		auto transformMatrix = rotMatrix * GetTranslationMatrix();
 
 		// Calculate local ray.
 		auto localRay = Ray(Vector3::Transform(ray.position, transformMatrix.Invert()), Vector3::Transform(ray.direction, rotMatrix.Invert()));
@@ -221,7 +221,7 @@ namespace TEN::Physics
 	void CollisionMesh::DrawDebug() const
 	{
 		auto rotMatrix = GetRotationMatrix();
-		auto transformMatrix = GetTranslationMatrix() * rotMatrix;
+		auto transformMatrix = rotMatrix * GetTranslationMatrix();
 
 		for (const auto& tri : _triangles)
 			tri.DrawDebug(transformMatrix, rotMatrix, _vertices);
