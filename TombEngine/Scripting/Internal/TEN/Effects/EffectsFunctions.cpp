@@ -633,7 +633,7 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_EmitAirBubble, &EmitAirBubble);
 		tableEffects.set_function(ScriptReserved_EmitStreamer, &EmitStreamer);
 		tableEffects.set_function(ScriptReserved_EmitFire, &EmitFire);
-
+		tableEffects.set_function(ScriptReserved_EmitWaterfallMist, &EmitWaterfallMist);
 		tableEffects.set_function(ScriptReserved_MakeExplosion, &MakeExplosion);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
 		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
