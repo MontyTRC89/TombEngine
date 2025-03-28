@@ -765,7 +765,7 @@ namespace TEN::Renderer
 		float opacity = Lerp(pickup.PrevOpacity, pickup.Opacity, GetInterpolationFactor());
 
 		// Draw display pickup.
-		DrawObjectIn3DSpace(pickup.ObjectID, pos, orient, scale, 128.0f);
+		DrawObjectIn2DSpace(pickup.ObjectID, pos, orient, scale);
 
 		// Draw count string.
 		if (pickup.Count != 1)
@@ -895,7 +895,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	void Renderer::DrawObjectIn3DSpace(int objectNumber, Vector2 pos2D, EulerAngles orient, float scale, float depth, float opacity, int meshBits)
+	void Renderer::DrawObjectIn3DSpace(int objectNumber, Vector3 pos3D, EulerAngles orient, float scale, float opacity, int meshBits)
 	{
 		constexpr auto AMBIENT_LIGHT_COLOR = Vector4(0.5f, 0.5f, 0.5f, 1.0f);
 		constexpr float NearPlane = 0.1f; // Near clipping plane
@@ -904,20 +904,12 @@ namespace TEN::Renderer
 		unsigned int stride = sizeof(Vertex);
 		unsigned int offset = 0;
 
-		auto screenRes = GetScreenResolution();
-		auto factor = Vector2(
-			screenRes.x / DISPLAY_SPACE_RES.x,
-			screenRes.y / DISPLAY_SPACE_RES.y);
-
-		//pos2D *= factor;
-		//scale *= (factor.x > factor.y) ? factor.y : factor.x;
-
 		int invObjectID = g_Gui.ConvertObjectToInventoryItem(objectNumber);
 		if (invObjectID != NO_VALUE)
 		{
 			const auto& invObject = InventoryObjectTable[invObjectID];
 
-			pos2D.y += invObject.YOffset;
+			pos3D.y += invObject.YOffset;
 			orient += invObject.Orientation;
 		}
 		
@@ -926,12 +918,7 @@ namespace TEN::Renderer
 		auto viewMatrix = Matrix::CreateLookAt(Vector3(0.0f, 0.0f, -BLOCK(1)), Vector3::Zero, Vector3::Up);
 		auto projMatrix = Matrix::CreatePerspectiveFieldOfView(
 			CurrentFOV, aspectRatio, NearPlane, FarPlane);
-		//auto projMatrix = Matrix::CreateOrthographic(_screenWidth, _screenHeight, -BLOCK(1), BLOCK(1));
-
-		TENLog("Screen Width: " + std::to_string(_screenWidth), LogLevel::Warning);
-		TENLog("Screen Height: " + std::to_string(_screenHeight), LogLevel::Warning);
-		TENLog("Aspect Ratio: " + std::to_string(aspectRatio), LogLevel::Warning);
-
+		
 		auto& moveableObject = _moveableObjects[objectNumber];
 		if (!moveableObject.has_value())
 			return;
@@ -948,10 +935,6 @@ namespace TEN::Renderer
 			UpdateAnimation(nullptr, *moveableObject, frameData, UINT_MAX);
 		}
 
-		//auto pos = _viewportToolkit.Unproject(Vector3(pos2D.x, pos2D.y, depth), projMatrix, viewMatrix, Matrix::Identity);
-
-		//std::string logMessage = "Unprojected Position: " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z);
-		//TENLog(logMessage, LogLevel::Warning);
 		// Set vertex buffer.
 		_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -976,16 +959,12 @@ namespace TEN::Renderer
 			// HACK: Rotate compass needle.
 			if (objectNumber == ID_COMPASS_ITEM && i == 1)
 				moveableObject->LinearizedBones[i]->ExtraRotation = EulerAngles(0, g_Gui.CompassNeedleAngle - ANGLE(180.0f), 0).ToQuaternion();
-			
-			TENLog("Final Scale: " + std::to_string(scale), LogLevel::Warning);
+
 			// Construct world matrix. // pos.x, pos.y, pos.z
-			auto translationMatrix = Matrix::CreateTranslation(pos2D.x / 10, pos2D.y / 10, 10.0f);
+			auto translationMatrix = Matrix::CreateTranslation(pos3D.x, pos3D.y, pos3D.z);
 			auto rotMatrix = orient.ToRotationMatrix();
 			auto scaleMatrix = Matrix::CreateScale(scale);
 			auto worldMatrix = scaleMatrix * rotMatrix * translationMatrix;
-
-			std::string logMessage = "Position: " + std::to_string(pos2D.x) + ", " + std::to_string(pos2D.y) + ", " + std::to_string(depth);
-			TENLog(logMessage, LogLevel::Warning);
 
 			if (object.animIndex != NO_VALUE)
 			{
