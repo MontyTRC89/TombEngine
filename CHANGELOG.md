@@ -19,6 +19,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### Lua API changes
 * Added missing constructor for `Collision.Probe` without room number.
+* Added EmitWaterfallMist under Effects.
+* Updated MakeExplosion and EmitBlood to spawn correct effects when used underwater.
 
 ## [Version 1.8](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.8) - 2025-03-16
 
