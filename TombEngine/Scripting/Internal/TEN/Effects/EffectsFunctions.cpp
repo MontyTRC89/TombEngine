@@ -508,6 +508,26 @@ namespace TEN::Scripting::Effects
 		SpawnBubble(pos.ToVector3(), roomNumber, convertedSize, convertedAmp);
 	}
 
+	/// Emit waterfall mist.
+	// @function EmitWaterMist
+	// @tparam Vec3 pos World position where the effect will be spawned.
+	// @tparam[opt] float size Sprite size. __Default: 32__
+	// @tparam[opt] float amp Oscillation amplitude. __Default: 32__
+	// @tparam[opt] Color color (default Color(255, 255, 255))
+	static void EmitWaterfallMist(const Vec3& pos, TypeOrNil<int> size, TypeOrNil<int> width, TypeOrNil<float> angle, TypeOrNil<ScriptColor> color)
+	{
+		constexpr auto DEFAULT_SIZE = 64;
+		constexpr auto DEFAULT_WIDTH = 32;
+
+		auto convertedAngle = ANGLE(ValueOr<float>(angle, 0.0f));
+		auto convertedSize = ValueOr<int>(size, DEFAULT_SIZE);
+		auto convertedWidth = ValueOr<int>(width, DEFAULT_WIDTH);
+		auto _color = ValueOr<ScriptColor>(color, ScriptColor(255, 255, 255));
+		auto convertedColor = Vector4(_color.GetR(), _color.GetG(), _color.GetB(), _color.GetA()) / UCHAR_MAX;
+
+		TriggerWaterfallMist(pos, convertedSize, convertedWidth, convertedAngle, convertedColor);
+	}
+
 	/// Emit fire for one frame. Will not hurt player. Call this each frame if you want a continuous fire.
 	// @function EmitFire
 	// @tparam Vec3 pos
