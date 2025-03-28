@@ -42,6 +42,7 @@
 #include "Objects/TR5/Emitter/tr5_spider_emitter.h"
 #include "Objects/TR5/Emitter/tr5_smoke_emitter.h"
 #include "Objects/TR5/Emitter/Waterfall.h"
+#include "Objects/Effects/Fireflies.h"
 
 // Objects
 #include "Objects/TR5/Light/tr5_light.h"
@@ -81,6 +82,7 @@ using namespace TEN::Effects::WaterfallEmitter;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::Traps;
+using namespace TEN::Effects::Fireflies;
 
 static void StartEntity(ObjectInfo *obj)
 {
@@ -794,6 +796,14 @@ static void StartObject(ObjectInfo *obj)
 	{
 		obj->drawRoutine = nullptr;
 		obj->control = ControlEmberEmitter;
+	}
+
+	obj = &Objects[ID_FIREFLY_EMITTER];
+	if (obj->loaded)
+	{
+		obj->Initialize = InitializeFireflySwarm;
+		obj->control = ControlFireflySwarm;
+		obj->drawRoutine = NULL;
 	}
 
 	obj = &Objects[ID_GEN_SLOT1];

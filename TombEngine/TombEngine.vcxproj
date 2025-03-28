@@ -506,6 +506,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClInclude Include="Objects\Effects\effect_objects.h" />
     <ClInclude Include="Objects\Effects\EmberEmitter.h" />
     <ClInclude Include="Objects\Effects\enemy_missile.h" />
+    <ClInclude Include="Objects\Effects\Fireflies.h" />
     <ClInclude Include="Objects\Effects\flame_emitters.h" />
     <ClInclude Include="Objects\Effects\LensFlare.h" />
     <ClInclude Include="Objects\Effects\tr4_locusts.h" />
@@ -1044,6 +1045,7 @@ if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.
     <ClCompile Include="Objects\Effects\effect_objects.cpp" />
     <ClCompile Include="Objects\Effects\EmberEmitter.cpp" />
     <ClCompile Include="Objects\Effects\enemy_missile.cpp" />
+    <ClCompile Include="Objects\Effects\Fireflies.cpp" />
     <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
     <ClCompile Include="Objects\Effects\LensFlare.cpp" />
     <ClCompile Include="Objects\Effects\tr4_locusts.cpp" />
