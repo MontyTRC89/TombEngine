@@ -6,6 +6,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ## [Version 1.8.1](link to release) - yyyy-mm-dd
 
 ### New features
+* Added Firefly Emitter object (ID 1099) with corresponding sprite slot (ID 1379).
 * Added live console input to perform Lua commands in realtime.
 
 ### Bug fixes
@@ -19,8 +20,10 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### Lua API changes
 * Added missing constructor for `Collision.Probe` without room number.
+* Added optional looping argument for `View.GetFlybyPosition` and `View.GetFlybyRotation` functions.
 * Added EmitWaterfallMist under Effects.
 * Updated MakeExplosion and EmitBlood to spawn correct effects when used underwater.
+
 
 ## [Version 1.8](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.8) - 2025-03-16
 

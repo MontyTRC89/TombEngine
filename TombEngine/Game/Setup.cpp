@@ -27,6 +27,7 @@
 #include "Objects/TR4/Entity/tr4_beetle_swarm.h"
 #include "Objects/Utils/object_helper.h"
 #include "Specific/level.h"
+#include "Objects/Effects/Fireflies.h"
 
 using namespace TEN::Effects::Hair;
 using namespace TEN::Entities;
@@ -200,6 +201,7 @@ void InitializeSpecialEffects()
 
 	TEN::Entities::TR4::ClearBeetleSwarm();
 	TEN::Entities::Creatures::TR3::ClearFishSwarm();
+	TEN::Effects::Fireflies::ClearFireflySwarm();
 }
 
 void CustomObjects()
