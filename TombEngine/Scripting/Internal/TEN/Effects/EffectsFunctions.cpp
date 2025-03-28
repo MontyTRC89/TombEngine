@@ -511,9 +511,10 @@ namespace TEN::Scripting::Effects
 	/// Emit waterfall mist.
 	// @function EmitWaterMist
 	// @tparam Vec3 pos World position where the effect will be spawned.
-	// @tparam[opt] float size Sprite size. __Default: 32__
-	// @tparam[opt] float amp Oscillation amplitude. __Default: 32__
-	// @tparam[opt] Color color (default Color(255, 255, 255))
+	// @tparam[opt] float size Effect size. __Default: 64__
+	// @tparam[opt] float width Width of the effect. __Default: 32__
+	// @tparam[opt] float rot Rotation of effect in degrees. __Default: 0__
+	// @tparam[opt] Color color Color of the effect.__Default: Color(255, 255, 255, 255))__
 	static void EmitWaterfallMist(const Vec3& pos, TypeOrNil<int> size, TypeOrNil<int> width, TypeOrNil<float> angle, TypeOrNil<ScriptColor> color)
 	{
 		constexpr auto DEFAULT_SIZE = 64;
