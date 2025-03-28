@@ -240,8 +240,7 @@ bool GenerateDummyLevel(const std::string& levelPath)
 
 unsigned CALLBACK ConsoleInput(void*)
 {
-	std::string input;
-
+	auto input = std::string();
 	while (!ThreadEnded)
 	{
 		if (!std::getline(std::cin, input))
@@ -427,10 +426,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Hide console window if mode isn't debug.
 #ifndef _DEBUG
 	if (!DebugMode)
-		ShowWindow(GetConsoleWindow(), 0);
+	{
+		FreeConsole();
+	}
 	else
 #endif
+	{
 		ConsoleThreadHandle = BeginThread(ConsoleInput, ConsoleThreadID);
+	}
 
 	// Clear application structure.
 	memset(&App, 0, sizeof(WINAPP));
