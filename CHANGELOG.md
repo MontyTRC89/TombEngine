@@ -6,7 +6,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ## [Version 1.8.1](link to release) - yyyy-mm-dd
 
 ### New features
-* Added Firefly Emitter object (ID 1099) with corresponding sprite slot (ID 1379).
+* Added Firefly Emitter object (ID 1099) with corresponding sprite slots (ID 1379).
 * Added live console input to perform Lua commands in realtime.
 
 ### Bug fixes
