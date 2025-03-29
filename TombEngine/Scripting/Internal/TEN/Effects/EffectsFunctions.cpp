@@ -4,6 +4,7 @@
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/los.h"
+#include "Game/effects/blood.h"
 #include "Game/effects/Bubble.h"
 #include "Game/effects/DisplaySprite.h"
 #include "Game/effects/effects.h"
@@ -32,10 +33,12 @@
 #include "Specific/trutils.h"
 #include <Scripting/Internal/TEN/Objects/Moveable/MoveableObject.h>
 
+
 /// Functions to generate effects.
 // @tentable Effects 
 // @pragma nostrip
 
+using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::DisplaySprite;
 using namespace TEN::Effects::Electricity;
@@ -481,7 +484,12 @@ namespace TEN::Scripting::Effects
 	// @tparam int count Sprite count. __default: 1__
 	static void EmitBlood(const Vec3& pos, TypeOrNil<int> count)
 	{
-		TriggerBlood(pos.x, pos.y, pos.z, -1, ValueOr<int>(count, 1));
+		int roomNumber = FindRoomNumber(pos.ToVector3i());
+		const auto& room = g_Level.Rooms[roomNumber];
+		if (room.flags & ENV_FLAG_WATER)
+			SpawnUnderwaterBloodCloud(pos, roomNumber, (GetRandomControl() & 7) + 8, ValueOr<int>(count, 1));
+		else
+			TriggerBlood(pos.x, pos.y, pos.z, -1, ValueOr<int>(count, 1));
 	}
 
 	/// Emit an air bubble in a water room.
@@ -500,6 +508,27 @@ namespace TEN::Scripting::Effects
 		SpawnBubble(pos.ToVector3(), roomNumber, convertedSize, convertedAmp);
 	}
 
+	/// Emit waterfall mist.
+	// @function EmitWaterMist
+	// @tparam Vec3 pos World position where the effect will be spawned.
+	// @tparam[opt] float size Effect size. __Default: 64__
+	// @tparam[opt] float width Width of the effect. __Default: 32__
+	// @tparam[opt] float rot Rotation of effect in degrees. __Default: 0__
+	// @tparam[opt] Color color Color of the effect.__Default: Color(255, 255, 255, 255))__
+	static void EmitWaterfallMist(const Vec3& pos, TypeOrNil<int> size, TypeOrNil<int> width, TypeOrNil<float> angle, TypeOrNil<ScriptColor> color)
+	{
+		constexpr auto DEFAULT_SIZE = 64;
+		constexpr auto DEFAULT_WIDTH = 32;
+
+		auto convertedAngle = ANGLE(ValueOr<float>(angle, 0.0f));
+		auto convertedSize = ValueOr<int>(size, DEFAULT_SIZE);
+		auto convertedWidth = ValueOr<int>(width, DEFAULT_WIDTH);
+		auto _color = ValueOr<ScriptColor>(color, ScriptColor(255, 255, 255));
+		auto convertedColor = Vector4(_color.GetR(), _color.GetG(), _color.GetB(), _color.GetA()) / UCHAR_MAX;
+
+		TriggerWaterfallMist(pos, convertedSize, convertedWidth, convertedAngle, convertedColor);
+	}
+
 	/// Emit fire for one frame. Will not hurt player. Call this each frame if you want a continuous fire.
 	// @function EmitFire
 	// @tparam Vec3 pos
@@ -513,10 +542,16 @@ namespace TEN::Scripting::Effects
 	// @function MakeExplosion 
 	// @tparam Vec3 pos
 	// @tparam float size (default 512.0) this will not be the size of the sprites, but rather the distance between the origin and any additional sprites
-	// @tparam bool shockwave (default false) if true, create a very faint white shockwave which will not hurt Lara
+	// @tparam bool shockwave (default false) if true, create a very faint white shockwave which will not hurt Lara. For underwater rooms it creates a splash if the pos is near the surface.
 	static void MakeExplosion(Vec3 pos, TypeOrNil<float> size, TypeOrNil<bool> shockwave)
 	{
-		TriggerExplosion(Vector3(pos.x, pos.y, pos.z), ValueOr<float>(size, 512.0f), true, false, ValueOr<bool>(shockwave, false), FindRoomNumber(Vector3i(pos.x, pos.y, pos.z)));
+		int roomNumber = FindRoomNumber(pos.ToVector3i());
+		const auto& room = g_Level.Rooms[roomNumber];
+
+		if (room.flags & ENV_FLAG_WATER)
+			TriggerUnderwaterExplosion(pos.ToVector3(), ValueOr<bool>(shockwave, false));
+		else
+			TriggerExplosion(Vector3(pos.x, pos.y, pos.z), ValueOr<float>(size, 512.0f), true, false, ValueOr<bool>(shockwave, false), FindRoomNumber(Vector3i(pos.x, pos.y, pos.z)));
 	}
 
 	/// Make an earthquake
@@ -598,7 +633,7 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_EmitAirBubble, &EmitAirBubble);
 		tableEffects.set_function(ScriptReserved_EmitStreamer, &EmitStreamer);
 		tableEffects.set_function(ScriptReserved_EmitFire, &EmitFire);
-
+		tableEffects.set_function(ScriptReserved_EmitWaterfallMist, &EmitWaterfallMist);
 		tableEffects.set_function(ScriptReserved_MakeExplosion, &MakeExplosion);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
 		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
