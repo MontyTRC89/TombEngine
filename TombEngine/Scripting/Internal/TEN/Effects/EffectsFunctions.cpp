@@ -617,6 +617,66 @@ namespace TEN::Scripting::Effects
 			convertedEdgeFeatherID, /*convertedLengthFeatherID, */convertedBlendID);
 	}
 
+	static void EmitSink(const Vec3& pos, const Vec3& dir, TypeOrNil<float> radius, TypeOrNil<float> life, TypeOrNil<float> vel, TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor)
+	{
+		constexpr auto DEFAULT_LIFE = 20.0f;
+		constexpr auto SECS_PER_FRAME = 1.0f / (float)FPS;
+		constexpr auto DUST_SIZE_MAX = 12.0f;
+
+		auto convertedPos = pos.ToVector3();
+		auto convertedDir = dir.ToVector3();
+		auto convertedRad = ValueOr<float>(radius, BLOCK(1 / 2));
+		auto convertedStartColor = ValueOr<ScriptColor>(startColor, ScriptColor(255, 255, 255, 255));
+		auto convertedEndColor = ValueOr<ScriptColor>(endColor, ScriptColor(255, 255, 255, 255));
+		float convertedLife = std::max(0.1f, ValueOr<float>(life, DEFAULT_LIFE));
+		auto convertedVel = ValueOr<float>(vel, 224.0f) / (float)FPS;
+
+		auto& part = *GetFreeParticle();
+
+		part.on = true;
+		part.SpriteSeqID = ID_DEFAULT_SPRITES;
+		part.SpriteID = SPRITE_TYPES::SPR_UNDERWATERDUST;
+		part.blendMode = BlendMode::Additive;
+
+		// Set particle colors
+		part.sR = convertedStartColor.GetR();
+		part.sG = convertedStartColor.GetG();
+		part.sB = convertedStartColor.GetB();
+
+		part.dR = convertedEndColor.GetR();
+		part.dG = convertedEndColor.GetG();
+		part.dB = convertedEndColor.GetB();
+
+		part.life =
+			part.sLife = (int)round(convertedLife / SECS_PER_FRAME);
+		part.colFadeSpeed = part.life / 2;
+		part.fadeToBlack = part.life / 3;
+
+		// Randomize position within the given radius
+		float angle = TO_DEGREES(Random::GenerateAngle());
+		float randRadius = sqrt(Random::GenerateFloat()) * convertedRad;
+
+		part.x = convertedPos.x + randRadius * cos(angle);
+		part.y = convertedPos.y + (Random::GenerateFloat() - 0.5f) * convertedRad * 0.5f;
+		part.z = convertedPos.z + randRadius * sin(angle);
+		part.roomNumber = FindRoomNumber(Vector3i(part.x, part.y, part.z));
+
+		// Normalize direction
+		convertedDir.Normalize();
+
+		part.xVel = convertedDir.x * convertedVel * 32;
+		part.yVel = convertedDir.y * convertedVel * 32;
+		part.zVel = convertedDir.z * convertedVel * 32;
+
+		// Other properties
+		part.friction = 85;
+		part.maxYvel = 0;
+		part.gravity = 0;
+		part.flags = SP_DEF | SP_EXPDEF;
+
+		part.sSize = part.size = Random::GenerateFloat(DUST_SIZE_MAX / 2, DUST_SIZE_MAX);;
+	}
+
 	void Register(sol::state* state, sol::table& parent) 
 	{
 		auto tableEffects = sol::table(state->lua_state(), sol::create);
@@ -634,6 +694,7 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_EmitStreamer, &EmitStreamer);
 		tableEffects.set_function(ScriptReserved_EmitFire, &EmitFire);
 		tableEffects.set_function(ScriptReserved_EmitWaterfallMist, &EmitWaterfallMist);
+		tableEffects.set_function(ScriptReserved_EmitWaterfallMist, &EmitSink);
 		tableEffects.set_function(ScriptReserved_MakeExplosion, &MakeExplosion);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
 		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
