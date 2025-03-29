@@ -106,7 +106,7 @@ These are:
 
 e.g. `myLevel.laraType = LaraType.Divesuit`
 
- __(not yet fully implemented)__
+ __Not yet fully implemented.__ Only types `Normal` and `Young` are guaranteed to work.
  @mem laraType*/
 		"laraType", &Level::Type,
 
@@ -224,12 +224,12 @@ RGBAColor8Byte Level::GetFogColor() const
 	return Fog.GetColor();
 }
 
-short Level::GetFogMinDistance() const
+float Level::GetFogMinDistance() const
 {
 	return Fog.MinDistance;
 }
 
-short Level::GetFogMaxDistance() const
+float Level::GetFogMaxDistance() const
 {
 	return Fog.MaxDistance;
 }
