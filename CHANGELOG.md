@@ -17,6 +17,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed crash with incorrectly applied animated textures on static meshes.
 * Fixed console window not hiding in non-debug mode on Windows 11.
 * Fixed key binding settings saving for the current play session after hitting Esc to cancel.
+* Fixed lensflare blending formula to avoid screen overbright.
 
 ### Lua API changes
 * Added missing constructor for `Collision.Probe` without room number.
