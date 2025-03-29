@@ -674,7 +674,7 @@ namespace TEN::Scripting::Effects
 		part.gravity = 0;
 		part.flags = SP_DEF | SP_EXPDEF;
 
-		part.sSize = part.size = Random::GenerateFloat(DUST_SIZE_MAX / 2, DUST_SIZE_MAX);;
+		part.sSize = part.size = Random::GenerateFloat(DUST_SIZE_MAX / 2, DUST_SIZE_MAX);
 	}
 
 	void Register(sol::state* state, sol::table& parent) 
@@ -694,7 +694,7 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_EmitStreamer, &EmitStreamer);
 		tableEffects.set_function(ScriptReserved_EmitFire, &EmitFire);
 		tableEffects.set_function(ScriptReserved_EmitWaterfallMist, &EmitWaterfallMist);
-		tableEffects.set_function(ScriptReserved_EmitWaterfallMist, &EmitSink);
+		tableEffects.set_function(ScriptReserved_EmitSink, &EmitSink);
 		tableEffects.set_function(ScriptReserved_MakeExplosion, &MakeExplosion);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
 		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
