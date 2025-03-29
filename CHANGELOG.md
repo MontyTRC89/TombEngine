@@ -3,11 +3,7 @@
 The dates are in European standard format where date is presented as **YYYY-MM-DD**.
 TombEngine releases are located in this repository (alongside with Tomb Editor): https://github.com/TombEngine/TombEditorReleases
 
-## [Version 1.8.1](link to release) - yyyy-mm-dd
-
-### New features
-* Added Firefly Emitter object (ID 1099) with corresponding sprite slot (ID 1379).
-* Added live console input to perform Lua commands in realtime.
+## [Version 1.8.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.8.1) - 2025-03-29
 
 ### Bug fixes
 * Fixed pathfinding for friendly NPCs such as monkeys.
@@ -18,6 +14,10 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed console window not hiding in non-debug mode on Windows 11.
 * Fixed key binding settings saving for the current play session after hitting Esc to cancel.
 * Fixed lensflare blending formula to avoid screen overbright.
+
+### New features
+* Added Firefly Emitter object (ID 1099) with corresponding sprite slot (ID 1379).
+* Added live console input to perform Lua commands in realtime.
 
 ### Lua API changes
 * Added missing constructor for `Collision.Probe` without room number.
