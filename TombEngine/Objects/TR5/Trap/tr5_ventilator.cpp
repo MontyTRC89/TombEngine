@@ -13,7 +13,7 @@ namespace TEN::Entities::Traps
 {
 	void VentilatorEffect(GameBoundingBox* bounds, int intensity, short rot, int speed)
 	{
-		constexpr auto DUST_SIZE_MAX = 12.0f;
+		constexpr auto DUST_SIZE_MAX = 64.0f;
 
 		int x, y, z;
 
@@ -59,10 +59,10 @@ namespace TEN::Entities::Traps
 		part.sR = 0;
 		part.sG = 0;
 		part.sB = 0;
-		part.dR = part.dG = (48 * speed) / 128;
+		part.dR = part.dG = (48 * speed) / 64;
 		part.colFadeSpeed = 4;
 		part.fadeToBlack = 8;
-		part.dB = (speed * ((GetRandomControl() & 8) + 48)) / 128;
+		part.dB = (speed * ((GetRandomControl() & 8) + 48)) / 64;
 		part.blendMode = BlendMode::Additive;
 		part.life = part.sLife = (GetRandomControl() & 3) + 20;
 
@@ -136,7 +136,7 @@ namespace TEN::Entities::Traps
 		part.zVel = (speed * part.zVel) / 128;
 		part.maxYvel = 0;
 		part.gravity = 0;
-		part.flags = SP_NONE;
+		part.flags = SP_DEF | SP_EXPDEF;
 		part.sSize = part.size = Random::GenerateFloat(DUST_SIZE_MAX / 2, DUST_SIZE_MAX);
 	}
 
