@@ -847,10 +847,19 @@ Pose GetCameraTransform(int sequence, float alpha, bool loop)
 
 	alpha = std::clamp(alpha, 0.0f, 1.0f);
 
+	if (sequence < 0 || sequence >= MAX_SPOTCAMS)
+	{
+		TENLog("Wrong flyby sequence number provided for getting camera coordinates.", LogLevel::Warning);
+		return Pose::Zero;
+	}
+
 	// Retrieve camera count in sequence.
 	int cameraCount = CameraCnt[SpotCamRemap[sequence]];
 	if (cameraCount < 2)
-		return Pose::Zero; // Not enough cameras to interpolate.
+	{
+		TENLog("Not enough cameras in flyby sequence to calculate the coordinates.", LogLevel::Warning);
+		return Pose::Zero;
+	}
 
 	// Find first ID for sequence.
 	int firstSeqID = 0;
