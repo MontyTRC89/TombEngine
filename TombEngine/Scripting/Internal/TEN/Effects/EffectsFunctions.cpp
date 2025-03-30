@@ -622,25 +622,25 @@ namespace TEN::Scripting::Effects
 	// @tparam Vec3 pos World position.
 	// @tparam Vec3 dir Directional vector.
 	// @tparam[opt] float radius Radius of emitter. The particles will be emitted inside the circle of provided radius measured from centre of world position. __default: 512__ 
-	// @tparam[opt] float life Lifespan in seconds. __default: 10__
+	// @tparam[opt] float life Lifespan in seconds. __default: 1__
 	// @tparam[opt] float vel Velocity of the particles in world units per second. __default: 512__
 	// @tparam[opt] float maxSize Max size of the particle. __default: 25__
-	// @tparam[opt] Color startColor Color at start of life. __default: Color(255, 255, 255)__
-	// @tparam[opt] Color endColor Color at end of life. __default: Color(255, 255, 255)__
+	// @tparam[opt] Color startColor Color at start of life. __default: Color(128, 128, 128)__
+	// @tparam[opt] Color endColor Color at end of life. __default: Color(0, 0, 0)__
 	static void EmitSink(const Vec3& pos, const Vec3& dir, TypeOrNil<float> radius, TypeOrNil<float> life, TypeOrNil<float> vel, TypeOrNil<float> maxSize, TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor)
 	{
-		constexpr auto DEFAULT_LIFE = 10.0f;
+		constexpr auto DEFAULT_LIFE = 1.0f;
 		constexpr auto SECS_PER_FRAME = 1.0f / (float)FPS;
 		constexpr auto DUST_SIZE_MAX = 25.0f;
 
 		auto convertedPos = pos.ToVector3();
 		auto convertedDir = dir.ToVector3();
-		auto convertedRad = ValueOr<float>(radius, BLOCK(1 / 2));
+		auto convertedRad = ValueOr<float>(radius, BLOCK(0.5f));
 		auto convertedLife = std::max(0.1f, ValueOr<float>(life, DEFAULT_LIFE));
-		auto convertedVel = ValueOr<float>(vel, BLOCK(1 / 2)) / (float)FPS;
+		auto convertedVel = ValueOr<float>(vel, BLOCK(0.5f)) / (float)FPS;
 		auto convertedMaxSize = std::max(0.1f, ValueOr<float>(maxSize, DUST_SIZE_MAX));
-		auto convertedStartColor = ValueOr<ScriptColor>(startColor, ScriptColor(255, 255, 255, 255));
-		auto convertedEndColor = ValueOr<ScriptColor>(endColor, ScriptColor(255, 255, 255, 255));
+		auto convertedStartColor = ValueOr<ScriptColor>(startColor, ScriptColor(128, 128, 128, 255));
+		auto convertedEndColor = ValueOr<ScriptColor>(endColor, ScriptColor(0, 0, 0, 255));
 
 		auto& part = *GetFreeParticle();
 
@@ -668,7 +668,7 @@ namespace TEN::Scripting::Effects
 		float randRadius = sqrt(Random::GenerateFloat()) * convertedRad;
 
 		part.x = convertedPos.x + randRadius * cos(angle);
-		part.y = convertedPos.y + (Random::GenerateFloat() - 0.5f) * convertedRad * 0.5f;
+		part.y = convertedPos.y + (Random::GenerateFloat() * 2.0f - 1.0f) * convertedRad;
 		part.z = convertedPos.z + randRadius * sin(angle);
 		part.roomNumber = FindRoomNumber(Vector3i(part.x, part.y, part.z));
 

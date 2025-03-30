@@ -179,6 +179,10 @@
 	<td class="name" ><a href="#EmitStreamer">EmitStreamer(mov, tag, pos, dir[, rot][, startColor][, endColor][, width][, life][, vel][, expRate][, rotRate][, edgeFeatherMode][, lengthFeatherMode][, blendID])</a></td>
 	<td class="summary">Emit an extending streamer effect.</td>
 	</tr>
+	<tr>
+	<td class="name" ><a href="#EmitSink">EmitSink(pos, dir[, radius][, life][, vel][, maxSize][, startColor][, endColor])</a></td>
+	<td class="summary">Emit a visual sink effect.</td>
+	</tr>
 </table>
 <h2><a href="#Tables">Tables</a></h2>
 <table class="function_list">
@@ -842,6 +846,62 @@ EmitAdvancedParticle(particle)</pre>
         <li><span class="parameter">blendID</span>
             <span class="types"><a class="type" href="../4 enums/Effects.BlendID.html#">BlendID</a></span>
          Renderer blend ID. <strong>Default: Effects.BlendID.ALPHA_BLEND</strong>
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "EmitSink"></a>
+    <strong>EmitSink(pos, dir[, radius][, life][, vel][, maxSize][, startColor][, endColor])</strong>
+    </dt>
+    <dd>
+    Emit a visual sink effect.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">pos</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         World position.
+        </li>
+        <li><span class="parameter">dir</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         Directional vector.
+        </li>
+        <li><span class="parameter">radius</span>
+            <span class="types"><span class="type">float</span></span>
+         Radius of emitter. The particles will be emitted inside the circle of provided radius measured from centre of world position. <strong>default: 512</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">life</span>
+            <span class="types"><span class="type">float</span></span>
+         Lifespan in seconds. <strong>default: 1</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">vel</span>
+            <span class="types"><span class="type">float</span></span>
+         Velocity of the particles in world units per second. <strong>default: 512</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">maxSize</span>
+            <span class="types"><span class="type">float</span></span>
+         Max size of the particle. <strong>default: 25</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">startColor</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
+         Color at start of life. <strong>default: Color(128, 128, 128)</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">endColor</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
+         Color at end of life. <strong>default: Color(0, 0, 0)</strong>
          (<em>optional</em>)
         </li>
     </ul>
