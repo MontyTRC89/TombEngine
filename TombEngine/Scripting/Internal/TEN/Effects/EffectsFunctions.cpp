@@ -617,19 +617,30 @@ namespace TEN::Scripting::Effects
 			convertedEdgeFeatherID, /*convertedLengthFeatherID, */convertedBlendID);
 	}
 
-	static void EmitSink(const Vec3& pos, const Vec3& dir, TypeOrNil<float> radius, TypeOrNil<float> life, TypeOrNil<float> vel, TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor)
+	/// Emit a visual sink effect.
+	// @function EmitSink
+	// @tparam Vec3 pos World position.
+	// @tparam Vec3 dir Directional vector.
+	// @tparam[opt] float radius Radius of emitter. The particles will be emitted inside the circle of provided radius measured from centre of world position. __default: 512__ 
+	// @tparam[opt] float life Lifespan in seconds. __default: 10__
+	// @tparam[opt] float vel Velocity of the particles in world units per second. __default: 512__
+	// @tparam[opt] float maxSize Max size of the particle. __default: 25__
+	// @tparam[opt] Color startColor Color at start of life. __default: Color(255, 255, 255)__
+	// @tparam[opt] Color endColor Color at end of life. __default: Color(255, 255, 255)__
+	static void EmitSink(const Vec3& pos, const Vec3& dir, TypeOrNil<float> radius, TypeOrNil<float> life, TypeOrNil<float> vel, TypeOrNil<float> maxSize, TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor)
 	{
-		constexpr auto DEFAULT_LIFE = 20.0f;
+		constexpr auto DEFAULT_LIFE = 10.0f;
 		constexpr auto SECS_PER_FRAME = 1.0f / (float)FPS;
-		constexpr auto DUST_SIZE_MAX = 12.0f;
+		constexpr auto DUST_SIZE_MAX = 25.0f;
 
 		auto convertedPos = pos.ToVector3();
 		auto convertedDir = dir.ToVector3();
 		auto convertedRad = ValueOr<float>(radius, BLOCK(1 / 2));
+		auto convertedLife = std::max(0.1f, ValueOr<float>(life, DEFAULT_LIFE));
+		auto convertedVel = ValueOr<float>(vel, BLOCK(1 / 2)) / (float)FPS;
+		auto convertedMaxSize = std::max(0.1f, ValueOr<float>(maxSize, DUST_SIZE_MAX));
 		auto convertedStartColor = ValueOr<ScriptColor>(startColor, ScriptColor(255, 255, 255, 255));
 		auto convertedEndColor = ValueOr<ScriptColor>(endColor, ScriptColor(255, 255, 255, 255));
-		float convertedLife = std::max(0.1f, ValueOr<float>(life, DEFAULT_LIFE));
-		auto convertedVel = ValueOr<float>(vel, 224.0f) / (float)FPS;
 
 		auto& part = *GetFreeParticle();
 
@@ -673,8 +684,7 @@ namespace TEN::Scripting::Effects
 		part.maxYvel = 0;
 		part.gravity = 0;
 		part.flags = SP_DEF | SP_EXPDEF;
-
-		part.sSize = part.size = Random::GenerateFloat(DUST_SIZE_MAX / 2, DUST_SIZE_MAX);
+		part.sSize = part.size = Random::GenerateFloat(convertedMaxSize / 2, convertedMaxSize);
 	}
 
 	void Register(sol::state* state, sol::table& parent) 
