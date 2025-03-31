@@ -8,9 +8,7 @@
 - Support for high framerate, antialiasing, mipmapping, and SSAO.
 - Full diagonal geometry support.
 - Uncapped map size.
-- A streamlined player control scheme..
-
-Contributions are welcome. If you would like to participate in development to any degree, whether that be through suggestions, bug reports, or code, join our [Discord server](https://discord.gg/h5tUYFmres).
+- A streamlined player control scheme.
 
 *Tomb Engine* is used in conjunction with *Tomb Editor*. The repository can be found [here](https://github.com/MontyTRC89/Tomb-Editor).
 
@@ -35,6 +33,9 @@ Steps:
 4) If it doesn't help, manually install  `directxtk_desktop_2019` and `Microsoft.XAudio2.Redist` packages via NuGet Package Manager.
 
 Once done, you should be able to build a level with *Tomb Editor* and run it in *TEN*.
+
+# Contributions
+Contributions are welcome. If you would like to participate in development to any degree, whether that be through suggestions, bug reports, or code, join our [Discord server](https://discord.gg/h5tUYFmres).
 
 # Disclaimer
 This community project is unaffiliated with Core Design, Eidos Interactive, or Embracer Group AB. *Tomb Raider* is a registered trademark of Embracer Group AB. *Tomb Engine* is not for sale. The code is open-source to encourage contributions and for study purposes. We are not responsible for illegal uses of this source code. This source code is released as-is and continues to be maintained by non-paid contributors in their free time.
