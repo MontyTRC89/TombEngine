@@ -191,6 +191,17 @@ bool SwitchTrigger(short itemNumber, short timer)
 		item.ItemFlags[5] != 0 && item.ItemFlags[4] == 0 &&
 		player.Control.HandStatus != HandStatus::Busy)
 	{
+		if (timer > 0)
+		{
+			item.Timer = timer;
+			item.Status = ITEM_ACTIVE;
+			item.ItemFlags[5] = 0;
+			if (timer != 1)
+				item.Timer = FPS * timer;
+
+			return true;
+		}
+
 		TENLog("Pulley Deactivated Trigger!", LogLevel::Warning);
 		item.Flags |= IFLAG_ACTIVATION_MASK;
 		item.Status = ITEM_DEACTIVATED;
