@@ -865,6 +865,7 @@ enum LaraAnim
 	LA_UNDERWATER_PULLEY_GRAB = 602,		// Grab underwater pulley
 	LA_UNDERWATER_PULLEY_PULL = 603,		// Pull underwater pulley		
 	LA_UNDERWATER_PULLEY_UNGRAB = 604,		// Release underwater pulley
+	LA_CEILING_LEVER_SWITCH = 605,		// Release underwater pulley
 
 	NUM_LARA_ANIMS
 

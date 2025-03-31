@@ -60,12 +60,12 @@ namespace TEN::Entities::Switches
 
 	
 	};
-	const auto CeilingSwitchPos = Vector3i(0, 32, 0);
+	const auto CeilingSwitchPos = Vector3i(0, BLOCK(1 / 32), 0);
 	const ObjectCollisionBounds CeilingSwitchBounds1 =
 	{
 		GameBoundingBox(
 			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
-			-BLOCK(17.0f / 16), BLOCK(2.0f),
+			-BLOCK(17.0f / 16), 0,
 			-BLOCK(1 / 2.0f), 0
 		),
 		std::pair(
@@ -78,7 +78,7 @@ namespace TEN::Entities::Switches
 	{
 		GameBoundingBox(
 			-BLOCK(3.0f / 8), BLOCK(3.0f / 8),
-			-BLOCK(17.0f / 16), BLOCK(2.0f),
+			-BLOCK(17.0f / 16), 0,
 			0, BLOCK(1 / 2.0f)
 		),
 		std::pair(
@@ -241,7 +241,7 @@ namespace TEN::Entities::Switches
 					ResetPlayerFlex(laraItem);
 					laraItem->Animation.Velocity.y = 0;
 					laraItem->Animation.IsAirborne = false;
-					laraItem->Animation.AnimNumber = LA_TRAPDOOR_CEILING_OPEN;
+					laraItem->Animation.AnimNumber = LA_CEILING_LEVER_SWITCH;
 					laraItem->Animation.FrameNumber = GetAnimData(laraItem).frameBase;
 					laraItem->Animation.ActiveState = LS_FREEFALL_BIS;
 					lara->Control.HandStatus = HandStatus::Busy;
