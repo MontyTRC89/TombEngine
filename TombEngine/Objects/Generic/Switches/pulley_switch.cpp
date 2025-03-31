@@ -19,7 +19,8 @@ enum PulleyFlags
 	NotHidden,
 	PullCountReset,
 	PullCount,
-	State
+	State,
+	Status
 };
 
 namespace TEN::Entities::Switches
@@ -203,6 +204,7 @@ namespace TEN::Entities::Switches
 				switchItem->TriggerFlags = abs(switchItem->ItemFlags[PulleyFlags::PullCount]);
 				switchItem->ItemFlags[PulleyFlags::PullCountReset] = 0;  // Reset activation flag
 				switchItem->ItemFlags[PulleyFlags::State] = 1; //Save switch is active flag
+				switchItem->ItemFlags[PulleyFlags::Status] = 1;
 				TENLog("TriggerFlags Restored: " + std::to_string(switchItem->TriggerFlags), LogLevel::Warning);
 			}
 			break;
@@ -214,6 +216,7 @@ namespace TEN::Entities::Switches
 				switchItem->TriggerFlags = abs(switchItem->ItemFlags[PulleyFlags::PullCount]);
 				switchItem->ItemFlags[PulleyFlags::PullCountReset] = 0;  // Reset activation flag
 				switchItem->ItemFlags[PulleyFlags::State] = 0; //Save switch is Inactive flag
+				switchItem->ItemFlags[PulleyFlags::Status] = 1;
 				TENLog("TriggerFlags Restored: " + std::to_string(switchItem->TriggerFlags), LogLevel::Warning);
 			}
 			break;
