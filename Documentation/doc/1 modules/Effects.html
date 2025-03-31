@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.7.2 (Developer) Lua API</title>
+    <title>TombEngine 1.8.1 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -80,7 +80,7 @@
   <li>    <a href="../4 enums/Collision.MaterialType.html">Collision.MaterialType</a></li>
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
-  <li>    <a href="../4 enums/Effects.FeatherMode.html">Effects.FeatherMode</a></li>
+  <li>    <a href="../4 enums/Effects.StreamerFeatherMode.html">Effects.StreamerFeatherMode</a></li>
   <li>    <a href="../4 enums/Effects.ParticleAnimationType.html">Effects.ParticleAnimationType</a></li>
   <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
   <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
@@ -124,16 +124,16 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#EmitLightningArc">EmitLightningArc(src, dest, color, lifetime, amplitude, beamWidth, detail, smooth, endDrift)</a></td>
+	<td class="name" ><a href="#EmitLightningArc">EmitLightningArc(origin, target, color, life, amplitude, beamWidth, detail, smooth, endDrift)</a></td>
 	<td class="summary">Emit a lightning arc.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#EmitParticle">EmitParticle(pos, vel, spriteID, gravity, rotVel, startColor, endColor, blendMode, startSize, endSize, life, applyDamage, applyPoison, spriteSeqID, startRot)</a></td>
+	<td class="name" ><a href="#EmitParticle">EmitParticle(pos, vel, spriteID, gravity, rotVel, startColor, endColor, blendMode, startSize, endSize, life, damage, poison, spriteSeqID, startRot)</a></td>
 	<td class="summary">Emit a particle.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#EmitAdvancedParticle">EmitAdvancedParticle(ParticleData)</a></td>
-	<td class="summary">Emit a particle with extensive configuration options including animations.</td>
+	<td class="summary">Emit a particle with extensive configuration options, including sprite sequence animation, lights, sounds, and damage effects.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#EmitShockwave">EmitShockwave(pos, innerRadius, outerRadius, color, lifetime, speed, angle, hurtsLara)</a></td>
@@ -171,6 +171,10 @@
 	<td class="name" ><a href="#GetWind">GetWind()</a></td>
 	<td class="summary">Get the wind vector for the current game frame.</td>
 	</tr>
+	<tr>
+	<td class="name" ><a href="#EmitStreamer">EmitStreamer(mov, tag, pos, dir[, rot][, startColor][, endColor][, width][, life][, vel][, expRate][, rotRate][, edgeFeatherMode][, lengthFeatherMode][, blendID])</a></td>
+	<td class="summary">Emit an extending streamer effect.</td>
+	</tr>
 </table>
 <h2><a href="#Tables">Tables</a></h2>
 <table class="function_list">
@@ -189,7 +193,7 @@
     <dl class="function">
     <dt>
     <a name = "EmitLightningArc"></a>
-    <strong>EmitLightningArc(src, dest, color, lifetime, amplitude, beamWidth, detail, smooth, endDrift)</strong>
+    <strong>EmitLightningArc(origin, target, color, life, amplitude, beamWidth, detail, smooth, endDrift)</strong>
     </dt>
     <dd>
     Emit a lightning arc.
@@ -198,13 +202,13 @@
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">src</span>
+        <li><span class="parameter">origin</span>
             <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
 
 
 
         </li>
-        <li><span class="parameter">dest</span>
+        <li><span class="parameter">target</span>
             <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
 
 
@@ -214,29 +218,29 @@
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
          (default Color(255, 255, 255))
         </li>
-        <li><span class="parameter">lifetime</span>
+        <li><span class="parameter">life</span>
             <span class="types"><span class="type">float</span></span>
-         Lifetime in seconds. Clamped to [0, 4.233] for now because of strange internal maths. (default 1.0)
+         Lifetime in seconds. Clamped to [0, 4.233] for now because of strange internal maths. <strong>default: 1</strong>
         </li>
         <li><span class="parameter">amplitude</span>
             <span class="types"><span class="type">int</span></span>
-         "strength" of the lightning - the higher the value, the "taller" the arcs. Clamped to [1, 255]. (default 20)
+         "strength" of the lightning - the higher the value, the "taller" the arcs. Clamped to [1, 255]. <strong>default: 20</strong>
         </li>
         <li><span class="parameter">beamWidth</span>
             <span class="types"><span class="type">int</span></span>
-         Clamped to [1, 127]. (default 2)
+         Clamped to [1, 127]. <strong>default 2</strong>
         </li>
         <li><span class="parameter">detail</span>
             <span class="types"><span class="type">int</span></span>
-         Higher numbers equal more segments, but it's not a 1:1 correlation. Clamped to [1, 127]. (default 10)
+         Higher numbers equal more segments, but it's not a 1:1 correlation. Clamped to [1, 127]. <strong>default: 10</strong>
         </li>
         <li><span class="parameter">smooth</span>
             <span class="types"><span class="type">bool</span></span>
-         If true, the arc will have large, smooth curves; if false, it will have small, jagged spikes. (default false)
+         If true, the arc will have large, smooth curves; if false, it will have small, jagged spikes. <strong>default: false</strong>
         </li>
         <li><span class="parameter">endDrift</span>
             <span class="types"><span class="type">bool</span></span>
-         If true, the end of the arc will be able to gradually drift away from its destination in a random direction (default false)
+         If true, the end of the arc will be able to gradually drift away from its destination in a random direction <strong>default: false</strong>
         </li>
     </ul>
 
@@ -247,7 +251,7 @@
 </dd>
     <dt>
     <a name = "EmitParticle"></a>
-    <strong>EmitParticle(pos, vel, spriteID, gravity, rotVel, startColor, endColor, blendMode, startSize, endSize, life, applyDamage, applyPoison, spriteSeqID, startRot)</strong>
+    <strong>EmitParticle(pos, vel, spriteID, gravity, rotVel, startColor, endColor, blendMode, startSize, endSize, life, damage, poison, spriteSeqID, startRot)</strong>
     </dt>
     <dd>
     Emit a particle.
@@ -262,59 +266,59 @@
         </li>
         <li><span class="parameter">vel</span>
             <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-         Velocity.
+         Directional velocity.
         </li>
         <li><span class="parameter">spriteID</span>
             <span class="types"><span class="type">int</span></span>
-         ID of the sprite in the sprite sequence object.
+         Sprite ID in the sprite sequence slot.
         </li>
         <li><span class="parameter">gravity</span>
             <span class="types"><span class="type">float</span></span>
-         Specifies if the particle will fall over time. Positive values ascend, negative values descend. Recommended range: [-1000 and 1000]. <strong>Default: 0</strong>
+         Effect of gravity. Positive value ascends, negative value descends. <strong>default: 0</strong>
         </li>
         <li><span class="parameter">rotVel</span>
             <span class="types"><span class="type">float</span></span>
-         Rotational velocity in degrees. <strong>Default: 0</strong>
+         Rotational velocity in degrees. <strong>default: 0</strong>
         </li>
         <li><span class="parameter">startColor</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
-         Color at start of life. <strong>Default: Color(255, 255, 255)</strong>
+         Color at start of life. <strong>default: Color(255, 255, 255)</strong>
         </li>
         <li><span class="parameter">endColor</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
-         Color to fade toward. This will finish long before the end of the particle's life due to internal math. <strong>Default: Color(255, 255, 255)</strong>
+         Color at end of life. This will finish long before the end of the particle's life due to internal math. <strong>default: Color(255, 255, 255)</strong>
         </li>
         <li><span class="parameter">blendMode</span>
             <span class="types"><a class="type" href="../4 enums/Effects.BlendID.html#">BlendID</a></span>
-         Render blend mode. <strong>TEN.Effects.BlendID.ALPHABLEND</strong>
+         Render blend mode. <strong>TEN.Effects.BlendID.ALPHA_BLEND</strong>
         </li>
         <li><span class="parameter">startSize</span>
             <span class="types"><span class="type">float</span></span>
-         Size at start of life. <strong>Default: 10</strong>
+         Size at start of life. <strong>default: 10</strong>
         </li>
         <li><span class="parameter">endSize</span>
             <span class="types"><span class="type">float</span></span>
-         Size at end of life. The particle will linearly shrink or grow toward this size over its lifespan. <strong>Default: 0</strong>
+         Size at end of life. <strong>default: 0</strong>
         </li>
         <li><span class="parameter">life</span>
             <span class="types"><span class="type">float</span></span>
-         Lifespan in seconds. <strong>Default: 2</strong>
+         Lifespan in seconds. <strong>default: 2</strong>
         </li>
-        <li><span class="parameter">applyDamage</span>
+        <li><span class="parameter">damage</span>
             <span class="types"><span class="type">bool</span></span>
-         Specify if the particle will harm the player on collision. <strong>Default: false</strong>
+         Harm the player on collision. <strong>default: false</strong>
         </li>
-        <li><span class="parameter">applyPoison</span>
+        <li><span class="parameter">poison</span>
             <span class="types"><span class="type">bool</span></span>
-         Specify if the particle will poison the player on collision. <strong>Default: false</strong>
+         Poison the player on collision. <strong>default: false</strong>
         </li>
         <li><span class="parameter">spriteSeqID</span>
-            <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-         ID of the sprite sequence object. <strong>Default: Objects.ObjID.DEFAULT_SPRITES</strong>
+            <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#SpriteConstants">SpriteConstants</a></span>
+         Sprite sequence slot ID. <strong>default: Objects.ObjID.DEFAULT_SPRITES</strong>
         </li>
         <li><span class="parameter">startRot</span>
             <span class="types"><span class="type">float</span></span>
-         Rotation at start of life. <strong>Default: random</strong>
+         Rotation at start of life. <strong>default: random</strong>
         </li>
     </ul>
 
@@ -324,22 +328,21 @@
     <h3>Usage:</h3>
     <ul>
         <pre class="example">EmitParticle(
-	pos,
-	Vec3(<span class="global">math</span>.random(), <span class="global">math</span>.random(), <span class="global">math</span>.random()),
-	<span class="number">22</span>, <span class="comment">-- spriteID
-</span>	<span class="number">0</span>, <span class="comment">-- gravity
-</span>	-<span class="number">2</span>, <span class="comment">-- rotVel
-</span>	Color(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">-- startColor
-</span>	Color(<span class="number">0</span>,  <span class="number">255</span>, <span class="number">0</span>), <span class="comment">-- endColor
-</span>	TEN.Effects.BlendID.ADDITIVE, <span class="comment">-- blendMode
-</span>	<span class="number">15</span>, <span class="comment">-- startSize
-</span>	<span class="number">50</span>, <span class="comment">-- endSize
-</span>	<span class="number">20</span>, <span class="comment">-- life
-</span>	<span class="keyword">false</span>, <span class="comment">-- applyDamage
-</span>	<span class="keyword">true</span>, <span class="comment">-- applyPoison
-</span> Objects.ObjID.DEFAULT_SPRITES, <span class="comment">-- spriteSeqID
-</span> <span class="number">180</span> <span class="comment">-- startRot
-</span> )</pre>
+    pos,
+	   Vec3(<span class="global">math</span>.random(), <span class="global">math</span>.random(), <span class="global">math</span>.random()),
+	   <span class="number">22</span>, <span class="comment">-- spriteID
+</span>	   <span class="number">0</span>, <span class="comment">-- gravity
+</span>	   -<span class="number">2</span>, <span class="comment">-- rotVel
+</span>	   Color(<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>), <span class="comment">-- startColor
+</span>	   Color(<span class="number">0</span>,  <span class="number">255</span>, <span class="number">0</span>), <span class="comment">-- endColor
+</span>	   TEN.Effects.BlendID.ADDITIVE, <span class="comment">-- blendMode
+</span>	   <span class="number">15</span>, <span class="comment">-- startSize
+</span>	   <span class="number">50</span>, <span class="comment">-- endSize
+</span>	   <span class="number">20</span>, <span class="comment">-- life
+</span>	   <span class="keyword">false</span>, <span class="comment">-- damage
+</span>	   <span class="keyword">true</span>, <span class="comment">-- poison
+</span>    Objects.ObjID.DEFAULT_SPRITES, <span class="comment">-- spriteSeqID
+</span>    <span class="number">180</span>) <span class="comment">-- startRot</span></pre>
     </ul>
 
 </dd>
@@ -348,7 +351,7 @@
     <strong>EmitAdvancedParticle(ParticleData)</strong>
     </dt>
     <dd>
-    Emit a particle with extensive configuration options including animations.
+    Emit a particle with extensive configuration options, including sprite sequence animation, lights, sounds, and damage effects.
 
 
 
@@ -356,7 +359,7 @@
     <ul>
         <li><span class="parameter">ParticleData</span>
             <span class="types"><a class="type" href="../1 modules/Effects.html#ParticleData">ParticleData</a></span>
-         The table holding all the particle data.
+         Table containing particle data.
         </li>
     </ul>
 
@@ -365,34 +368,35 @@
 
     <h3>Usage:</h3>
     <ul>
-        <pre class="example"><span class="keyword">local</span> particle = {
-position = GetMoveableByName(<span class="string">"camera_target_6"</span>) :GetPosition(),
-velocity = Vec3(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>),
-spriteSeqID = TEN.Objects.ObjID.CUSTOM_BAR_GRAPHIC,
-spriteID = <span class="number">0</span>,
-lifetime = <span class="number">10</span>,
-maxYVelocity = <span class="number">0</span>,
-gravity = <span class="number">0</span>,
-friction = <span class="number">10</span>,
-startRotation = <span class="number">0</span>,
-rotationSpeed = <span class="number">0</span>,
-startSize = <span class="number">80</span>,
-endSize = <span class="number">80</span>,
-startColor = TEN.Color(<span class="number">128</span>, <span class="number">128</span>, <span class="number">128</span>),
-endColor = TEN.Color(<span class="number">128</span>, <span class="number">128</span>, <span class="number">128</span>),
-blendMode = TEN.Effects.BlendID.ADDITIVE,
-wind = <span class="keyword">false</span>,
-damage = <span class="keyword">true</span>,
-poison = <span class="keyword">false</span>,
-burn = <span class="keyword">false</span>,
-damageHit = <span class="number">80</span>,
-sound = <span class="number">197</span>,
-light = <span class="keyword">true</span>,
-lightRadius = <span class="number">6</span>,
-lightFlicker = <span class="number">5</span>,
-animated = <span class="keyword">true</span>,
-frameRate = .<span class="number">25</span>,
-animationType = TEN.Effects.ParticleAnimationType.LOOP,
+        <pre class="example"><span class="keyword">local</span> particle =
+{
+    pos = GetMoveableByName(<span class="string">"camera_target_6"</span>):GetPosition(),
+    vel = Vec3(<span class="number">0</span>, <span class="number">0</span>, <span class="number">10</span>),
+    spriteSeqID = TEN.Objects.ObjID.CUSTOM_BAR_GRAPHIC,
+    spriteID = <span class="number">0</span>,
+    life = <span class="number">10</span>,
+    maxYVel = <span class="number">0</span>,
+    gravity = <span class="number">0</span>,
+    friction = <span class="number">10</span>,
+    startRot = <span class="number">0</span>,
+    rotVel = <span class="number">0</span>,
+    startSize = <span class="number">80</span>,
+    endSize = <span class="number">80</span>,
+    startColor = TEN.Color(<span class="number">128</span>, <span class="number">128</span>, <span class="number">128</span>),
+    endColor = TEN.Color(<span class="number">128</span>, <span class="number">128</span>, <span class="number">128</span>),
+    blendMode = TEN.Effects.BlendID.ADDITIVE,
+    wind = <span class="keyword">false</span>,
+    damage = <span class="keyword">true</span>,
+    poison = <span class="keyword">false</span>,
+    burn = <span class="keyword">false</span>,
+    damageHit = <span class="number">80</span>,
+    soundID = <span class="number">197</span>,
+    light = <span class="keyword">true</span>,
+    lightRadius = <span class="number">6</span>,
+    lightFlicker = <span class="number">5</span>,
+    animated = <span class="keyword">true</span>,
+    frameRate = <span class="number">0.25</span>,
+    animType = TEN.Effects.ParticleAnimationType.LOOP,
 }
 EmitAdvancedParticle(particle)</pre>
     </ul>
@@ -627,7 +631,7 @@ EmitAdvancedParticle(particle)</pre>
         </li>
         <li><span class="parameter">size</span>
             <span class="types"><span class="type">float</span></span>
-         (default 1.0)
+         Fire size. <strong>default: 1</strong>
         </li>
     </ul>
 
@@ -712,6 +716,95 @@ EmitAdvancedParticle(particle)</pre>
 
 
 </dd>
+    <dt>
+    <a name = "EmitStreamer"></a>
+    <strong>EmitStreamer(mov, tag, pos, dir[, rot][, startColor][, endColor][, width][, life][, vel][, expRate][, rotRate][, edgeFeatherMode][, lengthFeatherMode][, blendID])</strong>
+    </dt>
+    <dd>
+    Emit an extending streamer effect.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">mov</span>
+            <span class="types"><span class="type">Moveable</span></span>
+         Moveable object with which to associate the effect.
+        </li>
+        <li><span class="parameter">tag</span>
+            <span class="types"><span class="type">int[opt]</span></span>
+         Numeric tag with which to associate the effect on the moveable. <strong>Default: 0</strong>
+        </li>
+        <li><span class="parameter">pos</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         World position.
+        </li>
+        <li><span class="parameter">dir</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         Direction vector of movement velocity.
+        </li>
+        <li><span class="parameter">rot</span>
+            <span class="types"><span class="type">float</span></span>
+         Start rotation in degrees. <strong>Default: 0</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">startColor</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
+         Color at the start of life. <strong>Default: Color(255, 255, 255, 255))</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">endColor</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
+         Color at the end of life. <strong>Default: Color(0, 0, 0, 0))</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">width</span>
+            <span class="types"><span class="type">float</span></span>
+         Width in world units. <strong>Default: 0</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">life</span>
+            <span class="types"><span class="type">float</span></span>
+         Lifetime in seconds. <strong>Default: 1</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">vel</span>
+            <span class="types"><span class="type">float</span></span>
+         Movement velocity in world units per second. <strong>Default: 0</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">expRate</span>
+            <span class="types"><span class="type">float</span></span>
+         Width expansion rate in world units per second. <strong>Default: 0</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">rotRate</span>
+            <span class="types"><span class="type">float</span></span>
+         Rotation rate in degrees per second. <strong>Default: 0</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">edgeFeatherMode</span>
+            <span class="types"><a class="type" href="../4 enums/Effects.StreamerFeatherMode.html#">StreamerFeatherMode</a></span>
+         Edge feather mode. <strong>Default: Effects.StreamerFeatherMode.NONE</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">lengthFeatherMode</span>
+            <span class="types"><a class="type" href="../4 enums/Effects.StreamerFeatherMode.html#">StreamerFeatherMode</a></span>
+         Length feather mode. <strong>UNIMPLEMENTED, currently will always leave a fading tail</strong>
+         (<em>optional</em>)
+        </li>
+        <li><span class="parameter">blendID</span>
+            <span class="types"><a class="type" href="../4 enums/Effects.BlendID.html#">BlendID</a></span>
+         Renderer blend ID. <strong>Default: Effects.BlendID.ALPHA_BLEND</strong>
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
 </dl>
     <h2 class="section-header "><a name="Tables"></a>Tables</h2>
 
@@ -727,137 +820,137 @@ EmitAdvancedParticle(particle)</pre>
 
     <h3>Fields:</h3>
     <ul>
-        <li><span class="parameter">position</span>
+        <li><span class="parameter">pos</span>
             <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
          World position.
         </li>
-        <li><span class="parameter">velocity</span>
+        <li><span class="parameter">vel</span>
             <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
-         Velocity.
+         Directional velocity in world units per second.
         </li>
         <li><span class="parameter">spriteSeqID</span>
-            <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#">ObjID</a></span>
-         ID of the sprite sequence object. <strong>Default: Objects.ObjID.DEFAULT_SPRITES</strong>
+            <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#SpriteConstants">SpriteConstants</a></span>
+         Sprite sequence slot ID. <strong>default: Objects.ObjID.DEFAULT_SPRITES</strong>
          (<em>optional</em>)
         </li>
         <li><span class="parameter">spriteID</span>
             <span class="types"><span class="type">int</span></span>
-         ID of the sprite in the sprite sequence object.<strong>Default: 0</strong>
+         Sprite ID in the sprite sequence slot. <strong>default: 0</strong>
          (<em>optional</em>)
         </li>
-        <li><span class="parameter">lifetime</span>
+        <li><span class="parameter">life</span>
             <span class="types"><span class="type">float</span></span>
-         Lifespan in seconds. <strong>Default: 2</strong>
+         Lifespan in seconds. <strong>default: 2</strong>
          (<em>optional</em>)
         </li>
-        <li><span class="parameter">maxYVelocity</span>
+        <li><span class="parameter">maxYVel</span>
             <span class="types"><span class="type">float</span></span>
-         Specifies ithe maximum Y velocity for the particle. <strong>Default: 0</strong>
+         Maximum vertical velocity in world units per second. <strong>default: 0</strong>
          (<em>optional</em>)
         </li>
         <li><span class="parameter">gravity</span>
             <span class="types"><span class="type">float</span></span>
-         Specifies if the particle will fall over time. Positive values ascend, negative values descend. Recommended range: [-1000 and 1000]. <strong>Default: 0</strong>
+         Effect of gravity in world units per second. Positive value ascend, negative value descend. <strong>default: 0</strong>
          (<em>optional</em>)
         </li>
         <li><span class="parameter">friction</span>
             <span class="types"><span class="type">float</span></span>
-         Specifies the friction with which the particle will slow down over time. <strong>Default: 0</strong>
+         Friction affecting velocity over time in world units per second. <strong>default: 0</strong>
          (<em>optional</em>)
         </li>
-        <li><span class="parameter">startRotation</span>
+        <li><span class="parameter">startRot</span>
             <span class="types"><span class="type">float</span></span>
-         Rotation at start of life. <strong>Default: random</strong>
+         Rotation at start of life. <strong>default: random</strong>
          (<em>optional</em>)
         </li>
-        <li><span class="parameter">rotationSpeed</span>
+        <li><span class="parameter">rotVel</span>
             <span class="types"><span class="type">float</span></span>
-         Rotational velocity in degrees. <strong>Default: 0</strong>
+         Rotational velocity in degrees per second. <strong>default: 0</strong>
          (<em>optional</em>)
         </li>
         <li><span class="parameter">startSize</span>
             <span class="types"><span class="type">float</span></span>
-         Size at start of life. <strong>Default: 10</strong>
+         Size at start of life. <strong>default: 10</strong>
          (<em>optional</em>)
         </li>
         <li><span class="parameter">endSize</span>
             <span class="types"><span class="type">float</span></span>
-         Size at end of life. The particle will linearly shrink or grow toward this size over its lifespan. <strong>Default: 0</strong>
+         Size at end of life. <strong>default: 0</strong>
          (<em>optional</em>)
         </li>
         <li><span class="parameter">startColor</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
-         Color at start of life. <strong>Default: Color(255, 255, 255)</strong>
+         Color at start of life. <strong>default: Color(255, 255, 255)</strong>
          (<em>optional</em>)
         </li>
         <li><span class="parameter">endColor</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
-         Color to fade toward. This will finish long before the end of the particle's life due to internal math. <strong>Default: Color(255, 255, 255)</strong>
+         Color at end of life. Note that this will finish long before the end of life due to internal math. <strong>default: Color(255, 255, 255)</strong>
          (<em>optional</em>)
         </li>
         <li><span class="parameter">blendMode</span>
             <span class="types"><a class="type" href="../4 enums/Effects.BlendID.html#">BlendID</a></span>
-         Render blend mode. <strong>TEN.Effects.BlendID.ALPHA_BLEND</strong>
+         Render blend mode. <strong>default: TEN.Effects.BlendID.ALPHA_BLEND</strong>
          (<em>optional</em>)
         </li>
         <li><span class="parameter">damage</span>
             <span class="types"><span class="type">bool</span></span>
-         Specify if the particle will harm the player on collision. <strong>Default: false</strong>
+         Harm the player on collision. <strong>default: false</strong>
          (<em>optional</em>)
         </li>
         <li><span class="parameter">poison</span>
             <span class="types"><span class="type">bool</span></span>
-         Specify if the particle will poison the player on collision. <strong>Default: false</strong>
+         Poison the player on collision. <strong>default: false</strong>
          (<em>optional</em>)
         </li>
         <li><span class="parameter">burn</span>
             <span class="types"><span class="type">bool</span></span>
-         Specify if the particle will burn the player on collision. <strong>Default: false</strong>
+         Burn the player on collision. <strong>default: false</strong>
          (<em>optional</em>)
         </li>
         <li><span class="parameter">wind</span>
             <span class="types"><span class="type">bool</span></span>
-         Specify if the particle will be affected by wind in outside rooms. <strong>Default: false</strong>
+         Affect position by wind in outside rooms. <strong>default: false</strong>
          (<em>optional</em>)
         </li>
         <li><span class="parameter">damageHit</span>
             <span class="types"><span class="type">int</span></span>
-         Specify the damage particle will harm the player on collision. <strong>Default: 2</strong>
+         Player damage amount on collision. <strong>default: 2</strong>
          (<em>optional</em>)
         </li>
         <li><span class="parameter">light</span>
             <span class="types"><span class="type">bool</span></span>
-         Specify if the particle will be emit a light based on its color. Caution: Recommended only for a single particle. Having too many particles with lights can overflow the light system. <strong>Default: false</strong>
+         Emit a colored light. CAUTION: Recommended only for a single particle. Too many particles with lights can overwhelm the lighting system. <strong>default: false</strong>
          (<em>optional</em>)
         </li>
         <li><span class="parameter">lightRadius</span>
             <span class="types"><span class="type">int</span></span>
-         measured in "clicks" or 256 world units. <strong>Default: 0</strong>
+         Light radius in 1/4 blocks. <strong>default: 0</strong>
          (<em>optional</em>)
         </li>
         <li><span class="parameter">lightFlicker</span>
             <span class="types"><span class="type">int</span></span>
-         The interval at which light should flicker. <strong>Default: 0</strong>
+         Interval at which the light should flicker. <strong>default: 0</strong>
          (<em>optional</em>)
         </li>
-        <li><span class="parameter">sound</span>
+        <li><span class="parameter">soundID</span>
             <span class="types"><span class="type">int</span></span>
-         ID to play. Corresponds to the value in the sound XML file or Tomb Editor's "Sound Infos" window. Looping sounds recommended. Caution: Recommended only for a single particle. Having too many particles with sounds can overflow the sound system. <strong>Default: None</strong>
+         Sound ID to play. CAUTION: Recommended only for a single particle. Too many particles with sounds can overwhelm the sound system. <strong>default: none</strong>
          (<em>optional</em>)
         </li>
         <li><span class="parameter">animated</span>
             <span class="types"><span class="type">bool</span></span>
-         Specify if the particle will be animated. <strong>Default: false</strong>
+         Play animates sprite sequence. <strong>default: false</strong>
          (<em>optional</em>)
         </li>
-        <li><span class="parameter">animationType</span>
+        <li><span class="parameter">animType</span>
             <span class="types"><a class="type" href="../4 enums/Effects.ParticleAnimationType.html#">ParticleAnimationType</a></span>
-         Specify the the type of animation the particle will use. <strong>Default: TEN.Effects.ParticleAnimationType.LOOP</strong>
+         Animation type of the sprite sequence. <strong>default: TEN.Effects.ParticleAnimationType.LOOP</strong>
          (<em>optional</em>)
         </li>
         <li><span class="parameter">frameRate</span>
             <span class="types"><span class="type">float</span></span>
-         The framerate with which the particle will be animated. <strong>Default: 1</strong>
+         Sprite sequence animation framerate. <strong>default: 1</strong>
          (<em>optional</em>)
         </li>
     </ul>

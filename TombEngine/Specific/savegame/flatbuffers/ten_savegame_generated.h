@@ -169,6 +169,10 @@ struct FishData;
 struct FishDataBuilder;
 struct FishDataT;
 
+struct FireflyData;
+struct FireflyDataBuilder;
+struct FireflyDataT;
+
 struct KeyValPair;
 
 struct ScriptTable;
@@ -548,10 +552,9 @@ struct LevelDataT : public flatbuffers::NativeTable {
   bool rumble_enabled = false;
   int32_t weather_type = 0;
   float weather_strength = 0.0f;
-  bool fog_enabled = false;
   int32_t fog_color = 0;
-  int32_t fog_min_distance = 0;
-  int32_t fog_max_distance = 0;
+  float fog_min_distance = 0.0f;
+  float fog_max_distance = 0.0f;
   bool sky_layer_1_enabled = false;
   int32_t sky_layer_1_color = 0;
   int32_t sky_layer_1_speed = 0;
@@ -588,34 +591,33 @@ struct LevelData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_RUMBLE_ENABLED = 8,
     VT_WEATHER_TYPE = 10,
     VT_WEATHER_STRENGTH = 12,
-    VT_FOG_ENABLED = 14,
-    VT_FOG_COLOR = 16,
-    VT_FOG_MIN_DISTANCE = 18,
-    VT_FOG_MAX_DISTANCE = 20,
-    VT_SKY_LAYER_1_ENABLED = 22,
-    VT_SKY_LAYER_1_COLOR = 24,
-    VT_SKY_LAYER_1_SPEED = 26,
-    VT_SKY_LAYER_2_ENABLED = 28,
-    VT_SKY_LAYER_2_COLOR = 30,
-    VT_SKY_LAYER_2_SPEED = 32,
-    VT_HORIZON1_ENABLED = 34,
-    VT_HORIZON1_OBJECT_ID = 36,
-    VT_HORIZON1_POSITION = 38,
-    VT_HORIZON1_ORIENTATION = 40,
-    VT_HORIZON1_TRANSPARENCY = 42,
-    VT_HORIZON2_ENABLED = 44,
-    VT_HORIZON2_OBJECT_ID = 46,
-    VT_HORIZON2_POSITION = 48,
-    VT_HORIZON2_ORIENTATION = 50,
-    VT_HORIZON2_TRANSPARENCY = 52,
-    VT_LENSFLARE_SPRITE_ID = 54,
-    VT_LENSFLARE_PITCH = 56,
-    VT_LENSFLARE_YAW = 58,
-    VT_LENSFLARE_COLOR = 60,
-    VT_STARFIELD_STAR_COUNT = 62,
-    VT_STARFIELD_METEOR_COUNT = 64,
-    VT_STARFIELD_METEOR_SPAWN_DENSITY = 66,
-    VT_STARFIELD_METEOR_VELOCITY = 68
+    VT_FOG_COLOR = 14,
+    VT_FOG_MIN_DISTANCE = 16,
+    VT_FOG_MAX_DISTANCE = 18,
+    VT_SKY_LAYER_1_ENABLED = 20,
+    VT_SKY_LAYER_1_COLOR = 22,
+    VT_SKY_LAYER_1_SPEED = 24,
+    VT_SKY_LAYER_2_ENABLED = 26,
+    VT_SKY_LAYER_2_COLOR = 28,
+    VT_SKY_LAYER_2_SPEED = 30,
+    VT_HORIZON1_ENABLED = 32,
+    VT_HORIZON1_OBJECT_ID = 34,
+    VT_HORIZON1_POSITION = 36,
+    VT_HORIZON1_ORIENTATION = 38,
+    VT_HORIZON1_TRANSPARENCY = 40,
+    VT_HORIZON2_ENABLED = 42,
+    VT_HORIZON2_OBJECT_ID = 44,
+    VT_HORIZON2_POSITION = 46,
+    VT_HORIZON2_ORIENTATION = 48,
+    VT_HORIZON2_TRANSPARENCY = 50,
+    VT_LENSFLARE_SPRITE_ID = 52,
+    VT_LENSFLARE_PITCH = 54,
+    VT_LENSFLARE_YAW = 56,
+    VT_LENSFLARE_COLOR = 58,
+    VT_STARFIELD_STAR_COUNT = 60,
+    VT_STARFIELD_METEOR_COUNT = 62,
+    VT_STARFIELD_METEOR_SPAWN_DENSITY = 64,
+    VT_STARFIELD_METEOR_VELOCITY = 66
   };
   int32_t level_far_view() const {
     return GetField<int32_t>(VT_LEVEL_FAR_VIEW, 0);
@@ -632,17 +634,14 @@ struct LevelData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   float weather_strength() const {
     return GetField<float>(VT_WEATHER_STRENGTH, 0.0f);
   }
-  bool fog_enabled() const {
-    return GetField<uint8_t>(VT_FOG_ENABLED, 0) != 0;
-  }
   int32_t fog_color() const {
     return GetField<int32_t>(VT_FOG_COLOR, 0);
   }
-  int32_t fog_min_distance() const {
-    return GetField<int32_t>(VT_FOG_MIN_DISTANCE, 0);
+  float fog_min_distance() const {
+    return GetField<float>(VT_FOG_MIN_DISTANCE, 0.0f);
   }
-  int32_t fog_max_distance() const {
-    return GetField<int32_t>(VT_FOG_MAX_DISTANCE, 0);
+  float fog_max_distance() const {
+    return GetField<float>(VT_FOG_MAX_DISTANCE, 0.0f);
   }
   bool sky_layer_1_enabled() const {
     return GetField<uint8_t>(VT_SKY_LAYER_1_ENABLED, 0) != 0;
@@ -723,10 +722,9 @@ struct LevelData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<uint8_t>(verifier, VT_RUMBLE_ENABLED) &&
            VerifyField<int32_t>(verifier, VT_WEATHER_TYPE) &&
            VerifyField<float>(verifier, VT_WEATHER_STRENGTH) &&
-           VerifyField<uint8_t>(verifier, VT_FOG_ENABLED) &&
            VerifyField<int32_t>(verifier, VT_FOG_COLOR) &&
-           VerifyField<int32_t>(verifier, VT_FOG_MIN_DISTANCE) &&
-           VerifyField<int32_t>(verifier, VT_FOG_MAX_DISTANCE) &&
+           VerifyField<float>(verifier, VT_FOG_MIN_DISTANCE) &&
+           VerifyField<float>(verifier, VT_FOG_MAX_DISTANCE) &&
            VerifyField<uint8_t>(verifier, VT_SKY_LAYER_1_ENABLED) &&
            VerifyField<int32_t>(verifier, VT_SKY_LAYER_1_COLOR) &&
            VerifyField<int32_t>(verifier, VT_SKY_LAYER_1_SPEED) &&
@@ -777,17 +775,14 @@ struct LevelDataBuilder {
   void add_weather_strength(float weather_strength) {
     fbb_.AddElement<float>(LevelData::VT_WEATHER_STRENGTH, weather_strength, 0.0f);
   }
-  void add_fog_enabled(bool fog_enabled) {
-    fbb_.AddElement<uint8_t>(LevelData::VT_FOG_ENABLED, static_cast<uint8_t>(fog_enabled), 0);
-  }
   void add_fog_color(int32_t fog_color) {
     fbb_.AddElement<int32_t>(LevelData::VT_FOG_COLOR, fog_color, 0);
   }
-  void add_fog_min_distance(int32_t fog_min_distance) {
-    fbb_.AddElement<int32_t>(LevelData::VT_FOG_MIN_DISTANCE, fog_min_distance, 0);
+  void add_fog_min_distance(float fog_min_distance) {
+    fbb_.AddElement<float>(LevelData::VT_FOG_MIN_DISTANCE, fog_min_distance, 0.0f);
   }
-  void add_fog_max_distance(int32_t fog_max_distance) {
-    fbb_.AddElement<int32_t>(LevelData::VT_FOG_MAX_DISTANCE, fog_max_distance, 0);
+  void add_fog_max_distance(float fog_max_distance) {
+    fbb_.AddElement<float>(LevelData::VT_FOG_MAX_DISTANCE, fog_max_distance, 0.0f);
   }
   void add_sky_layer_1_enabled(bool sky_layer_1_enabled) {
     fbb_.AddElement<uint8_t>(LevelData::VT_SKY_LAYER_1_ENABLED, static_cast<uint8_t>(sky_layer_1_enabled), 0);
@@ -879,10 +874,9 @@ inline flatbuffers::Offset<LevelData> CreateLevelData(
     bool rumble_enabled = false,
     int32_t weather_type = 0,
     float weather_strength = 0.0f,
-    bool fog_enabled = false,
     int32_t fog_color = 0,
-    int32_t fog_min_distance = 0,
-    int32_t fog_max_distance = 0,
+    float fog_min_distance = 0.0f,
+    float fog_max_distance = 0.0f,
     bool sky_layer_1_enabled = false,
     int32_t sky_layer_1_color = 0,
     int32_t sky_layer_1_speed = 0,
@@ -938,7 +932,6 @@ inline flatbuffers::Offset<LevelData> CreateLevelData(
   builder_.add_horizon1_enabled(horizon1_enabled);
   builder_.add_sky_layer_2_enabled(sky_layer_2_enabled);
   builder_.add_sky_layer_1_enabled(sky_layer_1_enabled);
-  builder_.add_fog_enabled(fog_enabled);
   builder_.add_rumble_enabled(rumble_enabled);
   builder_.add_storm_enabled(storm_enabled);
   return builder_.Finish();
@@ -6872,6 +6865,295 @@ struct FishData::Traits {
 
 flatbuffers::Offset<FishData> CreateFishData(flatbuffers::FlatBufferBuilder &_fbb, const FishDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
 
+struct FireflyDataT : public flatbuffers::NativeTable {
+  typedef FireflyData TableType;
+  int32_t sprite_index = 0;
+  int32_t sprite_id = 0;
+  int32_t blend_mode = 0;
+  int32_t scalar = 0;
+  std::unique_ptr<TEN::Save::Vector3> position{};
+  int32_t room_number = 0;
+  std::unique_ptr<TEN::Save::Vector3> position_target{};
+  std::unique_ptr<TEN::Save::EulerAngles> orientation{};
+  float velocity = 0.0f;
+  int32_t target_item_number = 0;
+  float z_vel = 0.0f;
+  float life = 0.0f;
+  int32_t number = 0;
+  int32_t d_r = 0;
+  int32_t d_g = 0;
+  int32_t d_b = 0;
+  int32_t r = 0;
+  int32_t g = 0;
+  int32_t b = 0;
+  bool on = false;
+  float size = 0.0f;
+  int32_t rot_Ang = 0;
+};
+
+struct FireflyData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
+  typedef FireflyDataT NativeTableType;
+  typedef FireflyDataBuilder Builder;
+  struct Traits;
+  enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
+    VT_SPRITE_INDEX = 4,
+    VT_SPRITE_ID = 6,
+    VT_BLEND_MODE = 8,
+    VT_SCALAR = 10,
+    VT_POSITION = 12,
+    VT_ROOM_NUMBER = 14,
+    VT_POSITION_TARGET = 16,
+    VT_ORIENTATION = 18,
+    VT_VELOCITY = 20,
+    VT_TARGET_ITEM_NUMBER = 22,
+    VT_Z_VEL = 24,
+    VT_LIFE = 26,
+    VT_NUMBER = 28,
+    VT_D_R = 30,
+    VT_D_G = 32,
+    VT_D_B = 34,
+    VT_R = 36,
+    VT_G = 38,
+    VT_B = 40,
+    VT_ON = 42,
+    VT_SIZE = 44,
+    VT_ROT_ANG = 46
+  };
+  int32_t sprite_index() const {
+    return GetField<int32_t>(VT_SPRITE_INDEX, 0);
+  }
+  int32_t sprite_id() const {
+    return GetField<int32_t>(VT_SPRITE_ID, 0);
+  }
+  int32_t blend_mode() const {
+    return GetField<int32_t>(VT_BLEND_MODE, 0);
+  }
+  int32_t scalar() const {
+    return GetField<int32_t>(VT_SCALAR, 0);
+  }
+  const TEN::Save::Vector3 *position() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_POSITION);
+  }
+  int32_t room_number() const {
+    return GetField<int32_t>(VT_ROOM_NUMBER, 0);
+  }
+  const TEN::Save::Vector3 *position_target() const {
+    return GetStruct<const TEN::Save::Vector3 *>(VT_POSITION_TARGET);
+  }
+  const TEN::Save::EulerAngles *orientation() const {
+    return GetStruct<const TEN::Save::EulerAngles *>(VT_ORIENTATION);
+  }
+  float velocity() const {
+    return GetField<float>(VT_VELOCITY, 0.0f);
+  }
+  int32_t target_item_number() const {
+    return GetField<int32_t>(VT_TARGET_ITEM_NUMBER, 0);
+  }
+  float z_vel() const {
+    return GetField<float>(VT_Z_VEL, 0.0f);
+  }
+  float life() const {
+    return GetField<float>(VT_LIFE, 0.0f);
+  }
+  int32_t number() const {
+    return GetField<int32_t>(VT_NUMBER, 0);
+  }
+  int32_t d_r() const {
+    return GetField<int32_t>(VT_D_R, 0);
+  }
+  int32_t d_g() const {
+    return GetField<int32_t>(VT_D_G, 0);
+  }
+  int32_t d_b() const {
+    return GetField<int32_t>(VT_D_B, 0);
+  }
+  int32_t r() const {
+    return GetField<int32_t>(VT_R, 0);
+  }
+  int32_t g() const {
+    return GetField<int32_t>(VT_G, 0);
+  }
+  int32_t b() const {
+    return GetField<int32_t>(VT_B, 0);
+  }
+  bool on() const {
+    return GetField<uint8_t>(VT_ON, 0) != 0;
+  }
+  float size() const {
+    return GetField<float>(VT_SIZE, 0.0f);
+  }
+  int32_t rot_Ang() const {
+    return GetField<int32_t>(VT_ROT_ANG, 0);
+  }
+  bool Verify(flatbuffers::Verifier &verifier) const {
+    return VerifyTableStart(verifier) &&
+           VerifyField<int32_t>(verifier, VT_SPRITE_INDEX) &&
+           VerifyField<int32_t>(verifier, VT_SPRITE_ID) &&
+           VerifyField<int32_t>(verifier, VT_BLEND_MODE) &&
+           VerifyField<int32_t>(verifier, VT_SCALAR) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_POSITION) &&
+           VerifyField<int32_t>(verifier, VT_ROOM_NUMBER) &&
+           VerifyField<TEN::Save::Vector3>(verifier, VT_POSITION_TARGET) &&
+           VerifyField<TEN::Save::EulerAngles>(verifier, VT_ORIENTATION) &&
+           VerifyField<float>(verifier, VT_VELOCITY) &&
+           VerifyField<int32_t>(verifier, VT_TARGET_ITEM_NUMBER) &&
+           VerifyField<float>(verifier, VT_Z_VEL) &&
+           VerifyField<float>(verifier, VT_LIFE) &&
+           VerifyField<int32_t>(verifier, VT_NUMBER) &&
+           VerifyField<int32_t>(verifier, VT_D_R) &&
+           VerifyField<int32_t>(verifier, VT_D_G) &&
+           VerifyField<int32_t>(verifier, VT_D_B) &&
+           VerifyField<int32_t>(verifier, VT_R) &&
+           VerifyField<int32_t>(verifier, VT_G) &&
+           VerifyField<int32_t>(verifier, VT_B) &&
+           VerifyField<uint8_t>(verifier, VT_ON) &&
+           VerifyField<float>(verifier, VT_SIZE) &&
+           VerifyField<int32_t>(verifier, VT_ROT_ANG) &&
+           verifier.EndTable();
+  }
+  FireflyDataT *UnPack(const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  void UnPackTo(FireflyDataT *_o, const flatbuffers::resolver_function_t *_resolver = nullptr) const;
+  static flatbuffers::Offset<FireflyData> Pack(flatbuffers::FlatBufferBuilder &_fbb, const FireflyDataT* _o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+};
+
+struct FireflyDataBuilder {
+  typedef FireflyData Table;
+  flatbuffers::FlatBufferBuilder &fbb_;
+  flatbuffers::uoffset_t start_;
+  void add_sprite_index(int32_t sprite_index) {
+    fbb_.AddElement<int32_t>(FireflyData::VT_SPRITE_INDEX, sprite_index, 0);
+  }
+  void add_sprite_id(int32_t sprite_id) {
+    fbb_.AddElement<int32_t>(FireflyData::VT_SPRITE_ID, sprite_id, 0);
+  }
+  void add_blend_mode(int32_t blend_mode) {
+    fbb_.AddElement<int32_t>(FireflyData::VT_BLEND_MODE, blend_mode, 0);
+  }
+  void add_scalar(int32_t scalar) {
+    fbb_.AddElement<int32_t>(FireflyData::VT_SCALAR, scalar, 0);
+  }
+  void add_position(const TEN::Save::Vector3 *position) {
+    fbb_.AddStruct(FireflyData::VT_POSITION, position);
+  }
+  void add_room_number(int32_t room_number) {
+    fbb_.AddElement<int32_t>(FireflyData::VT_ROOM_NUMBER, room_number, 0);
+  }
+  void add_position_target(const TEN::Save::Vector3 *position_target) {
+    fbb_.AddStruct(FireflyData::VT_POSITION_TARGET, position_target);
+  }
+  void add_orientation(const TEN::Save::EulerAngles *orientation) {
+    fbb_.AddStruct(FireflyData::VT_ORIENTATION, orientation);
+  }
+  void add_velocity(float velocity) {
+    fbb_.AddElement<float>(FireflyData::VT_VELOCITY, velocity, 0.0f);
+  }
+  void add_target_item_number(int32_t target_item_number) {
+    fbb_.AddElement<int32_t>(FireflyData::VT_TARGET_ITEM_NUMBER, target_item_number, 0);
+  }
+  void add_z_vel(float z_vel) {
+    fbb_.AddElement<float>(FireflyData::VT_Z_VEL, z_vel, 0.0f);
+  }
+  void add_life(float life) {
+    fbb_.AddElement<float>(FireflyData::VT_LIFE, life, 0.0f);
+  }
+  void add_number(int32_t number) {
+    fbb_.AddElement<int32_t>(FireflyData::VT_NUMBER, number, 0);
+  }
+  void add_d_r(int32_t d_r) {
+    fbb_.AddElement<int32_t>(FireflyData::VT_D_R, d_r, 0);
+  }
+  void add_d_g(int32_t d_g) {
+    fbb_.AddElement<int32_t>(FireflyData::VT_D_G, d_g, 0);
+  }
+  void add_d_b(int32_t d_b) {
+    fbb_.AddElement<int32_t>(FireflyData::VT_D_B, d_b, 0);
+  }
+  void add_r(int32_t r) {
+    fbb_.AddElement<int32_t>(FireflyData::VT_R, r, 0);
+  }
+  void add_g(int32_t g) {
+    fbb_.AddElement<int32_t>(FireflyData::VT_G, g, 0);
+  }
+  void add_b(int32_t b) {
+    fbb_.AddElement<int32_t>(FireflyData::VT_B, b, 0);
+  }
+  void add_on(bool on) {
+    fbb_.AddElement<uint8_t>(FireflyData::VT_ON, static_cast<uint8_t>(on), 0);
+  }
+  void add_size(float size) {
+    fbb_.AddElement<float>(FireflyData::VT_SIZE, size, 0.0f);
+  }
+  void add_rot_Ang(int32_t rot_Ang) {
+    fbb_.AddElement<int32_t>(FireflyData::VT_ROT_ANG, rot_Ang, 0);
+  }
+  explicit FireflyDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
+        : fbb_(_fbb) {
+    start_ = fbb_.StartTable();
+  }
+  flatbuffers::Offset<FireflyData> Finish() {
+    const auto end = fbb_.EndTable(start_);
+    auto o = flatbuffers::Offset<FireflyData>(end);
+    return o;
+  }
+};
+
+inline flatbuffers::Offset<FireflyData> CreateFireflyData(
+    flatbuffers::FlatBufferBuilder &_fbb,
+    int32_t sprite_index = 0,
+    int32_t sprite_id = 0,
+    int32_t blend_mode = 0,
+    int32_t scalar = 0,
+    const TEN::Save::Vector3 *position = 0,
+    int32_t room_number = 0,
+    const TEN::Save::Vector3 *position_target = 0,
+    const TEN::Save::EulerAngles *orientation = 0,
+    float velocity = 0.0f,
+    int32_t target_item_number = 0,
+    float z_vel = 0.0f,
+    float life = 0.0f,
+    int32_t number = 0,
+    int32_t d_r = 0,
+    int32_t d_g = 0,
+    int32_t d_b = 0,
+    int32_t r = 0,
+    int32_t g = 0,
+    int32_t b = 0,
+    bool on = false,
+    float size = 0.0f,
+    int32_t rot_Ang = 0) {
+  FireflyDataBuilder builder_(_fbb);
+  builder_.add_rot_Ang(rot_Ang);
+  builder_.add_size(size);
+  builder_.add_b(b);
+  builder_.add_g(g);
+  builder_.add_r(r);
+  builder_.add_d_b(d_b);
+  builder_.add_d_g(d_g);
+  builder_.add_d_r(d_r);
+  builder_.add_number(number);
+  builder_.add_life(life);
+  builder_.add_z_vel(z_vel);
+  builder_.add_target_item_number(target_item_number);
+  builder_.add_velocity(velocity);
+  builder_.add_orientation(orientation);
+  builder_.add_position_target(position_target);
+  builder_.add_room_number(room_number);
+  builder_.add_position(position);
+  builder_.add_scalar(scalar);
+  builder_.add_blend_mode(blend_mode);
+  builder_.add_sprite_id(sprite_id);
+  builder_.add_sprite_index(sprite_index);
+  builder_.add_on(on);
+  return builder_.Finish();
+}
+
+struct FireflyData::Traits {
+  using type = FireflyData;
+  static auto constexpr Create = CreateFireflyData;
+};
+
+flatbuffers::Offset<FireflyData> CreateFireflyData(flatbuffers::FlatBufferBuilder &_fbb, const FireflyDataT *_o, const flatbuffers::rehasher_function_t *_rehasher = nullptr);
+
 struct ScriptTableT : public flatbuffers::NativeTable {
   typedef ScriptTable TableType;
   std::vector<TEN::Save::KeyValPair> keys_vals{};
@@ -7858,6 +8140,7 @@ struct SaveGameStatisticsT : public flatbuffers::NativeTable {
   int32_t damage_taken = 0;
   int32_t distance = 0;
   int32_t kills = 0;
+  int32_t pickups = 0;
   int32_t secrets = 0;
   int32_t timer = 0;
 };
@@ -7873,8 +8156,9 @@ struct SaveGameStatistics FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_DAMAGE_TAKEN = 10,
     VT_DISTANCE = 12,
     VT_KILLS = 14,
-    VT_SECRETS = 16,
-    VT_TIMER = 18
+    VT_PICKUPS = 16,
+    VT_SECRETS = 18,
+    VT_TIMER = 20
   };
   int32_t ammo_hits() const {
     return GetField<int32_t>(VT_AMMO_HITS, 0);
@@ -7894,6 +8178,9 @@ struct SaveGameStatistics FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   int32_t kills() const {
     return GetField<int32_t>(VT_KILLS, 0);
   }
+  int32_t pickups() const {
+    return GetField<int32_t>(VT_PICKUPS, 0);
+  }
   int32_t secrets() const {
     return GetField<int32_t>(VT_SECRETS, 0);
   }
@@ -7908,6 +8195,7 @@ struct SaveGameStatistics FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<int32_t>(verifier, VT_DAMAGE_TAKEN) &&
            VerifyField<int32_t>(verifier, VT_DISTANCE) &&
            VerifyField<int32_t>(verifier, VT_KILLS) &&
+           VerifyField<int32_t>(verifier, VT_PICKUPS) &&
            VerifyField<int32_t>(verifier, VT_SECRETS) &&
            VerifyField<int32_t>(verifier, VT_TIMER) &&
            verifier.EndTable();
@@ -7939,6 +8227,9 @@ struct SaveGameStatisticsBuilder {
   void add_kills(int32_t kills) {
     fbb_.AddElement<int32_t>(SaveGameStatistics::VT_KILLS, kills, 0);
   }
+  void add_pickups(int32_t pickups) {
+    fbb_.AddElement<int32_t>(SaveGameStatistics::VT_PICKUPS, pickups, 0);
+  }
   void add_secrets(int32_t secrets) {
     fbb_.AddElement<int32_t>(SaveGameStatistics::VT_SECRETS, secrets, 0);
   }
@@ -7964,11 +8255,13 @@ inline flatbuffers::Offset<SaveGameStatistics> CreateSaveGameStatistics(
     int32_t damage_taken = 0,
     int32_t distance = 0,
     int32_t kills = 0,
+    int32_t pickups = 0,
     int32_t secrets = 0,
     int32_t timer = 0) {
   SaveGameStatisticsBuilder builder_(_fbb);
   builder_.add_timer(timer);
   builder_.add_secrets(secrets);
+  builder_.add_pickups(pickups);
   builder_.add_kills(kills);
   builder_.add_distance(distance);
   builder_.add_damage_taken(damage_taken);
@@ -8000,6 +8293,7 @@ struct SaveGameT : public flatbuffers::NativeTable {
   int32_t next_item_active = 0;
   std::vector<int32_t> room_items{};
   std::vector<std::unique_ptr<TEN::Save::FishDataT>> fish_swarm{};
+  std::vector<std::unique_ptr<TEN::Save::FireflyDataT>> firefly_swarm{};
   std::vector<std::unique_ptr<TEN::Save::FXInfoT>> fxinfos{};
   int32_t next_fx_free = 0;
   int32_t next_fx_active = 0;
@@ -8066,52 +8360,53 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_NEXT_ITEM_ACTIVE = 24,
     VT_ROOM_ITEMS = 26,
     VT_FISH_SWARM = 28,
-    VT_FXINFOS = 30,
-    VT_NEXT_FX_FREE = 32,
-    VT_NEXT_FX_ACTIVE = 34,
-    VT_FIXED_CAMERAS = 36,
-    VT_SINKS = 38,
-    VT_STATIC_MESHES = 40,
-    VT_FLYBY_CAMERAS = 42,
-    VT_PARTICLES = 44,
-    VT_RATS = 46,
-    VT_SPIDERS = 48,
-    VT_SCARABS = 50,
-    VT_BATS = 52,
-    VT_FLIP_MAPS = 54,
-    VT_FLIP_STATS = 56,
-    VT_FLIP_EFFECT = 58,
-    VT_FLIP_TIMER = 60,
-    VT_FLIP_STATUS = 62,
-    VT_CURRENT_FOV = 64,
-    VT_LAST_INV_ITEM = 66,
-    VT_ACTION_QUEUE = 68,
-    VT_SOUNDTRACKS = 70,
-    VT_CD_FLAGS = 72,
-    VT_POSTPROCESS_MODE = 74,
-    VT_POSTPROCESS_STRENGTH = 76,
-    VT_POSTPROCESS_TINT = 78,
-    VT_ROPE = 80,
-    VT_PENDULUM = 82,
-    VT_ALTERNATE_PENDULUM = 84,
-    VT_VOLUMES = 86,
-    VT_GLOBAL_EVENT_SETS = 88,
-    VT_VOLUME_EVENT_SETS = 90,
-    VT_SCRIPT_VARS = 92,
-    VT_CALLBACKS_PRE_START = 94,
-    VT_CALLBACKS_POST_START = 96,
-    VT_CALLBACKS_PRE_END = 98,
-    VT_CALLBACKS_POST_END = 100,
-    VT_CALLBACKS_PRE_SAVE = 102,
-    VT_CALLBACKS_POST_SAVE = 104,
-    VT_CALLBACKS_PRE_LOAD = 106,
-    VT_CALLBACKS_POST_LOAD = 108,
-    VT_CALLBACKS_PRE_LOOP = 110,
-    VT_CALLBACKS_POST_LOOP = 112,
-    VT_CALLBACKS_PRE_USEITEM = 114,
-    VT_CALLBACKS_POST_USEITEM = 116,
-    VT_CALLBACKS_PRE_FREEZE = 118,
-    VT_CALLBACKS_POST_FREEZE = 120
+    VT_FIREFLY_SWARM = 30,
+    VT_FXINFOS = 32,
+    VT_NEXT_FX_FREE = 34,
+    VT_NEXT_FX_ACTIVE = 36,
+    VT_FIXED_CAMERAS = 38,
+    VT_SINKS = 40,
+    VT_STATIC_MESHES = 42,
+    VT_FLYBY_CAMERAS = 44,
+    VT_PARTICLES = 46,
+    VT_RATS = 48,
+    VT_SPIDERS = 50,
+    VT_SCARABS = 52,
+    VT_BATS = 54,
+    VT_FLIP_MAPS = 56,
+    VT_FLIP_STATS = 58,
+    VT_FLIP_EFFECT = 60,
+    VT_FLIP_TIMER = 62,
+    VT_FLIP_STATUS = 64,
+    VT_CURRENT_FOV = 66,
+    VT_LAST_INV_ITEM = 68,
+    VT_ACTION_QUEUE = 70,
+    VT_SOUNDTRACKS = 72,
+    VT_CD_FLAGS = 74,
+    VT_POSTPROCESS_MODE = 76,
+    VT_POSTPROCESS_STRENGTH = 78,
+    VT_POSTPROCESS_TINT = 80,
+    VT_ROPE = 82,
+    VT_PENDULUM = 84,
+    VT_ALTERNATE_PENDULUM = 86,
+    VT_VOLUMES = 88,
+    VT_GLOBAL_EVENT_SETS = 90,
+    VT_VOLUME_EVENT_SETS = 92,
+    VT_SCRIPT_VARS = 94,
+    VT_CALLBACKS_PRE_START = 96,
+    VT_CALLBACKS_POST_START = 98,
+    VT_CALLBACKS_PRE_END = 100,
+    VT_CALLBACKS_POST_END = 102,
+    VT_CALLBACKS_PRE_SAVE = 104,
+    VT_CALLBACKS_POST_SAVE = 106,
+    VT_CALLBACKS_PRE_LOAD = 108,
+    VT_CALLBACKS_POST_LOAD = 110,
+    VT_CALLBACKS_PRE_LOOP = 112,
+    VT_CALLBACKS_POST_LOOP = 114,
+    VT_CALLBACKS_PRE_USEITEM = 116,
+    VT_CALLBACKS_POST_USEITEM = 118,
+    VT_CALLBACKS_PRE_FREEZE = 120,
+    VT_CALLBACKS_POST_FREEZE = 122
   };
   const TEN::Save::SaveGameHeader *header() const {
     return GetPointer<const TEN::Save::SaveGameHeader *>(VT_HEADER);
@@ -8151,6 +8446,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   }
   const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FishData>> *fish_swarm() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FishData>> *>(VT_FISH_SWARM);
+  }
+  const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FireflyData>> *firefly_swarm() const {
+    return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FireflyData>> *>(VT_FIREFLY_SWARM);
   }
   const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>> *fxinfos() const {
     return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>> *>(VT_FXINFOS);
@@ -8318,6 +8616,9 @@ struct SaveGame FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyOffset(verifier, VT_FISH_SWARM) &&
            verifier.VerifyVector(fish_swarm()) &&
            verifier.VerifyVectorOfTables(fish_swarm()) &&
+           VerifyOffset(verifier, VT_FIREFLY_SWARM) &&
+           verifier.VerifyVector(firefly_swarm()) &&
+           verifier.VerifyVectorOfTables(firefly_swarm()) &&
            VerifyOffset(verifier, VT_FXINFOS) &&
            verifier.VerifyVector(fxinfos()) &&
            verifier.VerifyVectorOfTables(fxinfos()) &&
@@ -8477,6 +8778,9 @@ struct SaveGameBuilder {
   }
   void add_fish_swarm(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FishData>>> fish_swarm) {
     fbb_.AddOffset(SaveGame::VT_FISH_SWARM, fish_swarm);
+  }
+  void add_firefly_swarm(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FireflyData>>> firefly_swarm) {
+    fbb_.AddOffset(SaveGame::VT_FIREFLY_SWARM, firefly_swarm);
   }
   void add_fxinfos(flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>>> fxinfos) {
     fbb_.AddOffset(SaveGame::VT_FXINFOS, fxinfos);
@@ -8642,6 +8946,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
     int32_t next_item_active = 0,
     flatbuffers::Offset<flatbuffers::Vector<int32_t>> room_items = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FishData>>> fish_swarm = 0,
+    flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FireflyData>>> firefly_swarm = 0,
     flatbuffers::Offset<flatbuffers::Vector<flatbuffers::Offset<TEN::Save::FXInfo>>> fxinfos = 0,
     int32_t next_fx_free = 0,
     int32_t next_fx_active = 0,
@@ -8734,6 +9039,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(
   builder_.add_next_fx_active(next_fx_active);
   builder_.add_next_fx_free(next_fx_free);
   builder_.add_fxinfos(fxinfos);
+  builder_.add_firefly_swarm(firefly_swarm);
   builder_.add_fish_swarm(fish_swarm);
   builder_.add_room_items(room_items);
   builder_.add_next_item_active(next_item_active);
@@ -8771,6 +9077,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
     int32_t next_item_active = 0,
     const std::vector<int32_t> *room_items = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::FishData>> *fish_swarm = nullptr,
+    const std::vector<flatbuffers::Offset<TEN::Save::FireflyData>> *firefly_swarm = nullptr,
     const std::vector<flatbuffers::Offset<TEN::Save::FXInfo>> *fxinfos = nullptr,
     int32_t next_fx_free = 0,
     int32_t next_fx_active = 0,
@@ -8821,6 +9128,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
   auto items__ = items ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Item>>(*items) : 0;
   auto room_items__ = room_items ? _fbb.CreateVector<int32_t>(*room_items) : 0;
   auto fish_swarm__ = fish_swarm ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FishData>>(*fish_swarm) : 0;
+  auto firefly_swarm__ = firefly_swarm ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FireflyData>>(*firefly_swarm) : 0;
   auto fxinfos__ = fxinfos ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FXInfo>>(*fxinfos) : 0;
   auto fixed_cameras__ = fixed_cameras ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FixedCamera>>(*fixed_cameras) : 0;
   auto sinks__ = sinks ? _fbb.CreateVector<flatbuffers::Offset<TEN::Save::Sink>>(*sinks) : 0;
@@ -8868,6 +9176,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGameDirect(
       next_item_active,
       room_items__,
       fish_swarm__,
+      firefly_swarm__,
       fxinfos__,
       next_fx_free,
       next_fx_active,
@@ -8932,7 +9241,6 @@ inline void LevelData::UnPackTo(LevelDataT *_o, const flatbuffers::resolver_func
   { auto _e = rumble_enabled(); _o->rumble_enabled = _e; }
   { auto _e = weather_type(); _o->weather_type = _e; }
   { auto _e = weather_strength(); _o->weather_strength = _e; }
-  { auto _e = fog_enabled(); _o->fog_enabled = _e; }
   { auto _e = fog_color(); _o->fog_color = _e; }
   { auto _e = fog_min_distance(); _o->fog_min_distance = _e; }
   { auto _e = fog_max_distance(); _o->fog_max_distance = _e; }
@@ -8975,7 +9283,6 @@ inline flatbuffers::Offset<LevelData> CreateLevelData(flatbuffers::FlatBufferBui
   auto _rumble_enabled = _o->rumble_enabled;
   auto _weather_type = _o->weather_type;
   auto _weather_strength = _o->weather_strength;
-  auto _fog_enabled = _o->fog_enabled;
   auto _fog_color = _o->fog_color;
   auto _fog_min_distance = _o->fog_min_distance;
   auto _fog_max_distance = _o->fog_max_distance;
@@ -9010,7 +9317,6 @@ inline flatbuffers::Offset<LevelData> CreateLevelData(flatbuffers::FlatBufferBui
       _rumble_enabled,
       _weather_type,
       _weather_strength,
-      _fog_enabled,
       _fog_color,
       _fog_min_distance,
       _fog_max_distance,
@@ -10892,6 +11198,95 @@ inline flatbuffers::Offset<FishData> CreateFishData(flatbuffers::FlatBufferBuild
       _velocity);
 }
 
+inline FireflyDataT *FireflyData::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
+  auto _o = std::make_unique<FireflyDataT>();
+  UnPackTo(_o.get(), _resolver);
+  return _o.release();
+}
+
+inline void FireflyData::UnPackTo(FireflyDataT *_o, const flatbuffers::resolver_function_t *_resolver) const {
+  (void)_o;
+  (void)_resolver;
+  { auto _e = sprite_index(); _o->sprite_index = _e; }
+  { auto _e = sprite_id(); _o->sprite_id = _e; }
+  { auto _e = blend_mode(); _o->blend_mode = _e; }
+  { auto _e = scalar(); _o->scalar = _e; }
+  { auto _e = position(); if (_e) _o->position = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = room_number(); _o->room_number = _e; }
+  { auto _e = position_target(); if (_e) _o->position_target = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
+  { auto _e = orientation(); if (_e) _o->orientation = std::unique_ptr<TEN::Save::EulerAngles>(new TEN::Save::EulerAngles(*_e)); }
+  { auto _e = velocity(); _o->velocity = _e; }
+  { auto _e = target_item_number(); _o->target_item_number = _e; }
+  { auto _e = z_vel(); _o->z_vel = _e; }
+  { auto _e = life(); _o->life = _e; }
+  { auto _e = number(); _o->number = _e; }
+  { auto _e = d_r(); _o->d_r = _e; }
+  { auto _e = d_g(); _o->d_g = _e; }
+  { auto _e = d_b(); _o->d_b = _e; }
+  { auto _e = r(); _o->r = _e; }
+  { auto _e = g(); _o->g = _e; }
+  { auto _e = b(); _o->b = _e; }
+  { auto _e = on(); _o->on = _e; }
+  { auto _e = size(); _o->size = _e; }
+  { auto _e = rot_Ang(); _o->rot_Ang = _e; }
+}
+
+inline flatbuffers::Offset<FireflyData> FireflyData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const FireflyDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
+  return CreateFireflyData(_fbb, _o, _rehasher);
+}
+
+inline flatbuffers::Offset<FireflyData> CreateFireflyData(flatbuffers::FlatBufferBuilder &_fbb, const FireflyDataT *_o, const flatbuffers::rehasher_function_t *_rehasher) {
+  (void)_rehasher;
+  (void)_o;
+  struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const FireflyDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
+  auto _sprite_index = _o->sprite_index;
+  auto _sprite_id = _o->sprite_id;
+  auto _blend_mode = _o->blend_mode;
+  auto _scalar = _o->scalar;
+  auto _position = _o->position ? _o->position.get() : 0;
+  auto _room_number = _o->room_number;
+  auto _position_target = _o->position_target ? _o->position_target.get() : 0;
+  auto _orientation = _o->orientation ? _o->orientation.get() : 0;
+  auto _velocity = _o->velocity;
+  auto _target_item_number = _o->target_item_number;
+  auto _z_vel = _o->z_vel;
+  auto _life = _o->life;
+  auto _number = _o->number;
+  auto _d_r = _o->d_r;
+  auto _d_g = _o->d_g;
+  auto _d_b = _o->d_b;
+  auto _r = _o->r;
+  auto _g = _o->g;
+  auto _b = _o->b;
+  auto _on = _o->on;
+  auto _size = _o->size;
+  auto _rot_Ang = _o->rot_Ang;
+  return TEN::Save::CreateFireflyData(
+      _fbb,
+      _sprite_index,
+      _sprite_id,
+      _blend_mode,
+      _scalar,
+      _position,
+      _room_number,
+      _position_target,
+      _orientation,
+      _velocity,
+      _target_item_number,
+      _z_vel,
+      _life,
+      _number,
+      _d_r,
+      _d_g,
+      _d_b,
+      _r,
+      _g,
+      _b,
+      _on,
+      _size,
+      _rot_Ang);
+}
+
 inline ScriptTableT *ScriptTable::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
   auto _o = std::make_unique<ScriptTableT>();
   UnPackTo(_o.get(), _resolver);
@@ -11269,6 +11664,7 @@ inline void SaveGameStatistics::UnPackTo(SaveGameStatisticsT *_o, const flatbuff
   { auto _e = damage_taken(); _o->damage_taken = _e; }
   { auto _e = distance(); _o->distance = _e; }
   { auto _e = kills(); _o->kills = _e; }
+  { auto _e = pickups(); _o->pickups = _e; }
   { auto _e = secrets(); _o->secrets = _e; }
   { auto _e = timer(); _o->timer = _e; }
 }
@@ -11287,6 +11683,7 @@ inline flatbuffers::Offset<SaveGameStatistics> CreateSaveGameStatistics(flatbuff
   auto _damage_taken = _o->damage_taken;
   auto _distance = _o->distance;
   auto _kills = _o->kills;
+  auto _pickups = _o->pickups;
   auto _secrets = _o->secrets;
   auto _timer = _o->timer;
   return TEN::Save::CreateSaveGameStatistics(
@@ -11297,6 +11694,7 @@ inline flatbuffers::Offset<SaveGameStatistics> CreateSaveGameStatistics(flatbuff
       _damage_taken,
       _distance,
       _kills,
+      _pickups,
       _secrets,
       _timer);
 }
@@ -11323,6 +11721,7 @@ inline void SaveGame::UnPackTo(SaveGameT *_o, const flatbuffers::resolver_functi
   { auto _e = next_item_active(); _o->next_item_active = _e; }
   { auto _e = room_items(); if (_e) { _o->room_items.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->room_items[_i] = _e->Get(_i); } } }
   { auto _e = fish_swarm(); if (_e) { _o->fish_swarm.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->fish_swarm[_i] = std::unique_ptr<TEN::Save::FishDataT>(_e->Get(_i)->UnPack(_resolver)); } } }
+  { auto _e = firefly_swarm(); if (_e) { _o->firefly_swarm.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->firefly_swarm[_i] = std::unique_ptr<TEN::Save::FireflyDataT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = fxinfos(); if (_e) { _o->fxinfos.resize(_e->size()); for (flatbuffers::uoffset_t _i = 0; _i < _e->size(); _i++) { _o->fxinfos[_i] = std::unique_ptr<TEN::Save::FXInfoT>(_e->Get(_i)->UnPack(_resolver)); } } }
   { auto _e = next_fx_free(); _o->next_fx_free = _e; }
   { auto _e = next_fx_active(); _o->next_fx_active = _e; }
@@ -11392,6 +11791,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
   auto _next_item_active = _o->next_item_active;
   auto _room_items = _fbb.CreateVector(_o->room_items);
   auto _fish_swarm = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FishData>> (_o->fish_swarm.size(), [](size_t i, _VectorArgs *__va) { return CreateFishData(*__va->__fbb, __va->__o->fish_swarm[i].get(), __va->__rehasher); }, &_va );
+  auto _firefly_swarm = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FireflyData>> (_o->firefly_swarm.size(), [](size_t i, _VectorArgs *__va) { return CreateFireflyData(*__va->__fbb, __va->__o->firefly_swarm[i].get(), __va->__rehasher); }, &_va );
   auto _fxinfos = _fbb.CreateVector<flatbuffers::Offset<TEN::Save::FXInfo>> (_o->fxinfos.size(), [](size_t i, _VectorArgs *__va) { return CreateFXInfo(*__va->__fbb, __va->__o->fxinfos[i].get(), __va->__rehasher); }, &_va );
   auto _next_fx_free = _o->next_fx_free;
   auto _next_fx_active = _o->next_fx_active;
@@ -11453,6 +11853,7 @@ inline flatbuffers::Offset<SaveGame> CreateSaveGame(flatbuffers::FlatBufferBuild
       _next_item_active,
       _room_items,
       _fish_swarm,
+      _firefly_swarm,
       _fxinfos,
       _next_fx_free,
       _next_fx_active,

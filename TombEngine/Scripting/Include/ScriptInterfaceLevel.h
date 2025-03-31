@@ -37,10 +37,9 @@ public:
 	virtual float GetWeatherStrength() const = 0;
 	virtual WeatherType GetWeatherType() const = 0;
 	virtual RGBAColor8Byte GetSkyLayerColor(int index) const = 0;
-	virtual bool GetFogEnabled() const = 0;
 	virtual RGBAColor8Byte GetFogColor() const = 0;
-	virtual short GetFogMinDistance() const = 0;
-	virtual short GetFogMaxDistance() const = 0;
+	virtual float GetFogMinDistance() const = 0;
+	virtual float GetFogMaxDistance() const = 0;
 	virtual short GetFarView() const = 0;
 	virtual int GetSecrets() const = 0;
 	virtual std::string GetAmbientTrack() const = 0;
@@ -63,8 +62,6 @@ public:
 	virtual Color GetLensFlareColor() const = 0;
 
 	// Starfield getters
-	virtual bool  GetStarfieldStarsEnabled() const = 0;
-	virtual bool  GetStarfieldMeteorsEnabled() const = 0;
 	virtual int	  GetStarfieldStarCount() const = 0;
 	virtual int	  GetStarfieldMeteorCount() const = 0;
 	virtual int	  GetStarfieldMeteorSpawnDensity() const = 0;

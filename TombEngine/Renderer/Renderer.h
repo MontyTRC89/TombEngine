@@ -409,6 +409,7 @@ namespace TEN::Renderer
 		void PrepareFires(RenderView& view);
 		void PrepareParticles(RenderView& view);
 		void PrepareSmokes(RenderView& view);
+		void PrepareFireflies(RenderView& view);
 		void PrepareElectricity(RenderView& view);
 		void PrepareHelicalLasers(RenderView& view);
 		void PrepareBlood(RenderView& view);
@@ -587,8 +588,11 @@ namespace TEN::Renderer
 
 		static inline BlendMode GetBlendModeFromAlpha(BlendMode blendMode, float alpha)
 		{
-			if (alpha < ALPHA_BLEND_THRESHOLD && (blendMode == BlendMode::Opaque || blendMode == BlendMode::FastAlphaBlend))
+			if (alpha < ALPHA_BLEND_THRESHOLD &&
+				(blendMode == BlendMode::Opaque || blendMode == BlendMode::AlphaTest || blendMode == BlendMode::FastAlphaBlend))
+			{
 				return BlendMode::AlphaBlend;
+			}
 
 			return blendMode;
 		}

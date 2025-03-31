@@ -232,52 +232,65 @@ namespace TEN::Effects::Environment
 
 	void EnvironmentController::UpdateStarfield(const ScriptInterfaceLevel& level)
 	{
-		if (!level.GetStarfieldStarsEnabled())
+		int starCount = level.GetStarfieldStarCount();
+		if (starCount == 0)
 			return;
 
 		if (ResetStarField)
 		{
-			int starCount = level.GetStarfieldStarCount();
-
 			Stars.clear();
-			Stars.reserve(starCount);
+			ResetStarField = false;
+		}
 
-			for (int i = 0; i < starCount; i++)
+		if (starCount != Stars.size())
+		{
+			// If starCount increased, add new stars to existing list.
+			if (starCount > Stars.size())
 			{
-				auto starDir = Random::GenerateDirectionInCone(-Vector3::UnitY, 70.0f);
-				starDir.Normalize();
+				// Reserve space for new stars if necessary.
+				Stars.reserve(starCount);
 
-				auto star = StarParticle{};
-				star.Direction = starDir;
-				star.Color = Vector3(
-					Random::GenerateFloat(0.6f, 1.0f),
-					Random::GenerateFloat(0.6f, 1.0f),
-					Random::GenerateFloat(0.6f, 1.0f));
-				star.Scale = Random::GenerateFloat(0.5f, 1.5f);
-
-				float cosine = Vector3::UnitY.Dot(starDir);
-				float maxCosine = cos(DEG_TO_RAD(50.0f));
-				float minCosine = cos(DEG_TO_RAD(70.0f));
-
-				if (cosine >= minCosine && cosine <= maxCosine)
+				for (int i = (int)Stars.size(); i < starCount; i++)
 				{
-					star.Extinction = (cosine - minCosine) / (maxCosine - minCosine);
-				}
-				else
-				{
-					star.Extinction = 1.0f;
-				}
+					auto starDir = Random::GenerateDirectionInCone(-Vector3::UnitY, 70.0f);
+					starDir.Normalize();
 
-				Stars.push_back(star);
+					auto star = StarParticle{};
+					star.Direction = starDir;
+					star.Color = Vector3(
+						Random::GenerateFloat(0.6f, 1.0f),
+						Random::GenerateFloat(0.6f, 1.0f),
+						Random::GenerateFloat(0.6f, 1.0f));
+					star.Scale = Random::GenerateFloat(0.5f, 1.5f);
+
+					float cosine = Vector3::UnitY.Dot(starDir);
+					float maxCosine = cos(DEG_TO_RAD(50.0f));
+					float minCosine = cos(DEG_TO_RAD(70.0f));
+
+					if (cosine >= minCosine && cosine <= maxCosine)
+					{
+						star.Extinction = (cosine - minCosine) / (maxCosine - minCosine);
+					}
+					else
+					{
+						star.Extinction = 1.0f;
+					}
+
+					Stars.push_back(star);
+				}
+			}
+			// If starCount decreased, resize vector without reinitializing.
+			else
+			{
+				Stars.resize(starCount);
 			}
 
-			ResetStarField = false;
 		}
 
 		for (auto& star : Stars)
 			star.Blinking = Random::GenerateFloat(0.5f, 1.0f);
 
-		if (level.GetStarfieldMeteorsEnabled())
+		if (level.GetStarfieldMeteorCount() > 0)
 		{
 			for (auto& meteor : Meteors)
 			{
@@ -513,7 +526,7 @@ namespace TEN::Effects::Environment
 			if (!IsPointInRoom(pos, roomNumber))
 				roomNumber = FindRoomNumber(pos, Camera.pos.RoomNumber, true);
 
-			if (roomNumber == NO_VALUE)
+			if (!IsPointInRoom(pos, roomNumber) || roomNumber == NO_VALUE)
 				continue;
 
 			// Check if water room.
@@ -639,7 +652,7 @@ namespace TEN::Effects::Environment
 				Meteors.end());
 		}
 
-		if (!level.GetStarfieldMeteorsEnabled())
+		if (level.GetStarfieldMeteorCount() == 0)
 			return;
 
 		int density = level.GetStarfieldMeteorSpawnDensity();

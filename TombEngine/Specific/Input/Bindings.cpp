@@ -187,7 +187,7 @@ namespace TEN::Input
 
 	void BindingManager::SetConflict(InputActionID actionID, bool value)
 	{
-		_conflicts.insert({ actionID, value });
+		_conflicts[actionID] = value;
 	}
 
 	bool BindingManager::TestConflict(InputActionID actionID)

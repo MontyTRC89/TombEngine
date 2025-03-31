@@ -53,7 +53,6 @@ struct Level : public ScriptInterfaceLevel
 	// TODO: Clean up this mess.
 
 	RGBAColor8Byte GetFogColor() const override;
-	bool GetFogEnabled() const override;
 	float GetWeatherStrength() const override;
 	bool GetSkyLayerEnabled(int index) const override;
 	bool GetStormEnabled() const override;
@@ -65,8 +64,8 @@ struct Level : public ScriptInterfaceLevel
 	void SetLevelFarView(short val);
 	static void Register(sol::table& parent);
 	WeatherType GetWeatherType() const override;
-	short GetFogMinDistance() const override;
-	short GetFogMaxDistance() const override;
+	float GetFogMinDistance() const override;
+	float GetFogMaxDistance() const override;
 	short GetFarView() const override;
 	void SetSecrets(int secrets);
 	int GetSecrets() const override;
@@ -94,8 +93,6 @@ struct Level : public ScriptInterfaceLevel
 	Color GetLensFlareColor() const override;
 
 	// Starfield getters
-	bool  GetStarfieldStarsEnabled() const override;
-	bool  GetStarfieldMeteorsEnabled() const override;
 	int	  GetStarfieldStarCount() const override;
 	int	  GetStarfieldMeteorCount() const override;
 	int	  GetStarfieldMeteorSpawnDensity() const override;

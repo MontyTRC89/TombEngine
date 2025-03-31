@@ -45,6 +45,7 @@ namespace TEN::Scripting
 		ScriptColor GetColor() const;
 		int			GetHitPoints() const;
 		bool		GetActiveStatus() const;
+		bool		GetCollidable() const;
 		bool		GetSolidStatus() const;
 
 		// Setters
@@ -56,6 +57,7 @@ namespace TEN::Scripting
 		void SetScale(float scale);
 		void SetColor(const ScriptColor& color);
 		void SetHitPoints(int hitPoints);
+		void SetCollidable(bool status);
 		void SetSolidStatus(bool status);
 
 		// Utilities

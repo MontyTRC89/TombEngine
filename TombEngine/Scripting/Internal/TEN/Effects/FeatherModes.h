@@ -3,10 +3,10 @@
 #include "Game/effects/Streamer.h"
 
 /// Constants for feather modes.
-// @enum Effects.FeatherMode
+// @enum Effects.StreamerFeatherMode
 // @pragma nostrip
 
-/// Table of Effects.FeatherMode constants.
+/// Table of Effects.StreamerFeatherMode constants.
 // To be used with @{Effects.EmitStreamer} function.
 //
 // - `NONE`
@@ -14,7 +14,7 @@
 // - `LEFT`
 // - `RIGHT`
 //
-// @table Effects.FeatherMode
+// @table Effects.StreamerFeatherMode
 
 using namespace TEN::Effects::Streamer;
 

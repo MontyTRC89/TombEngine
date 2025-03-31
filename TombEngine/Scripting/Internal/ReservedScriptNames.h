@@ -237,6 +237,7 @@ static constexpr char ScriptReserved_DeleteSaveGame[]			= "DeleteSaveGame";
 static constexpr char ScriptReserved_DoesSaveGameExist[]		= "DoesSaveGameExist";
 static constexpr char ScriptReserved_GetSecretCount[]			= "GetSecretCount";
 static constexpr char ScriptReserved_SetSecretCount[]			= "SetSecretCount";
+static constexpr char ScriptReserved_GetTotalSecretCount[]		= "GetTotalSecretCount";
 static constexpr char ScriptReserved_SetTotalSecretCount[]		= "SetTotalSecretCount";
 static constexpr char ScriptReserved_AddSecret[]				= "AddSecret";
 static constexpr char ScriptReserved_EnableFlyCheat[]			= "EnableFlyCheat";
@@ -335,6 +336,7 @@ static constexpr char ScriptReserved_EmitSpotLight[]				= "EmitSpotLight";
 static constexpr char ScriptReserved_EmitBlood[]					= "EmitBlood";
 static constexpr char ScriptReserved_EmitAirBubble[]				= "EmitAirBubble";
 static constexpr char ScriptReserved_EmitFire[]						= "EmitFire";
+static constexpr char ScriptReserved_EmitStreamer[]					= "EmitStreamer";
 static constexpr char ScriptReserved_MakeExplosion[]				= "MakeExplosion";
 static constexpr char ScriptReserved_MakeEarthquake[]				= "MakeEarthquake";
 
@@ -402,6 +404,7 @@ static constexpr char ScriptReserved_EventType[]				= "EventType";
 static constexpr char ScriptReserved_AlignMode[]				= "AlignMode";
 static constexpr char ScriptReserved_ScaleMode[]				= "ScaleMode";
 static constexpr char ScriptReserved_ParticleAnimationType[]	= "ParticleAnimationType";
+static constexpr char ScriptReserved_FeatherMode[]				= "StreamerFeatherMode";
 
 static constexpr char ScriptReserved_LevelVars[]	= "LevelVars";
 static constexpr char ScriptReserved_GameVars[]		= "GameVars";
@@ -444,25 +447,6 @@ constexpr char ScriptReserved_ProbePreview[]				= "Preview";
 
 constexpr char ScriptReserved_MaterialType[]				= "MaterialType";
 
-// ====
-// FLOW
-// ====
-
-// Horizon
-
-constexpr char ScriptReserved_Horizon[]					= "Horizon";
-constexpr char ScriptReserved_HorizonGetEnabled[]		= "GetEnabled";
-constexpr char ScriptReserved_HorizonGetObjectID[]		= "GetObjectID";
-constexpr char ScriptReserved_HorizonGetPosition[]		= "GetPosition";
-constexpr char ScriptReserved_HorizonGetRotation[]		= "GetRotation";
-constexpr char ScriptReserved_HorizonGetTransparency[]	= "GetTransparency";
-constexpr char ScriptReserved_HorizonSetEnabled[]		= "SetEnabled";
-constexpr char ScriptReserved_HorizonSetObjectID[]		= "SetObjectID";
-constexpr char ScriptReserved_HorizonSetPosition[]		= "SetPosition";
-constexpr char ScriptReserved_HorizonSetRotation[]		= "SetRotation";
-constexpr char ScriptReserved_HorizonSetTransparency[]	= "SetTransparency";
-
-
 // =======
 // OBJECTS
 // =======
@@ -504,6 +488,7 @@ constexpr char ScriptReserved_StaticGetPosition[]	= "GetPosition";
 constexpr char ScriptReserved_StaticGetRotation[]	= "GetRotation";
 constexpr char ScriptReserved_StaticGetScale[]		= "GetScale";
 constexpr char ScriptReserved_StaticGetSlot[]		= "GetSlot";
+constexpr char ScriptReserved_StaticGetCollidable[]	= "GetCollidable";
 constexpr char ScriptReserved_StaticGetSolid[]		= "GetSolid";
 constexpr char ScriptReserved_StaticSetColor[]		= "SetColor";
 constexpr char ScriptReserved_StaticSetHitPoints[]	= "SetHP";
@@ -513,6 +498,7 @@ constexpr char ScriptReserved_StaticSetRotation[]	= "SetRotation";
 constexpr char ScriptReserved_StaticSetScale[]		= "SetScale";
 constexpr char ScriptReserved_StaticSetSlot[]		= "SetSlot";
 constexpr char ScriptReserved_StaticSetSolid[]		= "SetSolid";
+constexpr char ScriptReserved_StaticSetCollidable[]	= "SetCollidable";
 constexpr char ScriptReserved_StaticShatter[]		= "Shatter";
 
 // =====

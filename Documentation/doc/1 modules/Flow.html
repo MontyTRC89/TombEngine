@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.7.2 (Developer) Lua API</title>
+    <title>TombEngine 1.8.1 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -80,7 +80,7 @@
   <li>    <a href="../4 enums/Collision.MaterialType.html">Collision.MaterialType</a></li>
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
-  <li>    <a href="../4 enums/Effects.FeatherMode.html">Effects.FeatherMode</a></li>
+  <li>    <a href="../4 enums/Effects.StreamerFeatherMode.html">Effects.StreamerFeatherMode</a></li>
   <li>    <a href="../4 enums/Effects.ParticleAnimationType.html">Effects.ParticleAnimationType</a></li>
   <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
   <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
@@ -227,8 +227,12 @@ scripts too.</p>
 	<td class="summary">Adds one secret to current level secret count and also plays secret music track.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#SetTotalSecretCount">SetTotalSecretCount(total)</a></td>
-	<td class="summary">Total number of secrets in game.</td>
+	<td class="name" ><a href="#GetTotalSecretCount">GetTotalSecretCount()</a></td>
+	<td class="summary">Get total number of secrets in the game.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetTotalSecretCount">SetTotalSecretCount(count)</a></td>
+	<td class="summary">Set total number of secrets in the game.</td>
 	</tr>
 	<tr>
 	<td class="name" ><a href="#FlipMap">FlipMap(flipmap)</a></td>
@@ -876,20 +880,41 @@ The index argument corresponds to the secret's unique ID, the same that would go
 
 </dd>
     <dt>
-    <a name = "SetTotalSecretCount"></a>
-    <strong>SetTotalSecretCount(total)</strong>
+    <a name = "GetTotalSecretCount"></a>
+    <strong>GetTotalSecretCount()</strong>
     </dt>
     <dd>
-    Total number of secrets in game.
+    Get total number of secrets in the game.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">int</span></span>
+        Total number of secrets in the game.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetTotalSecretCount"></a>
+    <strong>SetTotalSecretCount(count)</strong>
+    </dt>
+    <dd>
+    Set total number of secrets in the game.
 Must be an integer value (0 means no secrets).
 
 
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">total</span>
+        <li><span class="parameter">count</span>
             <span class="types"><span class="type">int</span></span>
-         number of secrets
+         Total number of secrets in the game.
         </li>
     </ul>
 
@@ -911,7 +936,7 @@ Must be an integer value (0 means no secrets).
     <ul>
         <li><span class="parameter">flipmap</span>
             <span class="types"><span class="type">int</span></span>
-         (ID of flipmap group to actuvate / deactivate)
+         ID of flipmap group to actuvate / deactivate.
         </li>
     </ul>
 

@@ -1759,6 +1759,7 @@ namespace TEN::Renderer
 		PrepareStreamers(view);
 		PrepareLaserBarriers(view);
 		PrepareSingleLaserBeam(view);
+		PrepareFireflies(view);
 
 		// Sprites grouped in buckets for instancing. Non-commutative sprites are collected at a later stage.
 		SortAndPrepareSprites(view);
@@ -1821,7 +1822,7 @@ namespace TEN::Renderer
 		cameraConstantBuffer.CameraUnderwater = g_Level.Rooms[cameraConstantBuffer.RoomNumber].flags & ENV_FLAG_WATER;
 		cameraConstantBuffer.DualParaboloidView = Matrix::CreateLookAt(LaraItem->Pose.Position.ToVector3(), LaraItem->Pose.Position.ToVector3() + Vector3(0, 0, 1024), -Vector3::UnitY);
 
-		if (level.GetFogEnabled())
+		if (level.GetFogMaxDistance() > 0)
 		{
 			auto fogColor = level.GetFogColor();
 			cameraConstantBuffer.FogColor = Vector4(fogColor.GetR() / 255.0f, fogColor.GetG() / 255.0f, fogColor.GetB() / 255.0f, 1.0f);
@@ -1830,7 +1831,7 @@ namespace TEN::Renderer
 		}
 		else
 		{
-			cameraConstantBuffer.FogMaxDistance = 0;
+			cameraConstantBuffer.FogMaxDistance = 0.0f;
 			cameraConstantBuffer.FogColor = Vector4::Zero;
 		}
 
@@ -2571,6 +2572,12 @@ namespace TEN::Renderer
 								if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
 									continue;
 
+								if (_staticTextures.size() <= bucket.Texture)
+								{
+									TENLog("Attempted to set incorrect static mesh texture atlas", LogLevel::Warning);
+									continue;
+								}
+
 								BindTexture(TextureRegister::ColorMap,
 									&std::get<0>(_staticTextures[bucket.Texture]),
 									SamplerStateRegister::AnisotropicClamp);
@@ -2704,8 +2711,8 @@ namespace TEN::Renderer
 				// Bind caustics texture.
 				if (_causticTextures.size() > 0)
 				{     
-					int nmeshes = -Objects[ID_CAUSTICS_TEXTURES].nmeshes;
-					int meshIndex = Objects[ID_CAUSTICS_TEXTURES].meshIndex;     
+					int nmeshes = -Objects[ID_CAUSTIC_TEXTURES].nmeshes;
+					int meshIndex = Objects[ID_CAUSTIC_TEXTURES].meshIndex;
 					int causticsFrame = GlobalCounter % _causticTextures.size();
 					BindTexture(TextureRegister::CausticsMap, &_causticTextures[causticsFrame], SamplerStateRegister::AnisotropicClamp);
 				} 
@@ -2866,18 +2873,20 @@ namespace TEN::Renderer
 
 		for (int layer = 0; layer < 2; layer++)
 		{
+			if (Vector3(Weather.SkyColor(layer)) == Vector3::Zero)
+				continue;
+
 			for (int i = 0; i < 2; i++)
 			{
-				auto weather = TEN::Effects::Environment::Weather;
 
 				auto translation = Matrix::CreateTranslation(
-					renderView.Camera.WorldPosition.x + weather.SkyPosition(layer) - i * SKY_SIZE,
+					renderView.Camera.WorldPosition.x + Weather.SkyPosition(layer) - i * SKY_SIZE,
 					renderView.Camera.WorldPosition.y - 1536.0f, 
 					renderView.Camera.WorldPosition.z);
 				auto world = rotation * translation;
 
 				_stStatic.World = (rotation * translation);
-				_stStatic.Color = weather.SkyColor(layer);
+				_stStatic.Color = Weather.SkyColor(layer);
 				_stStatic.ApplyFogBulbs = layer == 0 ? 1 : 0;
 				_cbStatic.UpdateData(_stStatic, _context.Get());
 
@@ -3029,7 +3038,7 @@ namespace TEN::Renderer
 		// Draw horizon.
 		for (int layer = 0; layer < 2; layer++)
 		{
-			if (!levelPtr->GetHorizonEnabled(layer))
+			if (!levelPtr->GetHorizonEnabled(layer) || levelPtr->GetHorizonTransparency(layer) <= EPSILON)
 				continue;
 
 			SetDepthState(DepthState::None);

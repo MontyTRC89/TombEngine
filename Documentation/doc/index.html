@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.7.2 (Developer) Lua API</title>
+    <title>TombEngine 1.8.1 Lua API</title>
     <link rel="stylesheet" href="ldoc.css" type="text/css" />
 </head>
 <body>
@@ -80,7 +80,7 @@
   <li>    <a href="4 enums/Collision.MaterialType.html">Collision.MaterialType</a></li>
   <li>    <a href="4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
-  <li>    <a href="4 enums/Effects.FeatherMode.html">Effects.FeatherMode</a></li>
+  <li>    <a href="4 enums/Effects.StreamerFeatherMode.html">Effects.StreamerFeatherMode</a></li>
   <li>    <a href="4 enums/Effects.ParticleAnimationType.html">Effects.ParticleAnimationType</a></li>
   <li>    <a href="4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
   <li>    <a href="4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
@@ -115,25 +115,25 @@
 <div id="content">
 
 
-  <h2>TombEngine 1.7.2 (Developer) scripting interface</h2>
-  <p>Welcome to the TombEngine scripting API. This is a work in progress and some information might be wrong or outdated. Please also note that this is primarily a reference document, not a tutorial, so expect descriptions to be fairly sparse.</p>
+  <h2>TombEngine 1.8.1 scripting interface</h2>
+  <p>Welcome to the TombEngine scripting API.</p>
 
-<p>At the time of writing, there is a tutorial describing the basics of Lua, as well as a number of example scripts, on <a href="https://www.tombengine.com">the TombEngine website</a>.</p>
-<h4>Module Hierarchy (boring but important)</h4>
-<p>Other than the "special tables" (GameVars, LevelVars and LevelFuncs), every module described herein is held in a master table called TEN.
+<p>Note that this is primarily a reference document, not a tutorial, so expect descriptions to be fairly sparse.
+At the time of writing, there is a tutorial describing the basics of Lua, as well as a number of example scripts, on <a href="https://www.tombengine.com">the TombEngine website</a>.</p>
+
+<h4>Module Hierarchy</h4>
+<p>Other than the "special tables" (<code>GameVars</code>, <code>LevelVars</code> and <code>LevelFuncs</code>), every module described herein is held in a master table called TEN.
 For convenience, these modules and classes are automatically put in the global table. For example, you can call GetMoveableByName either of these two ways:</p>
 <pre><code>local door = TEN.Objects.GetMoveableByName("door_type4_14")
 local door = GetMoveableByName("door_type4_14")
 </code></pre>
 
 <h4>Always check logs/TENLog.txt</h4>
-<p>If you are scripting levels, TombEngine will often kick you back to the title screen, even if <code>errorMode</code> (see Flow.Settings) is set to <code>ErrorMode.WARN</code> or <code>ErrorMode.SILENT</code>.</p>
+<p>If you are scripting levels, TombEngine will often kick you back to the title screen, even if <code>errorMode</code> (see <a href="2 classes/Flow.Settings.html#">Flow.Settings</a>) is set to <code>ErrorMode.WARN</code> or <code>ErrorMode.SILENT</code>.</p>
 
-<p>This might get annoying, but it's on purpose. If your Lua script contains a syntax error (e.g. you're missing <code>end</code> at the end of a function), the Lua interpreter will not be able to continue running the script. If it tried to keep running, you'd probably see some pretty strange behaviour, and would possibly get a crash regardless.</p>
+<p>This might get annoying, but it's on purpose. If your Lua script contains a syntax error (e.g. you're missing <code>end</code> at the end of a function), the Lua interpreter will not be able to continue running the script. If it tried to keep running, you'd probably see some pretty strange behaviour, and would possibly get a crash regardless. If this happens, check <strong>logs/TENLog.txt</strong> and look for an error message with the word "unrecoverable".</p>
 
-<p>If this happens, check <strong>logs/TENLog.txt</strong> and look for an error message with the word "unrecoverable".</p>
-
-<p>Enjoy.</p>
+<p>Happy building!</p>
 
 <p>- <em>squidshire and the TombEngine development team.</em></p>
 
@@ -247,7 +247,7 @@ local door = GetMoveableByName("door_type4_14")
 <table class="module_list">
 	<tr>
 		<td class="name"  ><a href="3 primitive classes/Flow.Fog.html">Flow.Fog</a></td>
-		<td class="summary">Distance fog.</td>
+		<td class="summary">Represesnts distance fog.</td>
 	</tr>
 	<tr>
 		<td class="name"  ><a href="3 primitive classes/Flow.Horizon.html">Flow.Horizon</a></td>
@@ -267,7 +267,7 @@ local door = GetMoveableByName("door_type4_14")
 	</tr>
 	<tr>
 		<td class="name"  ><a href="3 primitive classes/Flow.Starfield.html">Flow.Starfield</a></td>
-		<td class="summary">Represents a starfield in the sky.</td>
+		<td class="summary">Represents a star field in the sky.</td>
 	</tr>
 	<tr>
 		<td class="name"  ><a href="3 primitive classes/Color.html">Color</a></td>
@@ -305,7 +305,7 @@ local door = GetMoveableByName("door_type4_14")
 		<td class="summary">Constants for effect IDs.</td>
 	</tr>
 	<tr>
-		<td class="name"  ><a href="4 enums/Effects.FeatherMode.html">Effects.FeatherMode</a></td>
+		<td class="name"  ><a href="4 enums/Effects.StreamerFeatherMode.html">Effects.StreamerFeatherMode</a></td>
 		<td class="summary">Constants for feather modes.</td>
 	</tr>
 	<tr>

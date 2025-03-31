@@ -616,12 +616,16 @@ namespace TEN::Gui
 			{
 				// Save the configuration.
 				auto screenResolution = g_Configuration.SupportedScreenResolutions[CurrentSettings.SelectedScreenResolution];
+
+				bool screenResolutionChanged = CurrentSettings.Configuration.ScreenWidth != screenResolution.x ||
+											   CurrentSettings.Configuration.ScreenHeight != screenResolution.y;
+
 				CurrentSettings.Configuration.ScreenWidth = screenResolution.x;
 				CurrentSettings.Configuration.ScreenHeight = screenResolution.y;
 
 				// Determine whether we should update AA shaders.
-				bool shouldRecompileAAShaders = g_Configuration.AntialiasingMode != CurrentSettings.Configuration.AntialiasingMode &&
-												CurrentSettings.Configuration.AntialiasingMode != AntialiasingMode::Low;
+				bool shouldRecompileAAShaders = CurrentSettings.Configuration.AntialiasingMode != AntialiasingMode::Low &&
+												(screenResolutionChanged || g_Configuration.AntialiasingMode != CurrentSettings.Configuration.AntialiasingMode);
 
 				g_Configuration = CurrentSettings.Configuration;
 				SaveConfiguration();
@@ -686,7 +690,7 @@ namespace TEN::Gui
 			CurrentSettings.IgnoreInput = true;
 		}
 
-		if (CurrentSettings.NewKeyWaitTimer > 0.0f)
+		if (CurrentSettings.NewKeyWaitTimer > 0)
 		{
 			ClearAllActions();
 
@@ -695,15 +699,15 @@ namespace TEN::Gui
 			bool legacy30FpsDoneDraw = false;
 			bool decreaseCounter = false;
 			
-			while (CurrentSettings.NewKeyWaitTimer > 0.0f)
+			while (CurrentSettings.NewKeyWaitTimer > 0)
 			{
 				g_Synchronizer.Sync();
 
 				while (g_Synchronizer.Synced())
 				{
-					CurrentSettings.NewKeyWaitTimer -= 1.0f;
-					if (CurrentSettings.NewKeyWaitTimer <= 0.0f)
-						CurrentSettings.NewKeyWaitTimer = 0.0f;
+					CurrentSettings.NewKeyWaitTimer--;
+					if (CurrentSettings.NewKeyWaitTimer <= 0)
+						CurrentSettings.NewKeyWaitTimer = 0;
 
 					if (!fromPauseMenu)
 					{
@@ -756,7 +760,7 @@ namespace TEN::Gui
 							g_Bindings.SetKeyBinding(InputDeviceID::Custom, InputActionID(baseIndex + SelectedOption), selectedKeyID);
 							DefaultConflict();
 
-							CurrentSettings.NewKeyWaitTimer = 0.0f;
+							CurrentSettings.NewKeyWaitTimer = 0;
 							CurrentSettings.IgnoreInput = true;
 							return;
 						}
@@ -846,6 +850,7 @@ namespace TEN::Gui
 				if (SelectedOption == (OptionCount - 2))
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+
 					ApplyDefaultBindings();
 					return;
 				}
@@ -854,9 +859,11 @@ namespace TEN::Gui
 				if (SelectedOption == (OptionCount - 1))
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+
 					CurrentSettings.Configuration.Bindings = g_Bindings.GetBindingProfile(InputDeviceID::Custom);
 					g_Configuration.Bindings = g_Bindings.GetBindingProfile(InputDeviceID::Custom);
 					SaveConfiguration();
+
 					MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 					SelectedOption = 2;
 					return;
@@ -866,7 +873,9 @@ namespace TEN::Gui
 				if (SelectedOption == OptionCount)
 				{
 					SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+
 					g_Bindings.SetBindingProfile(InputDeviceID::Custom, CurrentSettings.Configuration.Bindings);
+
 					MenuToDisplay = fromPauseMenu ? Menu::Pause : Menu::Options;
 					SelectedOption = 2;
 					return;
@@ -876,6 +885,8 @@ namespace TEN::Gui
 			if (GuiIsDeselected())
 			{
 				SoundEffect(SFX_TR4_MENU_SELECT, nullptr, SoundEnvironment::Always);
+
+				g_Bindings.SetBindingProfile(InputDeviceID::Custom, CurrentSettings.Configuration.Bindings);
 
 				MenuToDisplay = Menu::Options;
 				SelectedOption = 2;
@@ -2233,6 +2244,7 @@ namespace TEN::Gui
 					item.HitPoints = LARA_HEALTH_MAX;
 
 				SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
+				SaveGame::Statistics.Level.HealthUsed++;
 				SaveGame::Statistics.Game.HealthUsed++;
 			}
 			else
@@ -2259,6 +2271,7 @@ namespace TEN::Gui
 				item.HitPoints = LARA_HEALTH_MAX;
 
 				SoundEffect(SFX_TR4_MENU_MEDI, nullptr, SoundEnvironment::Always);
+				SaveGame::Statistics.Level.HealthUsed++;
 				SaveGame::Statistics.Game.HealthUsed++;
 			}
 			else

@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.7.2 (Developer) Lua API</title>
+    <title>TombEngine 1.8.1 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -80,7 +80,7 @@
   <li>    <a href="../4 enums/Collision.MaterialType.html">Collision.MaterialType</a></li>
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
-  <li>    <a href="../4 enums/Effects.FeatherMode.html">Effects.FeatherMode</a></li>
+  <li>    <a href="../4 enums/Effects.StreamerFeatherMode.html">Effects.StreamerFeatherMode</a></li>
   <li>    <a href="../4 enums/Effects.ParticleAnimationType.html">Effects.ParticleAnimationType</a></li>
   <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
   <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
@@ -176,11 +176,11 @@
 	<td class="summary">Play a flyby sequence.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#GetFlybyPosition">GetFlybyPosition(seqID, progress)</a></td>
+	<td class="name" ><a href="#GetFlybyPosition">GetFlybyPosition(seqID, progress[, loop])</a></td>
 	<td class="summary">Get a flyby sequence's position at a specified progress point in percent.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#GetFlybyRotation">GetFlybyRotation(seqID, progress)</a></td>
+	<td class="name" ><a href="#GetFlybyRotation">GetFlybyRotation(seqID, progress[, loop])</a></td>
 	<td class="summary">Get a flyby sequence's rotation at a specified progress point in percent.</td>
 	</tr>
 	<tr>
@@ -499,7 +499,7 @@
 </dd>
     <dt>
     <a name = "GetFlybyPosition"></a>
-    <strong>GetFlybyPosition(seqID, progress)</strong>
+    <strong>GetFlybyPosition(seqID, progress[, loop])</strong>
     </dt>
     <dd>
     Get a flyby sequence's position at a specified progress point in percent.
@@ -516,6 +516,11 @@
             <span class="types"><span class="type">float</span></span>
          Progress point in percent. Clamped to [0, 100].
         </li>
+        <li><span class="parameter">loop</span>
+            <span class="types"><span class="type">bool</span></span>
+         Smooth the position near start and end points, as if the sequence is looped.
+         (<em>optional</em>)
+        </li>
     </ul>
 
     <h3>Returns:</h3>
@@ -531,7 +536,7 @@
 </dd>
     <dt>
     <a name = "GetFlybyRotation"></a>
-    <strong>GetFlybyRotation(seqID, progress)</strong>
+    <strong>GetFlybyRotation(seqID, progress[, loop])</strong>
     </dt>
     <dd>
     Get a flyby sequence's rotation at a specified progress point in percent.
@@ -547,6 +552,11 @@
         <li><span class="parameter">progress</span>
             <span class="types"><span class="type">float</span></span>
          Progress point in percent. Clamped to [0, 100].
+        </li>
+        <li><span class="parameter">loop</span>
+            <span class="types"><span class="type">bool</span></span>
+         Smooth the position near start and end points, as if the sequence is looped.
+         (<em>optional</em>)
         </li>
     </ul>
 
