@@ -180,7 +180,6 @@ bool SwitchTrigger(short itemNumber, short timer)
 		item.ItemFlags[5] != 0 && item.ItemFlags[4] == 1 &&
 		player.Control.HandStatus != HandStatus::Busy)
 	{
-		TENLog("Pulley Activated Trigger!", LogLevel::Warning);
 		item.Flags |= IFLAG_ACTIVATION_MASK;
 		item.Status = ITEM_ACTIVE;
 		item.ItemFlags[5] = 0;
@@ -202,7 +201,6 @@ bool SwitchTrigger(short itemNumber, short timer)
 			return true;
 		}
 
-		TENLog("Pulley Deactivated Trigger!", LogLevel::Warning);
 		item.Flags |= IFLAG_ACTIVATION_MASK;
 		item.Status = ITEM_DEACTIVATED;
 		item.ItemFlags[5] = 0;

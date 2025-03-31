@@ -165,13 +165,11 @@ namespace TEN::Entities::Switches
 			if (isPulling && isBaseFrame && switchItem->TriggerFlags > 0)
 			{
 				switchItem->TriggerFlags--;
-				TENLog("TriggerFlags Decremented: " + std::to_string(switchItem->TriggerFlags), LogLevel::Warning);
 			}
 
 			// If Ctrl is released, switch goes into WAIT state after animation ends
 			if (!IsHeld(In::Action) && isPulling && switchItem->TriggerFlags > 0)
 			{
-				TENLog("SWITCH TO WAIT", LogLevel::Warning);
 				switchItem->Animation.TargetState = SwitchStatus::SWITCH_WAIT;
 				LaraItem->Animation.TargetState = LS_PULLEY_UNGRAB;
 			}
@@ -184,12 +182,10 @@ namespace TEN::Entities::Switches
 				if (switchItem->ItemFlags[PulleyFlags::State] == 1)
 				{
 					switchItem->Animation.TargetState = SwitchStatus::SWITCH_OFF;
-					TENLog("Pulley Deactivated!", LogLevel::Warning);
 				}
 				else if (switchItem->ItemFlags[PulleyFlags::State] == 0)
 				{
 					switchItem->Animation.TargetState = SwitchStatus::SWITCH_ON;
-					TENLog("Pulley Activated!", LogLevel::Warning);
 				}
 
 				LaraItem->Animation.TargetState = LS_PULLEY_UNGRAB;
@@ -205,7 +201,6 @@ namespace TEN::Entities::Switches
 				switchItem->ItemFlags[PulleyFlags::PullCountReset] = 0;  // Reset activation flag
 				switchItem->ItemFlags[PulleyFlags::State] = 1; //Save switch is active flag
 				switchItem->ItemFlags[PulleyFlags::Status] = 1;
-				TENLog("TriggerFlags Restored: " + std::to_string(switchItem->TriggerFlags), LogLevel::Warning);
 			}
 			break;
 
@@ -217,12 +212,11 @@ namespace TEN::Entities::Switches
 				switchItem->ItemFlags[PulleyFlags::PullCountReset] = 0;  // Reset activation flag
 				switchItem->ItemFlags[PulleyFlags::State] = 0; //Save switch is Inactive flag
 				switchItem->ItemFlags[PulleyFlags::Status] = 1;
-				TENLog("TriggerFlags Restored: " + std::to_string(switchItem->TriggerFlags), LogLevel::Warning);
 			}
 			break;
 
 		case SwitchStatus::SWITCH_WAIT:
-			// If Ctrl is pressed again, transition to ANIMATE state (handled externally)
+			// If Ctrl is pressed again, transition to ANIMATE state (handled in collision code)
 			break;
 		}
 	}
