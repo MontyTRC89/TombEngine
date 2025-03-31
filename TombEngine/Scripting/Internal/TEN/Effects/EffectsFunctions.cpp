@@ -624,10 +624,11 @@ namespace TEN::Scripting::Effects
 	// @tparam[opt] float radius Radius of emitter. The particles will be emitted inside the circle of provided radius measured from centre of world position. __default: 512__ 
 	// @tparam[opt] float life Lifespan in seconds. __default: 1__
 	// @tparam[opt] float vel Velocity of the particles in world units per second. __default: 512__
+	// @tfield[opt] float friction Friction affecting velocity over time in world units per second. __default: 0__
 	// @tparam[opt] float maxSize Max size of the particle. __default: 25__
 	// @tparam[opt] Color startColor Color at start of life. __default: Color(128, 128, 128)__
 	// @tparam[opt] Color endColor Color at end of life. __default: Color(0, 0, 0)__
-	static void EmitSink(const Vec3& pos, const Vec3& dir, TypeOrNil<float> radius, TypeOrNil<float> life, TypeOrNil<float> vel, TypeOrNil<float> maxSize, TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor)
+	static void EmitSink(const Vec3& pos, const Vec3& dir, TypeOrNil<float> radius, TypeOrNil<float> life, TypeOrNil<float> vel, TypeOrNil<float> friction, TypeOrNil<float> maxSize, TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor)
 	{
 		constexpr auto DEFAULT_LIFE = 1.0f;
 		constexpr auto SECS_PER_FRAME = 1.0f / (float)FPS;
@@ -638,6 +639,7 @@ namespace TEN::Scripting::Effects
 		auto convertedRad = ValueOr<float>(radius, BLOCK(0.5f));
 		auto convertedLife = std::max(0.1f, ValueOr<float>(life, DEFAULT_LIFE));
 		auto convertedVel = ValueOr<float>(vel, BLOCK(0.5f)) / (float)FPS;
+		auto convertedFriction = ValueOr<float>(friction, 0) / (float)FPS;
 		auto convertedMaxSize = std::max(0.1f, ValueOr<float>(maxSize, DUST_SIZE_MAX));
 		auto convertedStartColor = ValueOr<ScriptColor>(startColor, ScriptColor(128, 128, 128, 255));
 		auto convertedEndColor = ValueOr<ScriptColor>(endColor, ScriptColor(0, 0, 0, 255));
@@ -680,7 +682,7 @@ namespace TEN::Scripting::Effects
 		part.zVel = convertedDir.z * convertedVel * 32;
 
 		// Other properties
-		part.friction = 85;
+		part.friction = convertedFriction;
 		part.maxYvel = 0;
 		part.gravity = 0;
 		part.flags = SP_DEF | SP_EXPDEF;
