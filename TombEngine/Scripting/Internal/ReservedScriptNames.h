@@ -247,6 +247,21 @@ static constexpr char ScriptReserved_EnableHomeLevel[]			= "EnableHomeLevel";
 static constexpr char ScriptReserved_EnableLoadSave[]			= "EnableLoadSave";
 static constexpr char ScriptReserved_EnablePointFilter[]		= "EnablePointFilter";
 
+// Creature Functions
+static constexpr char ScriptReserved_CreatureInfo[]			= "CreatureInfo";
+static constexpr char ScriptReserved_GetMood[]				= "GetMood";
+static constexpr char ScriptReserved_GetCreatureTarget[]	= "GetTarget";
+static constexpr char ScriptReserved_GetTargetPosition[]	= "GetTargetPosition";
+static constexpr char ScriptReserved_SetCreatureTarget[]	= "SetTarget";
+static constexpr char ScriptReserved_SetTargetPosition[]	= "SetTargetPosition";
+static constexpr char ScriptReserved_ClearTarget[]			= "ClearTarget";
+static constexpr char ScriptReserved_IsAlerted[]			= "IsAlerted";
+static constexpr char ScriptReserved_IsFriendly[]			= "IsFriendly";
+static constexpr char ScriptReserved_IsHurtByPlayer[]		= "IsHurtByLara";
+static constexpr char ScriptReserved_IsPoisoned[]			= "IsPoisoned";
+static constexpr char ScriptReserved_IsAtGoal[]				= "IsAtGoal";
+static constexpr char ScriptReserved_CreatureMood[]			= "CreatureMood";
+
 // Flow Functions
 static constexpr char ScriptReserved_SetStrings[]			= "SetStrings";
 static constexpr char ScriptReserved_GetString[]			= "GetString";

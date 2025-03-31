@@ -4,28 +4,28 @@
 #include <unordered_map>
 #include <string>
 
-/// Constants for feather modes.
-// @enum Effects.FeatherMode
+/// Constants for creature mood.
+// @enum Objects.CreatureMood
 // @pragma nostrip
 
-/// Table of Effects.FeatherMode constants.
-// To be used with @{Effects.EmitStreamer} function.
+/// Table of Objects.Creature constants.
+// To be used with @{Objects.CreatureInfo.GetMood} function.
 //
-// - `NONE`
-// - `CENTER`
-// - `LEFT`
-// - `RIGHT`
+// - `BORED`
+// - `ATTACK`
+// - `ESCAPE`
+// - `STALK`
 //
-// @table Effects.FeatherMode
+// @table Objects.CreatureMood
 
-namespace TEN::Scripting::Creature
+namespace TEN::Scripting::Objects
 {
 	static const auto CREATURE_MOOD = std::unordered_map<std::string, MoodType>
 	{
        
-        {"Bored", MoodType::Bored},
-        {"Attack", MoodType::Attack},
-        {"Escape", MoodType::Escape},
-        {"Stalk", MoodType::Stalk}
+        {"BORED", MoodType::Bored},
+        {"ATTACK", MoodType::Attack},
+        {"ESCAPE", MoodType::Escape},
+        {"STALK", MoodType::Stalk}
 	};
 }
