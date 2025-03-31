@@ -51,4 +51,3 @@ This is the credit list of **all** the people who contributed to TombEngine in a
 
 ### TombEngine Marketing 
 - Stranger1992 (Tomb Engine website, Discord, Facebook, Instagram, Youtube, X, and Twitch)
-- Kubsy (X and Reddit)
