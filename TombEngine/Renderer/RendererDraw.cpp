@@ -3229,13 +3229,17 @@ namespace TEN::Renderer
 		case RendererPass::GBuffer:
 			if (blendMode != BlendMode::Opaque &&
 				blendMode != BlendMode::AlphaTest &&
-				blendMode != BlendMode::FastAlphaBlend)
+				blendMode != BlendMode::FastAlphaBlend &&
+				// WARNING: For G-Buffer step we consider alpha blend like alpha test
+				// assuming that most of the geometry used in rooms, items and statics 
+				// are fences, foliages, trees... But it could fail with translucent surfaces! 
+				blendMode != BlendMode::AlphaBlend)
 			{
 				return false;
 			}
 
 			if (blendMode == BlendMode::Opaque)
-			{
+			{ 
 				SetBlendMode(BlendMode::Opaque);
 				SetAlphaTest(AlphaTestMode::None, 1.0f);
 			}
