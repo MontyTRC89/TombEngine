@@ -628,11 +628,17 @@ namespace TEN::Scripting::Effects
 	// @tparam[opt] float maxSize Max size of the particle. __default: 25__
 	// @tparam[opt] Color startColor Color at start of life. __default: Color(128, 128, 128)__
 	// @tparam[opt] Color endColor Color at end of life. __default: Color(0, 0, 0)__
-	static void EmitSink(const Vec3& pos, const Vec3& dir, TypeOrNil<float> radius, TypeOrNil<float> life, TypeOrNil<float> vel, TypeOrNil<float> friction, TypeOrNil<float> maxSize, TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor)
+	// @tparam[opt] Objects.ObjID.SpriteConstants spriteSeqID Sprite sequence slot ID. __default: Objects.ObjID.DEFAULT_SPRITES__
+	// @tparam[opt] int spriteID Sprite ID in the sprite sequence slot. __default: 14 (UNDERWATER DUST)__
+	static void EmitSink(const Vec3& pos, const Vec3& dir, TypeOrNil<float> radius, TypeOrNil<float> life, TypeOrNil<float> vel, TypeOrNil<float> friction, TypeOrNil<float> maxSize, TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<GAME_OBJECT_ID> spriteSeqID, TypeOrNil<int> spriteID)
 	{
 		constexpr auto DEFAULT_LIFE = 1.0f;
 		constexpr auto SECS_PER_FRAME = 1.0f / (float)FPS;
 		constexpr auto DUST_SIZE_MAX = 25.0f;
+
+		auto convertedSpriteSeqID = ValueOr<GAME_OBJECT_ID>(spriteSeqID, ID_DEFAULT_SPRITES);
+		if (!CheckIfSlotExists(convertedSpriteSeqID, "EmitParticle() script function."))
+			return;
 
 		auto convertedPos = pos.ToVector3();
 		auto convertedDir = dir.ToVector3();
@@ -643,12 +649,13 @@ namespace TEN::Scripting::Effects
 		auto convertedMaxSize = std::max(0.1f, ValueOr<float>(maxSize, DUST_SIZE_MAX));
 		auto convertedStartColor = ValueOr<ScriptColor>(startColor, ScriptColor(128, 128, 128, 255));
 		auto convertedEndColor = ValueOr<ScriptColor>(endColor, ScriptColor(0, 0, 0, 255));
+		auto convertedSpriteID = ValueOr<int>(spriteID, SPRITE_TYPES::SPR_UNDERWATERDUST);
 
 		auto& part = *GetFreeParticle();
 
 		part.on = true;
-		part.SpriteSeqID = ID_DEFAULT_SPRITES;
-		part.SpriteID = SPRITE_TYPES::SPR_UNDERWATERDUST;
+		part.SpriteSeqID = convertedSpriteSeqID;
+		part.SpriteID = convertedSpriteID;
 		part.blendMode = BlendMode::Additive;
 
 		// Set particle colors
