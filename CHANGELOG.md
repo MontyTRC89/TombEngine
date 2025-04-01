@@ -22,6 +22,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added missing constructor for `Collision.Probe` without room number.
 * Added optional looping argument for `View.GetFlybyPosition` and `View.GetFlybyRotation` functions.
 * Added EmitWaterfallMist under Effects.
+* Added EmitSink under Effects.
 * Updated MakeExplosion and EmitBlood to spawn correct effects when used underwater.
 
 
