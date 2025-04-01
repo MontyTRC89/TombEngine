@@ -509,7 +509,7 @@ namespace TEN::Scripting::Effects
 	}
 
 	/// Emit waterfall mist.
-	// @function EmitWaterMist
+	// @function EmitWaterfallMist
 	// @tparam Vec3 pos World position where the effect will be spawned.
 	// @tparam[opt] float size Effect size. __Default: 64__
 	// @tparam[opt] float width Width of the effect. __Default: 32__
