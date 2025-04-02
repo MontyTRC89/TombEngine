@@ -17,8 +17,12 @@ namespace TEN::Video
 
 		SetEnvironmentVariable("VLC_PLUGIN_PATH", "./vlc/plugins"); // TODO
 
-		const char* args[] = { "" };
-		vlcInstance = libvlc_new(1, args);
+		// Set VLC arguments, including the audio output module
+		const char* args[] = {
+			"--no-audio",  // Use DirectSound for audio output (on Windows)
+			"--no-video-title"     // Optional: Disable video title display
+		};
+		vlcInstance = libvlc_new(sizeof(args) / sizeof(args[0]), args);
 
 		HandleError();
 	}
@@ -46,6 +50,12 @@ namespace TEN::Video
 
 	bool VideoHandler::LoadVideo(const std::string& filename)
 	{
+		if (!std::filesystem::is_regular_file(filename))
+		{
+			TENLog("Video file not found: " + filename, LogLevel::Warning);
+			return false;
+		}
+
 		if (player)
 		{
 			libvlc_media_player_stop_async(player);
@@ -101,10 +111,10 @@ namespace TEN::Video
 
 		libvlc_video_set_callbacks(player, LockFrame, UnlockFrame, DisplayFrame, this);
 
-		SetVolume(volume);
+		//SetVolume(volume);
 		InitD3DTexture();
 
-		return HandleError();
+		return true;
 	}
 
 	void VideoHandler::InitD3DTexture()
@@ -174,7 +184,6 @@ namespace TEN::Video
 		if (currentPosition - lastRenderTime >= 1.0f / 60.0f) // Example: Update 60 FPS
 		{
 			lastRenderTime = currentPosition;
-			Render(d3dContext);
 			return true;
 		}
 		else
@@ -214,19 +223,16 @@ namespace TEN::Video
 		HandleError();
 	}
 
-	void VideoHandler::Render(ID3D11DeviceContext* context)
+	ID3D11ShaderResourceView* VideoHandler::GetTextureView() const
 	{
-		if (!videoTexture)
-			return;
-
-		context->PSSetShaderResources(0, 1, &textureView);
+		return textureView;
 	}
 
 	bool VideoHandler::CheckPlayerExistence()
 	{
 		if (!player)
 		{
-			TENLog("No video player initialized", LogLevel::Error);
+			// TENLog("No video player initialized", LogLevel::Error);
 			return false;
 		}
 

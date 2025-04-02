@@ -352,6 +352,7 @@ static constexpr char ScriptReserved_KeyClearAll[]					= "KeyClearAll";
 
 static constexpr char ScriptReserved_FlipMap[]						= "FlipMap";
 static constexpr char ScriptReserved_GetFlipMapStatus[]				= "GetFlipMapStatus";
+static constexpr char ScriptReserved_PlayVideo[]					= "PlayVideo";
 static constexpr char ScriptReserved_PlayFlyby[]					= "PlayFlyby";
 static constexpr char ScriptReserved_GetFlybyPosition[]				= "GetFlybyPosition";
 static constexpr char ScriptReserved_GetFlybyRotation[]				= "GetFlybyRotation";

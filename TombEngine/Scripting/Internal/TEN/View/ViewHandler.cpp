@@ -19,10 +19,12 @@
 #include "Scripting/Internal/TEN/View/ScaleModes.h"
 #include "Scripting/Internal/TEN/View/PostProcessEffects.h"
 #include "Specific/clock.h"
+#include "Specific/Video/Video.h"
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Scripting::DisplaySprite;
 using namespace TEN::Scripting::View;
+using namespace TEN::Video;
 
 using TEN::Renderer::g_Renderer;
 
@@ -109,6 +111,11 @@ namespace TEN::Scripting::View
 	{
 		UseSpotCam = true;
 		InitializeSpotCam(seqID);
+	}
+
+	static void PlayVideo(std::string fileName)
+	{
+		g_VideoPlayer->Play(fileName);
 	}
 
 	static Vec3 GetFlybyPosition(int seqID, float progress, TypeOrNil<bool> loop)
@@ -234,6 +241,11 @@ namespace TEN::Scripting::View
 		//@function SetPostProcessTint
 		//@tparam Color tint value to use.
 		tableView.set_function(ScriptReserved_SetPostProcessTint, &SetPostProcessTint);
+
+		/// Play a video file.
+		// @function PlayVideo
+		// @tparam string fileName Video file name.
+		tableView.set_function(ScriptReserved_PlayVideo, &PlayVideo);
 
 		/// Play a flyby sequence.
 		// @function PlayFlyby

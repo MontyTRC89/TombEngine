@@ -19,11 +19,12 @@
 #include "Scripting/Internal/LanguageScript.h"
 #include "Scripting/Include/ScriptInterfaceState.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
+#include "Video/Video.h"
 
 using namespace TEN::Renderer;
 using namespace TEN::Input;
 using namespace TEN::Utils;
-
+using namespace TEN::Video;
 
 WINAPP App;
 unsigned int ThreadID, ConsoleThreadID;
@@ -356,6 +357,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				TENLog("Resuming game thread", LogLevel::Info);
 				ResumeThread((HANDLE)ThreadHandle);
 				ResumeAllSounds(SoundPauseMode::Global);
+				g_VideoPlayer->Play();
 			}
 
 			return 0;
@@ -371,6 +373,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			TENLog("Suspending game thread", LogLevel::Info);
 			SuspendThread((HANDLE)ThreadHandle);
 			PauseAllSounds(SoundPauseMode::Global);
+			g_VideoPlayer->Pause();
 		}
 	}
 

@@ -25,7 +25,8 @@ namespace TEN::Video
 		float GetPosition();
 		void SetPosition(float position);
 		void SetVolume(int volume);
-		void Render(ID3D11DeviceContext* context);
+
+		ID3D11ShaderResourceView* GetTextureView() const;
 
 	private:
 		// VLC core components

@@ -15,6 +15,7 @@
 #include "Specific/Input/InputAction.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"
+#include "Specific/Video/Video.h"
 #include "Specific/winmain.h"
 #include "Version.h"
 
@@ -22,6 +23,7 @@ using namespace TEN::Gui;
 using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
+using namespace TEN::Video;
 
 extern TEN::Renderer::RendererHudBar* g_SFXVolumeBar;
 extern TEN::Renderer::RendererHudBar* g_MusicVolumeBar;
@@ -1087,6 +1089,34 @@ namespace TEN::Renderer
 	void Renderer::SetLoadingScreen(std::wstring& fileName)
 	{
 		SetTextureOrDefault(_loadingScreenTexture, fileName);
+	}
+
+	void Renderer::RenderVideoFrame()
+	{
+		// Player did not update, no need to re-render frame.
+		if (!g_VideoPlayer->Update())
+			return;
+
+		// Set basic render states.
+		SetBlendMode(BlendMode::Opaque);
+		SetCullMode(CullMode::CounterClockwise);
+
+		// Clear screen
+		_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
+		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+
+		// Bind back buffer.
+		_context->OMSetRenderTargets(1, _backBuffer.RenderTargetView.GetAddressOf(), _backBuffer.DepthStencilView.Get());
+		_context->RSSetViewports(1, &_viewport);
+		ResetScissor();
+
+		// Draw full screen background.
+		DrawFullScreenQuad(g_VideoPlayer->GetTextureView(), Vector3::One);
+
+		ClearScene();
+
+		_context->ClearState();
+		_swapChain->Present(1, 0);
 	}
 
 	void Renderer::RenderFreezeMode(float interpFactor, bool staticBackground)

@@ -39,6 +39,7 @@
 #include "Math/Math.h"
 #include "Objects/Effects/LensFlare.h"
 #include "Objects/Effects/tr4_locusts.h"
+#include "Objects/Effects/Fireflies.h"
 #include "Objects/Generic/Object/objects.h"
 #include "Objects/Generic/Object/rope.h"
 #include "Objects/Generic/Switches/generic_switch.h"
@@ -59,7 +60,7 @@
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
 #include "Specific/winmain.h"
-#include "Objects/Effects/Fireflies.h"
+#include "Specific/Video/Video.h"
 
 using namespace std::chrono;
 using namespace TEN::Effects;
@@ -91,6 +92,7 @@ using namespace TEN::Renderer;
 using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Effects;
 using namespace TEN::Effects::Fireflies;
+using namespace TEN::Video;
 
 constexpr auto DEATH_NO_INPUT_TIMEOUT = 10 * FPS;
 constexpr auto DEATH_INPUT_TIMEOUT	  = 3 * FPS;
@@ -655,6 +657,12 @@ GameStatus DoGameLoop(int levelIndex)
 
 	while (DoTheGame)
 	{
+		if (g_VideoPlayer->IsPlaying())
+		{
+			g_Renderer.RenderVideoFrame();
+			continue;
+		}
+
 		g_Synchronizer.Sync();
 
 		while (g_Synchronizer.Synced())
