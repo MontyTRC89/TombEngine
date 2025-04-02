@@ -55,8 +55,6 @@ namespace TEN::Video
 	{
 		TENLog("Initializing video player...", LogLevel::Info);
 
-		SetEnvironmentVariable("VLC_PLUGIN_PATH", "./vlc/plugins"); // TODO
-
 		// Set VLC arguments, including the audio output module
 		const char* args[] = { "--verbose", "--vout=none", "--no-video-title" }; // Example arguments
 		vlcInstance = libvlc_new(3, args);  // Use the appropriate arguments
