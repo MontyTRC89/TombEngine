@@ -1,13 +1,14 @@
 #include "framework.h"
-#include "tr5_teleporter.h"
-#include "Game/items.h"
-#include "Specific/level.h"
-#include "Game/collision/collide_room.h"
-#include "Sound/sound.h"
-#include "Game/effects/weather.h"
-#include "Game/Lara/lara.h"
+#include "Objects/TR5/Object/tr5_teleporter.h"
+
 #include "Game/camera.h"
+#include "Game/collision/collide_room.h"
 #include "Game/collision/Point.h"
+#include "Game/effects/weather.h"
+#include "Game/items.h"
+#include "Game/Lara/lara.h"
+#include "Sound/sound.h"
+#include "Specific/level.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Environment;
