@@ -197,7 +197,8 @@ namespace TEN::Video
 		if (!CheckPlayerExistence())
 			return false;
 
-		return (libvlc_media_player_get_state(player) == libvlc_Playing);
+		auto state = libvlc_media_player_get_state(player);
+		return (state == libvlc_Playing);
 	}
 
 	float VideoHandler::GetPosition()
