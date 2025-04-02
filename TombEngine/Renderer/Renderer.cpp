@@ -11,9 +11,6 @@
 #include "Renderer/Structures/RendererHudBar.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/clock.h"
-#include "Specific/Video/Video.h"
-
-using namespace TEN::Video;
 
 namespace TEN::Renderer
 {
@@ -32,7 +29,6 @@ namespace TEN::Renderer
 	Renderer::~Renderer()
 	{
 		FreeRendererData();
-		delete g_VideoPlayer;
 	}
 
 	void Renderer::FreeRendererData()

@@ -660,13 +660,7 @@ GameStatus DoGameLoop(int levelIndex)
 		g_Synchronizer.Sync();
 
 		if (g_VideoPlayer->Update())
-		{
-			if (g_VideoPlayer->Sync())
-				g_Renderer.RenderVideoFrame();
-
-			App.ResetClock = true;
 			continue;
-		}
 
 		while (g_Synchronizer.Synced())
 		{

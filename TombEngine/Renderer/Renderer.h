@@ -451,7 +451,7 @@ namespace TEN::Renderer
 		void PrepareShockwaves(RenderView& view);
 		void PrepareRipples(RenderView& view);
 		void PrepareUnderwaterBloodParticles(RenderView& view);
-		void DrawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color, bool fit = true);
+		void DrawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color, bool fit = true, float customAspect = 0.0f);
 		void DrawFullScreenSprite(RendererSprite* sprite, DirectX::SimpleMath::Vector3 color, bool fit = true);
 		void PrepareSmokeParticles(RenderView& view);
 		void PrepareSparkParticles(RenderView& view);
@@ -633,7 +633,7 @@ namespace TEN::Renderer
 		void AddDynamicSpotLight(const Vector3& pos, const Vector3& dir, float radius, float falloff, float distance, const Color& color, bool castShadows, int hash = 0);
 		void RenderLoadingScreen(float percentage);
 		void RenderFreezeMode(float interpFactor, bool staticBackground);
-		void RenderVideoFrame();
+		void RenderFullScreenTexture(ID3D11ShaderResourceView* texture, float aspect);
 		void UpdateProgress(float value);
 		void ToggleFullScreen(bool force = false);
 		void SetFullScreen();

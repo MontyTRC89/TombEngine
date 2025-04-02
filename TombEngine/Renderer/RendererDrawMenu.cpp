@@ -15,7 +15,6 @@
 #include "Specific/Input/InputAction.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"
-#include "Specific/Video/Video.h"
 #include "Specific/winmain.h"
 #include "Version.h"
 
@@ -23,7 +22,6 @@ using namespace TEN::Gui;
 using namespace TEN::Hud;
 using namespace TEN::Input;
 using namespace TEN::Math;
-using namespace TEN::Video;
 
 extern TEN::Renderer::RendererHudBar* g_SFXVolumeBar;
 extern TEN::Renderer::RendererHudBar* g_MusicVolumeBar;
@@ -1091,8 +1089,11 @@ namespace TEN::Renderer
 		SetTextureOrDefault(_loadingScreenTexture, fileName);
 	}
 
-	void Renderer::RenderVideoFrame()
+	void Renderer::RenderFullScreenTexture(ID3D11ShaderResourceView* texture, float aspect)
 	{
+		if (texture == nullptr)
+			return;
+
 		// Set basic render states.
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);
@@ -1107,7 +1108,7 @@ namespace TEN::Renderer
 		ResetScissor();
 
 		// Draw full screen background.
-		DrawFullScreenQuad(g_VideoPlayer->GetTextureView(), Vector3::One);
+		DrawFullScreenQuad(texture, Vector3::One, true, aspect);
 
 		ClearScene();
 

@@ -7,8 +7,10 @@
 
 namespace TEN::Video
 {
-	constexpr auto VIDEO_WIDTH = 1920;
-	constexpr auto VIDEO_HEIGHT = 1080;
+	constexpr auto MIN_VIDEO_WIDTH  = 800;
+	constexpr auto MIN_VIDEO_HEIGHT = 600;
+	constexpr auto MAX_VIDEO_WIDTH  = 2048;
+	constexpr auto MAX_VIDEO_HEIGHT = 2048;
 
 	class VideoHandler
 	{
@@ -22,11 +24,7 @@ namespace TEN::Video
 		void Stop();
 		bool Sync();
 		bool Update();
-		float GetPosition();
-		void SetPosition(float position);
 		void SetVolume(int volume);
-
-		ID3D11ShaderResourceView* GetTextureView() const;
 
 	private:
 		// VLC core components
@@ -35,8 +33,8 @@ namespace TEN::Video
 
 		// Video properties
 		int volume = 100;
-		unsigned int videoWidth = VIDEO_WIDTH;
-		unsigned int videoHeight = VIDEO_HEIGHT;
+		unsigned int videoWidth = MIN_VIDEO_WIDTH;
+		unsigned int videoHeight = MIN_VIDEO_HEIGHT;
 		std::string currentFilename = {};
 
 		// Render synchronization
@@ -50,13 +48,15 @@ namespace TEN::Video
 		ID3D11ShaderResourceView* textureView = nullptr;
 
 		// VLC frame callbacks
-		static void* LockFrame(void* opaque, void** pixels);
-		static void  UnlockFrame(void* opaque, void* picture, void* const* pixels);
-		static void  DisplayFrame(void* opaque, void* picture);
+		static void* LockFrame(void* data, void** pixels);
+		static void  UnlockFrame(void* data, void* picture, void* const* pixels);
+		static void  DisplayFrame(void* data, void* picture);
 
 		// Helpers
 		bool HandleError();
 		bool InitD3DTexture();
+		void DeInitD3DTexture();
+		void DeInitPlayer();
 	};
 
 	extern VideoHandler* g_VideoPlayer;

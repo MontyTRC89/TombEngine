@@ -654,6 +654,8 @@ void WinClose()
 
 	Sound_DeInit();
 	DeinitializeInput();
+
+	delete g_VideoPlayer;
 	
 	delete g_GameScript;
 	g_GameScript = nullptr;
