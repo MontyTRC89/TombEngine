@@ -355,9 +355,11 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			if (!DebugMode && ThreadHandle > 0)
 			{
 				TENLog("Resuming game thread", LogLevel::Info);
+
+				if (!g_VideoPlayer.Resume())
+					ResumeAllSounds(SoundPauseMode::Global);
+
 				ResumeThread((HANDLE)ThreadHandle);
-				ResumeAllSounds(SoundPauseMode::Global);
-				g_VideoPlayer.Resume();
 			}
 
 			return 0;
@@ -371,9 +373,11 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if (!DebugMode)
 		{
 			TENLog("Suspending game thread", LogLevel::Info);
+
+			if (!g_VideoPlayer.Pause())
+				PauseAllSounds(SoundPauseMode::Global);
+
 			SuspendThread((HANDLE)ThreadHandle);
-			PauseAllSounds(SoundPauseMode::Global);
-			g_VideoPlayer.Pause();
 		}
 	}
 

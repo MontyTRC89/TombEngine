@@ -20,8 +20,8 @@ namespace TEN::Video
 
 		void Initialize(const std::string& gameDir, ID3D11Device* device, ID3D11DeviceContext* context);
 		bool Play(const std::string& filename);
-		void Pause();
-		void Resume();
+		bool Pause();
+		bool Resume();
 		void Stop();
 		bool Sync();
 		bool Update();

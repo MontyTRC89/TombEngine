@@ -135,26 +135,36 @@ namespace TEN::Video
 		return true;
 	}
 
-	void VideoHandler::Pause()
+	bool VideoHandler::Pause()
 	{
 		if (_player == nullptr)
-			return;
+			return false;
 
 		if (libvlc_media_player_get_state(_player) != libvlc_Paused)
+		{
 			libvlc_media_player_pause(_player);
+			HandleError();
+			return true;
+		}
 
 		HandleError();
+		return false;
 	}
 
-	void VideoHandler::Resume()
+	bool VideoHandler::Resume()
 	{
 		if (_player == nullptr)
-			return;
+			return false;
 
 		if (libvlc_media_player_get_state(_player) == libvlc_Paused)
+		{
 			libvlc_media_player_play(_player);
+			HandleError();
+			return true;
+		}
 
 		HandleError();
+		return false;
 	}
 
 	void VideoHandler::Stop()
