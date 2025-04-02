@@ -357,7 +357,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				TENLog("Resuming game thread", LogLevel::Info);
 				ResumeThread((HANDLE)ThreadHandle);
 				ResumeAllSounds(SoundPauseMode::Global);
-				g_VideoPlayer->Play();
+				g_VideoPlayer->Resume();
 			}
 
 			return 0;

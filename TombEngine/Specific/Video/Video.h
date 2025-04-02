@@ -16,12 +16,12 @@ namespace TEN::Video
 		VideoHandler(ID3D11Device* device, ID3D11DeviceContext* context);
 		~VideoHandler();
 
-		void Play(const std::string& filename);
-		void Play();
+		bool Play(const std::string& filename);
 		void Pause();
+		void Resume();
 		void Stop();
+		bool Sync();
 		bool Update();
-		bool IsPlaying();
 		float GetPosition();
 		void SetPosition(float position);
 		void SetVolume(int volume);
@@ -38,13 +38,12 @@ namespace TEN::Video
 		unsigned int videoWidth = VIDEO_WIDTH;
 		unsigned int videoHeight = VIDEO_HEIGHT;
 		std::string currentFilename = {};
-		unsigned char* frameBuffer = nullptr;
 
-		// Synchronization
-		float lastRenderTime = 0.0f; // Last time we rendered a frame
-		float currentTime = 0.0f;    // Current time based on video position
+		// Render synchronization
+		bool needRender = true;
 
 		// D3D Resources
+		unsigned char* frameBuffer = nullptr;
 		ID3D11Device* d3dDevice = nullptr;
 		ID3D11DeviceContext* d3dContext = nullptr;
 		ID3D11Texture2D* videoTexture = nullptr;
@@ -55,10 +54,9 @@ namespace TEN::Video
 		static void  UnlockFrame(void* opaque, void* picture, void* const* pixels);
 		static void  DisplayFrame(void* opaque, void* picture);
 
-		bool CheckPlayerExistence();
+		// Helpers
 		bool HandleError();
-		bool LoadVideo(const std::string& filename);
-		void InitD3DTexture();
+		bool InitD3DTexture();
 	};
 
 	extern VideoHandler* g_VideoPlayer;

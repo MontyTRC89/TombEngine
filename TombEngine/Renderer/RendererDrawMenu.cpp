@@ -1093,10 +1093,6 @@ namespace TEN::Renderer
 
 	void Renderer::RenderVideoFrame()
 	{
-		// Player did not update, no need to re-render frame.
-		if (!g_VideoPlayer->Update())
-			return;
-
 		// Set basic render states.
 		SetBlendMode(BlendMode::Opaque);
 		SetCullMode(CullMode::CounterClockwise);

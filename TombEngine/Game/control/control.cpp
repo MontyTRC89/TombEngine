@@ -657,13 +657,16 @@ GameStatus DoGameLoop(int levelIndex)
 
 	while (DoTheGame)
 	{
-		if (g_VideoPlayer->IsPlaying())
+		g_Synchronizer.Sync();
+
+		if (g_VideoPlayer->Update())
 		{
-			g_Renderer.RenderVideoFrame();
+			if (g_VideoPlayer->Sync())
+				g_Renderer.RenderVideoFrame();
+
+			App.ResetClock = true;
 			continue;
 		}
-
-		g_Synchronizer.Sync();
 
 		while (g_Synchronizer.Synced())
 		{
@@ -728,7 +731,7 @@ void HandleControls(bool isTitle)
 {
 	// Poll input devices and update input variables.
 	// TODO: To allow cutscene skipping later, don't clear Deselect action.
-	UpdateInputActions(LaraItem, true);
+	UpdateInputActions(false, true);
 
 	if (isTitle)
 		ClearAction(In::Look);

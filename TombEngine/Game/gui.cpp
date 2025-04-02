@@ -716,7 +716,7 @@ namespace TEN::Gui
 					else
 					{
 						g_Renderer.PrepareScene(); // Just for updating blink time.
-						UpdateInputActions(item);
+						UpdateInputActions();
 					}
 
 					if (CurrentSettings.IgnoreInput)
@@ -1157,7 +1157,7 @@ namespace TEN::Gui
 		static const int numOptionsOptions	  = 2;
 
 		TimeInMenu++;
-		UpdateInputActions(item);
+		UpdateInputActions();
 
 		switch (MenuToDisplay)
 		{
@@ -3296,7 +3296,7 @@ namespace TEN::Gui
 				SaveGame::Statistics.Game.TimeTaken++;
 				SaveGame::Statistics.Level.TimeTaken++;
 
-				UpdateInputActions(item);
+				UpdateInputActions();
 
 				if (GuiIsDeselected() || IsClicked(In::Inventory))
 				{

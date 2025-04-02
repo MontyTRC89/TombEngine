@@ -40,6 +40,9 @@ namespace TEN::Debug
 
 	void TENLog(const std::string_view& msg, LogLevel level, LogConfig config, bool allowSpam)
 	{
+		if (spdlog::default_logger() == nullptr)
+			return;
+
 		static auto prevString = std::string();
 		if (prevString == msg && !allowSpam)
 			return;
