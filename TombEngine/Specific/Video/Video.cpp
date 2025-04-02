@@ -20,7 +20,6 @@ namespace TEN::Video
 		// Set VLC arguments, including the audio output module
 		const char* args[] = { "--logfile=vlc_log.txt", "--aout=directsound", "--vout=direct3d", "--no-video-title" }; // Example arguments
 		vlcInstance = libvlc_new(4, args);  // Use the appropriate arguments
-		libvlc_log_set(logger, libvlc_log_level_info);
 
 		HandleError();
 	}
@@ -112,7 +111,7 @@ namespace TEN::Video
 		//SetVolume(volume);
 		InitD3DTexture();
 
-		return true;
+		return HandleError();
 	}
 
 	void VideoHandler::InitD3DTexture()
