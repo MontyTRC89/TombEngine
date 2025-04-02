@@ -12,11 +12,13 @@
 #include "Specific/configuration.h"
 #include "Specific/memory/Vector.h"
 #include "Specific/trutils.h"
+#include "Specific/Video/Video.h"
 #include "Specific/winmain.h"
 
 extern GameConfiguration g_Configuration;
 
 using namespace TEN::Renderer::Utils;
+using namespace TEN::Video;
 
 namespace TEN::Renderer
 {
@@ -565,6 +567,9 @@ namespace TEN::Renderer
 
 		// Initialize shader manager.
 		_shaders.Initialize(_device, _context);
+
+		// Initialize video player.
+		g_VideoPlayer = new VideoHandler(_device.Get(), _context.Get());
 	}
 
 	void Renderer::ToggleFullScreen(bool force)

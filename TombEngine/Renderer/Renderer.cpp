@@ -6,11 +6,14 @@
 #include "Renderer/Structures/RendererRectangle.h"
 #include "Renderer/RenderView.h"
 #include "Renderer/RendererUtils.h"
+#include "Renderer/Graphics/RenderTargetCube.h"
 #include "Renderer/Graphics/VertexBuffer.h"
 #include "Renderer/Structures/RendererHudBar.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/clock.h"
-#include "Graphics/RenderTargetCube.h"
+#include "Specific/Video/Video.h"
+
+using namespace TEN::Video;
 
 namespace TEN::Renderer
 {
@@ -29,6 +32,7 @@ namespace TEN::Renderer
 	Renderer::~Renderer()
 	{
 		FreeRendererData();
+		delete g_VideoPlayer;
 	}
 
 	void Renderer::FreeRendererData()
