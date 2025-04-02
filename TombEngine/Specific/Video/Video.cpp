@@ -3,9 +3,9 @@
 
 #include <vlc/vlc.h>
 #include <iostream>
+#include "Renderer/Renderer.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
-#include "Renderer/Renderer.h"
 #include "Specific/winmain.h"
 
 using namespace TEN::Input;
