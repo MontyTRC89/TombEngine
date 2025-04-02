@@ -18,11 +18,9 @@ namespace TEN::Video
 		SetEnvironmentVariable("VLC_PLUGIN_PATH", "./vlc/plugins"); // TODO
 
 		// Set VLC arguments, including the audio output module
-		const char* args[] = {
-			"--no-audio",  // Use DirectSound for audio output (on Windows)
-			"--no-video-title"     // Optional: Disable video title display
-		};
-		vlcInstance = libvlc_new(sizeof(args) / sizeof(args[0]), args);
+		const char* args[] = { "--logfile=vlc_log.txt", "--aout=directsound", "--vout=direct3d", "--no-video-title" }; // Example arguments
+		vlcInstance = libvlc_new(4, args);  // Use the appropriate arguments
+		libvlc_log_set(logger, libvlc_log_level_info);
 
 		HandleError();
 	}
