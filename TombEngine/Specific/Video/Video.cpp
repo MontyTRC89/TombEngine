@@ -50,8 +50,8 @@ namespace TEN::Video
 	{
 		DeInitPlayer();
 
-		if (vlcInstance)
-			libvlc_release(vlcInstance);
+		if (_vlcInstance)
+			libvlc_release(_vlcInstance);
 
 		DeInitD3DTexture();
 	}
@@ -62,22 +62,22 @@ namespace TEN::Video
 
 		// Disable video output and title, because we are rendering to D3D texture.
 		const char* args[] = { "--vout=none", "--no-video-title" };
-		vlcInstance = libvlc_new(2, args);
+		_vlcInstance = libvlc_new(2, args);
 
 #ifdef _DEBUG
-		// libvlc_log_set(vlcInstance, LogCallback, nullptr);
+		// libvlc_log_set(_vlcInstance, LogCallback, nullptr);
 #endif
 
 		HandleError();
 
-		videoDirectory = gameDir + VIDEO_PATH;
-		d3dDevice = device;
-		d3dContext = context;
+		_videoDirectory = gameDir + VIDEO_PATH;
+		_d3dDevice = device;
+		_d3dContext = context;
 	}
 
 	bool VideoHandler::Play(const std::string& filename)
 	{
-		auto fullVideoName = videoDirectory + filename;
+		auto fullVideoName = _videoDirectory + filename;
 
 		// At first, attempt to load video file with full filename.
 		// Then, if not found, try all common video file extensions, and only quit if none are found.
@@ -102,20 +102,20 @@ namespace TEN::Video
 		// Delete previous player instance.
 		DeInitPlayer();
 
-		currentFilename = fullVideoName;
+		_currentFilename = fullVideoName;
 
-		auto* media = libvlc_media_new_path(currentFilename.c_str());
+		auto* media = libvlc_media_new_path(_currentFilename.c_str());
 		if (media == nullptr)
 		{
-			TENLog("Failed to create media from path: " + currentFilename, LogLevel::Error);
+			TENLog("Failed to create media from path: " + _currentFilename, LogLevel::Error);
 			return false;
 		}
 
 		// VLC requires to initialize media, load it into player and release it right away.
-		player = libvlc_media_player_new_from_media(vlcInstance, media);
+		_player = libvlc_media_player_new_from_media(_vlcInstance, media);
 		libvlc_media_release(media);
 
-		if (player == nullptr)
+		if (_player == nullptr)
 		{
 			TENLog("Failed to create media player", LogLevel::Error);
 			return false;
@@ -124,9 +124,9 @@ namespace TEN::Video
 		if (!InitD3DTexture())
 			return false;
 
-		libvlc_video_set_callbacks(player, LockFrame, UnlockFrame, DisplayFrame, this);
-		libvlc_media_player_play(player);
-		SetVolume(volume);
+		libvlc_video_set_callbacks(_player, LockFrame, UnlockFrame, DisplayFrame, this);
+		libvlc_media_player_play(_player);
+		SetVolume(_volume);
 
 		if (!HandleError())
 			return false;
@@ -137,22 +137,22 @@ namespace TEN::Video
 
 	void VideoHandler::Pause()
 	{
-		if (player == nullptr)
+		if (_player == nullptr)
 			return;
 
-		if (libvlc_media_player_get_state(player) != libvlc_Paused)
-			libvlc_media_player_pause(player);
+		if (libvlc_media_player_get_state(_player) != libvlc_Paused)
+			libvlc_media_player_pause(_player);
 
 		HandleError();
 	}
 
 	void VideoHandler::Resume()
 	{
-		if (player == nullptr)
+		if (_player == nullptr)
 			return;
 
-		if (libvlc_media_player_get_state(player) == libvlc_Paused)
-			libvlc_media_player_play(player);
+		if (libvlc_media_player_get_state(_player) == libvlc_Paused)
+			libvlc_media_player_play(_player);
 
 		HandleError();
 	}
@@ -161,25 +161,25 @@ namespace TEN::Video
 	{
 		DeInitPlayer();
 		DeInitD3DTexture();
-		needRender = false;
+		_needRender = false;
 
 		HandleError();
 	}
 
 	bool VideoHandler::Sync()
 	{
-		if (player == nullptr)
+		if (_player == nullptr)
 			return false;
 
-		bool renderResult = needRender;
-		needRender = false;
+		bool renderResult = _needRender;
+		_needRender = false;
 
 		return renderResult;
 	}
 
 	bool VideoHandler::Update()
 	{
-		if (player == nullptr)
+		if (_player == nullptr)
 			return false;
 
 		// Because VLC plays media asynchronously with internal clock, we may update game loop 
@@ -188,15 +188,15 @@ namespace TEN::Video
 		UpdateInputActions(true);
 
 		bool interruptPlayback = IsHeld(In::Deselect) || IsHeld(In::Look);
-		auto state = libvlc_media_player_get_state(player);
+		auto state = libvlc_media_player_get_state(_player);
 
 		if (!interruptPlayback && state == libvlc_Playing)
 		{
 			if (g_VideoPlayer.Sync())
 			{
 				unsigned int videoWidth, videoHeight;
-				libvlc_video_get_size(player, 0, &videoWidth, &videoHeight);
-				g_Renderer.RenderFullScreenTexture(textureView, (float)videoWidth / videoHeight);
+				libvlc_video_get_size(_player, 0, &videoWidth, &videoHeight);
+				g_Renderer.RenderFullScreenTexture(_textureView, (float)videoWidth / videoHeight);
 			}
 		}
 
@@ -215,17 +215,17 @@ namespace TEN::Video
 	void VideoHandler::SetVolume(int volume)
 	{
 		// Set volume even if player is not available, because volume may be externally changed from settings.
-		this->volume = std::clamp(volume, 0, 100);
+		this->_volume = std::clamp(volume, 0, 100);
 
-		if (player != nullptr)
-			libvlc_audio_set_volume(player, this->volume);
+		if (_player != nullptr)
+			libvlc_audio_set_volume(_player, this->_volume);
 
 		HandleError();
 	}
 
 	bool VideoHandler::HandleError()
 	{
-		if (vlcInstance == nullptr)
+		if (_vlcInstance == nullptr)
 			return false;
 
 		const char* vlcMessage = libvlc_errmsg();
@@ -240,7 +240,7 @@ namespace TEN::Video
 
 	bool VideoHandler::InitD3DTexture()
 	{
-		if (videoTexture || textureView)
+		if (_videoTexture || _textureView)
 		{
 			TENLog("Video texture already exists", LogLevel::Error);
 			return false;
@@ -249,21 +249,21 @@ namespace TEN::Video
 		auto resolution = g_Renderer.GetScreenResolution();
 		
 		// Limit maximum resolution, because some GPUs may not handle textures larger than 2048x2048.
-		videoWidth = std::clamp(resolution.x, MIN_VIDEO_WIDTH, MAX_VIDEO_WIDTH);
-		videoHeight = std::clamp(resolution.y, MIN_VIDEO_HEIGHT, MAX_VIDEO_HEIGHT);
+		_videoWidth = std::clamp(resolution.x, MIN_VIDEO_WIDTH, MAX_VIDEO_WIDTH);
+		_videoHeight = std::clamp(resolution.y, MIN_VIDEO_HEIGHT, MAX_VIDEO_HEIGHT);
 
-		libvlc_video_set_format(player, "BGRA", videoWidth, videoHeight, videoWidth * 4);
+		libvlc_video_set_format(_player, "BGRA", _videoWidth, _videoHeight, _videoWidth * 4);
 
-		frameBuffer = new unsigned char[videoWidth * videoHeight * 4];
-		if (!frameBuffer)
+		_frameBuffer = new unsigned char[_videoWidth * _videoHeight * 4];
+		if (!_frameBuffer)
 		{
 			TENLog("Failed to allocate frame buffer", LogLevel::Error);
 			return false;
 		}
 
 		D3D11_TEXTURE2D_DESC texDesc = {};
-		texDesc.Width = videoWidth;
-		texDesc.Height = videoHeight;
+		texDesc.Width = _videoWidth;
+		texDesc.Height = _videoHeight;
 		texDesc.MipLevels = 1;
 		texDesc.ArraySize = 1;
 		texDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -273,13 +273,13 @@ namespace TEN::Video
 		texDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		texDesc.MiscFlags = 0;
 
-		if (FAILED(d3dDevice->CreateTexture2D(&texDesc, nullptr, &videoTexture)))
+		if (FAILED(_d3dDevice->CreateTexture2D(&texDesc, nullptr, &_videoTexture)))
 		{
 			TENLog("Failed to create video texture", LogLevel::Error);
 			return false;
 		}
 
-		if (videoTexture != nullptr && FAILED(d3dDevice->CreateShaderResourceView(videoTexture, nullptr, &textureView)))
+		if (_videoTexture != nullptr && FAILED(_d3dDevice->CreateShaderResourceView(_videoTexture, nullptr, &_textureView)))
 		{
 			TENLog("Failed to create shader resource view", LogLevel::Error);
 			return false;
@@ -290,30 +290,30 @@ namespace TEN::Video
 
 	void VideoHandler::DeInitD3DTexture()
 	{
-		if (frameBuffer)
-			delete[] frameBuffer;
+		if (_frameBuffer)
+			delete[] _frameBuffer;
 
-		if (videoTexture)
+		if (_videoTexture)
 		{
-			videoTexture->Release();
-			videoTexture = nullptr;
+			_videoTexture->Release();
+			_videoTexture = nullptr;
 		}
 
-		if (textureView)
+		if (_textureView)
 		{
-			textureView->Release();
-			textureView = nullptr;
+			_textureView->Release();
+			_textureView = nullptr;
 		}
 	}
 
 	void VideoHandler::DeInitPlayer()
 	{
-		if (player == nullptr)
+		if (_player == nullptr)
 			return;
 
-		libvlc_media_player_stop_async(player);
-		libvlc_media_player_release(player);
-		player = nullptr;
+		libvlc_media_player_stop_async(_player);
+		libvlc_media_player_release(_player);
+		_player = nullptr;
 
 		HandleError();
 	}
@@ -321,7 +321,7 @@ namespace TEN::Video
 	void* VideoHandler::LockFrame(void* data, void** pixels)
 	{
 		VideoHandler* player = static_cast<VideoHandler*>(data);
-		*pixels = player->frameBuffer;
+		*pixels = player->_frameBuffer;
 		return nullptr;
 	}
 
@@ -329,22 +329,22 @@ namespace TEN::Video
 	{
 		VideoHandler* player = static_cast<VideoHandler*>(data);
 
-		if (!player->videoTexture)
+		if (!player->_videoTexture)
 		{
 			TENLog("Video texture does not exist", LogLevel::Error);
 			return;
 		}
 
 		// In case of consequential unlock frame callbacks, do not attempt to map texture again.
-		if (player->needRender)
+		if (player->_needRender)
 			return;
 
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
-		if (SUCCEEDED(player->d3dContext->Map(player->videoTexture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
+		if (SUCCEEDED(player->_d3dContext->Map(player->_videoTexture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
 		{
-			memcpy(mappedResource.pData, player->frameBuffer, player->videoWidth * player->videoHeight * 4);
-			player->d3dContext->Unmap(player->videoTexture, 0);
-			player->needRender = true;
+			memcpy(mappedResource.pData, player->_frameBuffer, player->_videoWidth * player->_videoHeight * 4);
+			player->_d3dContext->Unmap(player->_videoTexture, 0);
+			player->_needRender = true;
 		}
 		else
 		{

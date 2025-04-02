@@ -29,25 +29,25 @@ namespace TEN::Video
 
 	private:
 		// VLC core components
-		libvlc_instance_t* vlcInstance = nullptr;
-		libvlc_media_player_t* player = nullptr;
+		libvlc_instance_t* _vlcInstance = nullptr;
+		libvlc_media_player_t* _player = nullptr;
 
 		// Video properties
-		int volume = 100;
-		unsigned int videoWidth = MIN_VIDEO_WIDTH;
-		unsigned int videoHeight = MIN_VIDEO_HEIGHT;
-		std::string videoDirectory = {};
-		std::string currentFilename = {};
+		int _volume = 100;
+		unsigned int _videoWidth = MIN_VIDEO_WIDTH;
+		unsigned int _videoHeight = MIN_VIDEO_HEIGHT;
+		std::string _videoDirectory = {};
+		std::string _currentFilename = {};
 
 		// Render synchronization
-		bool needRender = true;
+		bool _needRender = true;
 
 		// D3D Resources
-		unsigned char* frameBuffer = nullptr;
-		ID3D11Device* d3dDevice = nullptr;
-		ID3D11DeviceContext* d3dContext = nullptr;
-		ID3D11Texture2D* videoTexture = nullptr;
-		ID3D11ShaderResourceView* textureView = nullptr;
+		unsigned char* _frameBuffer = nullptr;
+		ID3D11Device* _d3dDevice = nullptr;
+		ID3D11DeviceContext* _d3dContext = nullptr;
+		ID3D11Texture2D* _videoTexture = nullptr;
+		ID3D11ShaderResourceView* _textureView = nullptr;
 
 		// VLC frame callbacks
 		static void* LockFrame(void* data, void** pixels);
