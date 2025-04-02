@@ -15,9 +15,10 @@ namespace TEN::Video
 	class VideoHandler
 	{
 	public:
-		VideoHandler(ID3D11Device* device, ID3D11DeviceContext* context);
+		VideoHandler() = default;
 		~VideoHandler();
 
+		void Initialize(const std::string& gameDir, ID3D11Device* device, ID3D11DeviceContext* context);
 		bool Play(const std::string& filename);
 		void Pause();
 		void Resume();
@@ -35,6 +36,7 @@ namespace TEN::Video
 		int volume = 100;
 		unsigned int videoWidth = MIN_VIDEO_WIDTH;
 		unsigned int videoHeight = MIN_VIDEO_HEIGHT;
+		std::string videoDirectory = {};
 		std::string currentFilename = {};
 
 		// Render synchronization
@@ -59,5 +61,5 @@ namespace TEN::Video
 		void DeInitPlayer();
 	};
 
-	extern VideoHandler* g_VideoPlayer;
+	extern VideoHandler g_VideoPlayer;
 }

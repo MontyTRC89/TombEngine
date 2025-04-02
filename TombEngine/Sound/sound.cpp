@@ -78,7 +78,7 @@ void SetVolumeTracks(int vol)
 void SetVolumeFX(int vol)
 {
 	GlobalFXVolume = vol;
-	g_VideoPlayer->SetVolume(vol);
+	g_VideoPlayer.SetVolume(vol);
 }
 
 bool LoadSample(char* pointer, int compSize, int uncompSize, int index)

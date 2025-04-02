@@ -22,13 +22,14 @@ using namespace TEN::Video;
 
 namespace TEN::Renderer
 {
-	void Renderer::Initialize(int w, int h, bool windowed, HWND handle)
+	void Renderer::Initialize(const std::string& gameDir, int w, int h, bool windowed, HWND handle)
 	{
 		TENLog("Initializing DX11...", LogLevel::Info);
 
 		_screenWidth = w;
 		_screenHeight = h;
 		_isWindowed = windowed;
+
 		InitializeScreen(w, h, handle, false);
 		InitializeCommonTextures();
 
@@ -232,6 +233,9 @@ namespace TEN::Renderer
 		_sortedPolygonsIndices.reserve(MAX_TRANSPARENT_VERTICES);
 		_sortedPolygonsVertexBuffer = VertexBuffer<Vertex>(_device.Get(), MAX_TRANSPARENT_VERTICES, _sortedPolygonsVertices);
 		_sortedPolygonsIndexBuffer = IndexBuffer(_device.Get(), MAX_TRANSPARENT_VERTICES, _sortedPolygonsIndices);
+
+		// Initialize video player.
+		g_VideoPlayer.Initialize(gameDir, _device.Get(), _context.Get());
 	}
 
 	void Renderer::InitializePostProcess()
@@ -567,9 +571,6 @@ namespace TEN::Renderer
 
 		// Initialize shader manager.
 		_shaders.Initialize(_device, _context);
-
-		// Initialize video player.
-		g_VideoPlayer = new VideoHandler(_device.Get(), _context.Get());
 	}
 
 	void Renderer::ToggleFullScreen(bool force)

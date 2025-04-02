@@ -12,7 +12,10 @@ using namespace TEN::Input;
 
 namespace TEN::Video
 {
-	VideoHandler* g_VideoPlayer = nullptr;
+	VideoHandler g_VideoPlayer = {};
+
+	const std::string VIDEO_PATH = "FMV/";
+	const std::vector<std::string> VIDEO_EXTENSIONS = { ".mp4", ".avi", ".mkv", ".mov" };
 
 	void LogCallback(void* userdata, int level, const libvlc_log_t* ctx, const char* fmt, va_list args)
 	{
@@ -43,24 +46,6 @@ namespace TEN::Video
 		TENLog(std::string(logMessage), logLevel);
 	}
 
-	VideoHandler::VideoHandler(ID3D11Device* device, ID3D11DeviceContext* context)
-	{
-		TENLog("Initializing video player...", LogLevel::Info);
-
-		d3dDevice = device;
-		d3dContext = context;
-
-		// Disable video output and title, because we are rendering to D3D texture.
-		const char* args[] = { "--vout=none", "--no-video-title" };
-		vlcInstance = libvlc_new(2, args);
-
-#ifdef _DEBUG
-		// libvlc_log_set(vlcInstance, LogCallback, nullptr);
-#endif
-
-		HandleError();
-	}
-
 	VideoHandler::~VideoHandler()
 	{
 		DeInitPlayer();
@@ -71,18 +56,53 @@ namespace TEN::Video
 		DeInitD3DTexture();
 	}
 
+	void VideoHandler::Initialize(const std::string& gameDir, ID3D11Device* device, ID3D11DeviceContext* context)
+	{
+		TENLog("Initializing video player...", LogLevel::Info);
+
+		// Disable video output and title, because we are rendering to D3D texture.
+		const char* args[] = { "--vout=none", "--no-video-title" };
+		vlcInstance = libvlc_new(2, args);
+
+#ifdef _DEBUG
+		// libvlc_log_set(vlcInstance, LogCallback, nullptr);
+#endif
+
+		HandleError();
+
+		videoDirectory = gameDir + VIDEO_PATH;
+		d3dDevice = device;
+		d3dContext = context;
+	}
+
 	bool VideoHandler::Play(const std::string& filename)
 	{
-		if (!std::filesystem::is_regular_file(filename))
+		auto fullVideoName = videoDirectory + filename;
+
+		// At first, attempt to load video file with full filename.
+		// Then, if not found, try all common video file extensions, and only quit if none are found.
+		if (!std::filesystem::is_regular_file(fullVideoName))
 		{
-			TENLog("Video file not found: " + filename, LogLevel::Warning);
-			return false;
+			for (const auto& ext : VIDEO_EXTENSIONS)
+			{
+				if (std::filesystem::is_regular_file(fullVideoName + ext))
+				{
+					fullVideoName += ext;
+					break;
+				}
+			}
+
+			if (!std::filesystem::is_regular_file(fullVideoName))
+			{
+				TENLog("Video file not found: " + fullVideoName, LogLevel::Warning);
+				return false;
+			}
 		}
 
 		// Delete previous player instance.
 		DeInitPlayer();
 
-		currentFilename = filename;
+		currentFilename = fullVideoName;
 
 		auto* media = libvlc_media_new_path(currentFilename.c_str());
 		if (media == nullptr)
@@ -172,7 +192,7 @@ namespace TEN::Video
 
 		if (!interruptPlayback && state == libvlc_Playing)
 		{
-			if (g_VideoPlayer->Sync())
+			if (g_VideoPlayer.Sync())
 			{
 				unsigned int videoWidth, videoHeight;
 				libvlc_video_get_size(player, 0, &videoWidth, &videoHeight);
@@ -205,6 +225,9 @@ namespace TEN::Video
 
 	bool VideoHandler::HandleError()
 	{
+		if (vlcInstance == nullptr)
+			return false;
+
 		const char* vlcMessage = libvlc_errmsg();
 		if (vlcMessage && strlen(vlcMessage) > 0)
 		{

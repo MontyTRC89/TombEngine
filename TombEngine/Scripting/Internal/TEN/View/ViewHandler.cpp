@@ -115,7 +115,7 @@ namespace TEN::Scripting::View
 
 	static void PlayVideo(std::string fileName)
 	{
-		g_VideoPlayer->Play(fileName);
+		g_VideoPlayer.Play(fileName);
 	}
 
 	static Vec3 GetFlybyPosition(int seqID, float progress, TypeOrNil<bool> loop)
@@ -242,9 +242,9 @@ namespace TEN::Scripting::View
 		//@tparam Color tint value to use.
 		tableView.set_function(ScriptReserved_SetPostProcessTint, &SetPostProcessTint);
 
-		/// Play a video file.
+		/// Play a video file. Should be placed in the `FMV` folder.
 		// @function PlayVideo
-		// @tparam string fileName Video file name.
+		// @tparam string fileName Video file name.  Can be provided without extension, if it's a common video format, like mp4, mov, mkv or avi.
 		tableView.set_function(ScriptReserved_PlayVideo, &PlayVideo);
 
 		/// Play a flyby sequence.

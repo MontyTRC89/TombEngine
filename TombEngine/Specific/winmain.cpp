@@ -357,7 +357,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				TENLog("Resuming game thread", LogLevel::Info);
 				ResumeThread((HANDLE)ThreadHandle);
 				ResumeAllSounds(SoundPauseMode::Global);
-				g_VideoPlayer->Resume();
+				g_VideoPlayer.Resume();
 			}
 
 			return 0;
@@ -373,7 +373,7 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			TENLog("Suspending game thread", LogLevel::Info);
 			SuspendThread((HANDLE)ThreadHandle);
 			PauseAllSounds(SoundPauseMode::Global);
-			g_VideoPlayer->Pause();
+			g_VideoPlayer.Pause();
 		}
 	}
 
@@ -595,7 +595,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
 		// Initialize renderer.
-		g_Renderer.Initialize(g_Configuration.ScreenWidth, g_Configuration.ScreenHeight, g_Configuration.EnableWindowedMode, App.WindowHandle);
+		g_Renderer.Initialize(gameDir, g_Configuration.ScreenWidth, g_Configuration.ScreenHeight, g_Configuration.EnableWindowedMode, App.WindowHandle);
 
 		// Initialize audio.
 		Sound_Init(gameDir);
@@ -654,8 +654,6 @@ void WinClose()
 
 	Sound_DeInit();
 	DeinitializeInput();
-
-	delete g_VideoPlayer;
 	
 	delete g_GameScript;
 	g_GameScript = nullptr;
