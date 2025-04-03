@@ -356,15 +356,16 @@ unsigned CALLBACK GameMain(void *)
 
 	TimeInit();
 
+	// Play intro video.
+	if (!g_GameFlow->IntroVideoPath.empty())
+	{
+		g_VideoPlayer.Play(g_GameFlow->IntroVideoPath);
+		while (g_VideoPlayer.Update());
+	}
+
 	// Do fixed-time title image.
-	if (g_GameFlow->IntroImagePath.empty())
-	{
-		TENLog("Intro image path not set.", LogLevel::Warning);
-	}
-	else
-	{
+	if (!g_GameFlow->IntroImagePath.empty())
 		g_Renderer.RenderTitleImage();
-	}
 
 	// Execute Lua gameflow and play game.
 	g_GameFlow->DoFlow();

@@ -77,25 +77,31 @@ namespace TEN::Video
 
 	bool VideoHandler::Play(const std::string& filename)
 	{
-		auto fullVideoName = _videoDirectory + filename;
-
-		// At first, attempt to load video file with full filename.
+		// At first, attempt to load video file with original filename. Then proceed with asset directory.
 		// Then, if not found, try all common video file extensions, and only quit if none are found.
+
+		auto fullVideoName = filename;
+
 		if (!std::filesystem::is_regular_file(fullVideoName))
 		{
-			for (const auto& ext : VIDEO_EXTENSIONS)
-			{
-				if (std::filesystem::is_regular_file(fullVideoName + ext))
-				{
-					fullVideoName += ext;
-					break;
-				}
-			}
+			fullVideoName = _videoDirectory + filename;
 
 			if (!std::filesystem::is_regular_file(fullVideoName))
 			{
-				TENLog("Video file not found: " + fullVideoName, LogLevel::Warning);
-				return false;
+				for (const auto& ext : VIDEO_EXTENSIONS)
+				{
+					if (std::filesystem::is_regular_file(fullVideoName + ext))
+					{
+						fullVideoName += ext;
+						break;
+					}
+				}
+
+				if (!std::filesystem::is_regular_file(fullVideoName))
+				{
+					TENLog("Video file not found: " + fullVideoName, LogLevel::Warning);
+					return false;
+				}
 			}
 		}
 
@@ -199,6 +205,10 @@ namespace TEN::Video
 
 		bool interruptPlayback = IsHeld(In::Deselect) || IsHeld(In::Look);
 		auto state = libvlc_media_player_get_state(_player);
+
+		// If player is just opening or buffering, always return true and wait for the process to end.
+		if (state == libvlc_Opening || state == libvlc_Buffering)
+			return true;
 
 		if (!interruptPlayback && state == libvlc_Playing)
 		{

@@ -15,6 +15,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### Lua API changes
 * Added `View.PlayVideoFile` function to play videos.
+* Added `Flow.SetIntroVideoPath` function to specify intro video.
 
 ## [Version 1.8.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.8.1) - 2025-03-29
 
