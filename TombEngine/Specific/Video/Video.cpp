@@ -71,6 +71,10 @@ namespace TEN::Video
 		HandleError();
 
 		_videoDirectory = gameDir + VIDEO_PATH;
+		_textureSize = Vector2i::Zero;
+		_videoSize = Vector2i::Zero;
+		_currentFilename = {};
+
 		_d3dDevice = device;
 		_d3dContext = context;
 	}
@@ -108,6 +112,9 @@ namespace TEN::Video
 		// Delete previous player instance.
 		DeInitPlayer();
 
+		// Size can be only fetched when playback was started, so reset it to zero.
+		_textureSize = Vector2i::Zero;
+		_videoSize = Vector2i::Zero;
 		_currentFilename = fullVideoName;
 
 		auto* media = libvlc_media_new_path(_currentFilename.c_str());
@@ -195,24 +202,31 @@ namespace TEN::Video
 		bool interruptPlayback = IsHeld(In::Deselect) || IsHeld(In::Look);
 		auto state = libvlc_media_player_get_state(_player);
 
-		// If player is just opening or buffering, always return true and wait for the process to end.
-		if (state == libvlc_Opening || state == libvlc_Buffering)
+		// If player is just opening, buffering or stopping, always return true and wait for the process to end.
+		if (state == libvlc_Opening || state == libvlc_Buffering || state == libvlc_Stopping)
 			return true;
 
-		if (interruptPlayback || state == libvlc_Stopping || state == libvlc_Error || state == libvlc_Stopped)
+		// If user pressed a key to break out from the video, or player has finished playback or in an error, stop and delete it.
+		if (interruptPlayback || state == libvlc_Error || state == libvlc_Stopped)
 		{
 			Stop();
 			ClearAction(In::Pause); // HACK: Otherwise pause key won't work after video ends.
 			ResumeAllSounds(SoundPauseMode::Global);
 		}
 
+		// Only try to render frame if player is active, and no user interruption occured.
 		if (!interruptPlayback && state == libvlc_Playing)
 		{
 			if (_needRender)
 			{
-				unsigned int videoWidth, videoHeight;
-				libvlc_video_get_size(_player, 0, &videoWidth, &videoHeight);
-				g_Renderer.RenderFullScreenTexture(_textureView, (float)videoWidth / videoHeight);
+				if (_videoSize == Vector2i::Zero)
+				{
+					unsigned int videoWidth, videoHeight;
+					libvlc_video_get_size(_player, 0, &videoWidth, &videoHeight);
+					_videoSize = Vector2i(videoWidth, videoHeight);
+				}
+
+				g_Renderer.RenderFullScreenTexture(_textureView, (float)_videoSize.x / _videoSize.y);
 				_needRender = false;
 			}
 		}
@@ -259,16 +273,16 @@ namespace TEN::Video
 		auto resolution = g_Renderer.GetScreenResolution();
 		
 		// Limit maximum resolution, because some GPUs may not handle textures larger than 2048x2048.
-		_videoWidth = std::clamp(resolution.x, MIN_VIDEO_WIDTH, MAX_VIDEO_WIDTH);
-		_videoHeight = std::clamp(resolution.y, MIN_VIDEO_HEIGHT, MAX_VIDEO_HEIGHT);
+		_textureSize.x = std::clamp(resolution.x, MIN_VIDEO_WIDTH, MAX_VIDEO_WIDTH);
+		_textureSize.y = std::clamp(resolution.y, MIN_VIDEO_HEIGHT, MAX_VIDEO_HEIGHT);
 
-		libvlc_video_set_format(_player, "BGRA", _videoWidth, _videoHeight, _videoWidth * 4);
+		libvlc_video_set_format(_player, "BGRA", _textureSize.x, _textureSize.y, _textureSize.x * 4);
 
-		_frameBuffer.resize(_videoWidth * _videoHeight * 4);
+		_frameBuffer.resize(_textureSize.x * _textureSize.y * 4);
 
 		D3D11_TEXTURE2D_DESC texDesc = {};
-		texDesc.Width = _videoWidth;
-		texDesc.Height = _videoHeight;
+		texDesc.Width = _textureSize.x;
+		texDesc.Height = _textureSize.y;
 		texDesc.MipLevels = 1;
 		texDesc.ArraySize = 1;
 		texDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -344,7 +358,7 @@ namespace TEN::Video
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		if (SUCCEEDED(player->_d3dContext->Map(player->_videoTexture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
 		{
-			memcpy(mappedResource.pData, player->_frameBuffer.data(), player->_videoWidth * player->_videoHeight * 4);
+			memcpy(mappedResource.pData, player->_frameBuffer.data(), player->_textureSize.x * player->_textureSize.y * 4);
 			player->_d3dContext->Unmap(player->_videoTexture, 0);
 			player->_needRender = true;
 		}

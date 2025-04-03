@@ -5,6 +5,8 @@
 #include <d3d11.h>
 #include <string>
 
+using namespace TEN::Math;
+
 namespace TEN::Video
 {
 	constexpr auto MIN_VIDEO_WIDTH  = 800;
@@ -33,8 +35,8 @@ namespace TEN::Video
 
 		// Video properties
 		int _volume = 100;
-		unsigned int _videoWidth = MIN_VIDEO_WIDTH;
-		unsigned int _videoHeight = MIN_VIDEO_HEIGHT;
+		Vector2i _videoSize = Vector2i::Zero;
+		Vector2i _textureSize = Vector2i::Zero;
 		std::string _videoDirectory = {};
 		std::string _currentFilename = {};
 
