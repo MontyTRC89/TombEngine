@@ -263,6 +263,9 @@ namespace TEN::Renderer
 
 			objectID = gunshell->objectNumber;
 
+			if (!_moveableObjects[objectID].has_value())
+				continue;
+
 			auto translation = Matrix::CreateTranslation(gunshell->pos.Position.ToVector3());
 			auto rotMatrix = gunshell->pos.Orientation.ToRotationMatrix();
 			auto worldMatrix = rotMatrix * translation;

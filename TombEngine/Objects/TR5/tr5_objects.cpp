@@ -774,7 +774,6 @@ static void StartObject(ObjectInfo *obj)
 	obj = &Objects[ID_TELEPORTER];
 	if (obj->loaded)
 	{
-		obj->Initialize = InitializeTeleporter;
 		obj->control = ControlTeleporter;
 		obj->drawRoutine = nullptr;
 	}

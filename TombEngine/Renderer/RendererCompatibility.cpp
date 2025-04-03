@@ -68,9 +68,6 @@ namespace TEN::Renderer
 			_animatedTextures[i] = tex;
 		}
 
-		if (_animatedTextures.size() > 0)
-			TENLog("Generated " + std::to_string(_animatedTextures.size()) + " animated textures.", LogLevel::Info);
-
 		std::transform(g_Level.AnimatedTexturesSequences.begin(), g_Level.AnimatedTexturesSequences.end(), std::back_inserter(_animatedTextureSets), [](ANIMATED_TEXTURES_SEQUENCE& sequence) {
 			RendererAnimatedTextureSet set{};
 			set.NumTextures = sequence.numFrames;
