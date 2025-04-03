@@ -23,7 +23,6 @@ namespace TEN::Video
 		bool Pause();
 		bool Resume();
 		void Stop();
-		bool Sync();
 		bool Update();
 		void SetVolume(int volume);
 

@@ -182,17 +182,6 @@ namespace TEN::Video
 		HandleError();
 	}
 
-	bool VideoHandler::Sync()
-	{
-		if (_player == nullptr)
-			return false;
-
-		bool renderResult = _needRender;
-		_needRender = false;
-
-		return renderResult;
-	}
-
 	bool VideoHandler::Update()
 	{
 		if (_player == nullptr)
@@ -210,21 +199,22 @@ namespace TEN::Video
 		if (state == libvlc_Opening || state == libvlc_Buffering)
 			return true;
 
-		if (!interruptPlayback && state == libvlc_Playing)
-		{
-			if (g_VideoPlayer.Sync())
-			{
-				unsigned int videoWidth, videoHeight;
-				libvlc_video_get_size(_player, 0, &videoWidth, &videoHeight);
-				g_Renderer.RenderFullScreenTexture(_textureView, (float)videoWidth / videoHeight);
-			}
-		}
-
 		if (interruptPlayback || state == libvlc_Stopping || state == libvlc_Error || state == libvlc_Stopped)
 		{
 			Stop();
 			ClearAction(In::Pause); // HACK: Otherwise pause key won't work after video ends.
 			ResumeAllSounds(SoundPauseMode::Global);
+		}
+
+		if (!interruptPlayback && state == libvlc_Playing)
+		{
+			if (_needRender)
+			{
+				unsigned int videoWidth, videoHeight;
+				libvlc_video_get_size(_player, 0, &videoWidth, &videoHeight);
+				g_Renderer.RenderFullScreenTexture(_textureView, (float)videoWidth / videoHeight);
+				_needRender = false;
+			}
 		}
 
 		HandleError();
