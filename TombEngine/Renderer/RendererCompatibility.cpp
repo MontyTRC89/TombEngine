@@ -882,25 +882,6 @@ namespace TEN::Renderer
 				}
 
 				_spriteSequences[SpriteSequencesIds[i]] = sequence;
-
-				if (SpriteSequencesIds[i] == ID_CAUSTIC_TEXTURES)
-				{
-					_causticTextures.clear();
-					for (int j = 0; j < sequence.SpritesList.size(); j++)
-					{
-						_causticTextures.push_back(
-							Texture2D(
-								_device.Get(),
-								_context.Get(),
-								sequence.SpritesList[j]->Texture->Texture.Get(),
-								sequence.SpritesList[j]->X,
-								sequence.SpritesList[j]->Y,
-								sequence.SpritesList[j]->Width,
-								sequence.SpritesList[j]->Height
-							)
-						);
-					}
-				}
 			}
 		}
 
