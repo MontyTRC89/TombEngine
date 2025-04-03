@@ -35,7 +35,7 @@ namespace TEN::Video
 #ifdef _DEBUG
 		const char* args[] = { "--vout=none", "--no-video-title"};
 		_vlcInstance = libvlc_new(2, args);
-		libvlc_log_set(_vlcInstance, OnLog, nullptr);
+		//libvlc_log_set(_vlcInstance, OnLog, nullptr);
 #else
 		const char* args[] = { "--vout=none", "--no-video-title", "--quiet" };
 		_vlcInstance = libvlc_new(3, args);
