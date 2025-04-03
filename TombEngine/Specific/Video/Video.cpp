@@ -15,7 +15,7 @@ namespace TEN::Video
 	VideoHandler g_VideoPlayer = {};
 
 	const std::string VIDEO_PATH = "FMV/";
-	const std::vector<std::string> VIDEO_EXTENSIONS = { ".mp4", ".avi", ".mkv", ".mov" };
+	const std::vector<std::string> VIDEO_EXTENSIONS = { ".mp4", ".avi", ".mkv" };
 
 	void LogCallback(void* userdata, int level, const libvlc_log_t* ctx, const char* fmt, va_list args)
 	{
