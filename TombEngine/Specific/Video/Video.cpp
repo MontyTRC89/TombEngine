@@ -17,35 +17,6 @@ namespace TEN::Video
 	const std::string VIDEO_PATH = "FMV/";
 	const std::vector<std::string> VIDEO_EXTENSIONS = { ".mp4", ".avi", ".mkv" };
 
-	void LogCallback(void* userdata, int level, const libvlc_log_t* ctx, const char* fmt, va_list args)
-	{
-		LogLevel logLevel = LogLevel::Info;
-
-		switch (level)
-		{
-		case LIBVLC_ERROR:
-			logLevel = LogLevel::Error;
-			break;
-		case LIBVLC_WARNING:
-			logLevel = LogLevel::Warning;
-			break;
-		case LIBVLC_NOTICE:
-			logLevel = LogLevel::Info;
-			break;
-		case LIBVLC_DEBUG:
-			logLevel = LogLevel::Info;
-			break;
-		default:
-			logLevel = LogLevel::Info;
-			break;
-		}
-
-		char logMessage[1024];
-		vsnprintf(logMessage, sizeof(logMessage), fmt, args);
-
-		TENLog(std::string(logMessage), logLevel);
-	}
-
 	VideoHandler::~VideoHandler()
 	{
 		DeInitPlayer();
@@ -61,11 +32,13 @@ namespace TEN::Video
 		TENLog("Initializing video player...", LogLevel::Info);
 
 		// Disable video output and title, because we are rendering to D3D texture.
-		const char* args[] = { "--vout=none", "--no-video-title" };
-		_vlcInstance = libvlc_new(2, args);
-
 #ifdef _DEBUG
-		// libvlc_log_set(_vlcInstance, LogCallback, nullptr);
+		const char* args[] = { "--vout=none", "--no-video-title"};
+		_vlcInstance = libvlc_new(2, args);
+		libvlc_log_set(_vlcInstance, OnLog, nullptr);
+#else
+		const char* args[] = { "--vout=none", "--no-video-title", "--quiet" };
+		_vlcInstance = libvlc_new(3, args);
 #endif
 
 		HandleError();
@@ -137,7 +110,7 @@ namespace TEN::Video
 		if (!InitD3DTexture())
 			return false;
 
-		libvlc_video_set_callbacks(_player, LockFrame, UnlockFrame, DisplayFrame, this);
+		libvlc_video_set_callbacks(_player, OnLockFrame, OnUnlockFrame, OnDisplayFrame, this);
 		libvlc_media_player_play(_player);
 		SetVolume(_volume);
 
@@ -334,14 +307,14 @@ namespace TEN::Video
 		HandleError();
 	}
 
-	void* VideoHandler::LockFrame(void* data, void** pixels)
+	void* VideoHandler::OnLockFrame(void* data, void** pixels)
 	{
 		VideoHandler* player = static_cast<VideoHandler*>(data);
 		*pixels = player->_frameBuffer.data();
 		return nullptr;
 	}
 
-	void VideoHandler::UnlockFrame(void* data, void* picture, void* const* pixels)
+	void VideoHandler::OnUnlockFrame(void* data, void* picture, void* const* pixels)
 	{
 		VideoHandler* player = static_cast<VideoHandler*>(data);
 
@@ -368,8 +341,37 @@ namespace TEN::Video
 		}
 	}
 
-	void VideoHandler::DisplayFrame(void* data, void* picture)
+	void VideoHandler::OnDisplayFrame(void* data, void* picture)
 	{
 		// Empty event.
+	}
+
+	void VideoHandler::OnLog(void* data, int level, const libvlc_log_t* ctx, const char* fmt, va_list args)
+	{
+		LogLevel logLevel = LogLevel::Info;
+
+		switch (level)
+		{
+		case LIBVLC_ERROR:
+			logLevel = LogLevel::Error;
+			break;
+		case LIBVLC_WARNING:
+			logLevel = LogLevel::Warning;
+			break;
+		case LIBVLC_NOTICE:
+			logLevel = LogLevel::Info;
+			break;
+		case LIBVLC_DEBUG:
+			logLevel = LogLevel::Info;
+			break;
+		default:
+			logLevel = LogLevel::Info;
+			break;
+		}
+
+		char logMessage[1024];
+		vsnprintf(logMessage, sizeof(logMessage), fmt, args);
+
+		TENLog("VLC: " + std::string(logMessage), logLevel);
 	}
 }

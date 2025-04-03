@@ -50,10 +50,11 @@ namespace TEN::Video
 		ID3D11Texture2D* _videoTexture = nullptr;
 		ID3D11ShaderResourceView* _textureView = nullptr;
 
-		// VLC frame callbacks
-		static void* LockFrame(void* data, void** pixels);
-		static void  UnlockFrame(void* data, void* picture, void* const* pixels);
-		static void  DisplayFrame(void* data, void* picture);
+		// VLC callbacks
+		static void* OnLockFrame(void* data, void** pixels);
+		static void  OnUnlockFrame(void* data, void* picture, void* const* pixels);
+		static void  OnDisplayFrame(void* data, void* picture);
+		static void  OnLog(void* data, int level, const libvlc_log_t* ctx, const char* fmt, va_list args);
 
 		// Helpers
 		bool HandleError();
