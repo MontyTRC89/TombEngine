@@ -1150,6 +1150,7 @@ bool StalkBox(ItemInfo* item, ItemInfo* enemy, int boxNumber)
 {
 	if (enemy == nullptr || boxNumber == NO_VALUE)
 		return false;
+
 	auto* box = &g_Level.PathfindingBoxes[boxNumber];
 
 	int xRange = STALK_DIST + ((box->bottom - box->top) * BLOCK(1));
@@ -1635,8 +1636,11 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 	auto* LOT = &creature->LOT;
 
 	auto* enemy = creature->Enemy;
-	if (enemy == nullptr)
-		return;
+
+	// HACK: Fallback to bored mood from attack mood if enemy was cleared.
+	// Replaces previous "fix" with early exit, because it was breaking friendly NPC pathfinding. -- Lwmte, 24.03.25
+	if (enemy == nullptr && creature->Mood == MoodType::Attack)
+		creature->Mood = MoodType::Bored;
 
 	int boxNumber;
 	switch (creature->Mood)
@@ -1645,7 +1649,7 @@ void CreatureMood(ItemInfo* item, AI_INFO* AI, bool isViolent)
 		boxNumber = LOT->Node[GetRandomControl() * LOT->ZoneCount >> 15].boxNumber;
 		if (ValidBox(item, AI->zoneNumber, boxNumber))
 		{
-			if (StalkBox(item, enemy, boxNumber) && enemy->HitPoints > 0 && creature->Enemy)
+			if (StalkBox(item, enemy, boxNumber) && creature->Enemy && enemy->HitPoints > 0)
 			{
 				TargetBox(LOT, boxNumber);
 				creature->Mood = MoodType::Bored;

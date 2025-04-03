@@ -263,6 +263,9 @@ namespace TEN::Renderer
 
 			objectID = gunshell->objectNumber;
 
+			if (!_moveableObjects[objectID].has_value())
+				continue;
+
 			auto translation = Matrix::CreateTranslation(gunshell->pos.Position.ToVector3());
 			auto rotMatrix = gunshell->pos.Orientation.ToRotationMatrix();
 			auto worldMatrix = rotMatrix * translation;
@@ -1759,6 +1762,7 @@ namespace TEN::Renderer
 		PrepareStreamers(view);
 		PrepareLaserBarriers(view);
 		PrepareSingleLaserBeam(view);
+		PrepareFireflies(view);
 
 		// Sprites grouped in buckets for instancing. Non-commutative sprites are collected at a later stage.
 		SortAndPrepareSprites(view);
@@ -2571,6 +2575,12 @@ namespace TEN::Renderer
 								if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
 									continue;
 
+								if (_staticTextures.size() <= bucket.Texture)
+								{
+									TENLog("Attempted to set incorrect static mesh texture atlas", LogLevel::Warning);
+									continue;
+								}
+
 								BindTexture(TextureRegister::ColorMap,
 									&std::get<0>(_staticTextures[bucket.Texture]),
 									SamplerStateRegister::AnisotropicClamp);
@@ -3222,13 +3232,17 @@ namespace TEN::Renderer
 		case RendererPass::GBuffer:
 			if (blendMode != BlendMode::Opaque &&
 				blendMode != BlendMode::AlphaTest &&
-				blendMode != BlendMode::FastAlphaBlend)
+				blendMode != BlendMode::FastAlphaBlend &&
+				// WARNING: For G-Buffer step we consider alpha blend like alpha test
+				// assuming that most of the geometry used in rooms, items and statics 
+				// are fences, foliages, trees... But it could fail with translucent surfaces! 
+				blendMode != BlendMode::AlphaBlend)
 			{
 				return false;
 			}
 
 			if (blendMode == BlendMode::Opaque)
-			{
+			{ 
 				SetBlendMode(BlendMode::Opaque);
 				SetAlphaTest(AlphaTestMode::None, 1.0f);
 			}
