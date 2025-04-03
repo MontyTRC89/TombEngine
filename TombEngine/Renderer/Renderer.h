@@ -340,7 +340,7 @@ namespace TEN::Renderer
 
 		// Special effects
 
-		std::vector<Texture2D> _causticTextures;
+		//std::vector<Texture2D> _causticTextures;
 		RendererMirror* _currentMirror = nullptr;
 
 		// Transparency

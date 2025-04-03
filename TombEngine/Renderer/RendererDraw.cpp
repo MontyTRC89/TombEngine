@@ -2712,12 +2712,19 @@ namespace TEN::Renderer
 			if (rendererPass != RendererPass::GBuffer)
 			{
 				// Bind caustics texture.
-				if (_causticTextures.size() > 0)
+				if (std::find(SpriteSequencesIds.begin(), SpriteSequencesIds.end(), ID_CAUSTIC_TEXTURES) != SpriteSequencesIds.end())
 				{     
 					int nmeshes = -Objects[ID_CAUSTIC_TEXTURES].nmeshes;
 					int meshIndex = Objects[ID_CAUSTIC_TEXTURES].meshIndex;
-					int causticsFrame = GlobalCounter % _causticTextures.size();
-					BindTexture(TextureRegister::CausticsMap, &_causticTextures[causticsFrame], SamplerStateRegister::AnisotropicClamp);
+					int causticsFrame = GlobalCounter % nmeshes;
+					auto causticsSprite = _spriteSequences[ID_CAUSTIC_TEXTURES].SpritesList[causticsFrame];
+
+					BindTexture(TextureRegister::CausticsMap, causticsSprite->Texture, SamplerStateRegister::AnisotropicClamp);
+				
+					_stRoom.CausticsSize = Vector2(
+						(float)causticsSprite->Width / (float)causticsSprite->Texture->Width,
+						(float)causticsSprite->Height / (float)causticsSprite->Texture->Height);
+					_stRoom.CausticsStartUV = causticsSprite->UV[0];
 				} 
 
 				// Set shadow map data and bind shadow map texture.
