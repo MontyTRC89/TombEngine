@@ -264,12 +264,7 @@ namespace TEN::Video
 
 		libvlc_video_set_format(_player, "BGRA", _videoWidth, _videoHeight, _videoWidth * 4);
 
-		_frameBuffer = new unsigned char[_videoWidth * _videoHeight * 4];
-		if (!_frameBuffer)
-		{
-			TENLog("Failed to allocate frame buffer", LogLevel::Error);
-			return false;
-		}
+		_frameBuffer.resize(_videoWidth * _videoHeight * 4);
 
 		D3D11_TEXTURE2D_DESC texDesc = {};
 		texDesc.Width = _videoWidth;
@@ -300,9 +295,6 @@ namespace TEN::Video
 
 	void VideoHandler::DeInitD3DTexture()
 	{
-		if (_frameBuffer)
-			delete[] _frameBuffer;
-
 		if (_videoTexture)
 		{
 			_videoTexture->Release();
@@ -331,7 +323,7 @@ namespace TEN::Video
 	void* VideoHandler::LockFrame(void* data, void** pixels)
 	{
 		VideoHandler* player = static_cast<VideoHandler*>(data);
-		*pixels = player->_frameBuffer;
+		*pixels = player->_frameBuffer.data();
 		return nullptr;
 	}
 
@@ -352,7 +344,7 @@ namespace TEN::Video
 		D3D11_MAPPED_SUBRESOURCE mappedResource;
 		if (SUCCEEDED(player->_d3dContext->Map(player->_videoTexture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
 		{
-			memcpy(mappedResource.pData, player->_frameBuffer, player->_videoWidth * player->_videoHeight * 4);
+			memcpy(mappedResource.pData, player->_frameBuffer.data(), player->_videoWidth * player->_videoHeight * 4);
 			player->_d3dContext->Unmap(player->_videoTexture, 0);
 			player->_needRender = true;
 		}

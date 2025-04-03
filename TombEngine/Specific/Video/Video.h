@@ -43,7 +43,7 @@ namespace TEN::Video
 		bool _needRender = true;
 
 		// D3D Resources
-		unsigned char* _frameBuffer = nullptr;
+		std::vector<char> _frameBuffer = {};
 		ID3D11Device* _d3dDevice = nullptr;
 		ID3D11DeviceContext* _d3dContext = nullptr;
 		ID3D11Texture2D* _videoTexture = nullptr;
