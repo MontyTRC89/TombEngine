@@ -110,7 +110,7 @@ namespace TEN::Video
 		if (!InitD3DTexture())
 			return false;
 
-		libvlc_video_set_callbacks(_player, OnLockFrame, OnUnlockFrame, OnDisplayFrame, this);
+		libvlc_video_set_callbacks(_player, OnLockFrame, OnUnlockFrame, nullptr, this);
 		libvlc_media_player_play(_player);
 		SetVolume(_volume);
 
@@ -339,11 +339,6 @@ namespace TEN::Video
 		{
 			TENLog("Failed to map video texture", LogLevel::Error);
 		}
-	}
-
-	void VideoHandler::OnDisplayFrame(void* data, void* picture)
-	{
-		// Empty event.
 	}
 
 	void VideoHandler::OnLog(void* data, int level, const libvlc_log_t* ctx, const char* fmt, va_list args)

@@ -53,7 +53,6 @@ namespace TEN::Video
 		// VLC callbacks
 		static void* OnLockFrame(void* data, void** pixels);
 		static void  OnUnlockFrame(void* data, void* picture, void* const* pixels);
-		static void  OnDisplayFrame(void* data, void* picture);
 		static void  OnLog(void* data, int level, const libvlc_log_t* ctx, const char* fmt, va_list args);
 
 		// Helpers
