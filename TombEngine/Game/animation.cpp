@@ -689,6 +689,18 @@ void ClampRotation(Pose& outPose, short angle, short rotation)
 
 Vector3i GetJointPosition(const ItemInfo& item, int jointIndex, const Vector3i& relOffset)
 {
+	bool incorrectJoint = false;
+	if (jointIndex < 0 || jointIndex >= Objects[item.ObjectNumber].nmeshes)
+	{
+		TENLog("Unknown joint ID specified for object " + GetObjectName(item.ObjectNumber), LogLevel::Warning, LogConfig::All);
+		incorrectJoint = true;
+	}
+
+	// Always return object's root position if it's invisible, because we can't predict its
+	// joint position otherwise, since it's not animated.
+	if (incorrectJoint || Objects[item.ObjectNumber].drawRoutine == nullptr || item.Status == ITEM_INVISIBLE)
+		return Geometry::TranslatePoint(item.Pose.Position, item.Pose.Orientation, relOffset);
+
 	// Use matrices done in renderer to transform relative offset.
 	return Vector3i(g_Renderer.GetMoveableBonePosition(item.Index, jointIndex, relOffset.ToVector3()));
 }
