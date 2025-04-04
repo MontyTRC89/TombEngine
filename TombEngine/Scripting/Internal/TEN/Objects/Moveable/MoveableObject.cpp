@@ -430,13 +430,13 @@ void Moveable::SetPosition(const Vec3& pos, sol::optional<bool> updateRoom)
 
 /// Get the moveable's joint position with an optional relative offset.
 // @function Moveable:GetJointPosition
-// @tparam int jointID Joint ID.
+// @tparam int jointIndex Index of a joint to get position.
 // @tparam[opt] Vec3 offset Offset relative to the joint.
 // @treturn Vec3 World position.
-Vec3 Moveable::GetJointPos(int jointID, sol::optional<Vec3> offset) const
+Vec3 Moveable::GetJointPos(int jointIndex, sol::optional<Vec3> offset) const
 {
 	auto convertedOffset = offset.has_value() ? offset->ToVector3i() : Vector3i::Zero;
-	return Vec3(GetJointPosition(_moveable, jointID, convertedOffset));
+	return Vec3(GetJointPosition(_moveable, jointIndex, convertedOffset));
 }
 
 /// Get the object's joint rotation
