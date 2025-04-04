@@ -247,7 +247,7 @@ namespace TEN::Entities::Switches
 					lara->Control.HandStatus = HandStatus::Busy;
 					AddActiveItem(itemNumber);
 					switchItem->Status = ITEM_ACTIVE;
-					switchItem->Animation.TargetState = 1;
+					switchItem->Animation.TargetState = SWITCH_ANIMATE;
 
 					ForcedFixedCamera.x = switchItem->Pose.Position.x - BLOCK(1) * phd_sin(switchItem->Pose.Orientation.y + ANGLE(90.0f));
 					ForcedFixedCamera.y = switchItem->Pose.Position.y - BLOCK(1);
