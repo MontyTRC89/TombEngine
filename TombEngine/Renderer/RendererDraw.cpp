@@ -31,6 +31,7 @@
 #include "Renderer/Structures/RendererSortableObject.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
 using namespace TEN::Effects::Hair;
@@ -2712,7 +2713,7 @@ namespace TEN::Renderer
 			if (rendererPass != RendererPass::GBuffer)
 			{
 				// Bind caustics texture.
-				if (std::find(SpriteSequencesIds.begin(), SpriteSequencesIds.end(), ID_CAUSTIC_TEXTURES) != SpriteSequencesIds.end())
+				if (TEN::Utils::Contains(SpriteSequencesIds, (int)ID_CAUSTIC_TEXTURES))
 				{     
 					int nmeshes = -Objects[ID_CAUSTIC_TEXTURES].nmeshes;
 					int meshIndex = Objects[ID_CAUSTIC_TEXTURES].meshIndex;

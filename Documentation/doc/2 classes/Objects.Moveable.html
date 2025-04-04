@@ -172,7 +172,7 @@
  (e.g.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:GetJointPosition">Moveable:GetJointPosition(jointID[, offset])</a></td>
+	<td class="name" ><a href="#Moveable:GetJointPosition">Moveable:GetJointPosition(jointIndex[, offset])</a></td>
 	<td class="summary">Get the moveable's joint position with an optional relative offset.</td>
 	</tr>
 	<tr>
@@ -771,7 +771,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
 </dd>
     <dt>
     <a name = "Moveable:GetJointPosition"></a>
-    <strong>Moveable:GetJointPosition(jointID[, offset])</strong>
+    <strong>Moveable:GetJointPosition(jointIndex[, offset])</strong>
     </dt>
     <dd>
     Get the moveable's joint position with an optional relative offset.
@@ -780,9 +780,9 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">jointID</span>
+        <li><span class="parameter">jointIndex</span>
             <span class="types"><span class="type">int</span></span>
-         Joint ID.
+         Index of a joint to get position.
         </li>
         <li><span class="parameter">offset</span>
             <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>

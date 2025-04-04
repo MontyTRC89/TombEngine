@@ -835,7 +835,7 @@ namespace TEN::Renderer
 			}
 
 			// Light already on a list
-			if (std::find(renderView.LightsToDraw.begin(), renderView.LightsToDraw.end(), light) != renderView.LightsToDraw.end())
+			if (TEN::Utils::Contains(renderView.LightsToDraw, light))
 			{
 				continue;
 			}

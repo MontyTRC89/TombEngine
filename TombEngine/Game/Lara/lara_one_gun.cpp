@@ -32,6 +32,7 @@
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Bubble;
@@ -1594,7 +1595,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 		for (auto* itemPtr : collObjects.Items)
 		{
 			// Object was already affected by collision, skip it.
-			if (std::find(affectedObjects.begin(), affectedObjects.end(), itemPtr->Index) != affectedObjects.end())
+			if (TEN::Utils::Contains(affectedObjects, itemPtr->Index))
 				continue;
 
 			const auto& currentObject = Objects[itemPtr->ObjectNumber];
