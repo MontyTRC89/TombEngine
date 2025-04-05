@@ -19,12 +19,10 @@ namespace TEN::Video
 
 	VideoHandler::~VideoHandler()
 	{
-		DeInitPlayer();
+		Stop();
 
 		if (_vlcInstance)
 			libvlc_release(_vlcInstance);
-
-		DeInitD3DTexture();
 	}
 
 	void VideoHandler::Initialize(const std::string& gameDir, ID3D11Device* device, ID3D11DeviceContext* context)
@@ -33,25 +31,25 @@ namespace TEN::Video
 
 		// Disable video output and title, because we are rendering to D3D texture.
 #ifdef _DEBUG
-		const char* args[] = { "--vout=none", "--no-video-title"};
-		_vlcInstance = libvlc_new(2, args);
+		const char* args[] = { "--vout=none", "--no-video-title", "--no-media-library"};
+		_vlcInstance = libvlc_new(3, args);
 		//libvlc_log_set(_vlcInstance, OnLog, nullptr);
 #else
-		const char* args[] = { "--vout=none", "--no-video-title", "--quiet" };
-		_vlcInstance = libvlc_new(3, args);
+		const char* args[] = { "--vout=none", "--no-video-title", "--no-media-library", "--quiet" };
+		_vlcInstance = libvlc_new(4, args);
 #endif
 
 		HandleError();
 
+		_d3dDevice = device;
+		_d3dContext = context;
+
 		_videoDirectory = gameDir + VIDEO_PATH;
-		_videoSize = _textureSize = Vector2i::Zero;
+		_size = Vector2i::Zero;
 		_fileName = {};
 		_playbackMode = VideoPlaybackMode::Exclusive;
 		_looped = false;
 		_silent = false;
-
-		_d3dDevice = device;
-		_d3dContext = context;
 	}
 
 	bool VideoHandler::Play(const std::string& filename, VideoPlaybackMode mode, bool silent, bool loop)
@@ -86,7 +84,8 @@ namespace TEN::Video
 		// Don't start playback if the same video is already playing.
 		if (_player != nullptr)
 		{
-			if (libvlc_media_player_get_state(_player) == libvlc_Playing && _fileName == fullVideoName)
+			if (libvlc_media_player_get_state(_player) == libvlc_Playing &&
+				_playbackMode == mode && _fileName == fullVideoName)
 			{
 				TENLog("Video file " + fullVideoName + " is already playing.", LogLevel::Warning);
 				return false;
@@ -95,9 +94,6 @@ namespace TEN::Video
 
 		// Stop previous player instance, if it exists.
 		Stop();
-
-		// Size can be only fetched when playback was started, so reset it to zero.
-		_videoSize = _textureSize = Vector2i::Zero;
 
 		_looped = loop;
 		_silent = silent;
@@ -122,7 +118,9 @@ namespace TEN::Video
 		}
 
 		libvlc_video_set_callbacks(_player, OnLockFrame, OnUnlockFrame, nullptr, this);
+		libvlc_video_set_format_callbacks(_player, OnSetup, nullptr);
 		libvlc_media_player_play(_player);
+
 		SetVolume(_volume);
 
 		if (!HandleError())
@@ -205,8 +203,8 @@ namespace TEN::Video
 
 	void VideoHandler::RenderBackground()
 	{
-		_texture.Width = _textureSize.x;
-		_texture.Height = _textureSize.y;
+		_texture.Width = _size.x;
+		_texture.Height = _size.y;
 		_texture.Texture = _videoTexture;
 		_texture.ShaderResourceView = _textureView;
 
@@ -226,7 +224,7 @@ namespace TEN::Video
 		bool interruptPlayback = IsHeld(In::Deselect) || IsHeld(In::Look);
 		auto state = libvlc_media_player_get_state(_player);
 
-		// If player is just opening, buffering or stopping, always return true and wait for the process to end.
+		// If player is just opening, buffering or stopping, always return early and wait for the process to end.
 		if (state == libvlc_Opening || state == libvlc_Buffering)
 			return;
 
@@ -247,8 +245,7 @@ namespace TEN::Video
 
 	void VideoHandler::RenderExclusive()
 	{
-		auto res = g_Renderer.GetScreenResolution();
-		g_Renderer.RenderFullScreenTexture(_textureView, (float)_videoSize.x / (float)_videoSize.y);
+		g_Renderer.RenderFullScreenTexture(_textureView, (float)_size.x / (float)_size.y);
 	}
 
 	bool VideoHandler::Update()
@@ -256,25 +253,18 @@ namespace TEN::Video
 		if (_player == nullptr)
 			return false;
 
-		// Fetch video size only once, when playback is just started.
-		if (libvlc_media_player_get_state(_player) == libvlc_Playing && _videoSize == Vector2i::Zero)
-		{
-			unsigned videoWidth, videoHeight;
-			libvlc_video_get_size(_player, 0, &videoWidth, &videoHeight);
-			_videoSize = Vector2i(videoWidth, videoHeight);
-			InitD3DTexture();
-		}
+		auto state = libvlc_media_player_get_state(_player);
 
 		// Attempt to map and render texture only if callback has set the frame to be rendered.
-		if (_needRender && _videoTexture)
+		if (_needRender)
 		{
 			D3D11_MAPPED_SUBRESOURCE mappedResource;
-			if (SUCCEEDED(_d3dContext->Map(_videoTexture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
+			if (_videoTexture && SUCCEEDED(_d3dContext->Map(_videoTexture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
 			{
 				// Copy framebuffer row by row, otherwise skewing may occur.
 				unsigned char* pData = reinterpret_cast<unsigned char*>(mappedResource.pData);
-				for (int row = 0; row < _textureSize.y; row++)
-					memcpy(pData + row * mappedResource.RowPitch, _frameBuffer.data() + row * _textureSize.x * 4, _textureSize.x * 4);
+				for (int row = 0; row < _size.y; row++)
+					memcpy(pData + row * mappedResource.RowPitch, _frameBuffer.data() + row * _size.x * 4, _size.x * 4);
 				_d3dContext->Unmap(_videoTexture, 0);
 
 				if (_playbackMode == VideoPlaybackMode::Exclusive)
@@ -375,18 +365,12 @@ namespace TEN::Video
 			TENLog("Video texture already exists", LogLevel::Error);
 			return false;
 		}
-		
-		// Limit maximum resolution, because some GPUs may not handle textures larger than 2048x2048.
-		_textureSize.x = std::clamp(_videoSize.x, MIN_VIDEO_WIDTH, MAX_VIDEO_WIDTH);
-		_textureSize.y = std::clamp(_videoSize.y, MIN_VIDEO_HEIGHT, MAX_VIDEO_HEIGHT);
 
-		libvlc_video_set_format(_player, "BGRA", _textureSize.x, _textureSize.y, _textureSize.x * 4);
-
-		_frameBuffer.resize(_textureSize.x * _textureSize.y * 4);
+		_frameBuffer.resize(_size.x * _size.y * 4);
 
 		D3D11_TEXTURE2D_DESC texDesc = {};
-		texDesc.Width = _textureSize.x;
-		texDesc.Height = _textureSize.y;
+		texDesc.Width = _size.x;
+		texDesc.Height = _size.y;
 		texDesc.MipLevels = 1;
 		texDesc.ArraySize = 1;
 		texDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
@@ -426,6 +410,9 @@ namespace TEN::Video
 		}
 
 		_texture = {};
+		_frameBuffer.clear();
+
+		_size = Vector2i::Zero;
 	}
 
 	void VideoHandler::DeInitPlayer()
@@ -435,6 +422,7 @@ namespace TEN::Video
 
 		libvlc_media_player_stop_async(_player);
 		libvlc_media_player_release(_player);
+
 		_player = nullptr;
 		_fileName = {};
 
@@ -444,10 +432,6 @@ namespace TEN::Video
 	void* VideoHandler::OnLockFrame(void* data, void** pixels)
 	{
 		VideoHandler* player = static_cast<VideoHandler*>(data);
-
-		if (player->_videoSize == Vector2i::Zero)
-			return nullptr;
-
 		*pixels = player->_frameBuffer.data();
 		return nullptr;
 	}
@@ -455,11 +439,26 @@ namespace TEN::Video
 	void VideoHandler::OnUnlockFrame(void* data, void* picture, void* const* pixels)
 	{
 		VideoHandler* player = static_cast<VideoHandler*>(data);
-
-		if (player->_videoSize == Vector2i::Zero)
-			return;
-
 		player->_needRender = true;
+	}
+
+	unsigned int VideoHandler::OnSetup(void** data, char* chroma, unsigned* width, unsigned* height, unsigned* pitches, unsigned* lines)
+	{
+		strncpy(chroma, "BGRA", 4);
+
+		*pitches = *width * 4;
+		*lines = *height;
+
+		VideoHandler* player = static_cast<VideoHandler*>(*data);
+
+		// Fetch video size only once, when playback is just started.
+		if (player->_size == Vector2i::Zero)
+		{
+			player->_size = Vector2i(*width, *height);
+			player->InitD3DTexture();
+		}
+
+		return 1;
 	}
 
 	void VideoHandler::OnLog(void* data, int level, const libvlc_log_t* ctx, const char* fmt, va_list args)

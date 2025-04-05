@@ -11,11 +11,6 @@ using namespace TEN::Renderer::Graphics;
 
 namespace TEN::Video
 {
-	constexpr auto MIN_VIDEO_WIDTH  = 800;
-	constexpr auto MIN_VIDEO_HEIGHT = 600;
-	constexpr auto MAX_VIDEO_WIDTH  = 2048;
-	constexpr auto MAX_VIDEO_HEIGHT = 2048;
-
 	enum class VideoPlaybackMode
 	{
 		Exclusive,
@@ -53,8 +48,7 @@ namespace TEN::Video
 		bool _silent = false;
 		bool _looped = false;
 		VideoPlaybackMode _playbackMode = VideoPlaybackMode::Exclusive;
-		Vector2i _videoSize = Vector2i::Zero;
-		Vector2i _textureSize = Vector2i::Zero;
+		Vector2i _size = Vector2i::Zero;
 		std::string _fileName = {};
 		std::string _videoDirectory = {};
 
@@ -73,6 +67,7 @@ namespace TEN::Video
 		static void* OnLockFrame(void* data, void** pixels);
 		static void  OnUnlockFrame(void* data, void* picture, void* const* pixels);
 		static void  OnLog(void* data, int level, const libvlc_log_t* ctx, const char* fmt, va_list args);
+		static unsigned int OnSetup(void** data, char* chroma, unsigned* width, unsigned* height, unsigned* pitches, unsigned* lines);
 
 		// Update
 		void UpdateExclusive();
