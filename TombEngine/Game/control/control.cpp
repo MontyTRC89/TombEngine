@@ -704,6 +704,7 @@ void EndGameLoop(int levelIndex, GameStatus reason)
 	SaveGame::SaveHub(levelIndex);
 	DeInitializeScripting(levelIndex, reason);
 
+	g_VideoPlayer.Stop();
 	StopAllSounds();
 	StopSoundTracks(SOUND_XFADETIME_LEVELJUMP, true);
 	StopRumble();

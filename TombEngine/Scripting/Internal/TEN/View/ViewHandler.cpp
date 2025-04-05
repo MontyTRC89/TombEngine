@@ -113,9 +113,15 @@ namespace TEN::Scripting::View
 		InitializeSpotCam(seqID);
 	}
 
-	static void PlayVideo(std::string fileName)
+	static void PlayVideo(const std::string& fileName, TypeOrNil<bool> background, TypeOrNil<bool> silent, TypeOrNil<bool> loop)
 	{
-		g_VideoPlayer.Play(fileName);
+		auto mode = ValueOr<bool>(background, false) ? VideoPlaybackMode::Background : VideoPlaybackMode::Exclusive;
+		g_VideoPlayer.Play(fileName, mode, ValueOr<bool>(silent, false), ValueOr<bool>(loop, false));
+	}
+
+	static void StopVideo()
+	{
+		g_VideoPlayer.Stop();
 	}
 
 	static Vec3 GetFlybyPosition(int seqID, float progress, TypeOrNil<bool> loop)
@@ -187,8 +193,8 @@ namespace TEN::Scripting::View
 
 		///Move black cinematic bars in from the top and bottom of the game window.
 		//@function SetCineBars
-		//@tparam float height __(default 30)__ Percentage of the screen to be covered
-		//@tparam float speed __(default 30)__ Coverage percent per second
+		//@tparam float height (default 30). Percentage of the screen to be covered
+		//@tparam float speed (default 30). Coverage percent per second
 		tableView.set_function(ScriptReserved_SetCineBars, &SetCineBars);
 
 		///Set field of view.
@@ -244,8 +250,15 @@ namespace TEN::Scripting::View
 
 		/// Play a video file. Should be placed in the `FMV` folder.
 		// @function PlayVideo
-		// @tparam string fileName Video file name.  Can be provided without extension, if it's a common video format, like mp4, mov, mkv or avi.
+		// @tparam string fileName Video file name.  Can be provided without extension, if type is mp4, mkv or avi.
+		// @tparam[opt] bool background (default: false). Play video in the background mode. In such case, video must be shown using @{View.DisplaySprite}.
+		// @tparam[opt] bool silent (default: false). Play video without sound.
+		// @tparam[opt] bool loop (default: false). Play video in a loop.
 		tableView.set_function(ScriptReserved_PlayVideo, &PlayVideo);
+
+		/// Stop the currently playing video. Only possible if video is playing in the background mode.
+		// @function StopVideo
+		tableView.set_function(ScriptReserved_StopVideo, &StopVideo);
 
 		/// Play a flyby sequence.
 		// @function PlayFlyby

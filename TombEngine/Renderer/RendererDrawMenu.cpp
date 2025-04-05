@@ -1089,33 +1089,6 @@ namespace TEN::Renderer
 		SetTextureOrDefault(_loadingScreenTexture, fileName);
 	}
 
-	void Renderer::RenderFullScreenTexture(ID3D11ShaderResourceView* texture, float aspect)
-	{
-		if (texture == nullptr)
-			return;
-
-		// Set basic render states.
-		SetBlendMode(BlendMode::Opaque);
-		SetCullMode(CullMode::CounterClockwise);
-
-		// Clear screen
-		_context->ClearRenderTargetView(_backBuffer.RenderTargetView.Get(), Colors::Black);
-		_context->ClearDepthStencilView(_backBuffer.DepthStencilView.Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
-
-		// Bind back buffer.
-		_context->OMSetRenderTargets(1, _backBuffer.RenderTargetView.GetAddressOf(), _backBuffer.DepthStencilView.Get());
-		_context->RSSetViewports(1, &_viewport);
-		ResetScissor();
-
-		// Draw full screen background.
-		DrawFullScreenQuad(texture, Vector3::One, true, aspect);
-
-		ClearScene();
-
-		_context->ClearState();
-		_swapChain->Present(1, 0);
-	}
-
 	void Renderer::RenderFreezeMode(float interpFactor, bool staticBackground)
 	{
 		if (staticBackground)

@@ -62,6 +62,18 @@ namespace TEN::Renderer
 		_isLocked = true;
 	}
 
+	void Renderer::UpdateVideoTexture(Texture2D* texture)
+	{
+		_videoSprite.X = _videoSprite.Y = 0;
+		_videoSprite.Width = texture->Width;
+		_videoSprite.Height = texture->Height;
+		_videoSprite.UV[0] = Vector2(0,0);
+		_videoSprite.UV[1] = Vector2(1,0);
+		_videoSprite.UV[2] = Vector2(1,1);
+		_videoSprite.UV[3] = Vector2(0,1);
+		_videoSprite.Texture = texture;
+	}
+
 	void Renderer::ReloadShaders(bool recompileAAShaders)
 	{
 		try

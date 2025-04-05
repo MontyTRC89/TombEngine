@@ -231,6 +231,7 @@ namespace TEN::Renderer
 		std::vector<TexturePair>							   _moveablesTextures;
 		std::vector<TexturePair>							   _staticTextures;
 		std::vector<Texture2D>								   _spritesTextures;
+		RendererSprite										   _videoSprite; // Video texture is an unique case
 
 		Matrix _playerWorldMatrix;
 
@@ -634,6 +635,7 @@ namespace TEN::Renderer
 		void RenderLoadingScreen(float percentage);
 		void RenderFreezeMode(float interpFactor, bool staticBackground);
 		void RenderFullScreenTexture(ID3D11ShaderResourceView* texture, float aspect);
+		void UpdateVideoTexture(Texture2D* texture);
 		void UpdateProgress(float value);
 		void ToggleFullScreen(bool force = false);
 		void SetFullScreen();
