@@ -122,8 +122,6 @@ namespace TEN::Video
 		}
 
 		if (!InitD3DTexture())
-			return false;
-
 		libvlc_video_set_callbacks(_player, OnLockFrame, OnUnlockFrame, nullptr, this);
 		libvlc_media_player_play(_player);
 		SetVolume(_volume);
@@ -250,15 +248,8 @@ namespace TEN::Video
 
 	void VideoHandler::RenderExclusive()
 	{
-		// Fetch video size only once, when playback is just started.
-		if (_videoSize == Vector2i::Zero)
-		{
-			unsigned int videoWidth, videoHeight;
-			libvlc_video_get_size(_player, 0, &videoWidth, &videoHeight);
-			_videoSize = Vector2i(videoWidth, videoHeight);
-		}
-
-		g_Renderer.RenderFullScreenTexture(_textureView, (float)_videoSize.x / _videoSize.y);
+		auto res = g_Renderer.GetScreenResolution();
+		g_Renderer.RenderFullScreenTexture(_textureView, (float)_videoSize.x / (float)_videoSize.y);
 	}
 
 	bool VideoHandler::Update()
@@ -266,13 +257,25 @@ namespace TEN::Video
 		if (_player == nullptr)
 			return false;
 
+		// Fetch video size only once, when playback is just started.
+		if (libvlc_media_player_get_state(_player) == libvlc_Playing && _videoSize == Vector2i::Zero)
+		{
+			unsigned videoWidth, videoHeight;
+			libvlc_video_get_size(_player, 0, &videoWidth, &videoHeight);
+			_videoSize = Vector2i(videoWidth, videoHeight);
+			InitD3DTexture();
+		}
+
 		// Attempt to map and render texture only if callback has set the frame to be rendered.
 		if (_needRender && _videoTexture)
 		{
 			D3D11_MAPPED_SUBRESOURCE mappedResource;
 			if (SUCCEEDED(_d3dContext->Map(_videoTexture, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource)))
 			{
-				memcpy(mappedResource.pData, _frameBuffer.data(), _textureSize.x * _textureSize.y * 4);
+				// Copy framebuffer row by row, otherwise skewing may occur.
+				unsigned char* pData = reinterpret_cast<unsigned char*>(mappedResource.pData);
+				for (int row = 0; row < _textureSize.y; row++)
+					memcpy(pData + row * mappedResource.RowPitch, _frameBuffer.data() + row * _textureSize.x * 4, _textureSize.x * 4);
 				_d3dContext->Unmap(_videoTexture, 0);
 
 				if (_playbackMode == VideoPlaybackMode::Exclusive)
@@ -373,12 +376,10 @@ namespace TEN::Video
 			TENLog("Video texture already exists", LogLevel::Error);
 			return false;
 		}
-
-		auto resolution = g_Renderer.GetScreenResolution();
 		
 		// Limit maximum resolution, because some GPUs may not handle textures larger than 2048x2048.
-		_textureSize.x = std::clamp(resolution.x, MIN_VIDEO_WIDTH, MAX_VIDEO_WIDTH);
-		_textureSize.y = std::clamp(resolution.y, MIN_VIDEO_HEIGHT, MAX_VIDEO_HEIGHT);
+		_textureSize.x = std::clamp(_videoSize.x, MIN_VIDEO_WIDTH, MAX_VIDEO_WIDTH);
+		_textureSize.y = std::clamp(_videoSize.y, MIN_VIDEO_HEIGHT, MAX_VIDEO_HEIGHT);
 
 		libvlc_video_set_format(_player, "BGRA", _textureSize.x, _textureSize.y, _textureSize.x * 4);
 
@@ -444,6 +445,10 @@ namespace TEN::Video
 	void* VideoHandler::OnLockFrame(void* data, void** pixels)
 	{
 		VideoHandler* player = static_cast<VideoHandler*>(data);
+
+		if (player->_videoSize == Vector2i::Zero)
+			return nullptr;
+
 		*pixels = player->_frameBuffer.data();
 		return nullptr;
 	}
@@ -451,6 +456,10 @@ namespace TEN::Video
 	void VideoHandler::OnUnlockFrame(void* data, void* picture, void* const* pixels)
 	{
 		VideoHandler* player = static_cast<VideoHandler*>(data);
+
+		if (player->_videoSize == Vector2i::Zero)
+			return;
+
 		player->_needRender = true;
 	}
 
