@@ -121,7 +121,6 @@ namespace TEN::Video
 			return false;
 		}
 
-		if (!InitD3DTexture())
 		libvlc_video_set_callbacks(_player, OnLockFrame, OnUnlockFrame, nullptr, this);
 		libvlc_media_player_play(_player);
 		SetVolume(_volume);
