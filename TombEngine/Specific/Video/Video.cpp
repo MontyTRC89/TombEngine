@@ -46,7 +46,7 @@ namespace TEN::Video
 		_videoDirectory = gameDir + VIDEO_PATH;
 		_textureSize = Vector2i::Zero;
 		_videoSize = Vector2i::Zero;
-		_currentFilename = {};
+		_fileName = {};
 
 		_d3dDevice = device;
 		_d3dContext = context;
@@ -88,12 +88,12 @@ namespace TEN::Video
 		// Size can be only fetched when playback was started, so reset it to zero.
 		_textureSize = Vector2i::Zero;
 		_videoSize = Vector2i::Zero;
-		_currentFilename = fullVideoName;
+		_fileName = fullVideoName;
 
-		auto* media = libvlc_media_new_path(_currentFilename.c_str());
+		auto* media = libvlc_media_new_path(_fileName.c_str());
 		if (media == nullptr)
 		{
-			TENLog("Failed to create media from path: " + _currentFilename, LogLevel::Error);
+			TENLog("Failed to create media from path: " + _fileName, LogLevel::Error);
 			return false;
 		}
 
@@ -116,6 +116,8 @@ namespace TEN::Video
 
 		if (!HandleError())
 			return false;
+
+		TENLog("Playing video file: " + _fileName, LogLevel::Info);
 
 		PauseAllSounds(SoundPauseMode::Global);
 		return true;

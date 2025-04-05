@@ -38,7 +38,7 @@ namespace TEN::Video
 		Vector2i _videoSize = Vector2i::Zero;
 		Vector2i _textureSize = Vector2i::Zero;
 		std::string _videoDirectory = {};
-		std::string _currentFilename = {};
+		std::string _fileName = {};
 
 		// Render synchronization
 		bool _needRender = true;
