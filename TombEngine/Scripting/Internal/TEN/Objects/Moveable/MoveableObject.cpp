@@ -1240,7 +1240,6 @@ bool Moveable::MeshExists(int index) const
 // @tparam int mesh Mesh of a target moveable to use as a camera target.
 void Moveable::AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId)
 {
-	if ((_moveable->Active || _moveable->IsLara()) && (mov._moveable->Active || mov._moveable->IsLara()))
 		ObjCamera(_moveable, camMeshId, mov._moveable, targetMeshId, true);
 }
 
