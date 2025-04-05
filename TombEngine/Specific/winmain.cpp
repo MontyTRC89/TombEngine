@@ -649,6 +649,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 void WinClose()
 {
+	g_VideoPlayer.Stop();
+
 	if (ConsoleThreadHandle)
 		CloseHandle((HANDLE)ConsoleThreadHandle);
 
