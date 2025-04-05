@@ -13,6 +13,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed Teleporter object.
 * Fixed Wraith objects not working correctly in flipped rooms.
 * Fixed caustics not rendered correctly if texture compression was enabled.
+* Fixed exclusion blend mode not working correctly.
 
 ### Lua API changes
 * Added `View.PlayVideoFile` function to play videos.
