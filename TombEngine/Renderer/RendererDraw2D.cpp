@@ -587,7 +587,7 @@ namespace TEN::Renderer
 			// If sprite is a video texture, bypass it if texture is inactive.
 			if (displaySprite.SpriteID == NO_VALUE && _videoSprite.Texture == nullptr)
 			{
-				TENLog("Failed to stream video texture to a sprite. Video is not playing.", LogLevel::Warning);
+				TENLog("Failed to stream video texture. Video is not playing or still loading.", LogLevel::Warning);
 				continue;
 			}
 
