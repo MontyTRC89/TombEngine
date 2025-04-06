@@ -351,6 +351,61 @@ namespace TEN::Video
 		return _fileName;
 	}
 
+	Color VideoHandler::GetDominantColor() const
+	{
+		if (_player == nullptr || _frameBuffer.size() == 0)
+			return Color(0.0f, 0.0f, 0.0f);
+
+		unsigned long long accR = 0, accG = 0, accB = 0;
+
+		int pixelCount = 0;
+		int step = 8;
+
+		for (int y = 0; y < _size.y; y += step) 
+		{
+			for (int x = 0; x < _size.x; x += step) 
+			{
+				int index = (y * (x * 4)) + (x * 4);
+
+				unsigned char b = _frameBuffer[index];
+				unsigned char g = _frameBuffer[index + 1];
+				unsigned char r = _frameBuffer[index + 2];
+
+				accR += r;
+				accG += g;
+				accB += b;
+				pixelCount++;
+			}
+		}
+
+		if (pixelCount == 0)
+			return Color(0.0f, 0.0f, 0.0f);
+
+		unsigned char avgR = (unsigned char)(accR / pixelCount);
+		unsigned char avgG = (unsigned char)(accG / pixelCount);
+		unsigned char avgB = (unsigned char)(accB / pixelCount);
+
+		auto result = Vector3((float)avgR / 255.0f, (float)avgG / 255.0f, (float)avgB / 255.0f);
+
+		float luma = Luma(result);
+		if (luma < 0.3f && luma > 0.0f)
+		{
+			float boostFactor = 0.3f / luma;
+			result *= boostFactor;
+			result.Clamp(Vector3::Zero, Vector3::One);
+		}
+
+		if (luma < 0.5f)
+		{
+			float desaturationFactor = (0.4f - luma) / 0.4f;
+			result.x = result.x * (1.0f - desaturationFactor) + luma * desaturationFactor;
+			result.y = result.y * (1.0f - desaturationFactor) + luma * desaturationFactor;
+			result.z = result.z * (1.0f - desaturationFactor) + luma * desaturationFactor;
+		}
+
+		return Color(result);
+	}
+
 	bool VideoHandler::GetSilent() const
 	{
 		return _silent;

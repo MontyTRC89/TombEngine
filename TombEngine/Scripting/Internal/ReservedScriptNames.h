@@ -358,6 +358,7 @@ static constexpr char ScriptReserved_StopVideo[]					= "StopVideo";
 static constexpr char ScriptReserved_IsVideoPlaying[]				= "IsVideoPlaying";
 static constexpr char ScriptReserved_GetVideoPosition[]				= "GetVideoPosition";
 static constexpr char ScriptReserved_SetVideoPosition[]				= "SetVideoPosition";
+static constexpr char ScriptReserved_GetVideoDominantColor[]		= "GetVideoDominantColor";
 static constexpr char ScriptReserved_PlayFlyby[]					= "PlayFlyby";
 static constexpr char ScriptReserved_GetFlybyPosition[]				= "GetFlybyPosition";
 static constexpr char ScriptReserved_GetFlybyRotation[]				= "GetFlybyRotation";

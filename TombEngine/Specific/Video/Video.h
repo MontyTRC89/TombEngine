@@ -36,6 +36,7 @@ namespace TEN::Video
 		int   GetPosition() const;
 		void  SetPosition(int frameCount);
 		std::string GetFileName() const;
+		Color GetDominantColor() const;
 		bool GetSilent() const;
 		bool GetLooped() const;
 		bool IsPlaying() const;

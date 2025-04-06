@@ -150,6 +150,11 @@ namespace TEN::Scripting::View
 		return;
 	}
 
+	static ScriptColor GetVideoDominantColor()
+	{
+		return g_VideoPlayer.GetDominantColor();
+	}
+
 	static bool IsVideoPlaying(sol::optional<std::string> name)
 	{
 		bool isPlaying = g_VideoPlayer.IsPlaying();
@@ -310,6 +315,11 @@ namespace TEN::Scripting::View
 		// @function SetVideoPosition
 		// @tparam Time position New video position.
 		tableView.set_function(ScriptReserved_SetVideoPosition, &SetVideoPosition);
+
+		/// Gets the dominant color for the current video frame. If no video is playing, returns black.
+		// @function GetVideoDominantColor
+		// @treturn Color Dominant video color.
+		tableView.set_function(ScriptReserved_GetVideoDominantColor, &GetVideoDominantColor);
 
 		/// Checks if video is currently playing.
 		// @function IsVideoPlaying
