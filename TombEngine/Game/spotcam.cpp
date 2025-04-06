@@ -841,12 +841,25 @@ int Spline(int x, int* knots, int nk)
 
 Pose GetCameraTransform(int sequence, float alpha, bool loop)
 {
+	constexpr auto BLEND_RANGE = 0.1f;
+	constexpr auto BLEND_START = BLEND_RANGE;
+	constexpr auto BLEND_END   = 1.0f - BLEND_RANGE;
+
 	alpha = std::clamp(alpha, 0.0f, 1.0f);
+
+	if (sequence < 0 || sequence >= MAX_SPOTCAMS)
+	{
+		TENLog("Wrong flyby sequence number provided for getting camera coordinates.", LogLevel::Warning);
+		return Pose::Zero;
+	}
 
 	// Retrieve camera count in sequence.
 	int cameraCount = CameraCnt[SpotCamRemap[sequence]];
 	if (cameraCount < 2)
-		return Pose::Zero; // Not enough cameras to interpolate.
+	{
+		TENLog("Not enough cameras in flyby sequence to calculate the coordinates.", LogLevel::Warning);
+		return Pose::Zero;
+	}
 
 	// Find first ID for sequence.
 	int firstSeqID = 0;
@@ -887,18 +900,14 @@ Pose GetCameraTransform(int sequence, float alpha, bool loop)
 		return Spline(tAlpha, rolls.data(), splinePoints);
 	};
 
-	Vector3 origin = {};
-	Vector3 target = {};
+	auto origin = Vector3::Zero;
+	auto target = Vector3::Zero;
 	short orientZ = 0;
 
-	constexpr float BLEND_RANGE = 0.1f;
-	constexpr float BLEND_START = BLEND_RANGE;
-	constexpr float BLEND_END   = 1.0f - BLEND_RANGE;
-
-	// If loop is enabled and we are at the start or end of the sequence, blend between the last and first cameras.
+	// If loop is enabled and alpha is at sequence start or end, blend between last and first cameras.
 	if (loop && (alpha < BLEND_START || alpha >= BLEND_END))
 	{
-		float blendFactor = (alpha < BLEND_START) ? 0.5f + (alpha / BLEND_RANGE) * 0.5f : (alpha - BLEND_END) / BLEND_START * 0.5f;
+		float blendFactor = (alpha < BLEND_START) ? (0.5f + ((alpha / BLEND_RANGE) * 0.5f)) : (((alpha - BLEND_END) / BLEND_START) * 0.5f);
 
 		origin = Vector3::Lerp(getInterpolatedPoint(BLEND_END, xOrigins, yOrigins, zOrigins), getInterpolatedPoint(BLEND_START, xOrigins, yOrigins, zOrigins), blendFactor);
 		target = Vector3::Lerp(getInterpolatedPoint(BLEND_END, xTargets, yTargets, zTargets), getInterpolatedPoint(BLEND_START, xTargets, yTargets, zTargets), blendFactor);

@@ -6,11 +6,17 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ## [Version 1.8.2](link to release) - yyyy-MM-DD
 
 ### Bug fixes
+* Fixed crashes when shooting, if gunflash or gunshell objects are not present in a level.
+* Fixed Teleporter object.
+* Fixed Wraith objects not working correctly in flipped rooms.
+* Fixed caustics not rendered correctly if texture compression was enabled.
+* Fixed exclusion blend mode not working correctly.
 * Updated MakeExplosion and EmitBlood to spawn correct effects when used underwater.
 
 ### Lua API changes
-* Added EmitWaterfallMist under Effects.
-* Added EmitSink under Effects.
+* Fixed `Moveable.GetJointPosition` not returning correct results if moveable is invisible or not rendered.
+* Added `EmitWaterfallMist` under Effects.
+* Added `EmitSink` under Effects.
 
 ## [Version 1.8.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.8.1) - 2025-03-29
 

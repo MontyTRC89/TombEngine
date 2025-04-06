@@ -1085,30 +1085,9 @@ namespace TEN::Renderer
 		if (!settings.MuzzleFlash)
 			return false;
 
-		_shaders.Bind(Shader::Statics);
-
-		unsigned int stride = sizeof(Vertex);
-		unsigned int offset = 0;
-
-		_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-		const auto& room = _rooms[LaraItem->RoomNumber];
-		auto* itemPtr = &_items[LaraItem->Index];
-
-		// Divide gunflash tint by 2 because tinting uses multiplication and additive color which doesn't look good with overbright color values.
-		_stStatic.Color = settings.ColorizeMuzzleFlash ? ((Vector4)settings.FlashColor / 2) : Vector4::One;
-		_stStatic.AmbientLight = room.AmbientLight;
-		_stStatic.LightMode = (int)LightMode::Static;
-		BindStaticLights(itemPtr->LightsToDraw);
-
 		short length = 0;
 		short zOffset = 0;
 		short rotationX = 0;
-
-		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
-		SetBlendMode(BlendMode::Additive);
 
 		if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare &&
 			Lara.Control.Weapon.GunType != LaraWeaponType::Crossbow)
@@ -1151,8 +1130,32 @@ namespace TEN::Renderer
 				zOffset += 10;
 			}
 
+			if (!_moveableObjects[gunflash].has_value())
+				return false;
+
 			const auto& flashMoveable = *_moveableObjects[gunflash];
 			const auto& flashMesh = *flashMoveable.ObjectMeshes[0];
+
+			_shaders.Bind(Shader::Statics);
+
+			unsigned int stride = sizeof(Vertex);
+			unsigned int offset = 0;
+
+			_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+			_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+			const auto& room = _rooms[LaraItem->RoomNumber];
+			auto* itemPtr = &_items[LaraItem->Index];
+
+			// Divide gunflash tint by 2 because tinting uses multiplication and additive color which doesn't look good with overbright color values.
+			_stStatic.Color = settings.ColorizeMuzzleFlash ? ((Vector4)settings.FlashColor / 2) : Vector4::One;
+			_stStatic.AmbientLight = room.AmbientLight;
+			_stStatic.LightMode = (int)LightMode::Static;
+			BindStaticLights(itemPtr->LightsToDraw);
+
+			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+			SetBlendMode(BlendMode::Additive);
 
 			for (const auto& flashBucket : flashMesh.Buckets) 
 			{
