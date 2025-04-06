@@ -180,6 +180,18 @@
 	<td class="summary">Stop the currently playing video.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#GetVideoPosition">GetVideoPosition()</a></td>
+	<td class="summary">Gets the currently playing video position.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetVideoPosition">SetVideoPosition(position)</a></td>
+	<td class="summary">Sets the currently playing video position.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#IsVideoPlaying">IsVideoPlaying([name])</a></td>
+	<td class="summary">Checks if video is currently playing.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#PlayFlyby">PlayFlyby(seqID)</a></td>
 	<td class="summary">Play a flyby sequence.</td>
 	</tr>
@@ -488,7 +500,7 @@
     <strong>PlayVideo(fileName[, background][, silent][, loop])</strong>
     </dt>
     <dd>
-    Play a video file.  Should be placed in the <code>FMV</code> folder.
+    Play a video file.  File should be placed in the <code>FMV</code> folder.
 
 
 
@@ -500,7 +512,8 @@
         </li>
         <li><span class="parameter">background</span>
             <span class="types"><span class="type">bool</span></span>
-         (default: false). Play video in the background mode. In such case, video must be shown using <a href="../2 classes/View.DisplaySprite.html#">View.DisplaySprite</a>.
+         (default: false). Play video in the background mode.
+ In such case, video won't play in fullscreen, but must be shown using special animated texture type in Tomb Editor, or using <a href="../2 classes/View.DisplaySprite.html#">View.DisplaySprite</a>.
          (<em>optional</em>)
         </li>
         <li><span class="parameter">silent</span>
@@ -530,6 +543,78 @@
 
 
 
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetVideoPosition"></a>
+    <strong>GetVideoPosition()</strong>
+    </dt>
+    <dd>
+    Gets the currently playing video position.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Time.html#">Time</a></span>
+        Current video position.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetVideoPosition"></a>
+    <strong>SetVideoPosition(position)</strong>
+    </dt>
+    <dd>
+    Sets the currently playing video position.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">position</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Time.html#">Time</a></span>
+         New video position.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "IsVideoPlaying"></a>
+    <strong>IsVideoPlaying([name])</strong>
+    </dt>
+    <dd>
+    Checks if video is currently playing.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         Video file name. If provided, checks if the currently playing video file name is the same as the provided one.
+         (<em>optional</em>)
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        True if video is currently playing.
+    </ol>
 
 
 
