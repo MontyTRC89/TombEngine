@@ -2823,40 +2823,61 @@ namespace TEN::Renderer
 							// Draw geometry.
 							if (animated)
 							{
-								BindTexture(TextureRegister::ColorMap,
-									&std::get<0>(_animatedTextures[bucket.Texture]),
-									SamplerStateRegister::AnisotropicClamp);
-								BindTexture(TextureRegister::NormalMap,
-									&std::get<1>(_animatedTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+								const auto& set  = _animatedTextureSets[bucket.Texture];
+								_stAnimated.Fps  = set.Fps;
 
-								const auto& set = _animatedTextureSets[bucket.Texture];
-								_stAnimated.NumFrames = set.NumTextures;
-								_stAnimated.Type = 0;
-								_stAnimated.Fps = set.Fps;
-
-								for (unsigned char j = 0; j < set.NumTextures; j++)
+								if (set.Type == AnimatedTextureType::Video)
 								{
-									if (j >= _stAnimated.Textures.size())
+									_stAnimated.Type = 0;
+									_stAnimated.NumFrames = 1;
+
+									auto texture = _videoSprite.Texture ? _videoSprite.Texture : &std::get<0>(_animatedTextures[bucket.Texture]);
+									BindTexture(TextureRegister::ColorMap, texture, SamplerStateRegister::AnisotropicClamp);
+									BindTexture(TextureRegister::NormalMap, &std::get<1>(_animatedTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+
+									// Correct texture UVs according to Tomb Editor magic vertex order.
+									std::array<int, 4> indices = { (2 + set.Fps) % 4, (3 + set.Fps) % 4, (0 + set.Fps) % 4, (1 + set.Fps) % 4 };
+									if (set.Flipped)
 									{
-										TENLog("Animated frame " + std::to_string(j) + " out of bounds. Too many frames in sequence.");
-										break;
+										std::swap(indices[1], indices[3]);
+										std::rotate(indices.begin(), indices.begin() + 2, indices.end());
 									}
 
-									_stAnimated.Textures[j].TopLeft = set.Textures[j].UV[0];
-									_stAnimated.Textures[j].TopRight = set.Textures[j].UV[1];
-									_stAnimated.Textures[j].BottomRight = set.Textures[j].UV[2];
-									_stAnimated.Textures[j].BottomLeft = set.Textures[j].UV[3];
+									_stAnimated.Textures[0].TopLeft     = _videoSprite.UV[indices[0]];
+									_stAnimated.Textures[0].TopRight    = _videoSprite.UV[indices[1]];
+									_stAnimated.Textures[0].BottomRight = _videoSprite.UV[indices[2]];
+									_stAnimated.Textures[0].BottomLeft  = _videoSprite.UV[indices[3]];
 								}
+
+								if (set.Type == AnimatedTextureType::Frames)
+								{
+									_stAnimated.Type = (int)set.Type;
+									_stAnimated.NumFrames = set.NumTextures;
+
+									BindTexture(TextureRegister::ColorMap,  &std::get<0>(_animatedTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+									BindTexture(TextureRegister::NormalMap, &std::get<1>(_animatedTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+
+									for (unsigned char j = 0; j < set.NumTextures; j++)
+									{
+										if (j >= _stAnimated.Textures.size())
+										{
+											TENLog("Animated frame " + std::to_string(j) + " out of bounds. Too many frames in sequence.");
+											break;
+										}
+
+										_stAnimated.Textures[j].TopLeft     = set.Textures[j].UV[0];
+										_stAnimated.Textures[j].TopRight    = set.Textures[j].UV[1];
+										_stAnimated.Textures[j].BottomRight = set.Textures[j].UV[2];
+										_stAnimated.Textures[j].BottomLeft  = set.Textures[j].UV[3];
+									}
+								}
+
 								_cbAnimated.UpdateData(_stAnimated, _context.Get());
 							}
 							else
 							{
-								BindTexture(
-									TextureRegister::ColorMap, &std::get<0>(_roomTextures[bucket.Texture]),
-									SamplerStateRegister::AnisotropicClamp);
-								BindTexture(
-									TextureRegister::NormalMap, &std::get<1>(_roomTextures[bucket.Texture]),
-									SamplerStateRegister::AnisotropicClamp);
+								BindTexture(TextureRegister::ColorMap,  &std::get<0>(_roomTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+								BindTexture(TextureRegister::NormalMap, &std::get<1>(_roomTextures[bucket.Texture]),SamplerStateRegister::AnisotropicClamp);
 							}
 
 							DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);

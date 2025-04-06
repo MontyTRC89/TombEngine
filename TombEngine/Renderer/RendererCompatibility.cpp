@@ -68,10 +68,16 @@ namespace TEN::Renderer
 			_animatedTextures[i] = tex;
 		}
 
-		std::transform(g_Level.AnimatedTexturesSequences.begin(), g_Level.AnimatedTexturesSequences.end(), std::back_inserter(_animatedTextureSets), [](ANIMATED_TEXTURES_SEQUENCE& sequence) {
+		std::transform(g_Level.AnimatedTexturesSequences.begin(), g_Level.AnimatedTexturesSequences.end(), std::back_inserter(_animatedTextureSets), [](ANIMATED_TEXTURES_SEQUENCE& sequence)
+		{
 			RendererAnimatedTextureSet set{};
-			set.NumTextures = sequence.numFrames;
-			std::transform(sequence.frames.begin(), sequence.frames.end(), std::back_inserter(set.Textures), [](ANIMATED_TEXTURES_FRAME& frm) {
+
+			set.NumTextures = sequence.NumFrames;
+			set.Type = (AnimatedTextureType)sequence.Type;
+			set.Fps = sequence.Fps;
+
+			std::transform(sequence.Frames.begin(), sequence.Frames.end(), std::back_inserter(set.Textures), [](ANIMATED_TEXTURES_FRAME& frm)
+			{
 				RendererAnimatedTexture tex{};
 				tex.UV[0].x = frm.x1;
 				tex.UV[0].y = frm.y1;
@@ -83,7 +89,29 @@ namespace TEN::Renderer
 				tex.UV[3].y = frm.y4;
 				return tex;
 			});
-			set.Fps = sequence.Fps;
+
+			// Video texture is a special case and requires to translate rotation and mirrored attributes from a placeholder texture.
+			if (set.Type == AnimatedTextureType::Video)
+			{
+				float area = 0.0f;
+				set.Fps = 0;
+
+				// Rotate and flip texture indices according to magic Tomb Editor vertex order.
+				for (int i = 1; i < 4; ++i)
+				{
+					// Determine texture rotation and save it as FPS.
+					if ((set.Textures[0].UV[i].y  < set.Textures[0].UV[set.Fps].y) ||
+						(set.Textures[0].UV[i].y == set.Textures[0].UV[set.Fps].y && set.Textures[0].UV[i].x < set.Textures[0].UV[set.Fps].x))
+						set.Fps = i;
+
+					// Determine texture mirroring.
+					int next = (i + 1) % 4;
+					area += (set.Textures[0].UV[i].x * set.Textures[0].UV[next].y - set.Textures[0].UV[next].x * set.Textures[0].UV[i].y);
+				}
+
+				set.Flipped = ((set.Textures[0].UV[1].x - set.Textures[0].UV[0].x) * (set.Textures[0].UV[2].y - set.Textures[0].UV[0].y) - (set.Textures[0].UV[1].y - set.Textures[0].UV[0].y) * (set.Textures[0].UV[2].x - set.Textures[0].UV[0].x)) <= 0.0f;
+			}
+
 			return set;
 		});
 
