@@ -299,7 +299,7 @@ const std::vector<byte> SaveGame::Build()
 	auto videoNameOffset = fbb.CreateString(g_VideoPlayer.GetFileName());
 	Save::VideoInfoBuilder sgVideoInfoBuilder{ fbb };
 	sgVideoInfoBuilder.add_name(videoNameOffset);
-	sgVideoInfoBuilder.add_position(g_VideoPlayer.GetPosition());
+	sgVideoInfoBuilder.add_position(g_VideoPlayer.GetNormalizedPosition());
 	sgVideoInfoBuilder.add_silent(g_VideoPlayer.GetSilent());
 	sgVideoInfoBuilder.add_looped(g_VideoPlayer.GetLooped());
 	auto videoInfoOffset = sgVideoInfoBuilder.Finish();
@@ -962,7 +962,7 @@ const std::vector<byte> SaveGame::Build()
 		fireflySave.add_b(firefly.b);
 		fireflySave.add_on(firefly.on);
 		fireflySave.add_size(firefly.size);
-		fireflySave.add_rot_Ang(firefly.rotAng);
+		fireflySave.add_rot_ang(firefly.rotAng);
 
 		auto fireflySaveOffset = fireflySave.Finish();
 		fireflySwarm.push_back(fireflySaveOffset);
@@ -2318,7 +2318,7 @@ static void ParseEffects(const Save::SaveGame* s)
 	if (!videoName.empty())
 	{
 		g_VideoPlayer.Play(videoName, VideoPlaybackMode::Background, s->video()->silent(), s->video()->looped());
-		g_VideoPlayer.SetPosition(s->video()->position());
+		g_VideoPlayer.SetNormalizedPosition(s->video()->position());
 	}
 
 	// Load fish swarm.
@@ -2370,7 +2370,7 @@ static void ParseEffects(const Save::SaveGame* s)
 		firefly.b = fireflySave->b();
 		firefly.on = fireflySave->on();
 		firefly.size = fireflySave->size();
-		firefly.rotAng = fireflySave->rot_Ang();
+		firefly.rotAng = fireflySave->rot_ang();
 
 		FireflySwarm.push_back(firefly);
 	}

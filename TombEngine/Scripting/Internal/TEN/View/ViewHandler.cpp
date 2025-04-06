@@ -135,10 +135,10 @@ namespace TEN::Scripting::View
 			return 0;
 		}
 
-		return g_VideoPlayer.GetPositionInFrames();
+		return g_VideoPlayer.GetPosition();
 	}
 
-	static void SetVideoPosition(Time position)
+	static void SetVideoPosition(Time frameCount)
 	{
 		if (!g_VideoPlayer.IsPlaying())
 		{
@@ -146,7 +146,7 @@ namespace TEN::Scripting::View
 			return;
 		}
 
-		g_VideoPlayer.SetPositionInFrames(position);
+		g_VideoPlayer.SetPosition(frameCount);
 		return;
 	}
 

@@ -528,7 +528,7 @@ table FireflyData {
 	b: int32;
 	on: bool;
 	size: float;
-	rot_Ang: int32;
+	rot_ang: int32;
 }
 
 struct KeyValPair {

@@ -288,7 +288,7 @@ namespace TEN::Video
 		return (_playbackMode == VideoPlaybackMode::Exclusive);
 	}
 
-	float VideoHandler::GetPosition() const
+	float VideoHandler::GetNormalizedPosition() const
 	{
 		if (_player == nullptr)
 			return 0.0f;
@@ -296,21 +296,21 @@ namespace TEN::Video
 		return (float)libvlc_media_player_get_position(_player);
 	}
 
-	int VideoHandler::GetPositionInFrames() const
+	int VideoHandler::GetPosition() const
 	{
 		if (_player == nullptr)
 			return 0;
 
 		libvlc_media_t* media = libvlc_media_player_get_media(_player);
 		long long duration = libvlc_media_get_duration(media);
-		float position_percentage = GetPosition();
+		float posNormalized = GetNormalizedPosition();
 
 		// Convert and return percentage in frames.
-		long long position_in_ms = position_percentage * duration;
-		return (int)((position_in_ms / 1000.0f) * FPS);
+		long long posMsec = posNormalized * duration;
+		return (int)((posMsec / 1000.0f) * FPS);
 	}
 
-	void VideoHandler::SetPosition(float position)
+	void VideoHandler::SetNormalizedPosition(float position)
 	{
 		if (_player == nullptr)
 			return;
@@ -319,7 +319,7 @@ namespace TEN::Video
 		HandleError();
 	}
 
-	void VideoHandler::SetPositionInFrames(int position)
+	void VideoHandler::SetPosition(int frameCount)
 	{
 		if (_player == nullptr)
 			return;
@@ -328,17 +328,17 @@ namespace TEN::Video
 		long long duration = libvlc_media_get_duration(media);
 
 		// Convert frames to time in milliseconds (assuming 30 FPS).
-		float position_in_ms = (position / FPS) * 1000.0f;
-		float position_percentage = position_in_ms / (float)(duration);
+		float posMsec = (frameCount / FPS) * 1000.0f;
+		float posNormalized = posMsec / (float)(duration);
 
-		if (position_percentage > 1.0f)
+		if (posNormalized > 1.0f)
 		{
 			TENLog("Video position is out of bounds.", LogLevel::Warning);
 			return;
 		}
 
 		// Set position in percentage.
-		SetPosition(position_percentage);
+		SetNormalizedPosition(posNormalized);
 		HandleError();
 	}
 

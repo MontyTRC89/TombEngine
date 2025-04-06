@@ -31,10 +31,10 @@ namespace TEN::Video
 		bool Update();
 		void SetVolume(int volume);
 
-		float GetPosition() const;
-		int   GetPositionInFrames() const;
-		void  SetPosition(float position);
-		void  SetPositionInFrames(int position);
+		float GetNormalizedPosition() const;
+		void  SetNormalizedPosition(float position);
+		int   GetPosition() const;
+		void  SetPosition(int frameCount);
 		std::string GetFileName() const;
 		bool GetSilent() const;
 		bool GetLooped() const;

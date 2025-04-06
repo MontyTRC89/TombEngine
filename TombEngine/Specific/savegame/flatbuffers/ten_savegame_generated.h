@@ -6999,7 +6999,7 @@ struct FireflyDataT : public flatbuffers::NativeTable {
   int32_t b = 0;
   bool on = false;
   float size = 0.0f;
-  int32_t rot_Ang = 0;
+  int32_t rot_ang = 0;
 };
 
 struct FireflyData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
@@ -7093,7 +7093,7 @@ struct FireflyData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   float size() const {
     return GetField<float>(VT_SIZE, 0.0f);
   }
-  int32_t rot_Ang() const {
+  int32_t rot_ang() const {
     return GetField<int32_t>(VT_ROT_ANG, 0);
   }
   bool Verify(flatbuffers::Verifier &verifier) const {
@@ -7194,8 +7194,8 @@ struct FireflyDataBuilder {
   void add_size(float size) {
     fbb_.AddElement<float>(FireflyData::VT_SIZE, size, 0.0f);
   }
-  void add_rot_Ang(int32_t rot_Ang) {
-    fbb_.AddElement<int32_t>(FireflyData::VT_ROT_ANG, rot_Ang, 0);
+  void add_rot_ang(int32_t rot_ang) {
+    fbb_.AddElement<int32_t>(FireflyData::VT_ROT_ANG, rot_ang, 0);
   }
   explicit FireflyDataBuilder(flatbuffers::FlatBufferBuilder &_fbb)
         : fbb_(_fbb) {
@@ -7231,9 +7231,9 @@ inline flatbuffers::Offset<FireflyData> CreateFireflyData(
     int32_t b = 0,
     bool on = false,
     float size = 0.0f,
-    int32_t rot_Ang = 0) {
+    int32_t rot_ang = 0) {
   FireflyDataBuilder builder_(_fbb);
-  builder_.add_rot_Ang(rot_Ang);
+  builder_.add_rot_ang(rot_ang);
   builder_.add_size(size);
   builder_.add_b(b);
   builder_.add_g(g);
@@ -11388,7 +11388,7 @@ inline void FireflyData::UnPackTo(FireflyDataT *_o, const flatbuffers::resolver_
   { auto _e = b(); _o->b = _e; }
   { auto _e = on(); _o->on = _e; }
   { auto _e = size(); _o->size = _e; }
-  { auto _e = rot_Ang(); _o->rot_Ang = _e; }
+  { auto _e = rot_ang(); _o->rot_ang = _e; }
 }
 
 inline flatbuffers::Offset<FireflyData> FireflyData::Pack(flatbuffers::FlatBufferBuilder &_fbb, const FireflyDataT* _o, const flatbuffers::rehasher_function_t *_rehasher) {
@@ -11420,7 +11420,7 @@ inline flatbuffers::Offset<FireflyData> CreateFireflyData(flatbuffers::FlatBuffe
   auto _b = _o->b;
   auto _on = _o->on;
   auto _size = _o->size;
-  auto _rot_Ang = _o->rot_Ang;
+  auto _rot_ang = _o->rot_ang;
   return TEN::Save::CreateFireflyData(
       _fbb,
       _sprite_index,
@@ -11444,7 +11444,7 @@ inline flatbuffers::Offset<FireflyData> CreateFireflyData(flatbuffers::FlatBuffe
       _b,
       _on,
       _size,
-      _rot_Ang);
+      _rot_ang);
 }
 
 inline ScriptTableT *ScriptTable::UnPack(const flatbuffers::resolver_function_t *_resolver) const {
