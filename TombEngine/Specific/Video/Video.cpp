@@ -126,7 +126,8 @@ namespace TEN::Video
 		if (!HandleError())
 			return false;
 
-		TENLog("Playing video file: " + _fileName + " (" + (mode == VideoPlaybackMode::Exclusive ? "Exclusive" : "Background") + " mode)", LogLevel::Info);
+		auto filePath = std::filesystem::path(_fileName);
+		TENLog("Playing video file: " + filePath.filename().string() + " (" + (mode == VideoPlaybackMode::Exclusive ? "Exclusive" : "Background") + " mode)", LogLevel::Info);
 
 		if (_playbackMode == VideoPlaybackMode::Exclusive)
 			PauseAllSounds(SoundPauseMode::Global);
