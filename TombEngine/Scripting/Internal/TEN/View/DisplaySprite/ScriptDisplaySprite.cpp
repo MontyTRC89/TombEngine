@@ -85,7 +85,7 @@ namespace TEN::Scripting::DisplaySprite
 	ScriptDisplaySprite::ScriptDisplaySprite(const Vec2& pos, float rot, const Vec2& scale, const ScriptColor& color)
 	{
 		_objectID = GAME_OBJECT_ID::ID_DEFAULT_SPRITES;
-		_spriteID = NO_VALUE;
+		_spriteID = VIDEO_SPRITE_ID;
 		_position = pos;
 		_rotation = rot;
 		_scale = scale;
@@ -213,7 +213,7 @@ namespace TEN::Scripting::DisplaySprite
 		constexpr auto DEFAULT_BLEND_MODE = BlendMode::AlphaBlend;
 
 		// Object is not a sprite sequence; return early.
-		if (_spriteID != NO_VALUE && (_objectID < GAME_OBJECT_ID::ID_HORIZON || _objectID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS))
+		if (_spriteID != VIDEO_SPRITE_ID && (_objectID < GAME_OBJECT_ID::ID_HORIZON || _objectID >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS))
 		{
 			TENLog("Attempted to draw display sprite from non-sprite sequence object " + std::to_string(_objectID), LogLevel::Warning);
 			return;

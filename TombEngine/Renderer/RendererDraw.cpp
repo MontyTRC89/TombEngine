@@ -2825,6 +2825,7 @@ namespace TEN::Renderer
 							{
 								const auto& set  = _animatedTextureSets[bucket.Texture];
 
+								// Stream video texture, if video playback is active, otherwise show original texture.
 								if (set.Type == AnimatedTextureType::Video && _videoSprite.Texture && _videoSprite.Texture->Texture)
 								{
 									_stAnimated.Type = 0; // Dummy type, should be set to 0 to avoid incorrect UV mapping.
@@ -2834,6 +2835,7 @@ namespace TEN::Renderer
 									BindTexture(TextureRegister::ColorMap, _videoSprite.Texture, SamplerStateRegister::AnisotropicClamp);
 									BindTexture(TextureRegister::NormalMap, &std::get<1>(_animatedTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
+									// Use normalized UVs, because we are showing the whole video texture on a single face.
 									_stAnimated.Textures[0].TopLeft     = set.Textures[0].NormalizedUV[0];
 									_stAnimated.Textures[0].TopRight    = set.Textures[0].NormalizedUV[1];
 									_stAnimated.Textures[0].BottomRight = set.Textures[0].NormalizedUV[2];

@@ -585,10 +585,10 @@ namespace TEN::Renderer
 		for (const auto& displaySprite : DisplaySprites)
 		{
 			// If sprite is a video texture, bypass it if texture is inactive.
-			if (displaySprite.SpriteID == NO_VALUE && _videoSprite.Texture == nullptr)
+			if (displaySprite.SpriteID == VIDEO_SPRITE_ID && (_videoSprite.Texture == nullptr || _videoSprite.Texture->Texture == nullptr))
 				continue;
 
-			const auto& sprite = displaySprite.SpriteID == NO_VALUE ? _videoSprite : _sprites[Objects[displaySprite.ObjectID].meshIndex + displaySprite.SpriteID];
+			const auto& sprite = displaySprite.SpriteID == VIDEO_SPRITE_ID ? _videoSprite : _sprites[Objects[displaySprite.ObjectID].meshIndex + displaySprite.SpriteID];
 
 			// Calculate sprite aspect ratio.
 			float spriteAspect = (float)sprite.Width / (float)sprite.Height;
