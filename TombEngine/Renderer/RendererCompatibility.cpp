@@ -79,6 +79,7 @@ namespace TEN::Renderer
 			std::transform(sequence.Frames.begin(), sequence.Frames.end(), std::back_inserter(set.Textures), [](ANIMATED_TEXTURES_FRAME& frm)
 			{
 				RendererAnimatedTexture tex{};
+
 				tex.UV[0].x = frm.x1;
 				tex.UV[0].y = frm.y1;
 				tex.UV[1].x = frm.x2;
@@ -87,30 +88,20 @@ namespace TEN::Renderer
 				tex.UV[2].y = frm.y3;
 				tex.UV[3].x = frm.x4;
 				tex.UV[3].y = frm.y4;
-				return tex;
-			});
 
-			// Video texture is a special case and requires to translate rotation and mirrored attributes from a placeholder texture.
-			if (set.Type == AnimatedTextureType::Video)
-			{
-				float area = 0.0f;
-				set.Fps = 0;
+				float UMin = std::min({ tex.UV[0].x, tex.UV[1].x, tex.UV[2].x, tex.UV[3].x });
+				float VMin = std::min({ tex.UV[0].y, tex.UV[1].y, tex.UV[2].y, tex.UV[3].y });
+				float UMax = std::max({ tex.UV[0].x, tex.UV[1].x, tex.UV[2].x, tex.UV[3].x });
+				float VMax = std::max({ tex.UV[0].y, tex.UV[1].y, tex.UV[2].y, tex.UV[3].y });
 
-				// Rotate and flip texture indices according to magic Tomb Editor vertex order.
-				for (int i = 1; i < 4; ++i)
+				for (int i = 0; i < 4; ++i)
 				{
-					// Determine texture rotation and save it as FPS.
-					if ((set.Textures[0].UV[i].y  < set.Textures[0].UV[set.Fps].y) ||
-						(set.Textures[0].UV[i].y == set.Textures[0].UV[set.Fps].y && set.Textures[0].UV[i].x < set.Textures[0].UV[set.Fps].x))
-						set.Fps = i;
-
-					// Determine texture mirroring.
-					int next = (i + 1) % 4;
-					area += (set.Textures[0].UV[i].x * set.Textures[0].UV[next].y - set.Textures[0].UV[next].x * set.Textures[0].UV[i].y);
+					tex.NormalizedUV[i].x = (tex.UV[i].x - UMin) / (UMax - UMin);
+					tex.NormalizedUV[i].y = (tex.UV[i].y - VMin) / (VMax - VMin);
 				}
 
-				set.Flipped = ((set.Textures[0].UV[1].x - set.Textures[0].UV[0].x) * (set.Textures[0].UV[2].y - set.Textures[0].UV[0].y) - (set.Textures[0].UV[1].y - set.Textures[0].UV[0].y) * (set.Textures[0].UV[2].x - set.Textures[0].UV[0].x)) <= 0.0f;
-			}
+				return tex;
+			});
 
 			return set;
 		});

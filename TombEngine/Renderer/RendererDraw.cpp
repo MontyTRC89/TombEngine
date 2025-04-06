@@ -2824,34 +2824,25 @@ namespace TEN::Renderer
 							if (animated)
 							{
 								const auto& set  = _animatedTextureSets[bucket.Texture];
-								_stAnimated.Fps  = set.Fps;
 
-								if (set.Type == AnimatedTextureType::Video)
+								if (set.Type == AnimatedTextureType::Video && _videoSprite.Texture && _videoSprite.Texture->Texture)
 								{
-									_stAnimated.Type = 0;
+									_stAnimated.Type = 0; // Dummy type, should be set to 0 to avoid incorrect UV mapping.
+									_stAnimated.Fps  = 1;
 									_stAnimated.NumFrames = 1;
 
-									auto texture = _videoSprite.Texture ? _videoSprite.Texture : &std::get<0>(_animatedTextures[bucket.Texture]);
-									BindTexture(TextureRegister::ColorMap, texture, SamplerStateRegister::AnisotropicClamp);
+									BindTexture(TextureRegister::ColorMap, _videoSprite.Texture, SamplerStateRegister::AnisotropicClamp);
 									BindTexture(TextureRegister::NormalMap, &std::get<1>(_animatedTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
-									// Correct texture UVs according to Tomb Editor magic vertex order.
-									std::array<int, 4> indices = { (2 + set.Fps) % 4, (3 + set.Fps) % 4, (0 + set.Fps) % 4, (1 + set.Fps) % 4 };
-									if (set.Flipped)
-									{
-										std::swap(indices[1], indices[3]);
-										std::rotate(indices.begin(), indices.begin() + 2, indices.end());
-									}
-
-									_stAnimated.Textures[0].TopLeft     = _videoSprite.UV[indices[0]];
-									_stAnimated.Textures[0].TopRight    = _videoSprite.UV[indices[1]];
-									_stAnimated.Textures[0].BottomRight = _videoSprite.UV[indices[2]];
-									_stAnimated.Textures[0].BottomLeft  = _videoSprite.UV[indices[3]];
+									_stAnimated.Textures[0].TopLeft     = set.Textures[0].NormalizedUV[0];
+									_stAnimated.Textures[0].TopRight    = set.Textures[0].NormalizedUV[1];
+									_stAnimated.Textures[0].BottomRight = set.Textures[0].NormalizedUV[2];
+									_stAnimated.Textures[0].BottomLeft  = set.Textures[0].NormalizedUV[3];
 								}
-
-								if (set.Type == AnimatedTextureType::Frames)
+								else
 								{
 									_stAnimated.Type = (int)set.Type;
+									_stAnimated.Fps  = set.Fps;
 									_stAnimated.NumFrames = set.NumTextures;
 
 									BindTexture(TextureRegister::ColorMap,  &std::get<0>(_animatedTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);

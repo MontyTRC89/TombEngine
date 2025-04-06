@@ -18,7 +18,6 @@ namespace TEN::Renderer::Structures
 		AnimatedTextureType Type = AnimatedTextureType::Frames;
 		int NumTextures = 0;
 		int Fps = 0;
-		bool Flipped = false; // Used for video texture.
 		std::vector<RendererAnimatedTexture> Textures;
 	};
 }
