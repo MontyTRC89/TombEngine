@@ -13,9 +13,9 @@ Util.CheckTimeFormat = function (timerFormat, errorText)
         local validKeys = {hours = true, minutes = true, seconds = true, deciseconds = true}
         for k, v in pairs(timerFormat) do
         	if not validKeys[k] or type(v) ~= "boolean" then
-                if errorText then
-                    TEN.Util.PrintLog(errorText, TEN.Util.LogLevel.WARNING)
-                end
+				if errorText then
+					TEN.Util.PrintLog(errorText, TEN.Util.LogLevel.WARNING)
+				end
 				return false
 			end
         end
