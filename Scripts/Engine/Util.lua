@@ -35,9 +35,9 @@ Util.GenerateTimeFormattedString = function (time, timerFormat, errorFormat)
     timerFormat = Util.CheckTimeFormat(timerFormat)
 
 	if not timerFormat then
-        if errorFormat then
-            TEN.Util.PrintLog(errorFormat, TEN.Util.LogLevel.ERROR)
-        end
+		if errorFormat then
+			TEN.Util.PrintLog(errorFormat, TEN.Util.LogLevel.ERROR)
+		end
 		return "Error"
 	else
 		local result = {}
