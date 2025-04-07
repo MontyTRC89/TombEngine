@@ -573,6 +573,16 @@ function Timer:SetPosition(x,y)
 	end
 end
 
+--- Get the on-screen position in percent of the displayed timer when active.
+-- @treturn Vec2 The position of the timer in percent
+-- @usage
+--  -- Example:
+--  local pos = Timer.Get("my_timer"):GetPosition()
+function Timer:GetPosition()
+	local pos = LevelVars.Engine.Timer.timers[self.name].pos
+	return TEN.Vec2( TEN.Util.ScreenToPercent(pos.x, pos.y) )
+end
+
 --- Set the scale of the displayed timer when it is active.
 --
 -- __Default value__: 1.0
@@ -586,6 +596,15 @@ function Timer:SetScale(scale)
 	else
 		LevelVars.Engine.Timer.timers[self.name].scale = scale
 	end
+end
+
+--- Get the scale of the displayed timer when it is active.
+-- @treturn float The scale of the timer
+-- @usage
+--  -- Example:
+--  local scale = Timer.Get("my_timer"):GetScale()
+function Timer:GetScale()
+	return LevelVars.Engine.Timer.timers[self.name].scale
 end
 
 --- Set the paused color of the displayed timer when it is active.
