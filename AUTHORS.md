@@ -49,5 +49,4 @@ This is the credit list of **all** the people who contributed to TombEngine in a
 - JoeyQuint (Standing 180° turn, monkey swing 180° turn)
 
 ### TombEngine Marketing 
-- Kubsy (Twitter and forum posts)
-- Stranger1992 (This website, Facebook, Instagram, Youtube and Twitch.
+- Stranger1992 (This website, Facebook, Instagram, Youtube, Twitter, and Twitch.

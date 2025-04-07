@@ -111,18 +111,18 @@ namespace TEN::Scripting::View
 		InitializeSpotCam(seqID);
 	}
 
-	static Vec3 GetFlybyPosition(int seqID, float progress)
+	static Vec3 GetFlybyPosition(int seqID, float progress, TypeOrNil<bool> loop)
 	{
 		constexpr auto PROGRESS_MAX = 100.0f;
 
-		return Vec3(GetCameraTransform(seqID, progress / PROGRESS_MAX).Position);
+		return Vec3(GetCameraTransform(seqID, progress / PROGRESS_MAX, ValueOr<bool>(loop, false)).Position);
 	}
 
-	static Rotation GetFlybyRotation(int seqID, float progress)
+	static Rotation GetFlybyRotation(int seqID, float progress, TypeOrNil<bool> loop)
 	{
 		constexpr auto PROGRESS_MAX = 100.0f;
 
-		return Rotation(GetCameraTransform(seqID, progress / PROGRESS_MAX).Orientation);
+		return Rotation(GetCameraTransform(seqID, progress / PROGRESS_MAX, ValueOr<bool>(loop, false)).Orientation);
 	}
 
 	static void FlashScreen(TypeOrNil<ScriptColor> col, TypeOrNil<float> speed)
@@ -244,6 +244,7 @@ namespace TEN::Scripting::View
 		// @function GetFlybyPosition
 		// @tparam int seqID Flyby sequence ID.
 		// @tparam float progress Progress point in percent. Clamped to [0, 100].
+		// @tparam[opt] bool loop Smooth the position near start and end points, as if the sequence is looped.
 		// @treturn Vec3 Position at the given progress point.
 		tableView.set_function(ScriptReserved_GetFlybyPosition, &GetFlybyPosition);
 
@@ -251,6 +252,7 @@ namespace TEN::Scripting::View
 		// @function GetFlybyRotation
 		// @tparam int seqID Flyby sequence ID.
 		// @tparam float progress Progress point in percent. Clamped to [0, 100].
+		// @tparam[opt] bool loop Smooth the position near start and end points, as if the sequence is looped.
 		// @treturn Rotation Rotation at the given progress point.
 		tableView.set_function(ScriptReserved_GetFlybyRotation, &GetFlybyRotation);
 
