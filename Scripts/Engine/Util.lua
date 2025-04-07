@@ -8,7 +8,7 @@ end
 
 -- Check if the time format is correct.
 Util.CheckTimeFormat = function (timerFormat, errorText)
-    errorText = errorText and Type.IsString(errorText) and errorText or false
+	errorText = errorText and Type.IsString(errorText) and errorText or false
 	if Type.IsTable(timerFormat) then
 		local validKeys = {hours = true, minutes = true, seconds = true, deciseconds = true}
 		for k, v in pairs(timerFormat) do
