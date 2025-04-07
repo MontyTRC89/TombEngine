@@ -10,9 +10,9 @@ end
 Util.CheckTimeFormat = function (timerFormat, errorText)
     errorText = errorText and Type.IsString(errorText) and errorText or false
 	if Type.IsTable(timerFormat) then
-        local validKeys = {hours = true, minutes = true, seconds = true, deciseconds = true}
-        for k, v in pairs(timerFormat) do
-        	if not validKeys[k] or type(v) ~= "boolean" then
+		local validKeys = {hours = true, minutes = true, seconds = true, deciseconds = true}
+		for k, v in pairs(timerFormat) do
+			if not validKeys[k] or type(v) ~= "boolean" then
 				if errorText then
 					TEN.Util.PrintLog(errorText, TEN.Util.LogLevel.WARNING)
 				end
