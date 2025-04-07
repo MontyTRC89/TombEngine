@@ -1240,7 +1240,7 @@ bool Moveable::MeshExists(int index) const
 // @tparam int mesh Mesh of a target moveable to use as a camera target.
 void Moveable::AttachObjCamera(short camMeshId, Moveable& mov, short targetMeshId)
 {
-		ObjCamera(_moveable, camMeshId, mov._moveable, targetMeshId, true);
+	ObjCamera(_moveable, camMeshId, mov._moveable, targetMeshId, true);
 }
 
 /// Borrow animation from an object
