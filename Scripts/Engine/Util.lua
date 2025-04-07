@@ -18,7 +18,7 @@ Util.CheckTimeFormat = function (timerFormat, errorText)
 				end
 				return false
 			end
-        end
+		end
 		return timerFormat
 	elseif Type.IsBoolean(timerFormat) then
 		return timerFormat and {seconds = true} or timerFormat
