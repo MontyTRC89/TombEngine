@@ -649,31 +649,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 void WinClose()
 {
-	g_VideoPlayer.DeInitialize();
-
 	if (ConsoleThreadHandle)
 		CloseHandle((HANDLE)ConsoleThreadHandle);
 
 	WaitForSingleObject((HANDLE)ThreadHandle, 5000);
-
 	DestroyAcceleratorTable(hAccTable);
-
-	Sound_DeInit();
-	DeinitializeInput();
-	
-	delete g_GameScript;
-	g_GameScript = nullptr;
-
-	delete g_GameFlow;
-	g_GameFlow = nullptr;
-
-	delete g_GameScriptEntities;
-	g_GameScriptEntities = nullptr;
-
-	delete g_GameStringsHandler;
-	g_GameStringsHandler = nullptr;
-
 	ShutdownTENLog();
-
 	CoUninitialize();
 }

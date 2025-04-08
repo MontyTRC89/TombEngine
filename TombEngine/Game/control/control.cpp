@@ -364,12 +364,14 @@ unsigned CALLBACK GameMain(void *)
 	if (!g_GameFlow->IntroVideoPath.empty())
 	{
 		g_VideoPlayer.Play(g_GameFlow->IntroVideoPath);
-		while (g_VideoPlayer.Update());
+		while (DoTheGame && g_VideoPlayer.Update());
 	}
 
 	// Execute Lua gameflow and play game.
 	g_GameFlow->DoFlow();
-
+	
+	// Exit game.
+	DeInitialize();
 	DoTheGame = false;
 
 	// Finish thread.
@@ -492,6 +494,25 @@ int GetRandomDraw()
 	return Random::GenerateInt();
 }
 
+void DeInitialize()
+{
+	g_VideoPlayer.DeInitialize();
+	Sound_DeInit();
+	DeinitializeInput();
+
+	delete g_GameScript;
+	g_GameScript = nullptr;
+
+	delete g_GameFlow;
+	g_GameFlow = nullptr;
+
+	delete g_GameScriptEntities;
+	g_GameScriptEntities = nullptr;
+
+	delete g_GameStringsHandler;
+	g_GameStringsHandler = nullptr;
+}
+
 void CleanUp()
 {
 	// Reset oscillator seed.
@@ -588,7 +609,8 @@ void InitializeScripting(int levelIndex, bool loadGame)
 void DeInitializeScripting(int levelIndex, GameStatus reason)
 {
 	// Reload gameflow script to clear level script variables.
-	g_GameFlow->LoadFlowScript();
+	if (reason != GameStatus::ExitGame)
+		g_GameFlow->LoadFlowScript();
 
 	g_GameScript->FreeLevelScripts();
 	g_GameScriptEntities->FreeEntities();
@@ -691,7 +713,7 @@ GameStatus DoGameLoop(int levelIndex)
 		}
 	}
 
-	EndGameLoop(levelIndex, status);
+	EndGameLoop(levelIndex, DoTheGame ? status : GameStatus::ExitGame);
 
 	return status;
 }
@@ -701,7 +723,9 @@ void EndGameLoop(int levelIndex, GameStatus reason)
 	// Save last screenshot for loading screen.
 	g_Renderer.DumpGameScene();
 
-	SaveGame::SaveHub(levelIndex);
+	if (reason == GameStatus::LevelComplete)
+		SaveGame::SaveHub(levelIndex);
+
 	DeInitializeScripting(levelIndex, reason);
 
 	g_VideoPlayer.Stop();

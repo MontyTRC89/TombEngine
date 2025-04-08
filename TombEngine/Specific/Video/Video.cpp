@@ -46,22 +46,23 @@ namespace TEN::Video
 
 	void VideoHandler::DeInitialize()
 	{
-		if (_player == nullptr)
-			return;
-
 		TENLog("Shutting down VLC...", LogLevel::Info);
 
 		// This flag is needed to avoid race conditions with update callbacks.
 		_deInitializing = true;
 
-		libvlc_media_player_stop_async(_player);
+		if (_player != nullptr)
+		{
+			if (libvlc_media_player_is_playing(_player))
+				libvlc_media_player_stop_async(_player);
 
-		if (libvlc_media_player_is_playing(_player))
-			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+			while (libvlc_media_player_is_playing(_player))
+				std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
-		libvlc_media_player_release(_player);
+			libvlc_media_player_release(_player);
 
-		_player = nullptr;
+			_player = nullptr;
+		}
 
 		if (_vlcInstance)
 			libvlc_release(_vlcInstance);
@@ -271,8 +272,6 @@ namespace TEN::Video
 		if (_deInitializing || _player == nullptr)
 			return false;
 
-		auto state = libvlc_media_player_get_state(_player);
-
 		// Attempt to map and render texture only if callback has set the frame to be rendered.
 		if (_needRender)
 		{
@@ -294,14 +293,14 @@ namespace TEN::Video
 			{
 				TENLog("Failed to render video texture", LogLevel::Error);
 			}
-
-			_needRender = false;
 		}
 
-		if (_playbackMode == VideoPlaybackMode::Exclusive)
+		if (_playbackMode == VideoPlaybackMode::Exclusive && _needRender)
 			UpdateExclusive();
 		else if (_playbackMode == VideoPlaybackMode::Background)
 			UpdateBackground();
+
+		_needRender = false;
 
 		return (_playbackMode == VideoPlaybackMode::Exclusive);
 	}
