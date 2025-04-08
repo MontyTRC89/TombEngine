@@ -69,6 +69,29 @@ namespace TEN::Renderer
 		std::vector<RendererFogBulb> tempFogBulbs;
 		tempFogBulbs.reserve(MAX_FOG_BULBS_DRAW);
 
+		for (auto& light : _dynamicLights[_dynamicLightList])
+		{
+			if (light.Type != LightType::FogBulb)
+				continue;
+
+			// Test bigger radius to avoid bad clipping.
+			if (renderView.Camera.Frustum.SphereInFrustum(light.Position, light.Out * 1.2f))
+			{
+				RendererFogBulb bulb;
+
+				bulb.Position = light.Position;
+				bulb.Density = light.Intensity;
+				bulb.Color = light.Color;
+				bulb.Radius = light.Out;
+				bulb.FogBulbToCameraVector = bulb.Position - renderView.Camera.WorldPosition;
+				bulb.Distance = bulb.FogBulbToCameraVector.Length();
+
+				tempFogBulbs.push_back(bulb);
+			}
+		}
+
+
+
 		for (auto& room : _rooms)
 		{
 			if (!g_Level.Rooms[room.RoomNumber].Active())
@@ -599,6 +622,9 @@ namespace TEN::Renderer
 		// Dynamic lights have the priority
 		for (auto& light : _dynamicLights[_dynamicLightList])
 		{
+
+
+
 			float distSqr = Vector3::DistanceSquared(pos, light.Position);
 
 			// Collect only lights nearer than 20 sectors

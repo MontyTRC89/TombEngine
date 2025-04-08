@@ -122,9 +122,10 @@ namespace TEN::Entities::Traps
 
 				auto pos = GetJointPosition(item, 4, Vector3i(0, 260, 0));
 				byte r = 51 - ((GetRandomControl() / 16) & 6);
-				byte g = 24 - ((GetRandomControl() / 64) & 6);
+				byte g = 44 - ((GetRandomControl() / 64) & 6);
 				byte b = GetRandomControl() & 10;
 				SpawnDynamicLight(pos.x, pos.y, pos.z, 12, r, g, b);
+				SpawnDynamicFogBulb(pos.x, pos.y, pos.z, 4, 0.08f, r+(115 - ((GetRandomControl() / 16) & 6)), g+(108- ((GetRandomControl() / 16) & 8)), b);
 
 				//if (Wibble & 6)
 				//{

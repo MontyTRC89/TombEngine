@@ -7,4 +7,5 @@ namespace TEN::Effects::Light
 	
 	// DEPRECATED!!! Use SpawnDynamicPointLight() instead and phase out this legacy function.
 	void SpawnDynamicLight(int x, int y, int z, short falloff, byte r, byte g, byte b);
+	void SpawnDynamicFogBulb(int x, int y, int z, short radius, float density, byte r, byte g, byte b);
 }
