@@ -167,6 +167,8 @@ namespace TEN::Input
 
 	void DeinitializeInput()
 	{
+		TENLog("Shutting down OIS...", LogLevel::Info);
+
 		if (OisKeyboard != nullptr)
 			OisInputManager->destroyInputObject(OisKeyboard);
 

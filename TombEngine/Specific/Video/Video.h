@@ -21,9 +21,9 @@ namespace TEN::Video
 	{
 	public:
 		VideoHandler() = default;
-		~VideoHandler();
 
 		void Initialize(const std::string& gameDir, ID3D11Device* device, ID3D11DeviceContext* context);
+		void DeInitialize();
 		bool Play(const std::string& filename, VideoPlaybackMode mode = VideoPlaybackMode::Exclusive, bool silent = false, bool looped = false);
 		bool Pause();
 		bool Resume();
@@ -57,6 +57,7 @@ namespace TEN::Video
 
 		// Render synchronization
 		bool _needRender = false;
+		bool _deInitializing = false;
 
 		// Renderer Resources
 		std::vector<char> _frameBuffer = {};

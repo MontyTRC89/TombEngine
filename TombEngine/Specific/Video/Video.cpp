@@ -17,14 +17,6 @@ namespace TEN::Video
 	const std::string VIDEO_PATH = "FMV/";
 	const std::vector<std::string> VIDEO_EXTENSIONS = { ".mp4", ".avi", ".mkv", ".mov" };
 
-	VideoHandler::~VideoHandler()
-	{
-		Stop();
-
-		if (_vlcInstance)
-			libvlc_release(_vlcInstance);
-	}
-
 	void VideoHandler::Initialize(const std::string& gameDir, ID3D11Device* device, ID3D11DeviceContext* context)
 	{
 		TENLog("Initializing video player...", LogLevel::Info);
@@ -50,6 +42,31 @@ namespace TEN::Video
 		_playbackMode = VideoPlaybackMode::Exclusive;
 		_looped = false;
 		_silent = false;
+	}
+
+	void VideoHandler::DeInitialize()
+	{
+		if (_player == nullptr)
+			return;
+
+		TENLog("Shutting down VLC...", LogLevel::Info);
+
+		// This flag is needed to avoid race conditions with update callbacks.
+		_deInitializing = true;
+
+		libvlc_media_player_stop_async(_player);
+
+		if (libvlc_media_player_is_playing(_player))
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+		libvlc_media_player_release(_player);
+
+		_player = nullptr;
+
+		if (_vlcInstance)
+			libvlc_release(_vlcInstance);
+
+		_vlcInstance = nullptr;
 	}
 
 	bool VideoHandler::Play(const std::string& filename, VideoPlaybackMode mode, bool silent, bool loop)
@@ -183,7 +200,7 @@ namespace TEN::Video
 
 	void VideoHandler::UpdateBackground()
 	{
-		if (_player == nullptr)
+		if (_deInitializing || _player == nullptr)
 			return;
 
 		auto state = libvlc_media_player_get_state(_player);
@@ -214,7 +231,7 @@ namespace TEN::Video
 
 	void VideoHandler::UpdateExclusive()
 	{
-		if (_player == nullptr)
+		if (_deInitializing || _player == nullptr)
 			return;
 
 		// Because VLC plays media asynchronously with internal clock, we may update game loop 
@@ -251,7 +268,7 @@ namespace TEN::Video
 
 	bool VideoHandler::Update()
 	{
-		if (_player == nullptr)
+		if (_deInitializing || _player == nullptr)
 			return false;
 
 		auto state = libvlc_media_player_get_state(_player);
@@ -510,8 +527,10 @@ namespace TEN::Video
 
 	void VideoHandler::DeInitPlayer()
 	{
-		if (_player == nullptr)
+		if (_deInitializing || _player == nullptr)
 			return;
+
+		DeInitD3DTexture();
 
 		libvlc_media_player_stop_async(_player);
 		libvlc_media_player_release(_player);
