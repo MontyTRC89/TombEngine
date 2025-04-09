@@ -969,6 +969,9 @@ void UpdateGunFlashes()
 		part.z = pos.z;
 		part.roomNumber = LaraItem->RoomNumber;
 
+		part.rotAng = ANGLE(TO_DEGREES(Random::GenerateAngle())) >> 4;
+		part.rotAdd = 0;
+
 		part.sSize = part.size = part.dSize = 192;
 		part.scalar = 2;
 
