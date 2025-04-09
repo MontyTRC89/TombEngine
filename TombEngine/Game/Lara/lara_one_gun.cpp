@@ -68,27 +68,6 @@ constexpr auto HK_RAPID_MODE_SHOT_INTERVAL			  = 3.0f;
 
 constexpr auto SHOTGUN_PELLET_COUNT = 6;
 
-static Vector3i GetWeaponSmokeRelOffset(LaraWeaponType weaponType)
-{
-	switch (weaponType)
-	{
-	case LaraWeaponType::HK:
-		return Vector3i(0, 228, 96);
-
-	case LaraWeaponType::Shotgun:
-		return Vector3i(0, 228, 0);
-
-	case LaraWeaponType::GrenadeLauncher:
-		return Vector3i(0, 180, 80);
-
-	case LaraWeaponType::RocketLauncher:
-		return Vector3i(0, 84, 72);;
-
-	default:
-		return Vector3i::Zero;
-	}
-}
-
 void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 {
 	auto& player = *GetLaraInfo(&laraItem);
@@ -96,7 +75,7 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 
 	if (player.LeftArm.GunSmoke > 0)
 	{
-		auto relOffset = GetWeaponSmokeRelOffset(weaponType);
+		auto relOffset = g_GameFlow->GetSettings()->Weapons[(int)weaponType - 1].MuzzleOffset.ToVector3();
 		auto pos = GetJointPosition(&laraItem, LM_RHAND, relOffset);
 
 		if (laraItem.MeshBits.TestAny())
@@ -411,8 +390,10 @@ void FireShotgun(ItemInfo& laraItem)
 		if (!ammo.HasInfinite())
 			ammo--;
 
-		auto pos = GetJointPosition(&laraItem, LM_RHAND, Vector3i(0, 1508, 32));
-		auto pos2 = GetJointPosition(&laraItem, LM_RHAND, Vector3i(0, 228, 32));
+		auto offset = g_GameFlow->GetSettings()->Weapons[(int)LaraWeaponType::Shotgun].MuzzleOffset.ToVector3i();
+
+		auto pos = GetJointPosition(&laraItem, LM_RHAND, offset + Vector3::UnitY * CLICK(2));
+		auto pos2 = GetJointPosition(&laraItem, LM_RHAND, offset);
 
 		player.LeftArm.GunSmoke = 32;
 
