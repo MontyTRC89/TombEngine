@@ -2824,12 +2824,8 @@ namespace TEN::Renderer
 							}
 							else
 							{
-								BindTexture(
-									TextureRegister::ColorMap, &std::get<0>(_roomTextures[bucket.Texture]),
-									SamplerStateRegister::AnisotropicClamp);
-								BindTexture(
-									TextureRegister::NormalMap, &std::get<1>(_roomTextures[bucket.Texture]),
-									SamplerStateRegister::AnisotropicClamp);
+								BindTexture(TextureRegister::ColorMap,  &std::get<0>(_roomTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+								BindTexture(TextureRegister::NormalMap, &std::get<1>(_roomTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 							}
 
 							DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
