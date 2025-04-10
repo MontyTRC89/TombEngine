@@ -2,27 +2,14 @@
 #include "Objects/TR4/Trap/tr4_chain.h"
 
 #include "Game/collision/Sphere.h"
-#include "Game/animation.h"
-#include "Game/control/control.h"
 #include "Game/Lara/lara.h"
-#include "Game/Lara/lara_helpers.h"
-#include "Game/items.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/item_fx.h"
-#include "Game/effects/tomb4fx.h"
-#include "Game/effects/effects.h"
 #include "Game/collision/collide_item.h"
 #include "Specific/level.h"
-#include "Objects/Generic/Object/burning_torch.h"
-#include "Game/effects/chaffFX.h"
 #include "Game/effects/spark.h"
-#include "Objects/Effects/tr5_electricity.h"
-#include "Renderer/Renderer.h"
 
 using namespace TEN::Effects::Spark;
-using namespace TEN::Collision::Point;
-using namespace TEN::Effects::Items;
-using namespace TEN::Renderer;
 
 namespace TEN::Entities::Traps
 {
@@ -115,7 +102,7 @@ namespace TEN::Entities::Traps
 		if (!TriggerActive(&item))
 			return;
 
-		if (item.TriggerFlags > 0)
+		if (item.TriggerFlags < 0)
 		{
 			item.ItemFlags[2] = 1;
 			item.ItemFlags[3] = 75;
@@ -143,7 +130,7 @@ namespace TEN::Entities::Traps
 				return;
 			}
 		}
-		else if (item.TriggerFlags < 0)
+		else if (item.TriggerFlags > 0)
 		{
 			item.ItemFlags[2] = 1;
 			item.ItemFlags[3] = 75;
