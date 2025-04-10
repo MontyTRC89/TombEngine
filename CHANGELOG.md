@@ -11,6 +11,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed Wraith objects not working correctly in flipped rooms.
 * Fixed caustics not rendered correctly if texture compression was enabled.
 * Fixed exclusion blend mode not working correctly.
+* Fixed HK sound effects.
 
 ### New features
 * Added muzzle glow effect for firearms.
