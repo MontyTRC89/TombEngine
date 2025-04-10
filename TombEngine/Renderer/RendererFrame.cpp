@@ -90,8 +90,6 @@ namespace TEN::Renderer
 			}
 		}
 
-
-
 		for (auto& room : _rooms)
 		{
 			if (!g_Level.Rooms[room.RoomNumber].Active())
@@ -622,9 +620,6 @@ namespace TEN::Renderer
 		// Dynamic lights have the priority
 		for (auto& light : _dynamicLights[_dynamicLightList])
 		{
-
-
-
 			float distSqr = Vector3::DistanceSquared(pos, light.Position);
 
 			// Collect only lights nearer than 20 sectors

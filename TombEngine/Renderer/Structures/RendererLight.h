@@ -17,8 +17,6 @@ namespace TEN::Renderer::Structures
 		float Out;
 		float InRange;
 		float OutRange;
-		float Density;
-		float Radius;
 		
 		BoundingSphere BoundingSphere;
 		int RoomNumber;
