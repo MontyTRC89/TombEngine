@@ -13,12 +13,10 @@ using namespace TEN::Effects::Spark;
 
 namespace TEN::Entities::Traps
 {
-
-	constexpr auto PENDULUML_HARM_DAMAGE = 15;
-	constexpr auto PENDULUML_FIRE_NODE = 4;
-	constexpr auto PENDULUML_FIRE_FOG_DENSITY = 0.08f;
-	constexpr auto PENDULUML_FIRE_FOG_RADIUS = 4;
-	constexpr auto PENDULUML_FLAME_SPARK_LENGHT = 190;
+	constexpr auto PENDULUM_FIRE_NODE = 4;
+	constexpr auto PENDULUM_FIRE_FOG_DENSITY = 0.08f;
+	constexpr auto PENDULUM_FIRE_FOG_RADIUS = 4;
+	constexpr auto PENDULUM_FLAME_SPARK_LENGHT = 190;
 
 	const auto PendulumBite = CreatureBiteInfo(Vector3(0.0f, 0.0f, 0.0f), 4);
 
@@ -123,9 +121,9 @@ namespace TEN::Entities::Traps
 				r += 125 - ((GetRandomControl() / 16) & 4);
 				g += 98 - ((GetRandomControl() / 16) & 8);
 
-				SpawnDynamicFogBulb(pos.x, pos.y, pos.z, PENDULUML_FIRE_FOG_RADIUS, PENDULUML_FIRE_FOG_DENSITY, r ,g, b);
+				SpawnDynamicFogBulb(pos.x, pos.y, pos.z, PENDULUM_FIRE_FOG_RADIUS, PENDULUM_FIRE_FOG_DENSITY, r ,g, b);
 				TriggerPendulumFlame(itemNumber, pos);
-				TriggerPendulumSpark(pos, angle, PENDULUML_FLAME_SPARK_LENGHT, 1);
+				TriggerPendulumSpark(pos, angle, PENDULUM_FLAME_SPARK_LENGHT, 1);
 
 				return;
 			}
