@@ -13,12 +13,9 @@ using namespace TEN::Effects::Spark;
 
 namespace TEN::Entities::Traps
 {
-	constexpr auto PENDULUM_FIRE_NODE = 4;
 	constexpr auto PENDULUM_FIRE_FOG_DENSITY = 0.08f;
 	constexpr auto PENDULUM_FIRE_FOG_RADIUS = 4;
 	constexpr auto PENDULUM_FLAME_SPARK_LENGHT = 190;
-
-	const auto PendulumBite = CreatureBiteInfo(Vector3(0.0f, 0.0f, 0.0f), 4);
 
 	void TriggerPendulumFlame(int itemNumber, Vector3i pos)
 	{
