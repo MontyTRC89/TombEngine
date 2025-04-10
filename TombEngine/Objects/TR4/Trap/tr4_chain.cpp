@@ -14,28 +14,30 @@
 #include "Game/collision/collide_item.h"
 #include "Specific/level.h"
 #include "Objects/Generic/Object/burning_torch.h"
+#include "Game/effects/chaffFX.h"
+#include "Game/effects/spark.h"
+#include "Objects/Effects/tr5_electricity.h"
+#include "Renderer/Renderer.h"
 
-
-
-
+using namespace TEN::Effects::Spark;
+using namespace TEN::Collision::Point;
+using namespace TEN::Effects::Items;
+using namespace TEN::Renderer;
 
 namespace TEN::Entities::Traps
 {
 
 	constexpr auto PENDULUML_HARM_DAMAGE = 15;
 	constexpr auto PENDULUML_FIRE_NODE = 4;
+	constexpr auto PENDULUML_FIRE_FOG_DENSITY = 0.08f;
+	constexpr auto PENDULUML_FIRE_FOG_RADIUS = 4;
+	constexpr auto PENDULUML_FLAME_SPARK_LENGHT = 190;
+
 	const auto PendulumBite = CreatureBiteInfo(Vector3(0.0f, 0.0f, 0.0f), 4);
 
 	void TriggerPendulumFlame(int itemNumber, Vector3i pos)
 	{
 		auto& item = g_Level.Items[itemNumber];
-		int x, z;
-
-		x = LaraItem->Pose.Position.x - item.Pose.Position.x;
-		z = LaraItem->Pose.Position.z - item.Pose.Position.z;
-
-		//if (x < -0x4000 || x > 0x4000 || z < -0x4000 || z > 0x4000)
-			//return;
 
 		auto* spark = GetFreeParticle();
 		spark->on = 1;
@@ -47,8 +49,6 @@ namespace TEN::Entities::Traps
 		spark->dB = 32;
 		spark->colFadeSpeed = (GetRandomControl() & 3) + 12;
 		spark->fadeToBlack = 8;
-		//spark->fxObj = itemNumber;
-		//spark->nodeNumber = node;
 
 		spark->extras = 0;
 		spark->life = Random::GenerateInt(1,15);
@@ -68,10 +68,6 @@ namespace TEN::Entities::Traps
 			spark->rotAdd = (GetRandomControl() & 0x1F) - 16;
 		}
 
-
-
-		// Set the position of the spark relative to the node
-
 		spark->x = pos.x + (GetRandomControl() & 0x1F) - 16;
 		spark->y = pos.y;
 		spark->z = pos.z + (GetRandomControl() & 0x1F) - 16;
@@ -87,20 +83,30 @@ namespace TEN::Entities::Traps
 		spark->SpriteID = 0;
 	}
 
-	Vector3i GetNodePosition(const ItemInfo& item, unsigned char node)
+	void TriggerPendulumSpark(const GameVector& pos, const EulerAngles& angle, float length, int count)
 	{
-		// Berechne die Position des Knotens relativ zur Pose des Items
-		// Dies ist ein Platzhalter. Die tatsächliche Berechnung hängt von der Struktur des Items und der Knoten ab.
-		Vector3i nodePos;
-		// Beispielberechnung (muss an die tatsächliche Struktur angepasst werden):
-		nodePos.x = item.Pose.Position.x + node ; // Beispielwert
-		nodePos.y = item.Pose.Position.y + node - 125;  // Beispielwert
-		nodePos.z = item.Pose.Position.z + node ; // Beispielwert
-		return nodePos;
-	}
-
-
-
+		for (int i = 0; i < count; i++)
+		{
+			auto& s = GetFreeSparkParticle();
+			s = {};
+			s.age = 1;
+			s.life = Random::GenerateFloat(5, 8);
+			s.friction = 0.05f;
+			s.gravity = 0.1f;
+			s.height = length + Random::GenerateFloat(16.0f, 22.0f);
+			s.width = length;
+			s.room = pos.RoomNumber;
+			s.pos = Vector3(pos.x + Random::GenerateFloat(-16, 16), pos.y + Random::GenerateFloat(6, 60), pos.z + Random::GenerateFloat(-16, 16));
+			float ang = TO_RAD(angle.y);
+			float vAng = -TO_RAD(angle.x);
+			Vector3 v = Vector3(sin(ang), vAng + Random::GenerateFloat(-PI / 16, PI / 16), cos(ang));
+			v.Normalize(v);
+			s.velocity =  v* Random::GenerateFloat(32, 64);
+			s.sourceColor = Vector4(1, 0.7f, 0.4f, 1);
+			s.destinationColor = Vector4(0.4f, 0.1f, 0, 0.5f);
+			s.active = true;
+		}
+	}    
 
 	void ControlChain(short itemNumber)
 	{
@@ -113,7 +119,7 @@ namespace TEN::Entities::Traps
 		{
 			item.ItemFlags[2] = 1;
 			item.ItemFlags[3] = 75;
-			item.ItemFlags[5] = 1;
+			item.ItemFlags[4] = 1; // Set the item on fire when collide.
 
 			if (TriggerActive(&item))
 			{
@@ -121,21 +127,36 @@ namespace TEN::Entities::Traps
 				AnimateItem(&item);
 
 				auto pos = GetJointPosition(item, 4, Vector3i(0, 260, 0));
+				auto angle = GetBoneOrientation(item, 5);
 				byte r = 51 - ((GetRandomControl() / 16) & 6);
 				byte g = 44 - ((GetRandomControl() / 64) & 6);
 				byte b = GetRandomControl() & 10;
 				SpawnDynamicLight(pos.x, pos.y, pos.z, 12, r, g, b);
-				SpawnDynamicFogBulb(pos.x, pos.y, pos.z, 4, 0.08f, r+(115 - ((GetRandomControl() / 16) & 6)), g+(108- ((GetRandomControl() / 16) & 8)), b);
 
-				//if (Wibble & 6)
-				//{
-					TriggerPendulumFlame(itemNumber, pos);
-				//}
+				r += 125 - ((GetRandomControl() / 16) & 4);
+				g += 98 - ((GetRandomControl() / 16) & 8);
+
+				SpawnDynamicFogBulb(pos.x, pos.y, pos.z, PENDULUML_FIRE_FOG_RADIUS, PENDULUML_FIRE_FOG_DENSITY, r ,g, b);
+				TriggerPendulumFlame(itemNumber, pos);
+				TriggerPendulumSpark(pos, angle, PENDULUML_FLAME_SPARK_LENGHT, 1);
 
 				return;
 			}
 		}
-		else 
+		else if (item.TriggerFlags < 0)
+		{
+			item.ItemFlags[2] = 1;
+			item.ItemFlags[3] = 75;
+			item.ItemFlags[4] = 0;
+
+			if (TriggerActive(&item))
+			{
+				*(int*)&item.ItemFlags[0] = 0x787E;
+				AnimateItem(&item);
+				return;
+			}
+		} 
+		else
 		{
 			item.ItemFlags[3] = 25;
 
@@ -195,7 +216,7 @@ namespace TEN::Entities::Traps
 				{
 					DoDamage(playerItem, item.ItemFlags[3]);
 
-					if (item.ItemFlags[5])
+					if (item.ItemFlags[4])
 						TEN::Effects::Items::ItemBurn(LaraItem);
 
 					auto deltaPos = pos - playerItem->Pose.Position;
@@ -213,5 +234,4 @@ namespace TEN::Entities::Traps
 			harmBits >>= 1;
 		}
 	}
-
 }

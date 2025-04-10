@@ -1628,13 +1628,9 @@ namespace TEN::Renderer
 		if (_isLocked || g_GameFlow->LastFreezeMode != FreezeMode::None)
 			return;
 
-		
-
 		auto dynamicLight = RendererLight{};
 
 		dynamicLight.Color = Vector3(color.x, color.y, color.z);
-		//if (radius < BLOCK(2))
-			//dynamicLight.Color *= (radius / BLOCK(2));
 
 		dynamicLight.RoomNumber = NO_VALUE;
 		dynamicLight.Intensity = density;
