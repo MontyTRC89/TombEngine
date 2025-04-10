@@ -106,7 +106,7 @@ namespace TEN::Entities::Traps
 		{
 			item.ItemFlags[2] = 1;
 			item.ItemFlags[3] = 75;
-			item.ItemFlags[4] = 1; // Set the item on fire when collide.
+			item.ItemFlags[5] = 1; // Set the item on fire when collide.
 
 			if (TriggerActive(&item))
 			{
@@ -134,7 +134,7 @@ namespace TEN::Entities::Traps
 		{
 			item.ItemFlags[2] = 1;
 			item.ItemFlags[3] = 75;
-			item.ItemFlags[4] = 0;
+			item.ItemFlags[5] = 0;
 
 			if (TriggerActive(&item))
 			{
@@ -203,7 +203,7 @@ namespace TEN::Entities::Traps
 				{
 					DoDamage(playerItem, item.ItemFlags[3]);
 
-					if (item.ItemFlags[4])
+					if (item.ItemFlags[5])
 						TEN::Effects::Items::ItemBurn(LaraItem);
 
 					auto deltaPos = pos - playerItem->Pose.Position;
