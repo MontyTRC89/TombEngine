@@ -233,9 +233,8 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 				player.Control.Weapon.Timer = 0.0f;
 			}
 		}
-		else if (player.Control.Weapon.Timer != 0.0f)
+		else if (weaponType == LaraWeaponType::HK && player.Control.Weapon.Timer != 0.0f)
 		{
-			SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, SoundEnvironment::Land, 1.0f, 0.4f);
 			SoundEffect(SFX_TR4_HK_FIRE, &laraItem.Pose);
 		}
 		else if (weaponType == LaraWeaponType::Shotgun && !IsHeld(In::Action) && !player.LeftArm.Locked)
@@ -314,9 +313,8 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 				player.Control.Weapon.Timer = 0.0f;
 			}
 		}
-		else if (player.Control.Weapon.Timer != 0.0f)
+		else if (weaponType == LaraWeaponType::HK && player.Control.Weapon.Timer != 0.0f)
 		{
-			SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, SoundEnvironment::Land, 1.0f, 0.4f);
 			SoundEffect(SFX_TR4_HK_FIRE, &laraItem.Pose);
 		}
 
@@ -1230,7 +1228,6 @@ void LasersightWeaponHandler(ItemInfo& item, LaraWeaponType weaponType)
 
 			if (playSound)
 			{
-				SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
 				SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 				Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 			}
