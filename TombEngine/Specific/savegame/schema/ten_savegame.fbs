@@ -264,7 +264,6 @@ table TightropeControlData {
 table WeaponControlData {
 	weapon_item: int32;
 	has_fired: bool;
-	fired: bool;
 	uzi_left: bool;
 	uzi_right: bool;
 	gun_type: int32;
