@@ -2824,12 +2824,8 @@ namespace TEN::Renderer
 							}
 							else
 							{
-								BindTexture(
-									TextureRegister::ColorMap, &std::get<0>(_roomTextures[bucket.Texture]),
-									SamplerStateRegister::AnisotropicClamp);
-								BindTexture(
-									TextureRegister::NormalMap, &std::get<1>(_roomTextures[bucket.Texture]),
-									SamplerStateRegister::AnisotropicClamp);
+								BindTexture(TextureRegister::ColorMap,  &std::get<0>(_roomTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+								BindTexture(TextureRegister::NormalMap, &std::get<1>(_roomTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 							}
 
 							DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
@@ -3240,11 +3236,7 @@ namespace TEN::Renderer
 		case RendererPass::GBuffer:
 			if (blendMode != BlendMode::Opaque &&
 				blendMode != BlendMode::AlphaTest &&
-				blendMode != BlendMode::FastAlphaBlend &&
-				// WARNING: For G-Buffer step we consider alpha blend like alpha test
-				// assuming that most of the geometry used in rooms, items and statics 
-				// are fences, foliages, trees... But it could fail with translucent surfaces! 
-				blendMode != BlendMode::AlphaBlend)
+				blendMode != BlendMode::FastAlphaBlend)
 			{
 				return false;
 			}
