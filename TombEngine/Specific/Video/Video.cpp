@@ -377,7 +377,7 @@ namespace TEN::Video
 			}
 		}
 
-		if (_playbackMode == VideoPlaybackMode::Exclusive && _needRender)
+		if (_playbackMode == VideoPlaybackMode::Exclusive)
 		{
 			UpdateExclusive();
 		}
@@ -396,9 +396,12 @@ namespace TEN::Video
 		if (_deInitializing || _player == nullptr)
 			return;
 
-		// Because VLC plays media asynchronously with internal clock, game loop can be updated as quickly as possible.
-		App.ResetClock = true;
-		UpdateInputActions(true);
+		// Only update input if frame was rendered to avoid high CPU usage.
+		if (_needRender)
+		{
+			App.ResetClock = true;
+			UpdateInputActions(true);
+		}
 
 		bool interruptPlayback = IsHeld(In::Deselect) || IsHeld(In::Look);
 		auto state = libvlc_media_player_get_state(_player);
