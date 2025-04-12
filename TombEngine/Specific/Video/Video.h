@@ -34,6 +34,7 @@ namespace TEN::Video
 		// Render synchronization
 
 		bool _needRender	 = false;
+		bool _updateInput	 = false;
 		bool _deInitializing = false;
 
 		// Renderer Resources

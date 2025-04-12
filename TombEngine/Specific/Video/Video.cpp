@@ -264,6 +264,7 @@ namespace TEN::Video
 		_silent = silent;
 		_playbackMode = mode;
 		_fileName = fullVideoName;
+		_needRender = _updateInput = false;
 
 		auto* media = libvlc_media_new_path(_fileName.c_str());
 		if (media == nullptr)
@@ -396,10 +397,16 @@ namespace TEN::Video
 		if (_deInitializing || _player == nullptr)
 			return;
 
-		App.ResetClock = true;
-		UpdateInputActions(true);
+		bool interruptPlayback = false;
 
-		bool interruptPlayback = IsHeld(In::Deselect) || IsHeld(In::Look);
+		if (_updateInput)
+		{
+			App.ResetClock = true;
+			UpdateInputActions(true);
+			interruptPlayback = IsHeld(In::Deselect) || IsHeld(In::Look);
+			_updateInput = false;
+		}
+
 		auto state = libvlc_media_player_get_state(_player);
 
 		// If player is just opening, buffering, or stopping, always return early and wait for process to end.
@@ -556,6 +563,9 @@ namespace TEN::Video
 	{
 		auto* player = static_cast<VideoHandler*>(data);
 		player->_needRender = true;
+
+		if (player->_playbackMode == VideoPlaybackMode::Exclusive)
+			player->_updateInput = true;
 	}
 
 	void VideoHandler::OnLog(void* data, int level, const libvlc_log_t* ctx, const char* fmt, va_list args)
