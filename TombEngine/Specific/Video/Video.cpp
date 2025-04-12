@@ -24,7 +24,7 @@ namespace TEN::Video
 		long long duration = libvlc_media_get_duration(media);
 		float posNormalized = GetNormalizedPosition();
 
-		// Convert and return percentage in frames.
+		// Convert and return position in frames.
 		long long posMsec = posNormalized * duration;
 		return (int)((posMsec / 1000.0f) * FPS);
 	}
@@ -130,7 +130,7 @@ namespace TEN::Video
 			return;
 		}
 
-		// Set position in percentage.
+		// Set normalized position.
 		SetNormalizedPosition(posNormalized);
 		HandleError();
 	}
