@@ -375,6 +375,8 @@ namespace TEN::Video
 			{
 				TENLog("Failed to render video texture", LogLevel::Error);
 			}
+
+			_needRender = false;
 		}
 
 		if (_playbackMode == VideoPlaybackMode::Exclusive)
@@ -386,8 +388,6 @@ namespace TEN::Video
 			UpdateBackground();
 		}
 
-		_needRender = false;
-
 		return (_playbackMode == VideoPlaybackMode::Exclusive);
 	}
 
@@ -396,12 +396,8 @@ namespace TEN::Video
 		if (_deInitializing || _player == nullptr)
 			return;
 
-		// Only update input if frame was rendered to avoid high CPU usage.
-		if (_needRender)
-		{
-			App.ResetClock = true;
-			UpdateInputActions(true);
-		}
+		App.ResetClock = true;
+		UpdateInputActions(true);
 
 		bool interruptPlayback = IsHeld(In::Deselect) || IsHeld(In::Look);
 		auto state = libvlc_media_player_get_state(_player);
