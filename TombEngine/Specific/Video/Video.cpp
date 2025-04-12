@@ -396,7 +396,7 @@ namespace TEN::Video
 		if (_deInitializing || _player == nullptr)
 			return;
 
-		// Because VLC plays media asynchronously with internal clock, game loop can be updates as quickly as possible.
+		// Because VLC plays media asynchronously with internal clock, game loop can be updated as quickly as possible.
 		App.ResetClock = true;
 		UpdateInputActions(true);
 
