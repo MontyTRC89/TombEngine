@@ -400,94 +400,98 @@ float4 RotationMatrixToQuaternion(float3x3 m)
 {
 	float4 q;
 	float trace = m[0].x + m[1].y + m[2].z;
-	if (trace > 0.0f)
-	{
-		float s = sqrt(trace + 1.0f) * 2.0f;
-		q.w = 0.25f * s;
-		q.x = (m[2].y - m[1].z) / s;
-		q.y = (m[0].z - m[2].x) / s;
-		q.z = (m[1].x - m[0].y) / s;
-	}
-	else if (m[0].x > m[1].y && m[0].x > m[2].z)
-	{
-		float s = sqrt(1.0f + m[0].x - m[1].y - m[2].z) * 2.0f;
-		q.w = (m[2].y - m[1].z) / s;
-		q.x = 0.25f * s;
-		q.y = (m[0].y + m[1].x) / s;
-		q.z = (m[0].z + m[2].x) / s;
-	}
-	else if (m[1].y > m[2].z)
-	{
-		float s = sqrt(1.0f + m[1].y - m[0].x - m[2].z) * 2.0f;
-		q.w = (m[0].z - m[2].x) / s;
-		q.x = (m[0].y + m[1].x) / s;
-		q.y = 0.25f * s;
-		q.z = (m[1].z + m[2].y) / s;
-	}
-	else
-	{
-		float s = sqrt(1.0f + m[2].z - m[0].x - m[1].y) * 2.0f;
-		q.w = (m[1].x - m[0].y) / s;
-		q.x = (m[0].z + m[2].x) / s;
-		q.y = (m[1].z + m[2].y) / s;
-		q.z = 0.25f * s;
-	}
+
+	bool tracePositive = trace > 0.0f;
+	float s0 = sqrt(trace + 1.0f) * 2.0f;
+	float4 q0 = float4(
+		(m[2].y - m[1].z) / s0,
+		(m[0].z - m[2].x) / s0,
+		(m[1].x - m[0].y) / s0,
+		0.25f * s0
+	);
+
+	bool cond1 = (m[0].x > m[1].y) && (m[0].x > m[2].z);
+	float s1 = sqrt(1.0f + m[0].x - m[1].y - m[2].z) * 2.0f;
+	float4 q1 = float4(
+		0.25f * s1,
+		(m[0].y + m[1].x) / s1,
+		(m[0].z + m[2].x) / s1,
+		(m[2].y - m[1].z) / s1
+	);
+
+	bool cond2 = m[1].y > m[2].z;
+	float s2 = sqrt(1.0f + m[1].y - m[0].x - m[2].z) * 2.0f;
+	float4 q2 = float4(
+		(m[0].y + m[1].x) / s2,
+		0.25f * s2,
+		(m[1].z + m[2].y) / s2,
+		(m[0].z - m[2].x) / s2
+	);
+
+	float s3 = sqrt(1.0f + m[2].z - m[0].x - m[1].y) * 2.0f;
+	float4 q3 = float4(
+		(m[0].z + m[2].x) / s3,
+		(m[1].z + m[2].y) / s3,
+		0.25f * s3,
+		(m[1].x - m[0].y) / s3
+	);
+
+	q = tracePositive ? q0 : (cond1 ? q1 : (cond2 ? q2 : q3));
 	return q;
 }
 
 // Quaternion to Matrix (3x3)
 float3x3 QuaternionToRotationMatrix(float4 q)
 {
-	float x2 = q.x + q.x,  y2 = q.y + q.y,  z2 = q.z + q.z;
-	float xx = q.x * x2,   yy = q.y * y2,   zz = q.z * z2;
-	float xy = q.x * y2,   xz = q.x * z2,   yz = q.y * z2;
-	float wx = q.w * x2,   wy = q.w * y2,   wz = q.w * z2;
+	float x2 = q.x + q.x,  y2 = q.y + q.y,	z2 = q.z + q.z;
+	float xx = q.x * x2,   yy = q.y * y2,	zz = q.z * z2;
+	float xy = q.x * y2,   xz = q.x * z2,	yz = q.y * z2;
+	float wx = q.w * x2,   wy = q.w * y2,	wz = q.w * z2;
 
 	float3x3 m;
-	m[0] = float3(1.0f - (yy + zz), xy - wz,         xz + wy);
-	m[1] = float3(xy + wz,          1.0f - (xx + zz), yz - wx);
-	m[2] = float3(xz - wy,          yz + wx,         1.0f - (xx + yy));
+	m[0] = float3(1.0f - (yy + zz), xy - wz, xz + wy);
+	m[1] = float3(xy + wz, 1.0f - (xx + zz), yz - wx);
+	m[2] = float3(xz - wy, yz + wx, 1.0f - (xx + yy));
 	return m;
 }
 
-// Blend 2 bone weights (TODO: increase to 4 in the future, when skinned meshes are implemented)
+// Blend bone matrices using quaternion-based rotation and linear translation
 float4x4 BlendBoneMatrices(VertexShaderInput input, float4x4 bones[MAX_BONES], bool onlyRotation)
 {
-	float weight0 = input.BoneWeight[0];
-	float weight1 = input.BoneWeight[1];
-	float4x4 m0 = bones[input.BoneIndex[0]];
-	float4x4 m1 = bones[input.BoneIndex[1]];
+	float4 blendedQuat = float4(0, 0, 0, 0);
+	float3 blendedTranslation = float3(0, 0, 0);
 
-	// Extract and blend rotations (quaternions)
-	float3x3 r0 = (float3x3)m0;
-	float3x3 r1 = (float3x3)m1;
-	float4 q0 = RotationMatrixToQuaternion(r0);
-	float4 q1 = RotationMatrixToQuaternion(r1);
-
-	// Ensure shortest rotation path
-	if (dot(q0, q1) < 0.0f)
-		q1 = -q1;
-		
-	// Blend and convert back to 3x3 matrix
-	float4 qBlend = normalize(q0 * weight0 + q1 * weight1);
-	float3x3 rBlend = QuaternionToRotationMatrix(qBlend);
-
-	// Build final 4x4 matrix, keep translation from m0
-	float4x4 result = float4x4(
-		float4(rBlend[0], 0.0f),
-		float4(rBlend[1], 0.0f),
-		float4(rBlend[2], 0.0f),
-		m0[3] // Translation row unchanged
-	);
-
-	if (!onlyRotation)
+	[unroll]
+	for (int i = 0; i < MAX_BONE_WEIGHTS; ++i)
 	{
-		// Blend translation
-		float3 t0 = m0[3].xyz;
-		float3 t1 = m1[3].xyz;
-		float3 tBlend = t0 * weight0 + t1 * weight1;
-		result[3] = float4(tBlend, 1.0f);
+		float w = input.BoneWeight[i];
+		int index = input.BoneIndex[i];
+		float4x4 bone = bones[index];
+
+		float3x3 rot = (float3x3)bone;
+		float4 q = RotationMatrixToQuaternion(rot);
+
+		// Ensure shortest path for interpolation (flip if dot < 0)
+		float dotPrev = dot(blendedQuat, q);
+		q *= sign(dotPrev + 1e-5f); // Avoid zero dot product flip
+
+		blendedQuat += q * w;
+
+		if (!onlyRotation)
+		{
+			blendedTranslation += bone[3].xyz * w;
+		}
 	}
+
+	blendedQuat = normalize(blendedQuat);
+	float3x3 finalRot = QuaternionToRotationMatrix(blendedQuat);
+
+	float4x4 result = float4x4(
+		float4(finalRot[0], 0.0f),
+		float4(finalRot[1], 0.0f),
+		float4(finalRot[2], 0.0f),
+		float4(onlyRotation ? bones[input.BoneIndex[0]][3].xyz : blendedTranslation, 1.0f)
+	);
 
 	return result;
 }

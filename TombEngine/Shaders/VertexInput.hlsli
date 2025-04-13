@@ -1,6 +1,8 @@
 #ifndef VERTEXINPUT
 #define VERTEXINPUT
 
+#define MAX_BONE_WEIGHTS 4
+
 struct VertexShaderInput 
 {
 	float3 Position: POSITION0;
@@ -11,8 +13,8 @@ struct VertexShaderInput
 	float3 Binormal: BINORMAL0;
 	unsigned int AnimationFrameOffset: ANIMATIONFRAMEOFFSET;
 	float4 Effects: EFFECTS;
-	unsigned int BoneIndex[4]: BONEINDICES;
-	float BoneWeight[4]: BONEWEIGHTS;
+	unsigned int BoneIndex[MAX_BONE_WEIGHTS]: BONEINDICES;
+	float BoneWeight[MAX_BONE_WEIGHTS]: BONEWEIGHTS;
 	unsigned int PolyIndex : POLYINDEX;
 	unsigned int Index: DRAWINDEX;
 	int Hash : HASH;
