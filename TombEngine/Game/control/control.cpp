@@ -194,6 +194,7 @@ GameStatus GamePhase(bool insideMenu)
 	UpdateBlood();
 	UpdateBubbles();
 	UpdateDebris();
+	UpdateGunFlashes();
 	UpdateGunShells();
 	UpdateFootprints();
 	UpdateSplashes();

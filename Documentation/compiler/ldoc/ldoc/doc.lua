@@ -868,20 +868,19 @@ function build_arg_list (names,pmods)
       local opt
       if m then
          if not m.optchain then
-            acc ((']'):rep(npending))
             npending=0
          end
          opt = m.optchain or m.opt
-         if opt then
-            acc('[')
-            npending=npending+1
-         end
       end
       if i>1 then acc (', ') end
-      acc(names[i])
-      if opt and opt ~= true then acc('='..opt) end
+      if opt then
+         acc('[' .. names[i])
+         if opt ~= true then acc('='..opt) end
+         acc(']')
+      else
+         acc(names[i])
+      end
    end
-   acc ((']'):rep(npending))
    return  '('..table.concat(buffer)..')'
 end
 
