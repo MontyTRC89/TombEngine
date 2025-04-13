@@ -176,11 +176,11 @@
 	<td class="summary">Play a flyby sequence.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#GetFlybyPosition">GetFlybyPosition(seqID, progress[, loop])</a></td>
+	<td class="name" ><a href="#GetFlybyPosition">GetFlybyPosition(seqID, progress, [loop])</a></td>
 	<td class="summary">Get a flyby sequence's position at a specified progress point in percent.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#GetFlybyRotation">GetFlybyRotation(seqID, progress[, loop])</a></td>
+	<td class="name" ><a href="#GetFlybyRotation">GetFlybyRotation(seqID, progress, [loop])</a></td>
 	<td class="summary">Get a flyby sequence's rotation at a specified progress point in percent.</td>
 	</tr>
 	<tr>
@@ -499,7 +499,7 @@
 </dd>
     <dt>
     <a name = "GetFlybyPosition"></a>
-    <strong>GetFlybyPosition(seqID, progress[, loop])</strong>
+    <strong>GetFlybyPosition(seqID, progress, [loop])</strong>
     </dt>
     <dd>
     Get a flyby sequence's position at a specified progress point in percent.
@@ -519,7 +519,7 @@
         <li><span class="parameter">loop</span>
             <span class="types"><span class="type">bool</span></span>
          Smooth the position near start and end points, as if the sequence is looped.
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
     </ul>
 
@@ -536,7 +536,7 @@
 </dd>
     <dt>
     <a name = "GetFlybyRotation"></a>
-    <strong>GetFlybyRotation(seqID, progress[, loop])</strong>
+    <strong>GetFlybyRotation(seqID, progress, [loop])</strong>
     </dt>
     <dd>
     Get a flyby sequence's rotation at a specified progress point in percent.
@@ -556,7 +556,7 @@
         <li><span class="parameter">loop</span>
             <span class="types"><span class="type">bool</span></span>
          Smooth the position near start and end points, as if the sequence is looped.
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
     </ul>
 
