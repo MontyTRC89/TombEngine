@@ -481,7 +481,7 @@ namespace TEN::Scripting::Effects
 	/// Emit blood.
 	// @function EmitBlood
 	// @tparam Vec3 pos
-	// @tparam int count Sprite count. __default: 1__
+	// @tparam[opt=1] int count Sprite count.
 	static void EmitBlood(const Vec3& pos, TypeOrNil<int> count)
 	{
 		int roomNumber = FindRoomNumber(pos.ToVector3i());
@@ -495,8 +495,8 @@ namespace TEN::Scripting::Effects
 	/// Emit an air bubble in a water room.
 	// @function EmitAirBubble
 	// @tparam Vec3 pos World position where the effect will be spawned. Must be in a water room.
-	// @tparam[opt] float size Sprite size. __Default: 32__
-	// @tparam[opt] float amp Oscillation amplitude. __Default: 32__
+	// @tparam[opt=32] float size Sprite size.
+	// @tparam[opt=32] float amp Oscillation amplitude.
 	static void EmitAirBubble(const Vec3& pos, TypeOrNil<float> size, TypeOrNil<float> amp)
 	{
 		constexpr auto DEFAULT_SIZE = 128.0f;
@@ -511,10 +511,10 @@ namespace TEN::Scripting::Effects
 	/// Emit waterfall mist.
 	// @function EmitWaterfallMist
 	// @tparam Vec3 pos World position where the effect will be spawned.
-	// @tparam[opt] float size Effect size. __Default: 64__
-	// @tparam[opt] float width Width of the effect. __Default: 32__
-	// @tparam[opt] float rot Rotation of effect in degrees. __Default: 0__
-	// @tparam[opt] Color color Color of the effect.__Default: Color(255, 255, 255, 255))__
+	// @tparam[opt=64] float size Effect size.
+	// @tparam[opt=32] float width Width of the effect.
+	// @tparam[opt=0] float rot Rotation of effect in degrees.
+	// @tparam[opt=Color(255, 255, 255, 255)] Color color Color of the effect.
 	static void EmitWaterfallMist(const Vec3& pos, TypeOrNil<int> size, TypeOrNil<int> width, TypeOrNil<float> angle, TypeOrNil<ScriptColor> color)
 	{
 		constexpr auto DEFAULT_SIZE = 64;
@@ -541,8 +541,8 @@ namespace TEN::Scripting::Effects
 	/// Make an explosion. Does not hurt Lara
 	// @function MakeExplosion 
 	// @tparam Vec3 pos
-	// @tparam float size (default 512.0) this will not be the size of the sprites, but rather the distance between the origin and any additional sprites
-	// @tparam bool shockwave (default false) if true, create a very faint white shockwave which will not hurt Lara. For underwater rooms it creates a splash if the pos is near the surface.
+	// @tparam[opt=512] float size This will not be the size of the sprites, but rather the distance between the origin and any additional sprites
+	// @tparam[opt=false] bool shockwave If true, create a very faint white shockwave which will not hurt Lara. For underwater rooms it creates a splash if the pos is near the surface.
 	static void MakeExplosion(Vec3 pos, TypeOrNil<float> size, TypeOrNil<bool> shockwave)
 	{
 		int roomNumber = FindRoomNumber(pos.ToVector3i());
@@ -620,17 +620,16 @@ namespace TEN::Scripting::Effects
 	/// Emit a visual sink effect.
 	// @function EmitSink
 	// @tparam Vec3 pos World position.
-	// @tparam Vec3 dir Directional vector.
-	// @tparam[opt] float radius Radius of emitter. The particles will be emitted inside the circle of provided radius measured from centre of world position. __default: 512__ 
-	// @tparam[opt] float life Lifespan in seconds. __default: 1__
-	// @tparam[opt] float vel Velocity of the particles in world units per second. __default: 512__
-	// @tfield[opt] float friction Friction affecting velocity over time in world units per second. __default: 0__
-	// @tparam[opt] float maxSize Max size of the particle. __default: 25__
-	// @tparam[opt] Color startColor Color at start of life. __default: Color(128, 128, 128)__
-	// @tparam[opt] Color endColor Color at end of life. __default: Color(0, 0, 0)__
-	// @tparam[opt] Objects.ObjID.SpriteConstants spriteSeqID Sprite sequence slot ID. __default: Objects.ObjID.DEFAULT_SPRITES__
-	// @tparam[opt] int spriteID Sprite ID in the sprite sequence slot. __default: 14 (UNDERWATER DUST)__
-	static void EmitSink(const Vec3& pos, const Vec3& dir, TypeOrNil<float> radius, TypeOrNil<float> life, TypeOrNil<float> vel, TypeOrNil<float> friction, TypeOrNil<float> maxSize, TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<GAME_OBJECT_ID> spriteSeqID, TypeOrNil<int> spriteID)
+	// @tparam Vec3 dir Directional velocity of the particles in world units per second.
+	// @tparam[opt=512] float radius Radius of emitter. The particles will be emitted inside the circle of provided radius measured from centre of world position.
+	// @tparam[opt=1] float life Lifespan in seconds.
+	// @tfield[opt=0] float friction Friction affecting velocity over time in world units per second.
+	// @tparam[opt=25] float maxSize Max size of the particle.
+	// @tparam[opt=Color(128, 128, 128)] Color startColor Color at start of life.
+	// @tparam[opt=Color(0, 0, 0)] Color endColor Color at end of life.
+	// @tparam[opt=Objects.ObjID.DEFAULT_SPRITES] Objects.ObjID.SpriteConstants spriteSeqID Sprite sequence slot ID.
+	// @tparam[opt=14 (UNDERWATER_DUST)] int spriteID Sprite ID in the sprite sequence slot.
+	static void EmitSink(const Vec3& pos, const Vec3& dir, TypeOrNil<float> radius, TypeOrNil<float> life, TypeOrNil<float> friction, TypeOrNil<float> maxSize, TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<GAME_OBJECT_ID> spriteSeqID, TypeOrNil<int> spriteID)
 	{
 		constexpr auto DEFAULT_LIFE = 1.0f;
 		constexpr auto SECS_PER_FRAME = 1.0f / (float)FPS;
@@ -641,10 +640,9 @@ namespace TEN::Scripting::Effects
 			return;
 
 		auto convertedPos = pos.ToVector3();
-		auto convertedDir = dir.ToVector3();
+		auto convertedDir = dir.ToVector3() / (float)FPS;
 		auto convertedRad = ValueOr<float>(radius, BLOCK(0.5f));
 		auto convertedLife = std::max(0.1f, ValueOr<float>(life, DEFAULT_LIFE));
-		auto convertedVel = ValueOr<float>(vel, BLOCK(0.5f)) / (float)FPS;
 		auto convertedFriction = ValueOr<float>(friction, 0) / (float)FPS;
 		auto convertedMaxSize = std::max(0.1f, ValueOr<float>(maxSize, DUST_SIZE_MAX));
 		auto convertedStartColor = ValueOr<ScriptColor>(startColor, ScriptColor(128, 128, 128, 255));
@@ -681,12 +679,9 @@ namespace TEN::Scripting::Effects
 		part.z = convertedPos.z + randRadius * sin(angle);
 		part.roomNumber = FindRoomNumber(Vector3i(part.x, part.y, part.z));
 
-		// Normalize direction
-		convertedDir.Normalize();
-
-		part.xVel = convertedDir.x * convertedVel * 32;
-		part.yVel = convertedDir.y * convertedVel * 32;
-		part.zVel = convertedDir.z * convertedVel * 32;
+		part.xVel = convertedDir.x * 32;
+		part.yVel = convertedDir.y * 32;
+		part.zVel = convertedDir.z * 32;
 
 		// Other properties
 		part.friction = convertedFriction;
