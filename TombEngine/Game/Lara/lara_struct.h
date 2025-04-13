@@ -827,45 +827,15 @@ enum LaraAnim
 	
 	// 569-598 reserved for ladder object. -- Sezz 2023.04.16
 
-	LA_LADDER1 = 569,
-	LA_LADDER2 = 570,
-	LA_LADDER3 = 571,
-	LA_LADDER4 = 572,
-	LA_LADDER5 = 573,
-	LA_LADDER6 = 574,
-	LA_LADDER7 = 575,
-	LA_LADDER8 = 576,
-	LA_LADDER9 = 577,
-	LA_LADDER10 = 578,
-	LA_LADDER11 = 579,
-	LA_LADDER12 = 580,
-	LA_LADDER13 = 581,
-	LA_LADDER14 = 582,
-	LA_LADDER15 = 583,
-	LA_LADDER16 = 584,
-	LA_LADDER17 = 585,
-	LA_LADDER18 = 586,
-	LA_LADDER19 = 587,
-	LA_LADDER20 = 588,
-	LA_LADDER21 = 589,
-	LA_LADDER22 = 590,
-	LA_LADDER23 = 591,
-	LA_LADDER24 = 592,
-	LA_LADDER25 = 593,
-	LA_LADDER26 = 594,
-	LA_LADDER27 = 595,
-	LA_LADDER28 = 596,
-	LA_LADDER29 = 597,
-	LA_LADDER30 = 598,
-
-	//ADD NEW ANIMATIONS HERE
 	LA_UNDERWATER_WALL_KICK = 599,			// Lara kick wall underwater.
 	LA_WALL_PUSH = 600,						// Lara Push Wall.
 	LA_WALL_LEVER_SWITCH = 601,				// Use underwater level above ground
 	LA_UNDERWATER_PULLEY_GRAB = 602,		// Grab underwater pulley
 	LA_UNDERWATER_PULLEY_PULL = 603,		// Pull underwater pulley		
 	LA_UNDERWATER_PULLEY_UNGRAB = 604,		// Release underwater pulley
-	LA_CEILING_LEVER_SWITCH = 605,		// Release underwater pulley
+	LA_CEILING_LEVER_SWITCH = 605,			// Use underwater ceiling switch above ground
+
+	//ADD NEW ANIMATIONS HERE
 
 	NUM_LARA_ANIMS
 

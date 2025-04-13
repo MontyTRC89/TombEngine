@@ -176,7 +176,7 @@ bool SwitchTrigger(short itemNumber, short timer)
 		return false;
 
 	//Handle Pulley
-	if (item.ObjectNumber >= ID_PULLEY &&
+	if (item.ObjectNumber == ID_PULLEY &&
 		item.ItemFlags[5] != 0 && item.ItemFlags[4] == 1 &&
 		player.Control.HandStatus != HandStatus::Busy)
 	{
