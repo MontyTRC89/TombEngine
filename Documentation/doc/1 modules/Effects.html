@@ -140,11 +140,11 @@
 	<td class="summary">Emit a shockwave, similar to that seen when a harpy projectile hits something.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#EmitLight">EmitLight(pos[, color][, radius][, shadows][, name])</a></td>
+	<td class="name" ><a href="#EmitLight">EmitLight(pos, [color], [radius], [shadows], [name])</a></td>
 	<td class="summary">Emit dynamic light that lasts for a single frame.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#EmitSpotLight">EmitSpotLight(pos, dir[, color][, radius][, falloff][, distance][, shadows][, name])</a></td>
+	<td class="name" ><a href="#EmitSpotLight">EmitSpotLight(pos, dir, [color], [radius], [falloff], [distance], [shadows], [name])</a></td>
 	<td class="summary">Emit dynamic directional spotlight that lasts for a single frame.</td>
 	</tr>
 	<tr>
@@ -152,7 +152,7 @@
 	<td class="summary">Emit blood.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#EmitAirBubble">EmitAirBubble(pos[, size][, amp])</a></td>
+	<td class="name" ><a href="#EmitAirBubble">EmitAirBubble(pos, [size], [amp])</a></td>
 	<td class="summary">Emit an air bubble in a water room.</td>
 	</tr>
 	<tr>
@@ -172,7 +172,7 @@
 	<td class="summary">Get the wind vector for the current game frame.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#EmitStreamer">EmitStreamer(mov, tag, pos, dir[, rot][, startColor][, endColor][, width][, life][, vel][, expRate][, rotRate][, edgeFeatherMode][, lengthFeatherMode][, blendID])</a></td>
+	<td class="name" ><a href="#EmitStreamer">EmitStreamer(mov, tag, pos, dir, [rot], [startColor], [endColor], [width], [life], [vel], [expRate], [rotRate], [edgeFeatherMode], [lengthFeatherMode], [blendID])</a></td>
 	<td class="summary">Emit an extending streamer effect.</td>
 	</tr>
 </table>
@@ -454,7 +454,7 @@ EmitAdvancedParticle(particle)</pre>
 </dd>
     <dt>
     <a name = "EmitLight"></a>
-    <strong>EmitLight(pos[, color][, radius][, shadows][, name])</strong>
+    <strong>EmitLight(pos, [color], [radius], [shadows], [name])</strong>
     </dt>
     <dd>
     Emit dynamic light that lasts for a single frame.
@@ -471,22 +471,22 @@ EmitAdvancedParticle(particle)</pre>
         <li><span class="parameter">color</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
          light color (default Color(255, 255, 255))
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">radius</span>
             <span class="types"><span class="type">int</span></span>
          measured in "clicks" or 256 world units (default 20)
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">shadows</span>
             <span class="types"><span class="type">bool</span></span>
          determines whether light should generate dynamic shadows for applicable moveables (default is false)
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">name</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
          if provided, engine will interpolate this light for high framerate mode (be careful not to use same name for different lights)
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
     </ul>
 
@@ -497,7 +497,7 @@ EmitAdvancedParticle(particle)</pre>
 </dd>
     <dt>
     <a name = "EmitSpotLight"></a>
-    <strong>EmitSpotLight(pos, dir[, color][, radius][, falloff][, distance][, shadows][, name])</strong>
+    <strong>EmitSpotLight(pos, dir, [color], [radius], [falloff], [distance], [shadows], [name])</strong>
     </dt>
     <dd>
     Emit dynamic directional spotlight that lasts for a single frame.
@@ -518,32 +518,32 @@ EmitAdvancedParticle(particle)</pre>
         <li><span class="parameter">color</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
          (default Color(255, 255, 255))
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">radius</span>
             <span class="types"><span class="type">int</span></span>
          overall radius at the endpoint of a light cone, measured in "clicks" or 256 world units (default 10)
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">falloff</span>
             <span class="types"><span class="type">int</span></span>
          radius, at which light starts to fade out, measured in "clicks" (default 5)
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">distance</span>
             <span class="types"><span class="type">int</span></span>
          distance, at which light cone fades out, measured in "clicks" (default 20)
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">shadows</span>
             <span class="types"><span class="type">bool</span></span>
          determines whether light should generate dynamic shadows for applicable moveables (default is false)
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">name</span>
             <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
          if provided, engine will interpolate this light for high framerate mode (be careful not to use same name for different lights)
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
     </ul>
 
@@ -582,7 +582,7 @@ EmitAdvancedParticle(particle)</pre>
 </dd>
     <dt>
     <a name = "EmitAirBubble"></a>
-    <strong>EmitAirBubble(pos[, size][, amp])</strong>
+    <strong>EmitAirBubble(pos, [size], [amp])</strong>
     </dt>
     <dd>
     Emit an air bubble in a water room.
@@ -598,12 +598,12 @@ EmitAdvancedParticle(particle)</pre>
         <li><span class="parameter">size</span>
             <span class="types"><span class="type">float</span></span>
          Sprite size. <strong>Default: 32</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">amp</span>
             <span class="types"><span class="type">float</span></span>
          Oscillation amplitude. <strong>Default: 32</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
     </ul>
 
@@ -718,7 +718,7 @@ EmitAdvancedParticle(particle)</pre>
 </dd>
     <dt>
     <a name = "EmitStreamer"></a>
-    <strong>EmitStreamer(mov, tag, pos, dir[, rot][, startColor][, endColor][, width][, life][, vel][, expRate][, rotRate][, edgeFeatherMode][, lengthFeatherMode][, blendID])</strong>
+    <strong>EmitStreamer(mov, tag, pos, dir, [rot], [startColor], [endColor], [width], [life], [vel], [expRate], [rotRate], [edgeFeatherMode], [lengthFeatherMode], [blendID])</strong>
     </dt>
     <dd>
     Emit an extending streamer effect.
@@ -746,57 +746,57 @@ EmitAdvancedParticle(particle)</pre>
         <li><span class="parameter">rot</span>
             <span class="types"><span class="type">float</span></span>
          Start rotation in degrees. <strong>Default: 0</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">startColor</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
          Color at the start of life. <strong>Default: Color(255, 255, 255, 255))</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">endColor</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
          Color at the end of life. <strong>Default: Color(0, 0, 0, 0))</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">width</span>
             <span class="types"><span class="type">float</span></span>
          Width in world units. <strong>Default: 0</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">life</span>
             <span class="types"><span class="type">float</span></span>
          Lifetime in seconds. <strong>Default: 1</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">vel</span>
             <span class="types"><span class="type">float</span></span>
          Movement velocity in world units per second. <strong>Default: 0</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">expRate</span>
             <span class="types"><span class="type">float</span></span>
          Width expansion rate in world units per second. <strong>Default: 0</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">rotRate</span>
             <span class="types"><span class="type">float</span></span>
          Rotation rate in degrees per second. <strong>Default: 0</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">edgeFeatherMode</span>
             <span class="types"><a class="type" href="../4 enums/Effects.StreamerFeatherMode.html#">StreamerFeatherMode</a></span>
          Edge feather mode. <strong>Default: Effects.StreamerFeatherMode.NONE</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">lengthFeatherMode</span>
             <span class="types"><a class="type" href="../4 enums/Effects.StreamerFeatherMode.html#">StreamerFeatherMode</a></span>
          Length feather mode. <strong>UNIMPLEMENTED, currently will always leave a fading tail</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">blendID</span>
             <span class="types"><a class="type" href="../4 enums/Effects.BlendID.html#">BlendID</a></span>
          Renderer blend ID. <strong>Default: Effects.BlendID.ALPHA_BLEND</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
     </ul>
 
@@ -831,127 +831,127 @@ EmitAdvancedParticle(particle)</pre>
         <li><span class="parameter">spriteSeqID</span>
             <span class="types"><a class="type" href="../4 enums/Objects.ObjID.html#SpriteConstants">SpriteConstants</a></span>
          Sprite sequence slot ID. <strong>default: Objects.ObjID.DEFAULT_SPRITES</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">spriteID</span>
             <span class="types"><span class="type">int</span></span>
          Sprite ID in the sprite sequence slot. <strong>default: 0</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">life</span>
             <span class="types"><span class="type">float</span></span>
          Lifespan in seconds. <strong>default: 2</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">maxYVel</span>
             <span class="types"><span class="type">float</span></span>
          Maximum vertical velocity in world units per second. <strong>default: 0</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">gravity</span>
             <span class="types"><span class="type">float</span></span>
          Effect of gravity in world units per second. Positive value ascend, negative value descend. <strong>default: 0</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">friction</span>
             <span class="types"><span class="type">float</span></span>
          Friction affecting velocity over time in world units per second. <strong>default: 0</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">startRot</span>
             <span class="types"><span class="type">float</span></span>
          Rotation at start of life. <strong>default: random</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">rotVel</span>
             <span class="types"><span class="type">float</span></span>
          Rotational velocity in degrees per second. <strong>default: 0</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">startSize</span>
             <span class="types"><span class="type">float</span></span>
          Size at start of life. <strong>default: 10</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">endSize</span>
             <span class="types"><span class="type">float</span></span>
          Size at end of life. <strong>default: 0</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">startColor</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
          Color at start of life. <strong>default: Color(255, 255, 255)</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">endColor</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
          Color at end of life. Note that this will finish long before the end of life due to internal math. <strong>default: Color(255, 255, 255)</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">blendMode</span>
             <span class="types"><a class="type" href="../4 enums/Effects.BlendID.html#">BlendID</a></span>
          Render blend mode. <strong>default: TEN.Effects.BlendID.ALPHA_BLEND</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">damage</span>
             <span class="types"><span class="type">bool</span></span>
          Harm the player on collision. <strong>default: false</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">poison</span>
             <span class="types"><span class="type">bool</span></span>
          Poison the player on collision. <strong>default: false</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">burn</span>
             <span class="types"><span class="type">bool</span></span>
          Burn the player on collision. <strong>default: false</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">wind</span>
             <span class="types"><span class="type">bool</span></span>
          Affect position by wind in outside rooms. <strong>default: false</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">damageHit</span>
             <span class="types"><span class="type">int</span></span>
          Player damage amount on collision. <strong>default: 2</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">light</span>
             <span class="types"><span class="type">bool</span></span>
          Emit a colored light. CAUTION: Recommended only for a single particle. Too many particles with lights can overwhelm the lighting system. <strong>default: false</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">lightRadius</span>
             <span class="types"><span class="type">int</span></span>
          Light radius in 1/4 blocks. <strong>default: 0</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">lightFlicker</span>
             <span class="types"><span class="type">int</span></span>
          Interval at which the light should flicker. <strong>default: 0</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">soundID</span>
             <span class="types"><span class="type">int</span></span>
          Sound ID to play. CAUTION: Recommended only for a single particle. Too many particles with sounds can overwhelm the sound system. <strong>default: none</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">animated</span>
             <span class="types"><span class="type">bool</span></span>
          Play animates sprite sequence. <strong>default: false</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">animType</span>
             <span class="types"><a class="type" href="../4 enums/Effects.ParticleAnimationType.html#">ParticleAnimationType</a></span>
          Animation type of the sprite sequence. <strong>default: TEN.Effects.ParticleAnimationType.LOOP</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">frameRate</span>
             <span class="types"><span class="type">float</span></span>
          Sprite sequence animation framerate. <strong>default: 1</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
     </ul>
 
