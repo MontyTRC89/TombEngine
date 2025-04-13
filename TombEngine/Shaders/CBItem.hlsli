@@ -12,6 +12,7 @@ cbuffer ItemBuffer : register(b1)
 	int4 BoneLightModes[MAX_BONES / 4];
 	ShaderLight ItemLights[MAX_LIGHTS_PER_ITEM];
 	int NumItemLights;
+	int Skinned;
 };
 
 #endif // CBITEMSHADER

@@ -455,6 +455,36 @@ float3x3 QuaternionToRotationMatrix(float4 q)
 	return m;
 }
 
+// Spherical Linear Interpolation between two quaternions
+float4 Slerp(float4 q0, float4 q1, float t)
+{
+    // Compute the dot product (cosine of the angle between them)
+    float dotProd = dot(q0, q1);
+
+    // If the dot product is close to 1, use linear interpolation
+    if (dotProd > 0.9995f)
+    {
+        return normalize(lerp(q0, q1, t));  // Linear interpolation (fast and simple)
+    }
+
+    // Ensure the shortest path by flipping the sign of q1 if dot is negative
+    if (dotProd < 0.0f)
+    {
+        q1 = -q1;
+        dotProd = -dotProd;
+    }
+
+    // Calculate the angle between the two quaternions
+    float theta_0 = acos(dotProd);  // Angle between quaternions
+    float theta = theta_0 * t;      // Interpolation angle
+
+    float4 q2 = q1 - q0 * dotProd; // Subtract to get the orthogonal component
+    q2 = normalize(q2);             // Normalize to ensure it's a unit quaternion
+
+    // SLERP formula
+    return q0 * cos(theta) + q2 * sin(theta);
+}
+
 // Blend bone matrices using quaternion-based rotation and linear translation
 float4x4 BlendBoneMatrices(VertexShaderInput input, float4x4 bones[MAX_BONES], bool onlyRotation)
 {
@@ -475,7 +505,7 @@ float4x4 BlendBoneMatrices(VertexShaderInput input, float4x4 bones[MAX_BONES], b
 		float dotPrev = dot(blendedQuat, q);
 		q *= sign(dotPrev + 1e-5f); // Avoid zero dot product flip
 
-		blendedQuat += q * w;
+		blendedQuat = Slerp(blendedQuat, q, w);
 
 		if (!onlyRotation)
 		{
