@@ -1,3 +1,5 @@
+#ifndef VERTEXINPUT
+#define VERTEXINPUT
 
 struct VertexShaderInput 
 {
@@ -9,8 +11,11 @@ struct VertexShaderInput
 	float3 Binormal: BINORMAL0;
 	unsigned int AnimationFrameOffset: ANIMATIONFRAMEOFFSET;
 	float4 Effects: EFFECTS;
-	float Bone: BLENDINDICES;
+	unsigned int BoneIndex[4]: BONEINDICES;
+	float BoneWeight[4]: BONEWEIGHTS;
 	unsigned int PolyIndex : POLYINDEX;
 	unsigned int Index: DRAWINDEX;
 	int Hash : HASH;
 };
+
+#endif // VERTEXINPUT

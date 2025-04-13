@@ -14,7 +14,8 @@ namespace TEN::Renderer::Graphics::Vertices
 
 		unsigned int AnimationFrameOffset = 0;
 		Vector4		 Effects			  = Vector4::Zero;
-		float		 Bone				  = 0.0f;
+		unsigned int BoneIndex[4]		  = { 0, 0, 0, 0 };
+		float		 BoneWeight[4]		  = { 1, 0, 0, 0 };
 		unsigned int IndexInPoly		  = 0;
 		unsigned int OriginalIndex		  = 0;
 		unsigned int Hash				  = 0;

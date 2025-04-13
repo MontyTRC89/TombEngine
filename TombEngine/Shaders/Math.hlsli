@@ -1,6 +1,8 @@
 #ifndef MATH
 #define MATH
 
+#include "./VertexInput.hlsli"
+
 #define PI		3.1415926535897932384626433832795028841971693993751058209749445923
 #define PI2		6.2831853071795864769252867665590057683943387987502116419498891846
 #define EPSILON 1e-38
@@ -23,6 +25,8 @@
 #define MAX_LIGHTS_PER_ITEM	8
 #define MAX_FOG_BULBS	32
 #define SPEC_FACTOR 64
+
+#define MAX_BONES 32
 
 struct ShaderLight
 {
@@ -390,4 +394,102 @@ float3 NormalNoise(float3 v, float3 i, float3 n)
 	// Return perturbed pixel based on reference pixel and resulting vector with threshold c attenuated by 2/5 times.
 	return lerp(v, r, c * 0.3f);
 }
+
+// Matrix (3x3) to Quaternion
+float4 RotationMatrixToQuaternion(float3x3 m)
+{
+	float4 q;
+	float trace = m[0].x + m[1].y + m[2].z;
+	if (trace > 0.0f)
+	{
+		float s = sqrt(trace + 1.0f) * 2.0f;
+		q.w = 0.25f * s;
+		q.x = (m[2].y - m[1].z) / s;
+		q.y = (m[0].z - m[2].x) / s;
+		q.z = (m[1].x - m[0].y) / s;
+	}
+	else if (m[0].x > m[1].y && m[0].x > m[2].z)
+	{
+		float s = sqrt(1.0f + m[0].x - m[1].y - m[2].z) * 2.0f;
+		q.w = (m[2].y - m[1].z) / s;
+		q.x = 0.25f * s;
+		q.y = (m[0].y + m[1].x) / s;
+		q.z = (m[0].z + m[2].x) / s;
+	}
+	else if (m[1].y > m[2].z)
+	{
+		float s = sqrt(1.0f + m[1].y - m[0].x - m[2].z) * 2.0f;
+		q.w = (m[0].z - m[2].x) / s;
+		q.x = (m[0].y + m[1].x) / s;
+		q.y = 0.25f * s;
+		q.z = (m[1].z + m[2].y) / s;
+	}
+	else
+	{
+		float s = sqrt(1.0f + m[2].z - m[0].x - m[1].y) * 2.0f;
+		q.w = (m[1].x - m[0].y) / s;
+		q.x = (m[0].z + m[2].x) / s;
+		q.y = (m[1].z + m[2].y) / s;
+		q.z = 0.25f * s;
+	}
+	return q;
+}
+
+// Quaternion to Matrix (3x3)
+float3x3 QuaternionToRotationMatrix(float4 q)
+{
+	float x2 = q.x + q.x,  y2 = q.y + q.y,  z2 = q.z + q.z;
+	float xx = q.x * x2,   yy = q.y * y2,   zz = q.z * z2;
+	float xy = q.x * y2,   xz = q.x * z2,   yz = q.y * z2;
+	float wx = q.w * x2,   wy = q.w * y2,   wz = q.w * z2;
+
+	float3x3 m;
+	m[0] = float3(1.0f - (yy + zz), xy - wz,         xz + wy);
+	m[1] = float3(xy + wz,          1.0f - (xx + zz), yz - wx);
+	m[2] = float3(xz - wy,          yz + wx,         1.0f - (xx + yy));
+	return m;
+}
+
+// Blend 2 bone weights (TODO: increase to 4 in the future, when skinned meshes are implemented)
+float4x4 BlendBoneMatrices(VertexShaderInput input, float4x4 bones[MAX_BONES], bool onlyRotation)
+{
+	float weight0 = input.BoneWeight[0];
+	float weight1 = input.BoneWeight[1];
+	float4x4 m0 = bones[input.BoneIndex[0]];
+	float4x4 m1 = bones[input.BoneIndex[1]];
+
+	// Extract and blend rotations (quaternions)
+	float3x3 r0 = (float3x3)m0;
+	float3x3 r1 = (float3x3)m1;
+	float4 q0 = RotationMatrixToQuaternion(r0);
+	float4 q1 = RotationMatrixToQuaternion(r1);
+
+	// Ensure shortest rotation path
+	if (dot(q0, q1) < 0.0f)
+		q1 = -q1;
+		
+	// Blend and convert back to 3x3 matrix
+	float4 qBlend = normalize(q0 * weight0 + q1 * weight1);
+	float3x3 rBlend = QuaternionToRotationMatrix(qBlend);
+
+	// Build final 4x4 matrix, keep translation from m0
+	float4x4 result = float4x4(
+		float4(rBlend[0], 0.0f),
+		float4(rBlend[1], 0.0f),
+		float4(rBlend[2], 0.0f),
+		m0[3] // Translation row unchanged
+	);
+
+	if (!onlyRotation)
+	{
+		// Blend translation
+		float3 t0 = m0[3].xyz;
+		float3 t1 = m1[3].xyz;
+		float3 tBlend = t0 * weight0 + t1 * weight1;
+		result[3] = float4(tBlend, 1.0f);
+	}
+
+	return result;
+}
+
 #endif // MATH
