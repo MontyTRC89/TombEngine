@@ -1136,7 +1136,11 @@ namespace TEN::Renderer
 
 				BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[flashBucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
-				auto tMatrix = Matrix::CreateTranslation(settings.MuzzleOffset);
+
+				auto meshOffset = g_Level.Frames[GetAnimData(gunflash, 0).FramePtr].Offset;
+				auto offset = settings.MuzzleOffset + Vector3(meshOffset.x, meshOffset.z, meshOffset.y); // Offsets are inverted because of bone orientation.
+
+				auto tMatrix = Matrix::CreateTranslation(offset);
 				auto rotMatrix = Matrix::CreateRotationX(TO_RAD(Lara.Control.Weapon.GunType == LaraWeaponType::Pistol ? -16830 : -14560)); // HACK
 
 				auto worldMatrix = Matrix::Identity;

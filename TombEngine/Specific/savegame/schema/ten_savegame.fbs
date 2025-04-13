@@ -38,6 +38,7 @@ table LevelData {
 	horizon2_orientation: EulerAngles;
 	horizon2_transparency: float;
 
+	lensflare_enabled: bool;
 	lensflare_sprite_id: int32;
 	lensflare_pitch: float;
 	lensflare_yaw: float;

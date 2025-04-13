@@ -124,7 +124,7 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#DisplaySprite">DisplaySprite(ID, int, pos, rot, scale[, color])</a></td>
+	<td class="name" ><a href="#DisplaySprite">DisplaySprite(ID, int, pos, rot, scale, [color])</a></td>
 	<td class="summary">Create a DisplaySprite object.</td>
 	</tr>
 	<tr>
@@ -180,7 +180,7 @@
 	<td class="summary">Set the color of the display sprite.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#DisplaySprite:Draw">DisplaySprite:Draw([priority][, alignMode][, scaleMode][, blendMode])</a></td>
+	<td class="name" ><a href="#DisplaySprite:Draw">DisplaySprite:Draw([priority], [alignMode], [scaleMode], [blendMode])</a></td>
 	<td class="summary">Draw the display sprite in display space for the current frame.</td>
 	</tr>
 </table>
@@ -194,7 +194,7 @@
     <dl class="function">
     <dt>
     <a name = "DisplaySprite"></a>
-    <strong>DisplaySprite(ID, int, pos, rot, scale[, color])</strong>
+    <strong>DisplaySprite(ID, int, pos, rot, scale, [color])</strong>
     </dt>
     <dd>
     Create a DisplaySprite object.
@@ -226,7 +226,7 @@
         <li><span class="parameter">color</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
          Color. <strong>Default: Color(255, 255, 255, 255)</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
     </ul>
 
@@ -543,7 +543,7 @@
 </dd>
     <dt>
     <a name = "DisplaySprite:Draw"></a>
-    <strong>DisplaySprite:Draw([priority][, alignMode][, scaleMode][, blendMode])</strong>
+    <strong>DisplaySprite:Draw([priority], [alignMode], [scaleMode], [blendMode])</strong>
     </dt>
     <dd>
     Draw the display sprite in display space for the current frame.
@@ -555,22 +555,22 @@
         <li><span class="parameter">priority</span>
             <span class="types"><span class="type">int</span></span>
          Draw priority. Can be thought of as a layer, with higher values having precedence. <strong>Default: 0</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">alignMode</span>
             <span class="types"><a class="type" href="../4 enums/View.AlignMode.html#">AlignMode</a></span>
          Align mode interpreting an offset from the sprite's position. <strong>Default: View.AlignMode.CENTER</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">scaleMode</span>
             <span class="types"><a class="type" href="../4 enums/View.ScaleMode.html#">ScaleMode</a></span>
          Scale mode interpreting the display sprite's horizontal and vertical scale. <strong>Default: View.ScaleMode.FIT</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">blendMode</span>
             <span class="types"><a class="type" href="../4 enums/Effects.BlendID.html#">BlendID</a></span>
          Blend mode. <strong>Default: Effects.BlendID.ALPHABLEND</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
     </ul>
 

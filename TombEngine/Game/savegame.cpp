@@ -1154,6 +1154,7 @@ const std::vector<byte> SaveGame::Build()
 	levelData.add_sky_layer_2_color(level->GetSkyLayerColor(1));
 	levelData.add_sky_layer_2_speed(level->GetSkyLayerSpeed(1));
 
+	levelData.add_lensflare_enabled(level->LensFlare.GetEnabled());
 	levelData.add_lensflare_color(level->LensFlare.GetColor());
 	levelData.add_lensflare_pitch(level->LensFlare.GetPitch());
 	levelData.add_lensflare_yaw(level->LensFlare.GetYaw());
@@ -1855,6 +1856,7 @@ static void ParseLua(const Save::SaveGame* s, bool hubMode)
 	level->Layer2.CloudSpeed = s->level_data()->sky_layer_2_speed();
 	level->Layer2.SetColor(s->level_data()->sky_layer_2_color());
 
+	level->LensFlare.SetEnabled(s->level_data()->lensflare_enabled());
 	level->LensFlare.SetSunSpriteID(s->level_data()->lensflare_sprite_id());
 	level->LensFlare.SetPitch(s->level_data()->lensflare_pitch());
 	level->LensFlare.SetYaw(s->level_data()->lensflare_yaw());
