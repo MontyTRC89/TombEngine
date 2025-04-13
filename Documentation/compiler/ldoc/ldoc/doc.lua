@@ -846,7 +846,7 @@ end
 function build_arg_list (names,pmods)
    -- build up the string representation of the argument list,
    -- using any opt and optchain modifiers if present.
-   -- For instance, '(a [, b])' if b is marked as optional
+   -- For instance, '(a, [b])' if b is marked as optional
    -- with @param[opt] b
    local buffer, npending = { }, 0
    local function acc(x) table.insert(buffer, x) end
@@ -874,9 +874,7 @@ function build_arg_list (names,pmods)
       end
       if i>1 then acc (', ') end
       if opt then
-         acc('[' .. names[i])
-         if opt ~= true then acc('='..opt) end
-         acc(']')
+         acc('[' .. names[i] .. ']')
       else
          acc(names[i])
       end
