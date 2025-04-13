@@ -480,8 +480,8 @@ namespace TEN::Scripting::Effects
 
 	/// Emit blood.
 	// @function EmitBlood
-	// @tparam Vec3 pos
-	// @tparam[opt=1] int count Sprite count.
+	// @tparam Vec3 World position.
+	// @tparam[opt=1] int count Blood count.
 	static void EmitBlood(const Vec3& pos, TypeOrNil<int> count)
 	{
 		int roomNumber = FindRoomNumber(pos.ToVector3i());
@@ -623,7 +623,7 @@ namespace TEN::Scripting::Effects
 	// @tparam Vec3 dir Directional velocity of the particles in world units per second.
 	// @tparam[opt=512] float radius Radius of emitter. The particles will be emitted inside the circle of provided radius measured from centre of world position.
 	// @tparam[opt=1] float life Lifespan in seconds.
-	// @tfield[opt=0] float friction Friction affecting velocity over time in world units per second.
+	// @tparam[opt=0] float friction Friction affecting velocity over time in world units per second.
 	// @tparam[opt=25] float maxSize Max size of the particle.
 	// @tparam[opt=Color(128, 128, 128)] Color startColor Color at start of life.
 	// @tparam[opt=Color(0, 0, 0)] Color endColor Color at end of life.
