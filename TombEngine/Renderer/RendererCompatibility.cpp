@@ -533,6 +533,16 @@ namespace TEN::Renderer
 					_meshes.push_back(mesh);
 				}
 
+				if (obj->skinIndex != NO_VALUE)
+				{
+					RendererMesh* mesh = GetRendererMeshFromTrMesh(&moveable,
+						&g_Level.Meshes[obj->skinIndex],
+						0, false, false, &lastVertex, &lastIndex);
+
+					moveable.Skin = mesh;
+					_meshes.push_back(mesh);
+				}
+
 				if (objNum == ID_IMP_ROCK || objNum == ID_ENERGY_BUBBLES || objNum == ID_BUBBLES || objNum == ID_BODY_PART)
 				{
 					// HACK: these objects must have nmeshes = 0 because engine will use them in a different way while drawing Effects.

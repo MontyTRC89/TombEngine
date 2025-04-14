@@ -290,6 +290,7 @@ void LoadObjects()
 	{
 		auto mesh = MESH{};
 
+		mesh.hidden = ReadBool();
 		mesh.lightMode = (LightMode)ReadUInt8();
 
 		mesh.sphere.Center.x = ReadFloat();
@@ -447,7 +448,8 @@ void LoadObjects()
 		}
 
 		Objects[objNum].loaded = true;
-		Objects[objNum].nmeshes = ReadInt32();
+		Objects[objNum].skinIndex = ReadInt32();
+		Objects[objNum].nmeshes   = ReadInt32();
 		Objects[objNum].meshIndex = ReadInt32();
 		Objects[objNum].boneIndex = ReadInt32();
 		Objects[objNum].frameBase = ReadInt32();

@@ -75,6 +75,7 @@ struct SPRITE
 
 struct MESH
 {
+	bool hidden;
 	LightMode lightMode;
 	BoundingSphere sphere;
 	std::vector<Vector3> positions;

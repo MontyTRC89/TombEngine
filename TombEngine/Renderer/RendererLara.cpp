@@ -323,16 +323,24 @@ void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 	BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade, acceptsShadows);
 	_cbItem.UpdateData(_stItem, _context.Get());
 
-	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
+	if (laraObj.Skin != nullptr)
 	{
-		if (!nativeItem->MeshBits.Test(k))
-			continue;
+		DrawMoveableMesh(item, laraObj.Skin, room, 0, view, rendererPass);
+	}
+	else
+	{
+		for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
+		{
+			if (!nativeItem->MeshBits.Test(k))
+				continue;
 
-		DrawMoveableMesh(item, GetMesh(nativeItem->Model.MeshIndex[k]), room, k, view, rendererPass);
+			DrawMoveableMesh(item, GetMesh(nativeItem->Model.MeshIndex[k]), room, k, view, rendererPass);
+		}
+
+		DrawLaraJoints(item, room, view, rendererPass);
 	}
 
 	DrawLaraHolsters(item, room, view, rendererPass);
-	DrawLaraJoints(item, room, view, rendererPass);
 	DrawLaraHair(item, room, view, rendererPass);
 }
 

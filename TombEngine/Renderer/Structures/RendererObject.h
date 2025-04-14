@@ -14,6 +14,7 @@ namespace TEN::Renderer::Structures
 		int Id;
 		int Type;
 		std::vector<RendererMesh*> ObjectMeshes;
+		RendererMesh* Skin;
 		RendererBone* Skeleton;
 		std::vector<Matrix> AnimationTransforms;
 		std::vector<Matrix> BindPoseTransforms;
