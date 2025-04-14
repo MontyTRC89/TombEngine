@@ -188,8 +188,6 @@ void LoadEventSets();
 void LoadAIObjects();
 void LoadMirrors();
 
-void LoadPortal(RoomData& room);
-
 void GetCarriedItems();
 void GetAIPickups();
 void BuildOutsideRoomsTable();

@@ -106,7 +106,7 @@ namespace TEN::Entities::Generic
 			auto& item = items[i];
 
 			if ((item.ObjectNumber >= ID_PUSHABLE_OBJECT1 && item.ObjectNumber <= ID_PUSHABLE_OBJECT10) ||
-				(item.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE_1 && item.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE_10))
+				(item.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 && item.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10))
 			{
 				pushableItemNumbers.push_back(i);
 			}
@@ -176,7 +176,7 @@ namespace TEN::Entities::Generic
 				auto& currentItem = g_Level.Items[currentItemNumber];
 
 				// If climbable, is in same XZ position, and at lower height.
-				if ((currentItem.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE_1 && currentItem.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE_10) &&
+				if ((currentItem.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 && currentItem.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10) &&
 					(currentItem.Pose.Position.x == pushableItem.Pose.Position.x) && (currentItem.Pose.Position.z == pushableItem.Pose.Position.z) &&
 					(currentItem.Pose.Position.y > pushableItem.Pose.Position.y))
 				{

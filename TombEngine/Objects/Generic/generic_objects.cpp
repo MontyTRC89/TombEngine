@@ -89,7 +89,7 @@ static void StartObject(ObjectInfo* object)
 	for (int objectID = ID_PUSHABLE_OBJECT1; objectID <= ID_PUSHABLE_OBJECT10; objectID++)
 		InitPushableObject(object, objectID);
 
-	for (int objectID = ID_PUSHABLE_OBJECT_CLIMBABLE_1; objectID <= ID_PUSHABLE_OBJECT_CLIMBABLE_10; objectID++)
+	for (int objectID = ID_PUSHABLE_OBJECT_CLIMBABLE1; objectID <= ID_PUSHABLE_OBJECT_CLIMBABLE10; objectID++)
 		InitPushableObject(object, objectID);
 
 	object = &Objects[ID_BRIDGE_FLAT];

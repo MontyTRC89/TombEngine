@@ -67,8 +67,8 @@ namespace TEN::Entities::Generic
 		pushable.Height = GetPushableHeight(pushableItem);
 
 		// Set climbable.
-		if (pushableItem.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE_1 &&
-			pushableItem.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE_10)
+		if (pushableItem.ObjectNumber >= ID_PUSHABLE_OBJECT_CLIMBABLE1 &&
+			pushableItem.ObjectNumber <= ID_PUSHABLE_OBJECT_CLIMBABLE10)
 		{
 			pushable.UseRoomCollision = true;
 			pushable.UseBridgeCollision = true;
