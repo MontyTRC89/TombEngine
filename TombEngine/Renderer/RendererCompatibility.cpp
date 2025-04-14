@@ -972,7 +972,12 @@ namespace TEN::Renderer
 					vertex.Color.z = meshPtr->colors[v].z;
 					vertex.Color.w = 1.0f;
 
-					vertex.BoneIndex[0] = meshPtr->bones[v];
+					for (int b = 0; b < MAX_BONE_WEIGHTS; b++)
+					{
+						vertex.BoneIndex[b] = meshPtr->boneIndices[v][b];
+						vertex.BoneWeight[b] = meshPtr->boneWeights[v][b];
+					}
+
 					vertex.OriginalIndex = v;
 
 					vertex.Effects = Vector4(meshPtr->effects[v].x, meshPtr->effects[v].y, meshPtr->effects[v].z, poly->shineStrength);
