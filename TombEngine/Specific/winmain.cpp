@@ -24,14 +24,10 @@ using namespace TEN::Renderer;
 using namespace TEN::Input;
 using namespace TEN::Utils;
 
-using std::exception;
-using std::string;
-using std::cout;
-using std::endl;
 
 WINAPP App;
-unsigned int ThreadID;
-uintptr_t ThreadHandle;
+unsigned int ThreadID, ConsoleThreadID;
+uintptr_t ThreadHandle, ConsoleThreadHandle;
 HACCEL hAccTable;
 bool DebugMode = false;
 HWND WindowsHandle;
@@ -242,6 +238,31 @@ bool GenerateDummyLevel(const std::string& levelPath)
 	return true;
 }
 
+unsigned CALLBACK ConsoleInput(void*)
+{
+	auto input = std::string();
+	while (!ThreadEnded)
+	{
+		if (!std::getline(std::cin, input))
+			break;
+
+		if (std::regex_match(input, std::regex("^\\s*$")))
+			continue;
+
+		if (g_GameScript == nullptr)
+		{
+			TENLog("Scripting engine not initialized.", LogLevel::Error);
+			continue;
+		}
+		else
+		{
+			g_GameScript->AddConsoleInput(input);
+		}
+	}
+
+	return true;
+}
+
 void WinProcMsg()
 {
 	MSG msg;
@@ -405,8 +426,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Hide console window if mode isn't debug.
 #ifndef _DEBUG
 	if (!DebugMode)
-		ShowWindow(GetConsoleWindow(), 0);
+	{
+		FreeConsole();
+	}
+	else
 #endif
+	{
+		ConsoleThreadHandle = BeginThread(ConsoleInput, ConsoleThreadID);
+	}
 
 	// Clear application structure.
 	memset(&App, 0, sizeof(WINAPP));
@@ -615,6 +642,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 void WinClose()
 {
+	if (ConsoleThreadHandle)
+		CloseHandle((HANDLE)ConsoleThreadHandle);
+
 	WaitForSingleObject((HANDLE)ThreadHandle, 5000);
 
 	DestroyAcceleratorTable(hAccTable);

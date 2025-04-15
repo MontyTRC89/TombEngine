@@ -360,7 +360,7 @@ namespace TEN::Renderer
 
 		// Special effects
 
-		std::vector<Texture2D> _causticTextures;
+		//std::vector<Texture2D> _causticTextures;
 		RendererMirror* _currentMirror = nullptr;
 
 		// Water
@@ -444,6 +444,7 @@ namespace TEN::Renderer
 		void PrepareFires(RenderView& view);
 		void PrepareParticles(RenderView& view);
 		void PrepareSmokes(RenderView& view);
+		void PrepareFireflies(RenderView& view);
 		void PrepareElectricity(RenderView& view);
 		void PrepareHelicalLasers(RenderView& view);
 		void PrepareBlood(RenderView& view);

@@ -17,7 +17,7 @@ cbuffer RoomBuffer : register(b5)
 	int NumRoomLights;
 	int Padding;
 	float2 CausticsStartUV;
-	float2 CausticsScale;
+    float2 CausticsSize;
 	float4 AmbientColor;
 	ShaderLight RoomLights[MAX_LIGHTS_PER_ROOM];
 };
@@ -182,29 +182,33 @@ PixelShaderOutput PS(PixelShaderInput input)
 		}
 	}
 
-	if (Caustics)
-	{
-		float attenuation = saturate(dot(float3(0.0f, -1.0f, 0.0f), normal));
+    if (Caustics)
+    {
+        float attenuation = saturate(dot(float3(0.0f, -1.0f, 0.0f), normal));
 
-		float3 blending = abs(normal);
-		blending = normalize(max(blending, 0.00001f));
-		float b = (blending.x + blending.y + blending.z);
-		blending /= float3(b, b, b);
+        float3 blending = abs(normal);
+        blending = normalize(max(blending, 0.00001f));
+        float b = (blending.x + blending.y + blending.z);
+        blending /= float3(b, b, b);
 
-		float3 p = frac(input.WorldPosition.xyz / 2048.0f); 
-		
-		float3 xaxis = CausticsTexture.SampleLevel(CausticsTextureSampler, float2(p.z, p.y), 0).xyz;
-		float3 yaxis = CausticsTexture.SampleLevel(CausticsTextureSampler, float2(p.z, p.x), 0).xyz;
-		float3 zaxis = CausticsTexture.SampleLevel(CausticsTextureSampler, float2(p.y, p.x), 0).xyz;
+        float3 p = frac(input.WorldPosition.xyz / 2048.0f);
+	
+		float2 uv_x = CausticsStartUV + float2(p.z, p.y) * CausticsSize;
+        float2 uv_y = CausticsStartUV + float2(p.z, p.x) * CausticsSize;
+        float2 uv_z = CausticsStartUV + float2(p.y, p.x) * CausticsSize;
 
-		float3 xc = xaxis * blending.x;
-		float3 yc = yaxis * blending.y;
-		float3 zc = zaxis * blending.z;
+        float3 xaxis = CausticsTexture.SampleLevel(CausticsTextureSampler, uv_x, 0).xyz;
+        float3 yaxis = CausticsTexture.SampleLevel(CausticsTextureSampler, uv_y, 0).xyz;
+        float3 zaxis = CausticsTexture.SampleLevel(CausticsTextureSampler, uv_z, 0).xyz;
 
-		float3 caustics = xc + yc + zc;
+        float3 xc = xaxis * blending.x;
+        float3 yc = yaxis * blending.y;
+        float3 zc = zaxis * blending.z;
 
-		lighting += (caustics * attenuation * 2.0f);
-	}
+        float3 caustics = xc + yc + zc;
+
+        lighting += (caustics * attenuation * 2.0f);
+    }
 
 	lighting -= float3(input.FogBulbs.w, input.FogBulbs.w, input.FogBulbs.w);
 	output.Color.xyz = output.Color.xyz * lighting * occlusion;
