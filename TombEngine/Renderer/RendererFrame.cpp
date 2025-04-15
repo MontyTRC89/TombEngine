@@ -420,22 +420,25 @@ namespace TEN::Renderer
 			if (rendererObject.DoNotDraw)
 				continue;
 
-			// NOTE: Clip object by frustum only if it doesn't cast shadows. Otherwise shadows may disappear if object moves outside frustum.
+			// Clip object by frustum only if it doesn't cast shadows and is not in mirror room,
+			// otherwise disappearing shadows or reflections may be seen if object gets out of frustum.
+			bool inFrustum = true;
+			
 			if (!isRoomReflected && rendererObject.ShadowType == ShadowMode::None)
 			{
+				inFrustum = false;
+
 				// Get all spheres and check if frustum intersects any of them.
 				auto spheres = GetSpheres(itemNumber);
 
-				// Blow up sphere radius by half for cases of too small calculated spheres.
-				bool inFrustum = false;
 				for (int i = 0; !inFrustum, i < spheres.size(); i++)
 				{
 					if (renderView.Camera.Frustum.SphereInFrustum(spheres[i].Center, spheres[i].Radius * 1.5f))
 						inFrustum = true;
 				}
-				
-				if (!inFrustum)
-					continue;
+
+				// NOTE: removed continue loop here if not in frustum,
+				// for updating first positions and animations data
 			}
 
 			const auto& anim = GetAnimData(item);
@@ -494,6 +497,12 @@ namespace TEN::Renderer
 			
 			for (int j = 0; j < BONE_COUNT; j++)
 				newItem.InterpolatedAnimTransforms[j] = Matrix::Lerp(newItem.PrevAnimTransforms[j], newItem.AnimTransforms[j], GetInterpolationFactor(forceValue));
+
+			// NOTE: now at least positions and animations are updated,
+			// because even off-screen the correct position is required 
+			// by GetJointPosition functions and similars
+			if (!inFrustum)
+				continue;
 
 			CalculateLightFades(&newItem);
 			CollectLightsForItem(&newItem);
@@ -834,7 +843,7 @@ namespace TEN::Renderer
 			}
 
 			// Light already on a list
-			if (std::find(renderView.LightsToDraw.begin(), renderView.LightsToDraw.end(), light) != renderView.LightsToDraw.end())
+			if (TEN::Utils::Contains(renderView.LightsToDraw, light))
 			{
 				continue;
 			}

@@ -23,7 +23,7 @@ namespace TEN::Entities::Traps
 	constexpr auto MOVING_LASER_ACCEL			  = 1.0f;
 	constexpr auto MOVING_LASER_PAUSE_FRAME_COUNT = 30;
 
-	enum class MovingLaserProperty
+	enum class MovingLaserFlags
 	{
 		Velocity,
 		PauseTimer,
@@ -35,8 +35,8 @@ namespace TEN::Entities::Traps
 	void InitializeMovingLaser(short itemNumber)
 	{
 		auto& item = g_Level.Items[itemNumber];
-		item.ItemFlags[(int)MovingLaserProperty::DirectionSign] = 1;
-		item.ItemFlags[(int)MovingLaserProperty::Velocity] = 10;
+		item.ItemFlags[(int)MovingLaserFlags::DirectionSign] = 1;
+		item.ItemFlags[(int)MovingLaserFlags::Velocity] = 10;
 
 		// Offset by 1/4 block to make it dangerous at sector edges.
 		item.Pose.Translate(item.Pose.Orientation, -BLOCK(0.25f));
@@ -51,7 +51,7 @@ namespace TEN::Entities::Traps
 
 		// Calculate distances.
 		float moveDist = BLOCK(item.TriggerFlags) + BLOCK(0.5f);
-		float distPerFrame = (BLOCK(item.ItemFlags[(int)MovingLaserProperty::Velocity]) * 0.25f) / (float)FPS;
+		float distPerFrame = (BLOCK(item.ItemFlags[(int)MovingLaserFlags::Velocity]) * 0.25f) / (float)FPS;
 
 		item.Animation.ActiveState = 0;
 
@@ -74,38 +74,38 @@ namespace TEN::Entities::Traps
 			return;
 		}
 
-		if (item.ItemFlags[(int)MovingLaserProperty::PauseTimer] > 0)
+		if (item.ItemFlags[(int)MovingLaserFlags::PauseTimer] > 0)
 		{
-			item.ItemFlags[(int)MovingLaserProperty::PauseTimer]--;
-			if (item.ItemFlags[(int)MovingLaserProperty::PauseTimer] == 0)
+			item.ItemFlags[(int)MovingLaserFlags::PauseTimer]--;
+			if (item.ItemFlags[(int)MovingLaserFlags::PauseTimer] == 0)
 			{
-				item.ItemFlags[(int)MovingLaserProperty::DirectionSign] *= -1;
-				item.ItemFlags[(int)MovingLaserProperty::DistanceTraveled] = 0;
+				item.ItemFlags[(int)MovingLaserFlags::DirectionSign] *= -1;
+				item.ItemFlags[(int)MovingLaserFlags::DistanceTraveled] = 0;
 			}
 
 			AnimateItem(item);
 			return;
 		}
 
-		item.Pose.Translate(item.Pose.Orientation, (item.ItemFlags[(int)MovingLaserProperty::DirectionSign] * item.ItemFlags[(int)MovingLaserProperty::VelocityCalc]));
+		item.Pose.Translate(item.Pose.Orientation, (item.ItemFlags[(int)MovingLaserFlags::DirectionSign] * item.ItemFlags[(int)MovingLaserFlags::VelocityCalc]));
 
-		item.ItemFlags[(int)MovingLaserProperty::DistanceTraveled] += item.ItemFlags[(int)MovingLaserProperty::VelocityCalc];
+		item.ItemFlags[(int)MovingLaserFlags::DistanceTraveled] += item.ItemFlags[(int)MovingLaserFlags::VelocityCalc];
 
-		if (item.ItemFlags[(int)MovingLaserProperty::DistanceTraveled] < (moveDist - BLOCK(0.5f)))
+		if (item.ItemFlags[(int)MovingLaserFlags::DistanceTraveled] < (moveDist - BLOCK(0.5f)))
 		{
-			item.ItemFlags[(int)MovingLaserProperty::VelocityCalc] = std::min(distPerFrame, item.ItemFlags[(int)MovingLaserProperty::VelocityCalc] + MOVING_LASER_ACCEL);
+			item.ItemFlags[(int)MovingLaserFlags::VelocityCalc] = std::min(distPerFrame, item.ItemFlags[(int)MovingLaserFlags::VelocityCalc] + MOVING_LASER_ACCEL);
 		}
 		else
 		{
-			item.ItemFlags[(int)MovingLaserProperty::VelocityCalc] = std::max(MOVING_LASER_VELOCITY_MIN, item.ItemFlags[(int)MovingLaserProperty::VelocityCalc] - MOVING_LASER_ACCEL);
+			item.ItemFlags[(int)MovingLaserFlags::VelocityCalc] = std::max(MOVING_LASER_VELOCITY_MIN, item.ItemFlags[(int)MovingLaserFlags::VelocityCalc] - MOVING_LASER_ACCEL);
 		}
 
-		if (item.ItemFlags[(int)MovingLaserProperty::DistanceTraveled] >= moveDist)
+		if (item.ItemFlags[(int)MovingLaserFlags::DistanceTraveled] >= moveDist)
 		{
-			item.ItemFlags[(int)MovingLaserProperty::PauseTimer] = MOVING_LASER_PAUSE_FRAME_COUNT;
+			item.ItemFlags[(int)MovingLaserFlags::PauseTimer] = MOVING_LASER_PAUSE_FRAME_COUNT;
 		}
 
-		if (item.ItemFlags[(int)MovingLaserProperty::PauseTimer] == 0)
+		if (item.ItemFlags[(int)MovingLaserFlags::PauseTimer] == 0)
 		{
 			SoundEffect(SFX_TR5_MOVING_LASER_LOOP, &item.Pose, SoundEnvironment::Always);
 		}

@@ -22,6 +22,7 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
 using namespace TEN::Animation;
@@ -1393,7 +1394,7 @@ static std::vector<int> FillCollideableItemList()
 	{
 		const auto& item = g_Level.Items[i];
 
-		if (std::find(roomList.begin(), roomList.end(), item.RoomNumber) == roomList.end())
+		if (!TEN::Utils::Contains(roomList, (int)item.RoomNumber))
 			continue;
 
 		if (!g_Level.Rooms[item.RoomNumber].Active())
