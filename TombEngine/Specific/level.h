@@ -4,6 +4,7 @@
 #include "Game/items.h"
 #include "Game/itemdata/creature_info.h"
 #include "Game/room.h"
+#include "Renderer/RendererEnums.h"
 #include "Sound/sound.h"
 #include "Specific/IO/ChunkId.h"
 #include "Specific/IO/ChunkReader.h"
@@ -82,8 +83,8 @@ struct MESH
 	std::vector<Vector3> normals;
 	std::vector<Vector3> colors;
 	std::vector<Vector3> effects; // X = glow, Y = move, Z = refract
-	std::vector<unsigned int[MAX_BONE_WEIGHTS]> boneIndices;
-	std::vector<float[MAX_BONE_WEIGHTS]> boneWeights;
+	std::vector<std::array<unsigned int, 4>> boneIndices;
+	std::vector<std::array<float, 4>> boneWeights;
 	std::vector<BUCKET> buckets;
 };
 

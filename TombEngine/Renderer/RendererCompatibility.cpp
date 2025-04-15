@@ -499,6 +499,17 @@ namespace TEN::Renderer
 					totalIndices += bucket.numQuads * 6 + bucket.numTriangles * 3;
 				}
 			}
+
+			if (obj->skinIndex != NO_VALUE)
+			{
+				MESH* mesh = &g_Level.Meshes[obj->skinIndex];
+
+				for (auto& bucket : mesh->buckets)
+				{
+					totalVertices += bucket.numQuads * 4 + bucket.numTriangles * 3;
+					totalIndices += bucket.numQuads * 6 + bucket.numTriangles * 3;
+				}
+			}
 		}
 		_moveablesVertices.resize(totalVertices);
 		_moveablesIndices.resize(totalIndices);
