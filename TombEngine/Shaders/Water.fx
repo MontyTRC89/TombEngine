@@ -151,9 +151,8 @@ float CircularWave(float2 uv, float2 origin, float amplitude, float normTime, fl
 float4 PSWater(WaterPixelShaderInput input) : SV_Target
 {
     float4 output;
-    
     float waterSceneDepth = input.PositionCopy.z / input.PositionCopy.w;
-    
+
     // Refraction
     float4 refractionUV = input.PositionCopy;
     refractionUV.xy /= refractionUV.w;
@@ -165,22 +164,27 @@ float4 PSWater(WaterPixelShaderInput input) : SV_Target
     reflectionUV.xy /= reflectionUV.w;
     reflectionUV.x = 0.5f * reflectionUV.x + 0.5f;
     reflectionUV.y = -0.5f * reflectionUV.y + 0.5f;
-    
-    // Store old refraction UV for using them in the case we are near the borders
+
     float2 oldRefractionUV = refractionUV.xy;
-    
-    // Distor refraction UV
+
+    // Distortion UV
     float time = Frame / 1200.0f;
     float2 mappedUV = frac(input.WorldPosition.xyz / 8192.0f).xz;
-    float2 distortion = (WaterDistortionMapTexture.Sample(WaterDistortionMapSampler, mappedUV).xy * 2.0 - 1.0) * WaveStrength;
-    float2 distortedTexCoords = WaterDistortionMapTexture.Sample(WaterDistortionMapSampler,
-        float2(mappedUV.x + time, mappedUV.y)) * 0.001;
-    distortedTexCoords = mappedUV + float2(distortedTexCoords.x, distortedTexCoords.y + time);
-    float2 totalDistortion = (WaterDistortionMapTexture.Sample(WaterDistortionMapSampler, distortedTexCoords).rg * 2.0 - 1.0) * WaveStrength;
-    
+
+    // UV scroll only inside the tile in atlas
+    float2 scrollUV1 = frac(mappedUV + float2(time, 0.0f));
+    float2 atlasUV1 = WaterDistortionMapUvCoordinates.xy + scrollUV1 * WaterDistortionMapUvCoordinates.zw;
+    float2 distortedSample1 = WaterDistortionMapTexture.Sample(WaterDistortionMapSampler, atlasUV1).xy;
+    float2 distortedTexCoords = mappedUV + (distortedSample1 * 2.0f - 1.0f) * 0.001f;
+
+    // Additional scroll inside the tile in atlas
+    float2 scrollUV2 = frac(distortedTexCoords + float2(0.0f, time));
+    float2 atlasUV2 = WaterDistortionMapUvCoordinates.xy + scrollUV2 * WaterDistortionMapUvCoordinates.zw;
+    float2 totalDistortion = (WaterDistortionMapTexture.Sample(WaterDistortionMapSampler, atlasUV2).rg * 2.0 - 1.0) * WaveStrength;
+
     refractionUV.xy += totalDistortion;
     refractionUV.xy += totalDistortion;
-    
+
 #ifdef NEW_RIPPLES
     float wavesDistortion = 0.0;
 
@@ -189,22 +193,20 @@ float4 PSWater(WaterPixelShaderInput input) : SV_Target
         float2 origin = RipplesPosSize[i].xz;
         float amplitude = 256.0f;
         float normTime = RipplesParameters[i].y;
-
         float waveSize = 1024.0;
 
         wavesDistortion += CircularWave(input.WorldPosition.xz, origin, amplitude, normTime, waveSize);
     }
-    
-    // Distorsione delle UV in base alle onde
-    refractionUV.xy += float2(wavesDistortion * RIPPLE_ATTENUATION, wavesDistortion * RIPPLE_ATTENUATION);
-    reflectionUV.xy += float2(wavesDistortion * RIPPLE_ATTENUATION, wavesDistortion * RIPPLE_ATTENUATION);
- #endif
-    
-    // Reconstruct world position for avoiding sampling wrong refraction color
+
+    float rippleDist = wavesDistortion * RIPPLE_ATTENUATION;
+    refractionUV.xy += float2(rippleDist, rippleDist);
+    reflectionUV.xy += float2(rippleDist, rippleDist);
+#endif
+
     float3 worldPosition = Unproject(refractionUV.xy);
-    
+
 #ifdef CAMERA_UNDERWATER
-    if (worldPosition.y > WaterLevels[WaterPlaneIndex].x || 
+    if (worldPosition.y > WaterLevels[WaterPlaneIndex].x ||
 #else
     if (worldPosition.y < WaterLevels[WaterPlaneIndex].x ||
 #endif
@@ -214,32 +216,30 @@ float4 PSWater(WaterPixelShaderInput input) : SV_Target
         refractionUV.xy = oldRefractionUV;
     }
 
-    // Sample refraction and reflections colors
     float3 refractedColor = WaterRefractionTexture.Sample(WaterRefractionSampler, refractionUV.xy);
     float3 reflectedColor = WaterReflectionTexture.Sample(WaterReflectionSampler, float3(reflectionUV.xy, WaterPlaneIndex));
-    
-    // Specular highlights
+
     float3 lightDirection = normalize(input.WorldPosition.xyz - LightPosition);
     float3 halfVector = normalize(lightDirection + CamDirectionWS.xyz);
- 
-    float4 normalMapColor = WaterNormalMapTexture.Sample(WaterNormalMapSampler, distortedTexCoords);
+
+    // Sample normal map (with fixed UV coords for atlas)
+    float2 normalMapUV = WaterNormalMapUvCoordinates.xy + scrollUV2 * WaterNormalMapUvCoordinates.zw;
+    float4 normalMapColor = WaterNormalMapTexture.Sample(WaterNormalMapSampler, normalMapUV);
     float3 normal = float3(normalMapColor.r * 2.0 - 1.0, normalMapColor.b, normalMapColor.g * 2.0 - 1.0);
     normal = normalize(normal);
-    normal.y = normal.y;
-    
+
     float NdotL = saturate(dot(normal, lightDirection));
     float NdotH = saturate(dot(normal, halfVector));
     float3 specularLight = sign(NdotL) * KSpecular * LightColor * pow(NdotH, Shininess);
-    
-    // Fresnel
+
     float3 viewDirection = normalize(CamPositionWS - input.WorldPosition.xyz);
+
 #ifdef CAMERA_UNDERWATER
-        float fresnel = ComputeTotalInternalReflection(viewDirection);
+    float fresnel = ComputeTotalInternalReflection(viewDirection);
 #else
-        float fresnel = FresnelSchlick(viewDirection);
+    float fresnel = FresnelSchlick(viewDirection);
 #endif
 
-    // Final calculation
     output = lerp(float4(refractedColor, 1.0f), float4(reflectedColor, 1.0f), fresnel) + float4(specularLight, 0.0);
 
     // Extinction
@@ -253,30 +253,30 @@ float4 PSWater(WaterPixelShaderInput input) : SV_Target
     float3 extinction = exp(-waterDepth * AbsorptionCoefficient * WaterDepthScale);
     output.xyz = lerp(WaterFogColor, output.xyz, extinction);
 #endif
-    
+
 #ifdef WATER_FOAM
-    // Foam
-    mappedUV = frac(input.WorldPosition.xyz / 1024.0f).xz;
+    float2 foamMappedUV = frac(input.WorldPosition.xyz / 1024.0f).xz;
     float foamThreshold = 128.0f;
     float foamFactor = saturate(1.0 - (waterDepth / foamThreshold));  
-    float2 foamUV = float2(mappedUV.x + time, mappedUV.y);
-    float foamColor = WaterFoamTexture.Sample(WaterFoamSampler, foamUV).x;
-    float foamIntensity = saturate(foamFactor);
-    float foamFinal = foamIntensity * 0.5f;
+    float2 foamUV = frac(foamMappedUV + float2(time, 0.0f));
+    float2 atlasFoamUV = WaterFoamMapUvCoordinates.xy + foamUV * WaterFoamMapUvCoordinates.zw;
+    float foamColor = WaterFoamTexture.Sample(WaterFoamSampler, atlasFoamUV).x;
+    float foamFinal = saturate(foamFactor) * 0.5f;
     output.xyz = lerp(output.xyz, float3(foamColor, foamColor, foamColor), foamFinal);
-    
-    // Water fade
+
     float sceneDepth = DepthTexture.Sample(DepthSampler, oldRefractionUV).x;
     sceneDepth = LinearizeDepth(sceneDepth, NearPlane, FarPlane);
     waterSceneDepth = LinearizeDepth(waterSceneDepth, NearPlane, FarPlane);
+
     if (waterSceneDepth - sceneDepth > 0.01f)
     {
         discard;
     }
+
     float fade = (sceneDepth - waterSceneDepth) * 100.0f;
     output.w = min(output.w, fade);
 #endif
-    
+
     return output;
 }
 

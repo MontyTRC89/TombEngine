@@ -32,11 +32,17 @@ cbuffer WaterConstantBuffer : register(b2)
     float3 AbsorptionCoefficient;
     float WaterFogDensity;
     //--
+#ifdef NEW_RIPPLES
     float4 RipplesPosSize[MAX_WAVES];
     //--
     float4 RipplesParameters[MAX_WAVES];
     //--
     int RipplesCount;
+    //--
+#endif
+    float4 WaterDistortionMapUvCoordinates;
+    float4 WaterNormalMapUvCoordinates;
+    float4 WaterFoamMapUvCoordinates;
 };
 
 #endif

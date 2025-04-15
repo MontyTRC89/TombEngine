@@ -266,18 +266,6 @@ namespace TEN::Renderer
 			if (!_moveableObjects[objectID].has_value())
 				continue;
 
-			if (!_moveableObjects[objectID].has_value())
-				continue;
-
-			if (!_moveableObjects[objectID].has_value())
-				continue;
-
-			if (!_moveableObjects[objectID].has_value())
-				continue;
-
-			if (!_moveableObjects[objectID].has_value())
-				continue;
-
 			auto translation = Matrix::CreateTranslation(gunshell->pos.Position.ToVector3());
 			auto rotMatrix = gunshell->pos.Orientation.ToRotationMatrix();
 			auto worldMatrix = rotMatrix * translation;
@@ -4448,14 +4436,47 @@ namespace TEN::Renderer
 		// Bind vertex and index buffer.  
 		_context->IASetVertexBuffers(0, 1, _roomsVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 		_context->IASetIndexBuffer(_roomsIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-		              
+		               
 		BindRenderTargetAsTexture(TextureRegister::WaterRefractionTexture, &_postProcessRenderTarget[0], SamplerStateRegister::PointWrap);
 		BindRenderTargetAsTexture(TextureRegister::DepthMap, &_depthRenderTarget, SamplerStateRegister::PointWrap);
 		BindTexture(TextureRegister::WaterReflectionTexture, &_waterReflectionsBlurredRenderTarget, SamplerStateRegister::PointWrap);
-		    
-		BindTexture(TextureRegister::WaterDistortionMap, &_waterDistortionMap, SamplerStateRegister::AnisotropicWrap);
-		BindTexture(TextureRegister::WaterNormalMap, &_wave1NormalMap, SamplerStateRegister::AnisotropicWrap);
-		BindTexture(TextureRegister::WaterFoamMap, &_waterFoamMap, SamplerStateRegister::AnisotropicWrap);
+
+		if (std::find(SpriteSequencesIds.begin(), SpriteSequencesIds.end(), ID_DYNAMIC_WATER_SPRITES) != SpriteSequencesIds.end())
+		{
+			auto distortionMap = _spriteSequences[ID_DYNAMIC_WATER_SPRITES].SpritesList[0];
+
+			_stWater.WaterDistortionMapUvCoordinates = Vector4(
+				distortionMap->UV[0].x,
+				distortionMap->UV[0].y,
+				(float)distortionMap->Width / (float)distortionMap->Texture->Width,
+				(float)distortionMap->Height / (float)distortionMap->Texture->Height
+			);
+
+			BindTexture(TextureRegister::WaterDistortionMap, distortionMap->Texture, SamplerStateRegister::AnisotropicWrap);
+
+			auto normalMap = _spriteSequences[ID_DYNAMIC_WATER_SPRITES].SpritesList[1];
+
+			_stWater.WaterNormalMapUvCoordinates = Vector4(
+				normalMap->UV[0].x,
+				normalMap->UV[0].y,
+				(float)normalMap->Width / (float)normalMap->Texture->Width,
+				(float)normalMap->Height / (float)normalMap->Texture->Height
+			);
+
+			BindTexture(TextureRegister::WaterNormalMap, normalMap->Texture, SamplerStateRegister::AnisotropicWrap);
+
+			auto foamMap = _spriteSequences[ID_DYNAMIC_WATER_SPRITES].SpritesList[2];
+
+			_stWater.WaterFoamMapUvCoordinates = Vector4(
+				foamMap->UV[0].x,
+				foamMap->UV[0].y,
+				(float)foamMap->Width / (float)foamMap->Texture->Width,
+				(float)foamMap->Height / (float)foamMap->Texture->Height
+			);
+
+			BindTexture(TextureRegister::WaterFoamMap, foamMap->Texture, SamplerStateRegister::AnisotropicWrap);
+
+		}
 
 #ifdef NEW_RIPPLES
 		_stWater.WaveStrength = 0.005f;
