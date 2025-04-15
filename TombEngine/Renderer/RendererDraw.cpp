@@ -31,6 +31,7 @@
 #include "Renderer/Structures/RendererSortableObject.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
 using namespace TEN::Effects::Hair;
@@ -2755,7 +2756,7 @@ namespace TEN::Renderer
 			if (rendererPass != RendererPass::GBuffer)
 			{
 				// Bind caustics texture.
-				if (std::find(SpriteSequencesIds.begin(), SpriteSequencesIds.end(), ID_CAUSTIC_TEXTURES) != SpriteSequencesIds.end())
+				if (TEN::Utils::Contains(SpriteSequencesIds, (int)ID_CAUSTIC_TEXTURES))
 				{     
 					int nmeshes = -Objects[ID_CAUSTIC_TEXTURES].nmeshes;
 					int meshIndex = Objects[ID_CAUSTIC_TEXTURES].meshIndex;
@@ -2869,12 +2870,8 @@ namespace TEN::Renderer
 							}
 							else
 							{
-								BindTexture(
-									TextureRegister::ColorMap, &std::get<0>(_roomTextures[bucket.Texture]),
-									SamplerStateRegister::AnisotropicClamp);
-								BindTexture(
-									TextureRegister::NormalMap, &std::get<1>(_roomTextures[bucket.Texture]),
-									SamplerStateRegister::AnisotropicClamp);
+								BindTexture(TextureRegister::ColorMap,  &std::get<0>(_roomTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+								BindTexture(TextureRegister::NormalMap, &std::get<1>(_roomTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 							}
 
 							DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
@@ -3285,11 +3282,7 @@ namespace TEN::Renderer
 		case RendererPass::GBuffer:
 			if (blendMode != BlendMode::Opaque &&
 				blendMode != BlendMode::AlphaTest &&
-				blendMode != BlendMode::FastAlphaBlend &&
-				// WARNING: For G-Buffer step we consider alpha blend like alpha test
-				// assuming that most of the geometry used in rooms, items and statics 
-				// are fences, foliages, trees... But it could fail with translucent surfaces! 
-				blendMode != BlendMode::AlphaBlend)
+				blendMode != BlendMode::FastAlphaBlend)
 			{
 				return false;
 			}

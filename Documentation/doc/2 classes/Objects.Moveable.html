@@ -166,13 +166,13 @@
 	<td class="summary">Get the moveable's position</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetPosition">Moveable:SetPosition(position[, updateRoom])</a></td>
+	<td class="name" ><a href="#Moveable:SetPosition">Moveable:SetPosition(position, [updateRoom])</a></td>
 	<td class="summary">Set the moveable's position
  If you are moving a moveable whose behaviour involves knowledge of room geometry,
  (e.g.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:GetJointPosition">Moveable:GetJointPosition(jointID[, offset])</a></td>
+	<td class="name" ><a href="#Moveable:GetJointPosition">Moveable:GetJointPosition(jointIndex, [offset])</a></td>
 	<td class="summary">Get the moveable's joint position with an optional relative offset.</td>
 	</tr>
 	<tr>
@@ -217,11 +217,11 @@
 	<td class="summary">Set OCB (object code bit) of the moveable</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetEffect">Moveable:SetEffect(effect[, timeout])</a></td>
+	<td class="name" ><a href="#Moveable:SetEffect">Moveable:SetEffect(effect, [timeout])</a></td>
 	<td class="summary">Set the effect for this moveable.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetCustomEffect">Moveable:SetCustomEffect(color1, color2[, timeout])</a></td>
+	<td class="name" ><a href="#Moveable:SetCustomEffect">Moveable:SetCustomEffect(color1, color2, [timeout])</a></td>
 	<td class="summary">Set custom colored burn effect to moveable</td>
 	</tr>
 	<tr>
@@ -285,7 +285,7 @@
 	<td class="summary">Retrieve the index of the current animation.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SetAnim">Moveable:SetAnim(index[, slot])</a></td>
+	<td class="name" ><a href="#Moveable:SetAnim">Moveable:SetAnim(index, [slot])</a></td>
 	<td class="summary">Set the object's animation to the one specified by the given index.</td>
 	</tr>
 	<tr>
@@ -364,7 +364,7 @@
  if it is not swapped.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#Moveable:SwapMesh">Moveable:SwapMesh(index, slotIndex[, swapIndex])</a></td>
+	<td class="name" ><a href="#Moveable:SwapMesh">Moveable:SwapMesh(index, slotIndex, [swapIndex])</a></td>
 	<td class="summary">Set state of specified mesh swap of object
  Use this to swap specified mesh of an object.</td>
 	</tr>
@@ -741,7 +741,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
 </dd>
     <dt>
     <a name = "Moveable:SetPosition"></a>
-    <strong>Moveable:SetPosition(position[, updateRoom])</strong>
+    <strong>Moveable:SetPosition(position, [updateRoom])</strong>
     </dt>
     <dd>
     Set the moveable's position
@@ -760,7 +760,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
         <li><span class="parameter">updateRoom</span>
             <span class="types"><span class="type">bool</span></span>
          Will room changes be automatically detected? Set to false if you are using overlapping rooms (default: true)
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
     </ul>
 
@@ -771,7 +771,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
 </dd>
     <dt>
     <a name = "Moveable:GetJointPosition"></a>
-    <strong>Moveable:GetJointPosition(jointID[, offset])</strong>
+    <strong>Moveable:GetJointPosition(jointIndex, [offset])</strong>
     </dt>
     <dd>
     Get the moveable's joint position with an optional relative offset.
@@ -780,14 +780,14 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
 
     <h3>Parameters:</h3>
     <ul>
-        <li><span class="parameter">jointID</span>
+        <li><span class="parameter">jointIndex</span>
             <span class="types"><span class="type">int</span></span>
-         Joint ID.
+         Index of a joint to get position.
         </li>
         <li><span class="parameter">offset</span>
             <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
          Offset relative to the joint.
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
     </ul>
 
@@ -1026,7 +1026,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
 </dd>
     <dt>
     <a name = "Moveable:SetEffect"></a>
-    <strong>Moveable:SetEffect(effect[, timeout])</strong>
+    <strong>Moveable:SetEffect(effect, [timeout])</strong>
     </dt>
     <dd>
     Set the effect for this moveable.
@@ -1042,7 +1042,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
         <li><span class="parameter">timeout</span>
             <span class="types"><span class="type">float</span></span>
          time (in seconds) after which effect turns off.
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
     </ul>
 
@@ -1053,7 +1053,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
 </dd>
     <dt>
     <a name = "Moveable:SetCustomEffect"></a>
-    <strong>Moveable:SetCustomEffect(color1, color2[, timeout])</strong>
+    <strong>Moveable:SetCustomEffect(color1, color2, [timeout])</strong>
     </dt>
     <dd>
     Set custom colored burn effect to moveable
@@ -1073,7 +1073,7 @@ baddy:SetOnCollidedWithRoom(LevelFuncs.roomCollided)</pre>
         <li><span class="parameter">timeout</span>
             <span class="types"><span class="type">float</span></span>
          Time (in seconds) after which effect turns off.
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
     </ul>
 
@@ -1423,7 +1423,7 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
 </dd>
     <dt>
     <a name = "Moveable:SetAnim"></a>
-    <strong>Moveable:SetAnim(index[, slot])</strong>
+    <strong>Moveable:SetAnim(index, [slot])</strong>
     </dt>
     <dd>
     Set the object's animation to the one specified by the given index.
@@ -1441,7 +1441,7 @@ sas:SetAIBits({<span class="number">1</span>, <span class="number">0</span>, <sp
         <li><span class="parameter">slot</span>
             <span class="types"><span class="type">int</span></span>
          slot ID of the desired anim (if omitted, moveable's own slot ID is used)
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
     </ul>
 
@@ -1857,7 +1857,7 @@ sas:SetPosition(newPos, <span class="keyword">false</span>)</pre>
 </dd>
     <dt>
     <a name = "Moveable:SwapMesh"></a>
-    <strong>Moveable:SwapMesh(index, slotIndex[, swapIndex])</strong>
+    <strong>Moveable:SwapMesh(index, slotIndex, [swapIndex])</strong>
     </dt>
     <dd>
     Set state of specified mesh swap of object
@@ -1878,7 +1878,7 @@ sas:SetPosition(newPos, <span class="keyword">false</span>)</pre>
         <li><span class="parameter">swapIndex</span>
             <span class="types"><span class="type">int</span></span>
          index of a mesh from meshswap slot to use
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
     </ul>
 
