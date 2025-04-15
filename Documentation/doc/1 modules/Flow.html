@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.8 Lua API</title>
+    <title>TombEngine 1.8.1 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -175,7 +175,7 @@ scripts too.</p>
 	<td class="summary">Returns the level that the game control is running in that moment.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#EndLevel">EndLevel([index][, startPos])</a></td>
+	<td class="name" ><a href="#EndLevel">EndLevel([index], [startPos])</a></td>
 	<td class="summary">Finishes the current level, with optional level index and start position index provided.</td>
 	</tr>
 	<tr>
@@ -570,7 +570,7 @@ have an ID of 0, the second an ID of 1, and so on.
 </dd>
     <dt>
     <a name = "EndLevel"></a>
-    <strong>EndLevel([index][, startPos])</strong>
+    <strong>EndLevel([index], [startPos])</strong>
     </dt>
     <dd>
     Finishes the current level, with optional level index and start position index provided.
@@ -585,12 +585,12 @@ teleported to such object with OCB similar to provided second argument.
         <li><span class="parameter">index</span>
             <span class="types"><span class="type">int</span></span>
          level index (default 0)
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">startPos</span>
             <span class="types"><span class="type">int</span></span>
          player start position (default 0)
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
     </ul>
 
@@ -959,7 +959,7 @@ Must be an integer value (0 means no secrets).
         <li><span class="parameter">index</span>
             <span class="types"><span class="type">int</span></span>
          Flipmap group ID to check. If no group specified or group is -1, function returns overall flipmap status (on or off).
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
     </ul>
 

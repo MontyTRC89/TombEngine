@@ -3,21 +3,44 @@
 The dates are in European standard format where date is presented as **YYYY-MM-DD**.
 TombEngine releases are located in this repository (alongside with Tomb Editor): https://github.com/TombEngine/TombEditorReleases
 
-## [Version 1.8.1](link to release) - yyyy-mm-dd
-
-### New features
-* Added live console input to perform Lua commands in realtime.
+## [Version 1.8.2]
 
 ### Bug fixes
-* Fixed pathfinding for friendly NPCs, such as monkeys.
+* Fixed crashes when shooting, if gunflash or gunshell objects are not present in a level.
+* Fixed Teleporter object.
+* Fixed Wraith objects not working correctly in flipped rooms.
+* Fixed lensflare enabled status not saved in a savegame.
+* Fixed caustics not rendered correctly if texture compression was enabled.
+* Fixed exclusion blend mode not working correctly.
+* Fixed SSAO incorrectly applied through alpha blended textures.
+* Fixed HK sound effects.
+
+### New features
+* Added muzzle glow effect for firearms.
+
+### Lua API changes
+* Added `muzzleGlow` and `muzzleOffset` parameters to weapon settings.
+* Fixed `Moveable.GetJointPosition` not returning correct results if moveable is invisible or not rendered.
+
+## [Version 1.8.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.8.1) - 2025-03-29
+
+### Bug fixes
+* Fixed pathfinding for friendly NPCs such as monkeys.
 * Fixed particles remaining in the level after reloading from the savegame.
 * Fixed particles being canceled by fog bulbs.
 * Fixed crash in case hair object is the last object in a level.
 * Fixed crash with incorrectly applied animated textures on static meshes.
 * Fixed console window not hiding in non-debug mode on Windows 11.
+* Fixed key binding settings saving for the current play session after hitting Esc to cancel.
+* Fixed lensflare blending formula to avoid screen overbright.
+
+### New features
+* Added Firefly Emitter object (ID 1099) with corresponding sprite slot (ID 1379).
+* Added live console input to perform Lua commands in realtime.
 
 ### Lua API changes
 * Added missing constructor for `Collision.Probe` without room number.
+* Added optional looping argument for `View.GetFlybyPosition` and `View.GetFlybyRotation` functions.
 
 ## [Version 1.8](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.8) - 2025-03-16
 

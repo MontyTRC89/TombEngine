@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.8 Lua API</title>
+    <title>TombEngine 1.8.1 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -300,8 +300,16 @@
 	<td class="summary">Display muzzle flash.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#muzzleGlow">muzzleGlow</a></td>
+	<td class="summary">Display muzzle glow.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#colorizeMuzzleFlash">colorizeMuzzleFlash</a></td>
 	<td class="summary">Colorize muzzle flash.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#muzzleOffset">muzzleOffset</a></td>
+	<td class="summary">Muzzle offset.</td>
 	</tr>
 </table>
 <h2><a href="#System">System </a></h2>
@@ -1216,6 +1224,27 @@
 
 </dd>
     <dt>
+    <a name = "muzzleGlow"></a>
+    <strong>muzzleGlow</strong>
+    </dt>
+    <dd>
+    Display muzzle glow.
+
+
+
+    <ul>
+        <li><span class="parameter">muzzleGlow</span>
+            <span class="types"><span class="type">bool</span></span>
+         specifies whether muzzle glow should be displayed or not. Applicable only for firearms.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
     <a name = "colorizeMuzzleFlash"></a>
     <strong>colorizeMuzzleFlash</strong>
     </dt>
@@ -1228,6 +1257,27 @@
         <li><span class="parameter">colorizeMuzzleFlash</span>
             <span class="types"><span class="type">bool</span></span>
          specifies whether muzzle flash should be tinted with the same color as gunflash color. Applicable only for firearms.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "muzzleOffset"></a>
+    <strong>muzzleOffset</strong>
+    </dt>
+    <dd>
+    Muzzle offset.
+
+
+
+    <ul>
+        <li><span class="parameter">muzzleOffset</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Vec3.html#">Vec3</a></span>
+         specifies offset for spawning muzzle gunflash effects. Applicable only for firearms.
         </li>
     </ul>
 

@@ -19,8 +19,8 @@ namespace TEN::Scripting::Input
 {
 	/// Vibrate the game controller if the function is available and the setting is on.
 	// @function Vibrate
-	// @tparam float strength Vibration strength.
-	// @tparam float time __(default 0.3)__ Vibration time in seconds.
+	// @tparam float strength Vibration strength. 
+	// @tparam[opt=0.3] float time Vibration time in seconds.
 	static void Vibrate(float strength, sol::optional<float> time)
 	{
 		Rumble(strength, time.value_or(0.3f), RumbleMode::Both);

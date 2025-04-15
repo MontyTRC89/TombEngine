@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.8 Lua API</title>
+    <title>TombEngine 1.8.1 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -129,7 +129,7 @@ when you need to use screen-space coordinates.</p>
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#DisplayString">DisplayString(string, Position[, scale][, color][, translated], table)</a></td>
+	<td class="name" ><a href="#DisplayString">DisplayString(string, Position, [scale], [color], [translated], table)</a></td>
 	<td class="summary">Create a DisplayString.</td>
 	</tr>
 	<tr>
@@ -183,7 +183,7 @@ when you need to use screen-space coordinates.</p>
     <dl class="function">
     <dt>
     <a name = "DisplayString"></a>
-    <strong>DisplayString(string, Position[, scale][, color][, translated], table)</strong>
+    <strong>DisplayString(string, Position, [scale], [color], [translated], table)</strong>
     </dt>
     <dd>
     Create a DisplayString.
@@ -204,18 +204,18 @@ For use in <a href="../1 modules/Strings.html#ShowString">ShowString</a> and <a 
         <li><span class="parameter">scale</span>
             <span class="types"><span class="type">float</span></span>
          size of the string, relative to the default size. <strong>Default: 1.0</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">color</span>
             <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
          the color of the text. <strong>Default: white</strong>
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">translated</span>
             <span class="types"><span class="type">bool</span></span>
          If false or omitted, the input string argument will be displayed.
 If true, the string argument will be the key of a translated string specified in strings.lua. <strong>Default: false</strong>.
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
         <li><span class="parameter">table</span>
             <span class="types"><a class="type" href="../4 enums/Strings.DisplayStringOption.html#">DisplayStringOption</a></span>
