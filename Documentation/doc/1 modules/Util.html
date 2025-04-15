@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.8 Lua API</title>
+    <title>TombEngine 1.8.1 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -152,7 +152,7 @@
 	<td class="summary">Pick a static mesh by the given display position.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#PrintLog">PrintLog(message, logLevel[, allowSpam])</a></td>
+	<td class="name" ><a href="#PrintLog">PrintLog(message, logLevel, [allowSpam])</a></td>
 	<td class="summary">Write messages within the Log file</td>
 	</tr>
 </table>
@@ -414,7 +414,7 @@ To be used with <a href="../2 classes/Strings.DisplayString.html#DisplayString:G
 </dd>
     <dt>
     <a name = "PrintLog"></a>
-    <strong>PrintLog(message, logLevel[, allowSpam])</strong>
+    <strong>PrintLog(message, logLevel, [allowSpam])</strong>
     </dt>
     <dd>
     Write messages within the Log file
@@ -439,7 +439,7 @@ To be used with <a href="../2 classes/Strings.DisplayString.html#DisplayString:G
         <li><span class="parameter">allowSpam</span>
             <span class="types"><span class="type">bool</span></span>
          true allows spamming of the message
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
     </ul>
 

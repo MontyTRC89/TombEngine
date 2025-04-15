@@ -111,9 +111,9 @@ namespace TEN::Gui
 
 		GameConfiguration Configuration = {};
 
-		int	  SelectedScreenResolution = 0;
-		bool  IgnoreInput			   = false; // Ignore input until all actions are inactive.
-		float NewKeyWaitTimer		   = 0.0f;
+		int	 SelectedScreenResolution = 0;
+		bool IgnoreInput			  = false; // Ignore input until all actions are inactive.
+		int	 NewKeyWaitTimer		  = 0;
 	};
 
 	class GuiController
