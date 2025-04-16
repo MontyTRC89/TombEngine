@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Renderer/Renderer.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_room.h"
 #include "Game/control/box.h"
@@ -37,6 +37,7 @@
 #include "Structures/RendererSpriteBucket.h"
 #include "Objects/Effects/Fireflies.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
 using namespace TEN::Effects::Drip;
@@ -1085,42 +1086,76 @@ namespace TEN::Renderer
 		if (!settings.MuzzleFlash)
 			return false;
 
+		_shaders.Bind(Shader::Statics);
+
+		unsigned int stride = sizeof(Vertex);
+		unsigned int offset = 0;
+
+		_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+		const auto& room = _rooms[LaraItem->RoomNumber];
+		auto* itemPtr = &_items[LaraItem->Index];
+
+		// Divide gunflash tint by 2 because tinting uses multiplication and additive color which doesn't look good with overbright color values.
+		_stStatic.Color = settings.ColorizeMuzzleFlash ? ((Vector4)settings.FlashColor / 2) : Vector4::One;
+		_stStatic.AmbientLight = room.AmbientLight;
+		_stStatic.LightMode = (int)LightMode::Static;
+		BindStaticLights(itemPtr->LightsToDraw);
+
+		short length = 0;
+		short zOffset = 0;
+		short rotationX = 0;
+
+		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+		SetBlendMode(BlendMode::Additive);
+
 		if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare &&
 			Lara.Control.Weapon.GunType != LaraWeaponType::Crossbow)
 		{
+			switch (Lara.Control.Weapon.GunType)
+			{
+			case LaraWeaponType::Revolver:
+				length = 192;
+				zOffset = 68;
+				rotationX = -14560;
+				break;
+
+			case LaraWeaponType::Uzi:
+				length = 190;
+				zOffset = 50;
+				rotationX = -14560;
+				break;
+
+			case LaraWeaponType::HK:
+			case LaraWeaponType::Shotgun:
+				length = 300;
+				zOffset = 92;
+				rotationX = -14560;
+				break;
+
+			default:
+			case LaraWeaponType::Pistol:
+				length = 180;
+				zOffset = 40;
+				rotationX = -16830;
+				break;
+			}
+
 			// Use MP5 flash if available.
 			auto gunflash = GAME_OBJECT_ID::ID_GUN_FLASH;
 			if (Lara.Control.Weapon.GunType == LaraWeaponType::HK && Objects[GAME_OBJECT_ID::ID_GUN_FLASH2].loaded)
+			{
 				gunflash = GAME_OBJECT_ID::ID_GUN_FLASH2;
-
-			if (!_moveableObjects[gunflash].has_value())
-				return false;
+				length += 20;
+				zOffset += 10;
+			}
 
 			const auto& flashMoveable = *_moveableObjects[gunflash];
 			const auto& flashMesh = *flashMoveable.ObjectMeshes[0];
 
-			_shaders.Bind(Shader::Statics);
-
-			unsigned int stride = sizeof(Vertex);
-			unsigned int offset = 0;
-
-			_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-			_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-			const auto& room = _rooms[LaraItem->RoomNumber];
-			auto* itemPtr = &_items[LaraItem->Index];
-
-			// Divide gunflash tint by 2 because tinting uses multiplication and additive color which doesn't look good with overbright color values.
-			_stStatic.Color = settings.ColorizeMuzzleFlash ? ((Vector4)settings.FlashColor / 2) : Vector4::One;
-			_stStatic.AmbientLight = room.AmbientLight;
-			_stStatic.LightMode = (int)LightMode::Static;
-			BindStaticLights(itemPtr->LightsToDraw);
-
-			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
-			SetBlendMode(BlendMode::Additive);
-
-			for (const auto& flashBucket : flashMesh.Buckets) 
+			for (const auto& flashBucket : flashMesh.Buckets)
 			{
 				if (flashBucket.BlendMode == BlendMode::Opaque)
 					continue;
@@ -1130,12 +1165,8 @@ namespace TEN::Renderer
 
 				BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[flashBucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
-
-				auto meshOffset = g_Level.Frames[GetAnimData(gunflash, 0).FramePtr].Offset;
-				auto offset = settings.MuzzleOffset + Vector3(meshOffset.x, meshOffset.z, meshOffset.y); // Offsets are inverted because of bone orientation.
-
-				auto tMatrix = Matrix::CreateTranslation(offset);
-				auto rotMatrix = Matrix::CreateRotationX(TO_RAD(Lara.Control.Weapon.GunType == LaraWeaponType::Pistol ? -16830 : -14560)); // HACK
+				auto tMatrix = Matrix::CreateTranslation(0, length, zOffset);
+				auto rotMatrix = Matrix::CreateRotationX(TO_RAD(rotationX));
 
 				auto worldMatrix = Matrix::Identity;
 				if (Lara.LeftArm.GunFlash)

@@ -1,7 +1,7 @@
 #include "framework.h"
 #include "Game/Setup.h"
 
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/camera.h"
 #include "Game/collision/collide_item.h"
 #include "Game/control/flipeffect.h"
@@ -29,6 +29,7 @@
 #include "Specific/level.h"
 #include "Objects/Effects/Fireflies.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Effects::Hair;
 using namespace TEN::Entities;
 using namespace TEN::Entities::Switches;
