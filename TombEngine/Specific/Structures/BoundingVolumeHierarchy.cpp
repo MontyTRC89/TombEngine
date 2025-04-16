@@ -249,7 +249,6 @@ namespace TEN::Structures
 			int leftChildId = sibling.LeftChildId;
 			int rightChildId = sibling.RightChildId;
 
-			float area = Geometry::GetBoundingBoxArea(sibling.Aabb);
 			float inheritCost = Geometry::GetBoundingBoxArea(leaf.Aabb) * 2;
 
 			// Calculate cost of creating new parent for sibling and new leaf.
@@ -461,7 +460,6 @@ namespace TEN::Structures
 				parent.Height = rightChild.Height + 1;
 			}
 
-			int prevParentId = parentId;
 			parentId = parent.ParentId;
 		}
 	}
