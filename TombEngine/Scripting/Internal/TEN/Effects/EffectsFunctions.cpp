@@ -514,7 +514,7 @@ namespace TEN::Scripting::Effects
 	// @tparam[opt=64] float size Effect size.
 	// @tparam[opt=32] float width Width of the effect.
 	// @tparam[opt=0] float rot Rotation of effect in degrees.
-	// @tparam[opt=Color(255, 255, 255, 255)] Color color Color of the effect.
+	// @tparam[opt=Color(255&#44; 255&#44; 255&#44; 255)] Color color Color of the effect.
 	static void EmitWaterfallMist(const Vec3& pos, TypeOrNil<int> size, TypeOrNil<int> width, TypeOrNil<float> angle, TypeOrNil<ScriptColor> color)
 	{
 		constexpr auto DEFAULT_SIZE = 64;
@@ -625,8 +625,8 @@ namespace TEN::Scripting::Effects
 	// @tparam[opt=1] float life Lifespan in seconds.
 	// @tparam[opt=0] float friction Friction affecting velocity over time in world units per second.
 	// @tparam[opt=25] float maxSize Max size of the particle.
-	// @tparam[opt=Color(128, 128, 128)] Color startColor Color at start of life.
-	// @tparam[opt=Color(0, 0, 0)] Color endColor Color at end of life.
+	// @tparam[opt=Color(128&#44; 128&#44; 128)] Color startColor Color at start of life.
+	// @tparam[opt=Color(0&#44; 0&#44; 0)] Color endColor Color at end of life.
 	// @tparam[opt=Objects.ObjID.DEFAULT_SPRITES] Objects.ObjID.SpriteConstants spriteSeqID Sprite sequence slot ID.
 	// @tparam[opt=14 (UNDERWATER_DUST)] int spriteID Sprite ID in the sprite sequence slot.
 	static void EmitSink(const Vec3& pos, const Vec3& dir, TypeOrNil<float> radius, TypeOrNil<float> life, TypeOrNil<float> friction, TypeOrNil<float> maxSize, TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<GAME_OBJECT_ID> spriteSeqID, TypeOrNil<int> spriteID)
