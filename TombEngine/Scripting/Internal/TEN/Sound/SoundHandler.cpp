@@ -87,7 +87,7 @@ namespace TEN::Scripting::Sound
 
 	/// Check if the audio track is playing.
 	// @function IsAudioTrackPlaying
-	// @tparam string Track Filename to check. Should be without extension and without full directory path.
+	// @tparam string track Filename to check. Should be without extension and without full directory path.
 	static bool IsAudioTrackPlaying(const std::string& trackName)
 	{
 		return Sound_TrackIsPlaying(trackName);
