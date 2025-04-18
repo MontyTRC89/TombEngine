@@ -200,6 +200,7 @@ namespace TEN::Renderer
 			_stItem.World = item->InterpolatedWorld;
 			_stItem.Color = item->Color;
 			_stItem.AmbientLight = item->AmbientLight;
+			_stItem.Skinned = item->ObjectID == GAME_OBJECT_ID::ID_LARA; // TODO: Implement for all skinned objects!
 			memcpy(_stItem.BonesMatrices, item->InterpolatedAnimTransforms, sizeof(Matrix) * MAX_BONES);
 			for (int k = 0; k < MAX_BONES; k++)
 				_stItem.BoneLightModes[k] = (int)LightMode::Static;
@@ -2389,6 +2390,7 @@ namespace TEN::Renderer
 
 		_stItem.Color = item->Color;
 		_stItem.AmbientLight = item->AmbientLight;
+		_stItem.Skinned = item->ObjectID == GAME_OBJECT_ID::ID_LARA; // TODO: Implement for all skinned objects!
 		memcpy(_stItem.BonesMatrices, item->InterpolatedAnimTransforms, sizeof(Matrix) * MAX_BONES);
 
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
@@ -3606,6 +3608,7 @@ namespace TEN::Renderer
 		_stItem.World = world;
 		_stItem.Color = objectInfo->Item->Color;
 		_stItem.AmbientLight = objectInfo->Item->AmbientLight;
+		_stItem.Skinned = objectInfo->Item->ObjectID == GAME_OBJECT_ID::ID_LARA; // TODO: Implement for all skinned objects!
 		memcpy(_stItem.BonesMatrices, objectInfo->Item->InterpolatedAnimTransforms, sizeof(Matrix) * MAX_BONES);
 
 		const auto& moveableObj = *_moveableObjects[objectInfo->Item->ObjectID];
