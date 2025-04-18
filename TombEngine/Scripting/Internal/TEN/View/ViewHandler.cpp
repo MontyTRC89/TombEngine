@@ -11,6 +11,7 @@
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
 #include "Scripting/Internal/TEN/Types/Color/Color.h"
+#include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/View/AlignModes.h"
 #include "Scripting/Internal/TEN/View/CameraTypes.h"
@@ -104,10 +105,24 @@ namespace TEN::Scripting::View
 		ObjCamera(LaraItem, 0, LaraItem, 0, false);
 	}
 
-	static void PlayFlyBy(short flyby)
+	static void PlayFlyby(int seqID)
 	{
 		UseSpotCam = true;
-		InitializeSpotCam(flyby);
+		InitializeSpotCam(seqID);
+	}
+
+	static Vec3 GetFlybyPosition(int seqID, float progress, TypeOrNil<bool> loop)
+	{
+		constexpr auto PROGRESS_MAX = 100.0f;
+
+		return Vec3(GetCameraTransform(seqID, progress / PROGRESS_MAX, ValueOr<bool>(loop, false)).Position);
+	}
+
+	static Rotation GetFlybyRotation(int seqID, float progress, TypeOrNil<bool> loop)
+	{
+		constexpr auto PROGRESS_MAX = 100.0f;
+
+		return Rotation(GetCameraTransform(seqID, progress / PROGRESS_MAX, ValueOr<bool>(loop, false)).Orientation);
 	}
 
 	static void FlashScreen(TypeOrNil<ScriptColor> col, TypeOrNil<float> speed)
@@ -151,12 +166,12 @@ namespace TEN::Scripting::View
 
 		///Do a full-screen fade-in from black.
 		//@function FadeIn
-		//@tparam float speed (default 1.0). Speed in "amount" per second. A value of 1 will make the fade take one second.
+		//@tparam float speed (default 1.0). Speed in units per second. A value of 1 will make the fade take one second.
 		tableView.set_function(ScriptReserved_FadeIn, &FadeIn);
 
 		///Do a full-screen fade-to-black. The screen will remain black until a call to FadeIn.
 		//@function FadeOut
-		//@tparam float speed (default 1.0). Speed in "amount" per second. A value of 1 will make the fade take one second.
+		//@tparam float speed (default 1.0). Speed in units per second. A value of 1 will make the fade take one second.
 		tableView.set_function(ScriptReserved_FadeOut, &FadeOut);
 
 		///Check if fade out is complete and screen is completely black.
@@ -220,10 +235,26 @@ namespace TEN::Scripting::View
 		//@tparam Color tint value to use.
 		tableView.set_function(ScriptReserved_SetPostProcessTint, &SetPostProcessTint);
 
-		///Enable FlyBy with specific ID
-		//@function PlayFlyBy
-		//@tparam short flyby (ID of flyby)
-		tableView.set_function(ScriptReserved_PlayFlyBy, &PlayFlyBy);
+		/// Play a flyby sequence.
+		// @function PlayFlyby
+		// @tparam int seqID Flyby sequence ID.
+		tableView.set_function(ScriptReserved_PlayFlyby, &PlayFlyby);
+
+		/// Get a flyby sequence's position at a specified progress point in percent.
+		// @function GetFlybyPosition
+		// @tparam int seqID Flyby sequence ID.
+		// @tparam float progress Progress point in percent. Clamped to [0, 100].
+		// @tparam[opt] bool loop Smooth the position near start and end points, as if the sequence is looped.
+		// @treturn Vec3 Position at the given progress point.
+		tableView.set_function(ScriptReserved_GetFlybyPosition, &GetFlybyPosition);
+
+		/// Get a flyby sequence's rotation at a specified progress point in percent.
+		// @function GetFlybyRotation
+		// @tparam int seqID Flyby sequence ID.
+		// @tparam float progress Progress point in percent. Clamped to [0, 100].
+		// @tparam[opt] bool loop Smooth the position near start and end points, as if the sequence is looped.
+		// @treturn Rotation Rotation at the given progress point.
+		tableView.set_function(ScriptReserved_GetFlybyRotation, &GetFlybyRotation);
 
 		/// Reset object camera back to Lara and deactivate object camera.
 		//@function ResetObjCamera
@@ -232,13 +263,16 @@ namespace TEN::Scripting::View
 		/// Flash screen.
 		//@function FlashScreen
 		//@tparam Color color (default Color(255, 255, 255))
-		//@tparam float speed (default 1.0). Speed in "amount" per second. Value of 1 will make flash take one second. Clamped to [0.005, 1.0].
+		//@tparam float speed (default 1.0). Speed in units per second. Value of 1 will make flash take one second. Clamped to [0.005, 1.0].
 		tableView.set_function(ScriptReserved_FlashScreen, &FlashScreen);
 
 		/// Get the display resolution's aspect ratio.
 		// @function GetAspectRatio
 		// @treturn float Display resolution's aspect ratio.
 		tableView.set_function(ScriptReserved_GetAspectRatio, &GetAspectRatio);
+
+		// COMPATIBILITY
+		tableView.set_function("PlayFlyBy", &PlayFlyby);
 
 		// Register types.
 		ScriptDisplaySprite::Register(*state, parent);

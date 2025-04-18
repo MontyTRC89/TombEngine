@@ -35,6 +35,7 @@
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Specific/level.h"
 #include "Structures/RendererSpriteBucket.h"
+#include "Objects/Effects/Fireflies.h"
 
 using namespace TEN::Effects::Blood;
 using namespace TEN::Effects::Bubble;
@@ -48,6 +49,7 @@ using namespace TEN::Effects::Streamer;
 using namespace TEN::Entities::Creatures::TR5;
 using namespace TEN::Entities::Traps;
 using namespace TEN::Math;
+using namespace TEN::Effects::Fireflies;
 
 extern BLOOD_STRUCT Blood[MAX_SPARKS_BLOOD];
 extern FIRE_SPARKS FireSparks[MAX_SPARKS_FIRE];
@@ -112,65 +114,72 @@ namespace TEN::Renderer
 
 	void Renderer::PrepareStreamers(RenderView& view)
 	{
-		constexpr auto DEFAULT_BLEND_MODE = BlendMode::Additive;
-
-		for (const auto& [itemNumber, module] : StreamerEffect.Modules)
+		for (const auto& [itemNumber, group] : StreamerEffect.GetGroups())
 		{
-			for (const auto& [tag, pool] : module.Pools)
+			for (const auto& [tag, pool] : group.GetPools())
 			{
 				for (const auto& streamer : pool)
 				{
-					for (int i = 0; i < streamer.Segments.size(); i++)
+					for (int i = 0; i < streamer.GetSegments().size(); i++)
 					{
-						const auto& segment = streamer.Segments[i];
-						const auto& prevSegment = streamer.Segments[std::max(i - 1, 0)];
+						const auto& segment = streamer.GetSegments()[i];
+						const auto& prevSegment = streamer.GetSegments()[std::max(i - 1, 0)];
 
 						if (segment.Life <= 0.0f)
 							continue;
-						
-						// Determine blend mode.
-						auto blendMode = DEFAULT_BLEND_MODE;
-						if (segment.Flags & (int)StreamerFlags::BlendModeAdditive)
-							blendMode = BlendMode::AlphaBlend;
 
-						if (segment.Flags & (int)StreamerFlags::FadeLeft)
+						auto vertex0 = Vector3::Lerp(segment.PrevVertices[0], segment.Vertices[0], GetInterpolationFactor());
+						auto vertex1 = Vector3::Lerp(segment.PrevVertices[1], segment.Vertices[1], GetInterpolationFactor());
+						auto prevVertex0 = Vector3::Lerp(prevSegment.PrevVertices[0], prevSegment.Vertices[0], GetInterpolationFactor());
+						auto prevVertex1 = Vector3::Lerp(prevSegment.PrevVertices[1], prevSegment.Vertices[1], GetInterpolationFactor());
+
+						auto color = Vector4::Lerp(segment.PrevColor, segment.Color, GetInterpolationFactor());
+						auto prevColor = Vector4::Lerp(prevSegment.PrevColor, prevSegment.Color, GetInterpolationFactor());
+
+						switch (streamer.GetFeatherMode())
 						{
-							AddColoredQuad(
-								Vector3::Lerp(segment.PrevVertices[0], segment.Vertices[0], GetInterpolationFactor()),
-								Vector3::Lerp(segment.PrevVertices[1], segment.Vertices[1], GetInterpolationFactor()),
-								Vector3::Lerp(prevSegment.PrevVertices[1], prevSegment.Vertices[1], GetInterpolationFactor()),
-								Vector3::Lerp(prevSegment.PrevVertices[0], prevSegment.Vertices[0], GetInterpolationFactor()),
-								Vector4::Zero, 
-								Vector4::Lerp(segment.PrevColor, segment.Color, GetInterpolationFactor()),
-								Vector4::Lerp(prevSegment.PrevColor, prevSegment.Color, GetInterpolationFactor()),
-								Vector4::Zero,
-								blendMode, view);
-						}
-						else if (segment.Flags & (int)StreamerFlags::FadeRight)
-						{
-							AddColoredQuad(
-								Vector3::Lerp(segment.PrevVertices[0], segment.Vertices[0], GetInterpolationFactor()),
-								Vector3::Lerp(segment.PrevVertices[1], segment.Vertices[1], GetInterpolationFactor()),
-								Vector3::Lerp(prevSegment.PrevVertices[1], prevSegment.Vertices[1], GetInterpolationFactor()),
-								Vector3::Lerp(prevSegment.PrevVertices[0], prevSegment.Vertices[0], GetInterpolationFactor()),
-								Vector4::Lerp(segment.PrevColor, segment.Color, GetInterpolationFactor()),
-								Vector4::Zero,
-								Vector4::Zero,
-								Vector4::Lerp(prevSegment.PrevColor, prevSegment.Color, GetInterpolationFactor()),
-								blendMode, view);
-						}
-						else
-						{
-							AddColoredQuad(
-								Vector3::Lerp(segment.PrevVertices[0], segment.Vertices[0], GetInterpolationFactor()),
-								Vector3::Lerp(segment.PrevVertices[1], segment.Vertices[1], GetInterpolationFactor()),
-								Vector3::Lerp(prevSegment.PrevVertices[1], prevSegment.Vertices[1], GetInterpolationFactor()),
-								Vector3::Lerp(prevSegment.PrevVertices[0], prevSegment.Vertices[0], GetInterpolationFactor()),
-								Vector4::Lerp(segment.PrevColor, segment.Color, GetInterpolationFactor()),
-								Vector4::Lerp(segment.PrevColor, segment.Color, GetInterpolationFactor()),
-								Vector4::Lerp(prevSegment.PrevColor, prevSegment.Color, GetInterpolationFactor()),
-								Vector4::Lerp(prevSegment.PrevColor, prevSegment.Color, GetInterpolationFactor()),
-								blendMode, view);
+							default:
+							case StreamerFeatherMode::None:
+								AddColoredQuad(
+									vertex0, vertex1,
+									prevVertex1,
+									prevVertex0,
+									color,
+									color,
+									prevColor,
+									prevColor,
+									streamer.GetBlendMode(), view);
+								break;
+
+							case StreamerFeatherMode::Center:
+							{
+								auto center = (vertex0 + vertex1) / 2;
+								auto prevCenter = (prevVertex0 + prevVertex1) / 2;
+
+								AddColoredQuad(
+									center, vertex1, prevVertex1, prevCenter,
+									color, Vector4::Zero, Vector4::Zero, prevColor,
+									streamer.GetBlendMode(), view);
+								AddColoredQuad(
+									vertex0, center, prevCenter, prevVertex0,
+									Vector4::Zero, color, prevColor, Vector4::Zero,
+									streamer.GetBlendMode(), view);
+							}
+								break;
+
+							case StreamerFeatherMode::Left:
+								AddColoredQuad(
+									vertex0, vertex1, prevVertex1, prevVertex0,
+									color, Vector4::Zero, Vector4::Zero, prevColor,
+									streamer.GetBlendMode(), view);
+								break;
+
+							case StreamerFeatherMode::Right:
+								AddColoredQuad(
+									vertex0, vertex1, prevVertex1, prevVertex0,
+									Vector4::Zero, color, prevColor, Vector4::Zero,
+									streamer.GetBlendMode(), view);
+								break;
 						}
 					}
 				}
@@ -320,6 +329,49 @@ namespace TEN::Renderer
 						PI_DIV_2, 1.0f, Vector2(arc.width * 8, Vector3::Distance(origin, target)), BlendMode::Additive, dir, true, view);					
 				}
 			}
+		}
+	}
+
+	void Renderer::PrepareFireflies(RenderView& view)
+	{
+		if (!Objects[ID_FIREFLY_EMITTER].loaded)
+			return;
+
+		for (auto& firefly : FireflySwarm)
+		{
+			if (!firefly.on)
+				continue;
+
+
+			if (!CheckIfSlotExists(ID_SPARK_SPRITE, "Particle rendering"))
+				continue;
+
+			auto axis = Vector3(0,0,0);
+			axis.Normalize();
+
+
+			firefly.scalar = 3;
+			firefly.size = 3;
+
+			auto pos = Vector3::Lerp(
+				Vector3(firefly.PrevX, firefly.PrevY, firefly.PrevZ),
+				Vector3(firefly.Position.x, firefly.Position.y, firefly.Position.z),
+				GetInterpolationFactor());
+
+			pos = Vector3(firefly.Position.x, firefly.Position.y, firefly.Position.z);
+
+			// Disallow sprites out of bounds.
+			int spriteIndex = Objects[firefly.SpriteSeqID].meshIndex + firefly.SpriteID;
+			spriteIndex = std::clamp(spriteIndex, 0, (int)_sprites.size());
+
+			AddSpriteBillboard(
+				&_sprites[spriteIndex],
+				pos,
+				Color(firefly.r / (float)UCHAR_MAX, firefly.g / (float)UCHAR_MAX, firefly.b / (float)UCHAR_MAX, 1.0f),
+				TO_RAD(firefly.rotAng << 4), firefly.scalar,
+				Vector2(firefly.size, firefly.size),
+				firefly.blendMode, true, view);
+
 		}
 	}
 
@@ -1033,74 +1085,40 @@ namespace TEN::Renderer
 		if (!settings.MuzzleFlash)
 			return false;
 
-		_shaders.Bind(Shader::Statics);
-
-		unsigned int stride = sizeof(Vertex);
-		unsigned int offset = 0;
-
-		_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
-		_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
-
-		const auto& room = _rooms[LaraItem->RoomNumber];
-		auto* itemPtr = &_items[LaraItem->Index];
-
-		// Divide gunflash tint by 2 because tinting uses multiplication and additive color which doesn't look good with overbright color values.
-		_stStatic.Color = settings.ColorizeMuzzleFlash ? ((Vector4)settings.FlashColor / 2) : Vector4::One;
-		_stStatic.AmbientLight = room.AmbientLight;
-		_stStatic.LightMode = (int)LightMode::Static;
-		BindStaticLights(itemPtr->LightsToDraw);
-
-		short length = 0;
-		short zOffset = 0;
-		short rotationX = 0;
-
-		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
-		SetBlendMode(BlendMode::Additive);
-
 		if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare &&
 			Lara.Control.Weapon.GunType != LaraWeaponType::Crossbow)
 		{
-			switch (Lara.Control.Weapon.GunType)
-			{
-			case LaraWeaponType::Revolver:
-				length = 192;
-				zOffset = 68;
-				rotationX = -14560;
-				break;
-
-			case LaraWeaponType::Uzi:
-				length = 190;
-				zOffset = 50;
-				rotationX = -14560;
-				break;
-
-			case LaraWeaponType::HK:
-			case LaraWeaponType::Shotgun:
-				length = 300;
-				zOffset = 92;
-				rotationX = -14560;
-				break;
-
-			default:
-			case LaraWeaponType::Pistol:
-				length = 180;
-				zOffset = 40;
-				rotationX = -16830;
-				break;
-			}
-
 			// Use MP5 flash if available.
 			auto gunflash = GAME_OBJECT_ID::ID_GUN_FLASH;
 			if (Lara.Control.Weapon.GunType == LaraWeaponType::HK && Objects[GAME_OBJECT_ID::ID_GUN_FLASH2].loaded)
-			{
 				gunflash = GAME_OBJECT_ID::ID_GUN_FLASH2;
-				length += 20;
-				zOffset += 10;
-			}
+
+			if (!_moveableObjects[gunflash].has_value())
+				return false;
 
 			const auto& flashMoveable = *_moveableObjects[gunflash];
 			const auto& flashMesh = *flashMoveable.ObjectMeshes[0];
+
+			_shaders.Bind(Shader::Statics);
+
+			unsigned int stride = sizeof(Vertex);
+			unsigned int offset = 0;
+
+			_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
+			_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+			_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
+
+			const auto& room = _rooms[LaraItem->RoomNumber];
+			auto* itemPtr = &_items[LaraItem->Index];
+
+			// Divide gunflash tint by 2 because tinting uses multiplication and additive color which doesn't look good with overbright color values.
+			_stStatic.Color = settings.ColorizeMuzzleFlash ? ((Vector4)settings.FlashColor / 2) : Vector4::One;
+			_stStatic.AmbientLight = room.AmbientLight;
+			_stStatic.LightMode = (int)LightMode::Static;
+			BindStaticLights(itemPtr->LightsToDraw);
+
+			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
+			SetBlendMode(BlendMode::Additive);
 
 			for (const auto& flashBucket : flashMesh.Buckets) 
 			{
@@ -1112,8 +1130,12 @@ namespace TEN::Renderer
 
 				BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[flashBucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
-				auto tMatrix = Matrix::CreateTranslation(0, length, zOffset);
-				auto rotMatrix = Matrix::CreateRotationX(TO_RAD(rotationX));
+
+				auto meshOffset = g_Level.Frames[GetAnimData(gunflash, 0).FramePtr].Offset;
+				auto offset = settings.MuzzleOffset + Vector3(meshOffset.x, meshOffset.z, meshOffset.y); // Offsets are inverted because of bone orientation.
+
+				auto tMatrix = Matrix::CreateTranslation(offset);
+				auto rotMatrix = Matrix::CreateRotationX(TO_RAD(Lara.Control.Weapon.GunType == LaraWeaponType::Pistol ? -16830 : -14560)); // HACK
 
 				auto worldMatrix = Matrix::Identity;
 				if (Lara.LeftArm.GunFlash)

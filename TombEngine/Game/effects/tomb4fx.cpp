@@ -355,6 +355,7 @@ void ThrowPoison(const ItemInfo& item, int boneID, const Vector3& offset, const 
 		auto& part = SetupPoisonParticle(colorStart, colorEnd);
 		AttachAndCreateSpark(&part, &item, boneID, offset, vel, spriteID);
 		part.flags = SP_POISON | SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF;
+		part.damage = 5;
 	}
 }
 
@@ -937,6 +938,55 @@ void TriggerGunShell(short hand, short objNum, LaraWeaponType weaponType)
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, LaraWeaponType::Shotgun, 24);
 		else
 			TriggerGunSmoke(pos.x, pos.y, pos.z, 0, 0, 0, 0, weaponType, 16);
+	}
+}
+
+void UpdateGunFlashes()
+{
+	if (Lara.Control.Weapon.GunType == LaraWeaponType::None)
+		return;
+
+	const auto& settings = g_GameFlow->GetSettings()->Weapons[(int)Lara.Control.Weapon.GunType - 1];
+
+	if (!settings.MuzzleGlow)
+		return;
+
+	for (int hand = 0; hand < 2; hand++)
+	{
+		if ((hand ? Lara.RightArm.GunFlash : Lara.LeftArm.GunFlash) == 0)
+			continue;
+
+		auto& part = *GetFreeParticle();
+
+		part.on = true;
+		part.SpriteSeqID = ID_DEFAULT_SPRITES;
+		part.SpriteID = 11;
+		part.blendMode = BlendMode::Additive;
+
+		auto pos = GetJointPosition(LaraItem, hand ? LM_RHAND : LM_LHAND, settings.MuzzleOffset.ToVector3i());
+		part.x = pos.x;
+		part.y = pos.y;
+		part.z = pos.z;
+		part.roomNumber = LaraItem->RoomNumber;
+
+		part.rotAng = ANGLE(TO_DEGREES(Random::GenerateAngle())) >> 4;
+		part.rotAdd = 0;
+
+		part.sSize = part.size = part.dSize = 192;
+		part.scalar = 2;
+
+		part.xVel = part.yVel = part.zVel = 0;
+		part.gravity = part.friction = part.maxYvel = 0;
+
+		part.sR = part.dR = settings.FlashColor.GetR() / 2;
+		part.sG = part.dG = settings.FlashColor.GetG() / 2;
+		part.sB = part.dB = settings.FlashColor.GetB() / 2;
+
+		part.life = part.sLife = 2;
+		part.colFadeSpeed = 1;
+		part.fadeToBlack  = 1;
+
+		part.flags = SP_SCALE | SP_DEF | SP_EXPDEF;
 	}
 }
 

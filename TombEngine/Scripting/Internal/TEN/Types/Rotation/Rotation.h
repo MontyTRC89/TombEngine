@@ -40,5 +40,16 @@ namespace TEN::Scripting
 		// Operators
 
 		operator Vector3() const;
+
+		bool	  operator ==(const Rotation& rot) const;
+		Rotation  operator +(const Rotation& rot) const;
+		Rotation  operator -(const Rotation& rot) const;
+		Rotation& operator +=(const Rotation& rot);
+		Rotation& operator -=(const Rotation& rot);
+
+	private:
+		// Helpers
+
+		float WrapAngle(float angle) const;
 	};
 }

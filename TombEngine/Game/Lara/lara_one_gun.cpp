@@ -32,6 +32,7 @@
 #include "Specific/clock.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Bubble;
@@ -67,27 +68,6 @@ constexpr auto HK_RAPID_MODE_SHOT_INTERVAL			  = 3.0f;
 
 constexpr auto SHOTGUN_PELLET_COUNT = 6;
 
-static Vector3i GetWeaponSmokeRelOffset(LaraWeaponType weaponType)
-{
-	switch (weaponType)
-	{
-	case LaraWeaponType::HK:
-		return Vector3i(0, 228, 96);
-
-	case LaraWeaponType::Shotgun:
-		return Vector3i(0, 228, 0);
-
-	case LaraWeaponType::GrenadeLauncher:
-		return Vector3i(0, 180, 80);
-
-	case LaraWeaponType::RocketLauncher:
-		return Vector3i(0, 84, 72);;
-
-	default:
-		return Vector3i::Zero;
-	}
-}
-
 void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 {
 	auto& player = *GetLaraInfo(&laraItem);
@@ -95,7 +75,7 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 
 	if (player.LeftArm.GunSmoke > 0)
 	{
-		auto relOffset = GetWeaponSmokeRelOffset(weaponType);
+		auto relOffset = g_GameFlow->GetSettings()->Weapons[(int)weaponType - 1].MuzzleOffset.ToVector3();
 		auto pos = GetJointPosition(&laraItem, LM_RHAND, relOffset);
 
 		if (laraItem.MeshBits.TestAny())
@@ -251,9 +231,8 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 				player.Control.Weapon.Timer = 0.0f;
 			}
 		}
-		else if (player.Control.Weapon.Timer != 0.0f)
+		else if (weaponType == LaraWeaponType::HK && player.Control.Weapon.Timer != 0.0f)
 		{
-			SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, SoundEnvironment::Land, 1.0f, 0.4f);
 			SoundEffect(SFX_TR4_HK_FIRE, &laraItem.Pose);
 		}
 		else if (weaponType == LaraWeaponType::Shotgun && !IsHeld(In::Action) && !player.LeftArm.Locked)
@@ -332,9 +311,8 @@ void AnimateShotgun(ItemInfo& laraItem, LaraWeaponType weaponType)
 				player.Control.Weapon.Timer = 0.0f;
 			}
 		}
-		else if (player.Control.Weapon.Timer != 0.0f)
+		else if (weaponType == LaraWeaponType::HK && player.Control.Weapon.Timer != 0.0f)
 		{
-			SoundEffect(SFX_TR4_EXPLOSION1, &laraItem.Pose, SoundEnvironment::Land, 1.0f, 0.4f);
 			SoundEffect(SFX_TR4_HK_FIRE, &laraItem.Pose);
 		}
 
@@ -410,8 +388,10 @@ void FireShotgun(ItemInfo& laraItem)
 		if (!ammo.HasInfinite())
 			ammo--;
 
-		auto pos = GetJointPosition(&laraItem, LM_RHAND, Vector3i(0, 1508, 32));
-		auto pos2 = GetJointPosition(&laraItem, LM_RHAND, Vector3i(0, 228, 32));
+		auto offset = g_GameFlow->GetSettings()->Weapons[(int)LaraWeaponType::Shotgun].MuzzleOffset.ToVector3i();
+
+		auto pos = GetJointPosition(&laraItem, LM_RHAND, offset + Vector3::UnitY * CLICK(2));
+		auto pos2 = GetJointPosition(&laraItem, LM_RHAND, offset);
 
 		player.LeftArm.GunSmoke = 32;
 
@@ -1251,7 +1231,6 @@ void LasersightWeaponHandler(ItemInfo& item, LaraWeaponType weaponType)
 
 			if (playSound)
 			{
-				SoundEffect(SFX_TR4_EXPLOSION1, nullptr, SoundEnvironment::Land, 1.0f, 0.4f);
 				SoundEffect(SFX_TR4_HK_FIRE, nullptr);
 				Camera.bounce = -16 - (GetRandomControl() & 0x1F);
 			}
@@ -1339,8 +1318,8 @@ void DoExplosiveDamage(ItemInfo& emitter, ItemInfo& target, ItemInfo& projectile
 			SaveGame::Statistics.Level.AmmoHits++;
 			if (target.HitPoints <= 0)
 			{
-				SaveGame::Statistics.Level.Kills++;
 				SaveGame::Statistics.Game.Kills++;
+				SaveGame::Statistics.Level.Kills++;
 				CreatureDie(target.Index, true);
 			}
 		}
@@ -1594,7 +1573,7 @@ void HandleProjectile(ItemInfo& projectile, ItemInfo& emitter, const Vector3i& p
 		for (auto* itemPtr : collObjects.Items)
 		{
 			// Object was already affected by collision, skip it.
-			if (std::find(affectedObjects.begin(), affectedObjects.end(), itemPtr->Index) != affectedObjects.end())
+			if (TEN::Utils::Contains(affectedObjects, itemPtr->Index))
 				continue;
 
 			const auto& currentObject = Objects[itemPtr->ObjectNumber];

@@ -68,9 +68,6 @@ namespace TEN::Renderer
 			_animatedTextures[i] = tex;
 		}
 
-		if (_animatedTextures.size() > 0)
-			TENLog("Generated " + std::to_string(_animatedTextures.size()) + " animated textures.", LogLevel::Info);
-
 		std::transform(g_Level.AnimatedTexturesSequences.begin(), g_Level.AnimatedTexturesSequences.end(), std::back_inserter(_animatedTextureSets), [](ANIMATED_TEXTURES_SEQUENCE& sequence) {
 			RendererAnimatedTextureSet set{};
 			set.NumTextures = sequence.numFrames;
@@ -882,25 +879,6 @@ namespace TEN::Renderer
 				}
 
 				_spriteSequences[SpriteSequencesIds[i]] = sequence;
-
-				if (SpriteSequencesIds[i] == ID_CAUSTICS_TEXTURES)
-				{
-					_causticTextures.clear();
-					for (int j = 0; j < sequence.SpritesList.size(); j++)
-					{
-						_causticTextures.push_back(
-							Texture2D(
-								_device.Get(),
-								_context.Get(),
-								sequence.SpritesList[j]->Texture->Texture.Get(),
-								sequence.SpritesList[j]->X,
-								sequence.SpritesList[j]->Y,
-								sequence.SpritesList[j]->Width,
-								sequence.SpritesList[j]->Height
-							)
-						);
-					}
-				}
 			}
 		}
 

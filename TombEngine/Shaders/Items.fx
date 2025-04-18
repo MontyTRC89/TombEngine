@@ -140,6 +140,9 @@ PixelShaderOutput PS(PixelShaderInput input)
 		samplePosition = samplePosition * 0.5f + 0.5f; // transform to range 0.0 - 1.0  
 		samplePosition.y = 1.0f - samplePosition.y;
 		occlusion = pow(SSAOTexture.Sample(SSAOSampler, samplePosition).x, AmbientOcclusionExponent);
+		
+		if (BlendMode == BLENDMODE_ALPHABLEND)
+			occlusion = lerp(occlusion, 1.0f, tex.w);
 	}
 
 	float3 color = (BoneLightModes[input.Bone / 4][input.Bone % 4] == 0) ?
@@ -163,6 +166,7 @@ PixelShaderOutput PS(PixelShaderInput input)
 	output.Color = saturate(float4(color * occlusion, tex.w));
 	output.Color = DoFogBulbsForPixel(output.Color, float4(input.FogBulbs.xyz, 1.0f));
 	output.Color = DoDistanceFogForPixel(output.Color, FogColor, input.DistanceFog);
+	output.Color.w *= input.Color.w;
 
 	return output;
 }

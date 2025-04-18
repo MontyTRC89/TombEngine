@@ -689,6 +689,18 @@ void ClampRotation(Pose& outPose, short angle, short rotation)
 
 Vector3i GetJointPosition(const ItemInfo& item, int jointIndex, const Vector3i& relOffset)
 {
+	bool incorrectJoint = false;
+	if (jointIndex < 0 || jointIndex >= Objects[item.ObjectNumber].nmeshes)
+	{
+		TENLog("Unknown joint ID specified for object " + GetObjectName(item.ObjectNumber), LogLevel::Warning, LogConfig::All);
+		incorrectJoint = true;
+	}
+
+	// Always return object's root position if it's invisible, because we can't predict its
+	// joint position otherwise, since it's not animated.
+	if (incorrectJoint || Objects[item.ObjectNumber].drawRoutine == nullptr || item.Status == ITEM_INVISIBLE)
+		return Geometry::TranslatePoint(item.Pose.Position, item.Pose.Orientation, relOffset);
+
 	// Use matrices done in renderer to transform relative offset.
 	return Vector3i(g_Renderer.GetMoveableBonePosition(item.Index, jointIndex, relOffset.ToVector3()));
 }
@@ -711,6 +723,10 @@ Vector3i GetJointPosition(const ItemInfo& item, const CreatureBiteInfo& bite)
 Vector3 GetJointOffset(GAME_OBJECT_ID objectID, int jointIndex)
 {
 	const auto& object = Objects[objectID];
+	int boneIndex = object.boneIndex + (jointIndex * 4);
+
+	if (g_Level.Bones.size() <= boneIndex)
+		return Vector3::Zero;
 
 	int* bonePtr = &g_Level.Bones[object.boneIndex + (jointIndex * 4)];
 	return Vector3(*(bonePtr + 1), *(bonePtr + 2), *(bonePtr + 3));

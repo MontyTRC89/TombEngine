@@ -22,6 +22,7 @@
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
 using namespace TEN::Collision::Point;
@@ -93,7 +94,7 @@ void DoThumbstickCamera()
 
 	if (Camera.laraNode == -1 && Camera.target.ToVector3i() == OldCam.target)
 	{
-		const auto& axisCoeff = AxisMap[(int)InputAxis::Camera];
+		const auto& axisCoeff = AxisMap[InputAxisID::Camera];
 
 		if (abs(axisCoeff.x) > EPSILON && abs(Camera.targetAngle) == 0)
 			Camera.targetAngle = ANGLE(VERTICAL_CONSTRAINT_ANGLE * axisCoeff.x);
@@ -659,7 +660,7 @@ void CombatCamera(ItemInfo* item)
 
 	auto pointColl = GetPointCollision(Vector3i(Camera.target.x, Camera.target.y + CLICK(1), Camera.target.z), Camera.target.RoomNumber);
 	if (TestEnvironment(ENV_FLAG_SWAMP, pointColl.GetRoomNumber()))
-		Camera.target.y = g_Level.Rooms[pointColl.GetRoomNumber()].Position.y - CLICK(1);
+		Camera.target.y = g_Level.Rooms[pointColl.GetRoomNumber()].TopHeight - CLICK(1);
 
 	pointColl = GetPointCollision(Camera.target.ToVector3i(), Camera.target.RoomNumber);
 	Camera.target.RoomNumber = pointColl.GetRoomNumber();
@@ -1392,7 +1393,7 @@ static std::vector<int> FillCollideableItemList()
 	{
 		const auto& item = g_Level.Items[i];
 
-		if (std::find(roomList.begin(), roomList.end(), item.RoomNumber) == roomList.end())
+		if (!TEN::Utils::Contains(roomList, (int)item.RoomNumber))
 			continue;
 
 		if (!g_Level.Rooms[item.RoomNumber].Active())
