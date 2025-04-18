@@ -93,13 +93,9 @@ void Level::Register(sol::table& parent)
 //@mem weatherStrength
 		"weatherStrength", &Level::WeatherStrength,
 
-/*** (LaraType) Appearance of Lara. Must be one of the LaraType values.
-These are:
-
-	Normal  
-	Young
-
-e.g. `myLevel.laraType = LaraType.Young` will make Lara appear as young (with two ponytails rendered).
+/*** (LaraType) Appearance of Lara. Must be either `LaraType.Normal` or `LaraType.Young`.
+E.g. `myLevel.laraType = LaraType.Young` will make Lara appear as young (with two ponytails rendered).
+This setting does not affect ability to use weapons or flares.
 
  @mem laraType*/
 		"laraType", &Level::Type,
