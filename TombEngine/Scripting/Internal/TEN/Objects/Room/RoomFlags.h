@@ -35,5 +35,4 @@ static const std::unordered_map<std::string, RoomEnvFlags> ROOM_FLAG_IDS
 	{ "COLD", RoomEnvFlags::ENV_FLAG_COLD },
 	{ "DAMAGE", RoomEnvFlags::ENV_FLAG_DAMAGE },
 	{ "NOLENSFLARE", RoomEnvFlags::ENV_FLAG_NO_LENSFLARE },
-	{ "CAUSTICS", RoomEnvFlags::ENV_FLAG_CAUSTICS }
 };
