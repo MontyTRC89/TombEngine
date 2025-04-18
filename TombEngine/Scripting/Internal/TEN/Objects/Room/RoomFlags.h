@@ -22,7 +22,6 @@ The following constants are inside RoomFlagID.
  - `COLD`
  - `DAMAGE`
  - `NOLENSFLARE`
- - `CAUSTICS`
 @table Objects.RoomFlagID
 */
 
