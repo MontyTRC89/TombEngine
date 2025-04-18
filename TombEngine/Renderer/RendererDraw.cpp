@@ -2757,7 +2757,7 @@ namespace TEN::Renderer
 
 				if (rendererPass != RendererPass::GBuffer)
 				{
-					_stRoom.Caustics = int(g_Configuration.EnableCaustics && (nativeRoom.flags & ENV_FLAG_WATER) && (nativeRoom.flags & ENV_FLAG_SKYBOX));
+					_stRoom.Caustics = int(g_Configuration.EnableCaustics && (nativeRoom.flags & ENV_FLAG_WATER) && (nativeRoom.flags & ENV_FLAG_WIND));
 					_stRoom.AmbientColor = room.AmbientLight;
 					BindRoomLights(view.LightsToDraw);
 				}
