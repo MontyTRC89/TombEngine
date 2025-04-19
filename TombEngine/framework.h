@@ -23,6 +23,7 @@
 #include <string>
 #include <queue>
 #include <vector>
+#include <vlc/vlc.h>
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
