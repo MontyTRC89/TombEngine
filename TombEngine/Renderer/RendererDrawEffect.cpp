@@ -1085,50 +1085,13 @@ namespace TEN::Renderer
 		if (!settings.MuzzleFlash)
 			return false;
 
-		short length = 0;
-		short zOffset = 0;
-		short rotationX = 0;
-
 		if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare &&
 			Lara.Control.Weapon.GunType != LaraWeaponType::Crossbow)
 		{
-			switch (Lara.Control.Weapon.GunType)
-			{
-			case LaraWeaponType::Revolver:
-				length = 192;
-				zOffset = 68;
-				rotationX = -14560;
-				break;
-
-			case LaraWeaponType::Uzi:
-				length = 190;
-				zOffset = 50;
-				rotationX = -14560;
-				break;
-
-			case LaraWeaponType::HK:
-			case LaraWeaponType::Shotgun:
-				length = 300;
-				zOffset = 92;
-				rotationX = -14560;
-				break;
-
-			default:
-			case LaraWeaponType::Pistol:
-				length = 180;
-				zOffset = 40;
-				rotationX = -16830;
-				break;
-			}
-
 			// Use MP5 flash if available.
 			auto gunflash = GAME_OBJECT_ID::ID_GUN_FLASH;
 			if (Lara.Control.Weapon.GunType == LaraWeaponType::HK && Objects[GAME_OBJECT_ID::ID_GUN_FLASH2].loaded)
-			{
 				gunflash = GAME_OBJECT_ID::ID_GUN_FLASH2;
-				length += 20;
-				zOffset += 10;
-			}
 
 			if (!_moveableObjects[gunflash].has_value())
 				return false;
@@ -1167,8 +1130,12 @@ namespace TEN::Renderer
 
 				BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[flashBucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 
-				auto tMatrix = Matrix::CreateTranslation(0, length, zOffset);
-				auto rotMatrix = Matrix::CreateRotationX(TO_RAD(rotationX));
+
+				auto meshOffset = g_Level.Frames[GetAnimData(gunflash, 0).FramePtr].Offset;
+				auto offset = settings.MuzzleOffset + Vector3(meshOffset.x, meshOffset.z, meshOffset.y); // Offsets are inverted because of bone orientation.
+
+				auto tMatrix = Matrix::CreateTranslation(offset);
+				auto rotMatrix = Matrix::CreateRotationX(TO_RAD(Lara.Control.Weapon.GunType == LaraWeaponType::Pistol ? -16830 : -14560)); // HACK
 
 				auto worldMatrix = Matrix::Identity;
 				if (Lara.LeftArm.GunFlash)

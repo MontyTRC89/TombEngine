@@ -9,9 +9,17 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed crashes when shooting, if gunflash or gunshell objects are not present in a level.
 * Fixed Teleporter object.
 * Fixed Wraith objects not working correctly in flipped rooms.
+* Fixed lensflare enabled status not saved in a savegame.
 * Fixed caustics not rendered correctly if texture compression was enabled.
+* Fixed exclusion blend mode not working correctly.
+* Fixed SSAO incorrectly applied through alpha blended textures.
+* Fixed HK sound effects.
+
+### New features
+* Added muzzle glow effect for firearms.
 
 ### Lua API changes
+* Added `muzzleGlow` and `muzzleOffset` parameters to weapon settings.
 * Fixed `Moveable.GetJointPosition` not returning correct results if moveable is invisible or not rendered.
 
 ### Lua API changes
