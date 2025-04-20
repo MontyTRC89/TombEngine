@@ -68,11 +68,18 @@ namespace TEN::Renderer
 			_animatedTextures[i] = tex;
 		}
 
-		std::transform(g_Level.AnimatedTexturesSequences.begin(), g_Level.AnimatedTexturesSequences.end(), std::back_inserter(_animatedTextureSets), [](ANIMATED_TEXTURES_SEQUENCE& sequence) {
+		std::transform(g_Level.AnimatedTexturesSequences.begin(), g_Level.AnimatedTexturesSequences.end(), std::back_inserter(_animatedTextureSets), [](ANIMATED_TEXTURES_SEQUENCE& sequence)
+		{
 			RendererAnimatedTextureSet set{};
-			set.NumTextures = sequence.numFrames;
-			std::transform(sequence.frames.begin(), sequence.frames.end(), std::back_inserter(set.Textures), [](ANIMATED_TEXTURES_FRAME& frm) {
+
+			set.NumTextures = sequence.NumFrames;
+			set.Type = (AnimatedTextureType)sequence.Type;
+			set.Fps = sequence.Fps;
+
+			std::transform(sequence.Frames.begin(), sequence.Frames.end(), std::back_inserter(set.Textures), [](ANIMATED_TEXTURES_FRAME& frm)
+			{
 				RendererAnimatedTexture tex{};
+
 				tex.UV[0].x = frm.x1;
 				tex.UV[0].y = frm.y1;
 				tex.UV[1].x = frm.x2;
@@ -81,9 +88,21 @@ namespace TEN::Renderer
 				tex.UV[2].y = frm.y3;
 				tex.UV[3].x = frm.x4;
 				tex.UV[3].y = frm.y4;
+
+				float UMin = std::min({ tex.UV[0].x, tex.UV[1].x, tex.UV[2].x, tex.UV[3].x });
+				float VMin = std::min({ tex.UV[0].y, tex.UV[1].y, tex.UV[2].y, tex.UV[3].y });
+				float UMax = std::max({ tex.UV[0].x, tex.UV[1].x, tex.UV[2].x, tex.UV[3].x });
+				float VMax = std::max({ tex.UV[0].y, tex.UV[1].y, tex.UV[2].y, tex.UV[3].y });
+
+				for (int i = 0; i < 4; ++i)
+				{
+					tex.NormalizedUV[i].x = (tex.UV[i].x - UMin) / (UMax - UMin);
+					tex.NormalizedUV[i].y = (tex.UV[i].y - VMin) / (VMax - VMin);
+				}
+
 				return tex;
 			});
-			set.Fps = sequence.Fps;
+
 			return set;
 		});
 
