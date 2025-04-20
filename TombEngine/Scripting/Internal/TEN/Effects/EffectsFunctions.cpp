@@ -283,7 +283,7 @@ namespace TEN::Scripting::Effects
 	// @tfield[opt=0] int lightRadius Light radius in 1/4 blocks.
 	// @tfield[opt=0] int lightFlicker Interval at which the light should flicker.
 	// @tfield[opt] int soundID Sound ID to play. __Caution__: Recommended only for a single particle. Too many particles with sounds can overwhelm the sound system.
-	// @tfield[opt=false] bool animated Play animates sprite sequence.
+	// @tfield[opt=false] bool animated Play animated sprite sequence.
 	// @tfield[opt=TEN.Effects.ParticleAnimationType.LOOP] Effects.ParticleAnimationType animType Animation type of the sprite sequence.
 	// @tfield[opt=1] float frameRate Sprite sequence animation framerate.
 	// @tfield[opt=Rotation(0&#44; 0&#44; 0)] Rotation drawRot Sprite orientation in degrees.
