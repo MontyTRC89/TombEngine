@@ -14,5 +14,4 @@ namespace TEN::Entities::Doors
 
 	void OpenThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* door);
 	void ShutThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* door);
-	void UpdateDoorRoomCollisionMeshes(const DOOR_DATA& door);
 }

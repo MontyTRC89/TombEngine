@@ -165,8 +165,6 @@ namespace TEN::Entities::Doors
 			doorItem->RoomNumber = roomNumber;
 			doorItem->InDrawRoom = true;
 		}
-
-		UpdateDoorRoomCollisionMeshes(*doorData);
 	}
 
 	void DoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
@@ -290,8 +288,6 @@ namespace TEN::Entities::Doors
 					OpenThatDoor(&doorData->d1flip, doorData);
 					OpenThatDoor(&doorData->d2flip, doorData);
 					doorData->opened = true;
-
-					UpdateDoorRoomCollisionMeshes(*doorData);
 				}
 			}
 			else
@@ -308,8 +304,6 @@ namespace TEN::Entities::Doors
 						ShutThatDoor(&doorData->d1flip, doorData);
 						ShutThatDoor(&doorData->d2flip, doorData);
 						doorData->opened = false;
-
-						UpdateDoorRoomCollisionMeshes(*doorData);
 					}
 				}
 			}
@@ -330,8 +324,6 @@ namespace TEN::Entities::Doors
 					OpenThatDoor(&doorData->d1flip, doorData);
 					OpenThatDoor(&doorData->d2flip, doorData);
 					doorData->opened = true;
-
-					UpdateDoorRoomCollisionMeshes(*doorData);
 				}
 			}
 			else
@@ -347,8 +339,6 @@ namespace TEN::Entities::Doors
 					ShutThatDoor(&doorData->d1flip, doorData);
 					ShutThatDoor(&doorData->d2flip, doorData);
 					doorData->opened = false;
-
-					UpdateDoorRoomCollisionMeshes(*doorData);
 				}
 			}
 		}
@@ -366,8 +356,6 @@ namespace TEN::Entities::Doors
 						ShutThatDoor(&door->d1flip, door);
 						ShutThatDoor(&door->d2flip, door);
 						door->opened = false;
-
-						UpdateDoorRoomCollisionMeshes(*door);
 					}
 				}
 				else
@@ -394,8 +382,6 @@ namespace TEN::Entities::Doors
 					OpenThatDoor(&door->d2flip, door);
 					DontUnlockBox = false;
 					door->opened = true;
-
-					UpdateDoorRoomCollisionMeshes(*door);
 				}
 			}*/
 		}
@@ -451,24 +437,6 @@ namespace TEN::Entities::Doors
 
 			for (auto& creature : ActiveCreatures)
 				creature->LOT.TargetBox = NO_VALUE;
-		}
-	}
-
-	// HACK: Regenerate room collision meshes.
-	void UpdateDoorRoomCollisionMeshes(const DOOR_DATA& door)
-	{
-		// Generate current room collision mesh.
-		if (door.d1.floor != nullptr)
-		{
-			auto& room = g_Level.Rooms[door.d1.floor->RoomNumber];
-			room.GenerateCollisionMesh();
-		}
-
-		// Generate neighbor room collision mesh.
-		if (door.d2.floor != nullptr)
-		{
-			auto& room = g_Level.Rooms[door.d2.floor->RoomNumber];
-			room.GenerateCollisionMesh();
 		}
 	}
 }

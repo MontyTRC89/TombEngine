@@ -178,8 +178,8 @@ struct RoomData
 private:
 	void CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 											 const FloorInfo& sector,
-											 const FloorInfo& sectorNorth, const FloorInfo& sectorSouth,
-											 const FloorInfo& sectorEast, const FloorInfo& sectorWest);
+											 const FloorInfo* sectorNorth, const FloorInfo* sectorSouth,
+											 const FloorInfo* sectorEast, const FloorInfo* sectorWest);
 };
 
 void DoFlipMap(int group);
