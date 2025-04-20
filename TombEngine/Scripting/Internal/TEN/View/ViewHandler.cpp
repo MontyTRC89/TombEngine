@@ -295,11 +295,11 @@ namespace TEN::Scripting::View
 
 		/// Play a video file. File should be placed in the `FMV` folder.
 		// @function PlayVideo
-		// @tparam string fileName Video file name.  Can be provided without extension, if type is mp4, mkv or avi.
-		// @tparam[opt] bool background (default: false). Play video in the background mode.
+		// @tparam string fileName Video file name.  Can be provided without extension, if type is mp4, mkv, mov or avi.
+		// @tparam[opt=false] bool background Play video in the background mode.
 		// In such case, video won't play in fullscreen, but must be shown using special animated texture type in Tomb Editor, or using @{View.DisplaySprite}.
-		// @tparam[opt] bool silent (default: false). Play video without sound.
-		// @tparam[opt] bool loop (default: false). Play video in a loop.
+		// @tparam[opt=false] bool silent Play video without sound.
+		// @tparam[opt=false] bool loop Play video in a loop.
 		tableView.set_function(ScriptReserved_PlayVideo, &PlayVideo);
 
 		/// Stop the currently playing video. Only possible if video is playing in the background mode.

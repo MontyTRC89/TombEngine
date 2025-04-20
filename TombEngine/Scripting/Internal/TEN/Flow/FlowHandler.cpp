@@ -66,7 +66,7 @@ Add a level to the Flow.
 */
 	tableFlow.set_function(ScriptReserved_SetIntroImagePath, &FlowHandler::SetIntroImagePath, this);
 
-/*** Video to show when loading the game. Must be a common video format, such as .mp4, .mkv or .avi.
+/*** Video to show when loading the game. Must be a common video format, such as mp4, mkv, mov or avi.
 @function SetIntroVideoPath
 @tparam string path the path to the video, relative to the TombEngine exe
 */
