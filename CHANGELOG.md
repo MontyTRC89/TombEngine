@@ -7,6 +7,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ## New features
 * Added video playback support.
+* Added muzzle glow effect for firearms.
 
 ### Bug fixes
 * Fixed crashes when shooting, if gunflash or gunshell objects are not present in a level.
@@ -18,9 +19,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed HK shots not being registered in statistics.
 * Fixed HK sound effects.
 * Fixed SSAO incorrectly applied through alpha blended textures.
-
-### New features
-* Added muzzle glow effect for firearms.
 
 ### Lua API changes
 * Added `View.PlayVideoFile` function to play videos.
