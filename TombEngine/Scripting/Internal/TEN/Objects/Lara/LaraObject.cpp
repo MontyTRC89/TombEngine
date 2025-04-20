@@ -402,13 +402,13 @@ bool LaraObject::IsTorchLit() const
 /// Align the player with a moveable object for interaction.
 // @function LaraObject:Interact
 // @tparam Moveable mov Moveable object to align the player with.
-// @tparam[opt] int animNumber The animation to play after alignment is complete. __default: BUTTON_PUSH__
-// @tparam[opt] Vec3 offset Relative position offset from the moveable. __default: Vec3(0, 0, 312)__
-// @tparam[opt] Vec3 minOffsetConstraint Minimum relative offset constraint. __default: Vec3(-256, -512, 0)__
-// @tparam[opt] Vec3 maxOffsetConstraint Maximum relative offset constraint. __default: Vec3(256, 0, 512)__
-// @tparam[opt] Rotation minRotConstraint Minimum relative rotation constraint. __default: Rotation(-10, -40, -10)__
-// @tparam[opt] Rotation maxRotConstraint Maximum relative rotation constraint. __default: Rotation(10, 40, 10)__
-// @tparam[opt] Input.ActionID actionID Input action ID to trigger the alignment. __default: Input.ActionID.ACTION__
+// @tparam[opt=197 (BUTTON_PUSH)] int animNumber The animation to play after alignment is complete.
+// @tparam[opt=Vec3(0&#44; 0&#44; 312)] Vec3 offset Relative position offset from the moveable.
+// @tparam[opt=Vec3(-256&#44; -512&#44; 0)] Vec3 minOffsetConstraint Minimum relative offset constraint.
+// @tparam[opt=Vec3(256&#44; 0&#44; 512)] Vec3 maxOffsetConstraint Maximum relative offset constraint.
+// @tparam[opt=Rotation(-10&#44; -40&#44; -10)] Rotation minRotConstraint Minimum relative rotation constraint.
+// @tparam[opt=Rotation(10&#44; 40&#44; 10)] Rotation maxRotConstraint Maximum relative rotation constraint.
+// @tparam[opt=Input.ActionID.ACTION] Input.ActionID actionID Input action ID to trigger the alignment.
 // @usage
 // local Lara:Interact(
 //     moveable, 197,
@@ -469,10 +469,10 @@ void LaraObject::Interact(const Moveable& mov, TypeOrNil<int> animNumber,
 /// Test the player against a moveable object for interaction.
 // @function LaraObject:TestInteraction
 // @tparam Moveable mov Moveable object to align the player with.
-// @tparam[opt] Vec3 minOffsetConstraint Minimum relative offset constraint. __default: Vec3(-256, -512, 0)__
-// @tparam[opt] Vec3 maxOffsetConstraint Maximum relative offset constraint. __default: Vec3(256, 0, 512)__
-// @tparam[opt] Rotation minRotConstraint Minimum relative rotation constraint. __default: Rotation(-10, -40, -10)__
-// @tparam[opt] Rotation maxRotConstraint Maximum relative rotation constraint. __default: Rotation(10, 40, 10)__
+// @tparam[opt=Vec3(-256&#44; -512&#44; 0)] Vec3 minOffsetConstraint Minimum relative offset constraint.
+// @tparam[opt=Vec3(256&#44; 0&#44; 512)] Vec3 maxOffsetConstraint Maximum relative offset constraint.
+// @tparam[opt=Rotation(-10&#44; -40&#44; -10)] Rotation minRotConstraint Minimum relative rotation constraint.
+// @tparam[opt=Rotation(10&#44; 40&#44; 10)] Rotation maxRotConstraint Maximum relative rotation constraint.
 bool LaraObject::TestInteraction(const Moveable& mov,
 								 const TypeOrNil<Vec3>& offsetConstraintMin, const TypeOrNil<Vec3>& offsetConstraintMax,
 								 const TypeOrNil<Rotation>& rotConstraintMin, const TypeOrNil<Rotation>& rotConstraintMax) const
