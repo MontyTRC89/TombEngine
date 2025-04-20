@@ -25,15 +25,15 @@ namespace TEN::Scripting
 	
 		// NOTE: Since Weapons array is bound to Lua directly and Lua accesses this array by native enum, where 0 is NONE, and 1 is PISTOLS,
 		// 0 index is omitted due to Lua indexing arrays starting from 1. 1 must be subtracted from initializer index.
-		Weapons[(int)LaraWeaponType::Pistol          - 1] = { 8.0f,  BLOCK(8),  9,  (int)BLOCK(0.65f), 1,  1,  30, ScriptColor(192, 128, 0), 9,  3, true,  true,  true,  false };
-		Weapons[(int)LaraWeaponType::Revolver        - 1] = { 4.0f,  BLOCK(8),  16, (int)BLOCK(0.65f), 21, 21, 6,  ScriptColor(192, 128, 0), 9,  3, true,  false, true,  false };
-		Weapons[(int)LaraWeaponType::Uzi             - 1] = { 8.0f,  BLOCK(8),  3,  (int)BLOCK(0.65f), 1,  1,  30, ScriptColor(192, 128, 0), 9,  2, true,  true,  true,  false };
-		Weapons[(int)LaraWeaponType::Shotgun         - 1] = { 10.0f, BLOCK(8),  0,  (int)BLOCK(0.50f), 3,  3,  6,  ScriptColor(192, 128, 0), 12, 3, true,  true,  false, false };
-		Weapons[(int)LaraWeaponType::HK              - 1] = { 4.0f,  BLOCK(12), 0,  (int)BLOCK(0.50f), 4,  4,  30, ScriptColor(192, 128, 0), 12, 2, true,  true,  true,  false };
-		Weapons[(int)LaraWeaponType::Crossbow        - 1] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 5,  20, 10, ScriptColor(192, 128, 0), 0,  0, false, false, false, false };
-		Weapons[(int)LaraWeaponType::GrenadeLauncher - 1] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 30, 30, 10, ScriptColor(192, 128, 0), 0,  0, true,  false, false, false };
-		Weapons[(int)LaraWeaponType::RocketLauncher  - 1] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 30, 30, 1,  ScriptColor(192, 128, 0), 0,  0, true,  false, false, false };
-		Weapons[(int)LaraWeaponType::HarpoonGun      - 1] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 6,  6,  10, ScriptColor(192, 128, 0), 0,  0, false, false, false, false };
+		Weapons[(int)LaraWeaponType::Pistol          - 1] = { 8.0f,  BLOCK(8),  9,  (int)BLOCK(0.65f), 1,  1,  30, ScriptColor(192, 128, 0), 9,  3, true,  true,  true,  true,  false, Vec3(  0, 120, 30)  };
+		Weapons[(int)LaraWeaponType::Revolver        - 1] = { 4.0f,  BLOCK(8),  16, (int)BLOCK(0.65f), 21, 21, 6,  ScriptColor(192, 128, 0), 9,  3, true,  false, true,  true,  false, Vec3(-10, 130, 45)  };
+		Weapons[(int)LaraWeaponType::Uzi             - 1] = { 8.0f,  BLOCK(8),  3,  (int)BLOCK(0.65f), 1,  1,  30, ScriptColor(192, 128, 0), 9,  2, true,  true,  true,  true,  false, Vec3(  0, 110, 40)  };
+		Weapons[(int)LaraWeaponType::Shotgun         - 1] = { 10.0f, BLOCK(8),  0,  (int)BLOCK(0.50f), 3,  3,  6,  ScriptColor(192, 128, 0), 12, 3, true,  true,  false, false, false, Vec3(  0, 210, 42)  };
+		Weapons[(int)LaraWeaponType::HK              - 1] = { 4.0f,  BLOCK(12), 0,  (int)BLOCK(0.50f), 4,  4,  30, ScriptColor(192, 128, 0), 12, 2, true,  true,  true,  true,  false, Vec3(  0, 220, 102) };
+		Weapons[(int)LaraWeaponType::Crossbow        - 1] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 5,  20, 10, ScriptColor(192, 128, 0), 0,  0, false, false, false, false, false, Vec3() };
+		Weapons[(int)LaraWeaponType::GrenadeLauncher - 1] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 30, 30, 10, ScriptColor(192, 128, 0), 0,  0, true,  false, false, false, false, Vec3() };
+		Weapons[(int)LaraWeaponType::RocketLauncher  - 1] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 30, 30, 1,  ScriptColor(192, 128, 0), 0,  0, true,  false, false, false, false, Vec3() };
+		Weapons[(int)LaraWeaponType::HarpoonGun      - 1] = { 8.0f,  BLOCK(8),  0,  (int)BLOCK(0.50f), 6,  6,  10, ScriptColor(192, 128, 0), 0,  0, false, false, false, false, false, Vec3() };
 	}
 
 	void Settings::Register(sol::table& parent)
@@ -124,7 +124,7 @@ namespace TEN::Scripting
 		"lasersightLightColor", &CameraSettings::LasersightLightColor,
 	
 		/// Specify whether camera can collide with objects.
-		// @tfield bool objectCollision when enabled, camera will collide with moveables and statics. Disable or TR4-like camera behaviour.
+		// @tfield bool objectCollision when enabled, camera will collide with moveables and statics. Disable for TR4-like camera behaviour.
 		"objectCollision", &CameraSettings::ObjectCollision);
 	}
 
@@ -309,9 +309,17 @@ namespace TEN::Scripting
 		// @tfield bool muzzleFlash specifies whether muzzle flash should be displayed or not. Applicable only for firearms.
 		"muzzleFlash", &WeaponSettings::MuzzleFlash,
 
+		/// Display muzzle glow.
+		// @tfield bool muzzleGlow specifies whether muzzle glow should be displayed or not. Applicable only for firearms.
+		"muzzleGlow", &WeaponSettings::MuzzleGlow,
+
 		/// Colorize muzzle flash.
 		// @tfield bool colorizeMuzzleFlash specifies whether muzzle flash should be tinted with the same color as gunflash color. Applicable only for firearms.
-		"colorizeMuzzleFlash", &WeaponSettings::ColorizeMuzzleFlash);
+		"colorizeMuzzleFlash", &WeaponSettings::ColorizeMuzzleFlash,
+
+		/// Muzzle offset.
+		// @tfield Vec3 muzzleOffset specifies offset for spawning muzzle gunflash effects. Applicable only for firearms.
+		"muzzleOffset", &WeaponSettings::MuzzleOffset);
 	}
 
 	/// System

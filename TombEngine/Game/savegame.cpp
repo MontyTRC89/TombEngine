@@ -10,6 +10,7 @@
 #include "Game/control/flipeffect.h"
 #include "Game/control/lot.h"
 #include "Game/control/volume.h"
+#include "Objects/Effects/Fireflies.h"
 #include "Game/effects/item_fx.h"
 #include "Game/effects/effects.h"
 #include "Game/effects/weather.h"
@@ -43,8 +44,9 @@
 using namespace flatbuffers;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Control::Volumes;
-using namespace TEN::Effects::Items;
 using namespace TEN::Effects::Environment;
+using namespace TEN::Effects::Fireflies;
+using namespace TEN::Effects::Items;
 using namespace TEN::Entities::Creatures::TR3;
 using namespace TEN::Entities::Generic;
 using namespace TEN::Entities::Switches;
@@ -924,6 +926,38 @@ const std::vector<byte> SaveGame::Build()
 	}
 	auto fishSwarmOffset = fbb.CreateVector(fishSwarm);
 
+	std::vector<flatbuffers::Offset<Save::FireflyData>> fireflySwarm;
+	for (const auto& firefly : FireflySwarm)
+	{
+		Save::FireflyDataBuilder fireflySave{ fbb };
+		fireflySave.add_sprite_index(firefly.SpriteSeqID);
+		fireflySave.add_sprite_id(firefly.SpriteID);
+		fireflySave.add_blend_mode((int)firefly.blendMode);
+		fireflySave.add_scalar(firefly.scalar);
+		fireflySave.add_position(&FromVector3(firefly.Position));
+		fireflySave.add_room_number(firefly.RoomNumber);
+		fireflySave.add_position_target(&FromVector3(firefly.PositionTarget));
+		fireflySave.add_orientation(&FromEulerAngles(firefly.Orientation));
+		fireflySave.add_velocity(firefly.Velocity);
+		fireflySave.add_target_item_number((firefly.TargetItemPtr == nullptr) ? -1 : firefly.TargetItemPtr->Index);
+		fireflySave.add_z_vel(firefly.zVel);
+		fireflySave.add_life(firefly.Life);
+		fireflySave.add_number(firefly.Number);
+		fireflySave.add_d_r(firefly.rB);
+		fireflySave.add_d_g(firefly.gB);
+		fireflySave.add_d_b(firefly.bB);
+		fireflySave.add_r(firefly.r);
+		fireflySave.add_g(firefly.g);
+		fireflySave.add_b(firefly.b);
+		fireflySave.add_on(firefly.on);
+		fireflySave.add_size(firefly.size);
+		fireflySave.add_rot_Ang(firefly.rotAng);
+
+		auto fireflySaveOffset = fireflySave.Finish();
+		fireflySwarm.push_back(fireflySaveOffset);
+	}
+	auto fireflySwarmOffset = fbb.CreateVector(fireflySwarm);
+
 	// TODO: In future, we should save only active FX, not whole array.
 	// This may come together with Monty's branch merge -- Lwmte, 10.07.22
 
@@ -1109,6 +1143,7 @@ const std::vector<byte> SaveGame::Build()
 	levelData.add_sky_layer_2_color(level->GetSkyLayerColor(1));
 	levelData.add_sky_layer_2_speed(level->GetSkyLayerSpeed(1));
 
+	levelData.add_lensflare_enabled(level->LensFlare.GetEnabled());
 	levelData.add_lensflare_color(level->LensFlare.GetColor());
 	levelData.add_lensflare_pitch(level->LensFlare.GetPitch());
 	levelData.add_lensflare_yaw(level->LensFlare.GetYaw());
@@ -1546,6 +1581,7 @@ const std::vector<byte> SaveGame::Build()
 	sgb.add_next_item_active(NextItemActive);
 	sgb.add_items(serializedItemsOffset);
 	sgb.add_fish_swarm(fishSwarmOffset);
+	sgb.add_firefly_swarm(fireflySwarmOffset);
 	sgb.add_fxinfos(serializedEffectsOffset);
 	sgb.add_next_fx_free(NextFxFree);
 	sgb.add_next_fx_active(NextFxActive);
@@ -1810,6 +1846,7 @@ static void ParseLua(const Save::SaveGame* s, bool hubMode)
 	level->Layer2.CloudSpeed = s->level_data()->sky_layer_2_speed();
 	level->Layer2.SetColor(s->level_data()->sky_layer_2_color());
 
+	level->LensFlare.SetEnabled(s->level_data()->lensflare_enabled());
 	level->LensFlare.SetSunSpriteID(s->level_data()->lensflare_sprite_id());
 	level->LensFlare.SetPitch(s->level_data()->lensflare_pitch());
 	level->LensFlare.SetYaw(s->level_data()->lensflare_yaw());
@@ -2288,6 +2325,38 @@ static void ParseEffects(const Save::SaveGame* s)
 		fish.Velocity = fishSave->velocity();
 
 		FishSwarm.push_back(fish);
+	}
+
+	// Load firefly swarm.
+	for (int i = 0; i < s->firefly_swarm()->size(); i++)
+	{
+		const auto& fireflySave = s->firefly_swarm()->Get(i);
+		auto firefly = FireflyData{};
+
+		firefly.SpriteSeqID = fireflySave->sprite_index();
+		firefly.SpriteID = fireflySave->sprite_id();
+		firefly.blendMode = (BlendMode)fireflySave->blend_mode();
+		firefly.scalar = fireflySave->scalar();
+		firefly.Position = ToVector3(fireflySave->position());
+		firefly.RoomNumber = fireflySave->room_number();
+		firefly.PositionTarget = ToVector3(fireflySave->position_target());
+		firefly.Orientation = ToEulerAngles(fireflySave->orientation());
+		firefly.Velocity = fireflySave->velocity();
+		firefly.TargetItemPtr = (fireflySave->target_item_number() == -1) ? nullptr : &g_Level.Items[fireflySave->target_item_number()];
+		firefly.zVel = fireflySave->z_vel();
+		firefly.Life = fireflySave->life();
+		firefly.Number = fireflySave->number();
+		firefly.rB = fireflySave->d_r();
+		firefly.gB = fireflySave->d_g();
+		firefly.bB = fireflySave->d_b();
+		firefly.r = fireflySave->r();
+		firefly.g = fireflySave->g();
+		firefly.b = fireflySave->b();
+		firefly.on = fireflySave->on();
+		firefly.size = fireflySave->size();
+		firefly.rotAng = fireflySave->rot_Ang();
+
+		FireflySwarm.push_back(firefly);
 	}
 
 	// Load particles.

@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.8 Lua API</title>
+    <title>TombEngine 1.8.1 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -124,7 +124,7 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#Vibrate">Vibrate(strength, time)</a></td>
+	<td class="name" ><a href="#Vibrate">Vibrate(strength, [time])</a></td>
 	<td class="summary">Vibrate the game controller if the function is available and the setting is on.</td>
 	</tr>
 	<tr>
@@ -162,7 +162,7 @@
     <dl class="function">
     <dt>
     <a name = "Vibrate"></a>
-    <strong>Vibrate(strength, time)</strong>
+    <strong>Vibrate(strength, [time])</strong>
     </dt>
     <dd>
     Vibrate the game controller if the function is available and the setting is on.
@@ -177,7 +177,8 @@
         </li>
         <li><span class="parameter">time</span>
             <span class="types"><span class="type">float</span></span>
-         <strong>(default 0.3)</strong> Vibration time in seconds.
+         Vibration time in seconds.
+         <em>Default: 0.3.</em>
         </li>
     </ul>
 

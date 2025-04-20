@@ -31,6 +31,7 @@
 #include "Renderer/Structures/RendererSortableObject.h"
 #include "Specific/configuration.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
 using namespace TEN::Effects::Hair;
@@ -262,6 +263,9 @@ namespace TEN::Renderer
 				continue;
 
 			objectID = gunshell->objectNumber;
+
+			if (!_moveableObjects[objectID].has_value())
+				continue;
 
 			auto translation = Matrix::CreateTranslation(gunshell->pos.Position.ToVector3());
 			auto rotMatrix = gunshell->pos.Orientation.ToRotationMatrix();
@@ -1759,6 +1763,7 @@ namespace TEN::Renderer
 		PrepareStreamers(view);
 		PrepareLaserBarriers(view);
 		PrepareSingleLaserBeam(view);
+		PrepareFireflies(view);
 
 		// Sprites grouped in buckets for instancing. Non-commutative sprites are collected at a later stage.
 		SortAndPrepareSprites(view);
@@ -2571,6 +2576,12 @@ namespace TEN::Renderer
 								if (!SetupBlendModeAndAlphaTest(bucket.BlendMode, rendererPass, p))
 									continue;
 
+								if (_staticTextures.size() <= bucket.Texture)
+								{
+									TENLog("Attempted to set incorrect static mesh texture atlas", LogLevel::Warning);
+									continue;
+								}
+
 								BindTexture(TextureRegister::ColorMap,
 									&std::get<0>(_staticTextures[bucket.Texture]),
 									SamplerStateRegister::AnisotropicClamp);
@@ -2702,12 +2713,19 @@ namespace TEN::Renderer
 			if (rendererPass != RendererPass::GBuffer)
 			{
 				// Bind caustics texture.
-				if (_causticTextures.size() > 0)
+				if (TEN::Utils::Contains(SpriteSequencesIds, (int)ID_CAUSTIC_TEXTURES))
 				{     
 					int nmeshes = -Objects[ID_CAUSTIC_TEXTURES].nmeshes;
 					int meshIndex = Objects[ID_CAUSTIC_TEXTURES].meshIndex;
-					int causticsFrame = GlobalCounter % _causticTextures.size();
-					BindTexture(TextureRegister::CausticsMap, &_causticTextures[causticsFrame], SamplerStateRegister::AnisotropicClamp);
+					int causticsFrame = GlobalCounter % nmeshes;
+					auto causticsSprite = _spriteSequences[ID_CAUSTIC_TEXTURES].SpritesList[causticsFrame];
+
+					BindTexture(TextureRegister::CausticsMap, causticsSprite->Texture, SamplerStateRegister::AnisotropicClamp);
+				
+					_stRoom.CausticsSize = Vector2(
+						(float)causticsSprite->Width / (float)causticsSprite->Texture->Width,
+						(float)causticsSprite->Height / (float)causticsSprite->Texture->Height);
+					_stRoom.CausticsStartUV = causticsSprite->UV[0];
 				} 
 
 				// Set shadow map data and bind shadow map texture.
@@ -2806,12 +2824,8 @@ namespace TEN::Renderer
 							}
 							else
 							{
-								BindTexture(
-									TextureRegister::ColorMap, &std::get<0>(_roomTextures[bucket.Texture]),
-									SamplerStateRegister::AnisotropicClamp);
-								BindTexture(
-									TextureRegister::NormalMap, &std::get<1>(_roomTextures[bucket.Texture]),
-									SamplerStateRegister::AnisotropicClamp);
+								BindTexture(TextureRegister::ColorMap,  &std::get<0>(_roomTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+								BindTexture(TextureRegister::NormalMap, &std::get<1>(_roomTextures[bucket.Texture]), SamplerStateRegister::AnisotropicClamp);
 							}
 
 							DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
@@ -3228,7 +3242,7 @@ namespace TEN::Renderer
 			}
 
 			if (blendMode == BlendMode::Opaque)
-			{
+			{ 
 				SetBlendMode(BlendMode::Opaque);
 				SetAlphaTest(AlphaTestMode::None, 1.0f);
 			}

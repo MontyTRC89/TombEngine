@@ -1317,7 +1317,7 @@ bool LoadLevel(const std::string& path, bool partial)
 		auto assemblyVersion = TEN::Utils::GetProductOrFileVersion(true);
 		for (int i = 0; i < assemblyVersion.size(); i++)
 		{
-			if (assemblyVersion[i] < version[i])
+			if (assemblyVersion[i] != version[i])
 			{
 				TENLog("Level version is different from TEN version.", LogLevel::Warning);
 				break;
