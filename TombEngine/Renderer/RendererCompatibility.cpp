@@ -726,7 +726,7 @@ namespace TEN::Renderer
 								for (int v1 = 0; v1 < currentBucket.NumVertices; v1++)
 								{
 									auto* currentVertex = &_moveablesVertices[currentBucket.StartVertex + v1];
-									currentVertex->BoneIndex[0] = currentVertex->BoneIndex[1] = j + 1;
+									currentVertex->BoneIndex[0] = j + 1;
 
 									// Link mesh 0 to root mesh.
 									if (j == 0)
