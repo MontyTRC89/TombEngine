@@ -12,14 +12,16 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed lensflare enabled status not saved in a savegame.
 * Fixed caustics not rendered correctly if texture compression was enabled.
 * Fixed exclusion blend mode not working correctly.
-* Fixed SSAO incorrectly applied through alpha blended textures.
+* Fixed HK shots not being registered in statistics.
 * Fixed HK sound effects.
+* Fixed SSAO incorrectly applied through alpha blended textures.
 
 ### New features
 * Added muzzle glow effect for firearms.
 
 ### Lua API changes
 * Added `muzzleGlow` and `muzzleOffset` parameters to weapon settings.
+* Added ability to use gunflash parameters for all weapons in weapon settings.
 * Fixed `Moveable.GetJointPosition` not returning correct results if moveable is invisible or not rendered.
 
 ### Lua API changes
