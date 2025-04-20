@@ -14,10 +14,11 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed Teleporter object.
 * Fixed Wraith objects not working correctly in flipped rooms.
 * Fixed lensflare enabled status not saved in a savegame.
+* Fixed HK sound effects.
+* Fixed HK shots not being registered in statistics.
+* Fixed distorted knee and elbow joint vertices.
 * Fixed caustics not rendered correctly if texture compression was enabled.
 * Fixed exclusion blend mode not working correctly.
-* Fixed HK shots not being registered in statistics.
-* Fixed HK sound effects.
 * Fixed SSAO incorrectly applied through alpha blended textures.
 
 ### Lua API changes
