@@ -24,12 +24,12 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ### Lua API changes
 * Added `View.PlayVideoFile` function to play videos.
 * Added `Flow.SetIntroVideoPath` function to specify intro video.
+* Added `Lara:Interact` function to allow alignment with moveables.
 * Added `muzzleGlow` and `muzzleOffset` parameters to weapon settings.
 * Added ability to use gunflash parameters for all weapons in weapon settings.
 * Fixed `Moveable.GetJointPosition` not returning correct results if moveable is invisible or not rendered.
 
 ### Lua API changes
-* Added Interact function to `Lara` to allow alignment with moveables.
 
 ## [Version 1.8.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.8.1) - 2025-03-29
 
