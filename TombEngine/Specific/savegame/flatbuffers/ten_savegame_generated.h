@@ -3798,7 +3798,6 @@ struct WeaponControlDataT : public flatbuffers::NativeTable {
   typedef WeaponControlData TableType;
   int32_t weapon_item = 0;
   bool has_fired = false;
-  bool fired = false;
   bool uzi_left = false;
   bool uzi_right = false;
   int32_t gun_type = 0;
@@ -3817,25 +3816,21 @@ struct WeaponControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum FlatBuffersVTableOffset FLATBUFFERS_VTABLE_UNDERLYING_TYPE {
     VT_WEAPON_ITEM = 4,
     VT_HAS_FIRED = 6,
-    VT_FIRED = 8,
-    VT_UZI_LEFT = 10,
-    VT_UZI_RIGHT = 12,
-    VT_GUN_TYPE = 14,
-    VT_REQUEST_GUN_TYPE = 16,
-    VT_LAST_GUN_TYPE = 18,
-    VT_HOLSTER_INFO = 20,
-    VT_NUM_SHOTS_FIRED = 22,
-    VT_INTERVAL = 24,
-    VT_TIMER = 26
+    VT_UZI_LEFT = 8,
+    VT_UZI_RIGHT = 10,
+    VT_GUN_TYPE = 12,
+    VT_REQUEST_GUN_TYPE = 14,
+    VT_LAST_GUN_TYPE = 16,
+    VT_HOLSTER_INFO = 18,
+    VT_NUM_SHOTS_FIRED = 20,
+    VT_INTERVAL = 22,
+    VT_TIMER = 24
   };
   int32_t weapon_item() const {
     return GetField<int32_t>(VT_WEAPON_ITEM, 0);
   }
   bool has_fired() const {
     return GetField<uint8_t>(VT_HAS_FIRED, 0) != 0;
-  }
-  bool fired() const {
-    return GetField<uint8_t>(VT_FIRED, 0) != 0;
   }
   bool uzi_left() const {
     return GetField<uint8_t>(VT_UZI_LEFT, 0) != 0;
@@ -3868,7 +3863,6 @@ struct WeaponControlData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     return VerifyTableStart(verifier) &&
            VerifyField<int32_t>(verifier, VT_WEAPON_ITEM) &&
            VerifyField<uint8_t>(verifier, VT_HAS_FIRED) &&
-           VerifyField<uint8_t>(verifier, VT_FIRED) &&
            VerifyField<uint8_t>(verifier, VT_UZI_LEFT) &&
            VerifyField<uint8_t>(verifier, VT_UZI_RIGHT) &&
            VerifyField<int32_t>(verifier, VT_GUN_TYPE) &&
@@ -3895,9 +3889,6 @@ struct WeaponControlDataBuilder {
   }
   void add_has_fired(bool has_fired) {
     fbb_.AddElement<uint8_t>(WeaponControlData::VT_HAS_FIRED, static_cast<uint8_t>(has_fired), 0);
-  }
-  void add_fired(bool fired) {
-    fbb_.AddElement<uint8_t>(WeaponControlData::VT_FIRED, static_cast<uint8_t>(fired), 0);
   }
   void add_uzi_left(bool uzi_left) {
     fbb_.AddElement<uint8_t>(WeaponControlData::VT_UZI_LEFT, static_cast<uint8_t>(uzi_left), 0);
@@ -3941,7 +3932,6 @@ inline flatbuffers::Offset<WeaponControlData> CreateWeaponControlData(
     flatbuffers::FlatBufferBuilder &_fbb,
     int32_t weapon_item = 0,
     bool has_fired = false,
-    bool fired = false,
     bool uzi_left = false,
     bool uzi_right = false,
     int32_t gun_type = 0,
@@ -3962,7 +3952,6 @@ inline flatbuffers::Offset<WeaponControlData> CreateWeaponControlData(
   builder_.add_weapon_item(weapon_item);
   builder_.add_uzi_right(uzi_right);
   builder_.add_uzi_left(uzi_left);
-  builder_.add_fired(fired);
   builder_.add_has_fired(has_fired);
   return builder_.Finish();
 }
@@ -10201,7 +10190,6 @@ inline void WeaponControlData::UnPackTo(WeaponControlDataT *_o, const flatbuffer
   (void)_resolver;
   { auto _e = weapon_item(); _o->weapon_item = _e; }
   { auto _e = has_fired(); _o->has_fired = _e; }
-  { auto _e = fired(); _o->fired = _e; }
   { auto _e = uzi_left(); _o->uzi_left = _e; }
   { auto _e = uzi_right(); _o->uzi_right = _e; }
   { auto _e = gun_type(); _o->gun_type = _e; }
@@ -10223,7 +10211,6 @@ inline flatbuffers::Offset<WeaponControlData> CreateWeaponControlData(flatbuffer
   struct _VectorArgs { flatbuffers::FlatBufferBuilder *__fbb; const WeaponControlDataT* __o; const flatbuffers::rehasher_function_t *__rehasher; } _va = { &_fbb, _o, _rehasher}; (void)_va;
   auto _weapon_item = _o->weapon_item;
   auto _has_fired = _o->has_fired;
-  auto _fired = _o->fired;
   auto _uzi_left = _o->uzi_left;
   auto _uzi_right = _o->uzi_right;
   auto _gun_type = _o->gun_type;
@@ -10237,7 +10224,6 @@ inline flatbuffers::Offset<WeaponControlData> CreateWeaponControlData(flatbuffer
       _fbb,
       _weapon_item,
       _has_fired,
-      _fired,
       _uzi_left,
       _uzi_right,
       _gun_type,

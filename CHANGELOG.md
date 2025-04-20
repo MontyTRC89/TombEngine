@@ -10,18 +10,23 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed Teleporter object.
 * Fixed Wraith objects not working correctly in flipped rooms.
 * Fixed lensflare enabled status not saved in a savegame.
+* Fixed HK sound effects.
+* Fixed HK shots not being registered in statistics.
+* Fixed distorted knee and elbow joint vertices.
 * Fixed caustics not rendered correctly if texture compression was enabled.
 * Fixed exclusion blend mode not working correctly.
 * Fixed SSAO incorrectly applied through alpha blended textures.
-* Fixed distorted knee and elbow joint vertices.
-* Fixed HK sound effects.
 
 ### New features
 * Added muzzle glow effect for firearms.
 
 ### Lua API changes
 * Added `muzzleGlow` and `muzzleOffset` parameters to weapon settings.
+* Added ability to use gunflash parameters for all weapons in weapon settings.
 * Fixed `Moveable.GetJointPosition` not returning correct results if moveable is invisible or not rendered.
+
+### Lua API changes
+* Added Interact function to `Lara` to allow alignment with moveables.
 
 ## [Version 1.8.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.8.1) - 2025-03-29
 
