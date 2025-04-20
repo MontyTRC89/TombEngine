@@ -52,12 +52,12 @@ namespace TEN::Scripting::DisplaySprite
 
 	/// Create a DisplaySprite object.
 	// @function DisplaySprite
-	// @tparam Objects.ObjID.SpriteConstants ID of the sprite sequence object.
-	// @tparam int int spriteID ID of the sprite in the sequence.
+	// @tparam Objects.ObjID.SpriteConstants objectID ID of the sprite sequence object.
+	// @tparam int index Index of the sprite in the sequence.
 	// @tparam Vec2 pos Display position in percent.
 	// @tparam float rot Rotation in degrees.
 	// @tparam Vec2 scale Horizontal and vertical scale in percent. Scaling is interpreted by the DisplaySpriteEnum.ScaleMode passed to the Draw() function call.
-	// @tparam[opt] Color color Color. __Default: Color(255, 255, 255, 255)__
+	// @tparam[opt=Color(255&#44; 255&#44; 255)] Color color Color.
 	// @treturn DisplaySprite A new DisplaySprite object.
 	ScriptDisplaySprite::ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale, const ScriptColor& color)
 	{
@@ -98,7 +98,7 @@ namespace TEN::Scripting::DisplaySprite
 	}
 
 	/// Get the object ID of the sprite sequence object used by the display sprite.
-	// @function DisplaySprite:GetObjectID()
+	// @function DisplaySprite:GetObjectID
 	// @treturn Objects.ObjID.SpriteConstants Sprite sequence object ID.
 	GAME_OBJECT_ID ScriptDisplaySprite::GetObjectID() const
 	{
@@ -106,7 +106,7 @@ namespace TEN::Scripting::DisplaySprite
 	}
 
 	/// Get the sprite ID in the sprite sequence object used by the display sprite.
-	// @function DisplaySprite:GetSpriteID()
+	// @function DisplaySprite:GetSpriteID
 	// @treturn int Sprite ID in the sprite sequence object. Value __-1__ means that it is a background video, played using @{View.PlayVideo}.
 	int ScriptDisplaySprite::GetSpriteID() const
 	{
@@ -114,7 +114,7 @@ namespace TEN::Scripting::DisplaySprite
 	}
 
 	/// Get the display position of the display sprite in percent.
-	// @function DisplaySprite:GetPosition()
+	// @function DisplaySprite:GetPosition
 	// @treturn Vec2 Display position in percent.
 	Vec2 ScriptDisplaySprite::GetPosition() const
 	{
@@ -122,7 +122,7 @@ namespace TEN::Scripting::DisplaySprite
 	}
 
 	/// Get the rotation of the display sprite in degrees.
-	// @function DisplaySprite:GetRotation()
+	// @function DisplaySprite:GetRotation
 	// @treturn float Rotation in degrees.
 	float ScriptDisplaySprite::GetRotation() const
 	{
@@ -130,7 +130,7 @@ namespace TEN::Scripting::DisplaySprite
 	}
 
 	/// Get the horizontal and vertical scale of the display sprite in percent.
-	// @function DisplaySprite:GetScale()
+	// @function DisplaySprite:GetScale
 	// @treturn Vec2 Horizontal and vertical scale in percent.
 	Vec2 ScriptDisplaySprite::GetScale() const
 	{
@@ -138,7 +138,7 @@ namespace TEN::Scripting::DisplaySprite
 	}
 
 	/// Get the color of the display sprite.
-	// @function DisplaySprite:GetColor()
+	// @function DisplaySprite:GetColor
 	// @treturn Color Color.
 	ScriptColor ScriptDisplaySprite::GetColor() const
 	{
@@ -146,48 +146,48 @@ namespace TEN::Scripting::DisplaySprite
 	}
 
 	/// Set the sprite sequence object ID used by the display sprite.
-	// @function DisplaySprite:SetObjectID(Objects.ObjID.SpriteConstants)
-	// @tparam Objects.ObjID.SpriteConstants New sprite sequence object ID.
+	// @function DisplaySprite:SetObjectID
+	// @tparam Objects.ObjID.SpriteConstants objectID New sprite sequence object ID.
 	void ScriptDisplaySprite::SetObjectID(GAME_OBJECT_ID objectID)
 	{
 		_objectID = objectID;
 	}
 
 	/// Set the sprite ID in the sprite sequence object used by the display sprite.
-	// @function DisplaySprite:SetSpriteID(int)
-	// @tparam int New sprite ID in the sprite sequence object.
+	// @function DisplaySprite:SetSpriteID
+	// @tparam int spriteID New sprite ID in the sprite sequence object.
 	void ScriptDisplaySprite::SetSpriteID(int spriteID)
 	{
 		_spriteID = spriteID;
 	}
 
 	/// Set the display position of the display sprite in percent.
-	// @function DisplaySprite:SetPosition(Vec2)
-	// @tparam Vec2 New display position in percent.
+	// @function DisplaySprite:SetPosition
+	// @tparam Vec2 position New display position in percent.
 	void ScriptDisplaySprite::SetPosition(const Vec2& pos)
 	{
 		_position = pos;
 	}
 
 	/// Set the rotation of the display sprite in degrees.
-	// @function DisplaySprite:SetRotation(float)
-	// @tparam float New rotation in degrees.
+	// @function DisplaySprite:SetRotation
+	// @tparam float rotation New rotation in degrees.
 	void ScriptDisplaySprite::SetRotation(float rot)
 	{
 		_rotation = rot;
 	}
 
 	/// Set the horizontal and vertical scale of the display sprite in percent.
-	// @function DisplaySprite:SetScale(Vec2)
-	// @tparam float New horizontal and vertical scale in percent.
+	// @function DisplaySprite:SetScale
+	// @tparam float scale New horizontal and vertical scale in percent.
 	void ScriptDisplaySprite::SetScale(const Vec2& scale)
 	{
 		_scale = scale;
 	}
 
 	/// Set the color of the display sprite.
-	// @function DisplaySprite:SetColor(Color)
-	// @tparam float New color.
+	// @function DisplaySprite:SetColor
+	// @tparam Color color New color.
 	void ScriptDisplaySprite::SetColor(const ScriptColor& color)
 	{
 		_color = color;
@@ -195,10 +195,10 @@ namespace TEN::Scripting::DisplaySprite
 
 	/// Draw the display sprite in display space for the current frame.
 	// @function DisplaySprite:Draw
-	// @tparam[opt] int priority Draw priority. Can be thought of as a layer, with higher values having precedence. __Default: 0__
-	// @tparam[opt] View.AlignMode alignMode Align mode interpreting an offset from the sprite's position. __Default: View.AlignMode.CENTER__
-	// @tparam[opt] View.ScaleMode scaleMode Scale mode interpreting the display sprite's horizontal and vertical scale. __Default: View.ScaleMode.FIT__
-	// @tparam[opt] Effects.BlendID blendMode Blend mode. __Default: Effects.BlendID.ALPHABLEND__
+	// @tparam[opt=0] int priority Draw priority. Can be thought of as a layer, with higher values having precedence.
+	// @tparam[opt=View.AlignMode.CENTER] View.AlignMode alignMode Align mode interpreting an offset from the sprite's position.
+	// @tparam[opt=View.ScaleMode.FIT] View.ScaleMode scaleMode Scale mode interpreting the display sprite's horizontal and vertical scale.
+	// @tparam[opt=Effects.BlendID.ALPHABLEND] Effects.BlendID blendMode Blend mode.
 	void ScriptDisplaySprite::Draw(sol::optional<int> priority, sol::optional<DisplaySpriteAlignMode> alignMode,
 								   sol::optional<DisplaySpriteScaleMode> scaleMode, sol::optional<BlendMode> blendMode)
 	{

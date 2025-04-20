@@ -345,7 +345,7 @@ int LaraObject::GetAmmoCount() const
 
 /// Get current vehicle, if it exists.
 // @function LaraObject:GetVehicle
-// @treturn Objects.Moveable current vehicle (nil if no vehicle present).
+// @treturn Objects.Moveable Current vehicle (nil if no vehicle present).
 // @usage
 // local vehicle = Lara:GetVehicle()
 std::unique_ptr<Moveable> LaraObject::GetVehicle() const
@@ -390,7 +390,7 @@ std::unique_ptr<Moveable> LaraObject::GetPlayerInteractedMoveable() const
 
 /// Check if a held torch is lit.
 // @function LaraObject:IsTorchLit
-// @treturn bool True if lit, otherwise false.
+// @treturn bool True if lit, otherwise false (also false if there is no torch in hand).
 // @usage
 // local isTorchLit = Lara:IsTorchLit()
 bool LaraObject::IsTorchLit() const

@@ -224,37 +224,37 @@ namespace TEN::Scripting::View
 
 		///Do a full-screen fade-in from black.
 		//@function FadeIn
-		//@tparam float speed (default 1.0). Speed in units per second. A value of 1 will make the fade take one second.
+		//@tparam[opt=1] float speed Speed in units per second. A value of 1 will make the fade take one second.
 		tableView.set_function(ScriptReserved_FadeIn, &FadeIn);
 
 		///Do a full-screen fade-to-black. The screen will remain black until a call to FadeIn.
 		//@function FadeOut
-		//@tparam float speed (default 1.0). Speed in units per second. A value of 1 will make the fade take one second.
+		//@tparam[opt=1] float speed Speed in units per second. A value of 1 will make the fade take one second.
 		tableView.set_function(ScriptReserved_FadeOut, &FadeOut);
 
 		///Check if fade out is complete and screen is completely black.
-		//@treturn bool state of the fade out
+		//@treturn bool State of the fade out.
 		tableView.set_function(ScriptReserved_FadeOutComplete, &FadeOutComplete);
 
 		///Move black cinematic bars in from the top and bottom of the game window.
 		//@function SetCineBars
-		//@tparam float height (default 30). Percentage of the screen to be covered
-		//@tparam float speed (default 30). Coverage percent per second
+		//@tparam[opt=30] float height Percentage of the screen to be covered.
+		//@tparam[opt=30] float speed Coverage percent per second.
 		tableView.set_function(ScriptReserved_SetCineBars, &SetCineBars);
 
 		///Set field of view.
 		//@function SetFOV
-		//@tparam float angle in degrees (clamped to [10, 170])
+		//@tparam float angle Angle in degrees (clamped to [10, 170]).
 		tableView.set_function(ScriptReserved_SetFOV, &SetFOV);
 
 		///Get field of view.
 		//@function GetFOV
-		//@treturn float current FOV angle in degrees
+		//@treturn float Current FOV angle in degrees.
 		tableView.set_function(ScriptReserved_GetFOV, &GetFOV);
 
 		///Shows the mode of the game camera.
 		//@function GetCameraType
-		//@treturn View.CameraType value used by the Main Camera.
+		//@treturn View.CameraType Value used by the game camera.
 		//@usage
 		//LevelFuncs.OnLoop = function() 
 		//	if (View.GetCameraType() == CameraType.COMBAT) then
@@ -265,27 +265,27 @@ namespace TEN::Scripting::View
 
 		///Gets current camera position.
 		//@function GetCameraPosition
-		//@treturn Vec3 current camera position
+		//@treturn Vec3 Current camera position.
 		tableView.set_function(ScriptReserved_GetCameraPosition, &GetCameraPosition);
 
 		///Gets current camera target.
 		//@function GetCameraTarget
-		//@treturn Vec3 current camera target
+		//@treturn Vec3 Current camera target.
 		tableView.set_function(ScriptReserved_GetCameraTarget, &GetCameraTarget);
 
 		///Gets current room where camera is positioned.
 		//@function GetCameraRoom
-		//@treturn Objects.Room current room of the camera
+		//@treturn Objects.Room Current room of the camera.
 		tableView.set_function(ScriptReserved_GetCameraRoom, &GetCameraRoom);
 
 		///Sets the post-process effect mode, like negative or monochrome.
 		//@function SetPostProcessMode
-		//@tparam View.PostProcessMode effect type to set.
+		//@tparam View.PostProcessMode effect Effect type to set.
 		tableView.set_function(ScriptReserved_SetPostProcessMode, &SetPostProcessMode);
 
 		///Sets the post-process effect strength.
 		//@function SetPostProcessStrength
-		//@tparam float strength (default 1.0). How strong the effect is.
+		//@tparam[opt=1] float strength How strong the effect is.
 		tableView.set_function(ScriptReserved_SetPostProcessStrength, &SetPostProcessStrength);
 
 		///Sets the post-process tint.
@@ -295,11 +295,11 @@ namespace TEN::Scripting::View
 
 		/// Play a video file. File should be placed in the `FMV` folder.
 		// @function PlayVideo
-		// @tparam string fileName Video file name.  Can be provided without extension, if type is mp4, mkv or avi.
-		// @tparam[opt] bool background (default: false). Play video in the background mode.
+		// @tparam string fileName Video file name.  Can be provided without extension, if type is mp4, mkv, mov or avi.
+		// @tparam[opt=false] bool background Play video in the background mode.
 		// In such case, video won't play in fullscreen, but must be shown using special animated texture type in Tomb Editor, or using @{View.DisplaySprite}.
-		// @tparam[opt] bool silent (default: false). Play video without sound.
-		// @tparam[opt] bool loop (default: false). Play video in a loop.
+		// @tparam[opt=false] bool silent Play video without sound.
+		// @tparam[opt=false] bool loop Play video in a loop.
 		tableView.set_function(ScriptReserved_PlayVideo, &PlayVideo);
 
 		/// Stop the currently playing video. Only possible if video is playing in the background mode.
@@ -354,8 +354,8 @@ namespace TEN::Scripting::View
 
 		/// Flash screen.
 		//@function FlashScreen
-		//@tparam Color color (default Color(255, 255, 255))
-		//@tparam float speed (default 1.0). Speed in units per second. Value of 1 will make flash take one second. Clamped to [0.005, 1.0].
+		//@tparam[opt=Color(255&#44; 255&#44; 255)] Color color Color.
+		//@tparam[opt=1] float speed Speed in units per second. Value of 1 will make flash take one second. Clamped to [0.005, 1.0].
 		tableView.set_function(ScriptReserved_FlashScreen, &FlashScreen);
 
 		/// Get the display resolution's aspect ratio.
