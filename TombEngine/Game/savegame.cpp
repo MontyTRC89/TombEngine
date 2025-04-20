@@ -40,6 +40,7 @@
 #include "Specific/clock.h"
 #include "Specific/level.h"
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
+#include "Specific/Video/Video.h"
 
 using namespace flatbuffers;
 using namespace TEN::Collision::Floordata;
@@ -53,6 +54,7 @@ using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Gui;
 using namespace TEN::Renderer;
+using namespace TEN::Video;
 
 namespace Save = TEN::Save;
 
@@ -292,6 +294,15 @@ const std::vector<byte> SaveGame::Build()
 	sgGameStatisticsBuilder.add_secrets(Statistics.Game.Secrets);
 	sgGameStatisticsBuilder.add_timer(SaveGame::Statistics.Game.TimeTaken);
 	auto gameStatisticsOffset = sgGameStatisticsBuilder.Finish();
+
+	// Background video playback
+	auto videoNameOffset = fbb.CreateString(g_VideoPlayer.GetFileName());
+	Save::VideoInfoBuilder sgVideoInfoBuilder{ fbb };
+	sgVideoInfoBuilder.add_name(videoNameOffset);
+	sgVideoInfoBuilder.add_position(g_VideoPlayer.GetNormalizedPosition());
+	sgVideoInfoBuilder.add_silent(g_VideoPlayer.GetSilent());
+	sgVideoInfoBuilder.add_looped(g_VideoPlayer.GetLooped());
+	auto videoInfoOffset = sgVideoInfoBuilder.Finish();
 
 	// Lara
 	std::vector<int> puzzles;
@@ -950,7 +961,7 @@ const std::vector<byte> SaveGame::Build()
 		fireflySave.add_b(firefly.b);
 		fireflySave.add_on(firefly.on);
 		fireflySave.add_size(firefly.size);
-		fireflySave.add_rot_Ang(firefly.rotAng);
+		fireflySave.add_rot_ang(firefly.rotAng);
 
 		auto fireflySaveOffset = fireflySave.Finish();
 		fireflySwarm.push_back(fireflySaveOffset);
@@ -1587,8 +1598,8 @@ const std::vector<byte> SaveGame::Build()
 	sgb.add_postprocess_strength(g_Renderer.GetPostProcessStrength());
 	sgb.add_postprocess_tint(&FromVector3(g_Renderer.GetPostProcessTint()));
 	sgb.add_soundtracks(soundtrackOffset);
-
 	sgb.add_cd_flags(soundtrackMapOffset);
+	sgb.add_video(videoInfoOffset);
 	sgb.add_action_queue(actionQueueOffset);
 	sgb.add_flip_maps(flipMapsOffset);
 	sgb.add_flip_stats(flipStatsOffset);
@@ -2302,6 +2313,14 @@ static void ParseEffects(const Save::SaveGame* s)
 		PlaySoundTrack(track->name()->str(), (SoundTrackType)i, track->position(), SOUND_XFADETIME_LEVELJUMP);
 	}
 
+	// Restore video playback.
+	std::string videoName = s->video()->name()->str();
+	if (!videoName.empty())
+	{
+		g_VideoPlayer.Play(videoName, VideoPlaybackMode::Background, s->video()->silent(), s->video()->looped());
+		g_VideoPlayer.SetNormalizedPosition(s->video()->position());
+	}
+
 	// Load fish swarm.
 	for (int i = 0; i < s->fish_swarm()->size(); i++)
 	{
@@ -2351,7 +2370,7 @@ static void ParseEffects(const Save::SaveGame* s)
 		firefly.b = fireflySave->b();
 		firefly.on = fireflySave->on();
 		firefly.size = fireflySave->size();
-		firefly.rotAng = fireflySave->rot_Ang();
+		firefly.rotAng = fireflySave->rot_ang();
 
 		FireflySwarm.push_back(firefly);
 	}

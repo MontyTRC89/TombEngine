@@ -555,13 +555,19 @@ namespace TEN::Renderer
 						pos += _items[particle.fxObj].InterpolatedPosition; 
 					}
 				}
+				
+				// If sprite is a video texture, bypass it if texture is inactive.
+				if (particle.SpriteID == VIDEO_SPRITE_ID && (_videoSprite.Texture == nullptr || _videoSprite.Texture->Texture == nullptr))
+					continue;
 
 				// Disallow sprites out of bounds.
 				int spriteIndex = Objects[particle.SpriteSeqID].meshIndex + particle.SpriteID;
 				spriteIndex = std::clamp(spriteIndex, 0, (int)_sprites.size());
 
+				auto* sprite = particle.SpriteID == VIDEO_SPRITE_ID ? &_videoSprite : &_sprites[spriteIndex];
+
 				AddSpriteBillboard(
-					&_sprites[spriteIndex],
+					sprite,
 					pos,
 					Color(particle.r / (float)UCHAR_MAX, particle.g / (float)UCHAR_MAX, particle.b / (float)UCHAR_MAX, 1.0f),
 					TO_RAD(particle.rotAng << 4), particle.scalar,
