@@ -5,6 +5,9 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ## [Version 1.8.2]
 
+## New features
+* Added video playback support.
+
 ### Bug fixes
 * Fixed crashes when shooting, if gunflash or gunshell objects are not present in a level.
 * Fixed Teleporter object.
@@ -20,6 +23,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added muzzle glow effect for firearms.
 
 ### Lua API changes
+* Added `View.PlayVideoFile` function to play videos.
+* Added `Flow.SetIntroVideoPath` function to specify intro video.
 * Added `muzzleGlow` and `muzzleOffset` parameters to weapon settings.
 * Added ability to use gunflash parameters for all weapons in weapon settings.
 * Fixed `Moveable.GetJointPosition` not returning correct results if moveable is invisible or not rendered.
