@@ -22,7 +22,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed SSAO incorrectly applied through alpha blended textures.
 
 ### Lua API changes
-* Added `View.PlayVideoFile` function to play videos.
+* Added `View.PlayVideo`, `View.StopVideo`, and other helper functions for the video playback.
 * Added `Flow.SetIntroVideoPath` function to specify intro video.
 * Added `Lara:Interact` function to allow alignment with moveables.
 * Added `muzzleGlow` and `muzzleOffset` parameters to weapon settings.
