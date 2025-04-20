@@ -571,6 +571,7 @@ struct LevelDataT : public flatbuffers::NativeTable {
   std::unique_ptr<TEN::Save::Vector3> horizon2_position{};
   std::unique_ptr<TEN::Save::EulerAngles> horizon2_orientation{};
   float horizon2_transparency = 0.0f;
+  bool lensflare_enabled = false;
   int32_t lensflare_sprite_id = 0;
   float lensflare_pitch = 0.0f;
   float lensflare_yaw = 0.0f;
@@ -610,14 +611,15 @@ struct LevelData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
     VT_HORIZON2_POSITION = 46,
     VT_HORIZON2_ORIENTATION = 48,
     VT_HORIZON2_TRANSPARENCY = 50,
-    VT_LENSFLARE_SPRITE_ID = 52,
-    VT_LENSFLARE_PITCH = 54,
-    VT_LENSFLARE_YAW = 56,
-    VT_LENSFLARE_COLOR = 58,
-    VT_STARFIELD_STAR_COUNT = 60,
-    VT_STARFIELD_METEOR_COUNT = 62,
-    VT_STARFIELD_METEOR_SPAWN_DENSITY = 64,
-    VT_STARFIELD_METEOR_VELOCITY = 66
+    VT_LENSFLARE_ENABLED = 52,
+    VT_LENSFLARE_SPRITE_ID = 54,
+    VT_LENSFLARE_PITCH = 56,
+    VT_LENSFLARE_YAW = 58,
+    VT_LENSFLARE_COLOR = 60,
+    VT_STARFIELD_STAR_COUNT = 62,
+    VT_STARFIELD_METEOR_COUNT = 64,
+    VT_STARFIELD_METEOR_SPAWN_DENSITY = 66,
+    VT_STARFIELD_METEOR_VELOCITY = 68
   };
   int32_t level_far_view() const {
     return GetField<int32_t>(VT_LEVEL_FAR_VIEW, 0);
@@ -691,6 +693,9 @@ struct LevelData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   float horizon2_transparency() const {
     return GetField<float>(VT_HORIZON2_TRANSPARENCY, 0.0f);
   }
+  bool lensflare_enabled() const {
+    return GetField<uint8_t>(VT_LENSFLARE_ENABLED, 0) != 0;
+  }
   int32_t lensflare_sprite_id() const {
     return GetField<int32_t>(VT_LENSFLARE_SPRITE_ID, 0);
   }
@@ -741,6 +746,7 @@ struct LevelData FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
            VerifyField<TEN::Save::Vector3>(verifier, VT_HORIZON2_POSITION) &&
            VerifyField<TEN::Save::EulerAngles>(verifier, VT_HORIZON2_ORIENTATION) &&
            VerifyField<float>(verifier, VT_HORIZON2_TRANSPARENCY) &&
+           VerifyField<uint8_t>(verifier, VT_LENSFLARE_ENABLED) &&
            VerifyField<int32_t>(verifier, VT_LENSFLARE_SPRITE_ID) &&
            VerifyField<float>(verifier, VT_LENSFLARE_PITCH) &&
            VerifyField<float>(verifier, VT_LENSFLARE_YAW) &&
@@ -832,6 +838,9 @@ struct LevelDataBuilder {
   void add_horizon2_transparency(float horizon2_transparency) {
     fbb_.AddElement<float>(LevelData::VT_HORIZON2_TRANSPARENCY, horizon2_transparency, 0.0f);
   }
+  void add_lensflare_enabled(bool lensflare_enabled) {
+    fbb_.AddElement<uint8_t>(LevelData::VT_LENSFLARE_ENABLED, static_cast<uint8_t>(lensflare_enabled), 0);
+  }
   void add_lensflare_sprite_id(int32_t lensflare_sprite_id) {
     fbb_.AddElement<int32_t>(LevelData::VT_LENSFLARE_SPRITE_ID, lensflare_sprite_id, 0);
   }
@@ -893,6 +902,7 @@ inline flatbuffers::Offset<LevelData> CreateLevelData(
     const TEN::Save::Vector3 *horizon2_position = 0,
     const TEN::Save::EulerAngles *horizon2_orientation = 0,
     float horizon2_transparency = 0.0f,
+    bool lensflare_enabled = false,
     int32_t lensflare_sprite_id = 0,
     float lensflare_pitch = 0.0f,
     float lensflare_yaw = 0.0f,
@@ -928,6 +938,7 @@ inline flatbuffers::Offset<LevelData> CreateLevelData(
   builder_.add_weather_strength(weather_strength);
   builder_.add_weather_type(weather_type);
   builder_.add_level_far_view(level_far_view);
+  builder_.add_lensflare_enabled(lensflare_enabled);
   builder_.add_horizon2_enabled(horizon2_enabled);
   builder_.add_horizon1_enabled(horizon1_enabled);
   builder_.add_sky_layer_2_enabled(sky_layer_2_enabled);
@@ -9249,6 +9260,7 @@ inline void LevelData::UnPackTo(LevelDataT *_o, const flatbuffers::resolver_func
   { auto _e = horizon2_position(); if (_e) _o->horizon2_position = std::unique_ptr<TEN::Save::Vector3>(new TEN::Save::Vector3(*_e)); }
   { auto _e = horizon2_orientation(); if (_e) _o->horizon2_orientation = std::unique_ptr<TEN::Save::EulerAngles>(new TEN::Save::EulerAngles(*_e)); }
   { auto _e = horizon2_transparency(); _o->horizon2_transparency = _e; }
+  { auto _e = lensflare_enabled(); _o->lensflare_enabled = _e; }
   { auto _e = lensflare_sprite_id(); _o->lensflare_sprite_id = _e; }
   { auto _e = lensflare_pitch(); _o->lensflare_pitch = _e; }
   { auto _e = lensflare_yaw(); _o->lensflare_yaw = _e; }
@@ -9291,6 +9303,7 @@ inline flatbuffers::Offset<LevelData> CreateLevelData(flatbuffers::FlatBufferBui
   auto _horizon2_position = _o->horizon2_position ? _o->horizon2_position.get() : 0;
   auto _horizon2_orientation = _o->horizon2_orientation ? _o->horizon2_orientation.get() : 0;
   auto _horizon2_transparency = _o->horizon2_transparency;
+  auto _lensflare_enabled = _o->lensflare_enabled;
   auto _lensflare_sprite_id = _o->lensflare_sprite_id;
   auto _lensflare_pitch = _o->lensflare_pitch;
   auto _lensflare_yaw = _o->lensflare_yaw;
@@ -9325,6 +9338,7 @@ inline flatbuffers::Offset<LevelData> CreateLevelData(flatbuffers::FlatBufferBui
       _horizon2_position,
       _horizon2_orientation,
       _horizon2_transparency,
+      _lensflare_enabled,
       _lensflare_sprite_id,
       _lensflare_pitch,
       _lensflare_yaw,
