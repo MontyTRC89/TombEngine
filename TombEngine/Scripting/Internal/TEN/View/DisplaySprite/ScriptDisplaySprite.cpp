@@ -52,8 +52,8 @@ namespace TEN::Scripting::DisplaySprite
 
 	/// Create a DisplaySprite object.
 	// @function DisplaySprite
-	// @tparam Objects.ObjID.SpriteConstants ID of the sprite sequence object.
-	// @tparam int int spriteID ID of the sprite in the sequence.
+	// @tparam Objects.ObjID.SpriteConstants objectID ID of the sprite sequence object.
+	// @tparam int index Index of the sprite in the sequence.
 	// @tparam Vec2 pos Display position in percent.
 	// @tparam float rot Rotation in degrees.
 	// @tparam Vec2 scale Horizontal and vertical scale in percent. Scaling is interpreted by the DisplaySpriteEnum.ScaleMode passed to the Draw() function call.
