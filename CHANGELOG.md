@@ -15,8 +15,9 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed lensflare enabled status not saved in a savegame.
 * Fixed caustics not rendered correctly if texture compression was enabled.
 * Fixed exclusion blend mode not working correctly.
-* Fixed SSAO incorrectly applied through alpha blended textures.
+* Fixed HK shots not being registered in statistics.
 * Fixed HK sound effects.
+* Fixed SSAO incorrectly applied through alpha blended textures.
 
 ### New features
 * Added muzzle glow effect for firearms.
@@ -25,7 +26,11 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added `View.PlayVideoFile` function to play videos.
 * Added `Flow.SetIntroVideoPath` function to specify intro video.
 * Added `muzzleGlow` and `muzzleOffset` parameters to weapon settings.
+* Added ability to use gunflash parameters for all weapons in weapon settings.
 * Fixed `Moveable.GetJointPosition` not returning correct results if moveable is invisible or not rendered.
+
+### Lua API changes
+* Added Interact function to `Lara` to allow alignment with moveables.
 
 ## [Version 1.8.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.8.1) - 2025-03-29
 
