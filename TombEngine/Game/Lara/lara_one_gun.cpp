@@ -1445,7 +1445,7 @@ void ExplodeProjectile(ItemInfo& item, const Vector3i& prevPos)
 {
 	if (TestEnvironment(ENV_FLAG_WATER, item.RoomNumber))
 	{
-		TriggerUnderwaterExplosion(&item, 0);
+		TriggerUnderwaterExplosion(&item, true);
 	}
 	else
 	{

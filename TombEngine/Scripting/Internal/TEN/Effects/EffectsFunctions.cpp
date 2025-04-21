@@ -480,7 +480,7 @@ namespace TEN::Scripting::Effects
 
 	/// Emit blood.
 	// @function EmitBlood
-	// @tparam Vec3 World position.
+	// @tparam Vec3 pos World position.
 	// @tparam[opt=1] int count Blood count.
 	static void EmitBlood(const Vec3& pos, TypeOrNil<int> count)
 	{
@@ -542,7 +542,7 @@ namespace TEN::Scripting::Effects
 	// @function MakeExplosion 
 	// @tparam Vec3 pos
 	// @tparam[opt=512] float size This will not be the size of the sprites, but rather the distance between the origin and any additional sprites
-	// @tparam[opt=false] bool shockwave If true, create a very faint white shockwave which will not hurt Lara. For underwater rooms it creates a splash if the pos is near the surface.
+	// @tparam[opt=false] bool shockwave If true, create a very faint white shockwave which will not hurt Lara. For underwater rooms it creates a splash if pos is near the surface.
 	static void MakeExplosion(Vec3 pos, TypeOrNil<float> size, TypeOrNil<bool> shockwave)
 	{
 		int roomNumber = FindRoomNumber(pos.ToVector3i());
