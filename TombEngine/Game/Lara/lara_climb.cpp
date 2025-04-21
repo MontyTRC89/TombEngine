@@ -155,7 +155,10 @@ void lara_col_climb_up(ItemInfo* item, CollisionInfo* coll)
 		 
 		if (IsHeld(In::Forward) && resultRight && resultLeft)
 		{
-			if (resultRight < 0 || resultLeft < 0)
+			// Hack: to avoid clipping into angled wall, make sure both probes are not detecting the wall
+			// changed || to && which makes the player to continue climbing up when an angled wall is present
+			// likely breaks the LS_GRABBING state transition
+			if (resultRight < 0 && resultLeft < 0)
 			{
 				item->Animation.TargetState = LS_LADDER_IDLE;
 
@@ -349,6 +352,8 @@ void lara_col_climb_idle(ItemInfo* item, CollisionInfo* coll)
 				
 				// item->Animation.TargetState = LS_LADDER_TO_CROUCH;
 				// item->Animation.RequiredState = LS_CROUCH_IDLE;
+
+				item->Animation.TargetState = LS_LADDER_UP;
 			}
 		}
 	}
