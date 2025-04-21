@@ -344,8 +344,11 @@ void lara_col_climb_idle(ItemInfo* item, CollisionInfo* coll)
 			}
 			else
 			{
-				item->Animation.TargetState = LS_LADDER_TO_CROUCH;
-				item->Animation.RequiredState = LS_CROUCH_IDLE;
+				// Hack: disable this state transition to avoid clipping bug on issue 1584.
+				// Note: see lara_col_climb_up for cases where this state will be transferred to
+				
+				// item->Animation.TargetState = LS_LADDER_TO_CROUCH;
+				// item->Animation.RequiredState = LS_CROUCH_IDLE;
 			}
 		}
 	}
