@@ -353,6 +353,7 @@ void lara_col_climb_idle(ItemInfo* item, CollisionInfo* coll)
 				// item->Animation.TargetState = LS_LADDER_TO_CROUCH;
 				// item->Animation.RequiredState = LS_CROUCH_IDLE;
 
+				// transfer to this LS_LADDER_UP state to handle climbing onto the ledge
 				item->Animation.TargetState = LS_LADDER_UP;
 			}
 		}
