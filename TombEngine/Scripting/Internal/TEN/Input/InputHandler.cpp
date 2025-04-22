@@ -96,7 +96,7 @@ namespace TEN::Scripting::Input
 	}
 
 	/// Get the display position of the cursor in percent.
-	// @function GetMouseDisplayPosition()
+	// @function GetMouseDisplayPosition
 	// @treturn Vec2 Cursor display position in percent.
 	static Vec2 GetMouseDisplayPosition()
 	{
