@@ -42,49 +42,49 @@ namespace TEN::Entities::Doors
 			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f)))
 	};
 
-	const DOOR_DATA& GetDoorObject(const ItemInfo& item)
-	{
-		return *(DOOR_DATA*)item.Data;
-	}
+    const DOOR_DATA& GetDoorObject(const ItemInfo& item)  
+    {  
+       return (DOOR_DATA&)item.Data;  
+    }
 
 	DOOR_DATA& GetDoorObject(ItemInfo& item)
 	{
-		return *(DOOR_DATA*)item.Data;
+		return (DOOR_DATA&)item.Data;
 	}
 
 	void InitializeDoor(short itemNumber)
 	{
-		auto* doorItem = &g_Level.Items[itemNumber];
+		auto& doorItem = g_Level.Items[itemNumber];
 
-		if (doorItem->ObjectNumber == ID_SEQUENCE_DOOR1)
-			doorItem->Flags &= 0xBFFFu;
+		if (doorItem.ObjectNumber == ID_SEQUENCE_DOOR1)
+			doorItem.Flags &= 0xBFFFu;
 
-		if (doorItem->ObjectNumber == ID_LIFT_DOORS1 || doorItem->ObjectNumber == ID_LIFT_DOORS2)
-			doorItem->ItemFlags[0] = 4096;
+		if (doorItem.ObjectNumber == ID_LIFT_DOORS1 || doorItem.ObjectNumber == ID_LIFT_DOORS2)
+			doorItem.ItemFlags[0] = 4096;
 
-		doorItem->Data = ItemData(DOOR_DATA());
-		auto* doorData = (DOOR_DATA*)doorItem->Data;
+		doorItem.Data = ItemData(DOOR_DATA());
+		auto& door = GetDoorObject(doorItem);
 
-		doorData->opened = false;
-		doorData->dptr1 = nullptr;
-		doorData->dptr2 = nullptr;
-		doorData->dptr3 = nullptr;
-		doorData->dptr4 = nullptr;
+		door.opened = false;
+		door.dptr1 = nullptr;
+		door.dptr2 = nullptr;
+		door.dptr3 = nullptr;
+		door.dptr4 = nullptr;
 
 		short boxNumber, twoRoom;
 
 		int xOffset = 0;
 		int zOffset = 0;
 
-		if (doorItem->Pose.Orientation.y == 0)
+		if (doorItem.Pose.Orientation.y == 0)
 		{
 			zOffset = -BLOCK(1);
 		}
-		else if (doorItem->Pose.Orientation.y == ANGLE(180.0f))
+		else if (doorItem.Pose.Orientation.y == ANGLE(180.0f))
 		{
 			zOffset = BLOCK(1);
 		}
-		else if (doorItem->Pose.Orientation.y == ANGLE(90.0f))
+		else if (doorItem.Pose.Orientation.y == ANGLE(90.0f))
 		{
 			xOffset = -BLOCK(1);
 		}
@@ -95,147 +95,147 @@ namespace TEN::Entities::Doors
 
 		// TODO: Initialize collision mesh.
 
-		auto* room = &g_Level.Rooms[doorItem->RoomNumber];
-		doorData->d1.floor = GetSector(room, doorItem->Pose.Position.x - room->Position.x + xOffset, doorItem->Pose.Position.z - room->Position.z + zOffset);
+		auto* room = &g_Level.Rooms[doorItem.RoomNumber];
+		door.d1.floor = GetSector(room, doorItem.Pose.Position.x - room->Position.x + xOffset, doorItem.Pose.Position.z - room->Position.z + zOffset);
 
-		auto roomNumber = doorData->d1.floor->SidePortalRoomNumber;
+		auto roomNumber = door.d1.floor->SidePortalRoomNumber;
 		if (roomNumber == NO_VALUE)
 		{
-			boxNumber = doorData->d1.floor->PathfindingBoxID;
+			boxNumber = door.d1.floor->PathfindingBoxID;
 		}
 		else
 		{
 			auto* b = &g_Level.Rooms[roomNumber];
-			boxNumber = GetSector(b, doorItem->Pose.Position.x - b->Position.x + xOffset, doorItem->Pose.Position.z - b->Position.z + zOffset)->PathfindingBoxID;
+			boxNumber = GetSector(b, doorItem.Pose.Position.x - b->Position.x + xOffset, doorItem.Pose.Position.z - b->Position.z + zOffset)->PathfindingBoxID;
 		}
 
-		doorData->d1.block = (boxNumber != NO_VALUE && g_Level.PathfindingBoxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE; 
-		doorData->d1.data = *doorData->d1.floor;
+		door.d1.block = (boxNumber != NO_VALUE && g_Level.PathfindingBoxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE; 
+		door.d1.data = *door.d1.floor;
 
 		if (room->flippedRoom != NO_VALUE)
 		{
 			room = &g_Level.Rooms[room->flippedRoom];
-			doorData->d1flip.floor = GetSector(room, doorItem->Pose.Position.x - room->Position.x + xOffset, doorItem->Pose.Position.z - room->Position.z + zOffset);
+			door.d1flip.floor = GetSector(room, doorItem.Pose.Position.x - room->Position.x + xOffset, doorItem.Pose.Position.z - room->Position.z + zOffset);
 				
-			roomNumber = doorData->d1flip.floor->SidePortalRoomNumber;
+			roomNumber = door.d1flip.floor->SidePortalRoomNumber;
 			if (roomNumber == NO_VALUE)
 			{
-				boxNumber = doorData->d1flip.floor->PathfindingBoxID;
+				boxNumber = door.d1flip.floor->PathfindingBoxID;
 			}
 			else
 			{
 				auto* b = &g_Level.Rooms[roomNumber];
-				boxNumber = GetSector(b, doorItem->Pose.Position.x - b->Position.x + xOffset, doorItem->Pose.Position.z - b->Position.z + zOffset)->PathfindingBoxID;
+				boxNumber = GetSector(b, doorItem.Pose.Position.x - b->Position.x + xOffset, doorItem.Pose.Position.z - b->Position.z + zOffset)->PathfindingBoxID;
 			}
 
-			doorData->d1flip.block = (boxNumber != NO_VALUE && g_Level.PathfindingBoxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE;
-			doorData->d1flip.data = *doorData->d1flip.floor;
+			door.d1flip.block = (boxNumber != NO_VALUE && g_Level.PathfindingBoxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE;
+			door.d1flip.data = *door.d1flip.floor;
 		}
 		else
 		{
-			doorData->d1flip.floor = NULL;
+			door.d1flip.floor = NULL;
 		}
 
-		twoRoom = doorData->d1.floor->SidePortalRoomNumber;
+		twoRoom = door.d1.floor->SidePortalRoomNumber;
 
-		ShutThatDoor(&doorData->d1, doorData);
-		ShutThatDoor(&doorData->d1flip, doorData);
+		ShutThatDoor(&door.d1, &door);
+		ShutThatDoor(&door.d1flip, &door);
 
 		if (twoRoom == NO_VALUE)
 		{
-			doorData->d2.floor = NULL;
-			doorData->d2flip.floor = NULL;
+			door.d2.floor = NULL;
+			door.d2flip.floor = NULL;
 		}
 		else
 		{
 			room = &g_Level.Rooms[twoRoom];
-			doorData->d2.floor = GetSector(room, doorItem->Pose.Position.x - room->Position.x, doorItem->Pose.Position.z - room->Position.z);
+			door.d2.floor = GetSector(room, doorItem.Pose.Position.x - room->Position.x, doorItem.Pose.Position.z - room->Position.z);
 
-			roomNumber = doorData->d2.floor->SidePortalRoomNumber;
+			roomNumber = door.d2.floor->SidePortalRoomNumber;
 			if (roomNumber == NO_VALUE)
 			{
-				boxNumber = doorData->d2.floor->PathfindingBoxID;
+				boxNumber = door.d2.floor->PathfindingBoxID;
 			}
 			else
 			{
 				auto* b = &g_Level.Rooms[roomNumber];
-				boxNumber = GetSector(b, doorItem->Pose.Position.x - b->Position.x, doorItem->Pose.Position.z - b->Position.z)->PathfindingBoxID;
+				boxNumber = GetSector(b, doorItem.Pose.Position.x - b->Position.x, doorItem.Pose.Position.z - b->Position.z)->PathfindingBoxID;
 			}
 
-			doorData->d2.block = (boxNumber != NO_VALUE && g_Level.PathfindingBoxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE;
-			doorData->d2.data = *doorData->d2.floor;
+			door.d2.block = (boxNumber != NO_VALUE && g_Level.PathfindingBoxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE;
+			door.d2.data = *door.d2.floor;
 
 			if (room->flippedRoom != -1)
 			{
 				room = &g_Level.Rooms[room->flippedRoom];
-				doorData->d2flip.floor = GetSector(room, doorItem->Pose.Position.x - room->Position.x, doorItem->Pose.Position.z - room->Position.z);
+				door.d2flip.floor = GetSector(room, doorItem.Pose.Position.x - room->Position.x, doorItem.Pose.Position.z - room->Position.z);
 
-				roomNumber = doorData->d2flip.floor->SidePortalRoomNumber;
+				roomNumber = door.d2flip.floor->SidePortalRoomNumber;
 				if (roomNumber == NO_VALUE)
 				{
-					boxNumber = doorData->d2flip.floor->PathfindingBoxID;
+					boxNumber = door.d2flip.floor->PathfindingBoxID;
 				}
 				else
 				{
 					auto* b = &g_Level.Rooms[roomNumber];
-					boxNumber = GetSector(b, doorItem->Pose.Position.x - b->Position.x, doorItem->Pose.Position.z - b->Position.z)->PathfindingBoxID;
+					boxNumber = GetSector(b, doorItem.Pose.Position.x - b->Position.x, doorItem.Pose.Position.z - b->Position.z)->PathfindingBoxID;
 				}
 
-				doorData->d2flip.block = (boxNumber != NO_VALUE && g_Level.PathfindingBoxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE; 
-				doorData->d2flip.data = *doorData->d2flip.floor;
+				door.d2flip.block = (boxNumber != NO_VALUE && g_Level.PathfindingBoxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE; 
+				door.d2flip.data = *door.d2flip.floor;
 			}
 			else
 			{
-				doorData->d2flip.floor = NULL;
+				door.d2flip.floor = NULL;
 			}
 
-			ShutThatDoor(&doorData->d2, doorData);
-			ShutThatDoor(&doorData->d2flip, doorData);
+			ShutThatDoor(&door.d2, &door);
+			ShutThatDoor(&door.d2flip, &door);
 
-			roomNumber = doorItem->RoomNumber;
+			roomNumber = doorItem.RoomNumber;
 			ItemNewRoom(itemNumber, twoRoom);
-			doorItem->RoomNumber = roomNumber;
-			doorItem->InDrawRoom = true;
+			doorItem.RoomNumber = roomNumber;
+			doorItem.InDrawRoom = true;
 		}
 	}
 
-	void DoorCollision(short itemNumber, ItemInfo* laraItem, CollisionInfo* coll)
+	void DoorCollision(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
 	{
-		auto* laraInfo = GetLaraInfo(laraItem);
-		auto* doorItem = &g_Level.Items[itemNumber];
+		auto& doorItem = g_Level.Items[itemNumber];
+		auto& player = GetLaraInfo(*playerItem);
 
-		if (doorItem->TriggerFlags == 2 &&
-			doorItem->Status == ITEM_NOT_ACTIVE && !doorItem->Animation.IsAirborne && // CHECK
+		if (doorItem.TriggerFlags == 2 &&
+			doorItem.Status == ITEM_NOT_ACTIVE && !doorItem.Animation.IsAirborne && // CHECK
 			((IsHeld(In::Action) || g_Gui.GetInventoryItemChosen() == ID_CROWBAR_ITEM) &&
-				laraItem->Animation.ActiveState == LS_IDLE &&
-				laraItem->Animation.AnimNumber == LA_STAND_IDLE &&
-				!laraItem->HitStatus &&
-				laraInfo->Control.HandStatus == HandStatus::Free ||
-				laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber))
+				playerItem->Animation.ActiveState == LS_IDLE &&
+				playerItem->Animation.AnimNumber == LA_STAND_IDLE &&
+				!playerItem->HitStatus &&
+				player.Control.HandStatus == HandStatus::Free ||
+				player.Control.IsMoving && player.Context.InteractedItem == itemNumber))
 		{
-			doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
-			if (TestLaraPosition(CrowbarDoorBounds, doorItem, laraItem))
+			doorItem.Pose.Orientation.y ^= ANGLE(180.0f);
+			if (TestLaraPosition(CrowbarDoorBounds, &doorItem, playerItem))
 			{
-				if (!laraInfo->Control.IsMoving)
+				if (!player.Control.IsMoving)
 				{
 					if (g_Gui.GetInventoryItemChosen() == NO_VALUE)
 					{
 						if (g_Gui.IsObjectInInventory(ID_CROWBAR_ITEM))
 						{
 							g_Gui.SetEnterInventory(ID_CROWBAR_ITEM);
-							doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
+							doorItem.Pose.Orientation.y ^= ANGLE(180.0f);
 						}
 						else
 						{
-							if (OldPickupPos.x != laraItem->Pose.Position.x || OldPickupPos.y != laraItem->Pose.Position.y || OldPickupPos.z != laraItem->Pose.Position.z)
+							if (OldPickupPos.x != playerItem->Pose.Position.x || OldPickupPos.y != playerItem->Pose.Position.y || OldPickupPos.z != playerItem->Pose.Position.z)
 							{
-								OldPickupPos.x = laraItem->Pose.Position.x;
-								OldPickupPos.y = laraItem->Pose.Position.y;
-								OldPickupPos.z = laraItem->Pose.Position.z;
+								OldPickupPos.x = playerItem->Pose.Position.x;
+								OldPickupPos.y = playerItem->Pose.Position.y;
+								OldPickupPos.z = playerItem->Pose.Position.z;
 								SayNo();
 							}
 
-							doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
+							doorItem.Pose.Orientation.y ^= ANGLE(180.0f);
 						}
 
 						return;
@@ -243,49 +243,49 @@ namespace TEN::Entities::Doors
 
 					if (g_Gui.GetInventoryItemChosen() != ID_CROWBAR_ITEM)
 					{
-						doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
+						doorItem.Pose.Orientation.y ^= ANGLE(180.0f);
 						return;
 					}
 				}
 
 				g_Gui.SetInventoryItemChosen(NO_VALUE);
 
-				if (MoveLaraPosition(CrowbarDoorPos, doorItem, laraItem))
+				if (MoveLaraPosition(CrowbarDoorPos, &doorItem, playerItem))
 				{
-					SetAnimation(laraItem, LA_DOOR_OPEN_CROWBAR);
-					doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
+					SetAnimation(playerItem, LA_DOOR_OPEN_CROWBAR);
+					doorItem.Pose.Orientation.y ^= ANGLE(180.0f);
 
 					AddActiveItem(itemNumber);
 
-					laraInfo->Control.IsMoving = 0;
-					laraInfo->Control.HandStatus = HandStatus::Busy;
-					doorItem->Flags |= IFLAG_ACTIVATION_MASK;
-					doorItem->Status = ITEM_ACTIVE;
-					doorItem->Animation.TargetState = LS_RUN_FORWARD;
+					player.Control.IsMoving = 0;
+					player.Control.HandStatus = HandStatus::Busy;
+					doorItem.Flags |= IFLAG_ACTIVATION_MASK;
+					doorItem.Status = ITEM_ACTIVE;
+					doorItem.Animation.TargetState = LS_RUN_FORWARD;
 					return;
 				}
 
-				laraInfo->Context.InteractedItem = itemNumber;
+				player.Context.InteractedItem = itemNumber;
 			}
-			else if (laraInfo->Control.IsMoving && laraInfo->Context.InteractedItem == itemNumber)
+			else if (player.Control.IsMoving && player.Context.InteractedItem == itemNumber)
 			{
-				laraInfo->Control.IsMoving = 0;
-				laraInfo->Control.HandStatus = HandStatus::Free;
+				player.Control.IsMoving = 0;
+				player.Control.HandStatus = HandStatus::Free;
 			}
 
-			doorItem->Pose.Orientation.y ^= ANGLE(180.0f);
+			doorItem.Pose.Orientation.y ^= ANGLE(180.0f);
 		}
 
-		if (TestBoundsCollide(doorItem, laraItem, coll->Setup.Radius))
+		if (TestBoundsCollide(&doorItem, playerItem, coll->Setup.Radius))
 		{
-			if (HandleItemSphereCollision(*doorItem, *laraItem))
+			if (HandleItemSphereCollision(doorItem, *playerItem))
 			{
 				if (coll->Setup.EnableObjectPush)
 				{
-					if (!(doorItem->ObjectNumber >= ID_LIFT_DOORS1 &&
-						doorItem->ObjectNumber <= ID_LIFT_DOORS2) || doorItem->ItemFlags[0])
+					if (!(doorItem.ObjectNumber >= ID_LIFT_DOORS1 &&
+						doorItem.ObjectNumber <= ID_LIFT_DOORS2) || doorItem.ItemFlags[0])
 					{
-						ItemPushItem(doorItem, laraItem, coll, false, 1);
+						ItemPushItem(&doorItem, playerItem, coll, false, 1);
 					}
 				}
 			}
@@ -294,48 +294,48 @@ namespace TEN::Entities::Doors
 
 	void DoorControl(short itemNumber)
 	{
-		auto* doorItem = &g_Level.Items[itemNumber];
-		auto* doorData = (DOOR_DATA*)doorItem->Data;
+		auto& doorItem = g_Level.Items[itemNumber];
+		auto& door = GetDoorObject(doorItem);
 
 		// Doors with OCB = 1 are raisable with cog switchs
-		if (doorItem->TriggerFlags == 1)
+		if (doorItem.TriggerFlags == 1)
 		{
-			if (doorItem->ItemFlags[0])
+			if (doorItem.ItemFlags[0])
 			{
-				auto bounds = GameBoundingBox(doorItem);
+				auto bounds = GameBoundingBox(&doorItem);
 			
-				doorItem->ItemFlags[0]--;
-				doorItem->Pose.Position.y -= TEN::Entities::Switches::COG_DOOR_SPEED;
+				doorItem.ItemFlags[0]--;
+				doorItem.Pose.Position.y -= TEN::Entities::Switches::COG_DOOR_SPEED;
 				
-				int y = bounds.Y1 + doorItem->ItemFlags[2] - CLICK(1);
-				if (doorItem->Pose.Position.y < y)
+				int y = bounds.Y1 + doorItem.ItemFlags[2] - CLICK(1);
+				if (doorItem.Pose.Position.y < y)
 				{
-					doorItem->Pose.Position.y = y;
-					doorItem->ItemFlags[0] = 0;
+					doorItem.Pose.Position.y = y;
+					doorItem.ItemFlags[0] = 0;
 				}
-				if (!doorData->opened)
+				if (!door.opened)
 				{
-					OpenThatDoor(&doorData->d1, doorData);
-					OpenThatDoor(&doorData->d2, doorData);
-					OpenThatDoor(&doorData->d1flip, doorData);
-					OpenThatDoor(&doorData->d2flip, doorData);
-					doorData->opened = true;
+					OpenThatDoor(&door.d1, &door);
+					OpenThatDoor(&door.d2, &door);
+					OpenThatDoor(&door.d1flip, &door);
+					OpenThatDoor(&door.d2flip, &door);
+					door.opened = true;
 				}
 			}
 			else
 			{
-				if (doorItem->Pose.Position.y < doorItem->StartPose.Position.y)
-					doorItem->Pose.Position.y += 4;
-				if (doorItem->Pose.Position.y >= doorItem->StartPose.Position.y)
+				if (doorItem.Pose.Position.y < doorItem.StartPose.Position.y)
+					doorItem.Pose.Position.y += 4;
+				if (doorItem.Pose.Position.y >= doorItem.StartPose.Position.y)
 				{
-					doorItem->Pose.Position.y = doorItem->StartPose.Position.y;
-					if (doorData->opened)
+					doorItem.Pose.Position.y = doorItem.StartPose.Position.y;
+					if (door.opened)
 					{
-						ShutThatDoor(&doorData->d1, doorData);
-						ShutThatDoor(&doorData->d2, doorData);
-						ShutThatDoor(&doorData->d1flip, doorData);
-						ShutThatDoor(&doorData->d2flip, doorData);
-						doorData->opened = false;
+						ShutThatDoor(&door.d1, &door);
+						ShutThatDoor(&door.d2, &door);
+						ShutThatDoor(&door.d1flip, &door);
+						ShutThatDoor(&door.d2flip, &door);
+						door.opened = false;
 					}
 				}
 			}
@@ -343,82 +343,39 @@ namespace TEN::Entities::Doors
 			return;
 		}
 
-		if (doorItem->ObjectNumber < ID_LIFT_DOORS1 || doorItem->ObjectNumber > ID_LIFT_DOORS2)
+		if (doorItem.ObjectNumber < ID_LIFT_DOORS1 || doorItem.ObjectNumber > ID_LIFT_DOORS2)
 		{
-			if (TriggerActive(doorItem))
+			if (TriggerActive(&doorItem))
 			{
-				if (doorItem->Animation.ActiveState == 0)
-					doorItem->Animation.TargetState = 1;
-				else if (!doorData->opened)
+				if (doorItem.Animation.ActiveState == 0)
+					doorItem.Animation.TargetState = 1;
+				else if (!door.opened)
 				{
-					OpenThatDoor(&doorData->d1, doorData);
-					OpenThatDoor(&doorData->d2, doorData);
-					OpenThatDoor(&doorData->d1flip, doorData);
-					OpenThatDoor(&doorData->d2flip, doorData);
-					doorData->opened = true;
+					OpenThatDoor(&door.d1, &door);
+					OpenThatDoor(&door.d2, &door);
+					OpenThatDoor(&door.d1flip, &door);
+					OpenThatDoor(&door.d2flip, &door);
+					door.opened = true;
 				}
 			}
 			else
 			{
-				doorItem->Status = ITEM_ACTIVE;
+				doorItem.Status = ITEM_ACTIVE;
 
-				if (doorItem->Animation.ActiveState == 1)
-					doorItem->Animation.TargetState = 0;
-				else if (doorData->opened)
+				if (doorItem.Animation.ActiveState == 1)
+					doorItem.Animation.TargetState = 0;
+				else if (door.opened)
 				{
-					ShutThatDoor(&doorData->d1, doorData);
-					ShutThatDoor(&doorData->d2, doorData);
-					ShutThatDoor(&doorData->d1flip, doorData);
-					ShutThatDoor(&doorData->d2flip, doorData);
-					doorData->opened = false;
+					ShutThatDoor(&door.d1, &door);
+					ShutThatDoor(&door.d2, &door);
+					ShutThatDoor(&door.d1flip, &door);
+					ShutThatDoor(&door.d2flip, &door);
+					door.opened = false;
 				}
 			}
 		}
-		else
-		{
-			// TR5 lift doors
-			/*if (!TriggerActive(item))
-			{
-				if (item->itemFlags[0] >= BLOCK(4))
-				{
-					if (door->opened)
-					{
-						ShutThatDoor(&door->d1, door);
-						ShutThatDoor(&door->d2, door);
-						ShutThatDoor(&door->d1flip, door);
-						ShutThatDoor(&door->d2flip, door);
-						door->opened = false;
-					}
-				}
-				else
-				{
-					if (!item->itemFlags[0])
-						SoundEffect(SFX_TR5_LIFT_DOORS, &item->pos);
-					item->itemFlags[0] += CLICK(1);
-				}
-			}
-			else
-			{
-				if (item->itemFlags[0] > 0)
-				{
-					if (item->itemFlags[0] == BLOCK(4))
-						SoundEffect(SFX_TR5_LIFT_DOORS, &item->pos);
-					item->itemFlags[0] -= CLICK(1);
-				}
-				if (!door->opened)
-				{
-					DontUnlockBox = true;
-					OpenThatDoor(&door->d1, door);
-					OpenThatDoor(&door->d2, door);
-					OpenThatDoor(&door->d1flip, door);
-					OpenThatDoor(&door->d2flip, door);
-					DontUnlockBox = false;
-					door->opened = true;
-				}
-			}*/
-		}
 
-		AnimateItem(doorItem);
+		AnimateItem(&doorItem);
 	}
 
 	void OpenThatDoor(DOORPOS_DATA* doorPos, DOOR_DATA* dd)
