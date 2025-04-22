@@ -832,7 +832,16 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 	if (GetRandomControl() & 1)
 	{
 		if (uw == 1)
-			spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_UNDERWEXP;
+		{
+			if (mainColor == Vector3::Zero)
+			{
+				spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_UNDERWEXP;
+			}
+			else
+			{
+				spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_UNDERWEXP | SP_COLOR;
+			}
+		}
 		else
 		{
 			if (mainColor == Vector3::Zero)
@@ -975,6 +984,7 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber, const Vector
 			spark->dR = colorD[0];
 			spark->dG = colorD[1];
 			spark->dB = colorD[2];
+			spark->flags = SP_UNDERWEXP | SP_COLOR;
 		}
 
 		spark->on = 1;
