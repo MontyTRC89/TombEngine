@@ -196,9 +196,9 @@ namespace TEN::Entities::Doors
 			doorItem.InDrawRoom = true;
 		}
 
-		// Get collision mesh corners.
+		// Get sector AABB corners.
 		auto corners = std::array<Vector3, BoundingBox::CORNER_COUNT>{};
-		door.d2.floor->Aabb.GetCorners(corners.data()); // TODO: ????????????????????????????????
+		door.d2.floor->Aabb.GetCorners(corners.data());
 
 		// Set collision mesh.
 		auto desc = CollisionMeshDesc();
@@ -457,17 +457,27 @@ namespace TEN::Entities::Doors
 	{
 		const auto& door = GetDoorObject(item);
 
-		// TODO: ????????????????????????????????
 		auto& room = g_Level.Rooms[door.d1.floor->RoomNumber];
-		room.DoorCollisionMeshes.Insert(item.Index, door.d1.floor->Aabb);
+		room.DoorCollisionMeshes.Insert(item.Index, door.d2.floor->Aabb);
+
+		if (door.d1flip.floor != nullptr)
+		{
+			auto& roomFlip = g_Level.Rooms[door.d1flip.floor->RoomNumber];
+			roomFlip.DoorCollisionMeshes.Insert(item.Index, door.d2.floor->Aabb);
+		}
 	}
 
 	void DisableDoorCollisionMesh(const ItemInfo& item)
 	{
 		const auto& door = GetDoorObject(item);
 
-		// TODO: ????????????????????????????????
 		auto& room = g_Level.Rooms[door.d1.floor->RoomNumber];
 		room.DoorCollisionMeshes.Remove(item.Index);
+
+		if (door.d1flip.floor != nullptr)
+		{
+			auto& roomFlip = g_Level.Rooms[door.d1flip.floor->RoomNumber];
+			roomFlip.DoorCollisionMeshes.Remove(item.Index);
+		}
 	}
 }
