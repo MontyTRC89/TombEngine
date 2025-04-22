@@ -551,7 +551,7 @@ namespace TEN::Scripting::Effects
 		auto convertedSize = ValueOr<float>(size, 512.0f);
 
 		auto convertedMainColor = ValueOr<ScriptColor>(mainCol, ScriptColor(0, 0, 0));
-		auto convertedSecondColor = ValueOr<ScriptColor>(secondCol, ScriptColor(0, 0, 0));
+		auto convertedSecondColor = ValueOr<ScriptColor>(secondCol, convertedMainColor);
 
 		int roomNumber = FindRoomNumber(pos.ToVector3i());
 		const auto& room = g_Level.Rooms[roomNumber];
