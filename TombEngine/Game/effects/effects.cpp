@@ -850,7 +850,14 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 	}
 	else if (uw == 1)
 	{
-		spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_UNDERWEXP;
+		if (mainColor == Vector3::Zero)
+		{
+			spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_UNDERWEXP;
+		}
+		else
+		{
+			spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_UNDERWEXP | SP_COLOR;
+		}
 	}
 	else
 	{
