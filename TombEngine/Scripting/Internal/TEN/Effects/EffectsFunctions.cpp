@@ -541,17 +541,38 @@ namespace TEN::Scripting::Effects
 	/// Make an explosion. Does not hurt Lara
 	// @function MakeExplosion 
 	// @tparam Vec3 pos
-	// @tparam[opt=512] float size This will not be the size of the sprites, but rather the distance between the origin and any additional sprites
-	// @tparam[opt=false] bool shockwave If true, create a very faint white shockwave which will not hurt Lara. For underwater rooms it creates a splash if pos is near the surface.
-	static void MakeExplosion(Vec3 pos, TypeOrNil<float> size, TypeOrNil<bool> shockwave)
+	// @tparam[opt=512] float size Size of the shockwave if enabled.
+	// @tparam[opt=false] bool shockwave If true, create a very faint shockwave which will not hurt Lara. For underwater rooms it creates a splash if pos is near the surface.
+	// @tparam[opt] Color color Main Color of the explosion. If not provided default explosion color will be used.
+	// @tparam[opt] Color color Second Color of the explosion. If not provided default explosion color will be used.
+	static void MakeExplosion(Vec3 pos, TypeOrNil<float> size, TypeOrNil<bool> shockwave, TypeOrNil<ScriptColor> mainCol, TypeOrNil<ScriptColor> secondCol)
 	{
+		auto convertedShockwave = ValueOr<bool>(shockwave, false);
+		auto convertedSize = ValueOr<float>(size, 512.0f);
+
+		auto convertedMainColor = ValueOr<ScriptColor>(mainCol, ScriptColor(0, 0, 0));
+		auto convertedSecondColor = ValueOr<ScriptColor>(secondCol, ScriptColor(0, 0, 0));
+
 		int roomNumber = FindRoomNumber(pos.ToVector3i());
 		const auto& room = g_Level.Rooms[roomNumber];
 
 		if (room.flags & ENV_FLAG_WATER)
-			TriggerUnderwaterExplosion(pos.ToVector3(), ValueOr<bool>(shockwave, false));
+			TriggerUnderwaterExplosion(pos.ToVector3(), ValueOr<bool>(shockwave, false), Vector3(convertedMainColor), Vector3(convertedSecondColor));
 		else
-			TriggerExplosion(Vector3(pos.x, pos.y, pos.z), ValueOr<float>(size, 512.0f), true, false, ValueOr<bool>(shockwave, false), FindRoomNumber(Vector3i(pos.x, pos.y, pos.z)));
+		{
+			TriggerExplosionSparks(pos.x, pos.y, pos.z, 3, -2, 0, FindRoomNumber(Vector3i(pos.x, pos.y, pos.z)), Vector3(convertedMainColor), Vector3(convertedSecondColor));
+
+			if (convertedShockwave)
+			{
+				auto shockPos = Pose(Vector3i(pos));
+
+				if (Vector3(convertedMainColor) == Vector3::Zero)
+				TriggerShockwave(&shockPos, 0, convertedSize, 64, 128, 96, 0, 30, EulerAngles(rand() & 0xFFFF, 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
+				else
+				TriggerShockwave(&shockPos, 0, convertedSize, 64, convertedMainColor.GetR(), convertedMainColor.GetG(), convertedMainColor.GetB(), 30, EulerAngles(rand() & 0xFFFF, 0.0f, 0.0f), 0, true, false, false, (int)ShockwaveStyle::Normal);
+			}
+
+		}
 	}
 
 	/// Make an earthquake

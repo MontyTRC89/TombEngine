@@ -32,6 +32,7 @@ using namespace TEN::Effects::Splash;
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
 using namespace TEN::Math;
+using namespace TEN::Math::Random;
 using TEN::Renderer::g_Renderer;
 
 // NOTE: This fixes body part exploding instantly if entity is on ground.
@@ -1162,18 +1163,18 @@ void TriggerUnderwaterExplosion(ItemInfo* item, bool flag)
 	TriggerUnderwaterExplosion(position, flag);
 }
 
-void TriggerUnderwaterExplosion(Vector3 position, bool flag)
+void TriggerUnderwaterExplosion(Vector3 position, bool flag, const Vector3& mainColor, const Vector3& secondColor)
 {
 	int roomNumber = FindRoomNumber(position);
 	const auto& room = g_Level.Rooms[roomNumber];
 
 	if (flag)
 	{
-		TriggerExplosionBubble(position.x, position.y, position.z, room.RoomNumber);
-		TriggerExplosionSparks(position.x, position.y, position.z, 2, -2, 1, room.RoomNumber);
+		TriggerExplosionBubble(position.x, position.y, position.z, room.RoomNumber, mainColor, secondColor);
+		TriggerExplosionSparks(position.x, position.y, position.z, 2, -2, 1, room.RoomNumber, mainColor, secondColor);
 
 		for (int i = 0; i < 3; i++)
-			TriggerExplosionSparks(position.x, position.y, position.z, 2, -1, 1, room.RoomNumber);
+			TriggerExplosionSparks(position.x, position.y, position.z, 2, -1, 1, room.RoomNumber, mainColor, secondColor);
 
 		int waterHeight = GetPointCollision(position, room.RoomNumber).GetWaterTopHeight();
 		if (waterHeight != NO_HEIGHT)
@@ -1195,8 +1196,8 @@ void TriggerUnderwaterExplosion(Vector3 position, bool flag)
 		int y = position.y;
 		int z = (GetRandomControl() & 0x1FF) + position.z - CLICK(1);
 
-		TriggerExplosionBubbles(x, y, z, room.RoomNumber);
-		TriggerExplosionSparks(x, y, z, 2, -1, 1, room.RoomNumber);
+		TriggerExplosionBubbles(x, y, z, room.RoomNumber, mainColor, secondColor);
+		TriggerExplosionSparks(x, y, z, 2, -1, 1, room.RoomNumber, mainColor, secondColor);
 
 		int waterHeight = GetPointCollision(Vector3i(x, y, z), room.RoomNumber).GetWaterTopHeight();
 		if (waterHeight != NO_HEIGHT)
@@ -1476,20 +1477,65 @@ void UpdateShockwaves()
 	}
 }
 
-void TriggerExplosionBubble(int x, int y, int z, short roomNumber)
+void TriggerExplosionBubble(int x, int y, int z, short roomNumber, const Vector3& mainColor, const Vector3& secondColor)
 {
 	constexpr auto BUBBLE_COUNT = 24;
 	auto* spark = GetFreeParticle();
 
-	spark->sR = 128;
-	spark->dR = 128;
-	spark->dG = 128;
-	spark->dB = 128;
+	if (mainColor == Vector3::Zero)
+	{
+		spark->sR = 128;
+		spark->sG = 64;
+		spark->sB = 0;
+		spark->dR = 128;
+		spark->dG = 128;
+		spark->dB = 128;
+	}
+	else
+	{
+		// New colored flame processing.
+		int colorS[3] = { int(mainColor.x * UCHAR_MAX), int(mainColor.y * UCHAR_MAX), int(mainColor.z * UCHAR_MAX) };
+		int colorD[3] = { int(secondColor.x * UCHAR_MAX), int(secondColor.y * UCHAR_MAX), int(secondColor.z * UCHAR_MAX) };
+
+		// Determine weakest RGB component.
+		int lowestS = UCHAR_MAX;
+		int lowestD = UCHAR_MAX;
+		for (int i = 0; i < 3; i++)
+		{
+			if (lowestS > colorS[i]) lowestS = colorS[i];
+			if (lowestD > colorD[i]) lowestD = colorD[i];
+		}
+
+		// Introduce random color shift for non-weakest RGB components.
+		constexpr auto CHROMA_SHIFT = 32;
+		constexpr auto LUMA_SHIFT = 0.5f;
+
+		for (int i = 0; i < 3; i++)
+		{
+			if (colorS[i] != lowestS)
+				colorS[i] = int(colorS[i] + GenerateInt(-CHROMA_SHIFT, CHROMA_SHIFT));
+
+			if (colorD[i] != lowestD)
+				colorD[i] = int(colorD[i] + GenerateInt(-CHROMA_SHIFT, CHROMA_SHIFT));
+
+			colorS[i] = int(colorS[i] * (1.0f + GenerateFloat(-LUMA_SHIFT, 0)));
+			colorD[i] = int(colorD[i] * (1.0f + GenerateFloat(-LUMA_SHIFT, 0)));
+
+			colorS[i] = std::clamp(colorS[i], 0, UCHAR_MAX);
+			colorD[i] = std::clamp(colorD[i], 0, UCHAR_MAX);
+		}
+
+		spark->sR = colorS[0];
+		spark->sG = colorS[1];
+		spark->sB = colorS[2];
+		spark->dR = colorD[0];
+		spark->dG = colorD[1];
+		spark->dB = colorD[2];
+	}
+
 	spark->on = 1;
 	spark->life = 24;
 	spark->sLife = 24;
-	spark->sG = 64;
-	spark->sB = 0;
 	spark->colFadeSpeed = 8;
 	spark->fadeToBlack = 12;
 	spark->blendMode = BlendMode::Additive;
