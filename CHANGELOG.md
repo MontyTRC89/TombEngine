@@ -5,21 +5,29 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ## [Version 1.8.2]
 
+## New features
+* Added video playback support.
+* Added muzzle glow effect for firearms.
+
 ### Bug fixes
 * Fixed crashes when shooting, if gunflash or gunshell objects are not present in a level.
 * Fixed Teleporter object.
 * Fixed Wraith objects not working correctly in flipped rooms.
 * Fixed lensflare enabled status not saved in a savegame.
+* Fixed HK sound effects.
+* Fixed HK shots not being registered in statistics.
+* Fixed distorted knee and elbow joint vertices.
 * Fixed caustics not rendered correctly if texture compression was enabled.
 * Fixed exclusion blend mode not working correctly.
 * Fixed SSAO incorrectly applied through alpha blended textures.
-* Fixed HK sound effects.
-
-### New features
-* Added muzzle glow effect for firearms.
+* Removed legacy TR5 search object code which caused issues with meshswaps.
 
 ### Lua API changes
+* Added `View.PlayVideo`, `View.StopVideo`, and other helper functions for the video playback.
+* Added `Flow.SetIntroVideoPath` function to specify intro video.
+* Added `Lara:Interact` function to allow alignment with moveables.
 * Added `muzzleGlow` and `muzzleOffset` parameters to weapon settings.
+* Added ability to use gunflash parameters for all weapons in weapon settings.
 * Fixed `Moveable.GetJointPosition` not returning correct results if moveable is invisible or not rendered.
 
 ## [Version 1.8.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.8.1) - 2025-03-29
