@@ -20,6 +20,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed caustics not rendered correctly if texture compression was enabled.
 * Fixed exclusion blend mode not working correctly.
 * Fixed SSAO incorrectly applied through alpha blended textures.
+* Removed legacy TR5 search object code which caused issues with meshswaps.
 
 ### Lua API changes
 * Added `View.PlayVideo`, `View.StopVideo`, and other helper functions for the video playback.
