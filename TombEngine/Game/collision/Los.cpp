@@ -269,24 +269,24 @@ namespace TEN::Collision::Los
 			{
 				closestTri = meshColl->Triangle;
 				closestDist = meshColl->Distance;
+			}
 
-				// Run through bounded doors.
-				auto doorItemIds = room.DoorCollisionMeshes.GetBoundedIds(ray, closestDist);
-				for (int doorItemNumber : doorItemIds)
+			// 2.2) Clip doors.
+			auto doorItemIds = room.DoorCollisionMeshes.GetBoundedIds(ray, closestDist);
+			for (int doorItemNumber : doorItemIds)
+			{
+				const auto& doorItem = g_Level.Items[doorItemNumber];
+				const auto& door = GetDoorObject(doorItem);
+
+				auto doorMeshColl = door.CollisionMesh.GetCollision(ray, closestDist);
+				if (doorMeshColl.has_value())
 				{
-					const auto& doorItem = g_Level.Items[doorItemNumber];
-					const auto& door = GetDoorObject(doorItem);
-
-					auto doorMeshColl = door.CollisionMesh.GetCollision(ray, closestDist);
-					if (doorMeshColl.has_value())
-					{
-						closestTri = doorMeshColl->Triangle;
-						closestDist = doorMeshColl->Distance;
-					}
+					closestTri = doorMeshColl->Triangle;
+					closestDist = doorMeshColl->Distance;
 				}
 			}
 
-			// 2.2) Clip bridge (if applicable).
+			// 2.3) Clip bridge (if applicable).
 			if (collideBridges)
 			{
 				// Run through neighbor rooms.

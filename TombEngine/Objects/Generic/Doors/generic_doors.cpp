@@ -96,28 +96,6 @@ namespace TEN::Entities::Doors
 		auto* room = &g_Level.Rooms[doorItem.RoomNumber];
 		door.d1.floor = GetSector(room, doorItem.Pose.Position.x - room->Position.x + xOffset, doorItem.Pose.Position.z - room->Position.z + zOffset);
 
-		// Get collision mesh corners.
-		auto corners = std::array<Vector3, BoundingBox::CORNER_COUNT>{};
-		door.d1.floor->Aabb.GetCorners(corners.data());
-
-		// Set collision mesh.
-		auto desc = CollisionMeshDesc();
-		desc.InsertTriangle(corners[4], corners[1], corners[0]);
-		desc.InsertTriangle(corners[1], corners[4], corners[5]);
-		desc.InsertTriangle(corners[6], corners[3], corners[2]);
-		desc.InsertTriangle(corners[3], corners[6], corners[7]);
-		desc.InsertTriangle(corners[0], corners[1], corners[2]);
-		desc.InsertTriangle(corners[0], corners[2], corners[3]);
-		desc.InsertTriangle(corners[6], corners[5], corners[4]);
-		desc.InsertTriangle(corners[7], corners[6], corners[4]);
-		desc.InsertTriangle(corners[0], corners[3], corners[4]);
-		desc.InsertTriangle(corners[7], corners[4], corners[3]);
-		desc.InsertTriangle(corners[5], corners[2], corners[1]);
-		desc.InsertTriangle(corners[2], corners[5], corners[6]);
-		door.CollisionMesh = CollisionMesh(Vector3::Zero, Quaternion::Identity, desc);
-
-		EnableDoorCollisionMesh(doorItem);
-
 		auto roomNumber = door.d1.floor->SidePortalRoomNumber;
 		if (roomNumber == NO_VALUE)
 		{
@@ -153,7 +131,7 @@ namespace TEN::Entities::Doors
 		}
 		else
 		{
-			door.d1flip.floor = NULL;
+			door.d1flip.floor = nullptr;
 		}
 
 		twoRoom = door.d1.floor->SidePortalRoomNumber;
@@ -163,8 +141,8 @@ namespace TEN::Entities::Doors
 
 		if (twoRoom == NO_VALUE)
 		{
-			door.d2.floor = NULL;
-			door.d2flip.floor = NULL;
+			door.d2.floor = nullptr;
+			door.d2flip.floor = nullptr;
 		}
 		else
 		{
@@ -206,7 +184,7 @@ namespace TEN::Entities::Doors
 			}
 			else
 			{
-				door.d2flip.floor = NULL;
+				door.d2flip.floor = nullptr;
 			}
 
 			ShutThatDoor(&door.d2, &door);
@@ -217,6 +195,28 @@ namespace TEN::Entities::Doors
 			doorItem.RoomNumber = roomNumber;
 			doorItem.InDrawRoom = true;
 		}
+
+		// Get collision mesh corners.
+		auto corners = std::array<Vector3, BoundingBox::CORNER_COUNT>{};
+		door.d2.floor->Aabb.GetCorners(corners.data()); // TODO: ????????????????????????????????
+
+		// Set collision mesh.
+		auto desc = CollisionMeshDesc();
+		desc.InsertTriangle(corners[4], corners[1], corners[0]);
+		desc.InsertTriangle(corners[1], corners[4], corners[5]);
+		desc.InsertTriangle(corners[6], corners[3], corners[2]);
+		desc.InsertTriangle(corners[3], corners[6], corners[7]);
+		desc.InsertTriangle(corners[0], corners[1], corners[2]);
+		desc.InsertTriangle(corners[0], corners[2], corners[3]);
+		desc.InsertTriangle(corners[6], corners[5], corners[4]);
+		desc.InsertTriangle(corners[7], corners[6], corners[4]);
+		desc.InsertTriangle(corners[0], corners[3], corners[4]);
+		desc.InsertTriangle(corners[7], corners[4], corners[3]);
+		desc.InsertTriangle(corners[5], corners[2], corners[1]);
+		desc.InsertTriangle(corners[2], corners[5], corners[6]);
+		door.CollisionMesh = CollisionMesh(Vector3::Zero, Quaternion::Identity, desc);
+
+		EnableDoorCollisionMesh(doorItem);
 	}
 
 	void DoorCollision(short itemNumber, ItemInfo* playerItem, CollisionInfo* coll)
@@ -457,13 +457,17 @@ namespace TEN::Entities::Doors
 	{
 		const auto& door = GetDoorObject(item);
 
-		auto& room = g_Level.Rooms[item.RoomNumber];
+		// TODO: ????????????????????????????????
+		auto& room = g_Level.Rooms[door.d1.floor->RoomNumber];
 		room.DoorCollisionMeshes.Insert(item.Index, door.d1.floor->Aabb);
 	}
 
 	void DisableDoorCollisionMesh(const ItemInfo& item)
 	{
-		auto& room = g_Level.Rooms[item.RoomNumber];
+		const auto& door = GetDoorObject(item);
+
+		// TODO: ????????????????????????????????
+		auto& room = g_Level.Rooms[door.d1.floor->RoomNumber];
 		room.DoorCollisionMeshes.Remove(item.Index);
 	}
 }

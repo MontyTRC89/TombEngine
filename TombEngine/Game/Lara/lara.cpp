@@ -34,6 +34,7 @@
 #include "Game/Lara/PlayerStateMachine.h"
 #include "Game/misc.h"
 #include "Game/savegame.h"
+#include "Objects/Generic/Doors/generic_doors.h"
 #include "Renderer/Renderer.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
@@ -46,6 +47,7 @@ using namespace TEN::Collision::Point;
 using namespace TEN::Control::Volumes;
 using namespace TEN::Effects::Hair;
 using namespace TEN::Effects::Items;
+using namespace TEN::Entities::Doors;
 using namespace TEN::Entities::Player;
 using namespace TEN::Input;
 using namespace TEN::Math;
@@ -217,8 +219,17 @@ static void HandlePlayerDebug(const ItemInfo& item)
 		for (int neighborRoomNumber : room.NeighborRoomNumbers)
 		{
 			const auto& neighborRoom = g_Level.Rooms[neighborRoomNumber];
-
+			
 			neighborRoom.CollisionMesh.DrawDebug();
+
+			// Draw door collision meshes.
+			for (int doorItemNumber : neighborRoom.DoorCollisionMeshes.GetIds())
+			{
+				const auto& doorItem = g_Level.Items[doorItemNumber];
+				const auto& door = GetDoorObject(doorItem);
+
+				door.CollisionMesh.DrawDebug();
+			}
 		}
 	}
 	// Bridge stats.
