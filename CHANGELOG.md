@@ -3,7 +3,13 @@
 The dates are in European standard format where date is presented as **YYYY-MM-DD**.
 TombEngine releases are located in this repository (alongside with Tomb Editor): https://github.com/TombEngine/TombEditorReleases
 
+
 ## [Version 1.8.2]
+
+### changes
+* changed climb idle state: instead of going to LS_LADDER_TO_CROUCH go to climb upwards state
+* changed climb up state: to transfer to LS_LADDER_TO_CROUCH both probes must not detect a wall otherwise player will continue to climb upwards
+* Fixed clipping into walls when climbing near non level edge of walls
 
 ### Bug fixes
 * Fixed crashes when shooting, if gunflash or gunshell objects are not present in a level.
