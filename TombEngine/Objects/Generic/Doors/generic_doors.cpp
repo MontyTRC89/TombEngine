@@ -42,6 +42,16 @@ namespace TEN::Entities::Doors
 			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f)))
 	};
 
+	const DOOR_DATA& GetDoorObject(const ItemInfo& item)
+	{
+		return *(DOOR_DATA*)item.Data;
+	}
+
+	DOOR_DATA& GetDoorObject(ItemInfo& item)
+	{
+		return *(DOOR_DATA*)item.Data;
+	}
+
 	void InitializeDoor(short itemNumber)
 	{
 		auto* doorItem = &g_Level.Items[itemNumber];
@@ -67,20 +77,32 @@ namespace TEN::Entities::Doors
 		int zOffset = 0;
 
 		if (doorItem->Pose.Orientation.y == 0)
+		{
 			zOffset = -BLOCK(1);
+		}
 		else if (doorItem->Pose.Orientation.y == ANGLE(180.0f))
+		{
 			zOffset = BLOCK(1);
+		}
 		else if (doorItem->Pose.Orientation.y == ANGLE(90.0f))
+		{
 			xOffset = -BLOCK(1);
+		}
 		else
+		{
 			xOffset = BLOCK(1);
+		}
 
-		auto* r = &g_Level.Rooms[doorItem->RoomNumber];
-		doorData->d1.floor = GetSector(r, doorItem->Pose.Position.x - r->Position.x + xOffset, doorItem->Pose.Position.z - r->Position.z + zOffset);
+		// TODO: Initialize collision mesh.
+
+		auto* room = &g_Level.Rooms[doorItem->RoomNumber];
+		doorData->d1.floor = GetSector(room, doorItem->Pose.Position.x - room->Position.x + xOffset, doorItem->Pose.Position.z - room->Position.z + zOffset);
 
 		auto roomNumber = doorData->d1.floor->SidePortalRoomNumber;
 		if (roomNumber == NO_VALUE)
+		{
 			boxNumber = doorData->d1.floor->PathfindingBoxID;
+		}
 		else
 		{
 			auto* b = &g_Level.Rooms[roomNumber];
@@ -90,14 +112,16 @@ namespace TEN::Entities::Doors
 		doorData->d1.block = (boxNumber != NO_VALUE && g_Level.PathfindingBoxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE; 
 		doorData->d1.data = *doorData->d1.floor;
 
-		if (r->flippedRoom != NO_VALUE)
+		if (room->flippedRoom != NO_VALUE)
 		{
-			r = &g_Level.Rooms[r->flippedRoom];
-			doorData->d1flip.floor = GetSector(r, doorItem->Pose.Position.x - r->Position.x + xOffset, doorItem->Pose.Position.z - r->Position.z + zOffset);
+			room = &g_Level.Rooms[room->flippedRoom];
+			doorData->d1flip.floor = GetSector(room, doorItem->Pose.Position.x - room->Position.x + xOffset, doorItem->Pose.Position.z - room->Position.z + zOffset);
 				
 			roomNumber = doorData->d1flip.floor->SidePortalRoomNumber;
 			if (roomNumber == NO_VALUE)
+			{
 				boxNumber = doorData->d1flip.floor->PathfindingBoxID;
+			}
 			else
 			{
 				auto* b = &g_Level.Rooms[roomNumber];
@@ -108,7 +132,9 @@ namespace TEN::Entities::Doors
 			doorData->d1flip.data = *doorData->d1flip.floor;
 		}
 		else
+		{
 			doorData->d1flip.floor = NULL;
+		}
 
 		twoRoom = doorData->d1.floor->SidePortalRoomNumber;
 
@@ -122,12 +148,14 @@ namespace TEN::Entities::Doors
 		}
 		else
 		{
-			r = &g_Level.Rooms[twoRoom];
-			doorData->d2.floor = GetSector(r, doorItem->Pose.Position.x - r->Position.x, doorItem->Pose.Position.z - r->Position.z);
+			room = &g_Level.Rooms[twoRoom];
+			doorData->d2.floor = GetSector(room, doorItem->Pose.Position.x - room->Position.x, doorItem->Pose.Position.z - room->Position.z);
 
 			roomNumber = doorData->d2.floor->SidePortalRoomNumber;
 			if (roomNumber == NO_VALUE)
+			{
 				boxNumber = doorData->d2.floor->PathfindingBoxID;
+			}
 			else
 			{
 				auto* b = &g_Level.Rooms[roomNumber];
@@ -137,14 +165,16 @@ namespace TEN::Entities::Doors
 			doorData->d2.block = (boxNumber != NO_VALUE && g_Level.PathfindingBoxes[boxNumber].flags & BLOCKABLE) ? boxNumber : NO_VALUE;
 			doorData->d2.data = *doorData->d2.floor;
 
-			if (r->flippedRoom != -1)
+			if (room->flippedRoom != -1)
 			{
-				r = &g_Level.Rooms[r->flippedRoom];
-				doorData->d2flip.floor = GetSector(r, doorItem->Pose.Position.x - r->Position.x, doorItem->Pose.Position.z - r->Position.z);
+				room = &g_Level.Rooms[room->flippedRoom];
+				doorData->d2flip.floor = GetSector(room, doorItem->Pose.Position.x - room->Position.x, doorItem->Pose.Position.z - room->Position.z);
 
 				roomNumber = doorData->d2flip.floor->SidePortalRoomNumber;
 				if (roomNumber == NO_VALUE)
+				{
 					boxNumber = doorData->d2flip.floor->PathfindingBoxID;
+				}
 				else
 				{
 					auto* b = &g_Level.Rooms[roomNumber];
@@ -155,7 +185,9 @@ namespace TEN::Entities::Doors
 				doorData->d2flip.data = *doorData->d2flip.floor;
 			}
 			else
+			{
 				doorData->d2flip.floor = NULL;
+			}
 
 			ShutThatDoor(&doorData->d2, doorData);
 			ShutThatDoor(&doorData->d2flip, doorData);
@@ -395,6 +427,10 @@ namespace TEN::Entities::Doors
 		if (sector == nullptr)
 			return;
 
+		// TODO: No.
+		auto& room = g_Level.Rooms[sector->RoomNumber];
+		room.DoorCollisionMeshes.Insert(dd->item->Index, sector->Aabb);
+
 		*doorPos->floor = doorPos->data;
 
 		int pathfindingBoxID = doorPos->block;
@@ -413,6 +449,10 @@ namespace TEN::Entities::Doors
 		auto* sector = doorPos->floor;
 		if (sector == nullptr)
 			return;
+
+		// TODO: No.
+		auto& room = g_Level.Rooms[sector->RoomNumber];
+		room.DoorCollisionMeshes.Remove(dd->item->Index);
 
 		sector->PathfindingBoxID = NO_VALUE;
 		sector->TriggerIndex = 0;

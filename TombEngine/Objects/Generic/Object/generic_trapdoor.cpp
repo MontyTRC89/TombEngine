@@ -265,13 +265,19 @@ namespace TEN::Entities::Generic
 
 	void CloseTrapDoor(short itemNumber)
 	{
-		auto* trapDoorItem = &g_Level.Items[itemNumber];
-		trapDoorItem->ItemFlags[2] = 1;
+		auto& trapDoorItem = g_Level.Items[itemNumber];
+		auto& bridge = GetBridgeObject(trapDoorItem);
+
+		trapDoorItem.ItemFlags[2] = 1;
+		bridge.Enable(trapDoorItem);
 	}
 
 	void OpenTrapDoor(short itemNumber)
 	{
-		auto* trapDoorItem = &g_Level.Items[itemNumber];
-		trapDoorItem->ItemFlags[2] = 0;
+		auto& trapDoorItem = g_Level.Items[itemNumber];
+		auto& bridge = GetBridgeObject(trapDoorItem);
+
+		trapDoorItem.ItemFlags[2] = 0;
+		bridge.Disable(trapDoorItem);
 	}
 }

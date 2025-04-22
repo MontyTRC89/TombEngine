@@ -1,7 +1,9 @@
 #pragma once
+
 #include "Game/collision/floordata.h"
 
 struct ItemInfo;
+namespace TEN::Physics { class CollisionMesh; }
 
 struct DOORPOS_DATA
 {
@@ -26,4 +28,6 @@ struct DOOR_DATA
 	unsigned char dn3;
 	unsigned char dn4;
 	ItemInfo* item;
+
+	CollisionMesh CollisionMesh = {};
 };

@@ -98,24 +98,44 @@ void RoomData::GenerateCollisionMesh()
 			// Get north sector (Z+).
 			const auto* sectorNorth = &Sectors[(x * ZSize) + (z + 1)];
 			if (sectorNorth->SidePortalRoomNumber != NO_VALUE)
-				sectorNorth = nullptr;
+			{
+				const auto& room = g_Level.Rooms[sectorNorth->SidePortalRoomNumber];
+				auto gridCoord = GetRoomGridCoord(sectorNorth->SidePortalRoomNumber, sectorNorth->Position.x, sectorNorth->Position.y);
+
+				sectorNorth = &room.Sectors[(gridCoord.x * room.ZSize) + gridCoord.y];
+			}
 
 			// Get south sector (Z-).
 			const auto* sectorSouth = &Sectors[(x * ZSize) + (z - 1)];
 			if (sectorSouth->SidePortalRoomNumber != NO_VALUE)
-				sectorSouth = nullptr;
+			{
+				const auto& prevRoomZ = g_Level.Rooms[sectorSouth->SidePortalRoomNumber];
+				auto prevRoomGridCoordZ = GetRoomGridCoord(sectorSouth->SidePortalRoomNumber, sectorSouth->Position.x, sectorSouth->Position.y);
+
+				sectorSouth = &prevRoomZ.Sectors[(prevRoomGridCoordZ.x * prevRoomZ.ZSize) + prevRoomGridCoordZ.y];
+			}
 
 			// Get east sector (X+).
 			const auto* sectorEast = &Sectors[((x + 1) * ZSize) + z];
 			if (sectorEast->SidePortalRoomNumber != NO_VALUE)
-				sectorEast = nullptr;
+			{
+				const auto& room = g_Level.Rooms[sectorEast->SidePortalRoomNumber];
+				auto gridCoord = GetRoomGridCoord(sectorEast->SidePortalRoomNumber, sectorEast->Position.x, sectorEast->Position.y);
+
+				sectorEast = &room.Sectors[(gridCoord.x * room.ZSize) + gridCoord.y];
+			}
 
 			// Get west sector (X-).
 			const auto* sectorWest = &Sectors[((x - 1) * ZSize) + z];
 			if (sectorWest->SidePortalRoomNumber != NO_VALUE)
-				sectorWest = nullptr;
+			{
+				const auto& room = g_Level.Rooms[sectorWest->SidePortalRoomNumber];
+				auto gridCoord = GetRoomGridCoord(sectorWest->SidePortalRoomNumber, sectorWest->Position.x, sectorWest->Position.y);
 
-			CollectSectorCollisionMeshTriangles(desc, sector, sectorNorth, sectorSouth, sectorEast, sectorWest);
+				sectorWest = &room.Sectors[(gridCoord.x * room.ZSize) + gridCoord.y];
+			}
+
+			CollectSectorCollisionMeshTriangles(desc, sector, *sectorNorth, *sectorSouth, *sectorEast, *sectorWest);
 		}
 	}
 	desc.Optimize();
@@ -126,8 +146,8 @@ void RoomData::GenerateCollisionMesh()
 
 void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 												   const FloorInfo& sector,
-												   const FloorInfo* sectorNorth, const FloorInfo* sectorSouth,
-												   const FloorInfo* sectorEast, const FloorInfo* sectorWest)
+												   const FloorInfo& sectorNorth, const FloorInfo& sectorSouth,
+												   const FloorInfo& sectorEast, const FloorInfo& sectorWest)
 {
 	constexpr auto SECTOR_SURFACE_COUNT = 2;
 
@@ -207,7 +227,6 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 		{
 			const auto& surface = isFloor ? sector.FloorSurface : sector.CeilingSurface;
 			auto& surfVertices = isFloor ? sectorVerts.Floor : sectorVerts.Ceil;
-			int sign = isFloor ? 1 : -1;
 
 			// 2.1) Set surface status data.
 			surfVertices.IsSplit = sector.IsSurfaceSplit(isFloor);
@@ -252,18 +271,10 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 			// +---+
 			// |   | Current
 			// +---+
-			if (sectorNorth != nullptr)
-			{
-				surfVertices.NorthNeighbor.IsWall = sectorNorth->IsWall(1);
-				surfVertices.NorthNeighbor.Vertex0 = Vector3(corner1.x, getSurfaceTriangleVertexY(*sectorNorth, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner1.y);
-				surfVertices.NorthNeighbor.Vertex1 = Vector3(corner2.x, getSurfaceTriangleVertexY(*sectorNorth, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner2.y);
-			}
-			else
-			{
-				int height = Aabb.Center.y + (Aabb.Extents.y * sign);
-				surfVertices.NorthNeighbor.Vertex0 = Vector3(corner1.x, height, corner1.y);
-				surfVertices.NorthNeighbor.Vertex1 = Vector3(corner2.x, height, corner2.y);
-			}
+			const auto& surfNorth = isFloor ? sectorNorth.FloorSurface : sectorNorth.CeilingSurface;
+			surfVertices.NorthNeighbor.IsWall = sectorNorth.IsWall(1);
+			surfVertices.NorthNeighbor.Vertex0 = Vector3(corner1.x, getSurfaceTriangleVertexY(sectorNorth, REL_CORNER_0.x, REL_CORNER_0.y, 1, isFloor), corner1.y);
+			surfVertices.NorthNeighbor.Vertex1 = Vector3(corner2.x, getSurfaceTriangleVertexY(sectorNorth, REL_CORNER_3.x, REL_CORNER_3.y, 1, isFloor), corner2.y);
 
 			// 2.4) Set south neighbor data.
 			// +---+
@@ -272,56 +283,30 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 			// 0---1
 			// | X | South
 			// +---+
-			if (sectorSouth != nullptr)
-			{
-				surfVertices.SouthNeighbor.IsWall = sectorSouth->IsWall(0);
-				surfVertices.SouthNeighbor.Vertex0 = Vector3(corner0.x, getSurfaceTriangleVertexY(*sectorSouth, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner0.y);
-				surfVertices.SouthNeighbor.Vertex1 = Vector3(corner3.x, getSurfaceTriangleVertexY(*sectorSouth, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner3.y);
-			}
-			else
-			{
-				int height = Aabb.Center.y + (Aabb.Extents.y * sign);
-				surfVertices.NorthNeighbor.Vertex0 = Vector3(corner0.x, height, corner0.y);
-				surfVertices.NorthNeighbor.Vertex1 = Vector3(corner3.x, height, corner3.y);
-			}
+			const auto& surfSouth = isFloor ? sectorSouth.FloorSurface : sectorSouth.CeilingSurface;
+			surfVertices.SouthNeighbor.IsWall = sectorSouth.IsWall(0);
+			surfVertices.SouthNeighbor.Vertex0 = Vector3(corner0.x, getSurfaceTriangleVertexY(sectorSouth, REL_CORNER_1.x, REL_CORNER_1.y, 0, isFloor), corner0.y);
+			surfVertices.SouthNeighbor.Vertex1 = Vector3(corner3.x, getSurfaceTriangleVertexY(sectorSouth, REL_CORNER_2.x, REL_CORNER_2.y, 0, isFloor), corner3.y);
 
 			// 2.5) Set east neighbor data.
 			//         +---+ 1---+
 			// Current |   | | X | East
 			//         +---+ 0---+
-			if (sectorEast != nullptr)
-			{
-				const auto& surfEast = isFloor ? sectorEast->FloorSurface : sectorEast->CeilingSurface;
-				bool useEastSurfTri0 = (!sectorEast->IsSurfaceSplit(isFloor) || surfEast.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
-				surfVertices.EastNeighbor.IsWall = sectorEast->IsWall(useEastSurfTri0 ? 0 : 1);
-				surfVertices.EastNeighbor.Vertex0 = Vector3(corner2.x, getSurfaceTriangleVertexY(*sectorEast, REL_CORNER_1.x, REL_CORNER_1.y, useEastSurfTri0 ? 0 : 1, isFloor), corner2.y);
-				surfVertices.EastNeighbor.Vertex1 = Vector3(corner3.x, getSurfaceTriangleVertexY(*sectorEast, REL_CORNER_0.x, REL_CORNER_0.y, useEastSurfTri0 ? 0 : 1, isFloor), corner3.y);
-			}
-			else
-			{
-				int height = Aabb.Center.y + (Aabb.Extents.y * sign);
-				surfVertices.NorthNeighbor.Vertex0 = Vector3(corner2.x, height, corner2.y);
-				surfVertices.NorthNeighbor.Vertex1 = Vector3(corner3.x, height, corner3.y);
-			}
+			const auto& surfEast = isFloor ? sectorEast.FloorSurface : sectorEast.CeilingSurface;
+			bool useEastSurfTri0 = (!sectorEast.IsSurfaceSplit(isFloor) || surfEast.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
+			surfVertices.EastNeighbor.IsWall = sectorEast.IsWall(useEastSurfTri0 ? 0 : 1);
+			surfVertices.EastNeighbor.Vertex0 = Vector3(corner2.x, getSurfaceTriangleVertexY(sectorEast, REL_CORNER_1.x, REL_CORNER_1.y, useEastSurfTri0 ? 0 : 1, isFloor), corner2.y);
+			surfVertices.EastNeighbor.Vertex1 = Vector3(corner3.x, getSurfaceTriangleVertexY(sectorEast, REL_CORNER_0.x, REL_CORNER_0.y, useEastSurfTri0 ? 0 : 1, isFloor), corner3.y);
 
 			// 2.6) Set west neighbor data.
 			//      +---1 +---+
 			// West | X | |   | Current
 			//      +---0 +---+
-			if (sectorWest != nullptr)
-			{
-				const auto& surfWest = isFloor ? sectorWest->FloorSurface : sectorWest->CeilingSurface;
-				bool useWestSurfTri0 = !(!sectorWest->IsSurfaceSplit(isFloor) || surfWest.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
-				surfVertices.WestNeighbor.IsWall = sectorWest->IsWall(useWestSurfTri0 ? 0 : 1);
-				surfVertices.WestNeighbor.Vertex0 = Vector3(corner0.x, getSurfaceTriangleVertexY(*sectorWest, REL_CORNER_3.x, REL_CORNER_3.y, useWestSurfTri0 ? 0 : 1, isFloor), corner0.y);
-				surfVertices.WestNeighbor.Vertex1 = Vector3(corner1.x, getSurfaceTriangleVertexY(*sectorWest, REL_CORNER_2.x, REL_CORNER_2.y, useWestSurfTri0 ? 0 : 1, isFloor), corner1.y);
-			}
-			else
-			{
-				int height = Aabb.Center.y + (Aabb.Extents.y * sign);
-				surfVertices.NorthNeighbor.Vertex0 = Vector3(corner0.x, height, corner0.y);
-				surfVertices.NorthNeighbor.Vertex1 = Vector3(corner1.x, height, corner1.y);
-			}
+			const auto& surfWest = isFloor ? sectorWest.FloorSurface : sectorWest.CeilingSurface;
+			bool useWestSurfTri0 = !(!sectorWest.IsSurfaceSplit(isFloor) || surfWest.SplitAngle == SectorSurfaceData::SPLIT_ANGLE_0);
+			surfVertices.WestNeighbor.IsWall = sectorWest.IsWall(useWestSurfTri0 ? 0 : 1);
+			surfVertices.WestNeighbor.Vertex0 = Vector3(corner0.x, getSurfaceTriangleVertexY(sectorWest, REL_CORNER_3.x, REL_CORNER_3.y, useWestSurfTri0 ? 0 : 1, isFloor), corner0.y);
+			surfVertices.WestNeighbor.Vertex1 = Vector3(corner1.x, getSurfaceTriangleVertexY(sectorWest, REL_CORNER_2.x, REL_CORNER_2.y, useWestSurfTri0 ? 0 : 1, isFloor), corner1.y);
 
 			isFloor = !isFloor;
 		}
@@ -505,34 +490,7 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 			}
 		}
 
-		// 2.5) Collect west cardinal wall triangles.
-		bool isTriWallWest = surfVerts.IsSplitAngle0 ? surfVerts.Tri0.IsWall : surfVerts.Tri1.IsWall;
-		if (!isTriWallWest || !surfVerts.WestNeighbor.IsWall)
-		{
-			// Full wall.
-			if (isFloor && (!isTriWallWest && surfVerts.WestNeighbor.IsWall))
-			{
-				const auto& vertex0 = sectorVerts.Floor.IsSplitAngle0 ? sectorVerts.Floor.Tri0.Vertex0 : sectorVerts.Floor.Tri1.Vertex0;
-				const auto& vertex1 = sectorVerts.Floor.IsSplitAngle0 ? sectorVerts.Floor.Tri0.Vertex1 : sectorVerts.Floor.Tri1.Vertex1;
-				const auto& vertex2 = sectorVerts.Ceil.IsSplitAngle0 ? sectorVerts.Ceil.Tri0.Vertex1 : sectorVerts.Ceil.Tri1.Vertex1;
-				const auto& vertex3 = sectorVerts.Ceil.IsSplitAngle0 ? sectorVerts.Ceil.Tri0.Vertex0 : sectorVerts.Ceil.Tri1.Vertex0;
-
-				insertWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3);
-			}
-			// Step wall.
-			else if (!isTriWallWest && !surfVerts.WestNeighbor.IsWall)
-			{
-				const auto& vertex0 = surfVerts.IsSplitAngle0 ? surfVerts.Tri0.Vertex0 : surfVerts.Tri1.Vertex0;
-				const auto& vertex1 = surfVerts.IsSplitAngle0 ? surfVerts.Tri0.Vertex1 : surfVerts.Tri1.Vertex1;
-				const auto& vertex2 = surfVerts.WestNeighbor.Vertex1;
-				const auto& vertex3 = surfVerts.WestNeighbor.Vertex0;
-
-				if (isFloor ? !(vertex0.y <= vertex3.y && vertex1.y <= vertex2.y) : !(vertex0.y >= vertex3.y && vertex1.y >= vertex2.y))
-					insertWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3);
-			}
-		}
-
-		// 2.6) Collect east cardinal wall triangles.
+		// 2.5) Collect east cardinal wall triangles.
 		bool isTriWallEast = surfVerts.IsSplitAngle0 ? surfVerts.Tri1.IsWall : surfVerts.Tri0.IsWall;
 		if (!isTriWallEast || !surfVerts.EastNeighbor.IsWall)
 		{
@@ -553,6 +511,33 @@ void RoomData::CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 				const auto& vertex1 = surfVerts.IsSplitAngle0 ? surfVerts.Tri1.Vertex2 : surfVerts.Tri0.Vertex2;
 				const auto& vertex2 = surfVerts.EastNeighbor.Vertex1;
 				const auto& vertex3 = surfVerts.EastNeighbor.Vertex0;
+
+				if (isFloor ? !(vertex0.y <= vertex3.y && vertex1.y <= vertex2.y) : !(vertex0.y >= vertex3.y && vertex1.y >= vertex2.y))
+					insertWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3);
+			}
+		}
+
+		// 2.6) Collect west cardinal wall triangles.
+		bool isTriWallWest = surfVerts.IsSplitAngle0 ? surfVerts.Tri0.IsWall : surfVerts.Tri1.IsWall;
+		if (!isTriWallWest || !surfVerts.WestNeighbor.IsWall)
+		{
+			// Full wall.
+			if (isFloor && (!isTriWallWest && surfVerts.WestNeighbor.IsWall))
+			{
+				const auto& vertex0 = sectorVerts.Floor.IsSplitAngle0 ? sectorVerts.Floor.Tri0.Vertex0 : sectorVerts.Floor.Tri1.Vertex0;
+				const auto& vertex1 = sectorVerts.Floor.IsSplitAngle0 ? sectorVerts.Floor.Tri0.Vertex1 : sectorVerts.Floor.Tri1.Vertex1;
+				const auto& vertex2 = sectorVerts.Ceil.IsSplitAngle0 ? sectorVerts.Ceil.Tri0.Vertex1 : sectorVerts.Ceil.Tri1.Vertex1;
+				const auto& vertex3 = sectorVerts.Ceil.IsSplitAngle0 ? sectorVerts.Ceil.Tri0.Vertex0 : sectorVerts.Ceil.Tri1.Vertex0;
+
+				insertWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3);
+			}
+			// Step wall.
+			else if (!isTriWallWest && !surfVerts.WestNeighbor.IsWall)
+			{
+				const auto& vertex0 = surfVerts.IsSplitAngle0 ? surfVerts.Tri0.Vertex0 : surfVerts.Tri1.Vertex0;
+				const auto& vertex1 = surfVerts.IsSplitAngle0 ? surfVerts.Tri0.Vertex1 : surfVerts.Tri1.Vertex1;
+				const auto& vertex2 = surfVerts.WestNeighbor.Vertex1;
+				const auto& vertex3 = surfVerts.WestNeighbor.Vertex0;
 
 				if (isFloor ? !(vertex0.y <= vertex3.y && vertex1.y <= vertex2.y) : !(vertex0.y >= vertex3.y && vertex1.y >= vertex2.y))
 					insertWallTriangles(isFloor, vertex0, vertex1, vertex2, vertex3);

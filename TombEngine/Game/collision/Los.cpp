@@ -8,6 +8,7 @@
 #include "Game/room.h"
 #include "Game/Setup.h"
 #include "Objects/game_object_ids.h"
+#include "Objects/Generic/Doors/generic_doors.h"
 #include "Math/Math.h"
 #include "Renderer/Renderer.h"
 #include "Specific/level.h"
@@ -15,6 +16,7 @@
 
 using namespace TEN::Collision::Floordata;
 using namespace TEN::Collision::Point;
+using namespace TEN::Entities::Doors;
 using namespace TEN::Math;
 using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
@@ -121,7 +123,7 @@ namespace TEN::Collision::Los
 		// 1) Collect room LOS collision.
 		los.Room = GetRoomLosCollision(origin, roomNumber, dir, dist);
 
-		// 2) Collect item and sphere LOS collisions.
+		// 2) Collect item and sphere LOS collisions (if applicable).
 		if (collideItems || collideSpheres)
 		{
 			// Run through nearby items.
@@ -267,6 +269,21 @@ namespace TEN::Collision::Los
 			{
 				closestTri = meshColl->Triangle;
 				closestDist = meshColl->Distance;
+
+				// Run through bounded doors.
+				auto doorItemIds = room.DoorCollisionMeshes.GetBoundedIds(ray, closestDist);
+				for (int doorItemNumber : doorItemIds)
+				{
+					const auto& doorItem = g_Level.Items[doorItemNumber];
+					const auto& door = GetDoorObject(doorItem);
+
+					auto doorMeshColl = door.CollisionMesh.GetCollision(ray, closestDist);
+					if (doorMeshColl.has_value())
+					{
+						closestTri = doorMeshColl->Triangle;
+						closestDist = doorMeshColl->Distance;
+					}
+				}
 			}
 
 			// 2.2) Clip bridge (if applicable).

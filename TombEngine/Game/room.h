@@ -158,8 +158,9 @@ struct RoomData
 	//RoomObjectHandler Moveables = RoomObjectHandler(); // TODO: Refactor linked list of items in room to use a BVH instead.
 	//RoomObjectHandler Statics	= RoomObjectHandler(); // TODO: Refactor to use BVH.
 	std::vector<MESH_INFO> mesh = {}; // Statics
+	RoomObjectHandler DoorCollisionMeshes = {};
 
-	CollisionMesh			   CollisionMesh  = TEN::Physics::CollisionMesh();
+	CollisionMesh			   CollisionMesh = {};
 	RoomObjectHandler		   Bridges		  = RoomObjectHandler();
 	std::vector<PortalData>	   Portals		  = {};
 	std::vector<TriggerVolume> TriggerVolumes = {};
@@ -178,8 +179,8 @@ struct RoomData
 private:
 	void CollectSectorCollisionMeshTriangles(CollisionMeshDesc& desc,
 											 const FloorInfo& sector,
-											 const FloorInfo* sectorNorth, const FloorInfo* sectorSouth,
-											 const FloorInfo* sectorEast, const FloorInfo* sectorWest);
+											 const FloorInfo& sectorNorth, const FloorInfo& sectorSouth,
+											 const FloorInfo& sectorEast, const FloorInfo& sectorWest);
 };
 
 void DoFlipMap(int group);
