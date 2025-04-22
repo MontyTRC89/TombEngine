@@ -42,10 +42,10 @@ namespace TEN::Entities::Doors
 			EulerAngles(ANGLE(80.0f), ANGLE(80.0f), ANGLE(80.0f)))
 	};
 
-    const DOOR_DATA& GetDoorObject(const ItemInfo& item)  
-    {  
-       return (DOOR_DATA&)item.Data;  
-    }
+	const DOOR_DATA& GetDoorObject(const ItemInfo& item)  
+	{  
+	   return (DOOR_DATA&)item.Data;  
+	}
 
 	DOOR_DATA& GetDoorObject(ItemInfo& item)
 	{
