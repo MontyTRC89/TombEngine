@@ -626,7 +626,7 @@ void ResetRoomData()
 			continue;
 
 		auto& doorItem = g_Level.Items[item.Index];
-		auto& door = *(DOOR_DATA*)doorItem.Data;
+		auto& door = GetDoorObject(doorItem);
 
 		if (door.opened)
 			continue;
@@ -635,6 +635,7 @@ void ResetRoomData()
 		OpenThatDoor(&door.d2, &door);
 		OpenThatDoor(&door.d1flip, &door);
 		OpenThatDoor(&door.d2flip, &door);
+		DisableDoorCollisionMesh(doorItem);
 		door.opened = true;
 	}
 

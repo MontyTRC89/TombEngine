@@ -161,7 +161,7 @@ namespace TEN::Entities::Generic
 		corners[2] -= offset;
 		corners[6] -= offset;
 
-		// Define collision mesh description.
+		// Set collision mesh.
 		auto desc = CollisionMeshDesc();
 		desc.InsertTriangle(corners[4], corners[1], corners[0]);
 		desc.InsertTriangle(corners[1], corners[4], corners[5]);
@@ -175,8 +175,6 @@ namespace TEN::Entities::Generic
 		desc.InsertTriangle(corners[7], corners[4], corners[3]);
 		desc.InsertTriangle(corners[5], corners[2], corners[1]);
 		desc.InsertTriangle(corners[2], corners[5], corners[6]);
-
-		// Set collision mesh.
 		_collisionMesh = CollisionMesh(item.Pose.Position.ToVector3(), item.Pose.Orientation.ToQuaternion(), desc);
 	}
 

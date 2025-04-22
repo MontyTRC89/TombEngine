@@ -1,27 +1,27 @@
 #include "framework.h"
 #include "Objects/Generic/Doors/generic_doors.h"
-#include "Specific/level.h"
+
+#include "Game/animation.h"
+#include "Game/collision/collide_item.h"
+#include "Game/collision/collide_room.h"
+#include "Game/collision/Sphere.h"
 #include "Game/control/control.h"
 #include "Game/control/box.h"
-#include "Game/items.h"
 #include "Game/control/lot.h"
 #include "Game/Gui.h"
-#include "Specific/Input/Input.h"
-#include "Game/pickup/pickup.h"
-#include "Sound/sound.h"
-#include "Game/animation.h"
-#include "Game/collision/Sphere.h"
-#include "Objects/Generic/Switches/cog_switch.h"
-#include "Objects/objectslist.h"
+#include "Game/itemdata/door_data.h"
+#include "Game/itemdata/itemdata.h"
+#include "Game/items.h"
 #include "Game/Lara/lara.h"
 #include "Game/Lara/lara_helpers.h"
 #include "Game/Lara/lara_struct.h"
-#include "Math/Math.h"
 #include "Game/misc.h"
-#include "Game/itemdata/door_data.h"
-#include "Game/collision/collide_room.h"
-#include "Game/collision/collide_item.h"
-#include "Game/itemdata/itemdata.h"
+#include "Game/pickup/pickup.h"
+#include "Objects/Generic/Switches/cog_switch.h"
+#include "Objects/objectslist.h"
+#include "Sound/sound.h"
+#include "Specific/Input/Input.h"
+#include "Specific/level.h"
 
 using namespace TEN::Collision::Room;
 using namespace TEN::Collision::Sphere;
@@ -93,10 +93,30 @@ namespace TEN::Entities::Doors
 			xOffset = BLOCK(1);
 		}
 
-		// TODO: Initialize collision mesh.
-
 		auto* room = &g_Level.Rooms[doorItem.RoomNumber];
 		door.d1.floor = GetSector(room, doorItem.Pose.Position.x - room->Position.x + xOffset, doorItem.Pose.Position.z - room->Position.z + zOffset);
+
+		// Get collision mesh corners.
+		auto corners = std::array<Vector3, BoundingBox::CORNER_COUNT>{};
+		door.d1.floor->Aabb.GetCorners(corners.data());
+
+		// Set collision mesh.
+		auto desc = CollisionMeshDesc();
+		desc.InsertTriangle(corners[4], corners[1], corners[0]);
+		desc.InsertTriangle(corners[1], corners[4], corners[5]);
+		desc.InsertTriangle(corners[6], corners[3], corners[2]);
+		desc.InsertTriangle(corners[3], corners[6], corners[7]);
+		desc.InsertTriangle(corners[0], corners[1], corners[2]);
+		desc.InsertTriangle(corners[0], corners[2], corners[3]);
+		desc.InsertTriangle(corners[6], corners[5], corners[4]);
+		desc.InsertTriangle(corners[7], corners[6], corners[4]);
+		desc.InsertTriangle(corners[0], corners[3], corners[4]);
+		desc.InsertTriangle(corners[7], corners[4], corners[3]);
+		desc.InsertTriangle(corners[5], corners[2], corners[1]);
+		desc.InsertTriangle(corners[2], corners[5], corners[6]);
+		door.CollisionMesh = CollisionMesh(Vector3::Zero, Quaternion::Identity, desc);
+
+		EnableDoorCollisionMesh(doorItem);
 
 		auto roomNumber = door.d1.floor->SidePortalRoomNumber;
 		if (roomNumber == NO_VALUE)
@@ -319,6 +339,7 @@ namespace TEN::Entities::Doors
 					OpenThatDoor(&door.d2, &door);
 					OpenThatDoor(&door.d1flip, &door);
 					OpenThatDoor(&door.d2flip, &door);
+					DisableDoorCollisionMesh(doorItem);
 					door.opened = true;
 				}
 			}
@@ -335,6 +356,7 @@ namespace TEN::Entities::Doors
 						ShutThatDoor(&door.d2, &door);
 						ShutThatDoor(&door.d1flip, &door);
 						ShutThatDoor(&door.d2flip, &door);
+						EnableDoorCollisionMesh(doorItem);
 						door.opened = false;
 					}
 				}
@@ -355,6 +377,7 @@ namespace TEN::Entities::Doors
 					OpenThatDoor(&door.d2, &door);
 					OpenThatDoor(&door.d1flip, &door);
 					OpenThatDoor(&door.d2flip, &door);
+					DisableDoorCollisionMesh(doorItem);
 					door.opened = true;
 				}
 			}
@@ -370,6 +393,7 @@ namespace TEN::Entities::Doors
 					ShutThatDoor(&door.d2, &door);
 					ShutThatDoor(&door.d1flip, &door);
 					ShutThatDoor(&door.d2flip, &door);
+					EnableDoorCollisionMesh(doorItem);
 					door.opened = false;
 				}
 			}
@@ -383,10 +407,6 @@ namespace TEN::Entities::Doors
 		auto* sector = doorPos->floor;
 		if (sector == nullptr)
 			return;
-
-		// TODO: No.
-		auto& room = g_Level.Rooms[sector->RoomNumber];
-		room.DoorCollisionMeshes.Insert(dd->item->Index, sector->Aabb);
 
 		*doorPos->floor = doorPos->data;
 
@@ -406,10 +426,6 @@ namespace TEN::Entities::Doors
 		auto* sector = doorPos->floor;
 		if (sector == nullptr)
 			return;
-
-		// TODO: No.
-		auto& room = g_Level.Rooms[sector->RoomNumber];
-		room.DoorCollisionMeshes.Remove(dd->item->Index);
 
 		sector->PathfindingBoxID = NO_VALUE;
 		sector->TriggerIndex = 0;
@@ -435,5 +451,19 @@ namespace TEN::Entities::Doors
 			for (auto& creature : ActiveCreatures)
 				creature->LOT.TargetBox = NO_VALUE;
 		}
+	}
+
+	void EnableDoorCollisionMesh(const ItemInfo& item)
+	{
+		const auto& door = GetDoorObject(item);
+
+		auto& room = g_Level.Rooms[item.RoomNumber];
+		room.DoorCollisionMeshes.Insert(item.Index, door.d1.floor->Aabb);
+	}
+
+	void DisableDoorCollisionMesh(const ItemInfo& item)
+	{
+		auto& room = g_Level.Rooms[item.RoomNumber];
+		room.DoorCollisionMeshes.Remove(item.Index);
 	}
 }
