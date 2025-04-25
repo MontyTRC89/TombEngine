@@ -292,12 +292,11 @@ namespace TEN::Renderer
 					staticInfo->RoomNumber = oldMesh->roomNumber;
 					staticInfo->Color = oldMesh->color;
 					staticInfo->AmbientLight = r->AmbientLight;
-					staticInfo->Pose = oldMesh->pos;
-					staticInfo->Scale = oldMesh->scale;
+					staticInfo->Pose = staticInfo->PrevPose = oldMesh->pos;
 					staticInfo->OriginalSphere = Statics[staticInfo->ObjectNumber].visibilityBox.ToLocalBoundingSphere();
 					staticInfo->IndexInRoom = l;
 
-					staticInfo->Update();
+					staticInfo->Update(GetInterpolationFactor());
 				}
 			}
 

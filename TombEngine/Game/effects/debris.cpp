@@ -61,7 +61,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 {
 	int meshIndex = 0;
 	short yRot = 0;
-	float scale;
+	Vector3 scale;
 	Vector3 pos;
 	bool isStatic;
 
@@ -74,7 +74,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 		meshIndex = Statics[mesh->staticNumber].meshNumber;
 		yRot = mesh->pos.Orientation.y;
 		pos = Vector3(mesh->pos.Position.x, mesh->pos.Position.y, mesh->pos.Position.z);
-		scale = mesh->scale;
+		scale = mesh->pos.Scale;
 
 		if (mesh->HitPoints <= 0)
 			mesh->flags &= ~StaticMeshFlags::SM_VISIBLE;
@@ -89,7 +89,7 @@ void ShatterObject(SHATTER_ITEM* item, MESH_INFO* mesh, int num, short roomNumbe
 		meshIndex = item->meshIndex;
 		yRot = item->yRot;
 		pos = item->sphere.Center;
-		scale = 1.0f;
+		scale = Vector3::One;
 	}
 
 	auto fragmentsMesh = &g_Level.Meshes[meshIndex];

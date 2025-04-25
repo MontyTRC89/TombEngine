@@ -732,7 +732,7 @@ void LoadDynamicRoomData()
 			mesh.pos.Orientation.y = ReadUInt16();
 			mesh.pos.Orientation.x = ReadUInt16();
 			mesh.pos.Orientation.z = ReadUInt16();
-			mesh.scale = ReadFloat();
+			mesh.pos.Scale = Vector3(ReadFloat());
 			mesh.flags = ReadUInt16();
 			mesh.color = ReadVector4();
 			mesh.staticNumber = ReadUInt16();
