@@ -11,6 +11,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 
 ### Bug fixes
 * Fixed crashes when shooting, if gunflash or gunshell objects are not present in a level.
+* Fixed crashes when Lara is on a vehicle unreachable by friendly NPCs.
 * Fixed Teleporter object.
 * Fixed Wraith objects not working correctly in flipped rooms.
 * Fixed lensflare enabled status not saved in a savegame.
