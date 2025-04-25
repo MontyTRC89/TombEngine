@@ -10,17 +10,22 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added muzzle glow effect for firearms.
 
 ### Bug fixes
-* Fixed crashes when shooting, if gunflash or gunshell objects are not present in a level.
 * Fixed Teleporter object.
 * Fixed Wraith objects not working correctly in flipped rooms.
 * Fixed lensflare enabled status not saved in a savegame.
 * Fixed HK sound effects.
 * Fixed HK shots not being registered in statistics.
 * Fixed distorted knee and elbow joint vertices.
+* Fixed splash effects remaining in the level after reloading from the savegame.
 * Fixed caustics not rendered correctly if texture compression was enabled.
 * Fixed exclusion blend mode not working correctly.
 * Fixed SSAO incorrectly applied through alpha blended textures.
+* Fixed static meshes not interpolating when dynamically changing their positional data.
+* Fixed crashes when shooting, if gunflash or gunshell objects are not present in a level.
+* Fixed crashes when Lara is on a vehicle unreachable by friendly NPCs.
 * Removed legacy TR5 search object code which caused issues with meshswaps.
+* Removed excessive HK nerfing in running state.
+* Optimized weather particle rendering.
 
 ### Lua API changes
 * Added `View.PlayVideo`, `View.StopVideo`, and other helper functions for the video playback.

@@ -1028,6 +1028,12 @@ namespace TEN::Renderer
 			if (!part.Enabled)
 				continue;
 
+			auto pos  = Vector3::Lerp(part.PrevPosition, part.Position, GetInterpolationFactor());
+			auto size = Lerp(part.PrevSize, part.Size, GetInterpolationFactor());
+
+			if (!view.Camera.Frustum.SphereInFrustum(pos, size))
+				continue;
+
 			switch (part.Type)
 			{
 			case WeatherType::None:
@@ -1037,9 +1043,9 @@ namespace TEN::Renderer
 
 				AddSpriteBillboard(
 					&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
-					Vector3::Lerp(part.PrevPosition, part.Position, GetInterpolationFactor()),
+					pos,
 					Color(1.0f, 1.0f, 1.0f, part.Transparency()),
-					0.0f, 1.0f, Vector2(Lerp(part.PrevSize, part.Size, GetInterpolationFactor())),
+					0.0f, 1.0f, Vector2(size),
 					BlendMode::Additive, true, view);
 
 				break;
@@ -1051,9 +1057,9 @@ namespace TEN::Renderer
 
 				AddSpriteBillboard(
 					&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
-					Vector3::Lerp(part.PrevPosition, part.Position, GetInterpolationFactor()),
+					pos,
 					Color(1.0f, 1.0f, 1.0f, part.Transparency()),
-					0.0f, 1.0f, Vector2(Lerp(part.PrevSize, part.Size, GetInterpolationFactor())),
+					0.0f, 1.0f, Vector2(size),
 					BlendMode::Additive, true, view);
 
 				break;
@@ -1068,10 +1074,10 @@ namespace TEN::Renderer
 
 				AddSpriteBillboardConstrained(
 					&_sprites[Objects[ID_DRIP_SPRITE].meshIndex], 
-					Vector3::Lerp(part.PrevPosition, part.Position, GetInterpolationFactor()),
+					pos,
 					Color(0.8f, 1.0f, 1.0f, part.Transparency()),
 					0.0f, 1.0f,
-					Vector2(RAIN_WIDTH, Lerp(part.PrevSize, part.Size, GetInterpolationFactor())),
+					Vector2(RAIN_WIDTH, size),
 					BlendMode::Additive, -v, true, view);
 
 				break;

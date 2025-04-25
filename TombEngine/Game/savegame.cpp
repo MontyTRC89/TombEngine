@@ -1081,7 +1081,6 @@ const std::vector<byte> SaveGame::Build()
 			Save::StaticMeshInfoBuilder staticMesh{ fbb };
 
 			staticMesh.add_pose(&FromPose(room->mesh[j].pos));
-			staticMesh.add_scale(room->mesh[j].scale);
 			staticMesh.add_color(&FromVector4(room->mesh[j].color));
 
 			staticMesh.add_flags(room->mesh[j].flags);
@@ -2516,7 +2515,6 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 
 		room->mesh[number].pos = ToPose(*staticMesh->pose());
 		room->mesh[number].roomNumber = staticMesh->room_number();
-		room->mesh[number].scale = staticMesh->scale();
 		room->mesh[number].color = ToVector4(staticMesh->color());
 
 		room->mesh[number].flags = staticMesh->flags();
