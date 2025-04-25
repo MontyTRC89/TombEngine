@@ -1,4 +1,4 @@
------
+-----<style>.section-header.has-description {border-top: 1px solid #ccc; padding-top: 1em;}</style>
 --- Event sequence - a chain of functions to call at specified times, modeled after TRNG's organizers.
 --
 -- Works atop the Timer, and so is updated automatically pre-OnControlPhase, and saved automatically when the game is saved.
@@ -79,56 +79,57 @@ end
 --
 -- @tparam string name A label to give the sequence; used to retrieve the timer later as well as internally by TEN.
 -- @tparam bool loop if true, the sequence will start again from its first timer once its final function has been called
--- @tparam ?table|bool timerFormat Same as in @{Timer.Create}. This is mainly for debugging. __This will not work properly if another sequence or timer is showing a countdown.__
--- @tparam ?float|LevelFuncs|table ... A variable number of pairs of arguments, each pair consisting of:
---
--- a time in seconds (positive values are accepted and with only 1 tenth of a second [__0.1__]),
---
--- followed by the function defined in the *LevelFuncs* table to call once the time has elapsed,
---
+-- @tparam ?table|bool timerFormat Same as in <a href="Timer.html#timerFormat">Timer format</a> for Timer. This is mainly for debugging. __This will not work properly if another sequence or timer is showing a countdown.__
+-- @tparam ?float|LevelFuncs|table ... A variable number of pairs of arguments, each pair consisting of:<br>
+-- a time in seconds (positive values are accepted and with only 1 tenth of a second [__0.1__]),<br>
+-- followed by the function defined in the *LevelFuncs* table to call once the time has elapsed,<br>
 -- followed by another duration in seconds, another function name, etc.
 --
--- You can specify a function either by its name, or by a *table* __{}__ with the function name as the first member, followed by its arguments (see example).
+-- You can specify a function either by its name, or by a *table* __{ }__ with the function name as the first member, followed by its arguments (see example).
 -- @treturn EventSequence The inactive sequence.
 -- @usage
---	local EventSequence = require("Engine.EventSequence")
---	local TimerFormat = {seconds = true, deciseconds = true}
+-- local EventSequence = require("Engine.EventSequence")
+-- local TimerFormat = {seconds = true, deciseconds = true}
 --
---	-- Example 1 function without arguments:
---	-- This creates a sequence that calls LevelFuncs.Func after 2 seconds
---	-- then LevelFuncs.Func after 3 seconds
---	-- and finally LevelFuncs.Func after 4 seconds
---	LevelFuncs.Func = function ()
---		local pos = TEN.Vec2(TEN.Util.PercentToScreen(50, 10))
---		local str = TEN.Strings.DisplayString("Repeated function without arguments", pos, 1)
---		TEN.Strings.ShowString(str, 1)
---	end
---	EventSequence.Create(
---	    "test1",true,TimerFormat,
---	    2.0,
---	    LevelFuncs.Func,
---	    3.0,
---	    LevelFuncs.Func,
---	    4.0,
---	    LevelFuncs.Func)
+-- -- Example 1 function without arguments:
+-- -- This creates a sequence that calls LevelFuncs.Func after 2 seconds
+-- -- then LevelFuncs.Func after 3 seconds
+-- -- and finally LevelFuncs.Func after 4 seconds
+-- LevelFuncs.Func = function ()
+--    local pos = TEN.Vec2(TEN.Util.PercentToScreen(50, 10))
+--    local str = TEN.Strings.DisplayString("Repeated function without arguments", pos, 1)
+--    TEN.Strings.ShowString(str, 1)
+-- end
+-- EventSequence.Create(
+--    "test1", -- sequence's name
+--    true, -- loop
+--    TimerFormat, -- timer format
+--    2.0,  -- seconds until call the function
+--    LevelFuncs.Func, -- first function to call
+--    3.0, 
+--    LevelFuncs.Func,
+--    4.0,
+--    LevelFuncs.Func)
 --
---	-- Example 2 function with arguments:
---	-- This creates a sequence that calls LevelFuncs.Func2("1", 5, 10) after 2.3 seconds
---	-- then LevelFuncs.Func2("2", 5, 15) after 3.1 seconds
---	-- and finally LevelFuncs.Func2("3", 5, 20) after 4.8 seconds
---	LevelFuncs.Func2 = function (text, x, y)
---		local pos = TEN.Vec2(TEN.Util.PercentToScreen(x, y))
---		local str = TEN.Strings.DisplayString("Function " .. text .. "!", pos, 1)
---		TEN.Strings.ShowString(str, 1)
---	end
---	EventSequence.Create(
---	    "test2",true,false,
---	    2.3,
---	    {LevelFuncs.Func2, "1", 5, 10},
---	    3.1,
---	    {LevelFuncs.Func2, "2", 5, 15},
---	    4.8,
---	    {LevelFuncs.Func2, "3", 5, 20})
+-- -- Example 2 function with arguments:
+-- -- This creates a sequence that calls LevelFuncs.Func2("1", 5, 10) after 2.3 seconds
+-- -- then LevelFuncs.Func2("2", 5, 15) after 3.1 seconds
+-- -- and finally LevelFuncs.Func2("3", 5, 20) after 4.8 seconds
+-- LevelFuncs.Func2 = function (text, x, y)
+--    local pos = TEN.Vec2(TEN.Util.PercentToScreen(x, y))
+--    local str = TEN.Strings.DisplayString("Function " .. text .. "!", pos, 1)
+--    TEN.Strings.ShowString(str, 1)
+-- end
+-- EventSequence.Create(
+--    "test2", -- sequence's name
+--    true, -- loop
+--    false, -- no countdown is displayed
+--    2.3,
+--    {LevelFuncs.Func2, "1", 5, 10},
+--    3.1,
+--    {LevelFuncs.Func2, "2", 5, 15},
+--    4.8,
+--    {LevelFuncs.Func2, "3", 5, 20})
 EventSequence.Create =function (name, loop, timerFormat, ...)
 	if not Type.IsString(name) then
 		TEN.Util.PrintLog("Error in EventSequence.Create(): invalid name, sequence was not created", TEN.Util.LogLevel.ERROR)
@@ -208,31 +209,33 @@ end
 
 --- Get an event sequence by its name.
 -- @tparam string name The label that was given to the sequence when it was created
--- @treturn EventSequence The sequence
+-- @treturn EventSequence|nil The sequence if it exists, nil if it does not exist
+-- @usage
+-- -- Example:
+-- EventSequence.Get("my_seq")
 EventSequence.Get = function(name)
 	local self = {}
 	if not Type.IsString(name) then
-		TEN.Util.PrintLog("Error in EventSequence.Get(): invalid name", TEN.Util.LogLevel.ERROR)
-		self = {name = "noError", errorName = name}
-	elseif not LevelVars.Engine.EventSequence.sequences[name] then
-		TEN.Util.PrintLog("Warning in EventSequence.Get(): sequence with name '".. name .."' sequence not found", TEN.Util.LogLevel.WARNING)
-		self = {name = "noError", errorName = name}
-	else
-		self = {name = name}
+		return TEN.Util.PrintLog("Error in EventSequence.Get(): invalid name", TEN.Util.LogLevel.ERROR)
 	end
-	return setmetatable(self, EventSequence)
+	local thisES = LevelVars.Engine.EventSequence.sequences[name]
+	if not thisES then
+		return TEN.Util.PrintLog("Warning in EventSequence.Get(): sequence with name '".. name .."' sequence not found", TEN.Util.LogLevel.WARNING)
+	end
+	return setmetatable({name = name}, EventSequence)
 end
 
 --- Check if an event sequence exists.
 -- @tparam string name The label that was given to the event sequence when it was created
+-- @treturn bool true if the event sequence exists, false if it does not exist
 -- @usage
---	-- Example:
---	-- This function checks if an event sequence named "my_seq" exists and starts it
---	LevelFuncs.CheckAndStart = function()
---      if EventSequence.IfExists("my_seq") then
---          EventSequence.Get("my_seq"):Start()
---      end
---	end
+-- -- Example:
+-- -- This function checks if an event sequence named "my_seq" exists and starts it
+-- LevelFuncs.CheckAndStart = function()
+--    if EventSequence.IfExists("my_seq") then
+--       EventSequence.Get("my_seq"):Start()
+--    end
+-- end
 EventSequence.IfExists = function (name)
 	if not Type.IsString(name) then
 		TEN.Util.PrintLog("Error in EventSequence.IfExists(): invalid name", TEN.Util.LogLevel.ERROR)
@@ -244,8 +247,8 @@ end
 --- Delete an event sequence.
 -- @tparam string name The label that was given to the event sequence when it was created
 -- @usage
---	-- Example:
---  EventSequence.Delete("my_seq")
+-- -- Example:
+-- EventSequence.Delete("my_seq")
 EventSequence.Delete = function (name)
 	if not Type.IsString(name) then
 		TEN.Util.PrintLog("Error in EventSequence.Delete(): invalid name", TEN.Util.LogLevel.ERROR)
@@ -261,35 +264,42 @@ EventSequence.Delete = function (name)
 end
 
 ----
--- The list of all methods of the EventSequence object. We suggest that you always use the EventSequence.Get() function to use the methods of the EventSequence object to prevent errors or unexpected behavior
+-- List of all methods of the EventSequence object. It is always recommended to check the existence of a sequence with the *EventSequence.IfExists()* function before using methods, to avoid errors or unexpected behavior. When calling a method, it is recommended to use the *EventSequence.Get()* function, to avoid errors after loading a save game.
 -- @type EventSequence
 -- @usage
---	-- Examples of some methods
---	EventSequence.Get("my_seq"):Start()
---	EventSequence.Get("my_seq"):Stop()
---	EventSequence.Get("my_seq"):SetPaused(true)
+-- -- Examples of some methods
+-- EventSequence.Get("my_seq"):Start()
+-- EventSequence.Get("my_seq"):Stop()
+-- EventSequence.Get("my_seq"):SetPaused(true)
+--
+-- -- check if sequence exists before using methods
+-- if EventSequence.IfExists("my_seq") then
+--    EventSequence.Get("my_seq"):Start()
+-- end
 
 --- Begin or unpause a sequence. If showing the remaining time on-screen, its color will be set to white.
 -- @usage
---	-- Example:
---	EventSequence.Get("my_seq"):Start()
+-- -- Example:
+-- if EventSequence.IfExists("my_seq") then
+--    EventSequence.Get("my_seq"):Start()
+-- end
 function EventSequence:Start()
-	if self.errorName then
-		TEN.Util.PrintLog("Error in EventSequence:Start(): '" .. self.errorName .. "' sequence does not exist", TEN.Util.LogLevel.ERROR)
-	else
-		local thisES = LevelVars.Engine.EventSequence.sequences[self.name]
-		Timer.Get(thisES.timers[thisES.currentTimer]):Start(true)
-	end
+	local thisES = LevelVars.Engine.EventSequence.sequences[self.name]
+	Timer.Get(thisES.timers[thisES.currentTimer]):Start(true)
 end
 
 --- Pause or unpause the sequence. If showing the remaining time on-screen, its color will be set to yellow (paused) or white (unpaused).
 -- @tparam bool p If true, the sequence will be paused; if false, it will be unpaused
 -- @usage
---	-- Example 1: Pause the sequence
---	EventSequence.Get("my_seq"):SetPaused(true)
+-- -- Example 1: Pause the sequence
+-- if EventSequence.IfExists("my_seq") then
+--    EventSequence.Get("my_seq"):SetPaused(true)
+-- end
 --
---	-- Example 2: Unpause the sequence
---	EventSequence.Get("my_seq"):SetPaused(false)
+-- -- Example 2: Unpause the sequence
+-- if EventSequence.IfExists("my_seq") then
+--    EventSequence.Get("my_seq"):SetPaused(false)
+-- end
 function EventSequence:SetPaused(p)
 	if self.errorName then
 		TEN.Util.PrintLog("Error in EventSequence:SetPaused(): '" .. self.errorName .. "' sequence does not exist", TEN.Util.LogLevel.ERROR)
@@ -305,8 +315,8 @@ end
 
 --- Stop the sequence.
 -- @usage
---	-- Example:
---	EventSequence.Get("my_seq"):Stop()
+-- -- Example:
+-- EventSequence.Get("my_seq"):Stop()
 function EventSequence:Stop()
 	if self.errorName then
 		TEN.Util.PrintLog("Error in EventSequence:Stop(): '" .. self.errorName .. "' sequence does not exist", TEN.Util.LogLevel.ERROR)
@@ -319,15 +329,15 @@ end
 --- Get whether or not the sequence is paused
 -- @treturn bool true If the timer is paused, false if otherwise
 -- @usage
---	-- Example 1: paused sequence
---	if not EventSequence.Get("my_seq"):IsPaused() then
---		EventSequence.Get("my_seq"):SetPaused(true)
---	end
+-- -- Example 1: paused sequence
+-- if not EventSequence.Get("my_seq"):IsPaused() then
+--    EventSequence.Get("my_seq"):SetPaused(true)
+-- end
 --
---	-- Example 2: unpause the sequence
---	if EventSequence.Get("my_seq"):IsPaused() then
---		EventSequence.Get("my_seq"):SetPaused(false)
---	end
+-- -- Example 2: unpause the sequence
+-- if EventSequence.Get("my_seq"):IsPaused() then
+--    EventSequence.Get("my_seq"):SetPaused(false)
+-- end
 function EventSequence:IsPaused()
 	if self.errorName then
 		TEN.Util.PrintLog("Error in EventSequence:IsPaused(): '" .. self.errorName .. "' sequence does not exist", TEN.Util.LogLevel.ERROR)
@@ -340,10 +350,10 @@ end
 --- Get whether or not the sequence is active
 -- @treturn bool true If the sequence is active, false if otherwise
 -- @usage
---	-- Example:
---	if not EventSequence.Get("my_seq"):IsActive() then
---		EventSequence.Get("my_seq"):Start()
---	end
+-- -- Example:
+-- if not EventSequence.Get("my_seq"):IsActive() then
+--    EventSequence.Get("my_seq"):Start()
+-- end
 function EventSequence:IsActive()
 	if self.errorName then
 		TEN.Util.PrintLog("Error in EventSequence:IsActive(): '" .. self.errorName .. "' sequence does not exist", TEN.Util.LogLevel.ERROR)
