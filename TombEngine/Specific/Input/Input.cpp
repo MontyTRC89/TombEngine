@@ -22,9 +22,10 @@
 using namespace OIS;
 using namespace TEN::Gui;
 using namespace TEN::Math;
+using namespace TEN::Utils;
 using TEN::Renderer::g_Renderer;
 
-// Big TODO: Entire input system shouldn't be left exposed like this.
+// Big TODO: Make an Input class and handle everything inside it.
 
 namespace TEN::Input
 {
@@ -33,97 +34,22 @@ namespace TEN::Input
 	constexpr auto AXIS_OFFSET			 = 0.2f;
 	constexpr auto MOUSE_AXIS_CONSTRAINT = 100.0f;
 
-	// OIS interfaces
-	InputManager*  OisInputManager = nullptr;
-	Keyboard*	   OisKeyboard	   = nullptr;
-	Mouse*		   OisMouse		   = nullptr;
-	JoyStick*	   OisGamepad	   = nullptr;
-	ForceFeedback* OisRumble	   = nullptr;
-	Effect*		   OisEffect	   = nullptr;
-
 	// Globals
-	RumbleData				 RumbleInfo  = {};
-	std::vector<InputAction> ActionMap	 = {};
-	std::vector<QueueState>	 ActionQueue = {};
-	std::vector<bool>		 KeyMap		 = {};
-	std::vector<Vector2>	 AxisMap	 = {};
 
-	const std::vector<std::string> g_KeyNames =
-	{
-			"<None>",		"Esc",			"1",			"2",			"3",			"4",			"5",			"6",
-			"7",			"8",			"9",			"0",			"-",			"+",			"Back",			"Tab",
-			"Q",			"W",			"E",			"R",			"T",			"Y",			"U",			"I",
-			"O",			"P",			"[",			"]",			"Enter",		"Ctrl",			"A",			"S",
-			"D",			"F",			"G",			"H",			"J",			"K",			"L",			";",
-			"'",			"`",			"Shift",		"#",			"Z",			"X",			"C",			"V",
-			"B",			"N",			"M",			",",			".",			"/",			"Shift",		"Pad X",
-			"Alt",			"Space",		"Caps Lock",	"F1",			"F2",			"F3",			"F4",			"F5",
+	RumbleData RumbleInfo = {};
+	std::unordered_map<int, float>						KeyMap;			// Key = key ID, value = key value.
+	std::unordered_map<InputAxisID, Vector2>			AxisMap;		// Key = input axis ID, value = axis.
+	std::unordered_map<InputActionID, InputAction>		ActionMap;		// Key = input action ID, value = input action.
+	std::unordered_map<InputActionID, ActionQueueState> ActionQueueMap; // Key = inputActionID, value = action queue state.
 
-			"F6",			"F7",			"F8",			"F9",			"F10",			"Num Lock",		"Scroll Lock",	"Pad 7",
-			"Pad 8",		"Pad 9",		"Pad -",		"Pad 4",		"Pad 5",		"Pad 6",		"Pad +",		"Pad 1",
-			"Pad 2",		"Pad 3",		"Pad 0",		"Pad .",		"",				"",				"\\",			"F11",
-			"F12",			"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
+	// OIS interfaces
 
-			"",				"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"Pad Enter",	"Ctrl",			"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"Shift",		"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"Pad /",		"",				"",
-			"Alt",			"",				"",				"",				"",				"",				"",				"",
-			
-			"",				"",				"",				"",				"",				"",				"",				"Home",
-			"Up",			"Page Up",		"",				"Left",			"",				"Right",		"",				"End",
-			"Down",			"Page Down",	"Insert",		"Del",			"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-			"",				"",				"",				"",				"",				"",				"",				"",
-
-			"Joy 1", 		"Joy 2",		"Joy 3",		"Joy 4", 		"Joy 5",		"Joy 6", 		"Joy 7",		"Joy 8",
-			"Joy 9",		"Joy 10",		"Joy 11",		"Joy 12",		"Joy 13",		"Joy 14",		"Joy 15",		"Joy 16",
-
-			"X-",			"X+",			"Y-",			"Y+",			"Z-",			"Z+",			"W-",			"W+",
-			"Joy LT",		"Joy LT",		"Joy RT",		"Joy RT",		"D-Pad Up",		"D-Pad Down",	"D-Pad Left",	"D-Pad Right",
-
-			"Left-Click",	"Right-Click",	"Middle-Click",	"Mouse 4",		"Mouse 5",		"Mouse 6",		"Mouse 7",		"Mouse 8",
-			"Mouse X-",		"Mouse X+",		"Mouse Y-",		"Mouse Y+",		"Mouse Z-",		"Mouse Z+"
-	};
-
-	// Binding rows:
-	// 1. General actions
-	// 2. Vehicle actions
-	// 3. Quick actions
-	// 4. Menu actions
-
-	const auto DefaultGenericBindings = std::vector<int>
-	{
-		KC_UP, KC_DOWN, KC_LEFT, KC_RIGHT, KC_DELETE, KC_PGDOWN, KC_RSHIFT, KC_SLASH, KC_PERIOD, KC_RMENU, KC_END, KC_RCONTROL, KC_SPACE, KC_NUMPAD0,
-		KC_RCONTROL, KC_DOWN, KC_SLASH, KC_RSHIFT, KC_RMENU, KC_SPACE,
-		KC_COMMA, KC_MINUS, KC_EQUALS, KC_LBRACKET, KC_RBRACKET, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0,
-		KC_RETURN, KC_ESCAPE, KC_P, KC_ESCAPE, KC_F5, KC_F6
-	};
-	const auto DefaultXInputBindings = std::vector<int>
-	{
-		XB_AXIS_X_NEG, XB_AXIS_X_POS, XB_AXIS_Y_NEG, XB_AXIS_Y_POS, XB_LSTICK, XB_RSTICK, XB_RSHIFT, XB_AXIS_RTRIGGER_NEG, XB_AXIS_LTRIGGER_NEG, XB_X, XB_B, XB_A, XB_Y, XB_LSHIFT,
-		XB_A, XB_B, XB_AXIS_RTRIGGER_NEG, XB_AXIS_LTRIGGER_NEG, XB_X, XB_RSHIFT,
-		XB_DPAD_DOWN, XB_DPAD_RIGHT, XB_DPAD_LEFT, KC_LBRACKET, XB_DPAD_UP, KC_1, KC_2, KC_3, KC_4, KC_5, KC_6, KC_7, KC_8, KC_9, KC_0,
-		XB_A, XB_Y, XB_START, XB_SELECT, KC_F5, KC_F6
-	};
-
-	std::vector<std::vector<int>> Bindings =
-	{
-		DefaultGenericBindings,
-		DefaultGenericBindings
-	};
-
-	auto ConflictingKeys = std::array<bool, (int)In::Count>{};
+	static InputManager*  OisInputManager = nullptr;
+	static Keyboard*	  OisKeyboard	  = nullptr;
+	static Mouse*		  OisMouse		  = nullptr;
+	static JoyStick*	  OisGamepad	  = nullptr;
+	static ForceFeedback* OisRumble		  = nullptr;
+	static Effect*		  OisEffect		  = nullptr;
 
 	void InitializeEffect()
 	{
@@ -147,17 +73,26 @@ namespace TEN::Input
 	{
 		TENLog("Initializing input system...", LogLevel::Info);
 
-		// Initialize maps.
-		for (int i = 0; i < (int)ActionID::Count; i++)
+		RumbleInfo = {};
+
+		// Initialize key map.
+		for (int i = 0; i < KEY_COUNT; i++)
+			KeyMap[i] = 0.0f;
+
+		// Initialize input axis map.
+		for (int i = 0; i < (int)InputAxisID::Count; i++)
 		{
-			ActionMap.push_back(InputAction((ActionID)i));
-			ActionQueue.push_back(QueueState::None);
+			auto inputAxis = (InputAxisID)i;
+			AxisMap[inputAxis] = Vector2::Zero;
 		}
 
-		KeyMap.resize(MAX_INPUT_SLOTS);
-		AxisMap.resize((int)InputAxis::Count);
-
-		RumbleInfo = {};
+		// Initialize input action and input action queue maps.
+		for (int i = 0; i < (int)InputActionID::Count; i++)
+		{
+			auto actionID = (InputActionID)i;
+			ActionMap[actionID] = InputAction(actionID);
+			ActionQueueMap[actionID] = ActionQueueState::None;
+		}
 
 		try
 		{
@@ -194,7 +129,7 @@ namespace TEN::Input
 		}
 		catch (OIS::Exception& ex)
 		{
-			TENLog("An exception occured during input system init: " + std::string(ex.eText), LogLevel::Error);
+			TENLog("Exception occured during input system initialization: " + std::string(ex.eText), LogLevel::Error);
 		}
 
 		int deviceCount = OisInputManager->getNumberOfDevices(OISJoyStick);
@@ -225,13 +160,15 @@ namespace TEN::Input
 			}
 			catch (OIS::Exception& ex)
 			{
-				TENLog("An exception occured during game controller init: " + std::string(ex.eText), LogLevel::Error);
+				TENLog("Exception occured during game controller initialization: " + std::string(ex.eText), LogLevel::Error);
 			}
 		}
 	}
 
 	void DeinitializeInput()
 	{
+		TENLog("Shutting down OIS...", LogLevel::Info);
+
 		if (OisKeyboard != nullptr)
 			OisInputManager->destroyInputObject(OisKeyboard);
 
@@ -252,44 +189,47 @@ namespace TEN::Input
 
 	void ClearInputData()
 	{
-		for (auto& key : KeyMap)
-			key = false;
+		for (auto& [keyID, value] : KeyMap)
+			value = 0.0f;
 
-		for (auto& axis : AxisMap)
+		for (auto& [axisID, axis] : AxisMap)
 			axis = Vector2::Zero;
 	}
 
 	void ApplyActionQueue()
 	{
-		for (int i = 0; i < (int)In::Count; i++)
+		for (int i = 0; i < (int)InputActionID::Count; i++)
 		{
-			switch (ActionQueue[i])
+			auto actionID = (InputActionID)i;
+			switch (ActionQueueMap[actionID])
 			{
 			default:
-			case QueueState::None:
+			case ActionQueueState::None:
 				break;
 
-			case QueueState::Push:
-				ActionMap[i].Update(true);
+			case ActionQueueState::Update:
+				ActionMap[actionID].Update(true);
 				break;
 
-			case QueueState::Clear:
-				ActionMap[i].Clear();
+			case ActionQueueState::Clear:
+				ActionMap[actionID].Clear();
 				break;
 			}
 		}
 
-		for (auto& queue : ActionQueue)
-			queue = QueueState::None;
+		for (auto& [actionID, queue] : ActionQueueMap)
+			queue = ActionQueueState::None;
 	}
 
-	bool LayoutContainsIndex(int index)
+	static bool TestBoundKey(int keyID)
 	{
-		for (int layout = 1; layout >= 0; layout--)
+		for (int i = 1; i >= 0; i--)
 		{
-			for (int i = 0; i < (int)In::Count; i++)
+			auto deviceID = (InputDeviceID)i;
+			for (int j = 0; j < (int)InputActionID::Count; j++)
 			{
-				if (Bindings[layout][i] == index)
+				auto actionID = (InputActionID)j;
+				if (g_Bindings.GetBoundKeyID(deviceID, actionID) != KC_UNASSIGNED)
 					return true;
 			}
 		}
@@ -298,7 +238,7 @@ namespace TEN::Input
 	}
 
 	// Merge right and left Ctrl, Shift, and Alt keys.
-	int WrapSimilarKeys(int source)
+	static int WrapSimilarKeys(int source)
 	{
 		switch (source)
 		{
@@ -317,42 +257,46 @@ namespace TEN::Input
 
 	void DefaultConflict()
 	{
-		for (int i = 0; i < (int)In::Count; i++)
+		for (int i = 0; i < (int)InputActionID::Count; i++)
 		{
-			int key = Bindings[0][i];
+			auto actionID = (InputActionID)i;
 
-			ConflictingKeys[i] = false;
+			g_Bindings.SetConflict(actionID, false);
 
-			for (int j = 0; j < (int)In::Count; j++)
+			int key = g_Bindings.GetBoundKeyID(InputDeviceID::Default, actionID);
+			for (int j = 0; j < (int)InputActionID::Count; j++)
 			{
-				if (key != Bindings[1][j])
+				auto conflictActionID = (InputActionID)j;
+
+				if (key != g_Bindings.GetBoundKeyID(InputDeviceID::Custom, conflictActionID))
 					continue;
 
-				ConflictingKeys[i] = true;
+				g_Bindings.SetConflict(actionID, true);
 				break;
 			}
 		}
 	}
 
-	void SetDiscreteAxisValues(int index)
+	static void SetDiscreteAxisValues(unsigned int keyID)
 	{
-		for (int layout = 0; layout <= 1; layout++)
+		for (int i = 0; i < (int)InputDeviceID::Count; i++)
 		{
-			if (Bindings[layout][(int)In::Forward] == index)
+			auto deviceID = (InputDeviceID)i;
+			if (g_Bindings.GetBoundKeyID(deviceID, In::Forward) == keyID)
 			{
-				AxisMap[(int)InputAxis::Move].y = 1.0f;
+				AxisMap[InputAxisID::Move].y = 1.0f;
 			}
-			else if (Bindings[layout][(int)In::Back] == index)
+			else if (g_Bindings.GetBoundKeyID(deviceID, In::Back) == keyID)
 			{
-				AxisMap[(int)InputAxis::Move].y = -1.0f;
+				AxisMap[InputAxisID::Move].y = -1.0f;
 			}
-			else if (Bindings[layout][(int)In::Left] == index)
+			else if (g_Bindings.GetBoundKeyID(deviceID, In::Left) == keyID)
 			{
-				AxisMap[(int)InputAxis::Move].x = -1.0f;
+				AxisMap[InputAxisID::Move].x = -1.0f;
 			}
-			else if (Bindings[layout][(int)In::Right] == index)
+			else if (g_Bindings.GetBoundKeyID(deviceID, In::Right) == keyID)
 			{
-				AxisMap[(int)InputAxis::Move].x = 1.0f;
+				AxisMap[InputAxisID::Move].x = 1.0f;
 			}
 		}
 	}
@@ -366,14 +310,14 @@ namespace TEN::Input
 		{
 			OisKeyboard->capture();
 
-			// Poll keys.
-			for (int i = 0; i < MAX_KEYBOARD_KEYS; i++)
+			// Poll keyboard keys.
+			for (int i = 0; i < KEYBOARD_KEY_COUNT; i++)
 			{
 				if (!OisKeyboard->isKeyDown((KeyCode)i))
 					continue;
 
 				int key = WrapSimilarKeys(i);
-				KeyMap[key] = true;
+				KeyMap[key] = 1.0f;
 
 				// Interpret discrete directional keypresses as analog axis values.
 				SetDiscreteAxisValues(key);
@@ -400,13 +344,13 @@ namespace TEN::Input
 			state.width = screenRes.x;
 			state.height = screenRes.y;
 
-			// Poll buttons.
-			for (int i = 0; i < MAX_MOUSE_KEYS; i++)
-				KeyMap[ACTION_OFFSET_MOUSE + i] = state.buttonDown((MouseButtonID)i);
+			// Poll mouse buttons.
+			for (int i = 0; i < MOUSE_BUTTON_COUNT; i++)
+				KeyMap[KEY_OFFSET_MOUSE + i] = state.buttonDown((MouseButtonID)i) ? 1.0f : 0.0f;
 
 			// Register multiple directional keypresses mapped to mouse axes.
-			int baseIndex = ACTION_OFFSET_MOUSE + MAX_MOUSE_KEYS;
-			for (int pass = 0; pass < MAX_MOUSE_AXES; pass++)
+			int baseIndex = KEY_OFFSET_MOUSE + MOUSE_BUTTON_COUNT;
+			for (int pass = 0; pass < (MOUSE_AXIS_COUNT * 2); pass++)
 			{
 				switch (pass)
 				{
@@ -447,7 +391,7 @@ namespace TEN::Input
 					break;
 				}
 
-				KeyMap[baseIndex + pass] = true;
+				KeyMap[baseIndex + pass] = 1.0f;
 
 				// Interpret discrete directional keypresses as mouse axis values.
 				SetDiscreteAxisValues(baseIndex + pass);
@@ -465,7 +409,7 @@ namespace TEN::Input
 			normAxes *= sensitivity;
 
 			// Set mouse axis values.
-			AxisMap[(int)InputAxis::Mouse] = normAxes;
+			AxisMap[InputAxisID::Mouse] = normAxes;
 		}
 		catch (OIS::Exception& ex)
 		{
@@ -484,83 +428,84 @@ namespace TEN::Input
 			const auto& state = OisGamepad->getJoyStickState();
 
 			// Poll buttons.
-			for (int key = 0; key < state.mButtons.size(); key++)
-				KeyMap[ACTION_OFFSET_GAMEPAD + key] = state.mButtons[key];
+			for (int keyID = 0; keyID < state.mButtons.size(); keyID++)
+				KeyMap[KEY_OFFSET_GAMEPAD + keyID] = state.mButtons[keyID] ? 1.0f : 0.0f;
 
 			// Poll axes.
 			for (int axis = 0; axis < state.mAxes.size(); axis++)
 			{
-				// NOTE: We don't support anything above 6 existing XBOX/PS controller axes (2 sticks plus 2 triggers = 6).
-				if (axis >= MAX_GAMEPAD_AXES)
+				// NOTE: Anything above 6 existing XBOX/PS controller axes not supported (2 sticks plus 2 triggers).
+				if (axis >= GAMEPAD_AXIS_COUNT)
 					break;
 
 				// Filter out deadzone.
 				if (abs(state.mAxes[axis].abs) < AXIS_DEADZONE)
 					continue;
 
-				// Calculate raw normalized analog value for camera.
-				float axisValue = (state.mAxes[axis].abs > 0) ? -AXIS_DEADZONE : AXIS_DEADZONE;
-				float normalizedValue = (state.mAxes[axis].abs + axisValue) / (SHRT_MAX - AXIS_DEADZONE);
+				// Calculate raw normalized analog value (for camera).
+				float normalizedValue = float(state.mAxes[axis].abs + (state.mAxes[axis].abs > 0 ? -AXIS_DEADZONE : AXIS_DEADZONE)) /
+					float(SHRT_MAX - AXIS_DEADZONE);
 
 				// Calculate scaled analog value for movement.
 				// NOTE: [0.2f, 1.7f] range gives most organic rates.
 				float scaledValue = (abs(normalizedValue) * AXIS_SCALE) + AXIS_OFFSET;
 
 				// Calculate and reset discrete input slots.
-				int negKeyIndex = ACTION_OFFSET_GAMEPAD + MAX_GAMEPAD_KEYS + (axis * 2);
-				int posKeyIndex = ACTION_OFFSET_GAMEPAD + MAX_GAMEPAD_KEYS + (axis * 2) + 1;
-				KeyMap[negKeyIndex] = false;
-				KeyMap[posKeyIndex] = false;
+				int negKeyID = (KEY_OFFSET_GAMEPAD + GAMEPAD_BUTTON_COUNT) + (axis * 2);
+				int posKeyID = (KEY_OFFSET_GAMEPAD + GAMEPAD_BUTTON_COUNT) + (axis * 2) + 1;
+				KeyMap[negKeyID] = (normalizedValue > 0) ? abs(normalizedValue) : 0.0f;
+				KeyMap[posKeyID] = (normalizedValue < 0) ? abs(normalizedValue) : 0.0f;
 
 				// Determine discrete input registering based on analog value.
-				int usedIndex = (normalizedValue > 0) ? negKeyIndex : posKeyIndex;
-				KeyMap[usedIndex] = true;
+				int usedKeyID = (normalizedValue > 0) ? negKeyID : posKeyID;
 
 				// Register analog input in certain direction.
 				// If axis is bound as directional controls, register axis as directional input.
 				// Otherwise, register as camera movement input (for future).
 				// NOTE: abs() operations are needed to avoid issues with inverted axes on different controllers.
 
-				if (Bindings[1][(int)In::Forward] == usedIndex)
+				if (g_Bindings.GetBoundKeyID(InputDeviceID::Custom, In::Forward) == usedKeyID)
 				{
-					AxisMap[(int)InputAxis::Move].y = abs(scaledValue);
+					AxisMap[InputAxisID::Move].y = abs(scaledValue);
 				}
-				else if (Bindings[1][(int)In::Back] == usedIndex)
+				else if (g_Bindings.GetBoundKeyID(InputDeviceID::Custom, In::Back) == usedKeyID)
 				{
-					AxisMap[(int)InputAxis::Move].y = -abs(scaledValue);
+					AxisMap[InputAxisID::Move].y = -abs(scaledValue);
 				}
-				else if (Bindings[1][(int)In::Left] == usedIndex)
+				else if (g_Bindings.GetBoundKeyID(InputDeviceID::Custom, In::Left)  == usedKeyID)
 				{
-					AxisMap[(int)InputAxis::Move].x = -abs(scaledValue);
+					AxisMap[InputAxisID::Move].x = -abs(scaledValue);
 				}
-				else if (Bindings[1][(int)In::Right] == usedIndex)
+				else if (g_Bindings.GetBoundKeyID(InputDeviceID::Custom, In::Right) == usedKeyID)
 				{
-					AxisMap[(int)InputAxis::Move].x = abs(scaledValue);
+					AxisMap[InputAxisID::Move].x = abs(scaledValue);
 				}
-				else if (!LayoutContainsIndex(usedIndex))
+				else if (!TestBoundKey(usedKeyID))
 				{
 					if ((axis % 2) == 0)
 					{
-						AxisMap[(int)InputAxis::Camera].y = normalizedValue;
+						AxisMap[InputAxisID::Camera].y = normalizedValue;
 					}
 					else
 					{
-						AxisMap[(int)InputAxis::Camera].x = normalizedValue;
+						AxisMap[InputAxisID::Camera].x = normalizedValue;
 					}
 				}
 			}
 
 			// Poll POVs.
 			// NOTE: Controllers usually have one, but scan all just in case.
-			for (int pov = 0; pov < MAX_GAMEPAD_POV_AXES; pov++)
+			for (int pov = 0; pov < GAMEPAD_POV_AXIS_COUNT; pov++)
 			{
 				if (state.mPOV[pov].direction == Pov::Centered)
 					continue;
 
 				// Register multiple directional keypresses mapped to analog axes.
-				int baseIndex = ACTION_OFFSET_GAMEPAD + MAX_GAMEPAD_KEYS + (MAX_GAMEPAD_AXES * 2);
-				for (int pass = 0; pass < MAX_GAMEPAD_POV_AXES; pass++)
+				int baseKeyID = (KEY_OFFSET_GAMEPAD + GAMEPAD_BUTTON_COUNT) + (GAMEPAD_AXIS_COUNT * 2);
+				for (int pass = 0; pass < GAMEPAD_POV_AXIS_COUNT; pass++)
 				{
+					int keyID = (KEY_OFFSET_GAMEPAD + GAMEPAD_BUTTON_COUNT) + (GAMEPAD_AXIS_COUNT * 2);
+
 					switch (pass)
 					{
 					// D-Pad Up
@@ -588,8 +533,9 @@ namespace TEN::Input
 						break;
 					}
 
-					KeyMap[baseIndex + pass] = true;
-					SetDiscreteAxisValues(baseIndex + pass);
+					keyID += pass;
+					KeyMap[keyID] = 1.0f;
+					SetDiscreteAxisValues(keyID);
 				}
 			}
 		}
@@ -599,20 +545,20 @@ namespace TEN::Input
 		}
 	}
 
-	bool Key(int number)
+	static float Key(InputActionID actionID)
 	{
-		for (int layout = 1; layout >= 0; layout--)
+		for (int i = (int)InputDeviceID::Count - 1; i >= 0; i--)
 		{
-			int key = Bindings[layout][number];
-			
-			if (layout == 0 && ConflictingKeys[number])
+			auto deviceID = (InputDeviceID)i;
+			if (deviceID == InputDeviceID::Default && g_Bindings.TestConflict(actionID))
 				continue;
 
-			if (KeyMap[key])
-				return true;
+			int keyID = g_Bindings.GetBoundKeyID(deviceID, actionID);
+			if (KeyMap[keyID] != 0.0f)
+				return KeyMap[keyID];
 		}
 
-		return false;
+		return 0.0f;
 	}
 
 	void SolveActionCollisions()
@@ -667,8 +613,7 @@ namespace TEN::Input
 		RumbleInfo.Power -= RumbleInfo.FadeSpeed;
 
 		// Don't update effect too frequently if its value hasn't changed much.
-		if (RumbleInfo.Power >= 0.2f &&
-			RumbleInfo.LastPower - RumbleInfo.Power < 0.1f)
+		if (RumbleInfo.Power >= 0.2f && (RumbleInfo.LastPower - RumbleInfo.Power) < 0.1f)
 			return;
 
 		if (RumbleInfo.Power <= 0.0f)
@@ -707,10 +652,10 @@ namespace TEN::Input
 		RumbleInfo.LastPower = RumbleInfo.Power;
 	}
 
-	void UpdateInputActions(ItemInfo* item, bool applyQueue)
+	void UpdateInputActions(bool allowAsyncUpdate, bool applyQueue)
 	{
 		// Don't update input data during frameskip.
-		if (!g_Synchronizer.Locked())
+		if (allowAsyncUpdate || !g_Synchronizer.Locked())
 		{
 			ClearInputData();
 			UpdateRumble();
@@ -722,8 +667,8 @@ namespace TEN::Input
 		DefaultConflict();
 
 		// Update action map.
-		for (auto& action : ActionMap)
-			action.Update(Key((int)action.GetID()));
+		for (auto& [actionID, action] : ActionMap)
+			action.Update(Key(action.GetID()));
 
 		if (applyQueue)
 			ApplyActionQueue();
@@ -735,11 +680,11 @@ namespace TEN::Input
 
 	void ClearAllActions()
 	{
-		for (auto& action : ActionMap)
+		for (auto& [actionID, action] : ActionMap)
 			action.Clear();
 
-		for (auto& queue : ActionQueue)
-			queue = QueueState::None;
+		for (auto& [actionID, queue] : ActionQueueMap)
+			queue = ActionQueueState::None;
 	}
 
 	void Rumble(float power, float delayInSec, RumbleMode mode)
@@ -774,20 +719,14 @@ namespace TEN::Input
 		RumbleInfo = {};
 	}
 
-	static void ApplyBindings(const std::vector<int>& bindings)
+	static void ApplyBindings(const BindingProfile& set)
 	{
-		for (int i = 0; i < bindings.size(); i++)
-		{
-			if (i >= (int)In::Count)
-				break;
-
-			Bindings[1][i] = bindings[i];
-		}
+		g_Bindings.SetBindingProfile(InputDeviceID::Custom, set);
 	}
 
 	void ApplyDefaultBindings()
 	{
-		ApplyBindings(DefaultGenericBindings);
+		ApplyBindings(BindingManager::DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE);
 		ApplyDefaultXInputBindings();
 	}
 
@@ -796,22 +735,29 @@ namespace TEN::Input
 		if (!OisGamepad)
 			return false;
 
-		for (int i = 0; i < (int)In::Count; i++)
+		for (int i = 0; i < (int)InputActionID::Count; i++)
 		{
-			if (Bindings[1][i] != KC_UNASSIGNED && Bindings[1][i] != Bindings[0][i])
+			auto actionID = (InputActionID)i;
+
+			int defaultKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Default, actionID);
+			int userKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Custom, actionID);
+
+			if (userKeyID != KC_UNASSIGNED &&
+				userKeyID != defaultKeyID)
+			{
 				return false;
+			}
 		}
 
-		auto vendor = TEN::Utils::ToLower(OisGamepad->vendor());
+		auto vendor = ToLower(OisGamepad->vendor());
 		if (vendor.find("xbox") != std::string::npos || vendor.find("xinput") != std::string::npos)
 		{
-			ApplyBindings(DefaultXInputBindings);
+			ApplyBindings(BindingManager::DEFAULT_XBOX_CONTROLLER_BINDING_PROFILE);
+			g_Configuration.Bindings = g_Bindings.GetBindingProfile(InputDeviceID::Custom);
 
-			for (int i = 0; i < (int)In::Count; i++)
-				g_Configuration.Bindings[i] = Bindings[1][i];
-
-			// Additionally turn on thumbstick camera and vibration.
-			g_Configuration.EnableRumble = g_Configuration.EnableThumbstickCamera = true;
+			// Additionally enable rumble and thumbstick camera.
+			g_Configuration.EnableRumble = true;
+			g_Configuration.EnableThumbstickCamera = true;
 
 			return true;
 		}
@@ -830,14 +776,14 @@ namespace TEN::Input
 		return (DISPLAY_SPACE_RES * (areaPos / areaRes));
 	}
 
-	void ClearAction(ActionID actionID)
+	void ClearAction(InputActionID actionID)
 	{
-		ActionMap[(int)actionID].Clear();
+		ActionMap[actionID].Clear();
 	}
 
 	bool NoAction()
 	{
-		for (const auto& action : ActionMap)
+		for (const auto& [actionID, action] : ActionMap)
 		{
 			if (action.IsHeld())
 				return false;
@@ -846,39 +792,41 @@ namespace TEN::Input
 		return true;
 	}
 
-	bool IsClicked(ActionID actionID)
+	bool IsClicked(InputActionID actionID)
 	{
-		return ActionMap[(int)actionID].IsClicked();
+		return ActionMap[actionID].IsClicked();
 	}
 
-	bool IsHeld(ActionID actionID, float delayInSec)
+	bool IsHeld(InputActionID actionID, float delayInSec)
 	{
-		return ActionMap[(int)actionID].IsHeld(delayInSec);
+		return ActionMap[actionID].IsHeld(delayInSec);
 	}
 
-	bool IsPulsed(ActionID actionID, float delayInSec, float initialDelayInSec)
+	bool IsPulsed(InputActionID actionID, float delayInSec, float initialDelayInSec)
 	{
-		return ActionMap[(int)actionID].IsPulsed(delayInSec, initialDelayInSec);
+		return ActionMap[actionID].IsPulsed(delayInSec, initialDelayInSec);
 	}
 
-	bool IsReleased(ActionID actionID, float maxDelayInSec)
+	bool IsReleased(InputActionID actionID, float maxDelayInSec)
 	{
-		return ActionMap[(int)actionID].IsReleased(maxDelayInSec);
+		return ActionMap[actionID].IsReleased(maxDelayInSec);
 	}
 
-	float GetActionValue(ActionID actionID)
+	float GetActionValue(InputActionID actionID)
 	{
-		return ActionMap[(int)actionID].GetValue();
+		return ActionMap[actionID].GetValue();
 	}
 
-	float GetActionTimeActive(ActionID actionID)
+	// Time in game frames.
+	unsigned int GetActionTimeActive(InputActionID actionID)
 	{
-		return ActionMap[(int)actionID].GetTimeActive();
+		return ActionMap[actionID].GetTimeActive();
 	}
 
-	float GetActionTimeInactive(ActionID actionID)
+	// Time in game frames.
+	unsigned int GetActionTimeInactive(InputActionID actionID)
 	{
-		return ActionMap[(int)actionID].GetTimeInactive();
+		return ActionMap[actionID].GetTimeInactive();
 	}
 
 	bool IsDirectionalActionHeld()

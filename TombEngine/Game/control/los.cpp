@@ -261,7 +261,6 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 	if (isFiring && Lara.Control.Look.IsUsingLasersight)
 	{
 		Lara.Control.Weapon.HasFired = true;
-		Lara.Control.Weapon.Fired = true;
 		Lara.RightArm.GunFlash = Weapons[(int)Lara.Control.Weapon.GunType].FlashTime;
 
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
@@ -703,6 +702,10 @@ std::optional<Vector3> GetStaticObjectLos(const Vector3& origin, int roomNumber,
 		{
 			// Check if static is visible.
 			if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
+				continue;
+
+			// Check if static is collidable.
+			if (!(staticObject.flags & StaticMeshFlags::SM_COLLISION))
 				continue;
 
 			// Check if static is solid (if applicable).

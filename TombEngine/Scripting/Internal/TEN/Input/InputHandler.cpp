@@ -19,8 +19,8 @@ namespace TEN::Scripting::Input
 {
 	/// Vibrate the game controller if the function is available and the setting is on.
 	// @function Vibrate
-	// @tparam float strength Vibration strength.
-	// @tparam float time __(default 0.3)__ Vibration time in seconds.
+	// @tparam float strength Vibration strength. 
+	// @tparam[opt=0.3] float time Vibration time in seconds.
 	static void Vibrate(float strength, sol::optional<float> time)
 	{
 		Rumble(strength, time.value_or(0.3f), RumbleMode::Both);
@@ -28,7 +28,7 @@ namespace TEN::Scripting::Input
 
 	static bool CheckInput(int actionID)
 	{
-		if (actionID > (int)ActionID::Count)
+		if (actionID > (int)InputActionID::Count)
 		{
 			ScriptAssertF(false, "Input action {} does not exist.", actionID);
 			return false;
@@ -45,7 +45,7 @@ namespace TEN::Scripting::Input
 		if (!CheckInput(actionID))
 			return false;
 
-		if (IsHeld((ActionID)actionID))
+		if (IsHeld((InputActionID)actionID))
 			return true;
 
 		return false;
@@ -59,7 +59,7 @@ namespace TEN::Scripting::Input
 		if (!CheckInput(actionID))
 			return false;
 
-		if (IsClicked((ActionID)actionID))
+		if (IsClicked((InputActionID)actionID))
 			return true;
 
 		return false;
@@ -73,7 +73,7 @@ namespace TEN::Scripting::Input
 		if (!CheckInput(actionID))
 			return;
 
-		ActionQueue[actionID] = QueueState::Push;
+		ActionQueueMap[(InputActionID)actionID] = ActionQueueState::Update;
 	}
 
 	/// Clear an action key.
@@ -84,19 +84,19 @@ namespace TEN::Scripting::Input
 		if (!CheckInput(actionID))
 			return;
 
-		ActionQueue[actionID] = QueueState::Clear;
+		ActionQueueMap[(InputActionID)actionID] = ActionQueueState::Clear;
 	}
 
 	/// Clear all action keys.
 	// @function KeyClearAll
 	static void KeyClearAll()
 	{
-		for (auto& queue : ActionQueue)
-			queue = QueueState::Clear;
+		for (auto& [actionID, queue] : ActionQueueMap)
+			queue = ActionQueueState::Clear;
 	}
 
 	/// Get the display position of the cursor in percent.
-	// @function GetMouseDisplayPosition()
+	// @function GetMouseDisplayPosition
 	// @treturn Vec2 Cursor display position in percent.
 	static Vec2 GetMouseDisplayPosition()
 	{

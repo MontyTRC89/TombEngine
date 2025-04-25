@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.7.2 (Developer) Lua API</title>
+    <title>TombEngine 1.8.2 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -64,6 +64,7 @@
 <h2>3 Primitive Classes</h2>
 <ul class="nowrap">
   <li>    <a href="../3 primitive classes/Flow.Fog.html">Flow.Fog</a></li>
+  <li>    <a href="../3 primitive classes/Flow.Horizon.html">Flow.Horizon</a></li>
   <li>    <a href="../3 primitive classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
   <li>    <a href="../3 primitive classes/Flow.LensFlare.html">Flow.LensFlare</a></li>
   <li>    <a href="../3 primitive classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
@@ -79,6 +80,8 @@
   <li>    <a href="../4 enums/Collision.MaterialType.html">Collision.MaterialType</a></li>
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
+  <li>    <a href="../4 enums/Effects.StreamerFeatherMode.html">Effects.StreamerFeatherMode</a></li>
+  <li>    <a href="../4 enums/Effects.ParticleAnimationType.html">Effects.ParticleAnimationType</a></li>
   <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
   <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
@@ -100,6 +103,7 @@
 </ul>
 <h2>5 Lua utility modules</h2>
 <ul class="nowrap">
+  <li>    <a href="../5 lua utility modules/CustomBar.html">CustomBar</a></li>
   <li>    <a href="../5 lua utility modules/Diary.html">Diary</a></li>
   <li>    <a href="../5 lua utility modules/EventSequence.html">EventSequence</a></li>
   <li>    <a href="../5 lua utility modules/Timer.html">Timer</a></li>
@@ -120,7 +124,7 @@
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#Vibrate">Vibrate(strength, time)</a></td>
+	<td class="name" ><a href="#Vibrate">Vibrate(strength, [time])</a></td>
 	<td class="summary">Vibrate the game controller if the function is available and the setting is on.</td>
 	</tr>
 	<tr>
@@ -158,7 +162,7 @@
     <dl class="function">
     <dt>
     <a name = "Vibrate"></a>
-    <strong>Vibrate(strength, time)</strong>
+    <strong>Vibrate(strength, [time])</strong>
     </dt>
     <dd>
     Vibrate the game controller if the function is available and the setting is on.
@@ -173,7 +177,8 @@
         </li>
         <li><span class="parameter">time</span>
             <span class="types"><span class="type">float</span></span>
-         <strong>(default 0.3)</strong> Vibration time in seconds.
+         Vibration time in seconds.
+         <em>Default: 0.3.</em>
         </li>
     </ul>
 
@@ -290,7 +295,7 @@
     <strong>GetMouseDisplayPosition()</strong>
     </dt>
     <dd>
-    Get the display position of the cursor in percent. ()
+    Get the display position of the cursor in percent.
 
 
 

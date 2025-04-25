@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.7.2 (Developer) Lua API</title>
+    <title>TombEngine 1.8.2 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -64,6 +64,7 @@
 <h2>3 Primitive Classes</h2>
 <ul class="nowrap">
   <li>    <a href="../3 primitive classes/Flow.Fog.html">Flow.Fog</a></li>
+  <li>    <a href="../3 primitive classes/Flow.Horizon.html">Flow.Horizon</a></li>
   <li>    <a href="../3 primitive classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
   <li>    <a href="../3 primitive classes/Flow.LensFlare.html">Flow.LensFlare</a></li>
   <li>    <a href="../3 primitive classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
@@ -79,6 +80,8 @@
   <li>    <a href="../4 enums/Collision.MaterialType.html">Collision.MaterialType</a></li>
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
+  <li>    <a href="../4 enums/Effects.StreamerFeatherMode.html">Effects.StreamerFeatherMode</a></li>
+  <li>    <a href="../4 enums/Effects.ParticleAnimationType.html">Effects.ParticleAnimationType</a></li>
   <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
   <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
@@ -100,6 +103,7 @@
 </ul>
 <h2>5 Lua utility modules</h2>
 <ul class="nowrap">
+  <li>    <a href="../5 lua utility modules/CustomBar.html">CustomBar</a></li>
   <li>    <a href="../5 lua utility modules/Diary.html">Diary</a></li>
   <li>    <a href="../5 lua utility modules/EventSequence.html">EventSequence</a></li>
   <li>    <here>Timer</here></li>
@@ -148,7 +152,7 @@ LevelFuncs.TriggerTimer = <span class="keyword">function</span>(obj)
 <h2><a href="#Functions">Functions</a></h2>
 <table class="function_list">
 	<tr>
-	<td class="name" ><a href="#Create">Create(name, totalTime, loop, timerFormat, func[, ...])</a></td>
+	<td class="name" ><a href="#Create">Create(name, totalTime, loop, timerFormat, func, [...])</a></td>
 	<td class="summary">Create (but do not start) a new timer.</td>
 	</tr>
 	<tr>
@@ -156,7 +160,7 @@ LevelFuncs.TriggerTimer = <span class="keyword">function</span>(obj)
 	<td class="summary">Get a timer by its name.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#myTimer:SetFunction">myTimer:SetFunction(func[, ...])</a></td>
+	<td class="name" ><a href="#myTimer:SetFunction">myTimer:SetFunction(func, [...])</a></td>
 	<td class="summary">Give the timer a new function and args</td>
 	</tr>
 	<tr>
@@ -210,7 +214,7 @@ LevelFuncs.TriggerTimer = <span class="keyword">function</span>(obj)
     <dl class="function">
     <dt>
     <a name = "Create"></a>
-    <strong>Create(name, totalTime, loop, timerFormat, func[, ...])</strong>
+    <strong>Create(name, totalTime, loop, timerFormat, func, [...])</strong>
     </dt>
     <dd>
     Create (but do not start) a new timer. </p>
@@ -263,7 +267,7 @@ LevelFuncs.TriggerTimer = <span class="keyword">function</span>(obj)
         </li>
         <li><span class="parameter">...</span>
          a variable number of arguments with which the above function will be called
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
     </ul>
 
@@ -308,7 +312,7 @@ LevelFuncs.TriggerTimer = <span class="keyword">function</span>(obj)
 </dd>
     <dt>
     <a name = "myTimer:SetFunction"></a>
-    <strong>myTimer:SetFunction(func[, ...])</strong>
+    <strong>myTimer:SetFunction(func, [...])</strong>
     </dt>
     <dd>
     Give the timer a new function and args
@@ -323,7 +327,7 @@ LevelFuncs.TriggerTimer = <span class="keyword">function</span>(obj)
         </li>
         <li><span class="parameter">...</span>
          a variable number of arguments with which the above function will be called
-         (<em>optional</em>)
+         <em>Optional.</em>
         </li>
     </ul>
 

@@ -3,7 +3,7 @@
 <html>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 <head>
-    <title>TombEngine 1.7.2 (Developer) Lua API</title>
+    <title>TombEngine 1.8.2 Lua API</title>
     <link rel="stylesheet" href="../ldoc.css" type="text/css" />
 </head>
 <body>
@@ -64,6 +64,7 @@
 <h2>3 Primitive Classes</h2>
 <ul class="nowrap">
   <li>    <a href="../3 primitive classes/Flow.Fog.html">Flow.Fog</a></li>
+  <li>    <a href="../3 primitive classes/Flow.Horizon.html">Flow.Horizon</a></li>
   <li>    <a href="../3 primitive classes/Flow.InventoryItem.html">Flow.InventoryItem</a></li>
   <li>    <a href="../3 primitive classes/Flow.LensFlare.html">Flow.LensFlare</a></li>
   <li>    <a href="../3 primitive classes/Flow.SkyLayer.html">Flow.SkyLayer</a></li>
@@ -79,6 +80,8 @@
   <li>    <a href="../4 enums/Collision.MaterialType.html">Collision.MaterialType</a></li>
   <li>    <a href="../4 enums/Effects.BlendID.html">Effects.BlendID</a></li>
   <li>    <a href="../4 enums/Effects.EffectID.html">Effects.EffectID</a></li>
+  <li>    <a href="../4 enums/Effects.StreamerFeatherMode.html">Effects.StreamerFeatherMode</a></li>
+  <li>    <a href="../4 enums/Effects.ParticleAnimationType.html">Effects.ParticleAnimationType</a></li>
   <li>    <a href="../4 enums/Flow.ErrorMode.html">Flow.ErrorMode</a></li>
   <li>    <a href="../4 enums/Flow.FreezeMode.html">Flow.FreezeMode</a></li>
   <li>    <a href="../4 enums/Flow.GameStatus.html">Flow.GameStatus</a></li>
@@ -100,6 +103,7 @@
 </ul>
 <h2>5 Lua utility modules</h2>
 <ul class="nowrap">
+  <li>    <a href="../5 lua utility modules/CustomBar.html">CustomBar</a></li>
   <li>    <a href="../5 lua utility modules/Diary.html">Diary</a></li>
   <li>    <a href="../5 lua utility modules/EventSequence.html">EventSequence</a></li>
   <li>    <a href="../5 lua utility modules/Timer.html">Timer</a></li>
@@ -142,6 +146,10 @@
 	<td class="summary">Kills.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#pickups">pickups</a></td>
+	<td class="summary">Pickups.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#secrets">secrets</a></td>
 	<td class="summary">Secrets.</td>
 	</tr>
@@ -170,7 +178,7 @@
     <ul>
         <li><span class="parameter">ammoHits</span>
             <span class="types"><span class="type">int</span></span>
-         amount of successful enemy hits.
+         Amount of successful enemy hits.
         </li>
     </ul>
 
@@ -191,7 +199,7 @@
     <ul>
         <li><span class="parameter">ammoUsed</span>
             <span class="types"><span class="type">int</span></span>
-         amount of used ammo.
+         Amount of used ammo.
         </li>
     </ul>
 
@@ -212,7 +220,7 @@
     <ul>
         <li><span class="parameter">distanceTraveled</span>
             <span class="types"><span class="type">int</span></span>
-         amount of traveled distance in world units. One meter is 420 world units.
+         Amount of traveled distance in world units. One meter is 420 world units.
         </li>
     </ul>
 
@@ -233,7 +241,7 @@
     <ul>
         <li><span class="parameter">healthPacksUsed</span>
             <span class="types"><span class="type">int</span></span>
-         amount of used medipacks.
+         Amount of used medipacks.
         </li>
     </ul>
 
@@ -254,7 +262,7 @@
     <ul>
         <li><span class="parameter">damageTaken</span>
             <span class="types"><span class="type">int</span></span>
-         overall amount of taken damage.
+         overall Amount of taken damage.
         </li>
     </ul>
 
@@ -275,7 +283,28 @@
     <ul>
         <li><span class="parameter">kills</span>
             <span class="types"><span class="type">int</span></span>
-         amount of killed enemies.
+         Amount of killed enemies.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "pickups"></a>
+    <strong>pickups</strong>
+    </dt>
+    <dd>
+    Pickups.
+
+
+
+    <ul>
+        <li><span class="parameter">pickups</span>
+            <span class="types"><span class="type">int</span></span>
+         Amount of picked up items.
         </li>
     </ul>
 
@@ -296,7 +325,7 @@
     <ul>
         <li><span class="parameter">secrets</span>
             <span class="types"><span class="type">int</span></span>
-         amount of found secrets.
+         Amount of found secrets.
         </li>
     </ul>
 
@@ -317,7 +346,7 @@
     <ul>
         <li><span class="parameter">timeTaken</span>
             <span class="types"><a class="type" href="../3 primitive classes/Time.html#">Time</a></span>
-         amount of time passed.
+         Amount of time passed.
         </li>
     </ul>
 

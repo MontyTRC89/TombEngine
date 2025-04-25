@@ -41,7 +41,19 @@ enum SpriteEnumFlag
 	SP_NODEATTACH = (1 << 12),
 	SP_PLASMAEXP  = (1 << 13),
 	SP_POISON	  = (1 << 14),
-	SP_COLOR	  = (1 << 15)
+	SP_COLOR	  = (1 << 15),
+	SP_ANIMATED	  = (1 << 16),
+	SP_LIGHT	  = (1 << 17),
+	SP_SOUND	  = (1 << 18)
+};
+
+enum ParticleAnimType
+{
+	None,
+	OneShot,
+	Loop,
+	BackAndForth,
+	LifetimeSpread
 };
 
 // Used by Particle.nodeNumber.
@@ -130,8 +142,8 @@ struct Particle
 	short rotAdd; // TODO: Due to legacy conventions, assigned values must be shifted >> 4.
 
 	short gravity;
-	unsigned short flags; // SP_enum
-
+	unsigned int flags; // SP_enum
+  
 	float sSize;
 	float dSize;
 	float size;
@@ -160,6 +172,16 @@ struct Particle
 	unsigned char extras;
 	signed char dynamic;
 	unsigned char nodeNumber; // ParticleNodeOffsetIDs enum.
+  
+	int damage;
+	float framerate;
+	ParticleAnimType animationType;
+
+	int lightRadius;
+	int lightFlicker;
+	int lightFlickerS;
+
+	int sound;
 
 	int PrevX;
 	int PrevY;
@@ -248,6 +270,7 @@ void ClearInactiveEffects(std::vector<TEffect>& effects)
 Particle* GetFreeParticle();
 
 void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID);
+void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID, ParticleAnimType animationType, float frameRate);
 
 void DetatchSpark(int num, SpriteEnumFlag type);
 void UpdateSparks();

@@ -84,21 +84,21 @@ namespace TEN::Entities::TR4
 			item.Index, (int)TailTag::First,
 			pos, dir0, orient2D, colorStart, COLOR_END,
 			WIDTH, LIFE_MAX, VEL, EXP_RATE, 0,
-			StreamerFeatherType::Center, BlendMode::Additive);
+			StreamerFeatherMode::Center, BlendMode::Additive);
 
 		// Spawn second tail.
 		StreamerEffect.Spawn(
 			item.Index, (int)TailTag::Second,
 			pos, dir1, orient2D, colorStart, COLOR_END,
 			WIDTH, LIFE_MAX, VEL, EXP_RATE, 0,
-			StreamerFeatherType::Center, BlendMode::Additive);
+			StreamerFeatherMode::Center, BlendMode::Additive);
 
 		// Spawn third tail.
 		StreamerEffect.Spawn(
 			item.Index, (int)TailTag::Third,
 			pos, dir2, orient2D, colorStart, COLOR_END,
 			WIDTH, LIFE_MAX, VEL, EXP_RATE, 0,
-			StreamerFeatherType::Center, BlendMode::Additive);
+			StreamerFeatherMode::Center, BlendMode::Additive);
 	}
 
 	static void WraithWallEffect(Vector3i pos, short yRot, int objectNumber)
@@ -308,6 +308,11 @@ namespace TEN::Entities::TR4
 			item.Pose.Orientation.x += angleV;
 		}
 
+		// Translate wraith.
+		item.Pose.Position.x += item.Animation.Velocity.z * phd_sin(item.Pose.Orientation.y);
+		item.Pose.Position.y += item.Animation.Velocity.z * phd_sin(item.Pose.Orientation.x);
+		item.Pose.Position.z += item.Animation.Velocity.z * phd_cos(item.Pose.Orientation.y);
+
 		auto pointColl = GetPointCollision(item);
 
 		bool hasHitWall = false;
@@ -317,13 +322,8 @@ namespace TEN::Entities::TR4
 			hasHitWall = true;
 		}
 
-		// Translate wraith.
-		item.Pose.Position.x += item.Animation.Velocity.z * phd_sin(item.Pose.Orientation.y);
-		item.Pose.Position.y += item.Animation.Velocity.z * phd_sin(item.Pose.Orientation.x);
-		item.Pose.Position.z += item.Animation.Velocity.z * phd_cos(item.Pose.Orientation.y);
-
 		if (pointColl.GetRoomNumber() != item.RoomNumber)
-			ItemNewRoom(itemNumber, pointColl.GetRoomNumber());
+			ItemNewRoom(itemNumber, FindRoomNumber(item.Pose.Position, item.RoomNumber));
 
 		for (int linkItemNumber = g_Level.Rooms[item.RoomNumber].itemNumber; linkItemNumber != NO_VALUE; linkItemNumber = g_Level.Items[linkItemNumber].NextItem)
 		{
