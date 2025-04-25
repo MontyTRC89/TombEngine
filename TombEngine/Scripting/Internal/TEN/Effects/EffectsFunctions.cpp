@@ -638,8 +638,8 @@ namespace TEN::Scripting::Effects
 			convertedEdgeFeatherID, /*convertedLengthFeatherID, */convertedBlendID);
 	}
 
-	/// Emit a visual sink effect.
-	// @function EmitSink
+	/// Emit a particle flowing effect.
+	// @function EmitFlow
 	// @tparam Vec3 pos World position.
 	// @tparam Vec3 dir Directional velocity of the particles in world units per second.
 	// @tparam[opt=512] float radius Radius of emitter. The particles will be emitted inside the circle of provided radius measured from centre of world position.
@@ -650,7 +650,7 @@ namespace TEN::Scripting::Effects
 	// @tparam[opt=Color(0&#44; 0&#44; 0)] Color endColor Color at end of life.
 	// @tparam[opt=Objects.ObjID.DEFAULT_SPRITES] Objects.ObjID.SpriteConstants spriteSeqID Sprite sequence slot ID.
 	// @tparam[opt=14 (UNDERWATER_DUST)] int spriteID Sprite ID in the sprite sequence slot.
-	static void EmitSink(const Vec3& pos, const Vec3& dir, TypeOrNil<float> radius, TypeOrNil<float> life, TypeOrNil<float> friction, TypeOrNil<float> maxSize, TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<GAME_OBJECT_ID> spriteSeqID, TypeOrNil<int> spriteID)
+	static void EmitFlow(const Vec3& pos, const Vec3& dir, TypeOrNil<float> radius, TypeOrNil<float> life, TypeOrNil<float> friction, TypeOrNil<float> maxSize, TypeOrNil<ScriptColor> startColor, TypeOrNil<ScriptColor> endColor, TypeOrNil<GAME_OBJECT_ID> spriteSeqID, TypeOrNil<int> spriteID)
 	{
 		constexpr auto DEFAULT_LIFE = 1.0f;
 		constexpr auto SECS_PER_FRAME = 1.0f / (float)FPS;
@@ -729,7 +729,7 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_EmitStreamer, &EmitStreamer);
 		tableEffects.set_function(ScriptReserved_EmitFire, &EmitFire);
 		tableEffects.set_function(ScriptReserved_EmitWaterfallMist, &EmitWaterfallMist);
-		tableEffects.set_function(ScriptReserved_EmitSink, &EmitSink);
+		tableEffects.set_function(ScriptReserved_EmitFlow, &EmitFlow);
 		tableEffects.set_function(ScriptReserved_MakeExplosion, &MakeExplosion);
 		tableEffects.set_function(ScriptReserved_MakeEarthquake, &Earthquake);
 		tableEffects.set_function(ScriptReserved_GetWind, &GetWind);
