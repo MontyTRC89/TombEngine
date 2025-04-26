@@ -1064,11 +1064,11 @@ namespace TEN::Renderer
 
 			for (int i = 0; i < clusterSize; i++)
 			{
+				// Combine particle index and cluster index for unique seeding.
+				int uniqueSeed = part.UniqueID + i;
+
 				if (i > 0)
 				{
-					// Combine particle index and cluster index for unique seeding.
-					int uniqueSeed = part.UniqueID + i;
-
 					// Use bits from uniqueSeed to determine distribution pattern.
 					float spread = part.Type == WeatherType::Snow ? SNOW_CLUSTER_SPREAD : RAIN_CLUSTER_SPREAD;
 					float offsetBase = spread * ((i + 1) / (float)clusterSize);
@@ -1115,29 +1115,42 @@ namespace TEN::Renderer
 				switch (part.Type)
 				{
 					case WeatherType::Snow:
-
+					{
 						if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Snow rendering"))
 							return;
 
+						// Use dedicated snow sprite sequence if available, otherwise fallback to underwater dust sprite.
+						int spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST;
+						if (Objects[ID_SNOW_SPRITES].loaded)
+							spriteIndex = Objects[ID_SNOW_SPRITES].meshIndex + (uniqueSeed % Objects[ID_SNOW_SPRITES].nmeshes);
+
+						/// Get a deterministic particle rotation from the cluster index.
+						float rot = ((float)i / (float)clusterSize) * PI_MUL_2;
+
 						AddSpriteBillboard(
-							&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
+							&_sprites[spriteIndex],
 							finalPos,
 							Color(1.0f, 1.0f, 1.0f, part.Transparency()),
-							0.0f, 1.0f, Vector2(finalScale),
+							rot, 1.0f, Vector2(finalScale),
 							BlendMode::Additive, false, view);
 
 						break;
+					}
 
 					case WeatherType::Rain:
-
+					{
 						if (!CheckIfSlotExists(ID_DRIP_SPRITE, "Rain rendering"))
 							return;
+
+						int spriteIndex = Objects[ID_DRIP_SPRITE].meshIndex;
+						if (Objects[ID_RAIN_SPRITES].loaded)
+							spriteIndex = Objects[ID_RAIN_SPRITES].meshIndex + (uniqueSeed % Objects[ID_RAIN_SPRITES].nmeshes);
 
 						Vector3 v;
 						part.Velocity.Normalize(v);
 
 						AddSpriteBillboardConstrained(
-							&_sprites[Objects[ID_DRIP_SPRITE].meshIndex],
+							&_sprites[spriteIndex],
 							finalPos,
 							Color(0.8f, 1.0f, 1.0f, part.Transparency()),
 							0.0f, 1.0f,
@@ -1145,6 +1158,7 @@ namespace TEN::Renderer
 							BlendMode::Additive, -v, false, view);
 
 						break;
+					}
 				}
 			}
 		}
