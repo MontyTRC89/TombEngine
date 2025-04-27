@@ -1,6 +1,5 @@
 name: Bug report
 description: Create a report to help us understand and triage your issue.
-title: ""
 labels: 
   - Awaiting Triage
 
@@ -30,8 +29,8 @@ body:
       label: Development Version
       description: Are you submitting this report from a development build that has not been officially released?
       options: 
-        - label: Yes
-        - label: No
+        - label: "I am using an unofficial development version."
+        - label: "I am using an official release."
     validations:
       required: true
 
