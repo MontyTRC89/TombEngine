@@ -24,5 +24,8 @@ struct BUCKET
 	int numQuads;
 	int numTriangles;
 	int waterPlaneIndex;
+	unsigned short waterSpeed;
+	Vector2 waterDirection;
+	WaterRefractionStrength waterRefractionStrength;
 	std::vector<POLYGON> polygons;
 };

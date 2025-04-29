@@ -4510,12 +4510,16 @@ namespace TEN::Renderer
 			_stWater.LightPosition = Vector3(BLOCK(10), waterPlane.WaterLevel - BLOCK(10), BLOCK(10));
 			_stWater.WaterPlaneIndex = i;
 			 
-			_cbWater.UpdateData(_stWater, _context.Get());
-			 
 			for (auto& waterBucket : waterPlane.Buckets)
 			{
 				if (waterBucket.Bucket->NumVertices == 0)
 					continue;
+
+				_stWater.WaterDirection = waterBucket.Bucket->WaterDirection;
+				_stWater.WaterSpeed = waterBucket.Bucket->WaterSpeed;
+				_stWater.WaterRefractionStrength = waterBucket.Bucket->WaterReflectionStrength;
+				
+				_cbWater.UpdateData(_stWater, _context.Get());
 				 
 				SetScissor(waterBucket.Room->ClipBounds);
 

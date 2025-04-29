@@ -44,7 +44,13 @@ namespace TEN::Renderer::ConstantBuffers
 		int RipplesCount;
 #endif
 		Vector4 WaterDistortionMapUvCoordinates;
+		//--
 		Vector4 WaterNormalMapUvCoordinates;
+		//--
 		Vector4 WaterFoamMapUvCoordinates;
+		//--
+		Vector2 WaterDirection;
+		float WaterSpeed;
+		float WaterRefractionStrength;
 	};
 }

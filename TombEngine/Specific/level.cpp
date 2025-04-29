@@ -319,8 +319,11 @@ void LoadObjects()
 
 			bucket.texture = ReadInt32();
 			bucket.blendMode = (BlendMode)ReadUInt8();
-			bucket.materialType = (ShaderMaterialType)ReadUInt8();
 			bucket.animated = ReadBool();
+
+			// New material properties
+			bucket.materialType = (ShaderMaterialType)ReadUInt8();
+
 			bucket.numQuads = 0;
 			bucket.numTriangles = 0;
 
@@ -819,9 +822,15 @@ void LoadStaticRoomData()
 
 			bucket.texture = ReadInt32();
 			bucket.blendMode = (BlendMode)ReadUInt8();
-			bucket.materialType = (ShaderMaterialType)ReadUInt8();
 			bucket.animated = ReadBool();
+			
+			// New material properties
+			bucket.materialType = (ShaderMaterialType)ReadUInt8();
 			bucket.waterPlaneIndex = ReadInt32();
+			bucket.waterDirection = ReadVector2();
+			bucket.waterSpeed = ReadInt32();
+			bucket.waterRefractionStrength = (WaterRefractionStrength)ReadUInt8();
+
 			bucket.numQuads = 0;
 			bucket.numTriangles = 0;
 

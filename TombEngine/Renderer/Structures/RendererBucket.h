@@ -21,5 +21,8 @@ namespace TEN::Renderer::Structures
 		int NumIndices;
 		Vector3 Centre;
 		std::vector<RendererPolygon> Polygons;
+		Vector2 WaterDirection;
+		float WaterReflectionStrength;
+		float WaterSpeed;
 	};
 }

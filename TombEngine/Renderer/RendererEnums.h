@@ -103,6 +103,21 @@ enum class ShaderMaterialType
 	Water = 1
 };
 
+enum class WaterRefractionStrength
+{
+	Low = 0,
+	Medium = 1,
+	High = 2
+};
+
+enum class WaterDirection
+{
+	North = 0,
+	East = 1,
+	South = 2,
+	West = 3
+};
+
 enum class CullMode
 {
 	Unknown = -1,

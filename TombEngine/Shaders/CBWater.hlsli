@@ -41,8 +41,14 @@ cbuffer WaterConstantBuffer : register(b2)
     //--
 #endif
     float4 WaterDistortionMapUvCoordinates;
+    //--
     float4 WaterNormalMapUvCoordinates;
+    //--
     float4 WaterFoamMapUvCoordinates;
+    //--
+    float2 WaterDirection;
+    float WaterSpeed;
+    float WaterRefractionStrength;
 };
 
 #endif

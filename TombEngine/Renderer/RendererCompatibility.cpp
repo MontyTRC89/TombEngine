@@ -300,6 +300,23 @@ namespace TEN::Renderer
 				bucket.NumIndices += levelBucket.numQuads * 6 + levelBucket.numTriangles * 3;
 				bucket.Centre = Vector3::Zero;
 
+				bucket.WaterDirection = levelBucket.waterDirection;
+				bucket.WaterSpeed = levelBucket.waterSpeed;
+				switch (levelBucket.waterRefractionStrength)
+				{
+				case WaterRefractionStrength::Low:
+					bucket.WaterReflectionStrength = 0.0005f;
+					break;
+
+				case WaterRefractionStrength::Medium:
+					bucket.WaterReflectionStrength = 0.001f;
+					break;
+
+				case WaterRefractionStrength::High:
+					bucket.WaterReflectionStrength = 0.002f;
+					break;
+				};
+
 				for (auto& poly : levelBucket.polygons)
 				{
 					RendererPolygon newPoly;

@@ -168,17 +168,20 @@ float4 PSWater(WaterPixelShaderInput input) : SV_Target
     float2 oldRefractionUV = refractionUV.xy;
 
     // Distortion UV
-    float time = Frame / 1200.0f;
+    const float FramesPerSecond = 30.0f;
+    const float UnitsPerBlock = 1024.0f;
+    float time = Frame * (WaterSpeed / (FramesPerSecond * UnitsPerBlock));
+    
     float2 mappedUV = frac(input.WorldPosition.xyz / 8192.0f).xz;
 
     // UV scroll only inside the tile in atlas
-    float2 scrollUV1 = frac(mappedUV + float2(time, 0.0f));
+    float2 scrollUV1 = frac(mappedUV + time * WaterDirection);
     float2 atlasUV1 = WaterDistortionMapUvCoordinates.xy + scrollUV1 * WaterDistortionMapUvCoordinates.zw;
     float2 distortedSample1 = WaterDistortionMapTexture.Sample(WaterDistortionMapSampler, atlasUV1).xy;
-    float2 distortedTexCoords = mappedUV + (distortedSample1 * 2.0f - 1.0f) * 0.001f;
+    float2 distortedTexCoords = mappedUV + (distortedSample1 * 2.0f - 1.0f) * WaterRefractionStrength;
 
     // Additional scroll inside the tile in atlas
-    float2 scrollUV2 = frac(distortedTexCoords + float2(0.0f, time));
+    float2 scrollUV2 = frac(distortedTexCoords + time * WaterDirection);
     float2 atlasUV2 = WaterDistortionMapUvCoordinates.xy + scrollUV2 * WaterDistortionMapUvCoordinates.zw;
     float2 totalDistortion = (WaterDistortionMapTexture.Sample(WaterDistortionMapSampler, atlasUV2).rg * 2.0 - 1.0) * WaveStrength;
 
