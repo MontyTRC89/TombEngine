@@ -48,22 +48,23 @@ PixelShaderInput VS(VertexShaderInput input)
 {
 	PixelShaderInput output;
 
-	float4x4 world = mul(Bones[input.Bone], World);
-	
+	// Blend and apply world matrix
+	float4x4 blended = Skinned ? BlendBoneMatrices(input, Bones, true) : Bones[input.BoneIndex[0]];
+	float4x4 world = mul(blended, World);
+
 	// Calculate vertex effects
 	float wibble = Wibble(input.Effects.xyz, input.Hash);
 	float3 pos = Move(input.Position, input.Effects.xyz, wibble);
 	float3 col = Glow(input.Color.xyz, input.Effects.xyz, wibble);
-	
-	float3 worldPosition = (mul(float4(pos, 1.0f), world).xyz);
+	float3 worldPosition = mul(float4(pos, 1.0f), world).xyz;
 
 	output.Position = mul(float4(worldPosition, 1.0f), ViewProjection);
 	output.UV = input.UV;
 	output.Color = float4(col, input.Color.w);
 	output.Color *= Color;
 	output.PositionCopy = output.Position;
-    output.Sheen = input.Effects.w;
-	output.Bone = input.Bone;
+	output.Sheen = input.Effects.w;
+	output.Bone = input.BoneIndex[0];
 	output.WorldPosition = worldPosition;
 
 	output.Normal = normalize(mul(input.Normal, (float3x3)world).xyz);

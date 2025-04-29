@@ -736,7 +736,7 @@ void LoadDynamicRoomData()
 			mesh.pos.Orientation.y = ReadUInt16();
 			mesh.pos.Orientation.x = ReadUInt16();
 			mesh.pos.Orientation.z = ReadUInt16();
-			mesh.scale = ReadFloat();
+			mesh.pos.Scale = Vector3(ReadFloat());
 			mesh.flags = ReadUInt16();
 			mesh.color = ReadVector4();
 			mesh.staticNumber = ReadUInt16();
@@ -1078,11 +1078,13 @@ void LoadAnimatedTextures()
 	for (int i = 0; i < animatedTextureCount; i++)
 	{
 		auto sequence = ANIMATED_TEXTURES_SEQUENCE{};
-		sequence.atlas = ReadInt32();
-		sequence.Fps = ReadInt32();
-		sequence.numFrames = ReadCount();
+		sequence.Atlas = ReadInt32();
+		sequence.Fps   = ReadUInt8();
+		sequence.Type  = ReadUInt8();
+		ReadUInt16(); // Unused.
+		sequence.NumFrames = ReadCount();
 
-		for (int j = 0; j < sequence.numFrames; j++)
+		for (int j = 0; j < sequence.NumFrames; j++)
 		{
 			auto frame = ANIMATED_TEXTURES_FRAME{};
 			frame.x1 = ReadFloat();
@@ -1093,7 +1095,7 @@ void LoadAnimatedTextures()
 			frame.y3 = ReadFloat();
 			frame.x4 = ReadFloat();
 			frame.y4 = ReadFloat();
-			sequence.frames.push_back(frame);
+			sequence.Frames.push_back(frame);
 		}
 
 		g_Level.AnimatedTexturesSequences.push_back(sequence);

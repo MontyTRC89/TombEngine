@@ -314,7 +314,9 @@ WaterReflectionsGeometryShaderInput VSItemsWaterReflections(VertexShaderInput in
 {
     WaterReflectionsGeometryShaderInput output;
     
-    float4x4 world = mul(Bones[input.Bone], World);
+    // Blend and apply world matrix
+    float4x4 blended = Skinned ? BlendBoneMatrices(input, Bones, true) : Bones[input.BoneIndex[0]];
+    float4x4 world = mul(blended, World);
     
     output.PositionCopy = output.Position = float4(0.0f, 0.0f, 0.0f, 0.0f);
     output.WorldPosition = mul(float4(input.Position, 1.0f), world);
