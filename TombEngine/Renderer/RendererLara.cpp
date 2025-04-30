@@ -320,7 +320,7 @@ void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 	bool acceptsShadows = laraObj.ShadowType == ShadowMode::None;
 	BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade, acceptsShadows);
 
-	if (_stItem.Skinned)
+	if (_stItem.Skinned == 1)
 	{
 		for (int m = 0; m < laraObj.AnimationTransforms.size(); m++)
 			_stItem.BonesMatrices[m] =  laraObj.BindPoseTransforms[m].Invert() * item->InterpolatedAnimTransforms[m];
@@ -337,13 +337,13 @@ void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 		if (!nativeItem->MeshBits.Test(k))
 			continue;
 
-		if (_stItem.Skinned && g_Level.Meshes[nativeItem->Model.MeshIndex[k]].hidden)
+		if (_stItem.Skinned == 1 && g_Level.Meshes[nativeItem->Model.MeshIndex[k]].hidden)
 			continue;
 
 		DrawMoveableMesh(item, GetMesh(nativeItem->Model.MeshIndex[k]), room, k, view, rendererPass);
 	}
 
-	if (!_stItem.Skinned)
+	if (_stItem.Skinned != 1)
 		DrawLaraJoints(item, room, view, rendererPass);
 
 	DrawLaraHolsters(item, room, view, rendererPass);
