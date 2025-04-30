@@ -24,6 +24,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed crashes when shooting, if gunflash or gunshell objects are not present in a level.
 * Fixed crashes when Lara is on a vehicle unreachable by friendly NPCs.
 * Removed legacy TR5 search object code which caused issues with meshswaps.
+* Removed excessive HK nerfing in running state.
+* Optimized weather particle rendering.
 
 ### Lua API changes
 * Added `View.PlayVideo`, `View.StopVideo`, and other helper functions for the video playback.
