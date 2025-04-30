@@ -41,6 +41,7 @@ namespace TEN::Scripting
 		AnimSettings::Register(parent);
 		CameraSettings::Register(parent);
 		FlareSettings::Register(parent);
+		GraphicsSettings::Register(parent);
 		HairSettings::Register(parent);
 		HudSettings::Register(parent);
 		PhysicsSettings::Register(parent);
@@ -52,8 +53,9 @@ namespace TEN::Scripting
 			sol::constructors<Settings()>(),
 			sol::meta_function::new_index, NewIndexErrorMaker(Settings, ScriptReserved_Settings),
 			ScriptReserved_AnimSettings, &Settings::Animations,
-			ScriptReserved_FlareSettings, &Settings::Flare,
 			ScriptReserved_CameraSettings, &Settings::Camera,
+			ScriptReserved_FlareSettings, &Settings::Flare,
+			ScriptReserved_GraphicsSettings, &Settings::Graphics,
 			ScriptReserved_HairSettings, &Settings::Hair,
 			ScriptReserved_HudSettings, &Settings::Hud,
 			ScriptReserved_PhysicsSettings, &Settings::Physics,
@@ -173,6 +175,21 @@ namespace TEN::Scripting
 		/// Toggle flicker effect.
 		// @tfield bool flicker Light and lensflare flickering. When turned off, flare light will be constant.
 		"flicker", &FlareSettings::Flicker);
+	}
+
+	/// Graphics
+	// @section Graphics
+	// These settings are used to enable or disable certain graphics features.
+
+	void GraphicsSettings::Register(sol::table& parent)
+	{
+		parent.create().new_usertype<GraphicsSettings>(ScriptReserved_GraphicsSettings, sol::constructors<GraphicsSettings()>(),
+			sol::call_constructor, sol::constructors<GraphicsSettings()>(),
+			sol::meta_function::new_index, NewIndexErrorMaker(GraphicsSettings, ScriptReserved_GraphicsSettings),
+
+			/// Enable skinning.
+			// @tfield bool enableSkinning If enabled, skinning will be used for animated objects with skin. Disable for classic TR workflow.
+			"enableSkinning", &GraphicsSettings::EnableSkinning);
 	}
 
 	/// Hair

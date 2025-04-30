@@ -2417,7 +2417,7 @@ namespace TEN::Renderer
 
 		_stItem.Color = item->Color;
 		_stItem.AmbientLight = item->AmbientLight;
-		_stItem.Skinned = moveableObj.Skin != nullptr;
+		_stItem.Skinned = g_GameFlow->GetSettings()->Graphics.EnableSkinning && moveableObj.Skin != nullptr;
 
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			_stItem.BoneLightModes[k] = (int)moveableObj.ObjectMeshes[k]->LightMode;

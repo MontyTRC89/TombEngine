@@ -312,7 +312,7 @@ void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 
 	_stItem.Color = item->Color;
 	_stItem.AmbientLight = item->AmbientLight;
-	_stItem.Skinned = laraObj.Skin != nullptr;
+	_stItem.Skinned = g_GameFlow->GetSettings()->Graphics.EnableSkinning && laraObj.Skin != nullptr;
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 		_stItem.BoneLightModes[k] = (int)GetMesh(nativeItem->Model.MeshIndex[k])->LightMode;
