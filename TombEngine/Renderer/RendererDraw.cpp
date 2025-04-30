@@ -2428,7 +2428,7 @@ namespace TEN::Renderer
 		if (_stItem.Skinned)
 		{
 			for (int m = 0; m < moveableObj.AnimationTransforms.size(); m++)
-				_stItem.BonesMatrices[m] = moveableObj.BindPoseTransforms[m].Invert() * item->InterpolatedAnimTransforms[m];
+				_stItem.BonesMatrices[m] = moveableObj.BindPoseTransforms[m] * item->InterpolatedAnimTransforms[m];
 			_cbItem.UpdateData(_stItem, _context.Get());
 
 			DrawMoveableMesh(item, moveableObj.Skin, room, 0, view, rendererPass);

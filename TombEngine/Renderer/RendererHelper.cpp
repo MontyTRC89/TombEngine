@@ -335,7 +335,7 @@ namespace TEN::Renderer
 	void Renderer::BuildHierarchyRecursive(RendererObject *obj, RendererBone *node, RendererBone *parentNode)
 	{
 		node->GlobalTransform = node->Transform * parentNode->GlobalTransform;
-		obj->BindPoseTransforms[node->Index] = node->GlobalTransform;
+		obj->BindPoseTransforms[node->Index] = node->GlobalTransform.Invert();
 		obj->Skeleton->GlobalTranslation = Vector3::Zero;
 		node->GlobalTranslation = node->Translation + parentNode->GlobalTranslation;
 
@@ -346,7 +346,7 @@ namespace TEN::Renderer
 	void Renderer::BuildHierarchy(RendererObject *obj)
 	{
 		obj->Skeleton->GlobalTransform = obj->Skeleton->Transform;
-		obj->BindPoseTransforms[obj->Skeleton->Index] = obj->Skeleton->GlobalTransform;
+		obj->BindPoseTransforms[obj->Skeleton->Index] = obj->Skeleton->GlobalTransform.Invert();
 		obj->Skeleton->GlobalTranslation = Vector3::Zero;
 
 		for (auto* childNode : obj->Skeleton->Children)

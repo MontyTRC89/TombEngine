@@ -323,7 +323,7 @@ void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 	if (_stItem.Skinned == 1)
 	{
 		for (int m = 0; m < laraObj.AnimationTransforms.size(); m++)
-			_stItem.BonesMatrices[m] =  laraObj.BindPoseTransforms[m].Invert() * item->InterpolatedAnimTransforms[m];
+			_stItem.BonesMatrices[m] =  laraObj.BindPoseTransforms[m] * item->InterpolatedAnimTransforms[m];
 		_cbItem.UpdateData(_stItem, _context.Get());
 
 		DrawMoveableMesh(item, laraObj.Skin, room, 0, view, rendererPass);
