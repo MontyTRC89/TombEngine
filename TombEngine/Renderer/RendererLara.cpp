@@ -312,7 +312,7 @@ void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 
 	_stItem.Color = item->Color;
 	_stItem.AmbientLight = item->AmbientLight;
-	_stItem.Skinned = (g_GameFlow->GetSettings()->Graphics.EnableSkinning && laraObj.Skin != nullptr) ? 1 : 2;
+	_stItem.Skinned = (g_GameFlow->GetSettings()->Graphics.EnableSkinning && laraSkin.Skin != nullptr) ? 1 : 2;
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 		_stItem.BoneLightModes[k] = (int)GetMesh(nativeItem->Model.MeshIndex[k])->LightMode;
@@ -326,7 +326,7 @@ void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 			_stItem.BonesMatrices[m] =  laraObj.BindPoseTransforms[m] * item->InterpolatedAnimTransforms[m];
 		_cbItem.UpdateData(_stItem, _context.Get());
 
-		DrawMoveableMesh(item, laraObj.Skin, room, 0, view, rendererPass);
+		DrawMoveableMesh(item, laraSkin.Skin, room, 0, view, rendererPass);
 	}
 
 	memcpy(_stItem.BonesMatrices, item->InterpolatedAnimTransforms, laraObj.AnimationTransforms.size() * sizeof(Matrix));
