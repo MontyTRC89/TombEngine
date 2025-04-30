@@ -312,33 +312,39 @@ void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 
 	_stItem.Color = item->Color;
 	_stItem.AmbientLight = item->AmbientLight;
-	_stItem.Skinned = true;
-	memcpy(_stItem.BonesMatrices, item->InterpolatedAnimTransforms, laraObj.AnimationTransforms.size() * sizeof(Matrix));
+	_stItem.Skinned = laraObj.Skin != nullptr;
+
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
-	{
 		_stItem.BoneLightModes[k] = (int)GetMesh(nativeItem->Model.MeshIndex[k])->LightMode;
-	}
 
 	bool acceptsShadows = laraObj.ShadowType == ShadowMode::None;
 	BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade, acceptsShadows);
-	_cbItem.UpdateData(_stItem, _context.Get());
 
-	if (laraObj.Skin != nullptr)
+	if (_stItem.Skinned)
 	{
+		for (int m = 0; m < laraObj.AnimationTransforms.size(); m++)
+			_stItem.BonesMatrices[m] =  laraObj.BindPoseTransforms[m].Invert() * item->InterpolatedAnimTransforms[m];
+		_cbItem.UpdateData(_stItem, _context.Get());
+
 		DrawMoveableMesh(item, laraObj.Skin, room, 0, view, rendererPass);
 	}
-	else
+
+	memcpy(_stItem.BonesMatrices, item->InterpolatedAnimTransforms, laraObj.AnimationTransforms.size() * sizeof(Matrix));
+	_cbItem.UpdateData(_stItem, _context.Get());
+
+	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 	{
-		for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
-		{
-			if (!nativeItem->MeshBits.Test(k))
-				continue;
+		if (!nativeItem->MeshBits.Test(k))
+			continue;
 
-			DrawMoveableMesh(item, GetMesh(nativeItem->Model.MeshIndex[k]), room, k, view, rendererPass);
-		}
+		if (_stItem.Skinned && g_Level.Meshes[nativeItem->Model.MeshIndex[k]].hidden)
+			continue;
 
-		DrawLaraJoints(item, room, view, rendererPass);
+		DrawMoveableMesh(item, GetMesh(nativeItem->Model.MeshIndex[k]), room, k, view, rendererPass);
 	}
+
+	if (!_stItem.Skinned)
+		DrawLaraJoints(item, room, view, rendererPass);
 
 	DrawLaraHolsters(item, room, view, rendererPass);
 	DrawLaraHair(item, room, view, rendererPass);

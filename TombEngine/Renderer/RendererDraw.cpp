@@ -2417,19 +2417,32 @@ namespace TEN::Renderer
 
 		_stItem.Color = item->Color;
 		_stItem.AmbientLight = item->AmbientLight;
-		_stItem.Skinned = item->ObjectID == GAME_OBJECT_ID::ID_LARA; // TODO: Implement for all skinned objects!
-		memcpy(_stItem.BonesMatrices, item->InterpolatedAnimTransforms, sizeof(Matrix) * MAX_BONES);
+		_stItem.Skinned = moveableObj.Skin != nullptr;
 
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			_stItem.BoneLightModes[k] = (int)moveableObj.ObjectMeshes[k]->LightMode;
 
 		bool acceptsShadows = moveableObj.ShadowType == ShadowMode::None;
 		BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade, acceptsShadows);
+
+		if (_stItem.Skinned)
+		{
+			for (int m = 0; m < moveableObj.AnimationTransforms.size(); m++)
+				_stItem.BonesMatrices[m] = moveableObj.BindPoseTransforms[m].Invert() * item->InterpolatedAnimTransforms[m];
+			_cbItem.UpdateData(_stItem, _context.Get());
+
+			DrawMoveableMesh(item, moveableObj.Skin, room, 0, view, rendererPass);
+		}
+
+		memcpy(_stItem.BonesMatrices, item->InterpolatedAnimTransforms, moveableObj.AnimationTransforms.size() * sizeof(Matrix));
 		_cbItem.UpdateData(_stItem, _context.Get());
 
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 		{
 			if (!nativeItem->MeshBits.Test(k))
+				continue;
+
+			if (_stItem.Skinned && g_Level.Meshes[nativeItem->Model.MeshIndex[k]].hidden)
 				continue;
 
 			DrawMoveableMesh(item, GetMesh(item->MeshIds[k]), room, k, view, rendererPass);
