@@ -136,7 +136,7 @@ namespace TEN::Entities::Traps
 		part.zVel = (speed * part.zVel) / 128;
 		part.maxYvel = 0;
 		part.gravity = 0;
-		part.flags = SP_DEF | SP_EXPDEF;
+		part.flags = SP_DEF ;
 		part.sSize = part.size = Random::GenerateFloat(DUST_SIZE_MAX / 2, DUST_SIZE_MAX);
 	}
 

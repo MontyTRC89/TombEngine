@@ -708,7 +708,7 @@ namespace TEN::Scripting::Effects
 		part.friction = convertedFriction;
 		part.maxYvel = 0;
 		part.gravity = 0;
-		part.flags = SP_DEF | SP_EXPDEF;
+		part.flags = SP_DEF;
 		part.sSize = part.size = Random::GenerateFloat(convertedMaxSize / 2, convertedMaxSize);
 	}
 
