@@ -16,6 +16,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed HK sound effects.
 * Fixed HK shots not being registered in statistics.
 * Fixed distorted knee and elbow joint vertices.
+* Fixed multi-mesh objects not shattering correctly.
 * Fixed splash effects remaining in the level after reloading from the savegame.
 * Fixed caustics not rendered correctly if texture compression was enabled.
 * Fixed exclusion blend mode not working correctly.
