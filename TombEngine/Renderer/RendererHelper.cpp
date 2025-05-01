@@ -472,6 +472,17 @@ namespace TEN::Renderer
 		}
 	}
 
+	SkinningMode Renderer::GetSkinningMode(RendererObject& obj)
+	{
+		if (g_GameFlow->GetSettings()->Graphics.Skinning && obj.Skin != nullptr)
+			return SkinningMode::Full;
+
+		if (obj.Id == GAME_OBJECT_ID::ID_LARA_SKIN)
+			return SkinningMode::Classic;
+		else
+			return SkinningMode::None;
+	}
+
 	Vector4 Renderer::GetPortalRect(Vector4 v, Vector4 vp) 
 	{
 		auto sp = (v * Vector4(0.5f, 0.5f, 0.5f, 0.5f)

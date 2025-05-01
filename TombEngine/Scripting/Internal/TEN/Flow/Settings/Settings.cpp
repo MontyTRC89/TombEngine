@@ -188,8 +188,8 @@ namespace TEN::Scripting
 			sol::meta_function::new_index, NewIndexErrorMaker(GraphicsSettings, ScriptReserved_GraphicsSettings),
 
 			/// Enable skinning.
-			// @tfield bool enableSkinning If enabled, skinning will be used for animated objects with skin. Disable for classic TR workflow.
-			"enableSkinning", &GraphicsSettings::EnableSkinning);
+			// @tfield bool skinning If enabled, skinning will be used for animated objects with skin. Disable to force classic TR workflow.
+			"skinning", &GraphicsSettings::Skinning);
 	}
 
 	/// Hair

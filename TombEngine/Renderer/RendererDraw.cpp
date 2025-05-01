@@ -196,18 +196,42 @@ namespace TEN::Renderer
 			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
 			auto& obj = GetRendererObject((GAME_OBJECT_ID)item->ObjectID);
+			auto skinMode = GetSkinningMode(obj);
+
+			BindConstantBufferVS(ConstantBufferRegister::Item, _cbItem.get());
+			BindConstantBufferPS(ConstantBufferRegister::Item, _cbItem.get());
 
 			_stItem.World = item->InterpolatedWorld;
 			_stItem.Color = item->Color;
 			_stItem.AmbientLight = item->AmbientLight;
-			_stItem.Skinned = item->ObjectID == GAME_OBJECT_ID::ID_LARA; // TODO: Implement for all skinned objects!
-			memcpy(_stItem.BonesMatrices, item->InterpolatedAnimTransforms, sizeof(Matrix) * MAX_BONES);
+			_stItem.Skinned = (int)skinMode;
+
 			for (int k = 0; k < MAX_BONES; k++)
 				_stItem.BoneLightModes[k] = (int)LightMode::Static;
 
+			if (skinMode == SkinningMode::Full)
+			{
+				for (int m = 0; m < obj.AnimationTransforms.size(); m++)
+					_stItem.BonesMatrices[m] = obj.BindPoseTransforms[m] * item->InterpolatedAnimTransforms[m];
+				_cbItem.UpdateData(_stItem, _context.Get());
+
+				for (auto& bucket : obj.Skin->Buckets)
+				{
+					if (bucket.NumVertices == 0)
+						continue;
+
+					if (bucket.BlendMode != BlendMode::Opaque && bucket.BlendMode != BlendMode::AlphaTest)
+						continue;
+
+					// Draw vertices.
+					DrawIndexedTriangles(bucket.NumIndices, bucket.StartIndex, 0);
+
+					_numShadowMapDrawCalls++;
+				}
+			}
+
+			memcpy(_stItem.BonesMatrices, item->InterpolatedAnimTransforms, sizeof(Matrix) * obj.AnimationTransforms.size());
 			_cbItem.UpdateData(_stItem, _context.Get());
-			BindConstantBufferVS(ConstantBufferRegister::Item, _cbItem.get());
-			BindConstantBufferPS(ConstantBufferRegister::Item, _cbItem.get());
 
 			for (int k = 0; k < obj.ObjectMeshes.size(); k++)
 			{
@@ -218,6 +242,9 @@ namespace TEN::Renderer
 				}
 
 				auto* mesh = GetMesh(item->MeshIds[k]);
+
+				if (skinMode == SkinningMode::Full && g_Level.Meshes[item->MeshIds[k]].hidden)
+					continue;
 
 				for (auto& bucket : mesh->Buckets)
 				{
@@ -238,8 +265,10 @@ namespace TEN::Renderer
 			{
 				auto& room = _rooms[item->RoomNumber];
 
+				if (skinMode == SkinningMode::Classic)
+					DrawLaraJoints(item, &room, renderView, RendererPass::ShadowMap);
+
 				DrawLaraHolsters(item, &room, renderView, RendererPass::ShadowMap);
-				DrawLaraJoints(item, &room, renderView, RendererPass::ShadowMap);
 				DrawLaraHair(item, &room, renderView, RendererPass::ShadowMap);
 			}
 		}
@@ -2411,13 +2440,15 @@ namespace TEN::Renderer
 		RendererRoom* room = &_rooms[item->RoomNumber];
 		RendererObject& moveableObj = *_moveableObjects[item->ObjectID];
 
+		auto skinMode = GetSkinningMode(moveableObj);
+
 		// Bind item main properties
 		_stItem.World = item->InterpolatedWorld;
 		ReflectMatrixOptionally(_stItem.World);
 
 		_stItem.Color = item->Color;
 		_stItem.AmbientLight = item->AmbientLight;
-		_stItem.Skinned = g_GameFlow->GetSettings()->Graphics.EnableSkinning && moveableObj.Skin != nullptr;
+		_stItem.Skinned = (int)skinMode;
 
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			_stItem.BoneLightModes[k] = (int)moveableObj.ObjectMeshes[k]->LightMode;
@@ -2425,7 +2456,7 @@ namespace TEN::Renderer
 		bool acceptsShadows = moveableObj.ShadowType == ShadowMode::None;
 		BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade, acceptsShadows);
 
-		if (_stItem.Skinned)
+		if (skinMode == SkinningMode::Full)
 		{
 			for (int m = 0; m < moveableObj.AnimationTransforms.size(); m++)
 				_stItem.BonesMatrices[m] = moveableObj.BindPoseTransforms[m] * item->InterpolatedAnimTransforms[m];
@@ -2442,7 +2473,7 @@ namespace TEN::Renderer
 			if (!nativeItem->MeshBits.Test(k))
 				continue;
 
-			if (_stItem.Skinned && g_Level.Meshes[nativeItem->Model.MeshIndex[k]].hidden)
+			if (skinMode == SkinningMode::Full && g_Level.Meshes[nativeItem->Model.MeshIndex[k]].hidden)
 				continue;
 
 			DrawMoveableMesh(item, GetMesh(item->MeshIds[k]), room, k, view, rendererPass);

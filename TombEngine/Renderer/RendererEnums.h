@@ -94,6 +94,13 @@ enum class BlendMode
 	FastAlphaBlend = 12
 };
 
+enum class SkinningMode
+{
+	None = 0,
+	Full = 1,
+	Classic = 2
+};;
+
 enum class CullMode
 {
 	Unknown = -1,

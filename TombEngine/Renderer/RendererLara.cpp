@@ -302,8 +302,9 @@ void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 	_context->IASetVertexBuffers(0, 1, _moveablesVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 	_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
-	RendererObject& laraObj = *_moveableObjects[ID_LARA];
-	RendererObject& laraSkin = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
+	auto& laraObj = *_moveableObjects[ID_LARA];
+	auto& laraSkin = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
+	auto skinMode = GetSkinningMode(laraSkin);
 
 	RendererRoom* room = &_rooms[LaraItem->RoomNumber];
 
@@ -312,7 +313,7 @@ void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 
 	_stItem.Color = item->Color;
 	_stItem.AmbientLight = item->AmbientLight;
-	_stItem.Skinned = (g_GameFlow->GetSettings()->Graphics.EnableSkinning && laraSkin.Skin != nullptr) ? 1 : 2;
+	_stItem.Skinned = (int)skinMode;
 
 	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
 		_stItem.BoneLightModes[k] = (int)GetMesh(nativeItem->Model.MeshIndex[k])->LightMode;
@@ -320,7 +321,7 @@ void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 	bool acceptsShadows = laraObj.ShadowType == ShadowMode::None;
 	BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade, acceptsShadows);
 
-	if (_stItem.Skinned == 1)
+	if (skinMode == SkinningMode::Full)
 	{
 		for (int m = 0; m < laraObj.AnimationTransforms.size(); m++)
 			_stItem.BonesMatrices[m] =  laraObj.BindPoseTransforms[m] * item->InterpolatedAnimTransforms[m];
@@ -337,13 +338,13 @@ void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 		if (!nativeItem->MeshBits.Test(k))
 			continue;
 
-		if (_stItem.Skinned == 1 && g_Level.Meshes[nativeItem->Model.MeshIndex[k]].hidden)
+		if (skinMode == SkinningMode::Full && g_Level.Meshes[nativeItem->Model.MeshIndex[k]].hidden)
 			continue;
 
 		DrawMoveableMesh(item, GetMesh(nativeItem->Model.MeshIndex[k]), room, k, view, rendererPass);
 	}
 
-	if (_stItem.Skinned != 1)
+	if (skinMode == SkinningMode::Classic)
 		DrawLaraJoints(item, room, view, rendererPass);
 
 	DrawLaraHolsters(item, room, view, rendererPass);
