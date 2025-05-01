@@ -118,7 +118,9 @@ namespace TEN::Entities::Traps
 				r += 125 - ((GetRandomControl() / 16) & 4);
 				g += 98 - ((GetRandomControl() / 16) & 8);
 
-				SpawnDynamicFogBulb(pos.x, pos.y, pos.z, PENDULUM_FIRE_FOG_RADIUS, PENDULUM_FIRE_FOG_DENSITY, r ,g, b);
+				auto color = Color(r / (float)CHAR_MAX, g / (float)CHAR_MAX, b / (float)CHAR_MAX);
+
+				SpawnDynamicFogBulb(pos.ToVector3(), PENDULUM_FIRE_FOG_RADIUS, PENDULUM_FIRE_FOG_DENSITY, color);
 				TriggerPendulumFlame(itemNumber, pos);
 				TriggerPendulumSpark(pos, angle, PENDULUM_FLAME_SPARK_LENGHT, 1);
 
