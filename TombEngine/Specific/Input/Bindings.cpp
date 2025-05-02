@@ -55,10 +55,11 @@ namespace TEN::Input
 		{ In::Pause, KC_P },
 		{ In::Inventory, KC_ESCAPE },
 		{ In::Save, KC_F5 },
-		{ In::Load, KC_F6 }
+		{ In::Load, KC_F6 },
+
 	};
 
-	const BindingProfile BindingManager::DEFAULT_XBOX_CONTROLLER_BINDING_PROFILE =
+	const BindingProfile BindingManager::DEFAULT_GAMEPAD_BINDING_PROFILE =
 	{
 		{ In::Forward, XK_AXIS_X_NEG },
 		{ In::Back, XK_AXIS_X_POS },
@@ -106,93 +107,93 @@ namespace TEN::Input
 		{ In::Load, KC_F6 }
 	};
 
-	BindingManager::BindingManager()
-	{
-		// Initialize default bindings.
-		_bindings =
-		{
-			{ InputDeviceID::Default, DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE },
-			{ InputDeviceID::Custom, DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE }
-		};
-
-		// Initialize conflicts.
-		for (int i = 0; i < (int)InputActionID::Count; i++)
-		{
-			auto actionID = (InputActionID)i;
-			_conflicts.insert({ actionID, false });
-		}
-	}
-
-	const BindingProfile& BindingManager::GetBindingProfile(InputDeviceID deviceID)
+	const BindingProfile& BindingManager::GetBindingProfile(BindingProfileID profileID)
 	{
 		// Find binding profile.
-		auto bindingProfileIt = _bindings.find(deviceID);
-		TENAssert(bindingProfileIt != _bindings.end(), "Attempted to get missing binding profile " + std::to_string((int)deviceID) + ".");
+		auto bindingProfileIt = _bindings.find(profileID);
+		TENAssert(bindingProfileIt != _bindings.end(), "Attempted to get missing binding profile " + std::to_string((int)profileID) + ".");
 
-		// Get and return binding profile.
-		const auto& [inputDeviceID, bindingProfile] = *bindingProfileIt;
+		// Return binding profile.
+		const auto& [keyProfileID, bindingProfile] = *bindingProfileIt;
 		return bindingProfile;
 	}
 
-	int BindingManager::GetBoundKeyID(InputDeviceID deviceID, InputActionID actionID)
+	int BindingManager::GetBoundKeyID(BindingProfileID profileID, ActionID actionID)
 	{
 		// Find binding profile.
-		auto bindingProfileIt = _bindings.find(deviceID);
+		auto bindingProfileIt = _bindings.find(profileID);
 		if (bindingProfileIt == _bindings.end())
 			return KC_UNASSIGNED;
 
 		// Get binding profile.
 		const auto& [inputDeviceID, bindingProfile] = *bindingProfileIt;
 
-		// Find key binding.
+		// Find key-action binding.
 		auto keyIt = bindingProfile.find(actionID);
 		if (keyIt == bindingProfile.end())
 			return KC_UNASSIGNED;
 
-		// Get and return key binding.
-		auto [inputActionID, keyID] = *keyIt;
+		// Return key binding.
+		auto [keyActionID, keyID] = *keyIt;
 		return keyID;
 	}
 
-	void BindingManager::SetKeyBinding(InputDeviceID deviceID, InputActionID actionID, int keyID)
+	void BindingManager::SetKeyBinding(BindingProfileID profileID, ActionID actionID, int keyID)
 	{
-		// Overwrite or add key binding.
-		_bindings[deviceID][actionID] = keyID;
+		// Overwrite or add key-action binding.
+		_bindings[profileID][actionID] = keyID;
 	}
 
-	void BindingManager::SetBindingProfile(InputDeviceID deviceID, const BindingProfile& bindingProfile)
+	void BindingManager::SetBindingProfile(BindingProfileID profileID, const BindingProfile& bindingProfile)
 	{
 		// Overwrite or create binding profile.
-		_bindings[deviceID] = bindingProfile;
+		_bindings[profileID] = bindingProfile;
 	}
 
-	void BindingManager::SetDefaultBindingProfile(InputDeviceID deviceID)
+	void BindingManager::SetDefaultBindingProfile(BindingProfileID profileID)
 	{
 		// Reset binding profile defaults.
-		switch (deviceID)
+		switch (profileID)
 		{
-		case InputDeviceID::Default:
-			_bindings[deviceID] = DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
-			break;
+			case BindingProfileID::Default:
+				_bindings[profileID] = DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
+				break;
 
-		case InputDeviceID::Custom:
-			_bindings[deviceID] = DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
-			break;
+			case BindingProfileID::Custom:
+				_bindings[profileID] = DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
+				break;
 
-		default:
-			TENLog("Failed to reset defaults for binding profile " + std::to_string((int)deviceID) + ".", LogLevel::Warning);
-			return;
+			default:
+				TENLog("Failed to reset defaults for binding profile " + std::to_string((int)profileID) + ".", LogLevel::Warning);
+				return;
 		}
 	}
 
-	void BindingManager::SetConflict(InputActionID actionID, bool value)
+	void BindingManager::SetConflict(ActionID actionID, bool value)
 	{
 		_conflicts[actionID] = value;
 	}
 
-	bool BindingManager::TestConflict(InputActionID actionID)
+	bool BindingManager::TestConflict(ActionID actionID)
 	{
 		return _conflicts.at(actionID);
+	}
+
+	void BindingManager::Initialize()
+	{
+		// Initialize default bindings.
+		_bindings =
+		{
+			{ BindingProfileID::Default, DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE },
+			{ BindingProfileID::Custom, DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE }
+		};
+
+		// Initialize conflicts.
+		for (int i = 0; i < (int)ActionID::Count; i++)
+		{
+			auto actionID = (ActionID)i;
+			_conflicts.insert({ actionID, false });
+		}
 	}
 
 	BindingManager g_Bindings;

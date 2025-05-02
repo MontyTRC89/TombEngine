@@ -272,19 +272,22 @@ bool SaveConfiguration()
 		g_Configuration.Bindings = BindingManager::DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
 
 	// Set Input binding keys.
-	for (int i = 0; i < (int)InputActionID::Count; i++)
+	for (int i = 0; i < (int)ActionID::Count; i++)
 	{
-		char buffer[9];
-		sprintf(buffer, "Action%d", i);
-
-		if (SetDWORDRegKey(inputKey, buffer, g_Configuration.Bindings.at((InputActionID)i)) != ERROR_SUCCESS)
+		if (g_Configuration.Bindings.find((ActionID)i) != g_Configuration.Bindings.end())
 		{
-			RegCloseKey(rootKey);
-			RegCloseKey(graphicsKey);
-			RegCloseKey(soundKey);
-			RegCloseKey(gameplayKey);
-			RegCloseKey(inputKey);
-			return false;
+			char buffer[9];
+			sprintf(buffer, "Action%d", i);
+
+			if (SetDWORDRegKey(inputKey, buffer, g_Configuration.Bindings.at((ActionID)i)) != ERROR_SUCCESS)
+			{
+				RegCloseKey(rootKey);
+				RegCloseKey(graphicsKey);
+				RegCloseKey(soundKey);
+				RegCloseKey(gameplayKey);
+				RegCloseKey(inputKey);
+				return false;
+			}
 		}
 	}
 
@@ -467,14 +470,14 @@ bool LoadConfiguration()
 			return false;
 		}
 
-		for (int i = 0; i < (int)InputActionID::Count; i++)
+		for (int i = 0; i < (int)ActionID::Count; i++)
 		{
 			DWORD tempKeyID = 0;
 			char buffer[9];
 			sprintf(buffer, "Action%d", i);
 
-			auto actionID = (InputActionID)i;
-			int boundKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Default, actionID);
+			auto actionID = (ActionID)i;
+			int boundKeyID = g_Bindings.GetBoundKeyID(BindingProfileID::Default, actionID);
 
 			if (GetDWORDRegKey(inputKey, buffer, &tempKeyID, boundKeyID) != ERROR_SUCCESS)
 			{
@@ -486,8 +489,8 @@ bool LoadConfiguration()
 				return false;
 			}
 
-			g_Configuration.Bindings.insert({ (InputActionID)i, tempKeyID });
-			g_Bindings.SetKeyBinding(InputDeviceID::Custom, actionID, tempKeyID);
+			g_Configuration.Bindings.insert({ (ActionID)i, tempKeyID });
+			g_Bindings.SetKeyBinding(BindingProfileID::Custom, actionID, tempKeyID);
 		}
 
 		RegCloseKey(inputKey);
@@ -495,7 +498,7 @@ bool LoadConfiguration()
 	// Input key doesn't exist; use default bindings.
 	else
 	{
-		g_Configuration.Bindings = g_Bindings.GetBindingProfile(InputDeviceID::Default);
+		g_Configuration.Bindings = g_Bindings.GetBindingProfile(BindingProfileID::Default);
 	}
 
 	RegCloseKey(rootKey);

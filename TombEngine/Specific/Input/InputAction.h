@@ -2,7 +2,7 @@
 
 namespace TEN::Input
 {
-	typedef enum class InputActionID
+	typedef enum class ActionID
 	{
 		// General actions
 
@@ -57,40 +57,69 @@ namespace TEN::Input
 		Save,
 		Load,
 
+		// Hotkey actions
+
+		Screenshot,
+		Fullscreen,
+		DebugPageLeft,
+		DebugPageRight,
+		ReloadShaders,
+
+		// Keyboard actions
+
+		A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
+		Num0, Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8, Num9, Minus, Equals,
+		Esc, Tab, Shift, Ctrl, Alt, Space, Enter, Backspace,
+		BracketLeft, BracketRight, Backslash, Semicolon, Apostrophe, Comma, Period, Slash,
+		ArrowUp, ArrowDown, ArrowLeft, ArrowRight,
+
+		// Mouse actions
+
+		ClickLeft,
+		ClickMiddle,
+		ClickRight,
+		ScrollUp,
+		ScrollDown,
+
+		// TODO: Can add gamepad actions too, however we MUST switch from OIS to SDL. It's a FAR better library
+		// which can also be used for extremely easy window init and management. -- Sezz 2025.05.03
+
 		Count
 	} In;
 
-	class InputAction
+	extern const std::vector<std::vector<ActionID>> ACTION_ID_GROUPS;
+
+	class Action
 	{
 	private:
 		// Fields
 
-		InputActionID _id			  = In::Forward;
-		float		  _value		  = 0.0f;
-		float		  _prevValue	  = 0.0f;
-		unsigned int  _timeActive	  = 0;
-		unsigned int  _prevTimeActive = 0;
-		unsigned int  _timeInactive	  = 0;
+		ActionID	 _id 			 = In::Forward;
+		float		 _value			 = 0.0f;
+		float		 _prevValue		 = 0.0f;
+		unsigned int _timeActive	 = 0;
+		unsigned int _prevTimeActive = 0;
+		unsigned int _timeInactive	 = 0;
 
 	public:
 		// Constructors
 
-		InputAction() = default;
-		InputAction(InputActionID actionID);
+		Action() = default;
+		Action(ActionID actionID);
 
 		// Getters
 
-		InputActionID GetID() const;
-		float		  GetValue() const;
-		unsigned int  GetTimeActive() const;
-		unsigned int  GetTimeInactive() const;
+		ActionID	 GetID() const;
+		float		 GetValue() const;
+		unsigned int GetTimeActive() const;
+		unsigned int GetTimeInactive() const;
 		
 		// Inquirers
 
 		bool IsClicked() const;
-		bool IsHeld(float delaySecs = 0.0f) const;
-		bool IsPulsed(float delaySecs, float initialDelaySecs = 0.0f) const;
-		bool IsReleased(float delaySecsMax = INFINITY) const;
+		bool IsHeld(float delaySec = 0.0f) const;
+		bool IsPulsed(float delaySec, float initialDelaySec = 0.0f) const;
+		bool IsReleased(float delaySecMax = INFINITY) const;
 
 		// Utilities
 

@@ -28,7 +28,7 @@ namespace TEN::Scripting::Input
 
 	static bool CheckInput(int actionID)
 	{
-		if (actionID > (int)InputActionID::Count)
+		if (actionID > (int)ActionID::Count)
 		{
 			ScriptAssertF(false, "Input action {} does not exist.", actionID);
 			return false;
@@ -45,7 +45,7 @@ namespace TEN::Scripting::Input
 		if (!CheckInput(actionID))
 			return false;
 
-		if (IsHeld((InputActionID)actionID))
+		if (IsHeld((ActionID)actionID))
 			return true;
 
 		return false;
@@ -59,7 +59,7 @@ namespace TEN::Scripting::Input
 		if (!CheckInput(actionID))
 			return false;
 
-		if (IsClicked((InputActionID)actionID))
+		if (IsClicked((ActionID)actionID))
 			return true;
 
 		return false;
@@ -73,7 +73,7 @@ namespace TEN::Scripting::Input
 		if (!CheckInput(actionID))
 			return;
 
-		ActionQueueMap[(InputActionID)actionID] = ActionQueueState::Update;
+		ActionQueueMap[(ActionID)actionID] = ActionQueueState::Update;
 	}
 
 	/// Clear an action key.
@@ -84,7 +84,7 @@ namespace TEN::Scripting::Input
 		if (!CheckInput(actionID))
 			return;
 
-		ActionQueueMap[(InputActionID)actionID] = ActionQueueState::Clear;
+		ActionQueueMap[(ActionID)actionID] = ActionQueueState::Clear;
 	}
 
 	/// Clear all action keys.

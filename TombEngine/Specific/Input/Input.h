@@ -43,10 +43,10 @@ namespace TEN::Input
 		float	   FadeSpeed = 0.0f;
 	};
 
-	extern std::unordered_map<int, float>					   KeyMap;
-	extern std::unordered_map<InputAxisID, Vector2>			   AxisMap;
-	extern std::unordered_map<InputActionID, InputAction>	   ActionMap;
-	extern std::unordered_map<InputActionID, ActionQueueState> ActionQueueMap;
+	extern std::unordered_map<int, float>				  KeyMap;
+	extern std::unordered_map<InputAxisID, Vector2>		  AxisMap;
+	extern std::unordered_map<ActionID, Action>			  ActionMap;
+	extern std::unordered_map<ActionID, ActionQueueState> ActionQueueMap;
 
 	void InitializeInput(HWND handle);
 	void DeinitializeInput();
@@ -61,15 +61,15 @@ namespace TEN::Input
 
 	Vector2 GetMouse2DPosition();
 
-	void		 ClearAction(InputActionID actionID);
+	void		 ClearAction(ActionID actionID);
 	bool		 NoAction();
-	bool		 IsClicked(InputActionID actionID);
-	bool		 IsHeld(InputActionID actionID, float delayInSec = 0.0f);
-	bool		 IsPulsed(InputActionID actionID, float delayInSec, float initialDelayInSec = 0.0f);
-	bool		 IsReleased(InputActionID actionID, float maxDelayInSec = INFINITY);
-	float		 GetActionValue(InputActionID actionID);
-	unsigned int GetActionTimeActive(InputActionID actionID);
-	unsigned int GetActionTimeInactive(InputActionID actionID);
+	bool		 IsClicked(ActionID actionID);
+	bool		 IsHeld(ActionID actionID, float delayInSec = 0.0f);
+	bool		 IsPulsed(ActionID actionID, float delayInSec, float initialDelayInSec = 0.0f);
+	bool		 IsReleased(ActionID actionID, float maxDelayInSec = INFINITY);
+	float		 GetActionValue(ActionID actionID);
+	unsigned int GetActionTimeActive(ActionID actionID);
+	unsigned int GetActionTimeInactive(ActionID actionID);
 
 	bool IsDirectionalActionHeld();
 	bool IsWakeActionHeld();
