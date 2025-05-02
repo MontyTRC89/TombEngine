@@ -704,12 +704,16 @@ namespace TEN::Scripting::Effects
 		part.yVel = convertedDir.y * 32;
 		part.zVel = convertedDir.z * 32;
 
+		part.rotAng = ANGLE(0.0f) >> 4;
+		part.rotAdd = ANGLE(0.0f) >> 4;
+
 		// Other properties
 		part.friction = convertedFriction;
 		part.maxYvel = 0;
 		part.gravity = 0;
-		part.flags = SP_DEF;
-		part.sSize = part.size = Random::GenerateFloat(convertedMaxSize / 2, convertedMaxSize);
+		part.flags = SP_SCALE | SP_ROTATE | SP_DEF | SP_EXPDEF;
+		part.scalar = 2;
+		part.sSize = part.size = part.dSize = Random::GenerateFloat(convertedMaxSize / 2, convertedMaxSize);
 	}
 
 	void Register(sol::state* state, sol::table& parent) 

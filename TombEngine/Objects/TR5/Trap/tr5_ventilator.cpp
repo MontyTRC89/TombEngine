@@ -136,8 +136,10 @@ namespace TEN::Entities::Traps
 		part.zVel = (speed * part.zVel) / 128;
 		part.maxYvel = 0;
 		part.gravity = 0;
-		part.flags = SP_DEF ;
-		part.sSize = part.size = Random::GenerateFloat(DUST_SIZE_MAX / 2, DUST_SIZE_MAX);
+		part.flags = SP_SCALE | SP_ROTATE | SP_DEF | SP_EXPDEF;
+		part.rotAng = ANGLE(0.0f) >> 4;
+		part.rotAdd = ANGLE(0.0f) >> 4;
+		part.sSize = part.size = part.dSize = Random::GenerateFloat(DUST_SIZE_MAX / 2, DUST_SIZE_MAX);
 	}
 
 	void InitializeVentilator(short itemNumber)
