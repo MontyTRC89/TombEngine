@@ -228,11 +228,11 @@ namespace TEN::Input
 	{
 		for (int i = 1; i >= 0; i--)
 		{
-			auto deviceID = (BindingProfileID)i;
+			auto profileID = (BindingProfileID)i;
 			for (int j = 0; j < (int)ActionID::Count; j++)
 			{
 				auto actionID = (ActionID)j;
-				if (g_Bindings.GetBoundKeyID(deviceID, actionID) != KC_UNASSIGNED)
+				if (g_Bindings.GetBoundKeyID(profileID, actionID) != KC_UNASSIGNED)
 					return true;
 			}
 		}
@@ -549,18 +549,22 @@ namespace TEN::Input
 
 	static float Key(ActionID actionID)
 	{
+		int keyID = KC_UNASSIGNED;
 		for (int i = (int)BindingProfileID::Count - 1; i >= 0; i--)
 		{
-			auto deviceID = (BindingProfileID)i;
-			if (deviceID == BindingProfileID::Default && g_Bindings.TestConflict(actionID))
+			auto profileID = (BindingProfileID)i;
+			if (profileID == BindingProfileID::Default && g_Bindings.TestConflict(actionID))
 				continue;
 
-			int keyID = g_Bindings.GetBoundKeyID(deviceID, actionID);
-			if (KeyMap[keyID] != 0.0f)
-				return KeyMap[keyID];
+			int newKeyID = g_Bindings.GetBoundKeyID(profileID, actionID);
+			if (KeyMap[newKeyID] != 0.0f)
+			{
+				keyID = newKeyID;
+				break;
+			}
 		}
 
-		return 0.0f;
+		return KeyMap[keyID];
 	}
 
 	void SolveActionCollisions()

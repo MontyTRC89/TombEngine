@@ -57,15 +57,7 @@ namespace TEN::Input
 		Save,
 		Load,
 
-		// Hotkey actions
-
-		Screenshot,
-		Fullscreen,
-		DebugPageLeft,
-		DebugPageRight,
-		ReloadShaders,
-
-		// Keyboard actions
+		// Raw keyboard actions
 
 		A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
 		Num0, Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8, Num9, Minus, Equals,
@@ -73,7 +65,7 @@ namespace TEN::Input
 		BracketLeft, BracketRight, Backslash, Semicolon, Apostrophe, Comma, Period, Slash,
 		ArrowUp, ArrowDown, ArrowLeft, ArrowRight,
 
-		// Mouse actions
+		// Raw mouse actions
 
 		ClickLeft,
 		ClickMiddle,
@@ -81,11 +73,22 @@ namespace TEN::Input
 		ScrollUp,
 		ScrollDown,
 
-		// TODO: Can add gamepad actions too, however we MUST switch from OIS to SDL. It's a FAR better library
-		// which can also be used for extremely easy window init and management. -- Sezz 2025.05.03
+		// TODO: Can add raw gamepad actions too, however, we MUST ditch OIS in favour of SDL for it.
+		// It's a FAR better library which can also be used for window management. -- Sezz 2025.05.03
 
 		Count
 	} In;
+
+	enum class ActionGroupID
+	{
+		General,
+		Vehicle,
+		Quick,
+		Menu,
+		RawKeyboard,
+		RawMouse,
+		//RawGamepad,
+	};
 
 	extern const std::vector<std::vector<ActionID>> ACTION_ID_GROUPS;
 

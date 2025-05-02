@@ -11,11 +11,13 @@ namespace TEN::Input
 	//	KeyboardMouseCustom
 	//	GamepadDefault
 	//	GamepadCustom
+	//	Raw
 	// And update the GUI accordingly to be capable of toggling between a keyboard/mouse bindings view and a gamepad bindings view.
 	enum class BindingProfileID
 	{
 		Default,
 		Custom,
+		Raw,
 
 		Count
 	};
@@ -34,6 +36,7 @@ namespace TEN::Input
 
 		static const BindingProfile DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
 		static const BindingProfile DEFAULT_GAMEPAD_BINDING_PROFILE;
+		static const BindingProfile RAW_EVENT_BINDING_PROFILE;
 
 		// Constructors
 
