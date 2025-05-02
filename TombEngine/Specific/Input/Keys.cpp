@@ -125,8 +125,9 @@ namespace TEN::Input
 		{ MK_AXIS_Z_NEG, "Mouse Z-" },
 		{ MK_AXIS_Z_POS, "Mouse Z+" },
 
+		// TODO: When SDL is integrated, this can be refactored to pick names depending
+		// on the type of controller connected (XBox, Nintendo, DualShock). -- Sezz 2025.03.05
 		// Gamepad keys
-		// TODO: Find a way to display XBox controller keys when using that controller type.
 		{ GK_BUTTON_1, "Gamepad 1" },
 		{ GK_BUTTON_2, "Gamepad 2" },
 		{ GK_BUTTON_3, "Gamepad 3" },

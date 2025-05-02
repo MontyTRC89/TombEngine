@@ -4,7 +4,7 @@ namespace TEN::Input
 {
 	typedef enum class ActionID
 	{
-		// General actions
+		// General
 
 		Forward,
 		Back,
@@ -21,7 +21,7 @@ namespace TEN::Input
 		Draw,
 		Look,
 
-		// Vehicle actions
+		// Vehicle
 
 		Accelerate,
 		Reverse,
@@ -30,7 +30,7 @@ namespace TEN::Input
 		Brake,
 		Fire,
 
-		// Quick actions
+		// Quick
 
 		Flare,
 		SmallMedipack,
@@ -48,7 +48,7 @@ namespace TEN::Input
 		Weapon9,
 		Weapon10,
 
-		// Menu actions
+		// Menu
 
 		Select,
 		Deselect,
@@ -57,7 +57,7 @@ namespace TEN::Input
 		Save,
 		Load,
 
-		// Raw keyboard actions
+		// Raw keyboard
 
 		A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
 		Num0, Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8, Num9, Minus, Equals,
@@ -65,7 +65,7 @@ namespace TEN::Input
 		BracketLeft, BracketRight, Backslash, Semicolon, Apostrophe, Comma, Period, Slash,
 		ArrowUp, ArrowDown, ArrowLeft, ArrowRight,
 
-		// Raw mouse actions
+		// Raw mouse
 
 		ClickLeft,
 		ClickMiddle,
