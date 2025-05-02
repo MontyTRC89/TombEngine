@@ -1,13 +1,6 @@
 #include "framework.h"
 #include "Specific/Input/Input.h"
 
-#include <OISException.h>
-#include <OISForceFeedback.h>
-#include <OISInputManager.h>
-#include <OISJoyStick.h>
-#include <OISKeyboard.h>
-#include <OISMouse.h>
-
 #include "Game/camera.h"
 #include "Game/Gui.h"
 #include "Game/items.h"
@@ -19,7 +12,6 @@
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
-using namespace OIS;
 using namespace TEN::Gui;
 using namespace TEN::Math;
 using namespace TEN::Utils;
@@ -44,24 +36,24 @@ namespace TEN::Input
 
 	// OIS interfaces
 
-	static InputManager*  OisInputManager = nullptr;
-	static Keyboard*	  OisKeyboard	  = nullptr;
-	static Mouse*		  OisMouse		  = nullptr;
-	static JoyStick*	  OisGamepad	  = nullptr;
-	static ForceFeedback* OisRumble		  = nullptr;
-	static Effect*		  OisEffect		  = nullptr;
+	static OIS::InputManager*  OisInputManager = nullptr;
+	static OIS::Keyboard*	   OisKeyboard	   = nullptr;
+	static OIS::Mouse*		   OisMouse		   = nullptr;
+	static OIS::JoyStick*	   OisGamepad	   = nullptr;
+	static OIS::ForceFeedback* OisRumble	   = nullptr;
+	static OIS::Effect*		   OisEffect	   = nullptr;
 
 	void InitializeEffect()
 	{
-		OisEffect = new Effect(Effect::ConstantForce, Effect::Constant);
-		OisEffect->direction = Effect::North;
+		OisEffect = new OIS::Effect(OIS::Effect::ConstantForce, OIS::Effect::Constant);
+		OisEffect->direction = OIS::Effect::North;
 		OisEffect->trigger_button = 0;
 		OisEffect->trigger_interval = 0;
-		OisEffect->replay_length = Effect::OIS_INFINITE;
+		OisEffect->replay_length = OIS::Effect::OIS_INFINITE;
 		OisEffect->replay_delay = 0;
 		OisEffect->setNumAxes(1);
 
-		auto& pConstForce = *dynamic_cast<ConstantEffect*>(OisEffect->getForceEffect());
+		auto& pConstForce = *dynamic_cast<OIS::ConstantEffect*>(OisEffect->getForceEffect());
 		pConstForce.level = 0;
 		pConstForce.envelope.attackLength = 0;
 		pConstForce.envelope.attackLevel = 0;
@@ -99,8 +91,8 @@ namespace TEN::Input
 
 		try
 		{
-			// Use OIS ParamList since default behaviour blocks WIN key and steals mouse.
-			auto paramList = ParamList{};
+			// Use OIS::ParamList since default behaviour blocks WIN key and steals mouse.
+			auto paramList = OIS::ParamList{};
 			auto wnd = std::ostringstream{};
 			wnd << (size_t)handle;
 			paramList.insert(std::make_pair(std::string("WINDOW"), wnd.str()));
@@ -109,25 +101,25 @@ namespace TEN::Input
 			paramList.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_FOREGROUND")));
 			paramList.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_NONEXCLUSIVE")));
 
-			OisInputManager = InputManager::createInputSystem(paramList);
-			OisInputManager->enableAddOnFactory(InputManager::AddOn_All);
+			OisInputManager = OIS::InputManager::createInputSystem(paramList);
+			OisInputManager->enableAddOnFactory(OIS::InputManager::AddOn_All);
 
-			if (OisInputManager->getNumberOfDevices(OISKeyboard) == 0)
+			if (OisInputManager->getNumberOfDevices(OIS::OISKeyboard) == 0)
 			{
 				TENLog("Keyboard not found.", LogLevel::Warning);
 			}
 			else
 			{
-				OisKeyboard = (Keyboard*)OisInputManager->createInputObject(OISKeyboard, true);
+				OisKeyboard = (OIS::Keyboard*)OisInputManager->createInputObject(OIS::OISKeyboard, true);
 			}
 
-			if (OisInputManager->getNumberOfDevices(OISMouse) == 0)
+			if (OisInputManager->getNumberOfDevices(OIS::OISMouse) == 0)
 			{
 				TENLog("Mouse not found.", LogLevel::Warning);
 			}
 			else
 			{
-				OisMouse = (Mouse*)OisInputManager->createInputObject(OISMouse, true);
+				OisMouse = (OIS::Mouse*)OisInputManager->createInputObject(OIS::OISMouse, true);
 			}
 		}
 		catch (OIS::Exception& ex)
@@ -135,18 +127,18 @@ namespace TEN::Input
 			TENLog("Exception occured during input system initialization: " + std::string(ex.eText), LogLevel::Error);
 		}
 
-		int deviceCount = OisInputManager->getNumberOfDevices(OISJoyStick);
+		int deviceCount = OisInputManager->getNumberOfDevices(OIS::OISJoyStick);
 		if (deviceCount > 0)
 		{
 			TENLog("Found " + std::to_string(deviceCount) + " connected game controller" + ((deviceCount > 1) ? "s." : "."), LogLevel::Info);
 
 			try
 			{
-				OisGamepad = (JoyStick*)OisInputManager->createInputObject(OISJoyStick, true);
+				OisGamepad = (OIS::JoyStick*)OisInputManager->createInputObject(OIS::OISJoyStick, true);
 				TENLog("Using '" + OisGamepad->vendor() + "' device for input.", LogLevel::Info);
 
 				// Try to initialize vibration interface.
-				OisRumble = (ForceFeedback*)OisGamepad->queryInterface(Interface::ForceFeedback);
+				OisRumble = (OIS::ForceFeedback*)OisGamepad->queryInterface(OIS::Interface::ForceFeedback);
 				if (OisRumble != nullptr)
 				{
 					TENLog("Controller supports vibration.", LogLevel::Info);
@@ -187,7 +179,7 @@ namespace TEN::Input
 			OisEffect = nullptr;
 		}
 
-		InputManager::destroyInputSystem(OisInputManager);
+		OIS::InputManager::destroyInputSystem(OisInputManager);
 	}
 
 	void ClearInputData()
@@ -232,7 +224,7 @@ namespace TEN::Input
 			for (int j = 0; j < (int)ActionID::Count; j++)
 			{
 				auto actionID = (ActionID)j;
-				if (g_Bindings.GetBoundKeyID(profileID, actionID) != KC_UNASSIGNED)
+				if (g_Bindings.GetBoundKeyID(profileID, actionID) != OIS::KC_UNASSIGNED)
 					return true;
 			}
 		}
@@ -245,14 +237,14 @@ namespace TEN::Input
 	{
 		switch (source)
 		{
-		case KC_LCONTROL:
-			return KC_RCONTROL;
+		case OIS::KC_LCONTROL:
+			return OIS::KC_RCONTROL;
 
-		case KC_LSHIFT:
-			return KC_RSHIFT;
+		case OIS::KC_LSHIFT:
+			return OIS::KC_RSHIFT;
 
-		case KC_LMENU:
-			return KC_RMENU;
+		case OIS::KC_LMENU:
+			return OIS::KC_RMENU;
 		}
 
 		return source;
@@ -315,7 +307,7 @@ namespace TEN::Input
 			// Poll keyboard keys.
 			for (int i = 0; i < KEYBOARD_KEY_COUNT; i++)
 			{
-				if (!OisKeyboard->isKeyDown((KeyCode)i))
+				if (!OisKeyboard->isKeyDown((OIS::KeyCode)i))
 					continue;
 
 				int key = WrapSimilarKeys(i);
@@ -348,7 +340,7 @@ namespace TEN::Input
 
 			// Poll mouse buttons.
 			for (int i = 0; i < MOUSE_BUTTON_COUNT; i++)
-				KeyMap[KEY_OFFSET_MOUSE + i] = state.buttonDown((MouseButtonID)i) ? 1.0f : 0.0f;
+				KeyMap[KEY_OFFSET_MOUSE + i] = state.buttonDown((OIS::MouseButtonID)i) ? 1.0f : 0.0f;
 
 			// Register multiple directional keypresses mapped to mouse axes.
 			int baseIndex = KEY_OFFSET_MOUSE + MOUSE_BUTTON_COUNT;
@@ -499,7 +491,7 @@ namespace TEN::Input
 			// NOTE: Controllers usually have one, but scan all just in case.
 			for (int pov = 0; pov < GAMEPAD_POV_AXIS_COUNT; pov++)
 			{
-				if (state.mPOV[pov].direction == Pov::Centered)
+				if (state.mPOV[pov].direction == OIS::Pov::Centered)
 					continue;
 
 				// Register multiple directional keypresses mapped to analog axes.
@@ -512,25 +504,25 @@ namespace TEN::Input
 					{
 					// D-Pad Up
 					case 0:
-						if ((state.mPOV[pov].direction & Pov::North) == 0)
+						if ((state.mPOV[pov].direction & OIS::Pov::North) == 0)
 							continue;
 						break;
 
 					// D-Pad Down
 					case 1:
-						if ((state.mPOV[pov].direction & Pov::South) == 0)
+						if ((state.mPOV[pov].direction & OIS::Pov::South) == 0)
 							continue;
 						break;
 
 					// D-Pad Left
 					case 2:
-						if ((state.mPOV[pov].direction & Pov::West) == 0)
+						if ((state.mPOV[pov].direction & OIS::Pov::West) == 0)
 							continue;
 						break;
 
 					// D-Pad Right
 					case 3:
-						if ((state.mPOV[pov].direction & Pov::East) == 0)
+						if ((state.mPOV[pov].direction & OIS::Pov::East) == 0)
 							continue;
 						break;
 					}
@@ -549,7 +541,7 @@ namespace TEN::Input
 
 	static float Key(ActionID actionID)
 	{
-		int keyID = KC_UNASSIGNED;
+		int keyID = OIS::KC_UNASSIGNED;
 		for (int i = (int)BindingProfileID::Count - 1; i >= 0; i--)
 		{
 			auto profileID = (BindingProfileID)i;
@@ -581,34 +573,34 @@ namespace TEN::Input
 	{
 		// Save screenshot.
 		static bool dbScreenshot = true;
-		if ((KeyMap[KC_SYSRQ] || KeyMap[KC_F12]) && dbScreenshot)
+		if ((KeyMap[OIS::KC_SYSRQ] || KeyMap[OIS::KC_F12]) && dbScreenshot)
 			g_Renderer.SaveScreenshot();
-		dbScreenshot = !(KeyMap[KC_SYSRQ] || KeyMap[KC_F12]);
+		dbScreenshot = !(KeyMap[OIS::KC_SYSRQ] || KeyMap[OIS::KC_F12]);
 
 		// Toggle fullscreen.
 		static bool dbFullscreen = true;
-		if ((KeyMap[KC_LMENU] || KeyMap[KC_RMENU]) && KeyMap[KC_RETURN] && dbFullscreen)
+		if ((KeyMap[OIS::KC_LMENU] || KeyMap[OIS::KC_RMENU]) && KeyMap[OIS::KC_RETURN] && dbFullscreen)
 		{
 			g_Configuration.EnableWindowedMode = !g_Configuration.EnableWindowedMode;
 			SaveConfiguration();
 			g_Renderer.ToggleFullScreen();
 		}
-		dbFullscreen = !((KeyMap[KC_LMENU] || KeyMap[KC_RMENU]) && KeyMap[KC_RETURN]);
+		dbFullscreen = !((KeyMap[OIS::KC_LMENU] || KeyMap[OIS::KC_RMENU]) && KeyMap[OIS::KC_RETURN]);
 
 		if (!DebugMode)
 			return;
 
 		// Switch debug page.
 		static bool dbDebugPage = true;
-		if ((KeyMap[KC_F10] || KeyMap[KC_F11]) && dbDebugPage)
-			g_Renderer.SwitchDebugPage(KeyMap[KC_F10]);
-		dbDebugPage = !(KeyMap[KC_F10] || KeyMap[KC_F11]);
+		if ((KeyMap[OIS::KC_F10] || KeyMap[OIS::KC_F11]) && dbDebugPage)
+			g_Renderer.SwitchDebugPage(KeyMap[OIS::KC_F10]);
+		dbDebugPage = !(KeyMap[OIS::KC_F10] || KeyMap[OIS::KC_F11]);
 
 		// Reload shaders.
 		static bool dbReloadShaders = true;
-		if (KeyMap[KC_F9] && dbReloadShaders)
+		if (KeyMap[OIS::KC_F9] && dbReloadShaders)
 			g_Renderer.ReloadShaders();
-		dbReloadShaders = !KeyMap[KC_F9];
+		dbReloadShaders = !KeyMap[OIS::KC_F9];
 	}
 
 	static void UpdateRumble()
@@ -630,21 +622,21 @@ namespace TEN::Input
 
 		try
 		{
-			auto& force = *dynamic_cast<ConstantEffect*>(OisEffect->getForceEffect());
+			auto& force = *dynamic_cast<OIS::ConstantEffect*>(OisEffect->getForceEffect());
 			force.level = RumbleInfo.Power * 10000;
 
 			switch (RumbleInfo.Mode)
 			{
 			case RumbleMode::Left:
-				OisEffect->direction = Effect::EDirection::West;
+				OisEffect->direction = OIS::Effect::EDirection::West;
 				break;
 
 			case RumbleMode::Right:
-				OisEffect->direction = Effect::EDirection::East;
+				OisEffect->direction = OIS::Effect::EDirection::East;
 				break;
 
 			case RumbleMode::Both:
-				OisEffect->direction = Effect::EDirection::North;
+				OisEffect->direction = OIS::Effect::EDirection::North;
 				break;
 			}
 
@@ -748,7 +740,7 @@ namespace TEN::Input
 			int defaultKeyID = g_Bindings.GetBoundKeyID(BindingProfileID::Default, actionID);
 			int userKeyID = g_Bindings.GetBoundKeyID(BindingProfileID::Custom, actionID);
 
-			if (userKeyID != KC_UNASSIGNED &&
+			if (userKeyID != OIS::KC_UNASSIGNED &&
 				userKeyID != defaultKeyID)
 			{
 				return false;

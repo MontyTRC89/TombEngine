@@ -1,8 +1,6 @@
 #pragma once
-#include "Specific/Input/InputAction.h"
 
-#include <string>
-#include <unordered_map>
+#include "Specific/Input/InputAction.h"
 
 using namespace TEN::Input;
 
