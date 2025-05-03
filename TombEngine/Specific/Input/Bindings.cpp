@@ -245,13 +245,16 @@ namespace TEN::Input
 	void BindingManager::Initialize()
 	{
 		// Initialize default bindings.
+		_bindings.reserve((int)BindingProfileID::Count);
 		_bindings =
 		{
 			{ BindingProfileID::Default, DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE },
-			{ BindingProfileID::Custom, DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE }
+			{ BindingProfileID::Custom, DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE },
+			{ BindingProfileID::Raw, RAW_EVENT_BINDING_PROFILE }
 		};
 
 		// Initialize conflicts.
+		_conflicts.reserve((int)ActionID::Count);
 		for (int i = 0; i < (int)ActionID::Count; i++)
 		{
 			auto actionID = (ActionID)i;

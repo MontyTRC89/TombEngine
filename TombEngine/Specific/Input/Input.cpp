@@ -275,20 +275,20 @@ namespace TEN::Input
 	{
 		for (int i = 0; i < (int)BindingProfileID::Count; i++)
 		{
-			auto deviceID = (BindingProfileID)i;
-			if (g_Bindings.GetBoundKeyID(deviceID, In::Forward) == keyID)
+			auto profileID = (BindingProfileID)i;
+			if (g_Bindings.GetBoundKeyID(profileID, In::Forward) == keyID)
 			{
 				AxisMap[InputAxisID::Move].y = 1.0f;
 			}
-			else if (g_Bindings.GetBoundKeyID(deviceID, In::Back) == keyID)
+			else if (g_Bindings.GetBoundKeyID(profileID, In::Back) == keyID)
 			{
 				AxisMap[InputAxisID::Move].y = -1.0f;
 			}
-			else if (g_Bindings.GetBoundKeyID(deviceID, In::Left) == keyID)
+			else if (g_Bindings.GetBoundKeyID(profileID, In::Left) == keyID)
 			{
 				AxisMap[InputAxisID::Move].x = -1.0f;
 			}
-			else if (g_Bindings.GetBoundKeyID(deviceID, In::Right) == keyID)
+			else if (g_Bindings.GetBoundKeyID(profileID, In::Right) == keyID)
 			{
 				AxisMap[InputAxisID::Move].x = 1.0f;
 			}
