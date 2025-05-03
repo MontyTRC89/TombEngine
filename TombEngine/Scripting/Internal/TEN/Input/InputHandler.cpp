@@ -26,7 +26,7 @@ namespace TEN::Scripting::Input
 		Rumble(strength, time.value_or(0.3f), RumbleMode::Both);
 	}
 
-	static bool CheckInput(int actionID)
+	static bool IsValidAction(int actionID)
 	{
 		if (actionID > (int)ActionID::Count)
 		{
@@ -42,7 +42,7 @@ namespace TEN::Scripting::Input
 	// @tparam Input.ActionID action Action ID to check.
 	static bool IsKeyHit(int actionID)
 	{
-		if (!CheckInput(actionID))
+		if (!IsValidAction(actionID))
 			return false;
 
 		return IsClicked((ActionID)actionID);
@@ -54,7 +54,7 @@ namespace TEN::Scripting::Input
 	// @tparam Input.ActionID action Action ID to check.
 	static bool IsKeyHeld(int actionID, TypeOrNil<float> delaySec)
 	{
-		if (!CheckInput(actionID))
+		if (!IsValidAction(actionID))
 			return false;
 
 		return IsHeld((ActionID)actionID, ValueOr<float>(delaySec, 0.0f));
@@ -68,7 +68,7 @@ namespace TEN::Scripting::Input
 	// @tparam float[opt=0] initialDelaySec Initial delay time in seconds on the first pulse.
 	static bool IsKeyPulsed(int actionID, float delaySec, TypeOrNil<float> initialDelaySec)
 	{
-		if (!CheckInput(actionID))
+		if (!IsValidAction(actionID))
 			return false;
 
 		return IsPulsed((ActionID)actionID, delaySec, ValueOr<float>(initialDelaySec, 0.0f));
@@ -80,7 +80,7 @@ namespace TEN::Scripting::Input
 	// @tparam Input.ActionID action Action ID to check.
 	static bool IsKeyReleased(int actionID, TypeOrNil<float> maxDelaySec)
 	{
-		if (!CheckInput(actionID))
+		if (!IsValidAction(actionID))
 			return false;
 
 		return IsReleased((ActionID)actionID, ValueOr<float>(maxDelaySec, INFINITY));
@@ -91,7 +91,7 @@ namespace TEN::Scripting::Input
 	// @tparam Input.ActionID action Action ID to push.
 	static void PushKey(int actionID)
 	{
-		if (!CheckInput(actionID))
+		if (!IsValidAction(actionID))
 			return;
 
 		ActionQueueMap[(ActionID)actionID] = ActionQueueState::Update;
@@ -102,7 +102,7 @@ namespace TEN::Scripting::Input
 	// @tparam Input.ActionID action Action ID to clear.
 	static void ClearKey(int actionID)
 	{
-		if (!CheckInput(actionID))
+		if (!IsValidAction(actionID))
 			return;
 
 		ActionQueueMap[(ActionID)actionID] = ActionQueueState::Clear;
