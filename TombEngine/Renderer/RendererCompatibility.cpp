@@ -68,11 +68,18 @@ namespace TEN::Renderer
 			_animatedTextures[i] = tex;
 		}
 
-		std::transform(g_Level.AnimatedTexturesSequences.begin(), g_Level.AnimatedTexturesSequences.end(), std::back_inserter(_animatedTextureSets), [](ANIMATED_TEXTURES_SEQUENCE& sequence) {
+		std::transform(g_Level.AnimatedTexturesSequences.begin(), g_Level.AnimatedTexturesSequences.end(), std::back_inserter(_animatedTextureSets), [](ANIMATED_TEXTURES_SEQUENCE& sequence)
+		{
 			RendererAnimatedTextureSet set{};
-			set.NumTextures = sequence.numFrames;
-			std::transform(sequence.frames.begin(), sequence.frames.end(), std::back_inserter(set.Textures), [](ANIMATED_TEXTURES_FRAME& frm) {
+
+			set.NumTextures = sequence.NumFrames;
+			set.Type = (AnimatedTextureType)sequence.Type;
+			set.Fps = sequence.Fps;
+
+			std::transform(sequence.Frames.begin(), sequence.Frames.end(), std::back_inserter(set.Textures), [](ANIMATED_TEXTURES_FRAME& frm)
+			{
 				RendererAnimatedTexture tex{};
+
 				tex.UV[0].x = frm.x1;
 				tex.UV[0].y = frm.y1;
 				tex.UV[1].x = frm.x2;
@@ -81,9 +88,21 @@ namespace TEN::Renderer
 				tex.UV[2].y = frm.y3;
 				tex.UV[3].x = frm.x4;
 				tex.UV[3].y = frm.y4;
+
+				float UMin = std::min({ tex.UV[0].x, tex.UV[1].x, tex.UV[2].x, tex.UV[3].x });
+				float VMin = std::min({ tex.UV[0].y, tex.UV[1].y, tex.UV[2].y, tex.UV[3].y });
+				float UMax = std::max({ tex.UV[0].x, tex.UV[1].x, tex.UV[2].x, tex.UV[3].x });
+				float VMax = std::max({ tex.UV[0].y, tex.UV[1].y, tex.UV[2].y, tex.UV[3].y });
+
+				for (int i = 0; i < 4; ++i)
+				{
+					tex.NormalizedUV[i].x = (tex.UV[i].x - UMin) / (UMax - UMin);
+					tex.NormalizedUV[i].y = (tex.UV[i].y - VMin) / (VMax - VMin);
+				}
+
 				return tex;
 			});
-			set.Fps = sequence.Fps;
+
 			return set;
 		});
 
@@ -273,12 +292,11 @@ namespace TEN::Renderer
 					staticInfo->RoomNumber = oldMesh->roomNumber;
 					staticInfo->Color = oldMesh->color;
 					staticInfo->AmbientLight = r->AmbientLight;
-					staticInfo->Pose = oldMesh->pos;
-					staticInfo->Scale = oldMesh->scale;
+					staticInfo->Pose = staticInfo->PrevPose = oldMesh->pos;
 					staticInfo->OriginalSphere = Statics[staticInfo->ObjectNumber].visibilityBox.ToLocalBoundingSphere();
 					staticInfo->IndexInRoom = l;
 
-					staticInfo->Update();
+					staticInfo->Update(GetInterpolationFactor());
 				}
 			}
 
@@ -345,7 +363,6 @@ namespace TEN::Renderer
 						((vertex->Position.x)* primes[0]) ^
 							((unsigned int)std::hash<float>{}(vertex->Position.y) * primes[1]) ^
 							(unsigned int)std::hash<float>{}(vertex->Position.z) * primes[2];
-						vertex->Bone = 0;
 
 						lastVertex++;
 					}
@@ -678,9 +695,10 @@ namespace TEN::Renderer
 												int y2 = _moveablesVertices[skinBucket->StartVertex + v2].Position.y + skinBone->GlobalTranslation.y;
 												int z2 = _moveablesVertices[skinBucket->StartVertex + v2].Position.z + skinBone->GlobalTranslation.z;
 
+												// Joint vertex and skin mesh vertex are aligned, connect them.
 												if (abs(x1 - x2) < 2 && abs(y1 - y2) < 2 && abs(z1 - z2) < 2)
 												{
-													jointVertex->Bone = bonesToCheck[k];
+													jointVertex->BoneIndex[0] = bonesToCheck[k];
 													jointVertex->Position = skinVertex->Position;
 													jointVertex->Normal = skinVertex->Normal;
 
@@ -695,6 +713,15 @@ namespace TEN::Renderer
 
 										if (isDone)
 											break;
+									}
+
+									// Joint vertex and skin mesh vertex are not connected, specify both bone weights for blending.
+									if (!isDone)
+									{
+										jointVertex->BoneIndex[0] = j;
+										jointVertex->BoneWeight[0] = 0.5f;
+										jointVertex->BoneIndex[1] = jointBone->Parent->Index;
+										jointVertex->BoneWeight[1] = 0.5f;
 									}
 								}
 							}
@@ -717,7 +744,7 @@ namespace TEN::Renderer
 								for (int v1 = 0; v1 < currentBucket.NumVertices; v1++)
 								{
 									auto* currentVertex = &_moveablesVertices[currentBucket.StartVertex + v1];
-									currentVertex->Bone = j + 1;
+									currentVertex->BoneIndex[0] = j + 1;
 
 									// Link mesh 0 to root mesh.
 									if (j == 0)
@@ -749,7 +776,7 @@ namespace TEN::Renderer
 												if ((parentVertex->OriginalIndex == vertices1[currentVertex->OriginalIndex] &&  isSecond) ||
 													(parentVertex->OriginalIndex == vertices0[currentVertex->OriginalIndex] && !isSecond))
 												{
-													currentVertex->Bone = 0;
+													currentVertex->BoneIndex[0] = 0;
 													currentVertex->Position = parentVertex->Position;
 													currentVertex->Normal = parentVertex->Normal;
 												}
@@ -781,7 +808,7 @@ namespace TEN::Renderer
 
 												if (abs(x1 - x2) == 0 && abs(y1 - y2) == 0 && abs(z1 - z2) == 0)
 												{
-													currentVertex->Bone = j;
+													currentVertex->BoneIndex[0] = j;
 													currentVertex->Position = parentVertex->Position;
 													currentVertex->Normal = parentVertex->Normal;
 													break;
@@ -953,7 +980,7 @@ namespace TEN::Renderer
 					vertex.Color.z = meshPtr->colors[v].z;
 					vertex.Color.w = 1.0f;
 
-					vertex.Bone = meshPtr->bones[v];
+					vertex.BoneIndex[0] = meshPtr->bones[v];
 					vertex.OriginalIndex = v;
 
 					vertex.Effects = Vector4(meshPtr->effects[v].x, meshPtr->effects[v].y, meshPtr->effects[v].z, poly->shineStrength);

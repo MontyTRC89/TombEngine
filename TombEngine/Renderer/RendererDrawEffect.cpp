@@ -556,13 +556,19 @@ namespace TEN::Renderer
 						pos += _items[particle.fxObj].InterpolatedPosition; 
 					}
 				}
+				
+				// If sprite is a video texture, bypass it if texture is inactive.
+				if (particle.SpriteID == VIDEO_SPRITE_ID && (_videoSprite.Texture == nullptr || _videoSprite.Texture->Texture == nullptr))
+					continue;
 
 				// Disallow sprites out of bounds.
 				int spriteIndex = Objects[particle.SpriteSeqID].meshIndex + particle.SpriteID;
 				spriteIndex = std::clamp(spriteIndex, 0, (int)_sprites.size());
 
+				auto* sprite = particle.SpriteID == VIDEO_SPRITE_ID ? &_videoSprite : &_sprites[spriteIndex];
+
 				AddSpriteBillboard(
-					&_sprites[spriteIndex],
+					sprite,
 					pos,
 					Color(particle.r / (float)UCHAR_MAX, particle.g / (float)UCHAR_MAX, particle.b / (float)UCHAR_MAX, 1.0f),
 					TO_RAD(particle.rotAng << 4), particle.scalar,
@@ -1023,6 +1029,12 @@ namespace TEN::Renderer
 			if (!part.Enabled)
 				continue;
 
+			auto pos  = Vector3::Lerp(part.PrevPosition, part.Position, GetInterpolationFactor());
+			auto size = Lerp(part.PrevSize, part.Size, GetInterpolationFactor());
+
+			if (!view.Camera.Frustum.SphereInFrustum(pos, size))
+				continue;
+
 			switch (part.Type)
 			{
 			case WeatherType::None:
@@ -1032,9 +1044,9 @@ namespace TEN::Renderer
 
 				AddSpriteBillboard(
 					&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
-					Vector3::Lerp(part.PrevPosition, part.Position, GetInterpolationFactor()),
+					pos,
 					Color(1.0f, 1.0f, 1.0f, part.Transparency()),
-					0.0f, 1.0f, Vector2(Lerp(part.PrevSize, part.Size, GetInterpolationFactor())),
+					0.0f, 1.0f, Vector2(size),
 					BlendMode::Additive, true, view);
 
 				break;
@@ -1046,9 +1058,9 @@ namespace TEN::Renderer
 
 				AddSpriteBillboard(
 					&_sprites[Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST],
-					Vector3::Lerp(part.PrevPosition, part.Position, GetInterpolationFactor()),
+					pos,
 					Color(1.0f, 1.0f, 1.0f, part.Transparency()),
-					0.0f, 1.0f, Vector2(Lerp(part.PrevSize, part.Size, GetInterpolationFactor())),
+					0.0f, 1.0f, Vector2(size),
 					BlendMode::Additive, true, view);
 
 				break;
@@ -1063,10 +1075,10 @@ namespace TEN::Renderer
 
 				AddSpriteBillboardConstrained(
 					&_sprites[Objects[ID_DRIP_SPRITE].meshIndex], 
-					Vector3::Lerp(part.PrevPosition, part.Position, GetInterpolationFactor()),
+					pos,
 					Color(0.8f, 1.0f, 1.0f, part.Transparency()),
 					0.0f, 1.0f,
-					Vector2(RAIN_WIDTH, Lerp(part.PrevSize, part.Size, GetInterpolationFactor())),
+					Vector2(RAIN_WIDTH, size),
 					BlendMode::Additive, -v, true, view);
 
 				break;
@@ -1082,9 +1094,23 @@ namespace TEN::Renderer
 		if (Lara.Control.Look.OpticRange > 0 && _currentMirror == nullptr)
 			return false;
 
+		if (Lara.Control.Weapon.GunType == LaraWeaponType::Flare)
+			return false;
+
 		const auto& settings = g_GameFlow->GetSettings()->Weapons[(int)Lara.Control.Weapon.GunType - 1];
 		if (!settings.MuzzleFlash)
 			return false;
+
+		// Use MP5 flash if available.
+		auto gunflash = GAME_OBJECT_ID::ID_GUN_FLASH;
+		if (Lara.Control.Weapon.GunType == LaraWeaponType::HK && Objects[GAME_OBJECT_ID::ID_GUN_FLASH2].loaded)
+			gunflash = GAME_OBJECT_ID::ID_GUN_FLASH2;
+
+		if (!_moveableObjects[gunflash].has_value())
+			return false;
+
+		const auto& flashMoveable = *_moveableObjects[gunflash];
+		const auto& flashMesh = *flashMoveable.ObjectMeshes[0];
 
 		_shaders.Bind(Shader::Statics);
 
@@ -1104,100 +1130,54 @@ namespace TEN::Renderer
 		_stStatic.LightMode = (int)LightMode::Static;
 		BindStaticLights(itemPtr->LightsToDraw);
 
-		short length = 0;
-		short zOffset = 0;
-		short rotationX = 0;
-
 		SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 		SetBlendMode(BlendMode::Additive);
 
-		if (Lara.Control.Weapon.GunType != LaraWeaponType::Flare &&
-			Lara.Control.Weapon.GunType != LaraWeaponType::Crossbow)
+		for (const auto& flashBucket : flashMesh.Buckets) 
 		{
-			switch (Lara.Control.Weapon.GunType)
+			if (flashBucket.BlendMode == BlendMode::Opaque)
+				continue;
+
+			if (flashBucket.Polygons.size() == 0)
+				continue;
+
+			BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[flashBucket.Texture]), SamplerStateRegister::AnisotropicClamp);
+
+			auto meshOffset = Objects[gunflash].Animations.front().Keyframes.front().RootOffset;
+			auto offset = settings.MuzzleOffset + Vector3(meshOffset.x, meshOffset.z, meshOffset.y); // Offsets are inverted because of bone orientation.
+
+			auto tMatrix = Matrix::CreateTranslation(offset);
+			auto rotMatrix = Matrix::CreateRotationX(TO_RAD(Lara.Control.Weapon.GunType == LaraWeaponType::Pistol ? -16830 : -14560)); // HACK
+
+			auto worldMatrix = Matrix::Identity;
+			if (Lara.LeftArm.GunFlash)
 			{
-			case LaraWeaponType::Revolver:
-				length = 192;
-				zOffset = 68;
-				rotationX = -14560;
-				break;
+				worldMatrix = itemPtr->AnimTransforms[LM_LHAND] * itemPtr->World;
+				worldMatrix = tMatrix * worldMatrix;
+				worldMatrix = rotMatrix * worldMatrix;
+				ReflectMatrixOptionally(worldMatrix);
 
-			case LaraWeaponType::Uzi:
-				length = 190;
-				zOffset = 50;
-				rotationX = -14560;
-				break;
+				_stStatic.World = worldMatrix;
+				_cbStatic.UpdateData(_stStatic, _context.Get());
 
-			case LaraWeaponType::HK:
-			case LaraWeaponType::Shotgun:
-				length = 300;
-				zOffset = 92;
-				rotationX = -14560;
-				break;
+				DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 
-			default:
-			case LaraWeaponType::Pistol:
-				length = 180;
-				zOffset = 40;
-				rotationX = -16830;
-				break;
+				_numMoveablesDrawCalls++;
 			}
 
-			// Use MP5 flash if available.
-			auto gunflash = GAME_OBJECT_ID::ID_GUN_FLASH;
-			if (Lara.Control.Weapon.GunType == LaraWeaponType::HK && Objects[GAME_OBJECT_ID::ID_GUN_FLASH2].loaded)
+			if (Lara.RightArm.GunFlash)
 			{
-				gunflash = GAME_OBJECT_ID::ID_GUN_FLASH2;
-				length += 20;
-				zOffset += 10;
-			}
+				worldMatrix = itemPtr->AnimTransforms[LM_RHAND] * itemPtr->World;
+				worldMatrix = tMatrix * worldMatrix;
+				worldMatrix = rotMatrix * worldMatrix;
+				ReflectMatrixOptionally(worldMatrix);
 
-			const auto& flashMoveable = *_moveableObjects[gunflash];
-			const auto& flashMesh = *flashMoveable.ObjectMeshes[0];
+				_stStatic.World = worldMatrix;
+				_cbStatic.UpdateData(_stStatic, _context.Get());
 
-			for (const auto& flashBucket : flashMesh.Buckets)
-			{
-				if (flashBucket.BlendMode == BlendMode::Opaque)
-					continue;
+				DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
 
-				if (flashBucket.Polygons.size() == 0)
-					continue;
-
-				BindTexture(TextureRegister::ColorMap, &std::get<0>(_moveablesTextures[flashBucket.Texture]), SamplerStateRegister::AnisotropicClamp);
-
-				auto tMatrix = Matrix::CreateTranslation(0, length, zOffset);
-				auto rotMatrix = Matrix::CreateRotationX(TO_RAD(rotationX));
-
-				auto worldMatrix = Matrix::Identity;
-				if (Lara.LeftArm.GunFlash)
-				{
-					worldMatrix = itemPtr->AnimTransforms[LM_LHAND] * itemPtr->World;
-					worldMatrix = tMatrix * worldMatrix;
-					worldMatrix = rotMatrix * worldMatrix;
-					ReflectMatrixOptionally(worldMatrix);
-
-					_stStatic.World = worldMatrix;
-					_cbStatic.UpdateData(_stStatic, _context.Get());
-
-					DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
-
-					_numMoveablesDrawCalls++;
-				}
-
-				if (Lara.RightArm.GunFlash)
-				{
-					worldMatrix = itemPtr->AnimTransforms[LM_RHAND] * itemPtr->World;
-					worldMatrix = tMatrix * worldMatrix;
-					worldMatrix = rotMatrix * worldMatrix;
-					ReflectMatrixOptionally(worldMatrix);
-
-					_stStatic.World = worldMatrix;
-					_cbStatic.UpdateData(_stStatic, _context.Get());
-
-					DrawIndexedTriangles(flashBucket.NumIndices, flashBucket.StartIndex, 0);
-
-					_numMoveablesDrawCalls++;
-				}
+				_numMoveablesDrawCalls++;
 			}
 		}
 

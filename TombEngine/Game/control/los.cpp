@@ -262,7 +262,6 @@ bool GetTargetOnLOS(GameVector* origin, GameVector* target, bool drawTarget, boo
 	if (isFiring && Lara.Control.Look.IsUsingLasersight)
 	{
 		Lara.Control.Weapon.HasFired = true;
-		Lara.Control.Weapon.Fired = true;
 		Lara.RightArm.GunFlash = Weapons[(int)Lara.Control.Weapon.GunType].FlashTime;
 
 		if (Lara.Control.Weapon.GunType == LaraWeaponType::Revolver)
