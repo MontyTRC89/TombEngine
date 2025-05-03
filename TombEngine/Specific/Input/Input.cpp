@@ -74,14 +74,14 @@ namespace TEN::Input
 		for (int i = 0; i < KEY_COUNT; i++)
 			KeyMap[i] = 0.0f;
 
-		// Initialize input axis map.
+		// Initialize axis map.
 		for (int i = 0; i < (int)InputAxisID::Count; i++)
 		{
 			auto inputAxis = (InputAxisID)i;
 			AxisMap[inputAxis] = Vector2::Zero;
 		}
 
-		// Initialize input action and input action queue maps.
+		// Initialize action and action queue maps.
 		for (int i = 0; i < (int)ActionID::Count; i++)
 		{
 			auto actionID = (ActionID)i;

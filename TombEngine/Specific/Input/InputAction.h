@@ -100,9 +100,9 @@ namespace TEN::Input
 		ActionID	 _id 			 = In::Forward;
 		float		 _value			 = 0.0f;
 		float		 _prevValue		 = 0.0f;
-		unsigned int _timeActive	 = 0;
-		unsigned int _prevTimeActive = 0;
-		unsigned int _timeInactive	 = 0;
+		unsigned int _timeActive	 = 0; // Time in game frames.
+		unsigned int _prevTimeActive = 0; // Time in game frames.
+		unsigned int _timeInactive	 = 0; // Time in game frames.
 
 	public:
 		// Constructors
