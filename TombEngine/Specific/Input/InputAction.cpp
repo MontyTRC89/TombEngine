@@ -60,7 +60,7 @@ namespace TEN::Input
 			In::Save,
 			In::Load
 		},
-		// Raw keyboard
+		// Keyboard
 		{
 			In::A, In::B, In::C, In::D, In::E, In::F, In::G, In::H, In::I, In::J, In::K, In::L, In::M, In::N, In::O, In::P, In::Q, In::R, In::S, In::T, In::U, In::V, In::W, In::X, In::Y, In::Z,
 			In::Num0, In::Num1, In::Num2, In::Num3, In::Num4, In::Num5, In::Num6, In::Num7, In::Num8, In::Num9, In::Minus, In::Equals,
@@ -68,7 +68,7 @@ namespace TEN::Input
 			In::BracketLeft, In::BracketRight, In::Backslash, In::Semicolon, In::Apostrophe, In::Comma, In::Period, In::Slash,
 			In::ArrowUp, In::ArrowDown, In::ArrowLeft, In::ArrowRight
 		},
-		// Raw mouse
+		// Mouse
 		{
 			In::ClickLeft,
 			In::ClickMiddle,

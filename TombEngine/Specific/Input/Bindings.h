@@ -4,7 +4,7 @@ namespace TEN::Input
 {
 	enum class ActionID;
 
-	using BindingProfile = std::unordered_map<ActionID, int>; // Key = input action ID, value = key ID.
+	using BindingProfile = std::unordered_map<ActionID, int>; // Key = action ID, value = key ID.
 
 	// TODO: The true ideal solution will be to have the following:
 	//	KeyboardMouseDefault
