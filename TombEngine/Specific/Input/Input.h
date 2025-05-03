@@ -54,7 +54,7 @@ namespace TEN::Input
 	void UpdateInputActions(bool allowAsyncUpdate = false, bool applyQueue = false);
 	void ApplyActionQueue();
 	void ClearAllActions();
-	void Rumble(float power, float delayInSec = 0.3f, RumbleMode mode = RumbleMode::Both);
+	void Rumble(float power, float delaySec = 0.3f, RumbleMode mode = RumbleMode::Both);
 	void StopRumble();
     void ApplyDefaultBindings();
     bool ApplyDefaultXInputBindings();
@@ -64,9 +64,9 @@ namespace TEN::Input
 	void		 ClearAction(ActionID actionID);
 	bool		 NoAction();
 	bool		 IsClicked(ActionID actionID);
-	bool		 IsHeld(ActionID actionID, float delayInSec = 0.0f);
-	bool		 IsPulsed(ActionID actionID, float delayInSec, float initialDelayInSec = 0.0f);
-	bool		 IsReleased(ActionID actionID, float maxDelayInSec = INFINITY);
+	bool		 IsHeld(ActionID actionID, float delaySec = 0.0f);
+	bool		 IsPulsed(ActionID actionID, float delaySec, float initialDelaySec = 0.0f);
+	bool		 IsReleased(ActionID actionID, float maxDelaySec = INFINITY);
 	float		 GetActionValue(ActionID actionID);
 	unsigned int GetActionTimeActive(ActionID actionID);
 	unsigned int GetActionTimeInactive(ActionID actionID);

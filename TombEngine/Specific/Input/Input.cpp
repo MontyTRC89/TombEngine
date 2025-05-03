@@ -685,7 +685,7 @@ namespace TEN::Input
 			queue = ActionQueueState::None;
 	}
 
-	void Rumble(float power, float delayInSec, RumbleMode mode)
+	void Rumble(float power, float delaySec, RumbleMode mode)
 	{
 		if (!g_Configuration.EnableRumble)
 			return;
@@ -695,7 +695,7 @@ namespace TEN::Input
 		if (power == 0.0f || RumbleInfo.Power)
 			return;
 
-		RumbleInfo.FadeSpeed = power / (delayInSec * FPS);
+		RumbleInfo.FadeSpeed = power / (delaySec * FPS);
 		RumbleInfo.Power = power + RumbleInfo.FadeSpeed;
 		RumbleInfo.LastPower = RumbleInfo.Power;
 	}
@@ -795,19 +795,19 @@ namespace TEN::Input
 		return ActionMap[actionID].IsClicked();
 	}
 
-	bool IsHeld(ActionID actionID, float delayInSec)
+	bool IsHeld(ActionID actionID, float delaySec)
 	{
-		return ActionMap[actionID].IsHeld(delayInSec);
+		return ActionMap[actionID].IsHeld(delaySec);
 	}
 
-	bool IsPulsed(ActionID actionID, float delayInSec, float initialDelayInSec)
+	bool IsPulsed(ActionID actionID, float delaySec, float initialDelaySec)
 	{
-		return ActionMap[actionID].IsPulsed(delayInSec, initialDelayInSec);
+		return ActionMap[actionID].IsPulsed(delaySec, initialDelaySec);
 	}
 
-	bool IsReleased(ActionID actionID, float maxDelayInSec)
+	bool IsReleased(ActionID actionID, float maxDelaySec)
 	{
-		return ActionMap[actionID].IsReleased(maxDelayInSec);
+		return ActionMap[actionID].IsReleased(maxDelaySec);
 	}
 
 	float GetActionValue(ActionID actionID)
