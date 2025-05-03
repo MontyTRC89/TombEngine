@@ -6,7 +6,7 @@
 
 namespace TEN::Input
 {
-	const BindingProfile BindingManager::DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE =
+	const BindingProfile DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE =
 	{
 		{ In::Forward,		  OIS::KC_UP },
 		{ In::Back,			  OIS::KC_DOWN },
@@ -54,55 +54,55 @@ namespace TEN::Input
 		{ In::Load,			  OIS::KC_F6 }
 	};
 
-	const BindingProfile BindingManager::DEFAULT_GAMEPAD_BINDING_PROFILE =
+	const BindingProfile DEFAULT_GAMEPAD_BINDING_PROFILE =
 	{
-		{ In::Forward, XK_AXIS_X_NEG },
-		{ In::Back, XK_AXIS_X_POS },
-		{ In::Left, XK_AXIS_Y_NEG },
-		{ In::Right, XK_AXIS_Y_POS },
-		{ In::StepLeft, XK_L_STICK },
-		{ In::StepRight, XK_R_STICK },
-		{ In::Action, XK_A },
-		{ In::Walk, XK_R_SHIFT },
-		{ In::Sprint, XK_AXIS_R_TRIGGER_NEG },
-		{ In::Crouch, XK_AXIS_L_TRIGGER_NEG },
-		{ In::Jump, XK_X },
-		{ In::Roll, XK_B },
-		{ In::Draw, XK_Y },
-		{ In::Look, XK_L_SHIFT },
+		{ In::Forward,		  XK_AXIS_X_NEG },
+		{ In::Back,			  XK_AXIS_X_POS },
+		{ In::Left,			  XK_AXIS_Y_NEG },
+		{ In::Right,		  XK_AXIS_Y_POS },
+		{ In::StepLeft,		  XK_L_STICK },
+		{ In::StepRight,	  XK_R_STICK },
+		{ In::Action,		  XK_A },
+		{ In::Walk,			  XK_R_SHIFT },
+		{ In::Sprint,		  XK_AXIS_R_TRIGGER_NEG },
+		{ In::Crouch,		  XK_AXIS_L_TRIGGER_NEG },
+		{ In::Jump,			  XK_X },
+		{ In::Roll,			  XK_B },
+		{ In::Draw,			  XK_Y },
+		{ In::Look,			  XK_L_SHIFT },
 
-		{ In::Accelerate, XK_A },
-		{ In::Reverse, XK_AXIS_X_POS },
-		{ In::Faster, XK_AXIS_R_TRIGGER_NEG },
-		{ In::Slower, XK_R_SHIFT },
-		{ In::Brake, XK_X },
-		{ In::Fire, XK_AXIS_L_TRIGGER_NEG },
+		{ In::Accelerate,	  XK_A },
+		{ In::Reverse,		  XK_AXIS_X_POS },
+		{ In::Faster,		  XK_AXIS_R_TRIGGER_NEG },
+		{ In::Slower,		  XK_R_SHIFT },
+		{ In::Brake,		  XK_X },
+		{ In::Fire,			  XK_AXIS_L_TRIGGER_NEG },
 
-		{ In::Flare, XK_DPAD_DOWN },
-		{ In::SmallMedipack, OIS::KC_MINUS },
-		{ In::LargeMedipack, OIS::KC_EQUALS },
+		{ In::Flare,		  XK_DPAD_DOWN },
+		{ In::SmallMedipack,  OIS::KC_MINUS },
+		{ In::LargeMedipack,  OIS::KC_EQUALS },
 		{ In::PreviousWeapon, OIS::KC_LBRACKET },
-		{ In::NextWeapon, OIS::KC_RBRACKET },
-		{ In::Weapon1, OIS::KC_1 },
-		{ In::Weapon2, OIS::KC_2 },
-		{ In::Weapon3, OIS::KC_3 },
-		{ In::Weapon4, OIS::KC_4 },
-		{ In::Weapon5, OIS::KC_5 },
-		{ In::Weapon6, OIS::KC_6 },
-		{ In::Weapon7, OIS::KC_7 },
-		{ In::Weapon8, OIS::KC_8 },
-		{ In::Weapon9, OIS::KC_9 },
-		{ In::Weapon10, OIS::KC_0 }/*,
+		{ In::NextWeapon,	  OIS::KC_RBRACKET },
+		{ In::Weapon1,		  OIS::KC_1 },
+		{ In::Weapon2,		  OIS::KC_2 },
+		{ In::Weapon3,		  OIS::KC_3 },
+		{ In::Weapon4,		  OIS::KC_4 },
+		{ In::Weapon5,		  OIS::KC_5 },
+		{ In::Weapon6,		  OIS::KC_6 },
+		{ In::Weapon7,		  OIS::KC_7 },
+		{ In::Weapon8,		  OIS::KC_8 },
+		{ In::Weapon9,		  OIS::KC_9 },
+		{ In::Weapon10,		  OIS::KC_0 },
 
-		{ In::Select, OIS::KC_RETURN },
-		{ In::Deselect, XK_SELECT },
-		{ In::Pause, XK_START },
-		{ In::Inventory, XK_SELECT },
-		{ In::Save, OIS::KC_F5 },
-		{ In::Load, OIS::KC_F6 }*/
+		{ In::Select,		  OIS::KC_RETURN },
+		{ In::Deselect,		  XK_SELECT },
+		{ In::Pause,		  XK_START },
+		{ In::Inventory,	  XK_SELECT },
+		{ In::Save,			  OIS::KC_F5 },
+		{ In::Load,			  OIS::KC_F6 }
 	};
 
-	const BindingProfile BindingManager::RAW_EVENT_BINDING_PROFILE
+	const BindingProfile RAW_EVENT_BINDING_PROFILE
 	{
 		{ In::A,			OIS::KC_A },
 		{ In::B,			OIS::KC_B },
@@ -166,8 +166,8 @@ namespace TEN::Input
 		{ In::ClickLeft, 	MK_LCLICK },
 		{ In::ClickMiddle, 	MK_MCLICK },
 		{ In::ClickRight, 	MK_RCLICK },
-		{ In::ScrollUp, 	MK_AXIS_X_NEG }, // TODO: Check.
-		{ In::ScrollDown, 	MK_AXIS_X_POS }	 // TODO: Check.
+		{ In::ScrollUp, 	MK_AXIS_X_NEG },
+		{ In::ScrollDown, 	MK_AXIS_X_POS }
 	};
 
 	const BindingProfile& BindingManager::GetBindingProfile(BindingProfileID profileID)
@@ -244,13 +244,12 @@ namespace TEN::Input
 
 	void BindingManager::Initialize()
 	{
-		// Initialize default bindings.
-		_bindings.reserve((int)BindingProfileID::Count);
+		// Initialize bindings.
 		_bindings =
 		{
 			{ BindingProfileID::Default, DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE },
-			{ BindingProfileID::Custom, DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE },
-			{ BindingProfileID::Raw, RAW_EVENT_BINDING_PROFILE }
+			{ BindingProfileID::Custom,	 DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE },
+			{ BindingProfileID::Raw,	 RAW_EVENT_BINDING_PROFILE }
 		};
 
 		// Initialize conflicts.

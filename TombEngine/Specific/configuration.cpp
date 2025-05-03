@@ -277,7 +277,7 @@ bool SaveConfiguration()
 	}
 
 	if (g_Configuration.Bindings.empty())
-		g_Configuration.Bindings = BindingManager::DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
+		g_Configuration.Bindings = DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
 
 	// Set Input binding keys.
 	for (auto actionGroupID : SAVEABLE_ACTION_GROUP_IDS)

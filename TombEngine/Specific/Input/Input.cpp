@@ -724,7 +724,7 @@ namespace TEN::Input
 
 	void ApplyDefaultBindings()
 	{
-		ApplyBindings(BindingManager::DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE);
+		ApplyBindings(DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE);
 		ApplyDefaultXInputBindings();
 	}
 
@@ -750,7 +750,7 @@ namespace TEN::Input
 		auto vendor = ToLower(OisGamepad->vendor());
 		if (vendor.find("xbox") != std::string::npos || vendor.find("xinput") != std::string::npos)
 		{
-			ApplyBindings(BindingManager::DEFAULT_GAMEPAD_BINDING_PROFILE);
+			ApplyBindings(DEFAULT_GAMEPAD_BINDING_PROFILE);
 			g_Configuration.Bindings = g_Bindings.GetBindingProfile(BindingProfileID::Custom);
 
 			// Additionally enable rumble and thumbstick camera.

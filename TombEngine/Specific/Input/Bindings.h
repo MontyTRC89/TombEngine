@@ -6,6 +6,10 @@ namespace TEN::Input
 
 	using BindingProfile = std::unordered_map<ActionID, int>; // Key = action ID, value = key ID.
 
+	extern const BindingProfile DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
+	extern const BindingProfile DEFAULT_GAMEPAD_BINDING_PROFILE;
+	extern const BindingProfile RAW_EVENT_BINDING_PROFILE;
+
 	// TODO: The true ideal solution will be to have the following:
 	//	KeyboardMouseDefault
 	//	KeyboardMouseCustom
@@ -32,12 +36,6 @@ namespace TEN::Input
 		std::unordered_map<ActionID, bool>					 _conflicts = {}; // Key = action ID, value = has conflict.
 
 	public:
-		// Constants
-
-		static const BindingProfile DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
-		static const BindingProfile DEFAULT_GAMEPAD_BINDING_PROFILE;
-		static const BindingProfile RAW_EVENT_BINDING_PROFILE;
-
 		// Constructors
 
 		BindingManager() = default;

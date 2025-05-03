@@ -57,7 +57,7 @@ namespace TEN::Input
 		Save,
 		Load,
 
-		// Raw keyboard
+		// Keyboard
 
 		A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z,
 		Num0, Num1, Num2, Num3, Num4, Num5, Num6, Num7, Num8, Num9, Minus, Equals,
@@ -65,7 +65,7 @@ namespace TEN::Input
 		BracketLeft, BracketRight, Backslash, Semicolon, Apostrophe, Comma, Period, Slash,
 		ArrowUp, ArrowDown, ArrowLeft, ArrowRight,
 
-		// Raw mouse
+		// Mouse
 
 		ClickLeft,
 		ClickMiddle,
@@ -87,7 +87,7 @@ namespace TEN::Input
 		Menu,
 		Keyboard,
 		Mouse,
-		//Gamepad,
+		//Gamepad
 	};
 
 	extern const std::vector<std::vector<ActionID>> ACTION_ID_GROUPS;
@@ -100,9 +100,9 @@ namespace TEN::Input
 		ActionID	 _id 			 = In::Forward;
 		float		 _value			 = 0.0f;
 		float		 _prevValue		 = 0.0f;
-		unsigned int _timeActive	 = 0; // Time in game frames.
-		unsigned int _prevTimeActive = 0; // Time in game frames.
-		unsigned int _timeInactive	 = 0; // Time in game frames.
+		unsigned int _timeActive	 = 0;			// Time in game frames.
+		unsigned int _prevTimeActive = 0;			// Time in game frames.
+		unsigned int _timeInactive	 = 0;			// Time in game frames.
 
 	public:
 		// Constructors
