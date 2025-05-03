@@ -542,9 +542,9 @@ namespace TEN::Scripting::Effects
 	// @function MakeExplosion 
 	// @tparam Vec3 pos World position.
 	// @tparam[opt=512] float size Size of the shockwave if enabled.
-	// @tparam[opt=false] bool shockwave If true, create a very faint shockwave which will not hurt Lara. For underwater rooms it creates a splash if pos is near the surface.
-	// @tparam[opt] Color color Main Color of the explosion. If not provided default explosion color will be used.
-	// @tparam[opt] Color color Second Color of the explosion. If not provided default explosion color will be used.
+	// @tparam[opt=false] bool shockwave If true, create a very faint shockwave which will not hurt Lara. For underwater rooms it creates a splash if pos is near the surface. Shockwave uses Main color if provided.
+	// @tparam[opt] Color maincol Main Color of the explosion and the shockwave. If not provided default explosion color will be used.
+	// @tparam[opt] Color secondCol Second Color of the explosion. If not provided default explosion color will be used.
 	static void MakeExplosion(Vec3 pos, TypeOrNil<float> size, TypeOrNil<bool> shockwave, TypeOrNil<ScriptColor> mainCol, TypeOrNil<ScriptColor> secondCol)
 	{
 		auto convertedShockwave = ValueOr<bool>(shockwave, false);
