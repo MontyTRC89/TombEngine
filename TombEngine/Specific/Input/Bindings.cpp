@@ -173,27 +173,27 @@ namespace TEN::Input
 	const BindingProfile& BindingManager::GetBindingProfile(BindingProfileID profileID)
 	{
 		// Find binding profile.
-		auto bindingProfileIt = _bindings.find(profileID);
-		TENAssert(bindingProfileIt != _bindings.end(), "Attempted to get missing binding profile " + std::to_string((int)profileID) + ".");
+		auto profileIt = _bindings.find(profileID);
+		TENAssert(profileIt != _bindings.end(), "Attempted to get missing binding profile " + std::to_string((int)profileID) + ".");
 
 		// Return binding profile.
-		const auto& [keyProfileID, bindingProfile] = *bindingProfileIt;
-		return bindingProfile;
+		const auto& [keyProfileID, profile] = *profileIt;
+		return profile;
 	}
 
 	int BindingManager::GetBoundKeyID(BindingProfileID profileID, ActionID actionID)
 	{
 		// Find binding profile.
-		auto bindingProfileIt = _bindings.find(profileID);
-		if (bindingProfileIt == _bindings.end())
+		auto profileIt = _bindings.find(profileID);
+		if (profileIt == _bindings.end())
 			return OIS::KC_UNASSIGNED;
 
 		// Get binding profile.
-		const auto& [inputDeviceID, bindingProfile] = *bindingProfileIt;
+		const auto& [inputDeviceID, profile] = *profileIt;
 
 		// Find key-action binding.
-		auto keyIt = bindingProfile.find(actionID);
-		if (keyIt == bindingProfile.end())
+		auto keyIt = profile.find(actionID);
+		if (keyIt == profile.end())
 			return OIS::KC_UNASSIGNED;
 
 		// Return key binding.
