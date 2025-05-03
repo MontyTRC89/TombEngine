@@ -4,107 +4,237 @@
 
 using namespace TEN::Input;
 
-/***
-Constants for action key IDs.
-@enum Input.ActionID
-@pragma nostrip
-*/
-
-/*** Table of Input.ActionID constants.
-To be used with @{Input.KeyIsHit}, @{Input.KeyIsHeld}, and similar functions.
-
-	FORWARD
-	BACK
-	LEFT
-	RIGHT
-	STEP_LEFT
-	STEP_RIGHT
-	WALK
-	SPRINT
-	CROUCH
-	JUMP
-	ROLL
-	ACTION
-	DRAW
-	LOOK
-
-	ACCELERATE
-	REVERSE
-	FASTER
-	SLOWER
-	BRAKE
-	FIRE
-
-	FLARE
-	SMALL_MEDIPACK
-	LARGE_MEDIPACK
-	PREVIOUS_WEAPON
-	NEXT_WEAPON
-	WEAPON_1
-	WEAPON_2
-	WEAPON_3
-	WEAPON_4
-	WEAPON_5
-	WEAPON_6
-	WEAPON_7
-	WEAPON_8
-	WEAPON_9
-	WEAPON_10
-
-	SELECT
-	DESELECT
-	PAUSE
-	INVENTORY
-	SAVE
-	LOAD
-
-@table Input.ActionID
-*/
-
-static const std::unordered_map<std::string, ActionID> ACTION_IDS
+namespace TEN::Scripting::Input
 {
-	{ "FORWARD", In::Forward },
-	{ "BACK", In::Back },
-	{ "LEFT", In::Left },
-	{ "RIGHT", In::Right },
-	{ "STEP_LEFT", In::StepLeft },
-	{ "STEP_RIGHT", In::StepRight },
-	{ "WALK", In::Walk },
-	{ "SPRINT", In::Sprint },
-	{ "CROUCH", In::Crouch },
-	{ "JUMP", In::Jump },
-	{ "ROLL", In::Roll },
-	{ "ACTION", In::Action },
-	{ "DRAW", In::Draw },
-	{ "LOOK", In::Look },
+	/// Constants for action key IDs.
+	// @enum Input.ActionID
+	// @pragma nostrip
 
-	{ "ACCELERATE", In::Accelerate },
-	{ "REVERSE", In::Reverse },
-	{ "FASTER", In::Faster },
-	{ "SLOWER", In::Slower },
-	{ "BRAKE", In::Brake },
-	{ "FIRE", In::Fire },
+	/// Table of Input.ActionID constants.
+	// To be used with @{Input.IsKeyHit}, @{Input.IsKeyHeld}, and other similar functions.
+	// 
+	// 	FORWARD
+	// 	BACK
+	// 	LEFT
+	// 	RIGHT
+	// 	STEP_LEFT
+	// 	STEP_RIGHT
+	// 	WALK
+	// 	SPRINT
+	// 	CROUCH
+	// 	JUMP
+	// 	ROLL
+	// 	ACTION
+	// 	DRAW
+	// 	LOOK
+	// 
+	// 	ACCELERATE
+	// 	REVERSE
+	// 	FASTER
+	// 	SLOWER
+	// 	BRAKE
+	// 	FIRE
+	// 
+	// 	FLARE
+	// 	SMALL_MEDIPACK
+	// 	LARGE_MEDIPACK
+	// 	PREVIOUS_WEAPON
+	// 	NEXT_WEAPON
+	// 	WEAPON_1
+	// 	WEAPON_2
+	// 	WEAPON_3
+	// 	WEAPON_4
+	// 	WEAPON_5
+	// 	WEAPON_6
+	// 	WEAPON_7
+	// 	WEAPON_8
+	// 	WEAPON_9
+	// 	WEAPON_10
+	// 
+	// 	SELECT
+	// 	DESELECT
+	// 	PAUSE
+	// 	INVENTORY
+	// 	SAVE
+	// 	LOAD
+	// 
+	//  A
+	//  B
+	//  C
+	//  D
+	//  E
+	//  F
+	//  G
+	//  H
+	//  I
+	//  J
+	//  K
+	//  L
+	//  M
+	//  N
+	//  O
+	//  P
+	//  Q
+	//  R
+	//  S
+	//  T
+	//  U
+	//  V
+	//  W
+	//  X
+	//  Y
+	//  Z
+	//  Num0
+	//  Num1
+	//  Num2
+	//  Num3
+	//  Num4
+	//  Num5
+	//  Num6
+	//  Num7
+	//  Num8
+	//  Num9
+	//  MINUS
+	//  EQUALS
+	//  ESC
+	//  TAB
+	//  SHIFT
+	//  CTRL
+	//  ALT
+	//  SPACE
+	//  ENTER
+	//  BACKSPACE
+	//  BRACKET_LEFT
+	//  BRACKET_RIGHT
+	//  BACKSLASH
+	//  SEMICOLON
+	//  APOSTROPHE
+	//  COMMA
+	//  PERIOD
+	//  SLASH
+	//  ARROW_UP
+	//  ARROW_DOWN
+	//  ARROW_LEFT
+	//  ARROW_RIGHT
+	// 
+	//  CLICK_LEFT
+	//  CLICK_MIDDLE
+	//  CLICK_RIGHT
+	//  SCROLL_UP
+	//  SCROLL_DOWN
+	// 
+	// @table Input.ActionID
 
-	{ "FLARE", In::Flare },
-	{ "SMALL_MEDIPACK", In::SmallMedipack },
-	{ "LARGE_MEDIPACK", In::LargeMedipack },
-	{ "PREVIOUS_WEAPON", In::PreviousWeapon },
-	{ "NEXT_WEAPON", In::NextWeapon },
-	{ "WEAPON_1", In::Weapon1 },
-	{ "WEAPON_2", In::Weapon2 },
-	{ "WEAPON_3", In::Weapon3 },
-	{ "WEAPON_4", In::Weapon4 },
-	{ "WEAPON_5", In::Weapon5 },
-	{ "WEAPON_6", In::Weapon6 },
-	{ "WEAPON_7", In::Weapon7 },
-	{ "WEAPON_8", In::Weapon8 },
-	{ "WEAPON_9", In::Weapon9 },
-	{ "WEAPON_10", In::Weapon10 },
+	static const std::unordered_map<std::string, ActionID> ACTION_IDS
+	{
+		{ "FORWARD", In::Forward },
+		{ "BACK", In::Back },
+		{ "LEFT", In::Left },
+		{ "RIGHT", In::Right },
+		{ "STEP_LEFT", In::StepLeft },
+		{ "STEP_RIGHT", In::StepRight },
+		{ "WALK", In::Walk },
+		{ "SPRINT", In::Sprint },
+		{ "CROUCH", In::Crouch },
+		{ "JUMP", In::Jump },
+		{ "ROLL", In::Roll },
+		{ "ACTION", In::Action },
+		{ "DRAW", In::Draw },
+		{ "LOOK", In::Look },
 
-	{ "SELECT", In::Select },
-	{ "DESELECT", In::Deselect },
-	{ "PAUSE", In::Pause },
-	{ "INVENTORY", In::Inventory },
-	{ "SAVE", In::Save },
-	{ "LOAD", In::Load }
-};
+		{ "ACCELERATE", In::Accelerate },
+		{ "REVERSE", In::Reverse },
+		{ "FASTER", In::Faster },
+		{ "SLOWER", In::Slower },
+		{ "BRAKE", In::Brake },
+		{ "FIRE", In::Fire },
+
+		{ "FLARE", In::Flare },
+		{ "SMALL_MEDIPACK", In::SmallMedipack },
+		{ "LARGE_MEDIPACK", In::LargeMedipack },
+		{ "PREVIOUS_WEAPON", In::PreviousWeapon },
+		{ "NEXT_WEAPON", In::NextWeapon },
+		{ "WEAPON_1", In::Weapon1 },
+		{ "WEAPON_2", In::Weapon2 },
+		{ "WEAPON_3", In::Weapon3 },
+		{ "WEAPON_4", In::Weapon4 },
+		{ "WEAPON_5", In::Weapon5 },
+		{ "WEAPON_6", In::Weapon6 },
+		{ "WEAPON_7", In::Weapon7 },
+		{ "WEAPON_8", In::Weapon8 },
+		{ "WEAPON_9", In::Weapon9 },
+		{ "WEAPON_10", In::Weapon10 },
+
+		{ "SELECT", In::Select },
+		{ "DESELECT", In::Deselect },
+		{ "PAUSE", In::Pause },
+		{ "INVENTORY", In::Inventory },
+		{ "SAVE", In::Save },
+		{ "LOAD", In::Load },
+
+		{ "A", In::A},
+		{ "B", In::B },
+		{ "C", In::C },
+		{ "D", In::D },
+		{ "E", In::E },
+		{ "F", In::F },
+		{ "G", In::G },
+		{ "H", In::H },
+		{ "I", In::I },
+		{ "J", In::J },
+		{ "K", In::K },
+		{ "L", In::L },
+		{ "M", In::M },
+		{ "N", In::N },
+		{ "O", In::O },
+		{ "P", In::P },
+		{ "Q", In::Q },
+		{ "R", In::R },
+		{ "S", In::S },
+		{ "T", In::T },
+		{ "U", In::U },
+		{ "V", In::V },
+		{ "W", In::W },
+		{ "X", In::X },
+		{ "Y", In::Y },
+		{ "Z", In::Z },
+		{ "Num0", In::Num0 },
+		{ "Num1", In::Num1 },
+		{ "Num2", In::Num2 },
+		{ "Num3", In::Num3 },
+		{ "Num4", In::Num4 },
+		{ "Num5", In::Num5 },
+		{ "Num6", In::Num6 },
+		{ "Num7", In::Num7 },
+		{ "Num8", In::Num8 },
+		{ "Num9", In::Num9 },
+		{ "MINUS", In::Minus },
+		{ "EQUALS", In::Equals },
+		{ "ESC", In::Esc },
+		{ "TAB", In::Tab },
+		{ "SHIFT", In::Shift },
+		{ "CTRL", In::Ctrl },
+		{ "ALT", In::Alt },
+		{ "SPACE", In::Space },
+		{ "ENTER", In::Enter },
+		{ "BACKSPACE", In::Backspace },
+		{ "BRACKET_LEFT", In::BracketLeft },
+		{ "BRACKET_RIGHT", In::BracketRight },
+		{ "BACKSLASH", In::Backslash },
+		{ "SEMICOLON", In::Semicolon },
+		{ "APOSTROPHE", In::Apostrophe },
+		{ "COMMA", In::Comma },
+		{ "PERIOD", In::Period },
+		{ "SLASH", In::Slash },
+		{ "ARROW_UP", In::ArrowUp },
+		{ "ARROW_DOWN", In::ArrowDown },
+		{ "ARROW_LEFT", In::ArrowLeft },
+		{ "ARROW_RIGHT", In::ArrowRight },
+
+		{ "CLICK_LEFT", In::ClickLeft },
+		{ "CLICK_MIDDLE", In::ClickMiddle },
+		{ "CLICK_RIGHT", In::ClickRight },
+		{ "SCROLL_UP", In::ScrollUp },
+		{ "SCROLL_DOWN", In::ScrollDown }
+	};
+}

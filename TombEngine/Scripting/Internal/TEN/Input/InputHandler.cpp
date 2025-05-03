@@ -37,38 +37,43 @@ namespace TEN::Scripting::Input
 		return true;
 	}
 
-	/// Check if an action key is being held.
-	// @function KeyIsHeld
+	/// Check if an action key is being hit.
+	// @function IsKeyHit
 	// @tparam Input.ActionID action Action ID to check.
-	static bool KeyIsHeld(int actionID)
+	static bool IsKeyHit(int actionID)
 	{
 		if (!CheckInput(actionID))
 			return false;
 
-		if (IsHeld((ActionID)actionID))
-			return true;
-
-		return false;
+		return IsClicked((ActionID)actionID);
 	}
 
-	/// Check if an action key is being hit or clicked.
-	// @function KeyIsHit
+	/// Check if an action key is being held.
+	// @function IsKeyHeld
 	// @tparam Input.ActionID action Action ID to check.
-	static bool KeyIsHit(int actionID)
+	static bool IsKeyHeld(int actionID)
 	{
 		if (!CheckInput(actionID))
 			return false;
 
-		if (IsClicked((ActionID)actionID))
-			return true;
+		return IsHeld((ActionID)actionID);
+	}
 
-		return false;
+	/// Check if an action key is being released.
+	// @function IsKeyReleased
+	// @tparam Input.ActionID action Action ID to check.
+	static bool IsKeyReleased(int actionID)
+	{
+		if (!CheckInput(actionID))
+			return false;
+
+		return IsReleased((ActionID)actionID);
 	}
 
 	/// Simulate an action key push.
 	// @function KeyPush
 	// @tparam Input.ActionID action Action ID to push.
-	static void KeyPush(int actionID)
+	static void PushKey(int actionID)
 	{
 		if (!CheckInput(actionID))
 			return;
@@ -79,7 +84,7 @@ namespace TEN::Scripting::Input
 	/// Clear an action key.
 	// @function KeyClear
 	// @tparam Input.ActionID action Action ID to clear.
-	static void KeyClear(int actionID)
+	static void ClearKey(int actionID)
 	{
 		if (!CheckInput(actionID))
 			return;
@@ -89,9 +94,9 @@ namespace TEN::Scripting::Input
 
 	/// Clear all action keys.
 	// @function KeyClearAll
-	static void KeyClearAll()
+	static void ClearAllKeys()
 	{
-		for (auto& [actionID, queue] : ActionQueueMap)
+		for (auto& [keyActionID, queue] : ActionQueueMap)
 			queue = ActionQueueState::Clear;
 	}
 
@@ -114,14 +119,21 @@ namespace TEN::Scripting::Input
 
 		parent.set(ScriptReserved_Input, table);
 		table.set_function(ScriptReserved_Vibrate, &Vibrate);
-		table.set_function(ScriptReserved_KeyIsHeld, &KeyIsHeld);
-		table.set_function(ScriptReserved_KeyIsHit, &KeyIsHit);
-		table.set_function(ScriptReserved_KeyPush, &KeyPush);
-		table.set_function(ScriptReserved_KeyClear, &KeyClear);
-		table.set_function(ScriptReserved_KeyClearAll, &KeyClearAll);
-
+		table.set_function(ScriptReserved_IsKeyHit, &IsKeyHit);
+		table.set_function(ScriptReserved_IsKeyHeld, &IsKeyHeld);
+		table.set_function(ScriptReserved_IsKeyReleased, &IsKeyReleased);
+		table.set_function(ScriptReserved_PushKey, &PushKey);
+		table.set_function(ScriptReserved_ClearKey, &ClearKey);
+		table.set_function(ScriptReserved_ClearAllKeys, &ClearAllKeys);
 		table.set_function(ScriptReserved_GetMouseDisplayPosition, &GetMouseDisplayPosition);
-		table.set_function(ScriptReserved_GetCursorDisplayPosition, &GetMouseDisplayPosition);
+
+		// COMPATIBILITY
+		table.set_function("KeyIsHit", &IsKeyHit);
+		table.set_function("KeyIsHeld", &IsKeyHeld);
+		table.set_function("KeyPush", &PushKey);
+		table.set_function("KeyClear", &ClearKey);
+		table.set_function("KeyClearAll", &ClearAllKeys);
+		table.set_function("GetCursorDisplayPosition", &GetMouseDisplayPosition);
 
 		auto handler = LuaHandler(state);
 		handler.MakeReadOnlyTable(table, ScriptReserved_ActionID, ACTION_IDS);
