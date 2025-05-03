@@ -6,6 +6,8 @@
 
 namespace TEN::Input
 {
+	BindingManager g_Bindings;
+
 	const BindingProfile DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE =
 	{
 		{ In::Forward,		  OIS::KC_UP },
@@ -260,6 +262,4 @@ namespace TEN::Input
 			_conflicts.insert({ actionID, false });
 		}
 	}
-
-	BindingManager g_Bindings;
 }
