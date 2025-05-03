@@ -70,6 +70,20 @@ namespace TEN::Scripting::Input
 		return IsReleased((ActionID)actionID);
 	}
 
+	/// Check if an action key is being pulsed.
+	// Note that to avoid a stutter on the second pulse, `initialDelaySec` must be a multiple of `delaySec`.
+	// @function IsKeyPulsed
+	// @tparam Input.ActionID action Action ID to check.
+	// @tparam float delaySec Delay time between pulses seconds.
+	// @tparam float[opt=0] initialDelaySec Initial delay time on the first pulse in seconds.
+	static bool IsKeyPulsed(int actionID, float delaySec, TypeOrNil<float> initialDelaySec)
+	{
+		if (!CheckInput(actionID))
+			return false;
+
+		return IsPulsed((ActionID)actionID, delaySec, ValueOr<float>(initialDelaySec, 0.0f));
+	}
+
 	/// Simulate an action key push.
 	// @function KeyPush
 	// @tparam Input.ActionID action Action ID to push.
@@ -122,6 +136,7 @@ namespace TEN::Scripting::Input
 		table.set_function(ScriptReserved_IsKeyHit, &IsKeyHit);
 		table.set_function(ScriptReserved_IsKeyHeld, &IsKeyHeld);
 		table.set_function(ScriptReserved_IsKeyReleased, &IsKeyReleased);
+		table.set_function(ScriptReserved_IsKeyPulsed, &IsKeyPulsed);
 		table.set_function(ScriptReserved_PushKey, &PushKey);
 		table.set_function(ScriptReserved_ClearKey, &ClearKey);
 		table.set_function(ScriptReserved_ClearAllKeys, &ClearAllKeys);

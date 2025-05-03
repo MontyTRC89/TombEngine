@@ -349,6 +349,7 @@ static constexpr char ScriptReserved_ClearAllKeys[]					= "ClearAllKeys";
 static constexpr char ScriptReserved_ClearKey[]						= "ClearKey";
 static constexpr char ScriptReserved_IsKeyHeld[]					= "IsKeyHeld";
 static constexpr char ScriptReserved_IsKeyHit[]						= "IsKeyHit";
+static constexpr char ScriptReserved_IsKeyPulsed[]					= "IsKeyPulsed";
 static constexpr char ScriptReserved_IsKeyReleased[]				= "IsKeyReleased";
 static constexpr char ScriptReserved_PushKey[]						= "PushKey";
 
