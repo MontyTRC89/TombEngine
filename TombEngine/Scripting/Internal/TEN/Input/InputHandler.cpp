@@ -39,7 +39,7 @@ namespace TEN::Scripting::Input
 
 	/// Check if an action key is being hit.
 	// @function IsKeyHit
-	// @tparam Input.ActionID action Action ID to check.
+	// @tparam Input.ActionID actionID Action ID to check.
 	static bool IsKeyHit(int actionID)
 	{
 		if (!IsValidAction(actionID))
@@ -51,7 +51,7 @@ namespace TEN::Scripting::Input
 	/// Check if an action key is being held.
 	// @function IsKeyHeld
 	// @tparam float[opt=0] delaySec Delay time in seconds before a hold can be registered.
-	// @tparam Input.ActionID action Action ID to check.
+	// @tparam Input.ActionID actionID Action ID to check.
 	static bool IsKeyHeld(int actionID, TypeOrNil<float> delaySec)
 	{
 		if (!IsValidAction(actionID))
@@ -63,7 +63,7 @@ namespace TEN::Scripting::Input
 	/// Check if an action key is being pulsed.
 	// Note that to avoid a stutter on the second pulse, `initialDelaySec` must be a multiple of `delaySec`.
 	// @function IsKeyPulsed
-	// @tparam Input.ActionID action Action ID to check.
+	// @tparam Input.ActionID actionID Action ID to check.
 	// @tparam float delaySec Delay time in seconds between pulses.
 	// @tparam float[opt=0] initialDelaySec Initial delay time in seconds on the first pulse.
 	static bool IsKeyPulsed(int actionID, float delaySec, TypeOrNil<float> initialDelaySec)
@@ -77,7 +77,7 @@ namespace TEN::Scripting::Input
 	/// Check if an action key is being released.
 	// @function IsKeyReleased
 	// @tparam float[opt=infinity] maxDelaySec Max delay time in seconds between hit and release within which a release can be registered.
-	// @tparam Input.ActionID action Action ID to check.
+	// @tparam Input.ActionID actionID Action ID to check.
 	static bool IsKeyReleased(int actionID, TypeOrNil<float> maxDelaySec)
 	{
 		if (!IsValidAction(actionID))
@@ -88,7 +88,7 @@ namespace TEN::Scripting::Input
 
 	/// Simulate an action key push.
 	// @function KeyPush
-	// @tparam Input.ActionID action Action ID to push.
+	// @tparam Input.ActionID actionID Action ID to push.
 	static void PushKey(int actionID)
 	{
 		if (!IsValidAction(actionID))
@@ -99,7 +99,7 @@ namespace TEN::Scripting::Input
 
 	/// Clear an action key.
 	// @function KeyClear
-	// @tparam Input.ActionID action Action ID to clear.
+	// @tparam Input.ActionID actionID Action ID to clear.
 	static void ClearKey(int actionID)
 	{
 		if (!IsValidAction(actionID))
