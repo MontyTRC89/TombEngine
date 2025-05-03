@@ -507,20 +507,10 @@ namespace TEN::Renderer
 			int objNum = MoveablesIds[i];
 			ObjectInfo* obj = &Objects[objNum];
 
-			for (int j = 0; j < obj->nmeshes; j++)
+			int meshCount = (obj->skinIndex == NO_VALUE) ? obj->nmeshes : obj->nmeshes + 1;
+			for (int j = 0; j < meshCount; j++)
 			{
 				MESH* mesh = &g_Level.Meshes[obj->meshIndex + j];
-
-				for (auto& bucket : mesh->buckets)
-				{
-					totalVertices += bucket.numQuads * 4 + bucket.numTriangles * 3;
-					totalIndices += bucket.numQuads * 6 + bucket.numTriangles * 3;
-				}
-			}
-
-			if (obj->skinIndex != NO_VALUE)
-			{
-				MESH* mesh = &g_Level.Meshes[obj->skinIndex];
 
 				for (auto& bucket : mesh->buckets)
 				{
@@ -564,10 +554,7 @@ namespace TEN::Renderer
 
 				if (obj->skinIndex != NO_VALUE)
 				{
-					RendererMesh* mesh = GetRendererMeshFromTrMesh(&moveable,
-						&g_Level.Meshes[obj->skinIndex],
-						0, false, false, &lastVertex, &lastIndex);
-
+					RendererMesh* mesh = GetRendererMeshFromTrMesh(&moveable, &g_Level.Meshes[obj->skinIndex], 0, false, false, &lastVertex, &lastIndex);
 					moveable.Skin = mesh;
 					_meshes.push_back(mesh);
 				}
