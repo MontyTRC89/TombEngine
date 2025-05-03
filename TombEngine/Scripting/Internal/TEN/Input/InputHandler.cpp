@@ -50,38 +50,40 @@ namespace TEN::Scripting::Input
 
 	/// Check if an action key is being held.
 	// @function IsKeyHeld
+	// @tparam float[opt=0] delaySec Delay time in seconds before a hold can be registered.
 	// @tparam Input.ActionID action Action ID to check.
-	static bool IsKeyHeld(int actionID)
+	static bool IsKeyHeld(int actionID, TypeOrNil<float> delaySec)
 	{
 		if (!CheckInput(actionID))
 			return false;
 
-		return IsHeld((ActionID)actionID);
-	}
-
-	/// Check if an action key is being released.
-	// @function IsKeyReleased
-	// @tparam Input.ActionID action Action ID to check.
-	static bool IsKeyReleased(int actionID)
-	{
-		if (!CheckInput(actionID))
-			return false;
-
-		return IsReleased((ActionID)actionID);
+		return IsHeld((ActionID)actionID, ValueOr<float>(delaySec, 0.0f));
 	}
 
 	/// Check if an action key is being pulsed.
 	// Note that to avoid a stutter on the second pulse, `initialDelaySec` must be a multiple of `delaySec`.
 	// @function IsKeyPulsed
 	// @tparam Input.ActionID action Action ID to check.
-	// @tparam float delaySec Delay time between pulses seconds.
-	// @tparam float[opt=0] initialDelaySec Initial delay time on the first pulse in seconds.
+	// @tparam float delaySec Delay time in seconds between pulses.
+	// @tparam float[opt=0] initialDelaySec Initial delay time in seconds on the first pulse.
 	static bool IsKeyPulsed(int actionID, float delaySec, TypeOrNil<float> initialDelaySec)
 	{
 		if (!CheckInput(actionID))
 			return false;
 
 		return IsPulsed((ActionID)actionID, delaySec, ValueOr<float>(initialDelaySec, 0.0f));
+	}
+
+	/// Check if an action key is being released.
+	// @function IsKeyReleased
+	// @tparam float[opt=infinity] maxDelaySec Max delay time in seconds between hit and release within which a release can be registered.
+	// @tparam Input.ActionID action Action ID to check.
+	static bool IsKeyReleased(int actionID, TypeOrNil<float> maxDelaySec)
+	{
+		if (!CheckInput(actionID))
+			return false;
+
+		return IsReleased((ActionID)actionID, ValueOr<float>(maxDelaySec, INFINITY));
 	}
 
 	/// Simulate an action key push.
@@ -135,8 +137,8 @@ namespace TEN::Scripting::Input
 		table.set_function(ScriptReserved_Vibrate, &Vibrate);
 		table.set_function(ScriptReserved_IsKeyHit, &IsKeyHit);
 		table.set_function(ScriptReserved_IsKeyHeld, &IsKeyHeld);
-		table.set_function(ScriptReserved_IsKeyReleased, &IsKeyReleased);
 		table.set_function(ScriptReserved_IsKeyPulsed, &IsKeyPulsed);
+		table.set_function(ScriptReserved_IsKeyReleased, &IsKeyReleased);
 		table.set_function(ScriptReserved_PushKey, &PushKey);
 		table.set_function(ScriptReserved_ClearKey, &ClearKey);
 		table.set_function(ScriptReserved_ClearAllKeys, &ClearAllKeys);
