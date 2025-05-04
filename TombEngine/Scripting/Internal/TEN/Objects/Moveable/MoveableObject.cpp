@@ -1022,13 +1022,13 @@ bool Moveable::GetMeshSwapped(int meshId) const
 // @tparam int index Index of a mesh.
 // @tparam int objectID ID of a slot to get meshswap from.
 // @tparam[opt] int swapIndex Index of a mesh from meshswap slot to use.
-void Moveable::SwapMesh(int meshId, int objectID, sol::optional<int> swapMeshIndex)
+void Moveable::SwapMesh(int meshId, int objectID, sol::optional<int> swapIndex)
 {
 	if (!MeshExists(meshId))
 		return;
 
-	if (!swapMeshIndex.has_value())
-		 swapMeshIndex = meshId;
+	if (!swapIndex.has_value())
+		swapIndex = meshId;
 
 	if (objectID <= NO_VALUE || objectID >= ID_NUMBER_OBJECTS || !Objects[objectID].loaded)
 	{
@@ -1036,13 +1036,19 @@ void Moveable::SwapMesh(int meshId, int objectID, sol::optional<int> swapMeshInd
 		return;
 	}
 
-	if (swapMeshIndex.value() >= Objects[objectID].nmeshes)
+	if (meshId >= Objects[_moveable->ObjectNumber].nmeshes || meshId < 0)
 	{
-		TENLog("Specified meshswap index does not exist in meshswap slot!", LogLevel::Error);
+		TENLog("Specified mesh index does not exist in a " + GetObjectName(_moveable->ObjectNumber) + " slot !", LogLevel::Error);
 		return;
 	}
 
-	_moveable->Model.MeshIndex[meshId] = Objects[objectID].meshIndex + swapMeshIndex.value();
+	if (swapIndex.value() >= Objects[objectID].nmeshes || swapIndex.value() < 0)
+	{
+		TENLog("Specified mesh index does not exist in a " + GetObjectName((GAME_OBJECT_ID)objectID) + " slot!", LogLevel::Error);
+		return;
+	}
+
+	_moveable->Model.MeshIndex[meshId] = Objects[objectID].meshIndex + swapIndex.value();
 }
 
 /// Unset specified mesh swap of a moveable. Use this to bring back original unswapped mesh.
@@ -1059,7 +1065,9 @@ void Moveable::UnswapMesh(int meshId)
 /// Swap skinned mesh of a moveable. Use this to replace one skinned mesh with another.
 // @function Moveable:SwapSkin
 // @tparam int objectID ID of a slot to get skinned meshswap from.
-void Moveable::SwapSkin(int objectID)
+// @tparam[opt] int swapIndex If set, swaps skinned mesh with bone mesh with a specified index.
+// Use if you have several skinned meshes (e.g. outfits) in a single slot.
+void Moveable::SwapSkin(int objectID, sol::optional<int> swapIndex)
 {
 	if (objectID <= NO_VALUE || objectID >= ID_NUMBER_OBJECTS || !Objects[objectID].loaded)
 	{
@@ -1067,8 +1075,20 @@ void Moveable::SwapSkin(int objectID)
 		return;
 	}
 
+	if (swapIndex.has_value())
+	{
+		if (swapIndex.value() >= Objects[objectID].nmeshes || swapIndex.value() < 0)
+		{
+			TENLog("Specified mesh index does not exist in a " + GetObjectName((GAME_OBJECT_ID)objectID) + " slot!", LogLevel::Error);
+			return;
+		}
+
+		_moveable->Model.SkinIndex = Objects[objectID].meshIndex + swapIndex.value();
+		return;
+	}
+
 	if (Objects[objectID].skinIndex == NO_VALUE)
-		TENLog("Given object ID has no skinned mesh specified. Skinned mesh will be unset.", LogLevel::Warning);
+		TENLog(GetObjectName((GAME_OBJECT_ID)objectID) + " object has no skinned mesh specified. Skinned mesh will be unset.", LogLevel::Warning);
 
 	_moveable->Model.SkinIndex = Objects[objectID].skinIndex;
 }
