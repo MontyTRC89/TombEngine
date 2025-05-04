@@ -1077,7 +1077,8 @@ void Moveable::SwapSkin(int objectID)
 // @function Moveable:UnswapSkin
 void Moveable::UnswapSkin()
 {
-	_moveable->Model.SkinIndex = Objects[_moveable->ObjectNumber].skinIndex;
+	int realID = _moveable->ObjectNumber == GAME_OBJECT_ID::ID_LARA ? GAME_OBJECT_ID::ID_LARA_SKIN : _moveable->ObjectNumber;
+	_moveable->Model.SkinIndex = Objects[realID].skinIndex;
 }
 
 /// Enable the item, as if a trigger for it had been stepped on.
