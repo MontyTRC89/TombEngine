@@ -3,9 +3,10 @@
 The dates are in European standard format where date is presented as **YYYY-MM-DD**.
 TombEngine releases are located in this repository (alongside with Tomb Editor): https://github.com/TombEngine/TombEditorReleases
 
-## [Version 1.8.2]
+## [Version 1.9]
 
 ## New features
+* Added skinned meshes support for any object slot.
 * Added video playback support.
 * Added muzzle glow effect for firearms.
 
@@ -29,12 +30,13 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Optimized weather particle rendering.
 
 ### Lua API changes
+* Added `Moveable:SwapSkin` and `Moveable:UnswapSkin` for skinned moveable mesh management.
 * Added `View.PlayVideo`, `View.StopVideo`, and other helper functions for the video playback.
 * Added `Flow.SetIntroVideoPath` function to specify intro video.
 * Added `Lara:Interact` function to allow alignment with moveables.
 * Added `muzzleGlow` and `muzzleOffset` parameters to weapon settings.
 * Added ability to use gunflash parameters for all weapons in weapon settings.
-* Fixed `Moveable.GetJointPosition` not returning correct results if moveable is invisible or not rendered.
+* Fixed `Moveable:GetJointPosition` not returning correct results if moveable is invisible or not rendered.
 
 ## [Version 1.8.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.8.1) - 2025-03-29
 
