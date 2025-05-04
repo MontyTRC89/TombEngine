@@ -478,7 +478,7 @@ namespace TEN::Renderer
 		if (g_GameFlow->GetSettings()->Graphics.Skinning && skinIndex != NO_VALUE)
 			return SkinningMode::Full;
 
-		if (obj.Id == GAME_OBJECT_ID::ID_LARA_SKIN)
+		if (obj.Id == GAME_OBJECT_ID::ID_LARA || obj.Id == GAME_OBJECT_ID::ID_LARA_SKIN)
 			return SkinningMode::Classic;
 		else
 			return SkinningMode::None;
