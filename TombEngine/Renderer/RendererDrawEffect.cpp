@@ -1117,7 +1117,7 @@ namespace TEN::Renderer
 					case WeatherType::Snow:
 					{
 						if (!CheckIfSlotExists(ID_DEFAULT_SPRITES, "Snow rendering"))
-							return;
+							continue;
 
 						// Use dedicated snow sprite sequence if available, otherwise fallback to underwater dust sprite.
 						int spriteIndex = Objects[ID_DEFAULT_SPRITES].meshIndex + SPR_UNDERWATERDUST;
@@ -1140,7 +1140,7 @@ namespace TEN::Renderer
 					case WeatherType::Rain:
 					{
 						if (!CheckIfSlotExists(ID_DRIP_SPRITE, "Rain rendering"))
-							return;
+							continue;
 
 						int spriteIndex = Objects[ID_DRIP_SPRITE].meshIndex;
 						if (Objects[ID_RAIN_SPRITES].loaded)
