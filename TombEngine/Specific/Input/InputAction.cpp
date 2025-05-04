@@ -63,10 +63,11 @@ namespace TEN::Input
 		// Keyboard
 		{
 			In::A, In::B, In::C, In::D, In::E, In::F, In::G, In::H, In::I, In::J, In::K, In::L, In::M, In::N, In::O, In::P, In::Q, In::R, In::S, In::T, In::U, In::V, In::W, In::X, In::Y, In::Z,
-			In::Num0, In::Num1, In::Num2, In::Num3, In::Num4, In::Num5, In::Num6, In::Num7, In::Num8, In::Num9, In::Minus, In::Equals,
-			In::Esc, In::Tab, In::Shift, In::Ctrl, In::Alt, In::Space, In::Enter, In::Backspace,
-			In::BracketLeft, In::BracketRight, In::Backslash, In::Semicolon, In::Apostrophe, In::Comma, In::Period, In::Slash,
-			In::ArrowUp, In::ArrowDown, In::ArrowLeft, In::ArrowRight
+			In::Num1, In::Num2, In::Num3, In::Num4, In::Num5, In::Num6, In::Num7, In::Num8, In::Num9, In::Num0,
+			In::Return, In::Escape, In::Backspace, In::Tab, In::Space,
+			In::Minus, In::Equals, In::BracketLeft, In::BracketRight, In::Backslash, In::Semicolon, In::Apostrophe, In::Comma, In::Period, In::Slash,
+			In::ArrowUp, In::ArrowDown, In::ArrowLeft, In::ArrowRight,
+			In::Ctrl, In::Shift, In::Alt
 		},
 		// Mouse
 		{
@@ -147,7 +148,8 @@ namespace TEN::Input
 
 	void Action::Update(float value)
 	{
-		UpdateValue(value);
+		_prevValue = _value;
+		_value	   = value;
 
 		if (IsClicked())
 		{
@@ -198,11 +200,5 @@ namespace TEN::Input
 		PrintDebugMessage("TimeActive: %d", _timeActive);
 		PrintDebugMessage("PrevTimeActive: %d", _prevTimeActive);
 		PrintDebugMessage("TimeInactive: %d", _timeInactive);
-	}
-
-	void Action::UpdateValue(float value)
-	{
-		_prevValue = _value;
-		_value	   = value;
 	}
 }

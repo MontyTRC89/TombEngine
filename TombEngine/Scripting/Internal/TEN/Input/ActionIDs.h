@@ -84,26 +84,23 @@ namespace TEN::Scripting::Input
 	//  X
 	//  Y
 	//  Z
-	//  Num0
-	//  Num1
-	//  Num2
-	//  Num3
-	//  Num4
-	//  Num5
-	//  Num6
-	//  Num7
-	//  Num8
-	//  Num9
+	//  NUM_1
+	//  NUM_2
+	//  NUM_3
+	//  NUM_4
+	//  NUM_5
+	//  NUM_6
+	//  NUM_7
+	//  NUM_8
+	//  NUM_9
+	//  NUM_0
+	//  RETURN
+	//  ESCAPE
+	//  BACKSPACE
+	//  TAB
+	//  SPACE
 	//  MINUS
 	//  EQUALS
-	//  ESC
-	//  TAB
-	//  SHIFT
-	//  CTRL
-	//  ALT
-	//  SPACE
-	//  ENTER
-	//  BACKSPACE
 	//  BRACKET_LEFT
 	//  BRACKET_RIGHT
 	//  BACKSLASH
@@ -111,11 +108,14 @@ namespace TEN::Scripting::Input
 	//  APOSTROPHE
 	//  COMMA
 	//  PERIOD
-	//  SLASH
+	//  SPASH
 	//  ARROW_UP
 	//  ARROW_DOWN
 	//  ARROW_LEFT
 	//  ARROW_RIGHT
+	//  CTRL
+	//  SHIFT
+	//  ALT
 	// 
 	//  CLICK_LEFT
 	//  CLICK_MIDDLE
@@ -172,7 +172,7 @@ namespace TEN::Scripting::Input
 		{ "SAVE", In::Save },
 		{ "LOAD", In::Load },
 
-		{ "A", In::A},
+		{ "A", In::A },
 		{ "B", In::B },
 		{ "C", In::C },
 		{ "D", In::D },
@@ -198,26 +198,23 @@ namespace TEN::Scripting::Input
 		{ "X", In::X },
 		{ "Y", In::Y },
 		{ "Z", In::Z },
-		{ "Num0", In::Num0 },
-		{ "Num1", In::Num1 },
-		{ "Num2", In::Num2 },
-		{ "Num3", In::Num3 },
-		{ "Num4", In::Num4 },
-		{ "Num5", In::Num5 },
-		{ "Num6", In::Num6 },
-		{ "Num7", In::Num7 },
-		{ "Num8", In::Num8 },
-		{ "Num9", In::Num9 },
+		{ "NUM_1", In::Num1 },
+		{ "NUM_2", In::Num2 },
+		{ "NUM_3", In::Num3 },
+		{ "NUM_4", In::Num4 },
+		{ "NUM_5", In::Num5 },
+		{ "NUM_6", In::Num6 },
+		{ "NUM_7", In::Num7 },
+		{ "NUM_8", In::Num8 },
+		{ "NUM_9", In::Num9 },
+		{ "NUM_0", In::Num0 },
+		{ "RETURN", In::Return },
+		{ "ESCAPE", In::Escape },
+		{ "BACKSPACE", In::Backspace },
+		{ "TAB", In::Tab },
+		{ "SPACE", In::Space },
 		{ "MINUS", In::Minus },
 		{ "EQUALS", In::Equals },
-		{ "ESC", In::Esc },
-		{ "TAB", In::Tab },
-		{ "SHIFT", In::Shift },
-		{ "CTRL", In::Ctrl },
-		{ "ALT", In::Alt },
-		{ "SPACE", In::Space },
-		{ "ENTER", In::Enter },
-		{ "BACKSPACE", In::Backspace },
 		{ "BRACKET_LEFT", In::BracketLeft },
 		{ "BRACKET_RIGHT", In::BracketRight },
 		{ "BACKSLASH", In::Backslash },
@@ -230,6 +227,9 @@ namespace TEN::Scripting::Input
 		{ "ARROW_DOWN", In::ArrowDown },
 		{ "ARROW_LEFT", In::ArrowLeft },
 		{ "ARROW_RIGHT", In::ArrowRight },
+		{ "CTRL", In::Ctrl },
+		{ "SHIFT", In::Shift },
+		{ "ALT", In::Alt },
 
 		{ "CLICK_LEFT", In::ClickLeft },
 		{ "CLICK_MIDDLE", In::ClickMiddle },
