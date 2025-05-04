@@ -179,7 +179,8 @@ namespace TEN::Renderer
 		auto& moveableObj = *_moveableObjects[nativeItem->ObjectNumber];
 
 		// Copy meshswaps
-		itemToDraw->MeshIds = nativeItem->Model.MeshIndex;
+		itemToDraw->MeshIndex = nativeItem->Model.MeshIndex;
+		itemToDraw->SkinIndex = nativeItem->Model.SkinIndex;
 
 		if (obj->animIndex == -1)
 			return;
@@ -472,9 +473,9 @@ namespace TEN::Renderer
 		}
 	}
 
-	SkinningMode Renderer::GetSkinningMode(RendererObject& obj)
+	SkinningMode Renderer::GetSkinningMode(RendererObject& obj, int skinIndex)
 	{
-		if (g_GameFlow->GetSettings()->Graphics.Skinning && obj.Skin != nullptr)
+		if (g_GameFlow->GetSettings()->Graphics.Skinning && skinIndex != NO_VALUE)
 			return SkinningMode::Full;
 
 		if (obj.Id == GAME_OBJECT_ID::ID_LARA_SKIN)

@@ -279,7 +279,8 @@ void Renderer::UpdateLaraAnimations(bool force)
 		playerObject.AnimationTransforms[m] = rItem.AnimTransforms[m];
 
 	// Copy meshswap indices.
-	rItem.MeshIds = LaraItem->Model.MeshIndex;
+	rItem.SkinIndex = LaraItem->Model.SkinIndex;
+	rItem.MeshIndex = LaraItem->Model.MeshIndex;
 	rItem.DoneAnimations = true;
 }
 
@@ -303,8 +304,7 @@ void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 	_context->IASetIndexBuffer(_moveablesIndexBuffer.Buffer.Get(), DXGI_FORMAT_R32_UINT, 0);
 
 	auto& laraObj = *_moveableObjects[ID_LARA];
-	auto& laraSkin = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
-	auto skinMode = GetSkinningMode(laraSkin);
+	auto skinMode = GetSkinningMode(laraObj, item->SkinIndex);
 
 	RendererRoom* room = &_rooms[LaraItem->RoomNumber];
 
@@ -315,8 +315,8 @@ void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 	_stItem.AmbientLight = item->AmbientLight;
 	_stItem.Skinned = (int)skinMode;
 
-	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
-		_stItem.BoneLightModes[k] = (int)GetMesh(nativeItem->Model.MeshIndex[k])->LightMode;
+	for (int k = 0; k < item->MeshIndex.size(); k++)
+		_stItem.BoneLightModes[k] = (int)GetMesh(item->MeshIndex[k])->LightMode;
 
 	bool acceptsShadows = laraObj.ShadowType == ShadowMode::None;
 	BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade, acceptsShadows);
@@ -327,13 +327,13 @@ void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 			_stItem.BonesMatrices[m] =  laraObj.BindPoseTransforms[m] * item->InterpolatedAnimTransforms[m];
 		_cbItem.UpdateData(_stItem, _context.Get());
 
-		DrawMoveableMesh(item, laraSkin.Skin, room, 0, view, rendererPass);
+		DrawMoveableMesh(item, GetMesh(item->SkinIndex), room, 0, view, rendererPass);
 	}
 
 	memcpy(_stItem.BonesMatrices, item->InterpolatedAnimTransforms, laraObj.AnimationTransforms.size() * sizeof(Matrix));
 	_cbItem.UpdateData(_stItem, _context.Get());
 
-	for (int k = 0; k < laraSkin.ObjectMeshes.size(); k++)
+	for (int k = 0; k < item->MeshIndex.size(); k++)
 	{
 		if (!nativeItem->MeshBits.Test(k))
 			continue;
@@ -341,7 +341,7 @@ void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 		if (skinMode == SkinningMode::Full && g_Level.Meshes[nativeItem->Model.MeshIndex[k]].hidden)
 			continue;
 
-		DrawMoveableMesh(item, GetMesh(nativeItem->Model.MeshIndex[k]), room, k, view, rendererPass);
+		DrawMoveableMesh(item, GetMesh(item->MeshIndex[k]), room, k, view, rendererPass);
 	}
 
 	if (skinMode == SkinningMode::Classic)

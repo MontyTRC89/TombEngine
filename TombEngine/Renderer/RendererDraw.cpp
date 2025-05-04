@@ -196,7 +196,7 @@ namespace TEN::Renderer
 			SetAlphaTest(AlphaTestMode::GreatherThan, ALPHA_TEST_THRESHOLD);
 
 			auto& obj = GetRendererObject((GAME_OBJECT_ID)item->ObjectID);
-			auto skinMode = GetSkinningMode(obj);
+			auto skinMode = GetSkinningMode(obj, item->SkinIndex);
 
 			BindConstantBufferVS(ConstantBufferRegister::Item, _cbItem.get());
 			BindConstantBufferPS(ConstantBufferRegister::Item, _cbItem.get());
@@ -215,7 +215,9 @@ namespace TEN::Renderer
 					_stItem.BonesMatrices[m] = obj.BindPoseTransforms[m] * item->InterpolatedAnimTransforms[m];
 				_cbItem.UpdateData(_stItem, _context.Get());
 
-				for (auto& bucket : obj.Skin->Buckets)
+				auto* mesh = GetMesh(item->SkinIndex);
+
+				for (auto& bucket : mesh->Buckets)
 				{
 					if (bucket.NumVertices == 0)
 						continue;
@@ -235,15 +237,15 @@ namespace TEN::Renderer
 
 			for (int k = 0; k < obj.ObjectMeshes.size(); k++)
 			{
-				if (item->MeshIds.size() <= k)
+				if (item->MeshIndex.size() <= k)
 				{
 					TENLog("Mesh structure was not properly initialized for object " + GetObjectName((GAME_OBJECT_ID)item->ObjectID));
 					break;
 				}
 
-				auto* mesh = GetMesh(item->MeshIds[k]);
+				auto* mesh = GetMesh(item->MeshIndex[k]);
 
-				if (skinMode == SkinningMode::Full && g_Level.Meshes[item->MeshIds[k]].hidden)
+				if (skinMode == SkinningMode::Full && g_Level.Meshes[item->MeshIndex[k]].hidden)
 					continue;
 
 				for (auto& bucket : mesh->Buckets)
@@ -2440,7 +2442,7 @@ namespace TEN::Renderer
 		RendererRoom* room = &_rooms[item->RoomNumber];
 		RendererObject& moveableObj = *_moveableObjects[item->ObjectID];
 
-		auto skinMode = GetSkinningMode(moveableObj);
+		auto skinMode = GetSkinningMode(moveableObj, item->SkinIndex);
 
 		// Bind item main properties
 		_stItem.World = item->InterpolatedWorld;
@@ -2450,8 +2452,8 @@ namespace TEN::Renderer
 		_stItem.AmbientLight = item->AmbientLight;
 		_stItem.Skinned = (int)skinMode;
 
-		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
-			_stItem.BoneLightModes[k] = (int)moveableObj.ObjectMeshes[k]->LightMode;
+		for (int k = 0; k < item->MeshIndex.size(); k++)
+			_stItem.BoneLightModes[k] = (int)GetMesh(item->MeshIndex[k])->LightMode;
 
 		bool acceptsShadows = moveableObj.ShadowType == ShadowMode::None;
 		BindMoveableLights(item->LightsToDraw, item->RoomNumber, item->PrevRoomNumber, item->LightFade, acceptsShadows);
@@ -2462,13 +2464,13 @@ namespace TEN::Renderer
 				_stItem.BonesMatrices[m] = moveableObj.BindPoseTransforms[m] * item->InterpolatedAnimTransforms[m];
 			_cbItem.UpdateData(_stItem, _context.Get());
 
-			DrawMoveableMesh(item, moveableObj.Skin, room, 0, view, rendererPass);
+			DrawMoveableMesh(item, GetMesh(item->SkinIndex), room, 0, view, rendererPass);
 		}
 
 		memcpy(_stItem.BonesMatrices, item->InterpolatedAnimTransforms, moveableObj.AnimationTransforms.size() * sizeof(Matrix));
 		_cbItem.UpdateData(_stItem, _context.Get());
 
-		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
+		for (int k = 0; k < item->MeshIndex.size(); k++)
 		{
 			if (!nativeItem->MeshBits.Test(k))
 				continue;
@@ -2476,7 +2478,7 @@ namespace TEN::Renderer
 			if (skinMode == SkinningMode::Full && g_Level.Meshes[nativeItem->Model.MeshIndex[k]].hidden)
 				continue;
 
-			DrawMoveableMesh(item, GetMesh(item->MeshIds[k]), room, k, view, rendererPass);
+			DrawMoveableMesh(item, GetMesh(item->MeshIndex[k]), room, k, view, rendererPass);
 		}
 	}
 

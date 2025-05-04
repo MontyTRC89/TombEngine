@@ -555,7 +555,6 @@ namespace TEN::Renderer
 				if (obj->skinIndex != NO_VALUE)
 				{
 					RendererMesh* mesh = GetRendererMeshFromTrMesh(&moveable, &g_Level.Meshes[obj->skinIndex], 0, false, false, &lastVertex, &lastIndex);
-					moveable.Skin = mesh;
 					_meshes.push_back(mesh);
 				}
 
