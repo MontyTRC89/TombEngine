@@ -9,14 +9,16 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added video playback support.
 * Added muzzle glow effect for firearms.
 * Added weather particle clustering and increase weather particle performance.
+* Added examine mode text rendering (string key should be in the format like `examine1_text` etc).
 
 ### Bug fixes
 * Fixed Teleporter object.
 * Fixed Wraith objects not working correctly in flipped rooms.
-* Fixed lensflare enabled status not saved in a savegame.
+* Fixed lensflare enabled status and far view not saved in a savegame.
 * Fixed HK sound effects.
 * Fixed HK shots not being registered in statistics.
 * Fixed distorted knee and elbow joint vertices.
+* Fixed multi-mesh objects not shattering correctly.
 * Fixed splash effects remaining in the level after reloading from the savegame.
 * Fixed caustics not rendered correctly if texture compression was enabled.
 * Fixed exclusion blend mode not working correctly.
