@@ -84,8 +84,8 @@ struct MESH
 	std::vector<Vector3> normals;
 	std::vector<Vector3> colors;
 	std::vector<Vector3> effects; // X = glow, Y = move, Z = refract
-	std::vector<std::array<unsigned int, 4>> boneIndices;
-	std::vector<std::array<float, 4>> boneWeights;
+	std::vector<std::array<unsigned char, 4>> boneIndices;
+	std::vector<std::array<unsigned char, 4>> boneWeights;
 	std::vector<BUCKET> buckets;
 };
 

@@ -726,9 +726,9 @@ namespace TEN::Renderer
 									if (!isDone)
 									{
 										jointVertex->BoneIndex[0] = j;
-										jointVertex->BoneWeight[0] = 0.5f;
+										jointVertex->BoneWeight[0] = 0.5f * UCHAR_MAX;
 										jointVertex->BoneIndex[1] = jointBone->Parent->Index;
-										jointVertex->BoneWeight[1] = 0.5f;
+										jointVertex->BoneWeight[1] = 0.5f * UCHAR_MAX;
 									}
 								}
 							}
@@ -987,11 +987,8 @@ namespace TEN::Renderer
 					vertex.Color.z = meshPtr->colors[v].z;
 					vertex.Color.w = 1.0f;
 
-					for (int b = 0; b < MAX_BONE_WEIGHTS; b++)
-					{
-						vertex.BoneIndex[b] = meshPtr->boneIndices[v][b];
-						vertex.BoneWeight[b] = meshPtr->boneWeights[v][b];
-					}
+					vertex.BoneIndex  = meshPtr->boneIndices[v];
+					vertex.BoneWeight = meshPtr->boneWeights[v];
 
 					vertex.OriginalIndex = v;
 

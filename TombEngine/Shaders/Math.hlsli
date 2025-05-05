@@ -27,6 +27,7 @@
 #define SPEC_FACTOR 64
 
 #define MAX_BONES 32
+#define MAX_BONE_WEIGHTS 4
 
 struct ShaderLight
 {
@@ -465,7 +466,7 @@ float4x4 BlendBoneMatrices(VertexShaderInput input, float4x4 bones[MAX_BONES], b
 		[unroll]
 		for (int i = 0; i < MAX_BONE_WEIGHTS; ++i)
 		{
-			float w = input.BoneWeight[i];
+			float w = float(input.BoneWeight[i]) / 255.0f;
 			int index = input.BoneIndex[i];
 			float4x4 bone = bones[index];
 
@@ -496,7 +497,7 @@ float4x4 BlendBoneMatrices(VertexShaderInput input, float4x4 bones[MAX_BONES], b
 		float totalWeight = 0.0f;
 		[unroll]
 		for (int i = 0; i < MAX_BONE_WEIGHTS; ++i)
-			totalWeight += input.BoneWeight[i];
+			totalWeight += float(input.BoneWeight[i]) / 255.0f;
 
 		// Avoid divide-by-zero and excessive weights
 		if (totalWeight < EPSILON)
@@ -507,7 +508,7 @@ float4x4 BlendBoneMatrices(VertexShaderInput input, float4x4 bones[MAX_BONES], b
 		[unroll]
 		for (int i = 0; i < MAX_BONE_WEIGHTS; ++i)
 		{
-			float w = input.BoneWeight[i] / totalWeight; // Normalize weights
+			float w = (float(input.BoneWeight[i]) / 255.0f) / totalWeight; // Normalize weights
 			blendedMatrix += bones[input.BoneIndex[i]] * w;
 		}
 

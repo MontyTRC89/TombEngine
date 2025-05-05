@@ -311,8 +311,8 @@ void LoadObjects()
 
 		mesh.boneIndices.resize(vertexCount);
 		mesh.boneWeights.resize(vertexCount);
-		ReadBytes(mesh.boneIndices.data(), 16 * vertexCount);
-		ReadBytes(mesh.boneWeights.data(), 16 * vertexCount);
+		ReadBytes(mesh.boneIndices.data(), sizeof(unsigned char) * 4 * vertexCount);
+		ReadBytes(mesh.boneWeights.data(), sizeof(unsigned char) * 4 * vertexCount);
 		
 		int bucketCount = ReadCount();
 		mesh.buckets.reserve(bucketCount);
