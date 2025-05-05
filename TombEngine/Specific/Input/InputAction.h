@@ -73,6 +73,11 @@ namespace TEN::Input
 		ClickRight,
 		ScrollUp,
 		ScrollDown,
+		// TODO: Another time. There's some complexity involved. -- Sezz 2025.03.05
+		/*MouseUp,
+		MouseDown,
+		MouseLeft,
+		MouseRight,*/
 
 		// TODO: Can add raw gamepad actions too, however, we MUST ditch OIS in favour of SDL for it.
 		// It's a FAR better library which can also be used for window management. -- Sezz 2025.05.03

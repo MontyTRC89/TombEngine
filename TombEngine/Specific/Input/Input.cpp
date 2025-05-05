@@ -388,12 +388,11 @@ namespace TEN::Input
 				SetDiscreteAxisValues(baseIndex + pass);
 			}
 
-			// TODO: Will need to take screen aspect ratio into account once mouse axes start being used. -- Sezz 2023.10.20
 			// Normalize raw mouse axis values to range [-1.0f, 1.0f].
 			auto rawAxes = Vector2(state.X.rel, state.Y.rel);
 			auto normAxes = Vector2(
-				(((rawAxes.x - -DISPLAY_SPACE_RES.x) * 2) / (DISPLAY_SPACE_RES.x - -DISPLAY_SPACE_RES.x)) - 1.0f,
-				(((rawAxes.y - -DISPLAY_SPACE_RES.y) * 2) / (DISPLAY_SPACE_RES.y - -DISPLAY_SPACE_RES.y)) - 1.0f);
+				(((rawAxes.x - -DISPLAY_SPACE_RES.x) * 2.0f) / float(DISPLAY_SPACE_RES.x - -DISPLAY_SPACE_RES.x)) - 1.0f,
+				(((rawAxes.y - -DISPLAY_SPACE_RES.y) * 2.0f) / float(DISPLAY_SPACE_RES.y - -DISPLAY_SPACE_RES.y)) - 1.0f);
 
 			// Apply sensitivity.
 			float sensitivity = (g_Configuration.MouseSensitivity * 0.1f) + 0.4f;
