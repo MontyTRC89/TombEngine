@@ -347,6 +347,8 @@ static constexpr char ScriptReserved_GetCameraTarget[]				= "GetCameraTarget";
 
 static constexpr char ScriptReserved_ClearAllKeys[]					= "ClearAllKeys";
 static constexpr char ScriptReserved_ClearKey[]						= "ClearKey";
+static constexpr char ScriptReserved_GetAnalogKeyValue[]			= "GetAnalogKeyValue";
+static constexpr char ScriptReserved_GetMouseDisplayPosition[]		= "GetMouseDisplayPosition";
 static constexpr char ScriptReserved_IsKeyHeld[]					= "IsKeyHeld";
 static constexpr char ScriptReserved_IsKeyHit[]						= "IsKeyHit";
 static constexpr char ScriptReserved_IsKeyPulsed[]					= "IsKeyPulsed";
@@ -377,7 +379,6 @@ static constexpr char ScriptReserved_PrintLog[]						= "PrintLog";
 static constexpr char ScriptReserved_PickMoveable[]					= "PickMoveableByDisplayPosition";
 static constexpr char ScriptReserved_PickStatic[]					= "PickStaticByDisplayPosition";
 static constexpr char ScriptReserved_GetDisplayPosition[]			= "GetDisplayPosition";
-static constexpr char ScriptReserved_GetMouseDisplayPosition[]		= "GetMouseDisplayPosition";
 static constexpr char ScriptReserved_PlayerInteract[]				= "Interact";
 static constexpr char ScriptReserved_PlayerTestInteraction[]		= "TestInteraction";
 
