@@ -452,9 +452,8 @@ void LaraObject::Interact(const Moveable& mov, TypeOrNil<int> animNumber,
 			if (MoveLaraPosition(convertedOffset, &interactedItem, _moveable))
 			{
 				ResetPlayerFlex(_moveable);
-				SetAnimation(_moveable, convertedAnimNumber);
+				SetAnimation(*_moveable, convertedAnimNumber);
 
-				_moveable->Animation.FrameNumber = GetAnimData(_moveable).frameBase;
 				player.Control.IsMoving = false;
 				player.Control.HandStatus = HandStatus::Busy;
 			}

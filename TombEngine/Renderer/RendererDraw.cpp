@@ -6,7 +6,7 @@
 #include <filesystem>
 
 #include "ConstantBuffers/CameraMatrixBuffer.h"
-#include "Game/animation.h"
+#include "Game/Animation/Animation.h"
 #include "Game/camera.h"
 #include "Game/control/control.h"
 #include "Game/control/volume.h"
@@ -34,6 +34,7 @@
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
+using namespace TEN::Animation;
 using namespace TEN::Effects::Hair;
 using namespace TEN::Hud;
 using namespace TEN::Effects::Environment;
