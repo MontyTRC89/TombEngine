@@ -67,9 +67,6 @@ namespace TEN::Input
 
 		RumbleInfo = {};
 
-		// Initialize bindings.
-		g_Bindings.Initialize();
-
 		// Initialize key map.
 		for (int i = 0; i < KEY_COUNT; i++)
 			KeyMap[i] = 0.0f;

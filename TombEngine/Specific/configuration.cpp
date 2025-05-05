@@ -282,8 +282,8 @@ bool SaveConfiguration()
 	// Set Input binding keys.
 	for (auto actionGroupID : SAVEABLE_ACTION_GROUP_IDS)
 	{
-		const auto& actionGroup = ACTION_ID_GROUPS[(int)actionGroupID];
-		for (auto actionID : actionGroup)
+		const auto& actionIDGroup = ACTION_ID_GROUPS[(int)actionGroupID];
+		for (auto actionID : actionIDGroup)
 		{
 			char buffer[9];
 			sprintf(buffer, "Action%d", (int)actionID);
@@ -481,8 +481,8 @@ bool LoadConfiguration()
 
 		for (auto actionGroupID : SAVEABLE_ACTION_GROUP_IDS)
 		{
-			const auto& actionGroup = ACTION_ID_GROUPS[(int)actionGroupID];
-			for (auto actionID : actionGroup)
+			const auto& actionIDGroup = ACTION_ID_GROUPS[(int)actionGroupID];
+			for (auto actionID : actionIDGroup)
 			{
 				DWORD tempKeyID = 0;
 				char buffer[9];

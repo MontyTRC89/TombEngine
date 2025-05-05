@@ -738,7 +738,7 @@ namespace TEN::Gui
 						if (selectedKeyID == KEY_COUNT)
 							selectedKeyID = 0;
 
-						if (selectedKeyID && !GetKeyName(selectedKeyID).empty())
+						if (selectedKeyID != OIS::KC_UNASSIGNED && !GetKeyName(selectedKeyID).empty())
 						{
 							unsigned int baseIndex = 0;
 							switch (MenuToDisplay)
