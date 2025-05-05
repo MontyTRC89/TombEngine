@@ -144,13 +144,13 @@ namespace TEN::Input
 		{ In::Num9,			OIS::KC_9 },
 		{ In::Minus,		OIS::KC_MINUS },
 		{ In::Equals,		OIS::KC_EQUALS },
-		{ In::Esc,			OIS::KC_ESCAPE },
+		{ In::Escape,		OIS::KC_ESCAPE },
 		{ In::Tab, 			OIS::KC_TAB },
 		{ In::Shift, 		OIS::KC_LSHIFT },
 		{ In::Ctrl, 		OIS::KC_LCONTROL },
 		{ In::Alt, 			OIS::KC_LMENU },
 		{ In::Space, 		OIS::KC_SPACE },
-		{ In::Enter, 		OIS::KC_RETURN },
+		{ In::Return,		OIS::KC_RETURN },
 		{ In::Backspace, 	OIS::KC_BACK },
 		{ In::BracketLeft, 	OIS::KC_LBRACKET },
 		{ In::BracketRight, OIS::KC_RBRACKET },
@@ -172,7 +172,7 @@ namespace TEN::Input
 		{ In::ScrollDown, 	MK_AXIS_X_POS }
 	};
 
-	const BindingProfile& BindingManager::GetBindingProfile(BindingProfileID profileID)
+	const BindingProfile& BindingManager::GetBindingProfile(BindingProfileID profileID) const
 	{
 		// Find binding profile.
 		auto profileIt = _bindings.find(profileID);
@@ -183,7 +183,7 @@ namespace TEN::Input
 		return profile;
 	}
 
-	int BindingManager::GetBoundKeyID(BindingProfileID profileID, ActionID actionID)
+	int BindingManager::GetBoundKeyID(BindingProfileID profileID, ActionID actionID) const
 	{
 		// Find binding profile.
 		auto profileIt = _bindings.find(profileID);
@@ -199,7 +199,7 @@ namespace TEN::Input
 			return OIS::KC_UNASSIGNED;
 
 		// Return key binding.
-		auto [keyActionID, keyID] = *keyIt;
+		const auto& [keyActionID, keyID] = *keyIt;
 		return keyID;
 	}
 

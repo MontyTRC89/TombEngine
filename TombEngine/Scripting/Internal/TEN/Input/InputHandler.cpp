@@ -114,7 +114,7 @@ namespace TEN::Scripting::Input
 	static float GetAnalogKeyValue(int actionID)
 	{
 		if (!IsValidAction(actionID))
-			return;
+			return 0.0f;
 
 		return GetActionValue((ActionID)actionID);
 	}
