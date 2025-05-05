@@ -657,16 +657,61 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 
 	if (uw == 1)
 	{
-		spark.sG = (GetRandomControl() & 0x3F) + 128;
-		spark.sB = 32;
-		spark.dR = 192;
-		spark.dG = (GetRandomControl() & 0x1F) + 64;
-		spark.dB = 0;
 		spark.colFadeSpeed = 7;
 		spark.fadeToBlack = 8;
 		spark.life = (GetRandomControl() & 7) + 16;
 		spark.sLife = spark.life;
 		spark.roomNumber = roomNumber;
+
+		if (mainColor == Vector3::Zero)
+		{
+		spark.sG = (GetRandomControl() & 0x3F) + 128;
+		spark.sB = 32;
+		spark.dR = 192;
+		spark.dG = (GetRandomControl() & 0x1F) + 64;
+		spark.dB = 0;
+		}
+		else
+		{
+			// New colored flame processing.
+			int colorS[3] = { int(mainColor.x * UCHAR_MAX), int(mainColor.y * UCHAR_MAX), int(mainColor.z * UCHAR_MAX) };
+			int colorD[3] = { int(secondColor.x * UCHAR_MAX), int(secondColor.y * UCHAR_MAX), int(secondColor.z * UCHAR_MAX) };
+
+			// Determine weakest RGB component.
+			int lowestS = UCHAR_MAX;
+			int lowestD = UCHAR_MAX;
+			for (int i = 0; i < 3; i++)
+			{
+				if (lowestS > colorS[i]) lowestS = colorS[i];
+				if (lowestD > colorD[i]) lowestD = colorD[i];
+			}
+
+			// Introduce random color shift for non-weakest RGB components.
+			constexpr auto CHROMA_SHIFT = 32;
+			constexpr auto LUMA_SHIFT = 0.5f;
+
+			for (int i = 0; i < 3; i++)
+			{
+				if (colorS[i] != lowestS)
+					colorS[i] = int(colorS[i] + GenerateInt(-CHROMA_SHIFT, CHROMA_SHIFT));
+
+				if (colorD[i] != lowestD)
+					colorD[i] = int(colorD[i] + GenerateInt(-CHROMA_SHIFT, CHROMA_SHIFT));
+
+				colorS[i] = int(colorS[i] * (1.0f + GenerateFloat(-LUMA_SHIFT, 0)));
+				colorD[i] = int(colorD[i] * (1.0f + GenerateFloat(-LUMA_SHIFT, 0)));
+
+				colorS[i] = std::clamp(colorS[i], 0, UCHAR_MAX);
+				colorD[i] = std::clamp(colorD[i], 0, UCHAR_MAX);
+			}
+
+			spark.sR = colorS[0];
+			spark.sG = colorS[1];
+			spark.sB = colorS[2];
+			spark.dR = colorD[0];
+			spark.dG = colorD[1];
+			spark.dB = colorD[2];
+		}
 	}
 	else
 	{
@@ -787,7 +832,16 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 	if (GetRandomControl() & 1)
 	{
 		if (uw == 1)
-			spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_UNDERWEXP;
+		{
+			if (mainColor == Vector3::Zero)
+			{
+				spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_UNDERWEXP;
+			}
+			else
+			{
+				spark.flags = SP_SCALE | SP_DEF | SP_ROTATE | SP_EXPDEF | SP_UNDERWEXP | SP_COLOR;
+			}
+		}
 		else
 		{
 			if (mainColor == Vector3::Zero)
@@ -805,7 +859,14 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 	}
 	else if (uw == 1)
 	{
-		spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_UNDERWEXP;
+		if (mainColor == Vector3::Zero)
+		{
+			spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_UNDERWEXP;
+		}
+		else
+		{
+			spark.flags = SP_SCALE | SP_DEF | SP_EXPDEF | SP_UNDERWEXP | SP_COLOR;
+		}
 	}
 	else
 	{
@@ -864,7 +925,7 @@ void TriggerExplosionSparks(int x, int y, int z, int extraTrig, int dynamic, int
 	}
 }
 
-void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
+void TriggerExplosionBubbles(int x, int y, int z, short roomNumber, const Vector3& mainColor, const Vector3& secondColor)
 {
 	int dx = LaraItem->Pose.Position.x - x;
 	int dz = LaraItem->Pose.Position.z - z;
@@ -874,15 +935,61 @@ void TriggerExplosionBubbles(int x, int y, int z, short roomNumber)
 	{
 		auto* spark = GetFreeParticle();
 
-		spark->sR = 128;
-		spark->dR = 128;
-		spark->dG = 128;
-		spark->dB = 128;
+		if (mainColor == Vector3::Zero)
+		{
+			spark->sR = 128;
+			spark->sG = 64;
+			spark->sB = 0;
+			spark->dR = 128;
+			spark->dG = 128;
+			spark->dB = 128;
+		}
+		else
+		{
+			// New colored flame processing.
+			int colorS[3] = { int(mainColor.x * UCHAR_MAX), int(mainColor.y * UCHAR_MAX), int(mainColor.z * UCHAR_MAX) };
+			int colorD[3] = { int(secondColor.x * UCHAR_MAX), int(secondColor.y * UCHAR_MAX), int(secondColor.z * UCHAR_MAX) };
+
+			// Determine weakest RGB component.
+			int lowestS = UCHAR_MAX;
+			int lowestD = UCHAR_MAX;
+			for (int i = 0; i < 3; i++)
+			{
+				if (lowestS > colorS[i]) lowestS = colorS[i];
+				if (lowestD > colorD[i]) lowestD = colorD[i];
+			}
+
+			// Introduce random color shift for non-weakest RGB components.
+			constexpr auto CHROMA_SHIFT = 32;
+			constexpr auto LUMA_SHIFT = 0.5f;
+
+			for (int i = 0; i < 3; i++)
+			{
+				if (colorS[i] != lowestS)
+					colorS[i] = int(colorS[i] + GenerateInt(-CHROMA_SHIFT, CHROMA_SHIFT));
+
+				if (colorD[i] != lowestD)
+					colorD[i] = int(colorD[i] + GenerateInt(-CHROMA_SHIFT, CHROMA_SHIFT));
+
+				colorS[i] = int(colorS[i] * (1.0f + GenerateFloat(-LUMA_SHIFT, 0)));
+				colorD[i] = int(colorD[i] * (1.0f + GenerateFloat(-LUMA_SHIFT, 0)));
+
+				colorS[i] = std::clamp(colorS[i], 0, UCHAR_MAX);
+				colorD[i] = std::clamp(colorD[i], 0, UCHAR_MAX);
+			}
+
+			spark->sR = colorS[0];
+			spark->sG = colorS[1];
+			spark->sB = colorS[2];
+			spark->dR = colorD[0];
+			spark->dG = colorD[1];
+			spark->dB = colorD[2];
+			spark->flags = SP_UNDERWEXP | SP_COLOR;
+		}
+
 		spark->on = 1;
 		spark->life = 24;
 		spark->sLife = 24;
-		spark->sG = 64;
-		spark->sB = 0;
 		spark->colFadeSpeed = 8;
 		spark->fadeToBlack = 12;
 		spark->blendMode = BlendMode::Additive;
@@ -1176,8 +1283,6 @@ void ControlWaterfallMist(short itemNumber)
 
 void TriggerWaterfallMist(const ItemInfo& item)
 {
-	static const int scale = 3;
-
 	int size = 64;
 	int width = 1;
 	short angle = item.Pose.Orientation.y + ANGLE(180.0f);
@@ -1188,24 +1293,35 @@ void TriggerWaterfallMist(const ItemInfo& item)
 		width = std::clamp(int(round(item.TriggerFlags / 100) * 100) / 2, 0, BLOCK(8));
 	}
 
+	auto color = item.Model.Color;
+	auto pos = item.Pose.Position.ToVector3();
+
+	TriggerWaterfallMist(pos, size, width, angle, color);
+	
+}
+
+void TriggerWaterfallMist(Vector3 pos, int size, int width, float angle, Vector4 color)
+{
+	static const int scale = 3;
+
 	float cos = phd_cos(angle);
 	float sin = phd_sin(angle);
 
-	int maxPosX =  width * sin + item.Pose.Position.x;
-	int maxPosZ =  width * cos + item.Pose.Position.z;
-	int minPosX = -width * sin + item.Pose.Position.x;
-	int minPosZ = -width * cos + item.Pose.Position.z;
+	int maxPosX = width * sin + pos.x;
+	int maxPosZ = width * cos + pos.z;
+	int minPosX = -width * sin + pos.x;
+	int minPosZ = -width * cos + pos.z;
 
-	float fadeMin = GetParticleDistanceFade(Vector3i(minPosX, item.Pose.Position.y, minPosZ));
-	float fadeMax = GetParticleDistanceFade(Vector3i(maxPosX, item.Pose.Position.y, maxPosZ));
+	float fadeMin = GetParticleDistanceFade(Vector3i(minPosX, pos.y, minPosZ));
+	float fadeMax = GetParticleDistanceFade(Vector3i(maxPosX, pos.y, maxPosZ));
 
 	if ((fadeMin == 0.0f) && (fadeMin == fadeMax))
 		return;
 
 	float finalFade = ((fadeMin >= 1.0f) && (fadeMin == fadeMax)) ? 1.0f : std::max(fadeMin, fadeMax);
 
-	auto startColor = item.Model.Color / 4.0f * finalFade * float(UCHAR_MAX);
-	auto endColor   = item.Model.Color / 8.0f * finalFade * float(UCHAR_MAX);
+	auto startColor = color / 4.0f * finalFade * float(UCHAR_MAX);
+	auto endColor = color / 8.0f * finalFade * float(UCHAR_MAX);
 
 	float step = size * scale;
 	int currentStep = 0;
@@ -1226,18 +1342,18 @@ void TriggerWaterfallMist(const ItemInfo& item)
 			spark->sR = std::clamp(int(startColor.x) + colorOffset, 0, UCHAR_MAX);
 			spark->sG = std::clamp(int(startColor.y) + colorOffset, 0, UCHAR_MAX);
 			spark->sB = std::clamp(int(startColor.z) + colorOffset, 0, UCHAR_MAX);
-			spark->dR = std::clamp(int(endColor.x)   + colorOffset, 0, UCHAR_MAX);
-			spark->dG = std::clamp(int(endColor.y)   + colorOffset, 0, UCHAR_MAX);
-			spark->dB = std::clamp(int(endColor.z)   + colorOffset, 0, UCHAR_MAX);
+			spark->dR = std::clamp(int(endColor.x) + colorOffset, 0, UCHAR_MAX);
+			spark->dG = std::clamp(int(endColor.y) + colorOffset, 0, UCHAR_MAX);
+			spark->dB = std::clamp(int(endColor.z) + colorOffset, 0, UCHAR_MAX);
 
 			spark->colFadeSpeed = 1;
 			spark->blendMode = BlendMode::Additive;
 			spark->life = spark->sLife = Random::GenerateInt(8, 12);
 			spark->fadeToBlack = spark->life - 6;
 
-			spark->x = offset * sign * sin + Random::GenerateInt(-8, 8) + item.Pose.Position.x;
-			spark->y = Random::GenerateInt(0, 16) + item.Pose.Position.y - 8;
-			spark->z = offset * sign * cos + Random::GenerateInt(-8, 8) + item.Pose.Position.z;
+			spark->x = offset * sign * sin + Random::GenerateInt(-8, 8) + pos.x;
+			spark->y = Random::GenerateInt(0, 16) + pos.y - 8;
+			spark->z = offset * sign * cos + Random::GenerateInt(-8, 8) + pos.z;
 
 			spark->xVel = 0;
 			spark->yVel = Random::GenerateInt(-64, 64);
