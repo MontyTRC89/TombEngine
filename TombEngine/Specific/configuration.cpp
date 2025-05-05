@@ -16,7 +16,7 @@ using namespace TEN::Renderer;
 
 GameConfiguration g_Configuration;
 
-static const auto SAVEABLE_ACTION_GROUP_IDS = std::vector<ActionGroupID>
+static const auto SAVABLE_ACTION_GROUP_IDS = std::vector<ActionGroupID>
 {
 	ActionGroupID::General,
 	ActionGroupID::Vehicle,
@@ -280,7 +280,7 @@ bool SaveConfiguration()
 		g_Configuration.Bindings = DEFAULT_KEYBOARD_MOUSE_BINDING_PROFILE;
 
 	// Set Input binding keys.
-	for (auto actionGroupID : SAVEABLE_ACTION_GROUP_IDS)
+	for (auto actionGroupID : SAVABLE_ACTION_GROUP_IDS)
 	{
 		const auto& actionIDGroup = ACTION_ID_GROUPS[(int)actionGroupID];
 		for (auto actionID : actionIDGroup)
@@ -479,7 +479,7 @@ bool LoadConfiguration()
 			return false;
 		}
 
-		for (auto actionGroupID : SAVEABLE_ACTION_GROUP_IDS)
+		for (auto actionGroupID : SAVABLE_ACTION_GROUP_IDS)
 		{
 			const auto& actionIDGroup = ACTION_ID_GROUPS[(int)actionGroupID];
 			for (auto actionID : actionIDGroup)
