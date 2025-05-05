@@ -132,7 +132,6 @@ namespace TEN::Input
 		unsigned int delayGameFrames = SecToGameFrames(_timeActive) * activeDelayGameFrames;
 		unsigned int prevDelayGameFrames = SecToGameFrames(_prevTimeActive) * activeDelayGameFrames;
 		return (delayGameFrames > prevDelayGameFrames);
-			return true;
 	}
 
 	bool Action::IsReleased(float delaySecMax) const
