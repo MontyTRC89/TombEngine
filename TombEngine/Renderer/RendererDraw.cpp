@@ -2464,7 +2464,7 @@ namespace TEN::Renderer
 				_stItem.BonesMatrices[m] = moveableObj.BindPoseTransforms[m] * item->InterpolatedAnimTransforms[m];
 			_cbItem.UpdateData(_stItem, _context.Get());
 
-			DrawMoveableMesh(item, GetMesh(item->SkinIndex), room, 0, view, rendererPass);
+			DrawMoveableMesh(item, GetMesh(item->SkinIndex), room, 0, true, view, rendererPass);
 		}
 
 		memcpy(_stItem.BonesMatrices, item->InterpolatedAnimTransforms, moveableObj.AnimationTransforms.size() * sizeof(Matrix));
@@ -2478,7 +2478,7 @@ namespace TEN::Renderer
 			if (skinMode == SkinningMode::Full && g_Level.Meshes[nativeItem->Model.MeshIndex[k]].hidden)
 				continue;
 
-			DrawMoveableMesh(item, GetMesh(item->MeshIndex[k]), room, k, view, rendererPass);
+			DrawMoveableMesh(item, GetMesh(item->MeshIndex[k]), room, k, false, view, rendererPass);
 		}
 	}
 
@@ -3250,7 +3250,7 @@ namespace TEN::Renderer
 		_swapChain->Present(1, 0);
 	}
 
-	void Renderer::DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, RenderView& view, RendererPass rendererPass)
+	void Renderer::DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, bool skinned, RenderView& view, RendererPass rendererPass)
 	{
 		if (rendererPass == RendererPass::CollectTransparentFaces)
 		{
@@ -3272,6 +3272,7 @@ namespace TEN::Renderer
 						object.ObjectType = RendererObjectType::Moveable;
 						object.Centre = center;
 						object.Distance = dist;
+						object.Skinned = skinned;
 						object.BlendMode = blendMode;
 						object.Bucket = &bucket;
 						object.Item = itemToDraw;
@@ -3446,6 +3447,7 @@ namespace TEN::Renderer
 					view.TransparentObjectsToDraw[i].ObjectType == object->ObjectType &&
 					view.TransparentObjectsToDraw[i].Item->ItemNumber == object->Item->ItemNumber &&
 					view.TransparentObjectsToDraw[i].Bucket->Texture == object->Bucket->Texture &&
+					view.TransparentObjectsToDraw[i].Skinned == object->Skinned &&
 					view.TransparentObjectsToDraw[i].BlendMode == object->BlendMode &&
 					_sortedPolygonsIndices.size() + (view.TransparentObjectsToDraw[i].Polygon->Shape == 0 ? 6 : 3) < MAX_TRANSPARENT_VERTICES)
 				{
@@ -3699,10 +3701,22 @@ namespace TEN::Renderer
 		_stItem.World = world;
 		_stItem.Color = objectInfo->Item->Color;
 		_stItem.AmbientLight = objectInfo->Item->AmbientLight;
-		_stItem.Skinned = objectInfo->Item->ObjectID == GAME_OBJECT_ID::ID_LARA; // TODO: Implement for all skinned objects!
-		memcpy(_stItem.BonesMatrices, objectInfo->Item->InterpolatedAnimTransforms, sizeof(Matrix) * MAX_BONES);
+		_stItem.Skinned = (int)(objectInfo->Skinned ? SkinningMode::Full : SkinningMode::None);
 
 		const auto& moveableObj = *_moveableObjects[objectInfo->Item->ObjectID];
+
+		if (objectInfo->Skinned)
+		{
+			for (int m = 0; m < moveableObj.BindPoseTransforms.size(); m++)
+				_stItem.BonesMatrices[m] = moveableObj.BindPoseTransforms[m] * objectInfo->Item->InterpolatedAnimTransforms[m];
+		}
+		else
+		{
+			memcpy(_stItem.BonesMatrices, objectInfo->Item->InterpolatedAnimTransforms, sizeof(Matrix) * MAX_BONES);
+		}
+
+		_cbItem.UpdateData(_stItem, _context.Get());
+
 		for (int k = 0; k < moveableObj.ObjectMeshes.size(); k++)
 			_stItem.BoneLightModes[k] = (int)moveableObj.ObjectMeshes[k]->LightMode;
 

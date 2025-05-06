@@ -460,7 +460,7 @@ namespace TEN::Renderer
 		void DrawLaraHolsters(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass);
 		void DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass);
 		void DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, RenderView& view, RendererPass rendererPass);
-		void DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, RenderView& view, RendererPass rendererPass);
+		void DrawMoveableMesh(RendererItem* itemToDraw, RendererMesh* mesh, RendererRoom* room, int boneIndex, bool skinned, RenderView& view, RendererPass rendererPass);
 		void PrepareSimpleParticles(RenderView& view);
 		void PrepareStreamers(RenderView& view);
 		void PrepareFootprints(RenderView& view);
@@ -668,7 +668,7 @@ namespace TEN::Renderer
 		void UpdateItemAnimations(int itemNumber, bool force);
 		std::vector<BoundingSphere> GetSpheres(int itemNumber);
 		void GetBoneMatrix(short itemNumber, int jointIndex, Matrix* outMatrix);
-		SkinningMode GetSkinningMode(RendererObject& obj, int skinIndex);
+		SkinningMode GetSkinningMode(const RendererObject& obj, int skinIndex);
 		void DrawObjectIn2DSpace(int objectNumber, Vector2 pos2D, EulerAngles orient, float scale1, float opacity = 1.0f, int meshBits = NO_JOINT_BITS);
 		void SetLoadingScreen(std::wstring& fileName);
 		void SetTextureOrDefault(Texture2D& texture, std::wstring path);

@@ -473,7 +473,7 @@ namespace TEN::Renderer
 		}
 	}
 
-	SkinningMode Renderer::GetSkinningMode(RendererObject& obj, int skinIndex)
+	SkinningMode Renderer::GetSkinningMode(const RendererObject& obj, int skinIndex)
 	{
 		if (g_GameFlow->GetSettings()->Graphics.Skinning && skinIndex != NO_VALUE)
 			return SkinningMode::Full;
