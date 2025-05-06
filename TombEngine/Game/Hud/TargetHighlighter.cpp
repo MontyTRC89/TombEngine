@@ -129,7 +129,7 @@ namespace TEN::Hud
 
 	void CrosshairData::Draw() const
 	{
-		constexpr auto SPRITE_SEQUENCE_OBJECT_ID = ID_CROSSHAIR;
+		constexpr auto SPRITE_SEQUENCE_OBJECT_ID = ID_CROSSHAIR_GRAPHICS;
 		constexpr auto STATIC_ELEMENT_SPRITE_ID	 = 0;
 		constexpr auto SEGMENT_ELEMENT_SPRITE_ID = 1;
 		constexpr auto PRIORITY					 = 0; // TODO: Check later. May interfere with Lua display sprites. -- Sezz 2023.10.06

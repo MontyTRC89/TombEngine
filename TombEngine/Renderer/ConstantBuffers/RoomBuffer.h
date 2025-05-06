@@ -13,7 +13,7 @@ namespace TEN::Renderer::ConstantBuffers
 		int Padding;
 		//--
 		Vector2 CausticsStartUV;
-		Vector2 CausticsScale;
+		Vector2 CausticsSize;
 		//--
 		Vector4 AmbientColor;
 		//--

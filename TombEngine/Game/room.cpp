@@ -252,11 +252,11 @@ GameBoundingBox& GetBoundsAccurate(const MESH_INFO& mesh, bool getVisibilityBox)
 
 	if (getVisibilityBox)
 	{
-		bounds = Statics[mesh.staticNumber].visibilityBox * mesh.scale;
+		bounds = Statics[mesh.staticNumber].visibilityBox * mesh.pos.Scale;
 	}
 	else
 	{
-		bounds = Statics[mesh.staticNumber].collisionBox * mesh.scale;
+		bounds = Statics[mesh.staticNumber].collisionBox * mesh.pos.Scale;
 	}
 
 	return bounds;
@@ -296,6 +296,7 @@ int FindRoomNumber(const Vector3i& pos, int startRoomNumber, bool onlyNeighbors)
 
 	if (!onlyNeighbors)
 	{
+		// TODO: Optimise search to O(log n) with BVH. -- Sezz 2025.03.01
 		for (int roomNumber = 0; roomNumber < g_Level.Rooms.size(); roomNumber++)
 		{
 			if (IsPointInRoom(pos, roomNumber))

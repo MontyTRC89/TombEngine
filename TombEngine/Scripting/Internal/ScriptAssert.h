@@ -13,7 +13,8 @@ ErrorMode GetScriptErrorMode();
 void ScriptWarn(const std::string& msg);
 bool ScriptAssert(bool cond, const std::string& msg, std::optional<ErrorMode> forceMode = std::nullopt);
 
-template <typename ... Ts> bool ScriptAssertF(bool cond, std::string_view str, Ts...args)
+template <typename ... Ts>
+bool ScriptAssertF(bool cond, std::string_view str, Ts...args)
 {
 	if (!cond)
 	{
@@ -33,7 +34,8 @@ template <typename ... Ts> bool ScriptAssertF(bool cond, std::string_view str, T
 	return cond;
 }
 
-template <typename ... Ts> bool ScriptAssertTerminateF(bool cond, std::string_view str, Ts...args)
+template <typename ... Ts>
+bool ScriptAssertTerminateF(bool cond, std::string_view str, Ts...args)
 {
 	if (!cond)
 	{

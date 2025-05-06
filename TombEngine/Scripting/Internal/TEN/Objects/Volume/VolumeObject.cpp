@@ -14,8 +14,8 @@ Activator volume.
 @pragma nostrip
 */
 
-static auto IndexError = index_error_maker(Volume, ScriptReserved_Volume);
-static auto NewIndexError = newindex_error_maker(Volume, ScriptReserved_Volume);
+static auto IndexError = IndexErrorMaker(Volume, ScriptReserved_Volume);
+static auto NewIndexError = NewIndexErrorMaker(Volume, ScriptReserved_Volume);
 
 Volume::Volume(TriggerVolume& volume) :
 	_volume(volume)
@@ -47,7 +47,7 @@ void Volume::Register(sol::table& parent)
 }
 
 /// Get the unique string identifier of this volume.
-// @function Volume:GetName()
+// @function Volume:GetName
 // @treturn string Name.
 std::string Volume::GetName() const
 {
@@ -55,7 +55,7 @@ std::string Volume::GetName() const
 }
 
 /// Get the position of this volume.
-// @function Volume:GetPosition()
+// @function Volume:GetPosition
 // @treturn Vec3 Position.
 Vec3 Volume::GetPos() const
 {
@@ -63,7 +63,7 @@ Vec3 Volume::GetPos() const
 }
 
 /// Get the rotation of this volume.
-// @function Volume:GetRotation()
+// @function Volume:GetRotation
 // @treturn Rotation Rotation.
 Rotation Volume::GetRot() const
 {
@@ -72,7 +72,7 @@ Rotation Volume::GetRot() const
 }
 
 /// Get this scale of this volume.
-// @function Volume:GetScale()
+// @function Volume:GetScale
 // @treturn Vec3 Scale.
 Vec3 Volume::GetScale() const
 {
@@ -80,7 +80,7 @@ Vec3 Volume::GetScale() const
 }
 
 /// Set the unique string identifier of this volume.
-// @function Volume:SetName()
+// @function Volume:SetName
 // @tparam string name New name.
 void Volume::SetName(const std::string& name)
 {
@@ -88,9 +88,9 @@ void Volume::SetName(const std::string& name)
 		return;
 
 	// Remove previous name if it exists.
-	if (s_callbackSetName(name, _volume))
+	if (_callbackSetName(name, _volume))
 	{
-		s_callbackRemoveName(_volume.Name);
+		_callbackRemoveName(_volume.Name);
 		_volume.Name = name;
 	}
 	else
@@ -101,7 +101,7 @@ void Volume::SetName(const std::string& name)
 }
 
 /// Set the position of this volume.
-// @function Volume:SetPosition()
+// @function Volume:SetPosition
 // @tparam Vec3 pos New position.
 void Volume::SetPos(const Vec3& pos)
 {
@@ -110,7 +110,7 @@ void Volume::SetPos(const Vec3& pos)
 }
 
 /// Set the rotation of this volume.
-// @function Volume:SetRotation()
+// @function Volume:SetRotation
 // @tparam Rotation rot New rotation.
 void Volume::SetRot(const Rotation& rot)
 {
@@ -119,7 +119,7 @@ void Volume::SetRot(const Rotation& rot)
 }
 
 /// Set the scale of the volume.
-// @function Volume:SetScale()
+// @function Volume:SetScale
 // @tparam Vec3 scale New scale.
 void Volume::SetScale(const Vec3& scale)
 {
@@ -128,7 +128,7 @@ void Volume::SetScale(const Vec3& scale)
 }
 
 /// Determine if this volume is active.
-// @function Volume:GetActive()
+// @function Volume:GetActive
 // @treturn bool Boolean representing active status.
 bool Volume::GetActive() const
 {
@@ -136,17 +136,16 @@ bool Volume::GetActive() const
 }
 
 /// Determine if a moveable is inside this volume.
-// @function Volume:IsMoveableInside()
-// @tparam Objects.Moveable Moveable to be checked for containment.
+// @function Volume:IsMoveableInside
+// @tparam Objects.Moveable moveable Moveable to be checked for containment.
 // @treturn bool Boolean representing containment status.
 bool Volume::IsMoveableInside(const Moveable& mov)
 {
 	for (const auto& entry : _volume.StateQueue)
 	{
-		// TODO: Use int, not short.
-		if (std::holds_alternative<short>(entry.Activator))
+		if (std::holds_alternative<int>(entry.Activator))
 		{
-			int id = std::get<short>(entry.Activator);
+			int id = std::get<int>(entry.Activator);
 			auto& mov2 = std::make_unique<Moveable>(id);
 
 			if (mov2.get()->GetName() == mov.GetName())
@@ -158,14 +157,14 @@ bool Volume::IsMoveableInside(const Moveable& mov)
 }
 
 /// Enable this volume.
-// @function Volume:Enable()
+// @function Volume:Enable
 void Volume::Enable()
 {
 	_volume.Enabled = true;
 }
 
 /// Disable this volume.
-// @function Volume:Disable()
+// @function Volume:Disable
 void Volume::Disable()
 {
 	ClearActivators();
@@ -173,7 +172,7 @@ void Volume::Disable()
 }
 
 /// Clear the activators for this volume, allowing it to trigger again.
-// @function Volume:ClearActivators()
+// @function Volume:ClearActivators
 void Volume::ClearActivators()
 {
 	_volume.StateQueue.clear();

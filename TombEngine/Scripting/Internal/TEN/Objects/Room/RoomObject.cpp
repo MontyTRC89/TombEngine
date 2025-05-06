@@ -12,14 +12,16 @@
 #include "Specific/level.h"
 #include "Specific/trutils.h"
 
+using namespace TEN::Scripting::Types;
+
 /// Room object.
 // @tenclass Objects.Room
 // @pragma nostrip
 
 //namespace TEN::Scripting
 //{
-	static auto IndexError = index_error_maker(Room, ScriptReserved_Volume);
-	static auto NewIndexError = newindex_error_maker(Room, ScriptReserved_Volume);
+	static auto IndexError = IndexErrorMaker(Room, ScriptReserved_Volume);
+	static auto NewIndexError = NewIndexErrorMaker(Room, ScriptReserved_Volume);
 
 	Room::Room(ROOM_INFO& room) :
 		_room(room)
@@ -48,7 +50,7 @@
 	}
 
 	/// Get the room's number.
-	// @function Room:GetRoomNumber()
+	// @function Room:GetRoomNumber
 	// @treturn int Room number.
 	int Room::GetRoomNumber() const
 	{
@@ -56,7 +58,7 @@
 	}
 
 	/// Get the room's unique string identifier.
-	// @function Room:GetName()
+	// @function Room:GetName
 	// @treturn string Room name.
 	std::string Room::GetName() const
 	{
@@ -64,7 +66,7 @@
 	}
 
 	/// Get the room's ambient light color.
-	// @function Room:GetColor()
+	// @function Room:GetColor
 	// @treturn Color Ambient light color.
 	ScriptColor Room::GetColor() const
 	{
@@ -72,7 +74,7 @@
 	}
 
 	/// Get the room's reverb type.
-	// @function Room:GetReverbType()
+	// @function Room:GetReverbType
 	// @treturn Objects.RoomReverb Reverb type.
 	ReverbType Room::GetReverbType() const
 	{
@@ -80,7 +82,7 @@
 	}
 
 	/// Set the room's unique string identifier.
-	// @function Room:SetName()
+	// @function Room:SetName
 	// @tparam string name New name.
 	void Room::SetName(const std::string& name)
 	{
@@ -88,9 +90,9 @@
 			return;
 
 		// Remove previous name if it already exists.
-		if (s_callbackSetName(name, _room))
+		if (_callbackSetName(name, _room))
 		{
-			s_callbackRemoveName(_room.Name);
+			_callbackRemoveName(_room.Name);
 			_room.Name = name;
 		}
 		else
@@ -101,17 +103,17 @@
 	}
 
 	/// Set the room's reverb type.
-	// @function Room:SetReverbType()
-	// @tparam Objects.RoomReverb Reverb type.
+	// @function Room:SetReverbType
+	// @tparam Objects.RoomReverb reverb Reverb type.
 	void Room::SetReverbType(ReverbType reverb)
 	{
 		_room.reverbType = reverb;
 	}
 
 	/// Set the room's specified flag.
-	// @function Room:SetFlag()
+	// @function Room:SetFlag
 	// @tparam Objects.RoomFlagID flagID Room flag ID.
-	// @tparam bool Boolean to set the flag to.
+	// @tparam bool value Boolean to set the flag to.
 	void Room::SetFlag(RoomEnvFlags flag, bool value)
 	{
 		if (value)
@@ -125,7 +127,7 @@
 	}
 
 	/// Get the room's specified flag value (true or false).
-	// @function Room:GetFlag()
+	// @function Room:GetFlag
 	// @tparam Objects.RoomFlagID flagID Room flag ID.
 	bool Room::IsTagPresent(const std::string& tag) const
 	{
@@ -141,7 +143,7 @@
 	}
 
 	/// Check if the specified tag is set for the room.
-	// @function Room:IsTagPresent()
+	// @function Room:IsTagPresent
 	// @tparam string tag Text tag to check (case sensitive).
 	// @treturn bool Boolean of the tag's presence.
 	bool Room::GetActive() const
@@ -150,7 +152,7 @@
 	}
 
 	/// Check if the room is active.
-	// @function Room:GetActive()
+	// @function Room:GetActive
 	// @treturn bool Boolean of the room's active status.
 	bool Room::GetFlag(RoomEnvFlags flag) const
 	{

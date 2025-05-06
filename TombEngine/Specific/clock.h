@@ -31,6 +31,6 @@ int	 TimeSync();
 bool TimeInit();
 bool TimeReset();
 
-bool TestGlobalTimeInterval(float intervalSecs, float offsetSecs = 0.0f);
+bool TestGlobalTimeInterval(unsigned int intervalGameFrames, unsigned int offsetGameFrames = 0);
 
 extern HighFramerateSynchronizer g_Synchronizer;

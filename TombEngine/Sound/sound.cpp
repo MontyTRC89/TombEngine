@@ -9,9 +9,11 @@
 #include "Specific/configuration.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"
+#include "Specific/Video/Video.h"
 #include "Specific/winmain.h"
 
 using namespace TEN::Gui;
+using namespace TEN::Video;
 
 enum SoundSourceFlags
 {
@@ -69,6 +71,7 @@ void SetVolumeTracks(int vol)
 void SetVolumeFX(int vol)
 {
 	GlobalFXVolume = vol;
+	g_VideoPlayer.SetVolume(vol);
 }
 
 bool LoadSample(char* pointer, int compSize, int uncompSize, int index)
@@ -1078,7 +1081,7 @@ void PlaySecretTrack()
 int GetShatterSound(int shatterID)
 {
 	auto fxID = Statics[shatterID].shatterSound;
-	if (fxID != NO_VALUE && fxID < NUM_SFX)
+	if (fxID != NO_VALUE && fxID < g_Level.SoundMap.size())
 		return fxID;
 
 	return SFX_TR4_SMASH_ROCK;

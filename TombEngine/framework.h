@@ -55,6 +55,12 @@
 // Standard
 #include <algorithm>
 #include <array>
+#include <atomic>
+#include <chrono>
+#include <CommCtrl.h>
+#include <ctime>
+#include <d3d11.h>
+#include <d3dcompiler.h>
 #include <chrono>
 #include <CommCtrl.h>
 #include <ctime>
@@ -124,6 +130,9 @@ using namespace DirectX::SimpleMath;
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 #include <spdlog/spdlog.h>
+
+// VLC
+#include <vlc/vlc.h>
 
 // WRL
 #include <wrl/client.h>

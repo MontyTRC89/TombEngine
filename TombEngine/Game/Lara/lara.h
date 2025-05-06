@@ -47,6 +47,7 @@ constexpr auto LARA_HEIGHT_TREAD	  = 700;		  // Height in water tread states.
 constexpr auto LARA_HEIGHT_STRETCH	  = 870;		  // Height in jump up and ledge hang states.
 constexpr auto LARA_HEIGHT_REACH	  = 820;		  // Height in reach state.
 constexpr auto LARA_HEIGHT_SURFACE	  = 800;		  // Height when resurfacing water.
+constexpr auto LARA_HEIGHT_UNDERWATER = 254;		  // Minimum height underwater.
 constexpr auto LARA_HEADROOM		  = 160;		  // Reasonable space above head.
 constexpr auto LARA_RADIUS			  = 100;
 constexpr auto LARA_RADIUS_CRAWL	  = 200;

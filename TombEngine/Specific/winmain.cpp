@@ -7,18 +7,21 @@
 #include "Sound/sound.h"
 #include "Specific/level.h"
 #include "Specific/configuration.h"
+#include "Specific/Parallel.h"
 #include "Specific/trutils.h"
 #include "Scripting/Internal/LanguageScript.h"
 #include "Scripting/Include/ScriptInterfaceState.h"
 #include "Scripting/Include/ScriptInterfaceLevel.h"
+#include "Video/Video.h"
 
 using namespace TEN::Renderer;
 using namespace TEN::Input;
 using namespace TEN::Utils;
+using namespace TEN::Video;
 
 WINAPP App;
-unsigned int ThreadID;
-uintptr_t ThreadHandle;
+unsigned int ThreadID, ConsoleThreadID;
+uintptr_t ThreadHandle, ConsoleThreadHandle;
 HACCEL hAccTable;
 bool DebugMode = false;
 HWND WindowsHandle;
@@ -229,6 +232,31 @@ bool GenerateDummyLevel(const std::string& levelPath)
 	return true;
 }
 
+unsigned CALLBACK ConsoleInput(void*)
+{
+	auto input = std::string();
+	while (!ThreadEnded)
+	{
+		if (!std::getline(std::cin, input))
+			break;
+
+		if (std::regex_match(input, std::regex("^\\s*$")))
+			continue;
+
+		if (g_GameScript == nullptr)
+		{
+			TENLog("Scripting engine not initialized.", LogLevel::Error);
+			continue;
+		}
+		else
+		{
+			g_GameScript->AddConsoleInput(input);
+		}
+	}
+
+	return true;
+}
+
 void WinProcMsg()
 {
 	MSG msg;
@@ -320,8 +348,11 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			if (!DebugMode && ThreadHandle > 0)
 			{
 				TENLog("Resuming game thread", LogLevel::Info);
+
+				if (!g_VideoPlayer.Resume())
+					ResumeAllSounds(SoundPauseMode::Global);
+
 				ResumeThread((HANDLE)ThreadHandle);
-				ResumeAllSounds(SoundPauseMode::Global);
 			}
 
 			return 0;
@@ -335,8 +366,11 @@ LRESULT CALLBACK WinAppProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 		if (!DebugMode)
 		{
 			TENLog("Suspending game thread", LogLevel::Info);
+
+			if (!g_VideoPlayer.Pause())
+				PauseAllSounds(SoundPauseMode::Global);
+
 			SuspendThread((HANDLE)ThreadHandle);
-			PauseAllSounds(SoundPauseMode::Global);
 		}
 	}
 
@@ -392,8 +426,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	// Hide console window if mode isn't debug.
 #ifndef _DEBUG
 	if (!DebugMode)
-		ShowWindow(GetConsoleWindow(), 0);
+	{
+		FreeConsole();
+	}
+	else
 #endif
+	{
+		ConsoleThreadHandle = BeginThread(ConsoleInput, ConsoleThreadID);
+	}
 
 	// Clear application structure.
 	memset(&App, 0, sizeof(WINAPP));
@@ -552,7 +592,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		CoInitializeEx(NULL, COINIT_MULTITHREADED);
 
 		// Initialize renderer.
-		g_Renderer.Initialize(g_Configuration.ScreenWidth, g_Configuration.ScreenHeight, g_Configuration.EnableWindowedMode, App.WindowHandle);
+		g_Renderer.Initialize(gameDir, g_Configuration.ScreenWidth, g_Configuration.ScreenHeight, g_Configuration.EnableWindowedMode, App.WindowHandle);
 
 		// Initialize audio.
 		Sound_Init(gameDir);
@@ -580,6 +620,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	DoTheGame = true;
 
+	g_Parallel.Initialize();
 	ThreadEnded = false;
 	ThreadHandle = BeginThread(GameMain, ThreadID);
 
@@ -601,26 +642,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 void WinClose()
 {
+	if (ConsoleThreadHandle)
+		CloseHandle((HANDLE)ConsoleThreadHandle);
+
 	WaitForSingleObject((HANDLE)ThreadHandle, 5000);
-
 	DestroyAcceleratorTable(hAccTable);
-
-	Sound_DeInit();
-	DeinitializeInput();
-	
-	delete g_GameScript;
-	g_GameScript = nullptr;
-
-	delete g_GameFlow;
-	g_GameFlow = nullptr;
-
-	delete g_GameScriptEntities;
-	g_GameScriptEntities = nullptr;
-
-	delete g_GameStringsHandler;
-	g_GameStringsHandler = nullptr;
-
 	ShutdownTENLog();
-
 	CoUninitialize();
 }

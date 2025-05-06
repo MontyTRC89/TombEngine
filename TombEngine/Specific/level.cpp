@@ -436,6 +436,12 @@ void LoadObjects()
 		int objNum = ReadInt32();
 		MoveablesIds.push_back(objNum);
 
+		if (objNum >= GAME_OBJECT_ID::ID_NUMBER_OBJECTS)
+		{
+			throw std::exception(("Unsupported object slot " + std::to_string(objNum) + 
+								  " is detected in a level. Make sure you delete unsupported objects from your wads.").c_str());
+		}
+
 		Objects[objNum].loaded = true;
 		Objects[objNum].nmeshes = ReadInt32();
 		Objects[objNum].meshIndex = ReadInt32();
@@ -444,7 +450,6 @@ void LoadObjects()
 		Objects[objNum].animIndex = ReadInt32();
 	}
 
-	TENLog("Initializing objects...", LogLevel::Info);
 	InitializeObjects();
 
 	int staticCount = ReadCount();
@@ -723,7 +728,7 @@ void LoadDynamicRoomData()
 			mesh.pos.Orientation.y = ReadUInt16();
 			mesh.pos.Orientation.x = ReadUInt16();
 			mesh.pos.Orientation.z = ReadUInt16();
-			mesh.scale = ReadFloat();
+			mesh.pos.Scale = Vector3(ReadFloat());
 			mesh.flags = ReadUInt16();
 			mesh.color = ReadVector4();
 			mesh.staticNumber = ReadUInt16();
@@ -1056,11 +1061,13 @@ void LoadAnimatedTextures()
 	for (int i = 0; i < animatedTextureCount; i++)
 	{
 		auto sequence = ANIMATED_TEXTURES_SEQUENCE{};
-		sequence.atlas = ReadInt32();
-		sequence.Fps = ReadInt32();
-		sequence.numFrames = ReadCount();
+		sequence.Atlas = ReadInt32();
+		sequence.Fps   = ReadUInt8();
+		sequence.Type  = ReadUInt8();
+		ReadUInt16(); // Unused.
+		sequence.NumFrames = ReadCount();
 
-		for (int j = 0; j < sequence.numFrames; j++)
+		for (int j = 0; j < sequence.NumFrames; j++)
 		{
 			auto frame = ANIMATED_TEXTURES_FRAME{};
 			frame.x1 = ReadFloat();
@@ -1071,7 +1078,7 @@ void LoadAnimatedTextures()
 			frame.y3 = ReadFloat();
 			frame.x4 = ReadFloat();
 			frame.y4 = ReadFloat();
-			sequence.frames.push_back(frame);
+			sequence.Frames.push_back(frame);
 		}
 
 		g_Level.AnimatedTexturesSequences.push_back(sequence);
@@ -1308,7 +1315,7 @@ bool LoadLevel(const std::string& path, bool partial)
 		auto assemblyVersion = TEN::Utils::GetProductOrFileVersion(true);
 		for (int i = 0; i < assemblyVersion.size(); i++)
 		{
-			if (assemblyVersion[i] < version[i])
+			if (assemblyVersion[i] != version[i])
 			{
 				TENLog("Level version is different from TEN version.", LogLevel::Warning);
 				break;
@@ -1389,7 +1396,7 @@ bool LoadLevel(const std::string& path, bool partial)
 		InitializeNeighborRoomList();
 		GetCarriedItems();
 		GetAIPickups();
-		g_GameScriptEntities->AssignLara();
+		g_GameScriptEntities->AssignPlayer();
 		UpdateProgress(90, partial);
 
 		if (!partial)
@@ -1455,19 +1462,19 @@ void LoadSamples()
 
 	TENLog("Sample count: " + std::to_string(sampleCount), LogLevel::Info);
 
-	int uncompressedSize = 0;
-	int compressedSize = 0;
-	char* buffer = (char*)malloc(2 * 1024 * 1024);
+	std::vector<char> buffer;
+	buffer.reserve(2 * 1024 * 1024);
 
 	for (int i = 0; i < sampleCount; i++)
 	{
-		uncompressedSize = ReadInt32();
-		compressedSize = ReadInt32();
-		ReadBytes(buffer, compressedSize);
-		LoadSample(buffer, compressedSize, uncompressedSize, i);
-	}
+		int uncompressedSize = ReadInt32();
+		int compressedSize = ReadInt32();
 
-	free(buffer);
+		buffer.resize(compressedSize);
+
+		ReadBytes(buffer.data(), compressedSize);
+		LoadSample(buffer.data(), compressedSize, uncompressedSize, i);
+	}
 }
 
 void LoadBoxes()

@@ -6,6 +6,7 @@
 #include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 
 using namespace TEN::Effects::DisplaySprite;
+using namespace TEN::Scripting::Types;
 
 enum BLEND_MODE;
 
@@ -30,6 +31,8 @@ namespace TEN::Scripting::DisplaySprite
 		// Constructors
 		ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale, const ScriptColor& color);
 		ScriptDisplaySprite(GAME_OBJECT_ID objectID, int spriteID, const Vec2& pos, float rot, const Vec2& scale);
+		ScriptDisplaySprite(const Vec2& pos, float rot, const Vec2& scale, const ScriptColor& color);
+		ScriptDisplaySprite(const Vec2& pos, float rot, const Vec2& scale);
 
 		// Getters
 		GAME_OBJECT_ID GetObjectID() const;

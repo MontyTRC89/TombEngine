@@ -42,6 +42,7 @@
 #include "Objects/TR4/Entity/tr4_setha.h"
 
 // Objects
+#include "Objects/TR4/Object/StatuePlinth.h"
 #include "Objects/TR4/Object/WraithTrap.h"
 #include "Objects/TR4/Object/tr4_element_puzzle.h"
 #include "Objects/TR4/Object/tr4_mapper.h"
@@ -694,6 +695,14 @@ namespace TEN::Entities
 			obj->SetHitEffect(true);
 		}
 
+		obj = &Objects[ID_STATUE_PLINTH];
+		if (obj->loaded)
+		{
+			obj->Initialize = InitializeStatuePlinth;
+			obj->collision = CollideStatuePlinth;
+			obj->SetHitEffect(true);
+		}
+
 		obj = &Objects[ID_WHEEL_OF_FORTUNE];
 		if (obj->loaded)
 		{
@@ -961,7 +970,7 @@ namespace TEN::Entities
 		{
 			obj->Initialize = InitializeJeep;
 			obj->collision = JeepPlayerCollision;
-			obj->shadowType = ShadowMode::Lara;
+			obj->shadowType = ShadowMode::Player;
 			obj->SetHitEffect(true);
 		}
 
@@ -970,7 +979,7 @@ namespace TEN::Entities
 		{
 			obj->Initialize = InitializeMotorbike;
 			obj->collision = MotorbikePlayerCollision;
-			obj->shadowType = ShadowMode::Lara;
+			obj->shadowType = ShadowMode::Player;
 			obj->SetHitEffect(true);
 		}
 	}

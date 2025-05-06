@@ -37,13 +37,17 @@ namespace TEN::Debug
 		if (prevString == msg && !allowSpam)
 			return;
 
-		if constexpr (!DebugBuild)
+		if constexpr (!DEBUG_BUILD)
 		{
 			if (config == LogConfig::Debug)
 				return;
 		}
 
 		auto logger = spdlog::get("multi_sink");
+
+		if (!logger)
+			return;
+
 		switch (level)
 		{
 		case LogLevel::Error:

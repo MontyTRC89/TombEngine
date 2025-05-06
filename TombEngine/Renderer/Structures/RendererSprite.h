@@ -6,6 +6,8 @@ namespace TEN::Renderer::Structures
 {
 	using namespace TEN::Renderer::Graphics;
 
+	constexpr int VIDEO_SPRITE_ID = NO_VALUE;
+
 	struct RendererSprite
 	{
 		int Index;

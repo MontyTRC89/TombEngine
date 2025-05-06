@@ -7,7 +7,7 @@ namespace TEN::Control::Volumes
 {
 	using Activator = std::variant<
 		std::nullptr_t,
-		short,
+		int,
 		MESH_INFO*,
 		CAMERA_INFO*>;
 

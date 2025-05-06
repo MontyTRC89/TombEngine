@@ -2,13 +2,14 @@
 
 #include "Renderer/Structures/RendererSprite.h"
 #include "Renderer/Structures/RendererSpriteBucket.h"
+#include "Specific/Parallel.h"
+
+using namespace TEN::Renderer::Structures;
 
 namespace TEN::Renderer
 {
-	using namespace TEN::Renderer::Structures;
-
 	void Renderer::AddSpriteBillboard(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D, float scale,
-		Vector2 size, BlendMode blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
+									  Vector2 size, BlendMode blendMode, bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
 		if (scale <= 0.0f)
 			scale = 1.0f;
@@ -38,8 +39,8 @@ namespace TEN::Renderer
 	}
 
 	void Renderer::AddSpriteBillboardConstrained(RendererSprite* sprite, const Vector3& pos, const Vector4& color, float orient2D,
-		float scale, Vector2 size, BlendMode blendMode, const Vector3& constrainAxis,
-		bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
+												 float scale, Vector2 size, BlendMode blendMode, const Vector3& constrainAxis,
+												 bool isSoftParticle, RenderView& view, SpriteRenderType renderType)
 	{
 		if (scale <= 0.0f)
 			scale = 1.0f;
@@ -261,16 +262,16 @@ namespace TEN::Renderer
 			return;
 
 		// Draw instanced sprites.
-		bool wasGPUSet = false;
-		for (auto& spriteBucket : _spriteBuckets)
+		bool wasGpuSet = false;
+		for (const auto& spriteBucket : _spriteBuckets)
 		{
-			if (spriteBucket.SpritesToDraw.size() == 0 || !spriteBucket.IsBillboard)
+			if (spriteBucket.SpritesToDraw.empty() || !spriteBucket.IsBillboard)
 				continue;
 
 			if (!SetupBlendModeAndAlphaTest(spriteBucket.BlendMode, rendererPass, 0))
 				continue;
 
-			if (!wasGPUSet)
+			if (!wasGpuSet)
 			{
 				_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
@@ -286,42 +287,45 @@ namespace TEN::Renderer
 				unsigned int offset = 0;
 				_context->IASetVertexBuffers(0, 1, _quadVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 
-				wasGPUSet = true;
+				wasGpuSet = true;
 			}
 
-			// Prepare constant buffer for instanced sprites.
-			for (int i = 0; i < spriteBucket.SpritesToDraw.size(); i++)
+			// Define sprite preparation logic.
+			auto prepareSprites = [&](int start, int end)
 			{
-				auto& rDrawSprite = spriteBucket.SpritesToDraw[i];
+				for (int i = start; i < end; i++)
+				{
+					const auto& spriteToDraw = spriteBucket.SpritesToDraw[i];
 
-				_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(&rDrawSprite, view);
-				_stInstancedSpriteBuffer.Sprites[i].Color = rDrawSprite.color;
-				_stInstancedSpriteBuffer.Sprites[i].IsBillboard = 1;
-				_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = rDrawSprite.SoftParticle ? 1 : 0;
+					_stInstancedSpriteBuffer.Sprites[i].World = GetWorldMatrixForSprite(spriteToDraw, view);
+					_stInstancedSpriteBuffer.Sprites[i].Color = spriteToDraw.color;
+					_stInstancedSpriteBuffer.Sprites[i].IsBillboard = 1.0f;
+					_stInstancedSpriteBuffer.Sprites[i].IsSoftParticle = spriteToDraw.SoftParticle ? 1.0f : 0.0f;
 
-				// NOTE: Strange packing due to particular HLSL 16 byte alignment requirements.
-				_stInstancedSpriteBuffer.Sprites[i].UV[0].x = rDrawSprite.Sprite->UV[0].x;
-				_stInstancedSpriteBuffer.Sprites[i].UV[0].y = rDrawSprite.Sprite->UV[1].x;
-				_stInstancedSpriteBuffer.Sprites[i].UV[0].z = rDrawSprite.Sprite->UV[2].x;
-				_stInstancedSpriteBuffer.Sprites[i].UV[0].w = rDrawSprite.Sprite->UV[3].x;
-				_stInstancedSpriteBuffer.Sprites[i].UV[1].x = rDrawSprite.Sprite->UV[0].y;
-				_stInstancedSpriteBuffer.Sprites[i].UV[1].y = rDrawSprite.Sprite->UV[1].y;
-				_stInstancedSpriteBuffer.Sprites[i].UV[1].z = rDrawSprite.Sprite->UV[2].y;
-				_stInstancedSpriteBuffer.Sprites[i].UV[1].w = rDrawSprite.Sprite->UV[3].y;
-			}
+					// NOTE: Strange packing due to particular HLSL 16 byte alignment requirements.
+					_stInstancedSpriteBuffer.Sprites[i].UV[0].x = spriteToDraw.Sprite->UV[0].x;
+					_stInstancedSpriteBuffer.Sprites[i].UV[0].y = spriteToDraw.Sprite->UV[1].x;
+					_stInstancedSpriteBuffer.Sprites[i].UV[0].z = spriteToDraw.Sprite->UV[2].x;
+					_stInstancedSpriteBuffer.Sprites[i].UV[0].w = spriteToDraw.Sprite->UV[3].x;
+					_stInstancedSpriteBuffer.Sprites[i].UV[1].x = spriteToDraw.Sprite->UV[0].y;
+					_stInstancedSpriteBuffer.Sprites[i].UV[1].y = spriteToDraw.Sprite->UV[1].y;
+					_stInstancedSpriteBuffer.Sprites[i].UV[1].z = spriteToDraw.Sprite->UV[2].y;
+					_stInstancedSpriteBuffer.Sprites[i].UV[1].w = spriteToDraw.Sprite->UV[3].y;
+				}
+			};
+			g_Parallel.AddTasks((int)spriteBucket.SpritesToDraw.size(), prepareSprites).wait();
 
 			BindTexture(TextureRegister::ColorMap, spriteBucket.Sprite->Texture, SamplerStateRegister::LinearClamp);
-
 			_cbInstancedSpriteBuffer.UpdateData(_stInstancedSpriteBuffer, _context.Get());
 
 			// Draw sprites with instancing.
-			DrawInstancedTriangles(4, (unsigned int)spriteBucket.SpritesToDraw.size(), 0);
+			DrawInstancedTriangles(4, (int)spriteBucket.SpritesToDraw.size(), 0);
 
 			_numInstancedSpritesDrawCalls++;
 		}
 
 		// Draw 3D non-instanced sprites.
-		wasGPUSet = false;
+		wasGpuSet = false;
 
 		for (auto& spriteBucket : _spriteBuckets)
 		{
@@ -331,7 +335,7 @@ namespace TEN::Renderer
 			if (!SetupBlendModeAndAlphaTest(spriteBucket.BlendMode, rendererPass, 0))
 				continue;
 
-			if (!wasGPUSet)
+			if (!wasGpuSet)
 			{
 				_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
@@ -342,10 +346,10 @@ namespace TEN::Renderer
 
 				_shaders.Bind(Shader::Sprites);
 
-				wasGPUSet = true;
+				wasGpuSet = true;
 			}
 			
-			_stSprite.IsSoftParticle = spriteBucket.IsSoftParticle ? 1 : 0;
+			_stSprite.IsSoftParticle = spriteBucket.IsSoftParticle ? 1.0f : 0.0f;
 			_stSprite.RenderType = (int)spriteBucket.RenderType;
 			_cbSprite.UpdateData(_stSprite, _context.Get());
 
@@ -414,11 +418,11 @@ namespace TEN::Renderer
 			_shaders.Bind(Shader::InstancedSprites);
 
 			// Set up vertex buffer and parameters.
-			UINT stride = sizeof(Vertex);
-			UINT offset = 0;
+			unsigned int stride = sizeof(Vertex);
+			unsigned int offset = 0;
 			_context->IASetVertexBuffers(0, 1, _quadVertexBuffer.Buffer.GetAddressOf(), &stride, &offset);
 
-			_stInstancedSpriteBuffer.Sprites[0].World = GetWorldMatrixForSprite(object->Sprite, view);
+			_stInstancedSpriteBuffer.Sprites[0].World = GetWorldMatrixForSprite(*object->Sprite, view);
 			_stInstancedSpriteBuffer.Sprites[0].Color = object->Sprite->color;
 			_stInstancedSpriteBuffer.Sprites[0].IsBillboard = 1;
 			_stInstancedSpriteBuffer.Sprites[0].IsSoftParticle = object->Sprite->SoftParticle ? 1 : 0;

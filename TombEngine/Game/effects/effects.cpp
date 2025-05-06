@@ -28,6 +28,7 @@
 #include "Sound/sound.h"
 #include "Specific/clock.h"
 #include "Specific/level.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Collision::Point;
 using namespace TEN::Effects::Blood;
@@ -183,6 +184,86 @@ void SetSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID)
 	particle.SpriteSeqID = objectID;
 	particle.SpriteID = (int)round(Lerp(0.0f, spriteCount, normalizedAge));
 }
+
+void SetAdvancedSpriteSequence(Particle& particle, GAME_OBJECT_ID objectID,	ParticleAnimType animationType, float frameRate)
+{
+	// Ensure valid lifespan
+	if (particle.life <= 0)
+	{
+		particle.on = false;
+		ParticleDynamics[particle.dynamic].On = false;
+		return;
+	}
+
+	// Calculate particle's age and normalized progress
+	float particleAge = particle.sLife - particle.life;  // Elapsed time since spawn
+	float normalizedAge = particleAge / particle.sLife;  // Progress as a fraction [0.0, 1.0]
+
+	// Retrieve sprite sequence information
+	//int firstFrame = Objects[objectID].meshIndex;          // Starting sprite index
+	int totalFrames = -Objects[objectID].nmeshes;          // Total frames (assuming nmeshes is negative)
+	if (totalFrames <= 0)
+	{
+		particle.SpriteSeqID = objectID;
+		particle.SpriteID = 0;  // Default to the first frame if no valid frames exist
+		return;
+	}
+
+	particle.SpriteSeqID = objectID;
+
+	// Handle animation modes
+	switch (animationType)
+	{
+	case ParticleAnimType::Loop:  // Frames loop sequentially
+	{
+		float frameDuration = frameRate > 0 ? 1.0f / frameRate : 1.0f / totalFrames;  // Duration per frame
+		int currentFrame = (int)(particleAge / frameDuration) % totalFrames;  // Wrap frames
+		particle.SpriteID = currentFrame;
+		break;
+	}
+
+	case ParticleAnimType::OneShot:  // Frames play once, then freeze on the last frame
+	{
+		float totalDuration = frameRate > 0 ? totalFrames / frameRate : particle.sLife;
+		int currentFrame = (int)(particleAge / (totalDuration / totalFrames));
+		if (currentFrame >= totalFrames)
+			currentFrame = totalFrames - 1;  // Clamp to the last frame
+		particle.SpriteID = currentFrame;
+		break;
+	}
+
+	case ParticleAnimType::BackAndForth:  // Frames go forward and then backward
+	{
+		float frameDuration = frameRate > 0 ? 1.0f / frameRate : 1.0f / totalFrames;
+		int totalFrameSteps = totalFrames * 2 - 2;  // Forward and backward frames (avoiding double-count of last frame)
+		int step = (int)(particleAge / frameDuration) % totalFrameSteps;
+		int currentFrame = step < totalFrames ? step : totalFrames - (step - totalFrames) - 1;
+		particle.SpriteID = currentFrame;
+		break;
+	}
+
+	case ParticleAnimType::LifetimeSpread:  // Distribute all frames evenly over lifetime
+	{
+		int currentFrame = (int)(normalizedAge * totalFrames);
+		if (currentFrame >= totalFrames)
+			currentFrame = totalFrames - 1;  // Clamp to the last frame
+		particle.SpriteID = currentFrame;
+		break;
+	}
+
+	case ParticleAnimType::None:  // Distribute all frames evenly over lifetime
+	{
+		particle.SpriteID = 0;
+		break;
+	}
+
+
+	default:  // Default behavior: keep the first frame
+		particle.SpriteID = 0;
+		break;
+	}
+}
+
 
 void UpdateWibble()
 {
@@ -347,8 +428,56 @@ void UpdateSparks()
 			if (spark.flags & SP_EXPLOSION)
 				SetSpriteSequence(spark, ID_EXPLOSION_SPRITES);
 
+
+			if (spark.flags & SP_ANIMATED)
+			{
+				ParticleAnimType animationType = static_cast<ParticleAnimType>(spark.animationType);
+				GAME_OBJECT_ID spriteObject = static_cast<GAME_OBJECT_ID>(spark.SpriteSeqID);
+				SetAdvancedSpriteSequence(spark, spriteObject,  animationType, spark.framerate);
+			}
+
+			if (spark.flags & SP_SOUND)
+				SoundEffect(spark.sound, &Pose(Vector3(spark.x, spark.y, spark.z)), SoundEnvironment::Always);
+
+			if (spark.flags & SP_LIGHT)
+			{
+				float radius = spark.lightRadius * spark.size / spark.sSize;
+				// Decrease flicker timer if set
+				if (spark.lightFlicker > 0)
+				{
+					spark.lightFlicker--;
+
+					if (spark.lightFlicker <= 0)
+					{
+						// Apply random flicker effect
+						int random = GetRandomControl();
+						int colorOffset = (random % 21) - 10; // Random change between -10 and +10
+
+						byte r = std::clamp(spark.r + colorOffset, 0, 255);
+						byte g = std::clamp(spark.g + colorOffset, 0, 255);
+						byte b = std::clamp(spark.b + colorOffset, 0, 255);
+
+						// Reset flicker timer
+						spark.lightFlicker = spark.lightFlickerS;
+
+						// Emit flickering light
+						SpawnDynamicPointLight(Vector3(spark.x, spark.y, spark.z), ScriptColor(r, g, b), radius, false, GetHash(std::string()));
+					}
+					else
+					{
+						// Normal light emission while flicker is counting down
+						SpawnDynamicPointLight(Vector3(spark.x, spark.y, spark.z), ScriptColor(spark.r, spark.g, spark.b), radius, false, GetHash(std::string()));
+					}
+				}
+				else
+				{
+					// If flicker is disabled or 0, just emit normal light
+					SpawnDynamicPointLight(Vector3(spark.x, spark.y, spark.z), ScriptColor(spark.r, spark.g, spark.b), radius, false, GetHash(std::string()));
+				}
+			}
+
 			if ((spark.flags & SP_FIRE && LaraItem->Effect.Type == EffectType::None) ||
-				(spark.flags & SP_DAMAGE) ||
+				(spark.flags & SP_DAMAGE) || 
 				(spark.flags & SP_POISON))
 			{
 				int ds = spark.size * (spark.scalar / 2.0);
@@ -363,10 +492,10 @@ void UpdateSparks()
 								ItemBurn(LaraItem);
 
 							if (spark.flags & SP_DAMAGE)
-								DoDamage(LaraItem, 2);
+								DoDamage(LaraItem, spark.damage);
 
 							if (spark.flags & SP_POISON)
-								Lara.Status.Poison += 5;
+								Lara.Status.Poison += spark.damage;
 						}
 					}
 				}

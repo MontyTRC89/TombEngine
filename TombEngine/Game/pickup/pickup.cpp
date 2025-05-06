@@ -21,6 +21,7 @@
 #include "Game/pickup/pickup_misc_items.h"
 #include "Game/pickup/pickup_weapon.h"
 #include "Game/room.h"
+#include "Game/savegame.h"
 #include "Game/Setup.h"
 #include "Objects/Generic/Object/burning_torch.h"
 #include "Objects/TR4/Object/tr4_clockwork_beetle.h"
@@ -156,6 +157,11 @@ void PickedUpObject(GAME_OBJECT_ID objectID, std::optional<int> count)
 		!TryAddMiscItem(Lara, objectID))
 	{
 		// Item isn't any of the above; do nothing.
+	}
+	else
+	{
+		SaveGame::Statistics.Level.Pickups++;
+		SaveGame::Statistics.Game.Pickups++;
 	}
 }
 
@@ -1232,30 +1238,6 @@ void SearchObjectControl(short itemNumber)
 		AnimateItem(item);
 
 	int frameNumber = item->Animation.FrameNumber - GetAnimData(item).frameBase;
-	if (item->ObjectNumber == ID_SEARCH_OBJECT1)
-	{
-		if (frameNumber > 0)
-		{
-			item->SetMeshSwapFlags(NO_JOINT_BITS);
-			item->MeshBits = ALL_JOINT_BITS;
-		}
-		else
-		{
-			item->SetMeshSwapFlags(ALL_JOINT_BITS);
-			item->MeshBits = 7;
-		}
-	}
-	else if (item->ObjectNumber == ID_SEARCH_OBJECT2)
-	{
-		if (frameNumber == 18)
-		{
-			item->MeshBits = 1;
-		}
-		else if (frameNumber == 172)
-		{
-			item->MeshBits = 2;
-		}
-	}
 
 	if (frameNumber == SearchCollectFrames[objectNumber])
 	{

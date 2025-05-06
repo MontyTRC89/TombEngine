@@ -1,6 +1,7 @@
 #include "Scripting/Include/ScriptInterfaceState.h"
 
 #include "Scripting/Internal/ReservedScriptNames.h"
+#include "Scripting/Internal/TEN/Collision/Probe.h"
 #include "Scripting/Internal/TEN/Effects/EffectsFunctions.h"
 #include "Scripting/Internal/TEN/Flow/FlowHandler.h"
 #include "Scripting/Internal/TEN/Input/InputHandler.h"
@@ -54,6 +55,7 @@ void ScriptInterfaceState::Init(const std::string& assetsDir)
 
 	// Misc. handlers not assigned above.
 	TEN::Scripting::InventoryHandler::Register(&SolState, RootTable);
+	TEN::Scripting::Collision::Register(&SolState, RootTable);
 	TEN::Scripting::Effects::Register(&SolState, RootTable);
 	TEN::Scripting::Input::Register(&SolState, RootTable);
 	TEN::Scripting::Sound::Register(&SolState, RootTable);

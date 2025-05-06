@@ -6,6 +6,8 @@
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Specific/clock.h"
 
+using namespace TEN::Scripting::Types;
+
 namespace TEN::Scripting
 {
 	struct AnimSettings
@@ -76,8 +78,9 @@ namespace TEN::Scripting
 
 	struct SystemSettings
 	{
-		ErrorMode ErrorMode	 = ErrorMode::Warn;
-		bool	  FastReload = true;
+		ErrorMode ErrorMode		= ErrorMode::Warn;
+		bool	  FastReload	= true;
+		bool	  Multithreaded = true;
 
 	static void Register(sol::table& parent);
 	};
@@ -100,7 +103,9 @@ namespace TEN::Scripting
 		bool Smoke				 = false;
 		bool Shell				 = false;
 		bool MuzzleFlash		 = true;
+		bool MuzzleGlow			 = true;
 		bool ColorizeMuzzleFlash = false;
+		Vec3 MuzzleOffset = {};
 
 		static void Register(sol::table& parent);
 	};

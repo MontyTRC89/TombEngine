@@ -112,7 +112,7 @@ namespace TEN::Renderer
 
 	void Renderer::DrawBar(float percent, const RendererHudBar& bar, GAME_OBJECT_ID textureSlot, int frame, bool isPoisoned)
 	{
-		if (!CheckIfSlotExists(ID_BAR_BORDER_GRAPHIC, "Bar rendering"))
+		if (!CheckIfSlotExists(ID_BAR_BORDER_GRAPHICS, "Bar rendering"))
 			return;
 
 		unsigned int strides = sizeof(Vertex);
@@ -134,7 +134,7 @@ namespace TEN::Renderer
 
 		BindConstantBufferVS(ConstantBufferRegister::Hud, _cbHUD.get());
 
-		RendererSprite* borderSprite = &_sprites[Objects[ID_BAR_BORDER_GRAPHIC].meshIndex];
+		RendererSprite* borderSprite = &_sprites[Objects[ID_BAR_BORDER_GRAPHICS].meshIndex];
 		_stHUDBar.BarStartUV = borderSprite->UV[0];
 		_stHUDBar.BarScale = Vector2(borderSprite->Width / (float)borderSprite->Texture->Width, borderSprite->Height / (float)borderSprite->Texture->Height);
 		_cbHUDBar.UpdateData(_stHUDBar, _context.Get());
@@ -259,11 +259,11 @@ namespace TEN::Renderer
 
 		if (Lara.Control.Look.OpticRange != 0 && !Lara.Control.Look.IsUsingLasersight)
 		{
-			DrawFullScreenSprite(&_sprites[Objects[ID_BINOCULAR_GRAPHIC].meshIndex], Vector3::One, false);
+			DrawFullScreenSprite(&_sprites[Objects[ID_BINOCULAR_GRAPHICS].meshIndex], Vector3::One, false);
 		}
 		else if (Lara.Control.Look.OpticRange != 0 && Lara.Control.Look.IsUsingLasersight)
 		{
-			DrawFullScreenSprite(&_sprites[Objects[ID_LASER_SIGHT_GRAPHIC].meshIndex], Vector3::One);
+			DrawFullScreenSprite(&_sprites[Objects[ID_LASERSIGHT_GRAPHICS].meshIndex], Vector3::One);
 
 			SetBlendMode(BlendMode::Opaque);
 
@@ -400,7 +400,7 @@ namespace TEN::Renderer
 		_primitiveBatch->End();
 	}
 
-	void Renderer::DrawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color, bool fit)
+	void Renderer::DrawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color, bool fit, float customAspect)
 	{
 		constexpr auto VERTEX_COUNT = 4;
 		constexpr auto UV_RANGE		= std::pair<Vector2, Vector2>(Vector2(0.0f), Vector2(1.0f));
@@ -417,7 +417,7 @@ namespace TEN::Renderer
 			texture2DPtr->GetDesc(&desc);
 
 			float screenAspect = float(_screenWidth) / float(_screenHeight);
-			float imageAspect  = float(desc.Width) / float(desc.Height);
+			float imageAspect  = customAspect == 0.0f ? float(desc.Width) / float(desc.Height) : customAspect;
 
 			if (screenAspect > imageAspect)
 			{
@@ -577,7 +577,11 @@ namespace TEN::Renderer
 
 		for (const auto& displaySprite : DisplaySprites)
 		{
-			const auto& sprite = _sprites[Objects[displaySprite.ObjectID].meshIndex + displaySprite.SpriteID];
+			// If sprite is a video texture, bypass it if texture is inactive.
+			if (displaySprite.SpriteID == VIDEO_SPRITE_ID && (_videoSprite.Texture == nullptr || _videoSprite.Texture->Texture == nullptr))
+				continue;
+
+			const auto& sprite = displaySprite.SpriteID == VIDEO_SPRITE_ID ? _videoSprite : _sprites[Objects[displaySprite.ObjectID].meshIndex + displaySprite.SpriteID];
 
 			// Calculate sprite aspect ratio.
 			float spriteAspect = (float)sprite.Width / (float)sprite.Height;

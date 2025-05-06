@@ -135,10 +135,10 @@ struct StaticInfo
 class StaticHandler
 {
 private:
-	static const int _defaultLUTSize = 256;
+	static constexpr auto LUT_SIZE = 256;
 
 	std::vector<StaticInfo> _statics = {};
-	std::vector<int> _lookupTable = {};
+	std::vector<int>		_lut	 = {};
 
 public:
 	void Initialize();
@@ -147,6 +147,7 @@ public:
 	StaticInfo& operator [](int staticID);
 
 	// Iterators
+
 	auto begin() { return _statics.begin(); }			// Non-const begin
 	auto end() { return _statics.end(); }				// Non-const end
 	auto begin() const { return _statics.cbegin(); }	// Const begin

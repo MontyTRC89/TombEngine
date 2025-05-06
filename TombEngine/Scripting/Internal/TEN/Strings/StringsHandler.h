@@ -6,9 +6,7 @@
 
 using DisplayStringMap = std::unordered_map<DisplayStringID, UserDisplayString>;
 
-class StringsHandler :
-	public LuaHandler,
-	public ScriptInterfaceStringsHandler
+class StringsHandler : public LuaHandler, public ScriptInterfaceStringsHandler
 {
 private:
 	DisplayStringMap   m_userDisplayStrings{};

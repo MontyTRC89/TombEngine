@@ -71,42 +71,38 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>$(SolutionDir)Build\bin\$(Platform)\$(Configuration)\</OutDir>
+    <OutDir>$(SolutionDir)Build\$(Configuration)\Bin\x86\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
-    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Libs\spdlog\x86;$(SolutionDir)Libs\lua\x86;$(SolutionDir)Libs\zlib\x86;$(SolutionDir)Libs\bass\x86;$(SolutionDir)Libs\ois\x86</LibraryPath>
+    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\vlc;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Libs\spdlog\x86;$(SolutionDir)Libs\lua\x86;$(SolutionDir)Libs\zlib\x86;$(SolutionDir)Libs\vlc\x86;$(SolutionDir)Libs\bass\x86;$(SolutionDir)Libs\ois\x86</LibraryPath>
     <TargetExt>.exe</TargetExt>
-    <IntDir>$(SolutionDir)Build\obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x64</ExecutablePath>
-    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
-    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x64;$(SolutionDir)Libs\spdlog\x64;$(SolutionDir)Libs\lua\x64;$(SolutionDir)Libs\zlib\x64;$(SolutionDir)Libs\bass\x64;$(SolutionDir)Libs\ois\x64</LibraryPath>
+    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\vlc;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x64;$(SolutionDir)Libs\spdlog\x64;$(SolutionDir)Libs\lua\x64;$(SolutionDir)Libs\zlib\x64;$(SolutionDir)Libs\vlc\x64;$(SolutionDir)Libs\bass\x64;$(SolutionDir)Libs\ois\x64</LibraryPath>
     <TargetExt>.exe</TargetExt>
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)</TargetName>
-    <OutDir>$(SolutionDir)Build\bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)Build\obj\$(Platform)\$(Configuration)\</IntDir>
+    <OutDir>$(SolutionDir)Build\$(Configuration)\Bin\x64\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>
-    </LinkIncremental>
-    <OutDir>$(SolutionDir)Build\bin\$(Platform)\$(Configuration)\</OutDir>
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)Build\$(Configuration)\Bin\x86\</OutDir>
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x86</ExecutablePath>
-    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
-    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Libs\spdlog\x86;$(SolutionDir)Libs\lua\x86;$(SolutionDir)Libs\zlib\x86;$(SolutionDir)Libs\bass\x86;$(SolutionDir)Libs\ois\x86</LibraryPath>
+    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\vlc;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x86;$(SolutionDir)Libs\spdlog\x86;$(SolutionDir)Libs\lua\x86;$(SolutionDir)Libs\zlib\x86;$(SolutionDir)Libs\vlc\x86;$(SolutionDir)Libs\bass\x86;$(SolutionDir)Libs\ois\x86</LibraryPath>
     <TargetExt>.exe</TargetExt>
-    <IntDir>$(SolutionDir)Build\obj\$(Platform)\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ExecutablePath>$(ExecutablePath);$(DXSDK_DIR)Utilities\bin\x64</ExecutablePath>
-    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
-    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x64;$(SolutionDir)Libs\spdlog\x64;$(SolutionDir)Libs\lua\x64;$(SolutionDir)Libs\zlib\x64;$(SolutionDir)Libs\bass\x64;$(SolutionDir)Libs\ois\x64</LibraryPath>
+    <IncludePath>$(SolutionDir)Libs;$(SolutionDir)Libs\lua;$(SolutionDir)Libs\sol;$(SolutionDir)Libs\zlib;$(SolutionDir)Libs\spdlog;$(SolutionDir)Libs\ois;$(SolutionDir)Libs\vlc;$(SolutionDir)Libs\bass;$(SolutionDir)Libs\srtparser;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath);$(DXSDK_DIR)Lib\x64;$(SolutionDir)Libs\spdlog\x64;$(SolutionDir)Libs\lua\x64;$(SolutionDir)Libs\zlib\x64;$(SolutionDir)Libs\vlc\x64;$(SolutionDir)Libs\bass\x64;$(SolutionDir)Libs\ois\x64</LibraryPath>
     <TargetExt>.exe</TargetExt>
-    <LinkIncremental>
-    </LinkIncremental>
-    <OutDir>$(SolutionDir)Build\bin\$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)Build\obj\$(Platform)\$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)Build\$(Configuration)\Bin\x64\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
     <TargetName>$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -115,7 +111,7 @@
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;SOL_SAFE_USERTYPE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Libs\bass\;$(SolutionDir)Libs\fixedpoint\;$(SolutionDir)Libs\srtparser\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -128,62 +124,51 @@
       <DisableSpecificWarnings>4018;4244;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
-      <ForcedIncludeFiles>Framework.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;version.lib;zlib.lib;spdlogd.lib;libvlc.lib;libvlccore.lib;OIS_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <LargeAddressAware>true</LargeAddressAware>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
-      <AdditionalLibraryDirectories>$(SolutionDir)Libs\bass\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(TargetDir)*.*" "$(SolutionDir)Game\Bin\x86\$(Configuration)"
-del "$(SolutionDir)Game\Bin\x86\$(Configuration)\$(TargetName).exp"
-del "$(SolutionDir)Game\Bin\x86\$(Configuration)\$(TargetName).lib"
-del "$(SolutionDir)Game\Bin\x86\$(Configuration)\$(TargetName).pdb"</Command>
-      <Message>Copy dll and exe to game directory.</Message>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>SETLOCAL EnableDelayedExpansion
-SET SchemaDir=$(ProjectDir)Specific\savegame\schema
-SET TimestampFile=$(TargetDir)flatbuffers.timestamp
-FOR %%F IN ("%SchemaDir%\ten_itemdata.fbs" "%SchemaDir%\ten_savegame.fbs") DO (
-    SET "CurrentTimestamp=!CurrentTimestamp! %%~tF"
-)
-IF EXIST "%TimestampFile%" (
-    SET /P LastTimestamp=&amp;lt;"%TimestampFile%"
-)
-SET CurrentTimestamp=%CurrentTimestamp: =%
-SET LastTimestamp=%LastTimestamp: =%
-IF "%CurrentTimestamp%" == "%LastTimestamp%" (
-    ECHO Skipping gen.bat, schema files are unchanged
-) ELSE (
-    ECHO Generating savegame code from flatbuffer schema...
-    CD "%SchemaDir%"
-    CALL gen.bat
-    ECHO !CurrentTimestamp! &amp;gt; "%TimestampFile%"
-)
-ENDLOCAL
+      <Command>powershell -ExecutionPolicy Bypass -File "$(SolutionDir)\Documentation\generate_objectlist.ps1"
+powershell -ExecutionPolicy Bypass -File "$(ProjectDir)Specific\savegame\schema\generate_code.ps1"
 
-CD "$(SolutionDir)Documentation"
+CD "$(ProjectDir)..\Documentation\"
 CALL compile.bat .
 
-md "$(SolutionDir)Game\Shaders"
+SET BuildDir=$(SolutionDir)Build\$(Configuration)
+SET ShaderDir=%BuildDir%\Shaders
+SET ScriptsDir=%BuildDir%\Scripts
+SET EngineDir=%ScriptsDir%\Engine
 
-xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
-xcopy /Y /D "$(SolutionDir)Scripts\*.*" "$(SolutionDir)Game\Scripts"
-xcopy /Y /D "$(SolutionDir)Scripts\Engine\*.*" "$(SolutionDir)Game\Scripts\Engine"
-xcopy /Y /D "$(SolutionDir)Scripts\Levels\*.*" "$(SolutionDir)Game\Scripts\Levels"
+if not exist %ShaderDir% mkdir %ShaderDir%
+if not exist %ScriptsDir% mkdir %ScriptsDir%
+if not exist %EngineDir% mkdir %EngineDir%
 
-xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
-xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
-xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
-      <Message>Generating documentation, savegame flatbuffer, bass dll and copying scripts and shaders files.</Message>
+xcopy /D /Y /I /E "$(ProjectDir)Shaders\*.*" %ShaderDir%
+
+xcopy /Y "$(SolutionDir)Libs\bass\x86\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Libs\lua\x86\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Libs\ois\x86\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Libs\vlc\x86\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"
+
+xcopy /D /Y /I /E "$(SolutionDir)Scripts\Engine\*.*" %EngineDir%
+xcopy /D /Y "$(SolutionDir)Scripts\SystemStrings.lua" %ScriptsDir%
+
+if not exist "%ScriptsDir%\Gameflow.lua" xcopy /Y "$(SolutionDir)Scripts\Gameflow.lua" %ScriptsDir%
+if not exist "%ScriptsDir%\Settings.lua" xcopy /Y "$(SolutionDir)Scripts\Settings.lua" %ScriptsDir%
+if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.lua" %ScriptsDir%</Command>
+      <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -192,7 +177,7 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;SOL_SAFE_USERTYPE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Libs\bass\;$(SolutionDir)Libs\fixedpoint\;$(SolutionDir)Libs\srtparser\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -205,66 +190,51 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
       <DisableSpecificWarnings>4018;4244;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
-      <ForcedIncludeFiles>Framework.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;version.lib;zlib.lib;spdlogd.lib;libvlc.lib;libvlccore.lib;OIS_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <LargeAddressAware>true</LargeAddressAware>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
-      <AdditionalLibraryDirectories>$(SolutionDir)Libs\bass\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(TargetDir)*.*" "$(SolutionDir)Game\Bin\x64\$(Configuration)"
-del "$(SolutionDir)Game\Bin\x64\$(Configuration)\$(TargetName).exp"
-del "$(SolutionDir)Game\Bin\x64\$(Configuration)\$(TargetName).lib"
-del "$(SolutionDir)Game\Bin\x64\$(Configuration)\$(TargetName).pdb"</Command>
-      <Message>Copying DLLs and EXE to Game directory.</Message>
+      <Command>
+      </Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>SETLOCAL EnableDelayedExpansion
-
-SET SchemaDir=$(ProjectDir)Specific\savegame\schema
-SET TimestampFile=$(TargetDir)flatbuffers.timestamp
-
-FOR %%F IN ("%SchemaDir%\ten_itemdata.fbs" "%SchemaDir%\ten_savegame.fbs") DO (
-    SET "CurrentTimestamp=!CurrentTimestamp! %%~tF"
-)
-
-IF EXIST "%TimestampFile%" (
-    SET /P LastTimestamp=&amp;lt;"%TimestampFile%"
-)
-
-SET CurrentTimestamp=%CurrentTimestamp: =%
-SET LastTimestamp=%LastTimestamp: =%
-
-IF "%CurrentTimestamp%" == "%LastTimestamp%" (
-    ECHO Skipping gen.bat, schema files are unchanged
-) ELSE (
-    ECHO Generating savegame code from flatbuffer schema...
-    CD "%SchemaDir%"
-    CALL gen.bat
-    ECHO !CurrentTimestamp! &amp;gt; "%TimestampFile%"
-)
-
-ENDLOCAL
+      <Command>powershell -ExecutionPolicy Bypass -File "$(SolutionDir)\Documentation\generate_objectlist.ps1"
+powershell -ExecutionPolicy Bypass -File "$(ProjectDir)Specific\savegame\schema\generate_code.ps1"
 
 CD "$(ProjectDir)..\Documentation\"
 CALL compile.bat .
 
-md "$(SolutionDir)Game\Shaders"
-xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
-xcopy /Y /D "$(SolutionDir)Scripts\*.*" "$(SolutionDir)Game\Scripts"
-xcopy /Y /D "$(SolutionDir)Scripts\Engine\*.*" "$(SolutionDir)Game\Scripts\Engine"
-xcopy /Y /D "$(SolutionDir)Scripts\Levels\*.*" "$(SolutionDir)Game\Scripts\Levels"
+SET BuildDir=$(SolutionDir)Build\$(Configuration)
+SET ShaderDir=%BuildDir%\Shaders
+SET ScriptsDir=%BuildDir%\Scripts
+SET EngineDir=%ScriptsDir%\Engine
 
-xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
-xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
-xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
-      <Message>Generating documentation, savegame flatbuffer, and bass DLL. Copying scripts and shaders to Game directory.</Message>
+if not exist %ShaderDir% mkdir %ShaderDir%
+if not exist %ScriptsDir% mkdir %ScriptsDir%
+if not exist %EngineDir% mkdir %EngineDir%
+
+xcopy /D /Y /I /E "$(ProjectDir)Shaders\*.*" %ShaderDir%
+
+xcopy /Y "$(SolutionDir)Libs\bass\x64\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Libs\lua\x64\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Libs\ois\x64\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Libs\vlc\x64\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"
+
+xcopy /D /Y /I /E "$(SolutionDir)Scripts\Engine\*.*" %EngineDir%
+xcopy /D /Y "$(SolutionDir)Scripts\SystemStrings.lua" %ScriptsDir%
+
+if not exist "%ScriptsDir%\Gameflow.lua" xcopy /Y "$(SolutionDir)Scripts\Gameflow.lua" %ScriptsDir%
+if not exist "%ScriptsDir%\Settings.lua" xcopy /Y "$(SolutionDir)Scripts\Settings.lua" %ScriptsDir%
+if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.lua" %ScriptsDir%</Command>
+      <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -273,7 +243,7 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;SOL_SAFE_USERTYPE;SOL_SAFE_FUNCTION_CALLS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Libs\bass\;$(SolutionDir)Libs\fixedpoint\;$(SolutionDir)Libs\srtparser\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -281,7 +251,7 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeaderFile>framework.h</PrecompiledHeaderFile>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <Optimization>MinSpace</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -296,64 +266,58 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
       <DisableSpecificWarnings>4018;4244;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
-      <ForcedIncludeFiles>Framework.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;version.lib;zlib.lib;spdlog.lib;libvlc.lib;libvlccore.lib;OIS.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <LargeAddressAware>true</LargeAddressAware>
       <TargetMachine>MachineX86</TargetMachine>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <AdditionalLibraryDirectories>$(SolutionDir)Libs\bass\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(TargetDir)*.*" "$(SolutionDir)Game\Bin\x86\$(Configuration)"
-del "$(SolutionDir)Game\Bin\x86\$(Configuration)\$(TargetName).exp"
-del "$(SolutionDir)Game\Bin\x86\$(Configuration)\$(TargetName).lib"
-del "$(SolutionDir)Game\Bin\x86\$(Configuration)\$(TargetName).pdb"</Command>
-      <Message>Copy dll and exe to game directory.</Message>
+      <Command>del "$(TargetDir)*.pdb" /q
+del "$(TargetDir)*.lib" /q
+del "$(TargetDir)*.exp" /q
+del "$(TargetDir)OIS_d.dll" /q</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>SETLOCAL EnableDelayedExpansion
-SET SchemaDir=$(ProjectDir)Specific\savegame\schema
-SET TimestampFile=$(TargetDir)flatbuffers.timestamp
-FOR %%F IN ("%SchemaDir%\ten_itemdata.fbs" "%SchemaDir%\ten_savegame.fbs") DO (
-    SET "CurrentTimestamp=!CurrentTimestamp! %%~tF"
-)
-IF EXIST "%TimestampFile%" (
-    SET /P LastTimestamp=&amp;lt;"%TimestampFile%"
-)
-SET CurrentTimestamp=%CurrentTimestamp: =%
-SET LastTimestamp=%LastTimestamp: =%
-IF "%CurrentTimestamp%" == "%LastTimestamp%" (
-    ECHO Skipping gen.bat, schema files are unchanged
-) ELSE (
-    ECHO Generating savegame code from flatbuffer schema...
-    CD "%SchemaDir%"
-    CALL gen.bat
-    ECHO !CurrentTimestamp! &amp;gt; "%TimestampFile%"
-)
-ENDLOCAL
+      <Command>powershell -ExecutionPolicy Bypass -File "$(SolutionDir)\Documentation\generate_objectlist.ps1"
 
-CD "$(SolutionDir)Documentation"
+CD "$(ProjectDir)..\Documentation\"
 CALL compile.bat .
 
-md "$(SolutionDir)Game\Shaders"
+CD "$(ProjectDir)Specific\savegame\schema\"
+CALL gen.bat
 
-xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
-xcopy /Y /D "$(SolutionDir)Scripts\*.*" "$(SolutionDir)Game\Scripts"
-xcopy /Y /D "$(SolutionDir)Scripts\Engine\*.*" "$(SolutionDir)Game\Scripts\Engine"
-xcopy /Y /D "$(SolutionDir)Scripts\Levels\*.*" "$(SolutionDir)Game\Scripts\Levels"
+SET BuildDir=$(SolutionDir)Build\$(Configuration)
+SET ShaderDir=%BuildDir%\Shaders
+SET ScriptsDir=%BuildDir%\Scripts
+SET EngineDir=%ScriptsDir%\Engine
 
-xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
-xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
-xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
+if not exist %ShaderDir% mkdir %ShaderDir%
+if not exist %ScriptsDir% mkdir %ScriptsDir%
+if not exist %EngineDir% mkdir %EngineDir%
+
+xcopy /D /Y /I /E "$(ProjectDir)Shaders\*.*" %ShaderDir%
+
+xcopy /Y "$(SolutionDir)Libs\bass\x86\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Libs\lua\x86\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Libs\ois\x86\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Libs\vlc\x86\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Libs\zlib\x86\*.dll" "$(TargetDir)"
+
+xcopy /D /Y /I /E "$(SolutionDir)Scripts\Engine\*.*" %EngineDir%
+xcopy /D /Y "$(SolutionDir)Scripts\SystemStrings.lua" %ScriptsDir%
+
+if not exist "%ScriptsDir%\Gameflow.lua" xcopy /Y "$(SolutionDir)Scripts\Gameflow.lua" %ScriptsDir%
+if not exist "%ScriptsDir%\Settings.lua" xcopy /Y "$(SolutionDir)Scripts\Settings.lua" %ScriptsDir%
+if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.lua" %ScriptsDir%</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generating documentation, savegame flatbuffer, bass dll and copying scripts and shaders files.</Message>
+      <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -362,7 +326,7 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;TombEngine_EXPORTS;_WINDOWS;_USRDLL;NOMINMAX;CREATURE_AI_PRIORITY_OPTIMIZATION;SPDLOG_COMPILED_LIB;SOL_SAFE_USERTYPE;SOL_SAFE_FUNCTION_CALLS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>false</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(SolutionDir)Libs\bass\;$(SolutionDir)Libs\fixedpoint\;$(SolutionDir)Libs\srtparser\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)TombEngine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <IgnoreStandardIncludePath>false</IgnoreStandardIncludePath>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -370,7 +334,7 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeaderFile>framework.h</PrecompiledHeaderFile>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <Optimization>MinSpace</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -385,72 +349,60 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
       <DisableSpecificWarnings>4018;4244;4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <TreatWarningAsError>true</TreatWarningAsError>
       <ObjectFileName>$(IntDir)/%(RelativeDir)/</ObjectFileName>
-      <ForcedIncludeFiles>Framework.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
-      <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;lua53.lib;bass.lib;bassmix.lib;bass_fx.lib;D3DCompiler.lib;dxgi.lib;dxguid.lib;d3d11.lib;version.lib;zlib.lib;spdlog.lib;libvlc.lib;libvlccore.lib;OIS.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
       <LargeAddressAware>true</LargeAddressAware>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
-      <AdditionalLibraryDirectories>$(SolutionDir)Libs\bass\$(Platform);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /Y /D "$(TargetDir)*.*" "$(SolutionDir)Game\Bin\x64\$(Configuration)"
-del "$(SolutionDir)Game\Bin\x64\$(Configuration)\$(TargetName).exp"
-del "$(SolutionDir)Game\Bin\x64\$(Configuration)\$(TargetName).lib"
-del "$(SolutionDir)Game\Bin\x64\$(Configuration)\$(TargetName).pdb"</Command>
-      <Message>Copy dll and exe to game directory.</Message>
+      <Command>del "$(TargetDir)*.pdb" /q
+del "$(TargetDir)*.lib" /q
+del "$(TargetDir)*.exp" /q
+del "$(TargetDir)OIS_d.dll" /q</Command>
     </PostBuildEvent>
     <PreBuildEvent>
-      <Command>SETLOCAL EnableDelayedExpansion
-
-SET SchemaDir=$(ProjectDir)Specific\savegame\schema
-SET TimestampFile=$(TargetDir)flatbuffers.timestamp
-
-FOR %%F IN ("%SchemaDir%\ten_itemdata.fbs" "%SchemaDir%\ten_savegame.fbs") DO (
-    SET "CurrentTimestamp=!CurrentTimestamp! %%~tF"
-)
-
-IF EXIST "%TimestampFile%" (
-    SET /P LastTimestamp=&amp;lt;"%TimestampFile%"
-)
-
-SET CurrentTimestamp=%CurrentTimestamp: =%
-SET LastTimestamp=%LastTimestamp: =%
-
-IF "%CurrentTimestamp%" == "%LastTimestamp%" (
-    ECHO Skipping gen.bat, schema files are unchanged
-) ELSE (
-    ECHO Generating savegame code from flatbuffer schema...
-    CD "%SchemaDir%"
-    CALL gen.bat
-    ECHO !CurrentTimestamp! &amp;gt; "%TimestampFile%"
-)
-
-ENDLOCAL
+      <Command>powershell -ExecutionPolicy Bypass -File "$(SolutionDir)\Documentation\generate_objectlist.ps1"
 
 CD "$(ProjectDir)..\Documentation\"
 CALL compile.bat .
 
-md "$(SolutionDir)Game\Shaders"
-xcopy /Y /D "$(ProjectDir)Shaders\*.*" "$(SolutionDir)Game\Shaders"
-xcopy /Y /D "$(SolutionDir)Scripts\*.*" "$(SolutionDir)Game\Scripts"
-xcopy /Y /D "$(SolutionDir)Scripts\Engine\*.*" "$(SolutionDir)Game\Scripts\Engine"
-xcopy /Y /D "$(SolutionDir)Scripts\Levels\*.*" "$(SolutionDir)Game\Scripts\Levels"
+CD "$(ProjectDir)Specific\savegame\schema\"
+CALL gen.bat
 
-xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass.dll" "$(TargetDir)"
-xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bass_fx.dll" "$(TargetDir)"
-xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Command>
+SET BuildDir=$(SolutionDir)Build\$(Configuration)
+SET ShaderDir=%BuildDir%\Shaders
+SET ScriptsDir=%BuildDir%\Scripts
+SET EngineDir=%ScriptsDir%\Engine
+
+if not exist %ShaderDir% mkdir %ShaderDir%
+if not exist %ScriptsDir% mkdir %ScriptsDir%
+if not exist %EngineDir% mkdir %EngineDir%
+
+xcopy /D /Y /I /E "$(ProjectDir)Shaders\*.*" %ShaderDir%
+
+xcopy /Y "$(SolutionDir)Libs\bass\x64\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Libs\lua\x64\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Libs\ois\x64\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Libs\vlc\x64\*.dll" "$(TargetDir)"
+xcopy /Y "$(SolutionDir)Libs\zlib\x64\*.dll" "$(TargetDir)"
+
+xcopy /D /Y /I /E "$(SolutionDir)Scripts\Engine\*.*" %EngineDir%
+xcopy /D /Y "$(SolutionDir)Scripts\SystemStrings.lua" %ScriptsDir%
+
+if not exist "%ScriptsDir%\Gameflow.lua" xcopy /Y "$(SolutionDir)Scripts\Gameflow.lua" %ScriptsDir%
+if not exist "%ScriptsDir%\Settings.lua" xcopy /Y "$(SolutionDir)Scripts\Settings.lua" %ScriptsDir%
+if not exist "%ScriptsDir%\Strings.lua" xcopy /Y "$(SolutionDir)Scripts\Strings.lua" %ScriptsDir%</Command>
     </PreBuildEvent>
     <PreBuildEvent>
-      <Message>Generating documentation, savegame flatbuffer, bass dll and copying scripts and shaders files.</Message>
+      <Message>Generating documentation, savegame flatbuffer and copying needed files...</Message>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Framework.h" />
     <ClInclude Include="Game\collision\Point.h" />
     <ClInclude Include="Game\collision\Sphere.h" />
     <ClInclude Include="Game\Debug\Debug.h" />
@@ -558,6 +510,7 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClInclude Include="Objects\Effects\effect_objects.h" />
     <ClInclude Include="Objects\Effects\EmberEmitter.h" />
     <ClInclude Include="Objects\Effects\enemy_missile.h" />
+    <ClInclude Include="Objects\Effects\Fireflies.h" />
     <ClInclude Include="Objects\Effects\flame_emitters.h" />
     <ClInclude Include="Objects\Effects\LensFlare.h" />
     <ClInclude Include="Objects\Effects\tr4_locusts.h" />
@@ -613,6 +566,7 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClInclude Include="Objects\TR1\Entity\WingedMutant.h" />
     <ClInclude Include="Objects\TR1\Trap\DamoclesSword.h" />
     <ClInclude Include="Objects\TR1\Trap\ElectricBall.h" />
+    <ClInclude Include="Objects\TR1\Trap\ThorHammer.h" />
     <ClInclude Include="Objects\TR1\Trap\SlammingDoors.h" />
     <ClInclude Include="Objects\TR1\tr1_objects.h" />
     <ClInclude Include="Objects\TR1\Trap\SwingingBlade.h" />
@@ -647,9 +601,9 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClInclude Include="Objects\TR3\Entity\Compsognathus.h" />
     <ClInclude Include="Objects\TR3\Entity\FishSwarm.h" />
     <ClInclude Include="Objects\TR3\Entity\Lizard.h" />
+    <ClInclude Include="Objects\TR3\Entity\SealMutant.h" />
     <ClInclude Include="Objects\TR3\Entity\PunaBoss.h" />
     <ClInclude Include="Objects\TR3\Entity\Raptor.h" />
-    <ClInclude Include="Objects\TR3\Entity\SealMutant.h" />
     <ClInclude Include="Objects\TR3\Entity\Shiva.h" />
     <ClInclude Include="Objects\TR3\Entity\SophiaLeigh.h" />
     <ClInclude Include="Objects\TR3\Entity\tr3_claw_mutant.h" />
@@ -716,6 +670,7 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClInclude Include="Objects\TR4\Entity\tr4_von_croy.h" />
     <ClInclude Include="Objects\TR4\Entity\tr4_wild_boar.h" />
     <ClInclude Include="Objects\TR4\Floor\tr4_burningfloor.h" />
+    <ClInclude Include="Objects\TR4\Object\StatuePlinth.h" />
     <ClInclude Include="Objects\TR4\Object\WraithTrap.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_clockwork_beetle.h" />
     <ClInclude Include="Objects\TR4\Object\tr4_element_puzzle.h" />
@@ -792,6 +747,7 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClInclude Include="Objects\TR5\Switch\tr5_raisingcog.h" />
     <ClInclude Include="Objects\TR5\Trap\LaserBarrier.h" />
     <ClInclude Include="Objects\TR5\Trap\LaserBeam.h" />
+    <ClInclude Include="Objects\TR5\Trap\MovingLaser.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_explosion.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_fallingceiling.h" />
     <ClInclude Include="Objects\TR5\Trap\tr5_romehammer.h" />
@@ -878,7 +834,6 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClInclude Include="Renderer\Structures\RendererStatic.h" />
     <ClInclude Include="Renderer\Structures\RendererStringToDraw.h" />
     <ClInclude Include="Renderer\Structures\RendererTriangle3D.h" />
-    <ClInclude Include="Resource.h" />
     <ClInclude Include="Scripting\Include\Flow\ScriptInterfaceFlowHandler.h" />
     <ClInclude Include="Scripting\Include\Objects\ScriptInterfaceObjectsHandler.h" />
     <ClInclude Include="Scripting\Include\ScriptInterfaceGame.h" />
@@ -892,6 +847,12 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClInclude Include="Scripting\Internal\ReservedScriptNames.h" />
     <ClInclude Include="Scripting\Internal\ScriptAssert.h" />
     <ClInclude Include="Scripting\Internal\ScriptUtil.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Effects\FeatherModes.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Effects\ParticleAnimTypes.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Collision\MaterialTypes.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Collision\Probe.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Flow\Horizon\Horizon.h" />
+    <ClInclude Include="Scripting\Internal\TEN\Objects\Lara\HandStatuses.h" />
     <ClInclude Include="Scripting\Internal\TEN\Objects\Lara\WeaponTypes.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Enums\ErrorModes.h" />
     <ClInclude Include="Scripting\Internal\TEN\Flow\Statistics\Statistics.h" />
@@ -954,6 +915,8 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClInclude Include="Sound\sound.h" />
     <ClInclude Include="Sound\sound_effects.h" />
     <ClInclude Include="Specific\BitField.h" />
+    <ClInclude Include="Specific\Input\Bindings.h" />
+    <ClInclude Include="Specific\Input\Keys.h" />
     <ClInclude Include="Specific\IO\ChunkId.h" />
     <ClInclude Include="Specific\IO\ChunkReader.h" />
     <ClInclude Include="Specific\IO\ChunkWriter.h" />
@@ -962,6 +925,7 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClInclude Include="Specific\Input\Input.h" />
     <ClInclude Include="Specific\Input\InputAction.h" />
     <ClInclude Include="Specific\LevelCameraInfo.h" />
+    <ClInclude Include="Specific\Parallel.h" />
     <ClInclude Include="Specific\RGBAColor8Byte.h" />
     <ClInclude Include="Specific\clock.h" />
     <ClInclude Include="Specific\configuration.h" />
@@ -973,12 +937,15 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClInclude Include="Specific\savegame\flatbuffers\ten_itemdata_generated.h" />
     <ClInclude Include="Specific\savegame\flatbuffers\ten_savegame_generated.h" />
     <ClInclude Include="Specific\trutils.h" />
+    <ClInclude Include="Specific\Video\Video.h" />
     <ClInclude Include="Specific\winmain.h" />
+    <ClInclude Include="framework.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Framework.cpp">
+    <ClCompile Include="framework.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -1083,6 +1050,7 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClCompile Include="Objects\Effects\effect_objects.cpp" />
     <ClCompile Include="Objects\Effects\EmberEmitter.cpp" />
     <ClCompile Include="Objects\Effects\enemy_missile.cpp" />
+    <ClCompile Include="Objects\Effects\Fireflies.cpp" />
     <ClCompile Include="Objects\Effects\flame_emitters.cpp" />
     <ClCompile Include="Objects\Effects\LensFlare.cpp" />
     <ClCompile Include="Objects\Effects\tr4_locusts.cpp" />
@@ -1139,6 +1107,7 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClCompile Include="Objects\TR1\tr1_objects.cpp" />
     <ClCompile Include="Objects\TR1\Trap\DamoclesSword.cpp" />
     <ClCompile Include="Objects\TR1\Trap\ElectricBall.cpp" />
+    <ClCompile Include="Objects\TR1\Trap\ThorHammer.cpp" />
     <ClCompile Include="Objects\TR1\Trap\SlammingDoors.cpp" />
     <ClCompile Include="Objects\TR1\Trap\SwingingBlade.cpp" />
     <ClCompile Include="Objects\TR2\Entity\Bartoli.cpp" />
@@ -1170,9 +1139,9 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClCompile Include="Objects\TR3\Entity\Compsognathus.cpp" />
     <ClCompile Include="Objects\TR3\Entity\FishSwarm.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Lizard.cpp" />
+    <ClCompile Include="Objects\TR3\Entity\SealMutant.cpp" />
     <ClCompile Include="Objects\TR3\Entity\PunaBoss.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Raptor.cpp" />
-    <ClCompile Include="Objects\TR3\Entity\SealMutant.cpp" />
     <ClCompile Include="Objects\TR3\Entity\Shiva.cpp" />
     <ClCompile Include="Objects\TR3\Entity\SophiaLeigh.cpp" />
     <ClCompile Include="Objects\TR3\Entity\tr3_civvy.cpp" />
@@ -1232,6 +1201,7 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClCompile Include="Objects\TR4\Entity\tr4_wild_boar.cpp" />
     <ClCompile Include="Objects\TR4\Entity\Wraith.cpp" />
     <ClCompile Include="Objects\TR4\Floor\tr4_burningfloor.cpp" />
+    <ClCompile Include="Objects\TR4\Object\StatuePlinth.cpp" />
     <ClCompile Include="Objects\TR4\Object\tr4_clockwork_beetle.cpp" />
     <ClCompile Include="Objects\TR4\Object\tr4_element_puzzle.cpp" />
     <ClCompile Include="Objects\TR4\Object\tr4_mapper.cpp" />
@@ -1305,6 +1275,7 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClCompile Include="Objects\TR5\tr5_objects.cpp" />
     <ClCompile Include="Objects\TR5\Trap\LaserBarrier.cpp" />
     <ClCompile Include="Objects\TR5\Trap\LaserBeam.cpp" />
+    <ClCompile Include="Objects\TR5\Trap\MovingLaser.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_explosion.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_fallingceiling.cpp" />
     <ClCompile Include="Objects\TR5\Trap\tr5_romehammer.cpp" />
@@ -1337,6 +1308,8 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClCompile Include="Scripting\Internal\ScriptAssert.cpp" />
     <ClCompile Include="Scripting\Internal\ScriptInterfaceState.cpp" />
     <ClCompile Include="Scripting\Internal\ScriptUtil.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Collision\Probe.cpp" />
+    <ClCompile Include="Scripting\Internal\TEN\Flow\Horizon\Horizon.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Flow\Statistics\Statistics.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Types\Color\Color.cpp" />
     <ClCompile Include="Scripting\Internal\TEN\Types\Time\Time.cpp" />
@@ -1375,14 +1348,18 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <ClCompile Include="Specific\BitField.cpp" />
     <ClCompile Include="Specific\clock.cpp" />
     <ClCompile Include="Specific\configuration.cpp" />
+    <ClCompile Include="Specific\Input\Bindings.cpp" />
     <ClCompile Include="Specific\Input\Input.cpp" />
     <ClCompile Include="Specific\Input\InputAction.cpp" />
+    <ClCompile Include="Specific\Input\Keys.cpp" />
     <ClCompile Include="Specific\IO\ChunkId.cpp" />
     <ClCompile Include="Specific\IO\ChunkReader.cpp" />
     <ClCompile Include="Specific\IO\Streams.cpp" />
     <ClCompile Include="Specific\level.cpp" />
+    <ClCompile Include="Specific\Parallel.cpp" />
     <ClCompile Include="Specific\RGBAColor8Byte.cpp" />
     <ClCompile Include="Specific\trutils.cpp" />
+    <ClCompile Include="Specific\Video\Video.cpp" />
     <ClCompile Include="Specific\winmain.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -1391,21 +1368,12 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <None Include="Resources\Title.bin" />
     <None Include="RuleSet.ruleset" />
     <None Include="Shaders\AnimatedTextures.hlsli" />
-    <None Include="Shaders\CBCamera.hlsli">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</DeploymentContent>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
-      <FileType>Text</FileType>
-    </None>
     <None Include="Shaders\Blending.hlsli">
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</DeploymentContent>
       <FileType>Document</FileType>
     </None>
+    <None Include="Shaders\CBCamera.hlsli" />
+    <None Include="Shaders\CBItem.hlsli" />
     <None Include="Shaders\CBPostProcess.hlsli">
       <DeploymentContent>true</DeploymentContent>
     </None>
@@ -1663,5 +1631,15 @@ xcopy /Y /D "$(SolutionDir)Libs\bass\$(Platform)\bassmix.dll" "$(TargetDir)"</Co
     <Image Include="Resources\Ten.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\Microsoft.XAudio2.Redist.1.2.10\build\native\Microsoft.XAudio2.Redist.targets" Condition="Exists('..\packages\Microsoft.XAudio2.Redist.1.2.10\build\native\Microsoft.XAudio2.Redist.targets')" />
+    <Import Project="..\packages\directxtk_desktop_2019.2022.12.16.1\build\native\directxtk_desktop_2019.targets" Condition="Exists('..\packages\directxtk_desktop_2019.2022.12.16.1\build\native\directxtk_desktop_2019.targets')" />
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\Microsoft.XAudio2.Redist.1.2.10\build\native\Microsoft.XAudio2.Redist.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.XAudio2.Redist.1.2.10\build\native\Microsoft.XAudio2.Redist.targets'))" />
+    <Error Condition="!Exists('..\packages\directxtk_desktop_2019.2022.12.16.1\build\native\directxtk_desktop_2019.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_desktop_2019.2022.12.16.1\build\native\directxtk_desktop_2019.targets'))" />
+  </Target>
 </Project>

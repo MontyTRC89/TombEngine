@@ -57,6 +57,8 @@ namespace TEN::Math
 		GameBoundingBox operator -(const GameBoundingBox& bounds) const;
 		GameBoundingBox operator -(const Pose& pose) const;
 		GameBoundingBox operator *(float scalar) const;
+		GameBoundingBox operator *(Vector3 scalar) const;
 		GameBoundingBox operator /(float scalar) const;
+		GameBoundingBox operator /(Vector3 scalar) const;
 	};
 }

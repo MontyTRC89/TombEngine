@@ -44,10 +44,11 @@ struct ANIMATED_TEXTURES_FRAME
 
 struct ANIMATED_TEXTURES_SEQUENCE
 {
-	int atlas;
+	int Type;
+	int Atlas;
 	int Fps;
-	int numFrames;
-	std::vector<ANIMATED_TEXTURES_FRAME> frames;
+	int NumFrames;
+	std::vector<ANIMATED_TEXTURES_FRAME> Frames;
 };
 
 struct AI_OBJECT

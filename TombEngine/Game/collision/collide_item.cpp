@@ -889,7 +889,8 @@ void CollideBridgeItems(ItemInfo& item, CollisionInfo& coll, PointCollisionData&
 		auto deltaPose = Pose(deltaPos, deltaOrient);
 
 		// Item is grounded and bridge position changed; set shift.
-		if (deltaPose != Pose::Zero && !item.Animation.IsAirborne)
+		if (deltaPose != Pose::Zero && !item.Animation.IsAirborne &&
+			item.IsLara() ? (GetLaraInfo(item).Control.WaterStatus != WaterStatus::Underwater && GetLaraInfo(item).Control.WaterStatus != WaterStatus::FlyCheat) : true)
 		{
 			const auto& bridgePos = bridgeItem.Pose.Position;
 
@@ -940,6 +941,10 @@ void CollideSolidStatics(ItemInfo* item, CollisionInfo* coll)
 		{
 			// Only process meshes which are visible.
 			if (!(mesh.flags & StaticMeshFlags::SM_VISIBLE))
+				continue;
+
+			// Bypass static meshes which are marked as non-collidable.
+			if (!(mesh.flags & StaticMeshFlags::SM_COLLISION))
 				continue;
 
 			// Only process meshes which are solid, or if solid mode is set by the setup.
@@ -1890,7 +1895,12 @@ void DoObjectCollision(ItemInfo* item, CollisionInfo* coll)
 
 		for (auto& staticObject : neighborRoom.mesh)
 		{
+			// Check if static is visible.
 			if (!(staticObject.flags & StaticMeshFlags::SM_VISIBLE))
+				continue;
+
+			// Check if static is collidable.
+			if (!(staticObject.flags & StaticMeshFlags::SM_COLLISION))
 				continue;
 
 			// For Lara, solid static mesh collisions are directly managed by GetCollisionInfo,

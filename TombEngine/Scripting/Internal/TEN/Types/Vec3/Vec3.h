@@ -1,7 +1,13 @@
 #pragma once
 
-class Rotation;
 namespace sol { class state; }
+
+class GameVector;
+class Pose;
+class Vector3i;
+namespace TEN::Scripting { class Rotation; };
+
+using namespace TEN::Scripting;
 
 class Vec3
 {
@@ -25,6 +31,9 @@ public:
 	// Utilities
 
 	Vec3  Normalize() const;
+	Vec3  Translate(const Vec3& dir, float dist);
+	Vec3  Translate(const Rotation& rot, float dist);
+	Vec3  Translate(const Rotation& rot, const Vec3& relOffset);
 	Vec3  Rotate(const Rotation& rot) const;
 	Vec3  Lerp(const Vec3& vector, float alpha) const;
 	Vec3  Cross(const Vec3& vector) const;

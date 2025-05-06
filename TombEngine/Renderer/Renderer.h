@@ -220,6 +220,7 @@ namespace TEN::Renderer
 		std::vector<TexturePair>							   _moveablesTextures;
 		std::vector<TexturePair>							   _staticTextures;
 		std::vector<Texture2D>								   _spritesTextures;
+		RendererSprite										   _videoSprite; // Video texture is an unique case
 
 		Matrix _playerWorldMatrix;
 
@@ -329,7 +330,7 @@ namespace TEN::Renderer
 
 		// Special effects
 
-		std::vector<Texture2D> _causticTextures;
+		//std::vector<Texture2D> _causticTextures;
 		RendererMirror* _currentMirror = nullptr;
 
 		// Transparency
@@ -398,6 +399,7 @@ namespace TEN::Renderer
 		void PrepareFires(RenderView& view);
 		void PrepareParticles(RenderView& view);
 		void PrepareSmokes(RenderView& view);
+		void PrepareFireflies(RenderView& view);
 		void PrepareElectricity(RenderView& view);
 		void PrepareHelicalLasers(RenderView& view);
 		void PrepareBlood(RenderView& view);
@@ -439,7 +441,7 @@ namespace TEN::Renderer
 		void PrepareShockwaves(RenderView& view);
 		void PrepareRipples(RenderView& view);
 		void PrepareUnderwaterBloodParticles(RenderView& view);
-		void DrawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color, bool fit = true);
+		void DrawFullScreenQuad(ID3D11ShaderResourceView* texture, Vector3 color, bool fit = true, float customAspect = 0.0f);
 		void DrawFullScreenSprite(RendererSprite* sprite, DirectX::SimpleMath::Vector3 color, bool fit = true);
 		void PrepareSmokeParticles(RenderView& view);
 		void PrepareSparkParticles(RenderView& view);
@@ -498,7 +500,7 @@ namespace TEN::Renderer
 							const Vector4& color0, const Vector4& color1, const Vector4& color2, const Vector4& color3,
 							BlendMode blendMode, RenderView& view, SpriteRenderType renderType = SpriteRenderType::Default);
 
-		Matrix GetWorldMatrixForSprite(RendererSpriteToDraw* spr, RenderView& view);
+		Matrix GetWorldMatrixForSprite(const RendererSpriteToDraw& sprite, RenderView& view);
 		RendererObject& GetRendererObject(GAME_OBJECT_ID id);
 		RendererMesh* GetMesh(int meshIndex);
 		Texture2D CreateDefaultNormalTexture();
@@ -569,9 +571,20 @@ namespace TEN::Renderer
 		static inline bool IsSortedBlendMode(BlendMode blendMode)
 		{
 			return !(blendMode == BlendMode::Opaque ||
-				blendMode == BlendMode::AlphaTest ||
-				blendMode == BlendMode::Additive ||
-				blendMode == BlendMode::FastAlphaBlend);
+					 blendMode == BlendMode::AlphaTest ||
+					 blendMode == BlendMode::Additive ||
+					 blendMode == BlendMode::FastAlphaBlend);
+		}
+
+		static inline BlendMode GetBlendModeFromAlpha(BlendMode blendMode, float alpha)
+		{
+			if (alpha < ALPHA_BLEND_THRESHOLD &&
+				(blendMode == BlendMode::Opaque || blendMode == BlendMode::AlphaTest || blendMode == BlendMode::FastAlphaBlend))
+			{
+				return BlendMode::AlphaBlend;
+			}
+
+			return blendMode;
 		}
 
 		inline RendererObject& GetStaticRendererObject(short objectNumber)
@@ -586,7 +599,7 @@ namespace TEN::Renderer
 		RendererMesh* GetRendererMeshFromTrMesh(RendererObject* obj, MESH* meshPtr, short boneIndex, int isJoints, int isHairs, int* lastVertex, int* lastIndex);
 		void DrawBar(float percent, const RendererHudBar& bar, GAME_OBJECT_ID textureSlot, int frame, bool poison);
 		void Create();
-		void Initialize(int w, int h, bool windowed, HWND handle);
+		void Initialize(const std::string& gameDir, int w, int h, bool windowed, HWND handle);
 		void ReloadShaders(bool recompileAAShaders = false);
 		void Render(float interpFactor);
 		void RenderTitle(float interpFactor);
@@ -610,6 +623,8 @@ namespace TEN::Renderer
 		void AddDynamicSpotLight(const Vector3& pos, const Vector3& dir, float radius, float falloff, float distance, const Color& color, bool castShadows, int hash = 0);
 		void RenderLoadingScreen(float percentage);
 		void RenderFreezeMode(float interpFactor, bool staticBackground);
+		void RenderFullScreenTexture(ID3D11ShaderResourceView* texture, float aspect);
+		void UpdateVideoTexture(Texture2D* texture);
 		void UpdateProgress(float value);
 		void ToggleFullScreen(bool force = false);
 		void SetFullScreen();
