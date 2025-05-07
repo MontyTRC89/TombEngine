@@ -63,44 +63,39 @@ namespace TEN::Physics
 
 	bool LocalCollisionTriangle::Intersects(const Ray& ray, float& dist, const std::vector<Vector3>& vertices) const
 	{
-		// Get normal.
-		const auto& normal = GetNormal(vertices);
-
-		// Test if ray is facing triangle.
-		if (ray.direction.Dot(normal) > EPSILON)
-			return false;
-
 		// Get vertices.
 		const auto& vertex0 = GetVertex0(vertices);
 		const auto& vertex1 = GetVertex1(vertices);
 		const auto& vertex2 = GetVertex2(vertices);
 
 		// Calculate edges.
-		auto edge0 = vertex1 - vertex0;
-		auto edge1 = vertex2 - vertex0;
+		auto edge1 = vertex1 - vertex0;
+		auto edge2 = vertex2 - vertex0;
 
 		// Calculate determinant.
-		auto dirCrossEdge1 = ray.direction.Cross(edge1);
-		float det = edge0.Dot(dirCrossEdge1);
+		auto rayEdgeCross = ray.direction.Cross(edge2);
+		float det = edge1.Dot(rayEdgeCross);
 
-		// Test if ray and triangle are parallel.
+		// Accept both sides. To cull back faces, remove `abs()` call.
 		if (abs(det) < EPSILON)
 			return false;
 
 		float invDet = 1.0f / det;
 
-		// Calculate barycentric coordinates.
-		float baryCoordVert0 = (ray.position - vertex0).Dot(dirCrossEdge1) * invDet;
-		if (baryCoordVert0 < 0.0f || baryCoordVert0 > 1.0f)
+		// Calculate barycentric coordinate U.
+		auto rayToVertex = ray.position - vertex0;
+		float barycentricU = rayToVertex.Dot(rayEdgeCross) * invDet;
+		if (barycentricU < 0.0f || barycentricU > 1.0f)
 			return false;
 
-		auto rayToVert0CrossEdge0 = (ray.position - vertex0).Cross(edge0);
-		float baryCoordVert1 = ray.direction.Dot(rayToVert0CrossEdge0) * invDet;
-		if (baryCoordVert1 < 0.0f || (baryCoordVert0 + baryCoordVert1) > 1.0f)
+		// Calculate barycentric coordinate V.
+		auto cross = rayToVertex.Cross(edge1);
+		float barycentricV = ray.direction.Dot(cross) * invDet;
+		if (barycentricV < 0.0f || (barycentricU + barycentricV) > 1.0f)
 			return false;
 
-		// Calculate distance along ray to intersection point.
-		float intersectDist = edge1.Dot(rayToVert0CrossEdge0) * invDet;
+		// Calculate intersection distance.
+		float intersectDist = edge2.Dot(cross) * invDet;
 		if (intersectDist < 0.0f)
 			return false;
 
