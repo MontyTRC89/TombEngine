@@ -201,6 +201,48 @@ namespace TEN::Entities::Doors
 		if (door.d2.floor != nullptr)
 		{
 			door.d2.floor->Aabb.GetCorners(corners.data());
+
+			auto quadrant = GetQuadrant(doorItem.Pose.Orientation.y);
+
+			// Get bound to flatten box corners if door is at portal.
+			float bound = 0.0f;
+			for (auto& corner : corners)
+			{
+				switch (quadrant)
+				{
+					case CardinalDirection::NORTH:
+						bound = std::min(bound, corner.z);
+						break;
+
+					case CardinalDirection::SOUTH:
+						bound = std::max(bound, corner.z);
+						break;
+
+					case CardinalDirection::EAST:
+						bound = std::min(bound, corner.x);
+						break;
+
+					case CardinalDirection::WEST:
+						bound = std::max(bound, corner.x);
+						break;
+				}
+			}
+
+			for (auto& corner : corners)
+			{
+				switch (quadrant)
+				{
+					case CardinalDirection::NORTH:
+					case CardinalDirection::SOUTH:
+						corner.z = bound;
+						break;
+
+					case CardinalDirection::EAST:
+					case CardinalDirection::WEST:
+						corner.x = bound;
+						break;
+				}
+			}
 		}
 		else
 		{
