@@ -143,11 +143,13 @@ namespace TEN::Scripting::Input
 		table.set_function(ScriptReserved_KeyClear, &KeyClear);
 		table.set_function(ScriptReserved_KeyClearAll, &KeyClearAll);
 		table.set_function(ScriptReserved_GetAxis, &GetAxisValue);
+		table.set_function(ScriptReserved_GetControllerStatus, &ControllerConnected);
 
 		table.set_function(ScriptReserved_GetMouseDisplayPosition, &GetMouseDisplayPosition);
 		table.set_function(ScriptReserved_GetCursorDisplayPosition, &GetMouseDisplayPosition);
 
 		auto handler = LuaHandler(state);
 		handler.MakeReadOnlyTable(table, ScriptReserved_ActionID, ACTION_IDS);
+		handler.MakeReadOnlyTable(table, ScriptReserved_AxisType, AXIS);
 	}
 }
