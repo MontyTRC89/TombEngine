@@ -110,3 +110,11 @@ static const std::unordered_map<std::string, InputActionID> ACTION_IDS
 	{ "SAVE", In::Save },
 	{ "LOAD", In::Load }
 };
+
+static const std::unordered_map<std::string, InputAxisID> AXIS
+{
+
+	{ "MOVE", InputAxisID::Move },
+	{ "CAMERA", InputAxisID::Camera },
+	{ "MOUSE", InputAxisID::Mouse }
+};

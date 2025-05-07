@@ -8,6 +8,7 @@
 #include "Scripting/Internal/TEN/Input/ActionIDs.h"
 #include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 #include "Specific/Input/Input.h"
+#include "Specific/Input/Input.cpp"
 
 using namespace TEN::Input;
 
@@ -108,6 +109,28 @@ namespace TEN::Scripting::Input
 		return Vec2(cursorPos);
 	}
 
+	/// Get the display position of the cursor in percent.
+	// @function GetMouseDisplayPosition
+	// @treturn Vec2 Cursor display position in percent.
+	static Vec2 GetAxisValue(InputAxisID axis)
+	{
+		// NOTE: Conversion from internal 800x600 to more intuitive 100x100 display space resolution is required.
+		// In a future refactor, everything will use 100x100 natively. -- Sezz 2023.10.20
+
+		return Vec2(AxisMap[axis]);
+	}
+
+	static bool ControllerConnected()
+	{
+		// NOTE: Conversion from internal 800x600 to more intuitive 100x100 display space resolution is required.
+		// In a future refactor, everything will use 100x100 natively. -- Sezz 2023.10.20
+
+		if (OisGamepad == nullptr)
+			return false;
+		else
+			return true;
+	}
+
 	void Register(sol::state* state, sol::table& parent)
 	{
 		auto table = sol::table(state->lua_state(), sol::create);
@@ -119,6 +142,7 @@ namespace TEN::Scripting::Input
 		table.set_function(ScriptReserved_KeyPush, &KeyPush);
 		table.set_function(ScriptReserved_KeyClear, &KeyClear);
 		table.set_function(ScriptReserved_KeyClearAll, &KeyClearAll);
+		table.set_function(ScriptReserved_GetAxis, &GetAxisValue);
 
 		table.set_function(ScriptReserved_GetMouseDisplayPosition, &GetMouseDisplayPosition);
 		table.set_function(ScriptReserved_GetCursorDisplayPosition, &GetMouseDisplayPosition);
