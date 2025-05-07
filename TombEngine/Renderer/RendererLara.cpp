@@ -327,7 +327,7 @@ void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 			_stItem.BonesMatrices[m] =  laraObj.BindPoseTransforms[m] * item->InterpolatedAnimTransforms[m];
 		_cbItem.UpdateData(_stItem, _context.Get());
 
-		DrawMoveableMesh(item, GetMesh(item->SkinIndex), room, 0, true, view, rendererPass);
+		DrawMesh(item, GetMesh(item->SkinIndex), RendererObjectType::Moveable, 0, true, view, rendererPass);
 	}
 
 	memcpy(_stItem.BonesMatrices, item->InterpolatedAnimTransforms, laraObj.AnimationTransforms.size() * sizeof(Matrix));
@@ -341,7 +341,7 @@ void Renderer::DrawLara(RenderView& view, RendererPass rendererPass)
 		if (skinMode == SkinningMode::Full && g_Level.Meshes[nativeItem->Model.MeshIndex[k]].hidden)
 			continue;
 
-		DrawMoveableMesh(item, GetMesh(item->MeshIndex[k]), room, k, false, view, rendererPass);
+		DrawMesh(item, GetMesh(item->MeshIndex[k]), RendererObjectType::Moveable, k, false, view, rendererPass);
 	}
 
 	if (skinMode == SkinningMode::Classic)
@@ -392,7 +392,7 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 		for (int j = 0; j < rendererObject.ObjectMeshes.size(); j++)
 		{
 			auto& rendererMesh = *rendererObject.ObjectMeshes[j];
-			DrawMoveableMesh(itemToDraw, &rendererMesh, room, j, false, view, rendererPass);
+			DrawMesh(itemToDraw, &rendererMesh, i ? RendererObjectType::HairSecondary : RendererObjectType::HairPrimary, j, false, view, rendererPass);
 		}
 	}
 }
@@ -407,7 +407,7 @@ void Renderer::DrawLaraJoints(RendererItem* itemToDraw, RendererRoom* room, Rend
 	for (int k = 1; k < laraSkinJoints.ObjectMeshes.size(); k++)
 	{
 		RendererMesh* mesh = laraSkinJoints.ObjectMeshes[k];
-		DrawMoveableMesh(itemToDraw, mesh, room, k, false, view, rendererPass);
+		DrawMesh(itemToDraw, mesh, RendererObjectType::Moveable, k, false, view, rendererPass);
 	}
 }
 
@@ -421,20 +421,20 @@ void Renderer::DrawLaraHolsters(RendererItem* itemToDraw, RendererRoom* room, Re
 	{
 		RendererObject& holsterSkin = *_moveableObjects[static_cast<int>(leftHolsterID)];
 		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_LTHIGH];
-		DrawMoveableMesh(itemToDraw, mesh, room, LM_LTHIGH, false, view, rendererPass);
+		DrawMesh(itemToDraw, mesh, RendererObjectType::Moveable, LM_LTHIGH, false, view, rendererPass);
 	}
 
 	if (_moveableObjects[static_cast<int>(rightHolsterID)])
 	{
 		RendererObject& holsterSkin = *_moveableObjects[static_cast<int>(rightHolsterID)];
 		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_RTHIGH];
-		DrawMoveableMesh(itemToDraw, mesh, room, LM_RTHIGH, false, view, rendererPass);
+		DrawMesh(itemToDraw, mesh, RendererObjectType::Moveable, LM_RTHIGH, false, view, rendererPass);
 	}
 
 	if (backHolsterID != HolsterSlot::Empty && _moveableObjects[static_cast<int>(backHolsterID)])
 	{
 		RendererObject& holsterSkin = *_moveableObjects[static_cast<int>(backHolsterID)];
 		RendererMesh* mesh = holsterSkin.ObjectMeshes[LM_TORSO];
-		DrawMoveableMesh(itemToDraw, mesh, room, LM_TORSO, false, view, rendererPass);
+		DrawMesh(itemToDraw, mesh, RendererObjectType::Moveable, LM_TORSO, false, view, rendererPass);
 	}
 }

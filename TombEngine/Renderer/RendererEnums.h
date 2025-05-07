@@ -261,7 +261,9 @@ enum class RendererObjectType
 	Moveable, 
 	Static,
 	Sprite,
-	MoveableAsStatic // For rats, bats, spiders, beetles
+	MoveableAsStatic, // For rats, bats, spiders, beetles
+	HairPrimary,
+	HairSecondary
 };
 
 enum class SMAAMode
