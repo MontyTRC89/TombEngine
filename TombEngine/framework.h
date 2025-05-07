@@ -25,6 +25,7 @@
 #include <queue>
 #include <unordered_set>
 #include <vector>
+#include <vlc/vlc.h>
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;

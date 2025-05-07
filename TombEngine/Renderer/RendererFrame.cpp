@@ -527,10 +527,9 @@ namespace TEN::Renderer
 				mesh->Color = nativeMesh->color;
 				mesh->OriginalSphere = Statics[mesh->ObjectNumber].visibilityBox.ToLocalBoundingSphere();
 				mesh->Pose = nativeMesh->pos;
-				mesh->Scale = nativeMesh->scale;
-				mesh->Update();
+				mesh->Update(GetInterpolationFactor());
 
-				nativeMesh->Dirty = false;
+				nativeMesh->Dirty = (mesh->PrevPose != mesh->Pose);
 			}
 
 			if (!(nativeMesh->flags & StaticMeshFlags::SM_VISIBLE))
@@ -930,6 +929,12 @@ namespace TEN::Renderer
 			effect.PrevTranslation = effect.Translation;
 			effect.PrevRotation = effect.Rotation;
 			effect.PrevScale = effect.Scale;
+		}
+
+		for (auto& room : _rooms)
+		{
+			for (auto& stat : room.Statics)
+				stat.PrevPose = stat.Pose;
 		}
 	}
 }

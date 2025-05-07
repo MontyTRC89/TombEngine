@@ -57,7 +57,6 @@ struct MESH_INFO
 {
 	Pose pos;
 	int roomNumber;
-	float scale;
 	short staticNumber;
 	short flags;
 	Vector4 color;

@@ -904,7 +904,7 @@ namespace TEN::Renderer
 		if (!texture.Texture)
 			return;
 
-		int timeout = 10;
+		int timeout = 20;
 		float currentFade = FADE_FACTOR;
 
 		while (timeout || currentFade > 0.0f)
@@ -930,7 +930,7 @@ namespace TEN::Renderer
 
 	void Renderer::DrawExamines()
 	{
-		constexpr auto SCREEN_POS = Vector2(400.0f, 300.0f);
+		auto screenPos = Vector2(DISPLAY_SPACE_RES.x / 2, DISPLAY_SPACE_RES.y / 2);
 
 		static EulerAngles orient = EulerAngles::Identity;
 		static float scaler = 1.2f;
@@ -964,10 +964,23 @@ namespace TEN::Renderer
 		if (scaler < 0.8f)
 			scaler = 0.8f;
 
+		// Construct string key and try to get it.
+		auto stringKey = TEN::Utils::ToLower(GetObjectName((GAME_OBJECT_ID)object.ObjectNumber)) + "_text";
+		auto string = g_GameFlow->GetString(stringKey.c_str());
+
+		// If string is found, draw it and shift examine position upwards.
+		if (GetHash(string) != GetHash(stringKey))
+		{
+			AddString(screenPos.x, screenPos.y + screenPos.y / 4.0f, g_GameFlow->GetString(stringKey.c_str()), PRINTSTRING_COLOR_WHITE, SF_Center());
+			screenPos.y -= screenPos.y / 4.0f;
+		}
+
 		float savedScale = object.Scale1;
 		object.Scale1 = scaler;
-		DrawObjectIn2DSpace(g_Gui.ConvertInventoryItemToObject(invItem), SCREEN_POS, orient, object.Scale1);
+		DrawObjectIn2DSpace(g_Gui.ConvertInventoryItemToObject(invItem), screenPos, orient, object.Scale1);
 		object.Scale1 = savedScale;
+
+		DrawAllStrings();
 	}
 
 	void Renderer::RenderInventoryScene(RenderTarget2D* renderTarget, TextureBase* background, float backgroundFade)

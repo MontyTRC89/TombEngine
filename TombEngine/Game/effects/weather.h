@@ -9,7 +9,7 @@ using namespace TEN::Entities::Effects;
 namespace TEN::Effects::Environment 
 {
 	constexpr auto WEATHER_PARTICLE_SPAWN_DENSITY		 = 32;
-	constexpr auto WEATHER_PARTICLE_COUNT_MAX			 = 2048;
+	constexpr auto WEATHER_PARTICLE_COUNT_MAX			 = 4096;
 	constexpr auto WEATHER_PARTICLE_COLL_CHECK_DELAY_MAX = 5.0f;
 
 	constexpr auto DUST_SIZE_MAX = 25.0f;
