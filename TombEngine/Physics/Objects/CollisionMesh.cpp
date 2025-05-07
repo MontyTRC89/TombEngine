@@ -76,7 +76,9 @@ namespace TEN::Physics
 		auto rayEdgeCross = ray.direction.Cross(edge2);
 		float det = edge1.Dot(rayEdgeCross);
 
-		// Accept both sides. To cull back faces, remove `abs()` call.
+		// Accept both sides.
+		// TODO: Culling back faces (done by removing `abs()`) would be preferred, but doors benefit from having it like this.
+		// If pathfinding refactors remove the door concept, adjust this check. -- Sezz 2025.5.7
 		if (abs(det) < EPSILON)
 			return false;
 

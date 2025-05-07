@@ -29,6 +29,5 @@ struct DOOR_DATA
 	unsigned char dn4;
 	ItemInfo* item;
 
-	CollisionMesh CollisionMeshFlip = {};
-	CollisionMesh CollisionMesh		= {};
+	CollisionMesh CollisionMesh	= {};
 };

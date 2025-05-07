@@ -196,7 +196,7 @@ namespace TEN::Entities::Doors
 			doorItem.InDrawRoom = true;
 		}
 
-		// Get sector AABB corners.
+		// Get sector AABB corners. NOTE: Doors in flip rooms use mesh generated in original room.
 		auto corners = std::array<Vector3, BoundingBox::CORNER_COUNT>{};
 		if (door.d2.floor != nullptr)
 		{
@@ -467,11 +467,16 @@ namespace TEN::Entities::Doors
 		auto& room = g_Level.Rooms[(door.d2.floor != nullptr) ? door.d2.floor->RoomNumber : door.d1.floor->RoomNumber];
 		room.DoorCollisionMeshes.Insert(item.Index, (door.d2.floor != nullptr) ? door.d2.floor->Aabb : door.d1.floor->Aabb);
 
-		/*if (door.d1flip.floor != nullptr)
+		if (door.d2flip.floor != nullptr)
 		{
-			auto& roomFlip = g_Level.Rooms[door.d1flip.floor->RoomNumber];
-			roomFlip.DoorCollisionMeshes.Insert(item.Index, door.d2.floor->Aabb);
-		}*/
+			auto& flipRoom = g_Level.Rooms[door.d2flip.floor->RoomNumber];
+			flipRoom.DoorCollisionMeshes.Insert(item.Index, (door.d2.floor != nullptr) ? door.d2.floor->Aabb : door.d1.floor->Aabb);
+		}
+		else if (door.d1flip.floor != nullptr)
+		{
+			auto& flipRoom = g_Level.Rooms[door.d1flip.floor->RoomNumber];
+			flipRoom.DoorCollisionMeshes.Insert(item.Index, (door.d2.floor != nullptr) ? door.d2.floor->Aabb : door.d1.floor->Aabb);
+		}
 	}
 
 	void DisableDoorCollisionMesh(const ItemInfo& item)
@@ -480,11 +485,16 @@ namespace TEN::Entities::Doors
 
 		auto& room = g_Level.Rooms[(door.d2.floor != nullptr) ? door.d2.floor->RoomNumber : door.d1.floor->RoomNumber];
 		room.DoorCollisionMeshes.Remove(item.Index);
-
-		/*if (door.d1flip.floor != nullptr)
+		
+		if (door.d2flip.floor != nullptr)
 		{
-			auto& roomFlip = g_Level.Rooms[door.d1flip.floor->RoomNumber];
-			roomFlip.DoorCollisionMeshes.Remove(item.Index);
-		}*/
+			auto& flipRoom = g_Level.Rooms[door.d2flip.floor->RoomNumber];
+			flipRoom.DoorCollisionMeshes.Remove(item.Index);
+		}
+		else if (door.d1flip.floor != nullptr)
+		{
+			auto& flipRoom = g_Level.Rooms[door.d1flip.floor->RoomNumber];
+			flipRoom.DoorCollisionMeshes.Remove(item.Index);
+		}
 	}
 }
