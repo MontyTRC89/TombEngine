@@ -157,10 +157,10 @@ struct RoomData
 	//RoomObjectHandler Moveables = RoomObjectHandler(); // TODO: Refactor linked list of items in room to use a BVH instead.
 	//RoomObjectHandler Statics	= RoomObjectHandler(); // TODO: Refactor to use BVH.
 	std::vector<MESH_INFO> mesh = {}; // Statics
-	RoomObjectHandler DoorCollisionMeshes = {};
 
-	CollisionMesh			   CollisionMesh = {};
+	CollisionMesh			   CollisionMesh  = {};
 	RoomObjectHandler		   Bridges		  = RoomObjectHandler();
+	RoomObjectHandler		   Doors		  = RoomObjectHandler();
 	std::vector<PortalData>	   Portals		  = {};
 	std::vector<TriggerVolume> TriggerVolumes = {};
 	std::vector<FloorInfo>	   Sectors		  = {};

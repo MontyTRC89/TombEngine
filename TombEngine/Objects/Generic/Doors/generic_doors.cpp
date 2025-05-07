@@ -507,17 +507,17 @@ namespace TEN::Entities::Doors
 		const auto& door = GetDoorObject(item);
 
 		auto& room = g_Level.Rooms[(door.d2.floor != nullptr) ? door.d2.floor->RoomNumber : door.d1.floor->RoomNumber];
-		room.DoorCollisionMeshes.Insert(item.Index, (door.d2.floor != nullptr) ? door.d2.floor->Aabb : door.d1.floor->Aabb);
+		room.Doors.Insert(item.Index, (door.d2.floor != nullptr) ? door.d2.floor->Aabb : door.d1.floor->Aabb);
 
 		if (door.d2flip.floor != nullptr)
 		{
 			auto& flipRoom = g_Level.Rooms[door.d2flip.floor->RoomNumber];
-			flipRoom.DoorCollisionMeshes.Insert(item.Index, (door.d2.floor != nullptr) ? door.d2.floor->Aabb : door.d1.floor->Aabb);
+			flipRoom.Doors.Insert(item.Index, (door.d2.floor != nullptr) ? door.d2.floor->Aabb : door.d1.floor->Aabb);
 		}
 		else if (door.d1flip.floor != nullptr)
 		{
 			auto& flipRoom = g_Level.Rooms[door.d1flip.floor->RoomNumber];
-			flipRoom.DoorCollisionMeshes.Insert(item.Index, (door.d2.floor != nullptr) ? door.d2.floor->Aabb : door.d1.floor->Aabb);
+			flipRoom.Doors.Insert(item.Index, (door.d2.floor != nullptr) ? door.d2.floor->Aabb : door.d1.floor->Aabb);
 		}
 	}
 
@@ -526,17 +526,17 @@ namespace TEN::Entities::Doors
 		const auto& door = GetDoorObject(item);
 
 		auto& room = g_Level.Rooms[(door.d2.floor != nullptr) ? door.d2.floor->RoomNumber : door.d1.floor->RoomNumber];
-		room.DoorCollisionMeshes.Remove(item.Index);
+		room.Doors.Remove(item.Index);
 		
 		if (door.d2flip.floor != nullptr)
 		{
 			auto& flipRoom = g_Level.Rooms[door.d2flip.floor->RoomNumber];
-			flipRoom.DoorCollisionMeshes.Remove(item.Index);
+			flipRoom.Doors.Remove(item.Index);
 		}
 		else if (door.d1flip.floor != nullptr)
 		{
 			auto& flipRoom = g_Level.Rooms[door.d1flip.floor->RoomNumber];
-			flipRoom.DoorCollisionMeshes.Remove(item.Index);
+			flipRoom.Doors.Remove(item.Index);
 		}
 	}
 }

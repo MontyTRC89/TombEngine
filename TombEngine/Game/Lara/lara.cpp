@@ -92,7 +92,7 @@ static void HandlePlayerDebug(const ItemInfo& item)
 			neighborRoom.CollisionMesh.DrawDebug();
 
 			// Draw door collision meshes.
-			for (int doorItemNumber : neighborRoom.DoorCollisionMeshes.GetIds())
+			for (int doorItemNumber : neighborRoom.Doors.GetIds())
 			{
 				const auto& doorItem = g_Level.Items[doorItemNumber];
 				const auto& door = GetDoorObject(doorItem);

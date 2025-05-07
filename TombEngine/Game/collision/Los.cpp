@@ -272,8 +272,8 @@ namespace TEN::Collision::Los
 			}
 
 			// 2.2) Clip doors.
-			auto doorItemIds = room.DoorCollisionMeshes.GetBoundedIds(ray, closestDist);
-			for (int doorItemNumber : doorItemIds)
+			auto doorItemNumbers = room.Doors.GetBoundedIds(ray, closestDist);
+			for (int doorItemNumber : doorItemNumbers)
 			{
 				const auto& doorItem = g_Level.Items[doorItemNumber];
 				const auto& door = GetDoorObject(doorItem);
