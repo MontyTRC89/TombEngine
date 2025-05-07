@@ -68,13 +68,15 @@ namespace TEN::Input
 
 		// Mouse
 
-		ClickLeft,
-		ClickMiddle,
-		ClickRight,
-		ScrollUp,
-		ScrollDown,
+		MouseClickLeft,
+		MouseClickMiddle,
+		MouseClickRight,
+		MouseScrollUp,
+		MouseScrollDown,
 		// TODO: Another time. There's some complexity involved. -- Sezz 2025.03.05
-		/*MouseUp,
+		/*MouseScrollLeft,
+		MouseScrollRight,
+		MouseUp,
 		MouseDown,
 		MouseLeft,
 		MouseRight,*/

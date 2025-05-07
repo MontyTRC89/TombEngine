@@ -71,11 +71,11 @@ namespace TEN::Input
 		},
 		// Mouse
 		{
-			In::ClickLeft,
-			In::ClickMiddle,
-			In::ClickRight,
-			In::ScrollUp,
-			In::ScrollDown
+			In::MouseClickLeft,
+			In::MouseClickMiddle,
+			In::MouseClickRight,
+			In::MouseScrollUp,
+			In::MouseScrollDown
 		}
 	};
 

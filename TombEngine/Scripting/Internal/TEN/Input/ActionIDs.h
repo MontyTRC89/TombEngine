@@ -84,16 +84,16 @@ namespace TEN::Scripting::Input
 	//  X
 	//  Y
 	//  Z
-	//  NUM_1
-	//  NUM_2
-	//  NUM_3
-	//  NUM_4
-	//  NUM_5
-	//  NUM_6
-	//  NUM_7
-	//  NUM_8
-	//  NUM_9
-	//  NUM_0
+	//  1
+	//  2
+	//  3
+	//  4
+	//  5
+	//  6
+	//  7
+	//  8
+	//  9
+	//  0
 	//  RETURN
 	//  ESCAPE
 	//  BACKSPACE
@@ -117,11 +117,11 @@ namespace TEN::Scripting::Input
 	//  SHIFT
 	//  ALT
 	// 
-	//  CLICK_LEFT
-	//  CLICK_MIDDLE
-	//  CLICK_RIGHT
-	//  SCROLL_UP
-	//  SCROLL_DOWN
+	//  MOUSE_CLICK_LEFT
+	//  MOUSE_CLICK_MIDDLE
+	//  MOUSE_CLICK_RIGHT
+	//  MOUSE_SCROLL_UP
+	//  MOUSE_SCROLL_DOWN
 	// 
 	// @table Input.ActionID
 
@@ -198,16 +198,16 @@ namespace TEN::Scripting::Input
 		{ "X", In::X },
 		{ "Y", In::Y },
 		{ "Z", In::Z },
-		{ "NUM_1", In::Num1 },
-		{ "NUM_2", In::Num2 },
-		{ "NUM_3", In::Num3 },
-		{ "NUM_4", In::Num4 },
-		{ "NUM_5", In::Num5 },
-		{ "NUM_6", In::Num6 },
-		{ "NUM_7", In::Num7 },
-		{ "NUM_8", In::Num8 },
-		{ "NUM_9", In::Num9 },
-		{ "NUM_0", In::Num0 },
+		{ "1", In::Num1 },
+		{ "2", In::Num2 },
+		{ "3", In::Num3 },
+		{ "4", In::Num4 },
+		{ "5", In::Num5 },
+		{ "6", In::Num6 },
+		{ "7", In::Num7 },
+		{ "8", In::Num8 },
+		{ "9", In::Num9 },
+		{ "0", In::Num0 },
 		{ "RETURN", In::Return },
 		{ "ESCAPE", In::Escape },
 		{ "BACKSPACE", In::Backspace },
@@ -231,10 +231,10 @@ namespace TEN::Scripting::Input
 		{ "SHIFT", In::Shift },
 		{ "ALT", In::Alt },
 
-		{ "CLICK_LEFT", In::ClickLeft },
-		{ "CLICK_MIDDLE", In::ClickMiddle },
-		{ "CLICK_RIGHT", In::ClickRight },
-		{ "SCROLL_UP", In::ScrollUp },
-		{ "SCROLL_DOWN", In::ScrollDown }
+		{ "MOUSE_CLICK_LEFT", In::MouseClickLeft },
+		{ "MOUSE_CLICK_MIDDLE", In::MouseClickMiddle },
+		{ "MOUSE_CLICK_RIGHT", In::MouseClickRight },
+		{ "MOUSE_SCROLL_UP", In::MouseScrollUp },
+		{ "MOUSE_SCROLL_DOWN", In::MouseScrollDown }
 	};
 }
