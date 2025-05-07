@@ -372,9 +372,9 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 		_stItem.Skinned = false;
 		ReflectMatrixOptionally(_stItem.BonesMatrices[0]);
 
-		for (int i = 0; i < unit.Segments.size(); i++)
+		for (int j = 0; j < unit.Segments.size(); j++)
 		{
-			const auto& segment = unit.Segments[i];
+			const auto& segment = unit.Segments[j];
 			auto worldMatrix = 
 				Matrix::CreateFromQuaternion(
 					Quaternion::Lerp(segment.PrevOrientation, segment.Orientation, GetInterpolationFactor(forceValue))) *
@@ -383,16 +383,16 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 			
 			ReflectMatrixOptionally(worldMatrix);
 
-			_stItem.BonesMatrices[i + 1] = worldMatrix;
-			_stItem.BoneLightModes[i] = (int)LightMode::Dynamic;
+			_stItem.BonesMatrices[j + 1] = worldMatrix;
+			_stItem.BoneLightModes[j] = (int)LightMode::Dynamic;
 		}
 
 		_cbItem.UpdateData(_stItem, _context.Get());
 
-		for (int i = 0; i < rendererObject.ObjectMeshes.size(); i++)
+		for (int j = 0; j < rendererObject.ObjectMeshes.size(); j++)
 		{
-			auto& rendererMesh = *rendererObject.ObjectMeshes[i];
-			DrawMoveableMesh(itemToDraw, &rendererMesh, room, i, false, view, rendererPass);
+			auto& rendererMesh = *rendererObject.ObjectMeshes[j];
+			DrawMoveableMesh(itemToDraw, &rendererMesh, room, j, false, view, rendererPass);
 		}
 	}
 }
