@@ -148,7 +148,7 @@ namespace TEN::Collision::Los
 						itemLos.RoomNumber = roomNumber;
 						itemLos.Distance = intersectDist;
 						itemLos.IsOriginContained = (bool)obb.Contains(origin);
-						los.Items.push_back(itemLos);
+						los.Items.push_back(std::move(itemLos));
 					}
 				}
 
@@ -174,7 +174,7 @@ namespace TEN::Collision::Los
 							sphereLos.RoomNumber = roomNumber;
 							sphereLos.Distance = intersectDist;
 							sphereLos.IsOriginContained = (bool)sphere.Contains(origin);
-							los.Spheres.push_back(sphereLos);
+							los.Spheres.push_back(std::move(sphereLos));
 						}
 					}
 				}
@@ -219,7 +219,7 @@ namespace TEN::Collision::Los
 					staticLos.RoomNumber = roomNumber;
 					staticLos.Distance = intersectDist;
 					staticLos.IsOriginContained = (bool)obb.Contains(origin);
-					los.Statics.push_back(staticLos);
+					los.Statics.push_back(std::move(staticLos));
 				}
 			}
 
