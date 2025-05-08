@@ -208,11 +208,11 @@ namespace TEN::Scripting
 		// @tfield int mesh Index of a root mesh to which hair will attach. Root mesh may be different for each hair object.
 		"rootMesh", &HairSettings::RootMesh,
 
-		/// Relative braid offset to a headmesh.
+		/// Relative braid offset to a headmesh. Not used with skinned hair mesh.
 		// @tfield Vec3 offset Specifies how braid is positioned in relation to a headmesh.
 		"offset", &HairSettings::Offset,
 	
-		/// Braid connection indices.
+		/// Braid connection indices. Not used with skinned hair mesh.
 		// @tfield table indices A list of headmesh's vertex connection indices. Each index corresponds to nearest braid rootmesh vertex. Amount of indices is unlimited.
 		"indices", &HairSettings::Indices);
 	}
