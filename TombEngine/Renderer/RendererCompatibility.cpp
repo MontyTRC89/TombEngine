@@ -741,6 +741,36 @@ namespace TEN::Renderer
 						const auto& skinObj = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
 						const auto& settings = g_GameFlow->GetSettings()->Hair;
 
+						// Flatten skinned hairmesh vertices to be transformed correctly.
+						// It's needed because every segment of hair skeleton uses global transform, and it's impossible
+						// to calculate correct offset for it dynamically.
+
+						if (obj->skinIndex != NO_VALUE)
+						{
+							const auto* hairMesh = GetMesh(obj->skinIndex);
+
+							for (const auto& bucket : hairMesh->Buckets)
+							{
+								for (int v = 0; v < bucket.NumVertices; v++)
+								{
+									auto& vertex = _moveablesVertices[bucket.StartVertex + v];
+
+									for (int w = 0; w < 4; w++)
+									{
+										if (vertex.BoneWeight[w] == 0)
+											continue;
+
+										auto offset = Vector3::Zero;
+
+										for (int b = 1; b < vertex.BoneIndex[w]; b++)
+											offset += GetJointOffset((GAME_OBJECT_ID)MoveablesIds[i], b);
+
+										vertex.Position += offset * (vertex.BoneWeight[w] / 255.0f);
+									}
+								}
+							}
+						}
+
 						for (int j = 0; j < obj->nmeshes; j++)
 						{
 							const auto* currentMesh = moveable.ObjectMeshes[j];
