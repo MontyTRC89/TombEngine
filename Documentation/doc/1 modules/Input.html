@@ -128,15 +128,15 @@
 	<td class="summary">Check if an action key is being hit.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#IsKeyHeld">IsKeyHeld(actionID, delaySec)</a></td>
+	<td class="name" ><a href="#IsKeyHeld">IsKeyHeld(actionID, [delaySec])</a></td>
 	<td class="summary">Check if an action key is being held.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#IsKeyPulsed">IsKeyPulsed(actionID, delaySec, initialDelaySec)</a></td>
+	<td class="name" ><a href="#IsKeyPulsed">IsKeyPulsed(actionID, delaySec, [initialDelaySec])</a></td>
 	<td class="summary">Check if an action key is being pulsed.</td>
 	</tr>
 	<tr>
-	<td class="name" ><a href="#IsKeyReleased">IsKeyReleased(actionID, maxDelaySec)</a></td>
+	<td class="name" ><a href="#IsKeyReleased">IsKeyReleased(actionID, [maxDelaySec])</a></td>
 	<td class="summary">Check if an action key is being released.</td>
 	</tr>
 	<tr>
@@ -196,7 +196,7 @@
 </dd>
     <dt>
     <a name = "IsKeyHeld"></a>
-    <strong>IsKeyHeld(actionID, delaySec)</strong>
+    <strong>IsKeyHeld(actionID, [delaySec])</strong>
     </dt>
     <dd>
     Check if an action key is being held.
@@ -210,8 +210,9 @@
          Action ID to check.
         </li>
         <li><span class="parameter">delaySec</span>
-            <span class="types"><span class="type">float[opt=0]</span></span>
+            <span class="types"><span class="type">float</span></span>
          Delay time in seconds before a hold can be registered.
+         <em>Default: 0.</em>
         </li>
     </ul>
 
@@ -222,7 +223,7 @@
 </dd>
     <dt>
     <a name = "IsKeyPulsed"></a>
-    <strong>IsKeyPulsed(actionID, delaySec, initialDelaySec)</strong>
+    <strong>IsKeyPulsed(actionID, delaySec, [initialDelaySec])</strong>
     </dt>
     <dd>
     Check if an action key is being pulsed.
@@ -241,8 +242,9 @@
          Delay time in seconds between pulses.
         </li>
         <li><span class="parameter">initialDelaySec</span>
-            <span class="types"><span class="type">float[opt=0]</span></span>
+            <span class="types"><span class="type">float</span></span>
          Initial delay time in seconds on the first pulse.
+         <em>Default: 0.</em>
         </li>
     </ul>
 
@@ -253,7 +255,7 @@
 </dd>
     <dt>
     <a name = "IsKeyReleased"></a>
-    <strong>IsKeyReleased(actionID, maxDelaySec)</strong>
+    <strong>IsKeyReleased(actionID, [maxDelaySec])</strong>
     </dt>
     <dd>
     Check if an action key is being released.
@@ -267,8 +269,9 @@
          Action ID to check.
         </li>
         <li><span class="parameter">maxDelaySec</span>
-            <span class="types"><span class="type">float[opt=infinity]</span></span>
+            <span class="types"><span class="type">float</span></span>
          Max delay time in seconds between hit and release within which a release can be registered.
+         <em>Default: infinity.</em>
         </li>
     </ul>
 

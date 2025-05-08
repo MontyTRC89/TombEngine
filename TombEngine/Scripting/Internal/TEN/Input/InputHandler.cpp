@@ -42,7 +42,7 @@ namespace TEN::Scripting::Input
 	/// Check if an action key is being held.
 	// @function IsKeyHeld
 	// @tparam Input.ActionID actionID Action ID to check.
-	// @tparam float[opt=0] delaySec Delay time in seconds before a hold can be registered.
+	// @tparam[opt=0] float delaySec Delay time in seconds before a hold can be registered.
 	static bool IsKeyHeld(int actionID, TypeOrNil<float> delaySec)
 	{
 		if (!IsValidAction(actionID))
@@ -56,7 +56,7 @@ namespace TEN::Scripting::Input
 	// @function IsKeyPulsed
 	// @tparam Input.ActionID actionID Action ID to check.
 	// @tparam float delaySec Delay time in seconds between pulses.
-	// @tparam float[opt=0] initialDelaySec Initial delay time in seconds on the first pulse.
+	// @tparam[opt=0] float initialDelaySec Initial delay time in seconds on the first pulse.
 	static bool IsKeyPulsed(int actionID, float delaySec, TypeOrNil<float> initialDelaySec)
 	{
 		if (!IsValidAction(actionID))
@@ -68,7 +68,7 @@ namespace TEN::Scripting::Input
 	/// Check if an action key is being released.
 	// @function IsKeyReleased
 	// @tparam Input.ActionID actionID Action ID to check.
-	// @tparam float[opt=infinity] maxDelaySec Max delay time in seconds between hit and release within which a release can be registered.
+	// @tparam[opt=infinity] float maxDelaySec Max delay time in seconds between hit and release within which a release can be registered.
 	static bool IsKeyReleased(int actionID, TypeOrNil<float> maxDelaySec)
 	{
 		if (!IsValidAction(actionID))
