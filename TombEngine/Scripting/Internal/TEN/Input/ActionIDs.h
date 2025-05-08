@@ -1,5 +1,6 @@
 #pragma once
 #include "Specific/Input/InputAction.h"
+#include "Specific/Input/Input.h"
 
 #include <string>
 #include <unordered_map>
@@ -111,7 +112,8 @@ static const std::unordered_map<std::string, InputActionID> ACTION_IDS
 	{ "LOAD", In::Load }
 };
 
-static const std::unordered_map<std::string, InputAxisID> AXIS
+
+static const auto AXIS_TYPE = std::unordered_map<std::string, InputAxisID>
 {
 
 	{ "MOVE", InputAxisID::Move },
