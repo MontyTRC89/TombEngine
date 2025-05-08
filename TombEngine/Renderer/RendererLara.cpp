@@ -357,7 +357,7 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 
 	for (int i = 0; i < HairEffect.Units.size(); i++)
 	{
-		const auto& unit = HairEffect.Units[i];
+		auto& unit = HairEffect.Units[i];
 		if (!unit.IsEnabled)
 			continue;
 
@@ -365,34 +365,51 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 		if (!object.loaded)
 			continue;
 
+		bool skinned = object.skinIndex != NO_VALUE && g_GameFlow->GetSettings()->Graphics.Skinning;
+		auto objectType = i ? RendererObjectType::HairSecondary : RendererObjectType::HairPrimary;
+
 		const auto& rendererObject = *_moveableObjects[unit.ObjectID];
 
 		_stItem.World = Matrix::Identity;
 		_stItem.BonesMatrices[0] = itemToDraw->InterpolatedAnimTransforms[HairUnit::GetRootMeshID(i)] * itemToDraw->InterpolatedWorld;
-		_stItem.Skinned = false;
+		_stItem.Skinned = (int)skinned;
+
 		ReflectMatrixOptionally(_stItem.BonesMatrices[0]);
 
 		for (int j = 0; j < unit.Segments.size(); j++)
 		{
-			const auto& segment = unit.Segments[j];
+			auto& segment = unit.Segments[j];
 			auto worldMatrix = 
 				Matrix::CreateFromQuaternion(
 					Quaternion::Lerp(segment.PrevOrientation, segment.Orientation, GetInterpolationFactor(forceValue))) *
 				Matrix::CreateTranslation(
 					Vector3::Lerp(segment.PrevPosition, segment.Position, GetInterpolationFactor(forceValue)));
-			
-			ReflectMatrixOptionally(worldMatrix);
 
+			if (skinned)
+				worldMatrix = Matrix::CreateRotationY(PI) * worldMatrix;
+
+			ReflectMatrixOptionally(worldMatrix);
 			_stItem.BonesMatrices[j + 1] = worldMatrix;
+
+			// Store calculated world matrix not to recalculate it when drawing alpha blended polygons.
+			segment.GlobalTransform = worldMatrix;
+
 			_stItem.BoneLightModes[j] = (int)LightMode::Dynamic;
 		}
 
 		_cbItem.UpdateData(_stItem, _context.Get());
 
-		for (int j = 0; j < rendererObject.ObjectMeshes.size(); j++)
+		if (skinned)
 		{
-			auto& rendererMesh = *rendererObject.ObjectMeshes[j];
-			DrawMesh(itemToDraw, &rendererMesh, i ? RendererObjectType::HairSecondary : RendererObjectType::HairPrimary, j, false, view, rendererPass);
+			DrawMesh(itemToDraw, GetMesh(object.skinIndex), objectType, 0, true, view, rendererPass);
+		}
+		else
+		{
+			for (int j = 0; j < rendererObject.ObjectMeshes.size(); j++)
+			{
+				auto& rendererMesh = *rendererObject.ObjectMeshes[j];
+				DrawMesh(itemToDraw, &rendererMesh, objectType, j, false, view, rendererPass);
+			}
 		}
 	}
 }

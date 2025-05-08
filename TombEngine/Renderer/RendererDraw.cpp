@@ -3881,11 +3881,7 @@ namespace TEN::Renderer
 		for (int i = 0; i < HairEffect.Units[index].Segments.size(); i++)
 		{
 			const auto& segment = HairEffect.Units[index].Segments[i];
-			auto worldMatrix =
-				Matrix::CreateFromQuaternion(
-					Quaternion::Lerp(segment.PrevOrientation, segment.Orientation, GetInterpolationFactor(forceValue))) *
-				Matrix::CreateTranslation(
-					Vector3::Lerp(segment.PrevPosition, segment.Position, GetInterpolationFactor(forceValue)));
+			auto worldMatrix = segment.GlobalTransform;
 
 			ReflectMatrixOptionally(worldMatrix);
 
