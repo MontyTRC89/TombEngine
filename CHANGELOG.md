@@ -43,6 +43,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added ability to use gunflash parameters for all weapons in weapon settings.
 * Fixed `Moveable.GetJointPosition` not returning correct results if moveable is invisible or not rendered.
 * Added `EmitFxFog` function to enable objects to emit a dynamic FX fog in real-time.
+* Fixed `Util.PickMoveableByDisplayPosition`.
 
 ## [Version 1.8.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.8.1) - 2025-03-29
 
