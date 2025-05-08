@@ -29,6 +29,8 @@ namespace TEN::Effects::Hair
 			Vector3	   PrevPosition	   = Vector3::Zero;
 			Quaternion PrevOrientation = Quaternion::Identity;
 
+			Matrix	   GlobalTransform = Matrix::Identity;
+
 			void StoreInterpolationData()
 			{
 				PrevPosition = Position;

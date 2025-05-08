@@ -507,7 +507,8 @@ namespace TEN::Renderer
 			int objNum = MoveablesIds[i];
 			ObjectInfo* obj = &Objects[objNum];
 
-			for (int j = 0; j < obj->nmeshes; j++)
+			int meshCount = (obj->skinIndex == NO_VALUE) ? obj->nmeshes : obj->nmeshes + 1;
+			for (int j = 0; j < meshCount; j++)
 			{
 				MESH* mesh = &g_Level.Meshes[obj->meshIndex + j];
 
@@ -548,6 +549,12 @@ namespace TEN::Renderer
 						MoveablesIds[i] == ID_HAIR_PRIMARY || MoveablesIds[i] == ID_HAIR_SECONDARY, &lastVertex, &lastIndex);
 
 					moveable.ObjectMeshes.push_back(mesh);
+					_meshes.push_back(mesh);
+				}
+
+				if (obj->skinIndex != NO_VALUE)
+				{
+					RendererMesh* mesh = GetRendererMeshFromTrMesh(&moveable, &g_Level.Meshes[obj->skinIndex], 0, false, false, &lastVertex, &lastIndex);
 					_meshes.push_back(mesh);
 				}
 
@@ -719,9 +726,9 @@ namespace TEN::Renderer
 									if (!isDone)
 									{
 										jointVertex->BoneIndex[0] = j;
-										jointVertex->BoneWeight[0] = 0.5f;
+										jointVertex->BoneWeight[0] = 0.5f * UCHAR_MAX;
 										jointVertex->BoneIndex[1] = jointBone->Parent->Index;
-										jointVertex->BoneWeight[1] = 0.5f;
+										jointVertex->BoneWeight[1] = 0.5f * UCHAR_MAX;
 									}
 								}
 							}
@@ -733,6 +740,36 @@ namespace TEN::Renderer
 						bool isSecond = isYoung && MoveablesIds[i] == ID_HAIR_SECONDARY;
 						const auto& skinObj = GetRendererObject(GAME_OBJECT_ID::ID_LARA_SKIN);
 						const auto& settings = g_GameFlow->GetSettings()->Hair;
+
+						// Flatten skinned hairmesh vertices to be transformed correctly.
+						// It's needed because every segment of hair skeleton uses global transform, and it's impossible
+						// to calculate correct offset for it dynamically.
+
+						if (obj->skinIndex != NO_VALUE)
+						{
+							const auto* hairMesh = GetMesh(obj->skinIndex);
+
+							for (const auto& bucket : hairMesh->Buckets)
+							{
+								for (int v = 0; v < bucket.NumVertices; v++)
+								{
+									auto& vertex = _moveablesVertices[bucket.StartVertex + v];
+
+									for (int w = 0; w < 4; w++)
+									{
+										if (vertex.BoneWeight[w] == 0)
+											continue;
+
+										auto offset = Vector3::Zero;
+
+										for (int b = 1; b < vertex.BoneIndex[w]; b++)
+											offset += GetJointOffset((GAME_OBJECT_ID)MoveablesIds[i], b);
+
+										vertex.Position += offset * (vertex.BoneWeight[w] / 255.0f);
+									}
+								}
+							}
+						}
 
 						for (int j = 0; j < obj->nmeshes; j++)
 						{
@@ -980,7 +1017,9 @@ namespace TEN::Renderer
 					vertex.Color.z = meshPtr->colors[v].z;
 					vertex.Color.w = 1.0f;
 
-					vertex.BoneIndex[0] = meshPtr->bones[v];
+					vertex.BoneIndex  = meshPtr->boneIndices[v];
+					vertex.BoneWeight = meshPtr->boneWeights[v];
+
 					vertex.OriginalIndex = v;
 
 					vertex.Effects = Vector4(meshPtr->effects[v].x, meshPtr->effects[v].y, meshPtr->effects[v].z, poly->shineStrength);
