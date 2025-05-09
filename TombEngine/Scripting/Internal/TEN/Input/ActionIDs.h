@@ -1,6 +1,5 @@
 #pragma once
 #include "Specific/Input/InputAction.h"
-#include "Specific/Input/Input.h"
 
 #include <string>
 #include <unordered_map>
