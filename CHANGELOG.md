@@ -28,8 +28,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Removed legacy TR5 search object code which caused issues with meshswaps.
 * Removed excessive HK nerfing in running state.
 * Optimized weather particle rendering.
-* Fixed fish missing random target points due to distance issues.
-* Fixed fish not attacking corpses anymore.
 
 ### Lua API changes
 * Added `View.PlayVideo`, `View.StopVideo`, and other helper functions for the video playback.
