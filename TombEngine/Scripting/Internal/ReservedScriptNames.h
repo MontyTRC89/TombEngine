@@ -346,11 +346,15 @@ static constexpr char ScriptReserved_SetPostProcessTint[]			= "SetPostProcessTin
 static constexpr char ScriptReserved_GetCameraPosition[]			= "GetCameraPosition";
 static constexpr char ScriptReserved_GetCameraTarget[]				= "GetCameraTarget";
 
-static constexpr char ScriptReserved_KeyIsHeld[]					= "KeyIsHeld";
-static constexpr char ScriptReserved_KeyIsHit[]						= "KeyIsHit";
-static constexpr char ScriptReserved_KeyPush[]						= "KeyPush";
-static constexpr char ScriptReserved_KeyClear[]						= "KeyClear";
-static constexpr char ScriptReserved_KeyClearAll[]					= "KeyClearAll";
+static constexpr char ScriptReserved_ClearAllKeys[]					= "ClearAllKeys";
+static constexpr char ScriptReserved_ClearKey[]						= "ClearKey";
+static constexpr char ScriptReserved_GetAnalogKeyValue[]			= "GetAnalogKeyValue";
+static constexpr char ScriptReserved_GetMouseDisplayPosition[]		= "GetMouseDisplayPosition";
+static constexpr char ScriptReserved_IsKeyHeld[]					= "IsKeyHeld";
+static constexpr char ScriptReserved_IsKeyHit[]						= "IsKeyHit";
+static constexpr char ScriptReserved_IsKeyPulsed[]					= "IsKeyPulsed";
+static constexpr char ScriptReserved_IsKeyReleased[]				= "IsKeyReleased";
+static constexpr char ScriptReserved_PushKey[]						= "PushKey";
 
 static constexpr char ScriptReserved_FlipMap[]						= "FlipMap";
 static constexpr char ScriptReserved_GetFlipMapStatus[]				= "GetFlipMapStatus";
@@ -376,8 +380,6 @@ static constexpr char ScriptReserved_PrintLog[]						= "PrintLog";
 static constexpr char ScriptReserved_PickMoveable[]					= "PickMoveableByDisplayPosition";
 static constexpr char ScriptReserved_PickStatic[]					= "PickStaticByDisplayPosition";
 static constexpr char ScriptReserved_GetDisplayPosition[]			= "GetDisplayPosition";
-static constexpr char ScriptReserved_GetCursorDisplayPosition[]		= "GetCursorDisplayPosition"; // Deprecated
-static constexpr char ScriptReserved_GetMouseDisplayPosition[]		= "GetMouseDisplayPosition";
 static constexpr char ScriptReserved_PlayerInteract[]				= "Interact";
 static constexpr char ScriptReserved_PlayerTestInteraction[]		= "TestInteraction";
 
