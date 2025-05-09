@@ -366,6 +366,7 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 			continue;
 
 		bool skinned = object.skinIndex != NO_VALUE && g_GameFlow->GetSettings()->Graphics.Skinning;
+		bool flipped = skinned || (GetJointOffset(unit.ObjectID, 1).z < 0);
 		auto objectType = i ? RendererObjectType::HairSecondary : RendererObjectType::HairPrimary;
 
 		const auto& rendererObject = *_moveableObjects[unit.ObjectID];
@@ -385,7 +386,7 @@ void Renderer::DrawLaraHair(RendererItem* itemToDraw, RendererRoom* room, Render
 				Matrix::CreateTranslation(
 					Vector3::Lerp(segment.PrevPosition, segment.Position, GetInterpolationFactor(forceValue)));
 
-			if (skinned)
+			if (flipped)
 				worldMatrix = Matrix::CreateRotationY(PI) * worldMatrix;
 
 			ReflectMatrixOptionally(worldMatrix);
