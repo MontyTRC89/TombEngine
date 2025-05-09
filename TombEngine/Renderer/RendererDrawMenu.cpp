@@ -317,8 +317,8 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int defaultKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Default, (InputActionID)k);
-						int userKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Custom, (InputActionID)k);
+						int defaultKeyID = g_Bindings.GetBoundKeyID(BindingProfileID::Default, (ActionID)k);
+						int userKeyID = g_Bindings.GetBoundKeyID(BindingProfileID::Custom, (ActionID)k);
 
 						int key = userKeyID ? userKeyID : defaultKeyID;
 						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
@@ -370,8 +370,8 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int defaultKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Default, (InputActionID)(baseIndex + k));
-						int userKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Custom, (InputActionID)(baseIndex + k));
+						int defaultKeyID = g_Bindings.GetBoundKeyID(BindingProfileID::Default, (ActionID)(baseIndex + k));
+						int userKeyID = g_Bindings.GetBoundKeyID(BindingProfileID::Custom, (ActionID)(baseIndex + k));
 
 						int key = userKeyID ? userKeyID : defaultKeyID;
 						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
@@ -429,8 +429,8 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int defaultKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Default, (InputActionID)(baseIndex + k));
-						int userKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Custom, (InputActionID)(baseIndex + k));
+						int defaultKeyID = g_Bindings.GetBoundKeyID(BindingProfileID::Default, (ActionID)(baseIndex + k));
+						int userKeyID = g_Bindings.GetBoundKeyID(BindingProfileID::Custom, (ActionID)(baseIndex + k));
 
 						int key = userKeyID ? userKeyID : defaultKeyID;
 						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));
@@ -481,8 +481,8 @@ namespace TEN::Renderer
 					}
 					else
 					{
-						int defaultKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Default, (InputActionID)(baseIndex + k));
-						int userKeyID = g_Bindings.GetBoundKeyID(InputDeviceID::Custom, (InputActionID)(baseIndex + k));
+						int defaultKeyID = g_Bindings.GetBoundKeyID(BindingProfileID::Default, (ActionID)(baseIndex + k));
+						int userKeyID = g_Bindings.GetBoundKeyID(BindingProfileID::Custom, (ActionID)(baseIndex + k));
 
 						int key = userKeyID ? userKeyID : defaultKeyID;
 						AddString(MenuRightSideEntry, y, GetKeyName(key).c_str(), PRINTSTRING_COLOR_ORANGE, SF(false));

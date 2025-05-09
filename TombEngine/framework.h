@@ -1,10 +1,13 @@
 #pragma once
 
+// =========
+// LIBRARIES
+// =========
+
+// Standard
 #include <algorithm>
 #include <array>
 #include <atomic>
-#include <d3d11.h>
-#include <d3dcompiler.h>
 #include <deque>
 #include <filesystem>
 #include <fstream>
@@ -15,8 +18,6 @@
 #include <optional>
 #include <regex>
 #include <set>
-#include <SimpleMath.h>
-#include <sol.hpp>
 #include <stack>
 #include <stdint.h>
 #include <stdio.h>
@@ -25,15 +26,38 @@
 #include <queue>
 #include <unordered_set>
 #include <vector>
-#include <vlc/vlc.h>
+
+// DirerctX 11
+#include <d3d11.h>
+#include <d3dcompiler.h>
+
+// DXTK
+#include <SimpleMath.h>
 
 using namespace DirectX;
 using namespace DirectX::SimpleMath;
 
-constexpr auto NO_VALUE = -1;
+// OIS
+#include <OISException.h>
+#include <OISForceFeedback.h>
+#include <OISInputManager.h>
+#include <OISJoyStick.h>
+#include <OISKeyboard.h>
+#include <OISMouse.h>
+
+// sol
+#include <sol.hpp>
+
+// VLC
+#include <vlc/vlc.h>
+
+// =========
+// RESOURCES
+// =========
+
+#include "Types.h"
 
 #include "Game/Debug/Debug.h"
 #include "Physics/Physics.h"
 
 using namespace TEN::Debug;
-using namespace TEN::Physics;

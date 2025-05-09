@@ -131,7 +131,7 @@ namespace TEN::Scripting::Util
 		auto ray = GetRayFrom2DPosition(Vector2(int(std::get<0>(realScreenPos)), int(std::get<1>(realScreenPos))));
 
 		auto vector = Vector3i::Zero;
-		int itemNumber = ObjectOnLOS2(&ray.first, &ray.second, &vector, nullptr, GAME_OBJECT_ID::ID_LARA);
+		int itemNumber = ObjectOnLOS2(&ray.first, &ray.second, &vector, nullptr);
 
 		if (itemNumber == NO_LOS_ITEM || itemNumber < 0)
 			return sol::nullopt;
