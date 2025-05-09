@@ -8,6 +8,7 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ## New features
 * Added video playback support.
 * Added muzzle glow effect for firearms.
+* Added weather particle clustering and increase weather particle performance.
 * Added examine mode text rendering (string key should be in the format like `examine1_text` etc).
 
 ### Bug fixes
@@ -27,7 +28,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed crashes when Lara is on a vehicle unreachable by friendly NPCs.
 * Removed legacy TR5 search object code which caused issues with meshswaps.
 * Removed excessive HK nerfing in running state.
-* Optimized weather particle rendering.
 
 ### Lua API changes
 * Added `View.PlayVideo`, `View.StopVideo`, and other helper functions for the video playback.
