@@ -9,10 +9,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added video playback support.
 * Added muzzle glow effect for firearms.
 * Added examine mode text rendering (string key should be in the format like `examine1_text` etc).
-* Added swinging flame pendulum for TR4 "ID_CHAIN" slot.
-  - Positive OCB for normal damage (like TR4 chain).
-  - Negative OCB for TR3-style flaming pendulum (sets Lara on fire).
-  - OCB 0 for visual-only effect (no damage or fire).
 
 ### Bug fixes
 * Fixed Teleporter object.
