@@ -12,12 +12,46 @@
 
 using namespace TEN::Input;
 
-/// Functions for input management.
-// @tentable Input
-// @pragma nostrip
-
 namespace TEN::Scripting::Input
 {
+	/// Functions for input management.
+	// @tentable Input
+	// @pragma nostrip
+
+	/// Get the analog value of an action key.
+	// @function GetAnalogKeyValue
+	// @tparam Input.ActionID actionID Action ID to query.
+	// @treturn float Analog value in the range [0, 1].
+	static float GetAnalogKeyValue(int actionID)
+	{
+		if (!IsValidAction(actionID))
+			return 0.0f;
+
+		return GetActionValue((ActionID)actionID);
+	}
+
+	/// Get an analog axis.
+	// @function GetAnalogAxis
+	// @tparam Input.AxisID Axis ID to fetch.
+	// @treturn Vec2 Analog axis with components in the range [-1, 1].
+	static Vec2 GetAnalogAxis(InputAxisID axisID)
+	{
+		return Vec2(AxisMap[axisID]);
+	}
+
+	/// Get the display position of the cursor in percent.
+	// @function GetMouseDisplayPosition
+	// @treturn Vec2 Cursor display position in percent.
+	static Vec2 GetMouseDisplayPosition()
+	{
+		// NOTE: Conversion from internal 800x600 to more intuitive 100x100 display space resolution is required.
+		// In a future refactor, everything will use 100x100 natively. -- Sezz 2023.10.20
+
+		auto cursorPos = GetMouse2DPosition();
+		cursorPos = Vector2(cursorPos.x / DISPLAY_SPACE_RES.x, cursorPos.y / DISPLAY_SPACE_RES.y) * 100;
+		return Vec2(cursorPos);
+	}
+
 	static bool IsValidAction(int actionID)
 	{
 		if (actionID > (int)ActionID::Count)
@@ -108,31 +142,6 @@ namespace TEN::Scripting::Input
 			queue = ActionQueueState::Clear;
 	}
 
-	/// Get the analog value of an action key.
-	// @function GetAnalogKeyValue
-	// @tparam Input.ActionID actionID Action ID to query.
-	// @treturn float Analog value in the range [0, 1].
-	static float GetAnalogKeyValue(int actionID)
-	{
-		if (!IsValidAction(actionID))
-			return 0.0f;
-
-		return GetActionValue((ActionID)actionID);
-	}
-
-	/// Get the display position of the cursor in percent.
-	// @function GetMouseDisplayPosition
-	// @treturn Vec2 Cursor display position in percent.
-	static Vec2 GetMouseDisplayPosition()
-	{
-		// NOTE: Conversion from internal 800x600 to more intuitive 100x100 display space resolution is required.
-		// In a future refactor, everything will use 100x100 natively. -- Sezz 2023.10.20
-
-		auto cursorPos = GetMouse2DPosition();
-		cursorPos = Vector2(cursorPos.x / DISPLAY_SPACE_RES.x, cursorPos.y / DISPLAY_SPACE_RES.y) * 100;
-		return Vec2(cursorPos);
-	}
-
 	/// Vibrate the game controller if the function is available and the setting is on.
 	// @function Vibrate
 	// @tparam float strength Vibration strength. 
@@ -142,31 +151,22 @@ namespace TEN::Scripting::Input
 		Rumble(strength, time.value_or(0.3f), RumbleMode::Both);
 	}
 
-	/// Returns the displacement of the specified axis. 
-	// @function GetAxisDisplacement
-	// @tparam Input.AxisType axis Axis displacement to return.
-	// @treturn Vec2 Displacement of specified axis.
-	static Vec2 GetAxisDisplacement(InputAxisID axis)
-	{
-		return Vec2(AxisMap[axis]);
-	}
-
 	void Register(sol::state* state, sol::table& parent)
 	{
 		auto table = sol::table(state->lua_state(), sol::create);
 
 		parent.set(ScriptReserved_Input, table);
-		table.set_function(ScriptReserved_IsKeyHit, &IsKeyHit);
-		table.set_function(ScriptReserved_IsKeyHeld, &IsKeyHeld);
-		table.set_function(ScriptReserved_IsKeyPulsed, &IsKeyPulsed);
-		table.set_function(ScriptReserved_IsKeyReleased, &IsKeyReleased);
-		table.set_function(ScriptReserved_PushKey, &PushKey);
-		table.set_function(ScriptReserved_ClearKey, &ClearKey);
-		table.set_function(ScriptReserved_ClearAllKeys, &ClearAllKeys);
-		table.set_function(ScriptReserved_GetMouseDisplayPosition, &GetMouseDisplayPosition);
-		table.set_function(ScriptReserved_GetAnalogKeyValue, &GetAnalogKeyValue);
-		table.set_function(ScriptReserved_Vibrate, &Vibrate);
-		table.set_function(ScriptReserved_GetAxisDisplacement, &GetAxisDisplacement);
+		table.set_function(ScriptReserved_InputGetAnalogKeyValue, &GetAnalogKeyValue);
+		table.set_function(ScriptReserved_InputGetAnalogAxis, &GetAnalogAxis);
+		table.set_function(ScriptReserved_InputGetMouseDisplayPosition, &GetMouseDisplayPosition);
+		table.set_function(ScriptReserved_InputIsKeyHit, &IsKeyHit);
+		table.set_function(ScriptReserved_InputIsKeyHeld, &IsKeyHeld);
+		table.set_function(ScriptReserved_InputIsKeyPulsed, &IsKeyPulsed);
+		table.set_function(ScriptReserved_InputIsKeyReleased, &IsKeyReleased);
+		table.set_function(ScriptReserved_InputPushKey, &PushKey);
+		table.set_function(ScriptReserved_InputClearKey, &ClearKey);
+		table.set_function(ScriptReserved_InputClearAllKeys, &ClearAllKeys);
+		table.set_function(ScriptReserved_InputVibrate, &Vibrate);
 
 		// COMPATIBILITY
 		table.set_function("KeyIsHit", &IsKeyHit);
@@ -177,7 +177,7 @@ namespace TEN::Scripting::Input
 		table.set_function("GetCursorDisplayPosition", &GetMouseDisplayPosition);
 
 		auto handler = LuaHandler(state);
-		handler.MakeReadOnlyTable(table, ScriptReserved_ActionID, ACTION_IDS);
-		handler.MakeReadOnlyTable(table, ScriptReserved_AxisType, AXIS_TYPE);
+		handler.MakeReadOnlyTable(table, ScriptReserved_InputActionID, ACTION_IDS);
+		handler.MakeReadOnlyTable(table, ScriptReserved_InputAxisID, AXIS_IDS);
 	}
 }

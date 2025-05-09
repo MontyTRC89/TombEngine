@@ -1,31 +1,29 @@
 #pragma once
-#include "Specific/Input/Input.h"
 
-#include <string>
-#include <unordered_map>
+#include "Specific/Input/Input.h"
 
 using namespace TEN::Input;
 
-/***
-Constants for axis IDs.
-@enum Input.AxisType
-@pragma nostrip
-*/
-
-/*** Table of Input.AxisType constants.
-To be used with @{Input.GetAxisDisplacement}.
-
-	MOVE - Joystick move stick.
-	CAMERA - Joystick look stick.
-	MOUSE - Mouse displacement.
-
-@table Input.AxisType
-*/
-
-static const auto AXIS_TYPE = std::unordered_map<std::string, InputAxisID>
+namespace TEN::Scripting::Input
 {
+	/// Constants for analog axis IDs.
+	// @enum Input.AxisID
+	// @pragma nostrip
 
-	{ "MOVE", InputAxisID::Move },
-	{ "CAMERA", InputAxisID::Camera },
-	{ "MOUSE", InputAxisID::Mouse }
-};
+	/// Table of Input.AxisID constants.
+	// To be used with @{Input.GetAxis}.
+	//
+	//	MOVE
+	//	CAMERA
+	//	MOUSE
+	//
+	//@table Input.AxisID
+
+	static const auto AXIS_IDS = std::unordered_map<std::string, InputAxisID>
+	{
+
+		{ "MOVE", InputAxisID::Move },
+		{ "CAMERA", InputAxisID::Camera },
+		{ "MOUSE", InputAxisID::Mouse }
+	};
+}
