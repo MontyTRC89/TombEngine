@@ -99,6 +99,9 @@ namespace TEN::Scripting::Input
 	//	BACKSPACE
 	//	TAB
 	//	SPACE
+	//	HOME
+	//	END
+	//	DELETE
 	//	MINUS
 	//	EQUALS
 	//	BRACKET_LEFT
@@ -213,6 +216,9 @@ namespace TEN::Scripting::Input
 		{ "BACKSPACE", In::Backspace },
 		{ "TAB", In::Tab },
 		{ "SPACE", In::Space },
+		{ "HOME", In::Home },
+		{ "END", In::End },
+		{ "DELETE", In::Delete },
 		{ "MINUS", In::Minus },
 		{ "EQUALS", In::Equals },
 		{ "BRACKET_LEFT", In::BracketLeft },
