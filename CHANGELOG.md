@@ -8,11 +8,8 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 ## New features
 * Added video playback support.
 * Added muzzle glow effect for firearms.
+* Added weather particle clustering and increase weather particle performance.
 * Added examine mode text rendering (string key should be in the format like `examine1_text` etc).
-* Added swinging flame pendulum for TR4 "ID_CHAIN" slot.
-  - Positive OCB for normal damage (like TR4 chain).
-  - Negative OCB for TR3-style flaming pendulum (sets Lara on fire).
-  - OCB 0 for visual-only effect (no damage or fire).
 
 ### Bug fixes
 * Fixed Teleporter object.
@@ -31,9 +28,6 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Fixed crashes when Lara is on a vehicle unreachable by friendly NPCs.
 * Removed legacy TR5 search object code which caused issues with meshswaps.
 * Removed excessive HK nerfing in running state.
-* Optimized weather particle rendering.
-* Fixed fish missing random target points due to distance issues.
-* Fixed fish not attacking corpses anymore.
 
 ### Lua API changes
 * Added `View.PlayVideo`, `View.StopVideo`, and other helper functions for the video playback.
@@ -41,9 +35,11 @@ TombEngine releases are located in this repository (alongside with Tomb Editor):
 * Added `Lara:Interact` function to allow alignment with moveables.
 * Added `muzzleGlow` and `muzzleOffset` parameters to weapon settings.
 * Added ability to use gunflash parameters for all weapons in weapon settings.
+* Added raw mouse and keyboard input action IDs to `Input.ActionID` enumeration. 
+* Added `Input.IsKeyPulsed` and `Input.IsKeyReleased` functions.
+* Updated `Input.IsKeyHeld` with additional parameter indicating key hold delay.
 * Fixed `Moveable.GetJointPosition` not returning correct results if moveable is invisible or not rendered.
-* Added `EmitFxFog` function to enable objects to emit a dynamic FX fog in real-time.
-* Added `GetAxisDisplacement` function to get displacement vector for the specified axis.
+* Fixed `Util.PickMoveableByDisplayPosition`.
 
 ## [Version 1.8.1](https://github.com/TombEngine/TombEditorReleases/releases/tag/v1.8.1) - 2025-03-29
 
