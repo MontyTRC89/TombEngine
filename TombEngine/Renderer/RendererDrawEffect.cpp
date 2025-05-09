@@ -1224,10 +1224,12 @@ namespace TEN::Renderer
 			auto meshOffset = g_Level.Frames[GetAnimData(gunflash, 0).FramePtr].Offset;
 			auto offset = settings.MuzzleOffset + Vector3(meshOffset.x, meshOffset.z, meshOffset.y); // Offsets are inverted because of bone orientation.
 
+			offset.x = -offset.x;
 			auto tMatrix = Matrix::CreateTranslation(offset);
-			auto rotMatrix = Matrix::CreateRotationX(TO_RAD(Lara.Control.Weapon.GunType == LaraWeaponType::Pistol ? -16830 : -14560)); // HACK
 
 			auto worldMatrix = Matrix::Identity;
+			auto rotMatrix = Matrix::CreateRotationX(TO_RAD(Lara.Control.Weapon.GunType == LaraWeaponType::Pistol ? -16830 : -14560)); // HACK
+
 			if (Lara.LeftArm.GunFlash)
 			{
 				worldMatrix = itemPtr->AnimTransforms[LM_LHAND] * itemPtr->World;
@@ -1242,6 +1244,9 @@ namespace TEN::Renderer
 
 				_numMoveablesDrawCalls++;
 			}
+
+			offset.x = -offset.x;
+			tMatrix = Matrix::CreateTranslation(offset);
 
 			if (Lara.RightArm.GunFlash)
 			{
