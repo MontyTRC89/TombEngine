@@ -19,11 +19,11 @@ namespace TEN::Scripting::Input
 	//
 	//@table Input.AxisID
 
-	static const auto AXIS_IDS = std::unordered_map<std::string, InputAxisID>
+	static const auto AXIS_IDS = std::unordered_map<std::string, AxisID>
 	{
 
-		{ "MOVE", InputAxisID::Move },
-		{ "CAMERA", InputAxisID::Camera },
-		{ "MOUSE", InputAxisID::Mouse }
+		{ "MOVE", AxisID::Move },
+		{ "CAMERA", AxisID::Camera },
+		{ "MOUSE", AxisID::Mouse }
 	};
 }

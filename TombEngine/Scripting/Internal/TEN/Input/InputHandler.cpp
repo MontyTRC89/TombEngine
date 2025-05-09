@@ -18,6 +18,17 @@ namespace TEN::Scripting::Input
 	// @tentable Input
 	// @pragma nostrip
 
+	static bool IsValidAction(int actionID)
+	{
+		if (actionID > (int)ActionID::Count)
+		{
+			ScriptAssertF(false, "Input action {} does not exist.", actionID);
+			return false;
+		}
+
+		return true;
+	}
+
 	/// Get the analog value of an action key.
 	// @function GetAnalogKeyValue
 	// @tparam Input.ActionID actionID Action ID to query.
@@ -34,7 +45,7 @@ namespace TEN::Scripting::Input
 	// @function GetAnalogAxis
 	// @tparam Input.AxisID Axis ID to fetch.
 	// @treturn Vec2 Analog axis with components in the range [-1, 1].
-	static Vec2 GetAnalogAxis(InputAxisID axisID)
+	static Vec2 GetAnalogAxis(AxisID axisID)
 	{
 		return Vec2(AxisMap[axisID]);
 	}
@@ -50,17 +61,6 @@ namespace TEN::Scripting::Input
 		auto cursorPos = GetMouse2DPosition();
 		cursorPos = Vector2(cursorPos.x / DISPLAY_SPACE_RES.x, cursorPos.y / DISPLAY_SPACE_RES.y) * 100;
 		return Vec2(cursorPos);
-	}
-
-	static bool IsValidAction(int actionID)
-	{
-		if (actionID > (int)ActionID::Count)
-		{
-			ScriptAssertF(false, "Input action {} does not exist.", actionID);
-			return false;
-		}
-
-		return true;
 	}
 
 	/// Check if an action key is being hit.
