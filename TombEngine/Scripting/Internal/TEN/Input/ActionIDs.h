@@ -111,12 +111,3 @@ static const std::unordered_map<std::string, InputActionID> ACTION_IDS
 	{ "SAVE", In::Save },
 	{ "LOAD", In::Load }
 };
-
-
-static const auto AXIS_TYPE = std::unordered_map<std::string, InputAxisID>
-{
-
-	{ "MOVE", InputAxisID::Move },
-	{ "CAMERA", InputAxisID::Camera },
-	{ "MOUSE", InputAxisID::Mouse }
-};

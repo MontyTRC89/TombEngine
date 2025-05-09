@@ -348,8 +348,7 @@ static constexpr char ScriptReserved_KeyIsHit[]						= "KeyIsHit";
 static constexpr char ScriptReserved_KeyPush[]						= "KeyPush";
 static constexpr char ScriptReserved_KeyClear[]						= "KeyClear";
 static constexpr char ScriptReserved_KeyClearAll[]					= "KeyClearAll";
-static constexpr char ScriptReserved_GetAxis[]						= "GetAxis";
-static constexpr char ScriptReserved_GetControllerStatus[]			= "GetControllerStatus";
+static constexpr char ScriptReserved_GetAxisDisplacement[]			= "GetAxisDisplacement";
 static constexpr char ScriptReserved_AxisType[]						= "AxisType";
 
 static constexpr char ScriptReserved_FlipMap[]						= "FlipMap";

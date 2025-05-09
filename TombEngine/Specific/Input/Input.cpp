@@ -850,4 +850,5 @@ namespace TEN::Input
 	{
 		return (IsDirectionalActionHeld() || IsHeld(In::Action) || IsHeld(In::Crouch) || IsHeld(In::Sprint));
 	}
+
 }

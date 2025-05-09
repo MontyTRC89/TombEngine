@@ -6,6 +6,7 @@
 #include "Scripting/Internal/ReservedScriptNames.h"
 #include "Scripting/Internal/ScriptUtil.h"
 #include "Scripting/Internal/TEN/Input/ActionIDs.h"
+#include "Scripting/Internal/TEN/Input/AxisIDs.h"
 #include "Scripting/Internal/TEN/Types/Vec2/Vec2.h"
 #include "Specific/Input/Input.h"
 
@@ -108,24 +109,13 @@ namespace TEN::Scripting::Input
 		return Vec2(cursorPos);
 	}
 
-	/// Get the display position of the cursor in percent.
-	// @function GetMouseDisplayPosition
-	// @treturn Vec2 Cursor display position in percent.
-	static Vec2 GetAxisValue(InputAxisID axis)
+	/// Returns the displacement of the specified axis. 
+	// @function GetAxisDisplacement
+	// @tparam Input.AxisType axis Axis displacement to return.
+	// @treturn Vec2 Displacement of specified axis.
+	static Vec2 GetAxisDisplacement(InputAxisID axis)
 	{
-		// NOTE: Conversion from internal 800x600 to more intuitive 100x100 display space resolution is required.
-		// In a future refactor, everything will use 100x100 natively. -- Sezz 2023.10.20
-
 		return Vec2(AxisMap[axis]);
-	}
-
-	static bool GetControllerStatus()
-	{
-		// NOTE: Conversion from internal 800x600 to more intuitive 100x100 display space resolution is required.
-		// In a future refactor, everything will use 100x100 natively. -- Sezz 2023.10.20
-
-		//return OisGamepad != nullptr;
-		return false;
 	}
 
 	void Register(sol::state* state, sol::table& parent)
@@ -139,7 +129,7 @@ namespace TEN::Scripting::Input
 		table.set_function(ScriptReserved_KeyPush, &KeyPush);
 		table.set_function(ScriptReserved_KeyClear, &KeyClear);
 		table.set_function(ScriptReserved_KeyClearAll, &KeyClearAll);
-		table.set_function(ScriptReserved_GetAxis, &GetAxisValue);
+		table.set_function(ScriptReserved_GetAxisDisplacement, &GetAxisDisplacement);
 
 		table.set_function(ScriptReserved_GetMouseDisplayPosition, &GetMouseDisplayPosition);
 		table.set_function(ScriptReserved_GetCursorDisplayPosition, &GetMouseDisplayPosition);
