@@ -226,8 +226,7 @@ namespace TEN::Entities::Switches
 		auto& item = g_Level.Items[itemNumber];
 		const auto& player = Lara;
 
-		if (item.ObjectNumber == ID_PULLEY &&
-			item.ItemFlags[5] != 0 && item.ItemFlags[4] == 1 &&
+		if (item.ItemFlags[5] != 0 && item.ItemFlags[4] == 1 &&
 			player.Control.HandStatus != HandStatus::Busy)
 		{
 			item.Flags |= IFLAG_ACTIVATION_MASK;
@@ -236,8 +235,7 @@ namespace TEN::Entities::Switches
 			return true;
 		}
 
-		if (item.ObjectNumber == ID_PULLEY &&
-			item.ItemFlags[5] != 0 && item.ItemFlags[4] == 0 &&
+		if (item.ItemFlags[5] != 0 && item.ItemFlags[4] == 0 &&
 			player.Control.HandStatus != HandStatus::Busy)
 		{
 			if (timer > 0)
@@ -257,8 +255,7 @@ namespace TEN::Entities::Switches
 			return true;
 		}
 
-		if (item.ObjectNumber == ID_PULLEY)
-			return false;
+		return false;
 	}
 
 
