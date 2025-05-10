@@ -1,7 +1,7 @@
 #pragma once
 
 // This file is generated automatically, do not edit it.
-// Last generated on 18/04/2025.
+// Last generated on 26/04/2025.
 
 #include <unordered_map>
 #include <string>
@@ -1003,6 +1003,8 @@ The following constants are inside ObjID.
 	CUSTOM_AMMO_GRAPHICS
 	DIARY_SPRITES
 	DIARY_ENTRY_SPRITES
+	SNOW_SPRITES
+	RAIN_SPRITES
 @table Members
 */
 
@@ -1254,6 +1256,8 @@ The following ObjID members refer to sprites.
 	CUSTOM_AMMO_GRAPHICS
 	DIARY_SPRITES
 	DIARY_ENTRY_SPRITES
+	SNOW_SPRITES
+	RAIN_SPRITES
 @table SpriteConstants
 */
 static const std::unordered_map<std::string, GAME_OBJECT_ID> GAME_OBJECT_IDS {
@@ -2242,5 +2246,7 @@ static const std::unordered_map<std::string, GAME_OBJECT_ID> GAME_OBJECT_IDS {
 	{ "CUSTOM_BAR_GRAPHICS", ID_CUSTOM_BAR_GRAPHICS },
 	{ "CUSTOM_AMMO_GRAPHICS", ID_CUSTOM_AMMO_GRAPHICS },
 	{ "DIARY_SPRITES", ID_DIARY_SPRITES },
-	{ "DIARY_ENTRY_SPRITES", ID_DIARY_ENTRY_SPRITES }
+	{ "DIARY_ENTRY_SPRITES", ID_DIARY_ENTRY_SPRITES },
+	{ "SNOW_SPRITES", ID_SNOW_SPRITES },
+	{ "RAIN_SPRITES", ID_RAIN_SPRITES }
 };

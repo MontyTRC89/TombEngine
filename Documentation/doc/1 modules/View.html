@@ -172,6 +172,30 @@
 	<td class="summary">Sets the post-process tint.</td>
 	</tr>
 	<tr>
+	<td class="name" ><a href="#PlayVideo">PlayVideo(fileName, [background], [silent], [loop])</a></td>
+	<td class="summary">Play a video file.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#StopVideo">StopVideo()</a></td>
+	<td class="summary">Stop the currently playing video.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetVideoPosition">GetVideoPosition()</a></td>
+	<td class="summary">Gets the currently playing video position.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#SetVideoPosition">SetVideoPosition(position)</a></td>
+	<td class="summary">Sets the currently playing video position.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#GetVideoDominantColor">GetVideoDominantColor()</a></td>
+	<td class="summary">Gets the dominant color for the current video frame.</td>
+	</tr>
+	<tr>
+	<td class="name" ><a href="#IsVideoPlaying">IsVideoPlaying([name])</a></td>
+	<td class="summary">Checks if video is currently playing.</td>
+	</tr>
+	<tr>
 	<td class="name" ><a href="#PlayFlyby">PlayFlyby(seqID)</a></td>
 	<td class="summary">Play a flyby sequence.</td>
 	</tr>
@@ -475,6 +499,152 @@
         </li>
     </ul>
 
+
+
+
+
+</dd>
+    <dt>
+    <a name = "PlayVideo"></a>
+    <strong>PlayVideo(fileName, [background], [silent], [loop])</strong>
+    </dt>
+    <dd>
+    Play a video file.  File should be placed in the <code>FMV</code> folder.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">fileName</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         Video file name.  Can be provided without extension, if type is mp4, mkv, mov or avi.
+        </li>
+        <li><span class="parameter">background</span>
+            <span class="types"><span class="type">bool</span></span>
+         Play video in the background mode.
+ In such case, video won't play in fullscreen, but must be shown using special animated texture type in Tomb Editor, or using <a href="../2 classes/View.DisplaySprite.html#">View.DisplaySprite</a>.
+         <em>Default: false.</em>
+        </li>
+        <li><span class="parameter">silent</span>
+            <span class="types"><span class="type">bool</span></span>
+         Play video without sound.
+         <em>Default: false.</em>
+        </li>
+        <li><span class="parameter">loop</span>
+            <span class="types"><span class="type">bool</span></span>
+         Play video in a loop.
+         <em>Default: false.</em>
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "StopVideo"></a>
+    <strong>StopVideo()</strong>
+    </dt>
+    <dd>
+    Stop the currently playing video.  Only possible if video is playing in the background mode.
+
+
+
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetVideoPosition"></a>
+    <strong>GetVideoPosition()</strong>
+    </dt>
+    <dd>
+    Gets the currently playing video position.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Time.html#">Time</a></span>
+        Current video position.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "SetVideoPosition"></a>
+    <strong>SetVideoPosition(position)</strong>
+    </dt>
+    <dd>
+    Sets the currently playing video position.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">position</span>
+            <span class="types"><a class="type" href="../3 primitive classes/Time.html#">Time</a></span>
+         New video position.
+        </li>
+    </ul>
+
+
+
+
+
+</dd>
+    <dt>
+    <a name = "GetVideoDominantColor"></a>
+    <strong>GetVideoDominantColor()</strong>
+    </dt>
+    <dd>
+    Gets the dominant color for the current video frame.  If no video is playing, returns black.
+
+
+
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><a class="type" href="../3 primitive classes/Color.html#">Color</a></span>
+        Dominant video color.
+    </ol>
+
+
+
+
+</dd>
+    <dt>
+    <a name = "IsVideoPlaying"></a>
+    <strong>IsVideoPlaying([name])</strong>
+    </dt>
+    <dd>
+    Checks if video is currently playing.
+
+
+
+    <h3>Parameters:</h3>
+    <ul>
+        <li><span class="parameter">name</span>
+            <span class="types"><a class="type" href="https://www.lua.org/manual/5.4/manual.html#6.4">string</a></span>
+         Video file name. If provided, checks if the currently playing video file name is the same as the provided one.
+         <em>Optional.</em>
+        </li>
+    </ul>
+
+    <h3>Returns:</h3>
+    <ol>
+
+           <span class="types"><span class="type">bool</span></span>
+        True if video is currently playing.
+    </ol>
 
 
 

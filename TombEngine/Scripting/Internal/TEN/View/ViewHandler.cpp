@@ -12,6 +12,7 @@
 #include "Scripting/Internal/TEN/Objects/Room/RoomObject.h"
 #include "Scripting/Internal/TEN/Types/Color/Color.h"
 #include "Scripting/Internal/TEN/Types/Rotation/Rotation.h"
+#include "Scripting/Internal/TEN/Types/Time/Time.h"
 #include "Scripting/Internal/TEN/Types/Vec3/Vec3.h"
 #include "Scripting/Internal/TEN/View/AlignModes.h"
 #include "Scripting/Internal/TEN/View/CameraTypes.h"
@@ -19,10 +20,14 @@
 #include "Scripting/Internal/TEN/View/ScaleModes.h"
 #include "Scripting/Internal/TEN/View/PostProcessEffects.h"
 #include "Specific/clock.h"
+#include "Specific/Video/Video.h"
+#include "Specific/trutils.h"
 
 using namespace TEN::Effects::Environment;
 using namespace TEN::Scripting::DisplaySprite;
 using namespace TEN::Scripting::View;
+using namespace TEN::Utils;
+using namespace TEN::Video;
 
 using TEN::Renderer::g_Renderer;
 
@@ -109,6 +114,59 @@ namespace TEN::Scripting::View
 	{
 		UseSpotCam = true;
 		InitializeSpotCam(seqID);
+	}
+
+	static void PlayVideo(const std::string& fileName, TypeOrNil<bool> background, TypeOrNil<bool> silent, TypeOrNil<bool> loop)
+	{
+		auto mode = ValueOr<bool>(background, false) ? VideoPlaybackMode::Background : VideoPlaybackMode::Exclusive;
+		g_VideoPlayer.Play(fileName, mode, ValueOr<bool>(silent, false), ValueOr<bool>(loop, false));
+	}
+
+	static void StopVideo()
+	{
+		g_VideoPlayer.Stop();
+	}
+
+	static Time GetVideoPosition()
+	{
+		if (!g_VideoPlayer.IsPlaying())
+		{
+			TENLog("Attempted to get video position while video is not playing.", LogLevel::Warning);
+			return 0;
+		}
+
+		return g_VideoPlayer.GetPosition();
+	}
+
+	static void SetVideoPosition(Time frameCount)
+	{
+		if (!g_VideoPlayer.IsPlaying())
+		{
+			TENLog("Attempted to set video position while video is not playing.", LogLevel::Warning);
+			return;
+		}
+
+		g_VideoPlayer.SetPosition(frameCount);
+		return;
+	}
+
+	static ScriptColor GetVideoDominantColor()
+	{
+		return g_VideoPlayer.GetDominantColor();
+	}
+
+	static bool IsVideoPlaying(sol::optional<std::string> name)
+	{
+		bool isPlaying = g_VideoPlayer.IsPlaying();
+
+		if (!isPlaying || !name.has_value())
+			return isPlaying;
+
+		// Get the current playing video filename from the full path.
+		auto filePath = std::filesystem::path(g_VideoPlayer.GetFileName());
+		auto currentVideoName = ToLower(filePath.filename().string());
+
+		return (currentVideoName == ToLower(name.value()));
 	}
 
 	static Vec3 GetFlybyPosition(int seqID, float progress, TypeOrNil<bool> loop)
@@ -234,6 +292,40 @@ namespace TEN::Scripting::View
 		//@function SetPostProcessTint
 		//@tparam Color tint value to use.
 		tableView.set_function(ScriptReserved_SetPostProcessTint, &SetPostProcessTint);
+
+		/// Play a video file. File should be placed in the `FMV` folder.
+		// @function PlayVideo
+		// @tparam string fileName Video file name.  Can be provided without extension, if type is mp4, mkv, mov or avi.
+		// @tparam[opt=false] bool background Play video in the background mode.
+		// In such case, video won't play in fullscreen, but must be shown using special animated texture type in Tomb Editor, or using @{View.DisplaySprite}.
+		// @tparam[opt=false] bool silent Play video without sound.
+		// @tparam[opt=false] bool loop Play video in a loop.
+		tableView.set_function(ScriptReserved_PlayVideo, &PlayVideo);
+
+		/// Stop the currently playing video. Only possible if video is playing in the background mode.
+		// @function StopVideo
+		tableView.set_function(ScriptReserved_StopVideo, &StopVideo);
+
+		/// Gets the currently playing video position.
+		// @function GetVideoPosition
+		// @treturn Time Current video position.
+		tableView.set_function(ScriptReserved_GetVideoPosition, &GetVideoPosition);
+
+		/// Sets the currently playing video position.
+		// @function SetVideoPosition
+		// @tparam Time position New video position.
+		tableView.set_function(ScriptReserved_SetVideoPosition, &SetVideoPosition);
+
+		/// Gets the dominant color for the current video frame. If no video is playing, returns black.
+		// @function GetVideoDominantColor
+		// @treturn Color Dominant video color.
+		tableView.set_function(ScriptReserved_GetVideoDominantColor, &GetVideoDominantColor);
+
+		/// Checks if video is currently playing.
+		// @function IsVideoPlaying
+		// @tparam[opt] string name Video file name. If provided, checks if the currently playing video file name is the same as the provided one.
+		// @treturn bool True if video is currently playing.
+		tableView.set_function(ScriptReserved_IsVideoPlaying, &IsVideoPlaying);
 
 		/// Play a flyby sequence.
 		// @function PlayFlyby

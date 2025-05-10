@@ -40,6 +40,7 @@
 #include "Specific/clock.h"
 #include "Specific/level.h"
 #include "Specific/savegame/flatbuffers/ten_savegame_generated.h"
+#include "Specific/Video/Video.h"
 
 using namespace flatbuffers;
 using namespace TEN::Collision::Floordata;
@@ -53,6 +54,7 @@ using namespace TEN::Entities::Switches;
 using namespace TEN::Entities::TR4;
 using namespace TEN::Gui;
 using namespace TEN::Renderer;
+using namespace TEN::Video;
 
 namespace Save = TEN::Save;
 
@@ -293,6 +295,15 @@ const std::vector<byte> SaveGame::Build()
 	sgGameStatisticsBuilder.add_timer(SaveGame::Statistics.Game.TimeTaken);
 	auto gameStatisticsOffset = sgGameStatisticsBuilder.Finish();
 
+	// Background video playback
+	auto videoNameOffset = fbb.CreateString(g_VideoPlayer.GetFileName());
+	Save::VideoInfoBuilder sgVideoInfoBuilder{ fbb };
+	sgVideoInfoBuilder.add_name(videoNameOffset);
+	sgVideoInfoBuilder.add_position(g_VideoPlayer.GetNormalizedPosition());
+	sgVideoInfoBuilder.add_silent(g_VideoPlayer.GetSilent());
+	sgVideoInfoBuilder.add_looped(g_VideoPlayer.GetLooped());
+	auto videoInfoOffset = sgVideoInfoBuilder.Finish();
+
 	// Lara
 	std::vector<int> puzzles;
 	for (int i = 0; i < NUM_PUZZLES; i++)
@@ -472,7 +483,6 @@ const std::vector<byte> SaveGame::Build()
 	Save::WeaponControlDataBuilder weaponControl{ fbb };
 	weaponControl.add_weapon_item(Lara.Control.Weapon.WeaponItem);
 	weaponControl.add_has_fired(Lara.Control.Weapon.HasFired);
-	weaponControl.add_fired(Lara.Control.Weapon.Fired);
 	weaponControl.add_uzi_left(Lara.Control.Weapon.UziLeft);
 	weaponControl.add_uzi_right(Lara.Control.Weapon.UziRight);
 	weaponControl.add_gun_type((int)Lara.Control.Weapon.GunType);
@@ -951,7 +961,7 @@ const std::vector<byte> SaveGame::Build()
 		fireflySave.add_b(firefly.b);
 		fireflySave.add_on(firefly.on);
 		fireflySave.add_size(firefly.size);
-		fireflySave.add_rot_Ang(firefly.rotAng);
+		fireflySave.add_rot_ang(firefly.rotAng);
 
 		auto fireflySaveOffset = fireflySave.Finish();
 		fireflySwarm.push_back(fireflySaveOffset);
@@ -1010,7 +1020,7 @@ const std::vector<byte> SaveGame::Build()
 	// Action queue
 	std::vector<int> actionQueue;
 	for (int i = 0; i < ActionQueueMap.size(); i++)
-		actionQueue.push_back((int)ActionQueueMap[(InputActionID)i]);
+		actionQueue.push_back((int)ActionQueueMap[(ActionID)i]);
 	auto actionQueueOffset = fbb.CreateVector(actionQueue);
 
 	// Flipmaps
@@ -1071,7 +1081,6 @@ const std::vector<byte> SaveGame::Build()
 			Save::StaticMeshInfoBuilder staticMesh{ fbb };
 
 			staticMesh.add_pose(&FromPose(room->mesh[j].pos));
-			staticMesh.add_scale(room->mesh[j].scale);
 			staticMesh.add_color(&FromVector4(room->mesh[j].color));
 
 			staticMesh.add_flags(room->mesh[j].flags);
@@ -1589,8 +1598,8 @@ const std::vector<byte> SaveGame::Build()
 	sgb.add_postprocess_strength(g_Renderer.GetPostProcessStrength());
 	sgb.add_postprocess_tint(&FromVector3(g_Renderer.GetPostProcessTint()));
 	sgb.add_soundtracks(soundtrackOffset);
-
 	sgb.add_cd_flags(soundtrackMapOffset);
+	sgb.add_video(videoInfoOffset);
 	sgb.add_action_queue(actionQueueOffset);
 	sgb.add_flip_maps(flipMapsOffset);
 	sgb.add_flip_stats(flipStatsOffset);
@@ -1833,6 +1842,8 @@ static void ParseLua(const Save::SaveGame* s, bool hubMode)
 	// Global level data
 
 	auto* level = (Level*)g_GameFlow->GetLevel(CurrentLevel);
+
+	level->LevelFarView = s->level_data()->level_far_view();
 
 	level->Fog.MaxDistance = s->level_data()->fog_max_distance();
 	level->Fog.MinDistance = s->level_data()->fog_min_distance();
@@ -2123,7 +2134,6 @@ static void ParsePlayer(const Save::SaveGame* s)
 	Lara.Control.Weapon.GunType = (LaraWeaponType)s->lara()->control()->weapon()->gun_type();
 	Lara.Control.Weapon.HasFired = s->lara()->control()->weapon()->has_fired();
 	Lara.Control.Weapon.Interval = s->lara()->control()->weapon()->interval();
-	Lara.Control.Weapon.Fired = s->lara()->control()->weapon()->fired();
 	Lara.Control.Weapon.LastGunType = (LaraWeaponType)s->lara()->control()->weapon()->last_gun_type();
 	Lara.Control.Weapon.RequestGunType = (LaraWeaponType)s->lara()->control()->weapon()->request_gun_type();
 	Lara.Control.Weapon.HolsterInfo.BackHolster = (HolsterSlot)s->lara()->control()->weapon()->holster_info()->back_holster();
@@ -2305,6 +2315,14 @@ static void ParseEffects(const Save::SaveGame* s)
 		PlaySoundTrack(track->name()->str(), (SoundTrackType)i, track->position(), SOUND_XFADETIME_LEVELJUMP);
 	}
 
+	// Restore video playback.
+	std::string videoName = s->video()->name()->str();
+	if (!videoName.empty())
+	{
+		g_VideoPlayer.Play(videoName, VideoPlaybackMode::Background, s->video()->silent(), s->video()->looped());
+		g_VideoPlayer.SetNormalizedPosition(s->video()->position());
+	}
+
 	// Load fish swarm.
 	for (int i = 0; i < s->fish_swarm()->size(); i++)
 	{
@@ -2354,7 +2372,7 @@ static void ParseEffects(const Save::SaveGame* s)
 		firefly.b = fireflySave->b();
 		firefly.on = fireflySave->on();
 		firefly.size = fireflySave->size();
-		firefly.rotAng = fireflySave->rot_Ang();
+		firefly.rotAng = fireflySave->rot_ang();
 
 		FireflySwarm.push_back(firefly);
 	}
@@ -2501,7 +2519,6 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 
 		room->mesh[number].pos = ToPose(*staticMesh->pose());
 		room->mesh[number].roomNumber = staticMesh->room_number();
-		room->mesh[number].scale = staticMesh->scale();
 		room->mesh[number].color = ToVector4(staticMesh->color());
 
 		room->mesh[number].flags = staticMesh->flags();
@@ -2563,7 +2580,7 @@ static void ParseLevel(const Save::SaveGame* s, bool hubMode)
 	for (int i = 0; i < s->action_queue()->size(); i++)
 	{
 		TENAssert(i < ActionQueueMap.size(), "Action queue size was changed.");
-		ActionQueueMap[(InputActionID)i] = (ActionQueueState)s->action_queue()->Get(i);
+		ActionQueueMap[(ActionID)i] = (ActionQueueState)s->action_queue()->Get(i);
 	}
 
 	// Legacy soundtrack map.

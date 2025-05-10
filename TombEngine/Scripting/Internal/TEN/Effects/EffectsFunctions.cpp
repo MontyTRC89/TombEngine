@@ -287,7 +287,6 @@ namespace TEN::Scripting::Effects
 	// @tfield[opt=TEN.Effects.ParticleAnimationType.LOOP] Effects.ParticleAnimationType animType Animation type of the sprite sequence.
 	// @tfield[opt=1] float frameRate Sprite sequence animation framerate.
 	// @tfield[opt=Rotation(0&#44; 0&#44; 0)] Rotation drawRot Sprite orientation in degrees.
-
 	static void EmitAdvancedParticle(const sol::table& table)
 	{
 		constexpr auto DEFAULT_START_SIZE = 10.0f;
