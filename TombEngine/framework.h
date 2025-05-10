@@ -56,8 +56,10 @@ using namespace DirectX::SimpleMath;
 // =========
 
 #include "Types.h"
-
 #include "Game/Debug/Debug.h"
-#include "Physics/Physics.h"
 
 using namespace TEN::Debug;
+
+#include "Physics/Physics.h"
+
+using namespace TEN::Physics;
