@@ -475,6 +475,24 @@ namespace TEN::Scripting::Effects
 		SpawnDynamicSpotLight(pos.ToVector3(), dir.ToVector3(), color, rad, fallOff, dist, ValueOr<bool>(castShadows, false), GetHash(ValueOr<std::string>(name, std::string())));
 	}
 
+	/// Emit dynamic fogbulb that lasts for a single frame.
+	// If you want a fogbulb that sticks around, you must call this each frame.
+	// @function EmitFxFog
+	// @tparam Vec3 pos position of the fogbulb
+	// @tparam[opt] int radius measured in "clicks" or 256 world units (default 20)
+	// @tparam[opt] float density from 0.0f to 1.0f (default 1.0f)
+	// @tparam[opt] Color color (default Color(255, 255, 255))
+	// @tparam[opt] string name if provided, engine will interpolate this light for high framerate mode (be careful not to use same name for different fogbulbs)
+	static void EmitFxFog(Vec3 pos, TypeOrNil<int> radius, TypeOrNil<float> density, TypeOrNil<ScriptColor> col, TypeOrNil<std::string> name)
+	{
+		constexpr auto DEFAULT_DENSITY = 1.0f;
+
+		auto color = ValueOr<ScriptColor>(col, ScriptColor(255, 255, 255));
+		int rad = (float)(ValueOr<int>(radius, 20) * BLOCK(0.25f));
+		int dens = (float)(ValueOr<float>(density, DEFAULT_DENSITY));
+		SpawnDynamicFogBulb(pos.ToVector3(), rad, dens, color, GetHash(ValueOr<std::string>(name, std::string())));
+	}
+
 	/// Emit blood.
 	// @function EmitBlood
 	// @tparam Vec3 pos
@@ -594,6 +612,7 @@ namespace TEN::Scripting::Effects
 		tableEffects.set_function(ScriptReserved_EmitShockwave, &EmitShockwave);
 		tableEffects.set_function(ScriptReserved_EmitLight, &EmitLight);
 		tableEffects.set_function(ScriptReserved_EmitSpotLight, &EmitSpotLight);
+		tableEffects.set_function(ScriptReserved_EmitFxFog, &EmitFxFog);
 		tableEffects.set_function(ScriptReserved_EmitBlood, &EmitBlood);
 		tableEffects.set_function(ScriptReserved_EmitAirBubble, &EmitAirBubble);
 		tableEffects.set_function(ScriptReserved_EmitStreamer, &EmitStreamer);

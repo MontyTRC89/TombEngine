@@ -777,7 +777,7 @@ namespace TEN::Entities
 		if (obj->loaded)
 		{
 			obj->control = ControlChain;
-			obj->collision = GenericSphereBoxCollision;
+			obj->collision = CollideChain;	
 			obj->SetHitEffect(true);
 		}
 
