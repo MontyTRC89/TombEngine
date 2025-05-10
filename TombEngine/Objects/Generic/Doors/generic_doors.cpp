@@ -19,6 +19,7 @@
 #include "Game/pickup/pickup.h"
 #include "Objects/Generic/Switches/cog_switch.h"
 #include "Objects/objectslist.h"
+#include "Physics/Physics.h"
 #include "Sound/sound.h"
 #include "Specific/Input/Input.h"
 #include "Specific/level.h"
@@ -27,6 +28,7 @@ using namespace TEN::Collision::Room;
 using namespace TEN::Collision::Sphere;
 using namespace TEN::Gui;
 using namespace TEN::Input;
+using namespace TEN::Physics;
 
 namespace TEN::Entities::Doors
 {

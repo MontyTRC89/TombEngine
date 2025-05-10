@@ -1,12 +1,14 @@
 #pragma once
 
 #include "Math/Math.h"
+#include "Physics/Physics.h"
 
 class GameVector;
 struct ItemInfo;
 struct MESH_INFO;
 
 using namespace TEN::Math;
+using namespace TEN::Physics;
 
 namespace TEN::Collision::Los
 {

@@ -10,6 +10,7 @@
 #include "Math/Math.h"
 #include "Objects/game_object_ids.h"
 #include "Objects/Generic/Doors/generic_doors.h"
+#include "Physics/Physics.h"
 #include "Renderer/Renderer.h"
 #include "Specific/level.h"
 #include "Specific/trutils.h"
@@ -19,6 +20,7 @@ using namespace TEN::Collision::Point;
 using namespace TEN::Collision::Room;
 using namespace TEN::Entities::Doors;
 using namespace TEN::Math;
+using namespace TEN::Physics;
 using namespace TEN::Renderer;
 using namespace TEN::Utils;
 

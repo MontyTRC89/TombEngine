@@ -59,7 +59,3 @@ using namespace DirectX::SimpleMath;
 #include "Game/Debug/Debug.h"
 
 using namespace TEN::Debug;
-
-#include "Physics/Physics.h"
-
-using namespace TEN::Physics;

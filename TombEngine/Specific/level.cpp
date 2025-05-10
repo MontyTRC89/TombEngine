@@ -20,6 +20,7 @@
 #include "Game/spotcam.h"
 #include "Objects/Generic/Doors/generic_doors.h"
 #include "Objects/Sink.h"
+#include "Physics/Physics.h"
 #include "Renderer/Renderer.h"
 #include "Scripting/Include/Flow/ScriptInterfaceFlowHandler.h"
 #include "Scripting/Include/Objects/ScriptInterfaceObjectsHandler.h"
@@ -30,6 +31,7 @@
 #include "Specific/trutils.h"
 #include "Specific/winmain.h"
 
+using namespace TEN::Physics;
 using TEN::Renderer::g_Renderer;
 
 using namespace TEN::Entities::Doors;

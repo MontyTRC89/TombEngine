@@ -9,11 +9,13 @@
 #include "Math/Math.h"
 #include "Objects/Generic/Object/Pushable/PushableInfo.h"
 #include "Objects/Generic/Object/Pushable/PushableObject.h"
+#include "Physics/Physics.h"
 
 // TODO: Uncomment when attractors are complete.
 //using namespace TEN::Colllision::Attractor;
 using namespace TEN::Collision::Room;
 using namespace TEN::Math;
+using namespace TEN::Physics;
 
 namespace TEN::Entities::Generic
 {

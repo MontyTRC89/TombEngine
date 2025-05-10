@@ -1,9 +1,12 @@
 #pragma once
 
 #include "Game/collision/floordata.h"
+#include "Physics/Physics.h"
 
 struct ItemInfo;
 namespace TEN::Physics { class CollisionMesh; }
+
+using namespace TEN::Physics;
 
 struct DOORPOS_DATA
 {
