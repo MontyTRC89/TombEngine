@@ -615,7 +615,7 @@ enum LaraAnim
 	LA_LADDER_LEFT_CORNER_INNER_START = 367,				// Ladder around inner left corner
 	LA_LADDER_LEFT_CORNER_INNER_END = 368,
 	LA_LADDER_RIGHT_CORNER_INNER_START = 369,				// Ladder around inner right corner
-	LA_UNUSED = 370,										// Unused.
+	LA_LADDER_RIGHT_CORNER_INNER_END = 370,					// Unused.
 	LA_JUMP_UP_TO_ROPE_START = 371,							// Jump up > rope idle (1/2)
 	LA_TRAIN_OVERBOARD_DEATH = 372,							// Train overboard death
 	LA_JUMP_UP_TO_ROPE_END = 373,							// Jump up > rope idle (2/2)
@@ -828,12 +828,12 @@ enum LaraAnim
 	// 569-598 reserved for ladder object. -- Sezz 2023.04.16
 
 	LA_UNDERWATER_WALL_KICK = 599,			// Lara kick wall underwater.
-	LA_WALL_PUSH = 600,						// Lara Push Wall.
-	LA_WALL_LEVER_SWITCH = 601,				// Use underwater level above ground
+	LA_WALL_PUSH = 600,						// Lara Push Wall above ground.
+	LA_WALL_LEVER_SWITCH = 601,				// Use lever above ground
 	LA_UNDERWATER_PULLEY_GRAB = 602,		// Grab underwater pulley
 	LA_UNDERWATER_PULLEY_PULL = 603,		// Pull underwater pulley		
 	LA_UNDERWATER_PULLEY_UNGRAB = 604,		// Release underwater pulley
-	LA_CEILING_LEVER_SWITCH = 605,			// Use underwater ceiling switch above ground
+	LA_CEILING_LEVER_SWITCH = 605,			// Use ceiling switch above ground
 
 	//ADD NEW ANIMATIONS HERE
 

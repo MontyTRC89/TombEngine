@@ -19,6 +19,7 @@
 #include "Game/Setup.h"
 #include "Game/spotcam.h"
 #include "Objects/Generic/Switches/generic_switch.h"
+#include "Objects/Generic/Switches/pulley_switch.h"
 #include "Objects/Generic/puzzles_keys.h"
 #include "Objects/objectslist.h"
 #include "Objects/TR3/Vehicles/kayak.h"
@@ -176,39 +177,8 @@ bool SwitchTrigger(short itemNumber, short timer)
 		return false;
 
 	//Handle Pulley
-	if (item.ObjectNumber == ID_PULLEY &&
-		item.ItemFlags[5] != 0 && item.ItemFlags[4] == 1 &&
-		player.Control.HandStatus != HandStatus::Busy)
-	{
-		item.Flags |= IFLAG_ACTIVATION_MASK;
-		item.Status = ITEM_ACTIVE;
-		item.ItemFlags[5] = 0;
-		return true;
-	}
-
-	if (item.ObjectNumber == ID_PULLEY &&
-		item.ItemFlags[5] != 0 && item.ItemFlags[4] == 0 &&
-		player.Control.HandStatus != HandStatus::Busy)
-	{
-		if (timer > 0)
-		{
-			item.Timer = timer;
-			item.Status = ITEM_ACTIVE;
-			item.ItemFlags[5] = 0;
-			if (timer != 1)
-				item.Timer = FPS * timer;
-
-			return true;
-		}
-
-		item.Flags |= IFLAG_ACTIVATION_MASK;
-		item.Status = ITEM_DEACTIVATED;
-		item.ItemFlags[5] = 0;
-		return true;
-	}
-
 	if (item.ObjectNumber == ID_PULLEY)
-		return false;
+		TriggerPulley(itemNumber, timer);
 
 	// Handle switches.
 	if (item.Status == ITEM_DEACTIVATED)

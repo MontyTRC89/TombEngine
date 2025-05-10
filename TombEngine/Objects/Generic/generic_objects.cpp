@@ -321,16 +321,13 @@ void StartDoors(ObjectInfo* object)
 		}
 	}
 
-	for (int i = ID_BREAKABLE_WALL1; i <= ID_BREAKABLE_WALL4; i++)
+	object = &Objects[ID_BREAKABLE_WALL];
+	if (object->loaded)
 	{
-		object = &Objects[i];
-		if (object->loaded)
-		{
-			object->Initialize = InitializeDoor;
-			object->collision = BreakableWallCollision;
-			object->control = PushPullKickDoorControl;
-			object->SetHitEffect(true);
-		}
+		object->Initialize = InitializeDoor;
+		object->collision = BreakableWallCollision;
+		object->control = PushPullKickDoorControl;
+		object->SetHitEffect(true);
 	}
 
 	for (int objectID = ID_PUSHPULL_DOOR1; objectID <= ID_KICK_DOOR4; objectID++)
