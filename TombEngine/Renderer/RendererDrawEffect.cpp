@@ -565,14 +565,28 @@ namespace TEN::Renderer
 				spriteIndex = std::clamp(spriteIndex, 0, (int)_sprites.size());
 
 				auto* sprite = particle.SpriteID == VIDEO_SPRITE_ID ? &_videoSprite : &_sprites[spriteIndex];
+				
+				if (particle.flags & SP_CONSTRAINED)
+				{
 
-				AddSpriteBillboard(
-					sprite,
-					pos,
-					Color(particle.r / (float)UCHAR_MAX, particle.g / (float)UCHAR_MAX, particle.b / (float)UCHAR_MAX, 1.0f),
-					TO_RAD(particle.rotAng << 4), particle.scalar,
-					Vector2(particle.size, particle.size),
-					particle.blendMode, true, view);
+					AddSpriteBillboardRotated(
+						sprite,
+						pos,
+						Color(particle.r / (float)UCHAR_MAX, particle.g / (float)UCHAR_MAX, particle.b / (float)UCHAR_MAX, 1.0f),
+						TO_RAD(particle.rotAng << 4),
+						particle.scalar,
+						Vector2(particle.size, particle.size), particle.blendMode, particle.constraint, true, view);
+				}
+				else
+				{
+					AddSpriteBillboard(
+						sprite,
+						pos,
+						Color(particle.r / (float)UCHAR_MAX, particle.g / (float)UCHAR_MAX, particle.b / (float)UCHAR_MAX, 1.0f),
+						TO_RAD(particle.rotAng << 4), particle.scalar,
+						Vector2(particle.size, particle.size),
+						particle.blendMode, true, view);
+				}
 			}
 			else
 			{
@@ -1449,6 +1463,20 @@ namespace TEN::Renderer
 		{
 			auto translationMatrix = Matrix::CreateTranslation(spritePos);
 			auto rotMatrix = Matrix::CreateRotationZ(sprite.Rotation) * Matrix::CreateLookAt(Vector3::Zero, sprite.LookAtAxis, Vector3::UnitZ);
+			spriteMatrix = scaleMatrix * rotMatrix * translationMatrix;
+		}
+		break;
+
+		case SpriteType::RotatedBillboard:
+		{
+			auto translationMatrix = Matrix::CreateTranslation(spritePos);
+
+			auto rotX = Matrix::CreateRotationX(sprite.LookAtAxis.x);
+			auto rotY = Matrix::CreateRotationY(sprite.LookAtAxis.y);
+			auto rotZ = Matrix::CreateRotationZ(sprite.LookAtAxis.z);
+
+			auto rotMatrix = rotX * rotY * rotZ;
+
 			spriteMatrix = scaleMatrix * rotMatrix * translationMatrix;
 		}
 		break;

@@ -136,7 +136,8 @@ enum class SpriteType
 	Billboard,
 	ThreeD,
 	CustomBillboard,
-	LookAtBillboard
+	LookAtBillboard,
+	RotatedBillboard
 };
 
 enum class RendererDebugPage
