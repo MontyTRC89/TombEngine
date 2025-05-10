@@ -157,7 +157,7 @@ struct LEVEL
 	std::vector<ANIMATED_TEXTURES_SEQUENCE> AnimatedTexturesSequences = {};
 };
 
-extern const std::vector<GAME_OBJECT_ID> BRIDGE_MOVEABLE_SLOT_IDS;
+extern const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS;
 
 extern std::vector<int> MoveablesIds;
 extern std::vector<int> SpriteSequencesIds;

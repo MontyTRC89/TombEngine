@@ -36,7 +36,7 @@ using namespace TEN::Entities::Doors;
 using namespace TEN::Input;
 using namespace TEN::Utils;
 
-const std::vector<GAME_OBJECT_ID> BRIDGE_MOVEABLE_SLOT_IDS =
+const std::vector<GAME_OBJECT_ID> BRIDGE_OBJECT_IDS =
 {
 	ID_EXPANDING_PLATFORM,
 

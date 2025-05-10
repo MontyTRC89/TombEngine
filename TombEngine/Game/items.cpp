@@ -195,7 +195,7 @@ bool ItemInfo::IsCreature() const
 
 bool ItemInfo::IsBridge() const
 {
-	return Contains(BRIDGE_MOVEABLE_SLOT_IDS, ObjectNumber);
+	return Contains(BRIDGE_OBJECT_IDS, ObjectNumber);
 }
 
 std::vector<BoundingSphere> ItemInfo::GetSpheres() const
