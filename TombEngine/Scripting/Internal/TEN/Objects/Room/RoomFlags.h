@@ -23,7 +23,7 @@ The following constants are inside RoomFlagID.
  - `COLD`
  - `DAMAGE`
  - `NOLENSFLARE`
-
+ - `NOCAUSTICS`
 @table Objects.RoomFlagID
 */
 
@@ -35,5 +35,6 @@ static const std::unordered_map<std::string, RoomEnvFlags> ROOM_FLAG_IDS
 	{ "WIND", RoomEnvFlags::ENV_FLAG_WIND },
 	{ "COLD", RoomEnvFlags::ENV_FLAG_COLD },
 	{ "DAMAGE", RoomEnvFlags::ENV_FLAG_DAMAGE },
-	{ "NOLENSFLARE", RoomEnvFlags::ENV_FLAG_NO_LENSFLARE }
+	{ "NOLENSFLARE", RoomEnvFlags::ENV_FLAG_NO_LENSFLARE },
+	{ "NOCAUSTICS", RoomEnvFlags::ENV_FLAG_NOCAUSTICS }
 };
